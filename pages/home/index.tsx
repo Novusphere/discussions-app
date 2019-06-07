@@ -8,6 +8,7 @@ import Head from 'next/head'
 //#region Interface Imports
 import {IHomePage, IStore} from '@Interfaces';
 import {HomeActions} from '@Actions';
+import TopNavbar from "@Components/TopNavbar";
 
 //#endregion Interface Imports
 
@@ -23,6 +24,7 @@ export class HomePage extends React.Component<IHomePage.IProps, IHomePage.IState
                 <Head>
                     <title>A decentralized forum | Home</title>
                 </Head>
+                <TopNavbar/>
                 <div className="title">
                     Hello!
                 </div>
