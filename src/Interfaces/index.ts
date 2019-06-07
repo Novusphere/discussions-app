@@ -3,6 +3,8 @@ export { IApp } from '@Interfaces/Pages/App.d.ts';
 export { IHomePage } from '@Interfaces/Pages/Home.d.ts';
 
 // COMPONENT INTERFACES
+export { IMainLayout } from '@Interfaces/Components/MainLayout.d.ts';
+export { ISplashHeader } from '@Interfaces/Components/SplashHeader.d.ts';
 export { IHeading } from '@Interfaces/Components/Heading.d.ts';
 
 // REDUX INTERFACES
