@@ -1,7 +1,7 @@
 import { combineReducers } from 'redux';
 
-import { HomeReducer } from './home';
+import { ActiveCategoryOrTag } from './home';
 
 export default combineReducers({
-	home: HomeReducer
+	home: ActiveCategoryOrTag
 });

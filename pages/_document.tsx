@@ -9,6 +9,12 @@ export default class MyDocument extends Document {
 					<link rel="icon" href="./static/images/atmos2.png" data-vue-meta="true" />
 					<meta charSet="utf-8" />
 				</Head>
+				<style jsx global>{`
+				  body {
+					padding: 0;
+					margin: 0;
+				  }
+				`}</style>
 				<body>
 					<Main />
 					<NextScript />
