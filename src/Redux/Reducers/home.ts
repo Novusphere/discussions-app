@@ -11,16 +11,18 @@ import { IAction, IHomePage } from '@Interfaces';
 
 /**
  * INITIAL_STATE
-*/
+ */
 const INITIAL_STATE: IHomePage.IStateProps = {
-	active: ''
+	category: '',
+	id: '',
+	title: ''
 };
 
 type IMapPayload = IHomePage.Actions.IMapPayload;
 
 /**
  * REDUCER
-*/
+ */
 export const ActiveCategoryOrTag = (state = INITIAL_STATE, action: IAction<IMapPayload>) => {
 	switch (action.type) {
 		case ActionConsts.Home.SetReducer:

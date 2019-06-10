@@ -7,7 +7,8 @@ import * as React from 'react';
 
 //#region Interface Imports
 import { IMainLayout } from '@Interfaces';
-import {SplashHeader} from "@Components";
+import { SplashHeader } from '@Components';
+
 //#endregion Interface Imports
 
 class MainLayout extends React.Component<IMainLayout.IProps, IMainLayout.IState> {
@@ -15,8 +16,7 @@ class MainLayout extends React.Component<IMainLayout.IProps, IMainLayout.IState>
 	constructor(props: IMainLayout.IProps) {
 		super(props);
 
-		this.state = {
-		};
+		this.state = {};
 	}
 
 	public render(): JSX.Element {
@@ -28,6 +28,5 @@ class MainLayout extends React.Component<IMainLayout.IProps, IMainLayout.IState>
 		);
 	}
 }
-
 
 export default MainLayout;

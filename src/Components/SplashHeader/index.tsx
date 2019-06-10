@@ -8,6 +8,6 @@ import './style.scss';
 
 export const SplashHeader = (): JSX.Element => (
 	<div className={'splash'}>
-		<img src={'./static/images/AWnzTB3pyy.png'} alt={'Splash'} />
+		<img src={'/static/images/AWnzTB3pyy.png'} alt={'Splash'} />
 	</div>
 );

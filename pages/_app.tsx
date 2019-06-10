@@ -1,8 +1,8 @@
 //#region Global Imports
-import App, {Container} from 'next/app';
+import App, { Container } from 'next/app';
 import * as React from 'react';
 
-import {Provider} from 'react-redux';
+import { Provider } from 'react-redux';
 import withRedux from 'next-redux-wrapper';
 //#endregion Global Imports
 
@@ -11,36 +11,35 @@ import store from '@Redux/store';
 //#endregion Local Imports
 
 //#region Interface Imports
-import {IApp} from '@Interfaces';
-import {MainLayout} from "@Components";
+import { IApp } from '@Interfaces';
+import { MainLayout } from '@Components';
 
 //#endregion Interface Imports
 
 class MyApp extends App<IApp.IProps> {
-    static async getInitialProps(props: any) {
-        let pageProps = {};
+	public static async getInitialProps(props: any) {
+		let pageProps = {};
 
-        if (props.Component.getInitialProps) {
-            pageProps = await props.Component.getInitialProps(props.ctx);
-        }
+		if (props.Component.getInitialProps) {
+			pageProps = await props.Component.getInitialProps(props.ctx);
+		}
 
-        return {pageProps};
-    }
+		return {pageProps};
+	}
 
+	render(): JSX.Element {
+		const {Component, pageProps, store} = this.props;
 
-    render(): JSX.Element {
-        const {Component, pageProps, store} = this.props;
-
-        return (
-            <Container>
-                <MainLayout>
-                    <Provider store={store}>
-                        <Component {...pageProps} />
-                    </Provider>
-                </MainLayout>
-            </Container>
-        );
-    }
+		return (
+			<Container>
+				<MainLayout>
+					<Provider store={store}>
+						<Component {...pageProps} />
+					</Provider>
+				</MainLayout>
+			</Container>
+		);
+	}
 }
 
 export default withRedux(store)(MyApp);

@@ -13,7 +13,11 @@ declare module IHomePage {
 
 	export interface IState { }
 
-	export interface IStateProps { }
+	export interface IStateProps {
+		category: string;
+		id: string;
+		title: string;
+	}
 
 	export interface IDispatchProps {
 		Map(payload: Actions.IMapPayload): Actions.IMapResponse

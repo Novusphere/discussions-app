@@ -1,4 +1,5 @@
 // PAGE INTERFACES
+export { IThreadView } from '@Interfaces/Pages/ThreadView.d.ts';
 export { IApp } from '@Interfaces/Pages/App.d.ts';
 export { IHomePage } from '@Interfaces/Pages/Home.d.ts';
 
@@ -12,7 +13,7 @@ export { IHeading } from '@Interfaces/Components/Heading.d.ts';
 export { IStore } from '@Interfaces/Redux/Store.d.ts';
 export { IAction } from '@Interfaces/Redux/Action.d.ts';
 
-//SERVICES INTERFACES
+// SERVICES INTERFACES
 export { HttpModel } from '@Interfaces/Services/API/Http.d.ts';
 export { PlanetaryModel } from '@Interfaces/Services/API/Planetary/Planetary';
 export { ApodPayload } from '@Interfaces/Services/API/Planetary/ApodPayload';
