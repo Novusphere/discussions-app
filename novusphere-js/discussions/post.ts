@@ -112,6 +112,8 @@ export default class Post {
     }
 
     private autoImage() {
+        if (!this.content) return;
+        
         const IMAGE_URL = /(.|)http[s]?:\/\/(\w|[:\/\.%-])+\.(png|jpg|jpeg|gif)(\?(\w|[:\/\.%-])+)?(.|)/gi;
         this.content = this.content.replace(IMAGE_URL, (link) => {
             let trimmedLink = link.trim();
