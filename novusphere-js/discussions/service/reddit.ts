@@ -23,6 +23,7 @@ export default class RedditService {
 
     redditDataToPost(data: any): Post {
         let p = new Post('reddit');
+        p.id = toBase10(data.id);
         p.transaction = data.id;
         p.uuid = 'reddit-' + data.id;
         if (data.parent_id) {

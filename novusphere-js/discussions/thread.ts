@@ -63,6 +63,9 @@ export default class Thread {
 
     async normalize() {
         if (!this.openingPost) return;
+
+        await this.importRedditReplies();
+        
         let posts : Post[] = [];
 
         // build the thread

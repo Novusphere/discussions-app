@@ -5,6 +5,7 @@ import RedditService from './service/reddit';
 
 export default class Post {
     // Blockchain Specific
+    id: number;
     transaction: string;
     blockApprox: number; // may not be the *exact* block the transaction occured in but "near" this block
     chain: string;
@@ -62,6 +63,7 @@ export default class Post {
     }
 
     constructor(chain: string) {
+        this.id = ((Math.random() * 0xFFFFFFFF) | 0); // generate random string id
         this.transaction = '';
         this.blockApprox = 0;
         this.chain = chain;
