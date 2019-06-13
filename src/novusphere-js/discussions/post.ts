@@ -120,26 +120,8 @@ export default class Post {
         });
     }
 
-    async importRedditReplies() {
-        if (this.uuid == this.threadUuid && 
-            this.attachment.value && 
-            this.attachment.value.match(REDDIT_URL)) {
-
-            let url = this.attachment.value.split('/');
-            var r = url.findIndex(p => p == 'r');
-
-            if (r > -1) {
-                let rs = new RedditService();
-                let redditPosts = await rs.getThread(this, url[r + 1], url[r + 3]);
-                for (let i = 1; i < redditPosts.length; i++)
-                    this.replies.push(redditPosts[i]);
-            }
-        }
-    }
-
     async normalize() {
         this.autoImage();
-        await this.importRedditReplies();
         await this.attachment.normalize();
     }
 }
