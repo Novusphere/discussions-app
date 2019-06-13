@@ -62,9 +62,6 @@ export default class RedditService {
         for (let i = 0; i < posts.length; i++) {
             posts[i].sub = owner.sub;
             posts[i].threadUuid = owner.threadUuid;
-            if (posts[i].parentUuid == posts[0].uuid) {
-                posts[i].parentUuid = owner.uuid;
-            }
         }
 
         return posts;

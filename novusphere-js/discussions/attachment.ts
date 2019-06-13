@@ -21,11 +21,11 @@ export enum AttachmentType {
 export enum AttachmentDisplay {
     Undefined = '',
     HTML = 'html',
+    Markdown = 'md',
     Link = 'link',
     IFrame = 'iframe',
     MP4 = 'mp4',
     Image = 'img',
-    Tweet = 'tweet'
 }
 
 export class Attachment {
@@ -48,7 +48,7 @@ export class Attachment {
             this.display = AttachmentDisplay.HTML;
         }
         catch (ex) {
-            console.log(ex);    
+            //console.log(ex);    
             return;
         }
     }
@@ -73,8 +73,8 @@ export class Attachment {
             if (this.value.match(YOUTUBE_URL)) {
                 await this.setFromOEmbed(`https://www.youtube.com/oembed?format=json&url=${this.value}`);
             }
-            else if (this.value.match(TWITTER_URL)) {
-                this.display = AttachmentDisplay.Tweet;
+            else if (this.value.match(TWITTER_URL)) {         
+                await this.setFromOEmbed(`https://publish.twitter.com/oembed?format=json&url=${this.value}`);
             }
             else if (this.value.match(DTUBE_URL)) {
                 await this.setFromOEmbed(`https://api.d.tube/oembed?url=${this.value.replace('/#!/', '/')}`);

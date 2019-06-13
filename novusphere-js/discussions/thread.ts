@@ -1,6 +1,7 @@
 import Post from './post';
 import { REDDIT_URL } from "./attachment";
 import RedditService from './service/reddit';
+import { reddit } from '..';
 
 export default class Thread {
     openingPost: Post | undefined;
@@ -56,8 +57,11 @@ export default class Thread {
         if (r > -1) {
             let rs = new RedditService();
             let redditPosts = await rs.getThread(this.openingPost, url[r + 1], url[r + 3]);
-            for (let i = 1; i < redditPosts.length; i++)
-                this.map[redditPosts[i].uuid] = redditPosts[i];
+            if (redditPosts.length > 0) {
+                for (let i = 1; i < redditPosts.length; i++)
+                    this.map[redditPosts[i].uuid] = redditPosts[i];
+                this.openingPost.uuid = redditPosts[0].uuid;
+            }
         }
     }
 
@@ -65,8 +69,8 @@ export default class Thread {
         if (!this.openingPost) return;
 
         await this.importRedditReplies();
-        
-        let posts : Post[] = [];
+
+        let posts: Post[] = [];
 
         // build the thread
         for (var uuid in this.map) {
