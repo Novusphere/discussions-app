@@ -1,15 +1,15 @@
-const YOUTUBE_URL = /https?:\/\/(www\.)?youtu(\.)?be(\.com)?\//i;
-const IMGUR_IMG_URL = /https?:\/\/(www\.)?i\.imgur\.com\//i;
-const REDDIT_IMG_URL = /https?:\/\/(www\.)?i\.redd\.it\//i;
-const TWITTER_URL = /https?:\/\/(www\.)?twitter\.com\//i;
-const DTUBE_URL = /https?:\/\/(www\.)?d\.tube\//;
-const SOUNDCLOUD_URL = /https?:\/\/(www\.)?soundcloud\.com\//;
-const BITCHUTE_URL = /https?:\/\/(www\.)?bitchute\.com\//;
-const TRYBE_URL = /https?:\/\/(www\.)?trybe\.one\//;
-const WHALESHARES_URL = /https?:\/\/(www\.)?whaleshares\.io\//;
-const STEEMIT_URL = /https?:\/\/(www\.)?steemit\.com\//;
+export const YOUTUBE_URL = /https?:\/\/(www\.)?youtu(\.)?be(\.com)?\//i;
+export const IMGUR_IMG_URL = /https?:\/\/(www\.)?i\.imgur\.com\//i;
+export const REDDIT_URL = /https?:\/\/(www\.)?reddit\.com\//i;
+export const TWITTER_URL = /https?:\/\/(www\.)?twitter\.com\//i;
+export const DTUBE_URL = /https?:\/\/(www\.)?d\.tube\//;
+export const SOUNDCLOUD_URL = /https?:\/\/(www\.)?soundcloud\.com\//;
+export const BITCHUTE_URL = /https?:\/\/(www\.)?bitchute\.com\//;
+export const TRYBE_URL = /https?:\/\/(www\.)?trybe\.one\//;
+export const WHALESHARES_URL = /https?:\/\/(www\.)?whaleshares\.io\//;
+export const STEEMIT_URL = /https?:\/\/(www\.)?steemit\.com\//;
 
-const IMAGE_TYPES = /\.(png|jpg|jpeg|gif)$/i;
+export const IMAGE_TYPES = /\.(png|jpg|jpeg|gif)$/i;
 
 export enum AttachmentType {
     Undefined = '',
@@ -32,19 +32,23 @@ export class Attachment {
     value: string;
     type: AttachmentType;
     display: AttachmentDisplay;
-    trusted: boolean;
+    trust_provider: string | undefined;
 
-    private setFromOEmbed(url: string) {
+    private async setFromOEmbed(url: string) {
+        url = 'http://db.novusphere.io/service/cors/?' + url;
+
         let oembed;
         try {
-            oembed = JSON.parse(url);
+            let response = await window.fetch(url);
+            oembed = await response.json();
+
+            this.trust_provider = oembed.provider_url;
             this.value = oembed.html;
             this.type = AttachmentType.Text;
             this.display = AttachmentDisplay.HTML;
-            this.trusted = true;
-
         }
         catch (ex) {
+            console.log(ex);    
             return;
         }
     }
@@ -74,6 +78,8 @@ export class Attachment {
             }
             else if (this.value.match(DTUBE_URL)) {
                 await this.setFromOEmbed(`https://api.d.tube/oembed?url=${this.value.replace('/#!/', '/')}`);
+            } else if (this.value.match(REDDIT_URL)) {
+                await this.setFromOEmbed(`https://www.reddit.com/oembed?url=${this.value}`);
             }
             else if (this.value.match(SOUNDCLOUD_URL)) {
                 await this.setFromOEmbed(`https://soundcloud.com/oembed?format=json&url=${this.value}`);
@@ -104,6 +110,5 @@ export class Attachment {
         this.value = '';
         this.type = AttachmentType.Undefined;
         this.display = AttachmentDisplay.Undefined;
-        this.trusted = false;
     }
 }

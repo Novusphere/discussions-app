@@ -25,10 +25,14 @@ export default class Thread {
         this.openingPost = posts.find(p => p.uuid == threadUuid);
         if (!this.openingPost) throw new Error('No opening post found!');
 
-        for (let i: number = 0; i < posts.length; i++) {
+        for (let i = 0; i < posts.length; i++) {
             const p = posts[i];
             if (p.uuid in this.map) continue;
             this.map[p.uuid] = p;
+
+            // normally, this will be empty, but might be set via Reddit
+            p.replies.forEach(pr => this.map[pr.uuid] = pr);
+
             if (p.parentUuid) {
                 const parent = this.map[p.parentUuid];
                 if (parent) {

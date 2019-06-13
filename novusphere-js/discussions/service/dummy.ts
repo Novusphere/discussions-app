@@ -8,7 +8,7 @@ export default class DummyService {
 
     getPostsForSubs(subs : string[]) : Post[] {
         // regular post, minor markdown, tagged user
-        var post1 = new Post('EOS');
+        var post1 = new Post('eos');
         post1.transaction = 'post19d5762a814d67622ab436f68ef7684a402c5324f533aaf8ae34bcd5586e';
         post1.blockApprox = 1000;
         post1.parentUuid = '';
@@ -27,7 +27,7 @@ export default class DummyService {
         post1.alreadyVoted = true;
 
         // regular post, attachment (youtube url)
-        var post2 = new Post('EOS');
+        var post2 = new Post('eos');
         post2.transaction = 'post29d5762a814d67622ab436f68ef7684a402c5324f533aaf8ae34bcd5586e';
         post2.blockApprox = 1000;
         post2.parentUuid = '';
@@ -44,7 +44,7 @@ export default class DummyService {
         post2.votes = 1;
         post2.attachment.display = AttachmentDisplay.Link;
         post2.attachment.type = AttachmentType.Url;
-        post2.attachment.value = 'https://www.youtube.com/watch?v=7ixxul8h33E';
+        post2.attachment.value = 'https://www.reddit.com/r/eos/comments/bzmk9k/will_voice_tokens_be_airdropped/';
 
 
         return [ post1, post2 ];
