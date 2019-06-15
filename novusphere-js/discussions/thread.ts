@@ -1,7 +1,6 @@
 import Post from './post';
 import { REDDIT_URL } from "./attachment";
 import RedditService from './service/reddit';
-import { reddit } from '..';
 
 export default class Thread {
     openingPost: Post | undefined;

@@ -10,6 +10,8 @@ import { IHomePage, IStore } from '@Interfaces';
 import { HomeActions } from '@Actions';
 import TopNavbar from '@Components/TopNavbar';
 
+//import { init as njsInit, eos } from '../../novusphere-js';
+
 //#endregion Interface Imports
 
 export class HomePage extends React.Component<IHomePage.IProps, IHomePage.IState> {
@@ -18,13 +20,26 @@ export class HomePage extends React.Component<IHomePage.IProps, IHomePage.IState
 		super(props);
 	}
 
+	componentDidMount() {
+		/*(async function() {
+
+			console.log('load');
+			await njsInit();
+			await eos.detectWallet();
+			await eos.login();
+			console.log(eos.auth);
+			console.log(eos.tokens);
+
+		})();*/
+	}
+
 	public render(): JSX.Element {
 		return (
 			<>
 				<Head>
 					<title>A decentralized forum | Home</title>
 				</Head>
-				<TopNavbar/>
+				<TopNavbar />
 				<div className="title">
 					Hello!
 				</div>

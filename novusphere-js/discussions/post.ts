@@ -1,7 +1,6 @@
 //@ts-ignore
 import ecc from 'eosjs-ecc';
-import { Attachment, REDDIT_URL } from './attachment';
-import RedditService from './service/reddit';
+import { Attachment} from './attachment';
 
 export default class Post {
     // Blockchain Specific
@@ -47,7 +46,7 @@ export default class Post {
     }
 
     isOpeningPost(): boolean {
-        return (this.uuid != '' && this.uuid == this.threadUuid);
+        return (this.parentUuid == '');
     }
 
     isAnonymousVerified(): boolean {
@@ -89,6 +88,10 @@ export default class Post {
         this.alreadyVoted = false;
     }
 
+    toAction() : any {
+        return {};
+    }
+
     applyEdit(p: Post) {
         if (!p.edit || p.parentUuid != this.uuid) return;
         if (p.chain != this.chain) return;
@@ -120,7 +123,7 @@ export default class Post {
             if (!trimmedLink.startsWith('http')) {
                 return link;
             }
-            return `<img href="${trimmedLink}" />`;
+            return `![](${trimmedLink})`;
         });
     }
 
