@@ -27,6 +27,7 @@ class DiscussionApp extends App {
 		this.stores = {
 			userStore: Stores('__userStore__', props.userState),
 			uiStore: Stores('__uiStore__', {}),
+			tagStore: Stores('__tagStore__', {}),
 		}
 	}
 

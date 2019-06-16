@@ -7,6 +7,7 @@ interface IMainLayoutProps {
 }
 
 import '../../styles/style.scss';
+import {TitleHeader} from "../index";
 
 @observer
 class MainLayout extends React.Component<IMainLayoutProps> {
@@ -17,9 +18,10 @@ class MainLayout extends React.Component<IMainLayoutProps> {
                     <title>A decentralized forum | Home</title>
                 </Head>
 
-                <div className={'w-100 header-image'}>
+                <div className={'w-100 header-image o-50'}>
                     {this.props.activeBanner}
                 </div>
+                <TitleHeader/>
                 {this.props.children}
             </>
         );

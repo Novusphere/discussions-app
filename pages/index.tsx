@@ -11,14 +11,11 @@ class Index extends React.Component<any, any> {
 	render() {
 
 		return (
-			<div className={'container'}>
+			<>
 				<p>
 					{this.props.userStore.username}
 				</p>
-				<p>
-					You can start now!!!
-				</p>
-			</div>
+			</>
 		);
 	}
 }
