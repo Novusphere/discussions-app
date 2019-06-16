@@ -2,6 +2,7 @@ import App, { Container } from 'next/app'
 import React from 'react'
 import Stores from '../stores';
 import { Provider } from 'mobx-react'
+import {MainLayout} from "../components";
 
 class DiscussionApp extends App {
 	private stores: any;
@@ -33,7 +34,9 @@ class DiscussionApp extends App {
 		return (
 			<Container>
 				<Provider {...this.stores}>
-					<Component {...pageProps} />
+					<MainLayout>
+						<Component {...pageProps} />
+					</MainLayout>
 				</Provider>
 			</Container>
 		)

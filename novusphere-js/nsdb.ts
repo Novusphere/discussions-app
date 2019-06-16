@@ -1,21 +1,6 @@
-class NSDBSettings {
-    nsEndpoint:string;
-    eosEndpoint:string;
-    constructor() {
-        this.nsEndpoint = 'https://db.novusphere.io';
-        this.eosEndpoint = 'https://api.greymass.com';
-    }
-}
+export const DEFAULT_NSDB_ENDPOINT = 'https://db.novusphere.io';
 
-// static shared object for NSDB for settings
-const settings = new NSDBSettings();
-
-export default class NSDB {
-    settings : NSDBSettings;
-
-    constructor() {
-        this.settings = settings;
-    }
+export class NSDB {
 
     query(q : any) : any {
         
