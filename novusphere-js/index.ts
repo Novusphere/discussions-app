@@ -14,7 +14,7 @@ import { Settings } from "./settings";
 const reddit = new RedditService();
 const discussions = new DiscussionService();
 const nsdb = new NSDB();
-const eos = new EOS();
+const eos =  new EOS();
 const settings = new Settings();
 
 export {
@@ -34,5 +34,6 @@ export {
 
 export async function init() {
     await settings.init();
+    if (eos)
     await eos.init(settings.eosNetwork);
 }

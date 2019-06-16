@@ -3,7 +3,14 @@ import scatter from 'eos-transit-scatter-provider';
 import lynx from 'eos-transit-lynx-provider';
 import tokenpocket from 'eos-transit-tokenpocket-provider';
 import meetone from 'eos-transit-meetone-provider';
-import { IToken, getTokens } from './tokens';
+import { IToken, getTokens, IAccountBalance, getAccountTokens } from './tokens';
+
+export const DEFAULT_EOS_NETWORK: NetworkConfig = {
+    host: 'eos.greymass.com',
+    port: 443,
+    protocol: 'https',
+    chainId: 'aca376f206b8fc25a6ed44dbdc66547c36c6c33e3a119ffbeaef943642f0e906'
+}
 
 export class EOS {
     accessContext?: WalletAccessContext;
@@ -125,19 +132,33 @@ export class EOS {
         const tx = (await eos.rpc.history_get_transaction(txid));
         return tx;
     }
-    async login(accountName?: string, permission?: string) {
+    async getToken(account: string, symbol: string): Promise<IToken | undefined> {
+        if (!this.tokens) return undefined;
+        return this.tokens.find(t => t.account == account && t.symbol == symbol);
+    }
+    async getSuggestAccounts(accountPartial: string, limit: number = 10) : Promise<string[]> {
+        let request = await window.fetch(`https://www.api.bloks.io/topholders?account_name[$search]=${accountPartial}&$limit=${limit}`);
+        let json = await request.json();
+        return json.data.map(d => d.account_name);
+    }
+    async getAccountTokens(account: string) : Promise<IAccountBalance[]> {
+        if (!this.tokens) return [];
+        return getAccountTokens(account, this.tokens);
+    }
+    async login(account?: string, permission?: string) {
         if (!this.wallet) return;
-        await this.wallet.login(accountName, permission);
+        await this.wallet.login(account, permission);
+
+        if (this.auth) {
+            window.dispatchEvent(new Event('eosAccountChange'));
+        }
     }
     async logout() {
         if (!this.wallet) return;
         await this.wallet.logout();
-    }
-}
 
-export const DEFAULT_EOS_NETWORK: NetworkConfig = {
-    host: 'eos.greymass.com',
-    port: 443,
-    protocol: 'https',
-    chainId: 'aca376f206b8fc25a6ed44dbdc66547c36c6c33e3a119ffbeaef943642f0e906'
+        if (!this.auth) {
+            window.dispatchEvent(new Event('eosAccountChange'));
+        }
+    }
 }

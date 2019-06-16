@@ -21,15 +21,17 @@ export class HomePage extends React.Component<IHomePage.IProps, IHomePage.IState
 	}
 
 	componentDidMount() {
-		/*(async function() {
-
+		/*(async function () {
 			console.log('load');
-			await njsInit();
-			await eos.detectWallet();
-			await eos.login();
-			console.log(eos.auth);
-			console.log(eos.tokens);
-
+			if (typeof window != undefined) {
+				await njsInit();
+				await eos.detectWallet();
+				await eos.login();
+				if (eos.auth) {
+					console.log(await eos.getAccountTokens(eos.auth.accountName))
+				}
+				console.log(await eos.getSuggestAccounts('novus'));
+			}
 		})();*/
 	}
 
