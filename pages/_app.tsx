@@ -1,45 +1,43 @@
-//#region Global Imports
-import App, { Container } from 'next/app';
-import * as React from 'react';
+import App, { Container } from 'next/app'
+import React from 'react'
+import Stores from '../stores';
+import { Provider } from 'mobx-react'
 
-import { Provider } from 'react-redux';
-import withRedux from 'next-redux-wrapper';
-//#endregion Global Imports
+class DiscussionApp extends App {
+	private stores: any;
 
-//#region Local Imports
-import store from '@Redux/store';
-//#endregion Local Imports
+	static async getInitialProps(ctx) {
+		let userState = null;
+		const isServer = !!ctx.req;
 
-//#region Interface Imports
-import { IApp } from '@Interfaces';
-import { MainLayout } from '@Components';
-
-//#endregion Interface Imports
-
-class MyApp extends App<IApp.IProps> {
-	public static async getInitialProps(props: any) {
-		let pageProps = {};
-
-		if (props.Component.getInitialProps) {
-			pageProps = await props.Component.getInitialProps(props.ctx);
+		if (isServer === true) {
+			const User = Stores('__userStore__',{});
+			userState = User.getUserFromCookie(ctx.req);
 		}
 
-		return {pageProps};
+		return {
+			isServer,
+			userState,
+		};
 	}
 
-	render(): JSX.Element {
-		const {Component, pageProps, store} = this.props;
+	constructor(props) {
+		super(props);
+		this.stores = {
+			userStore: Stores('__userStore__', props.userState),
+		}
+	}
 
+	public render() {
+		const { Component, pageProps } = (this as any).props
 		return (
 			<Container>
-				<MainLayout>
-					<Provider store={store}>
-						<Component {...pageProps} />
-					</Provider>
-				</MainLayout>
+				<Provider {...this.stores}>
+					<Component {...pageProps} />
+				</Provider>
 			</Container>
-		);
+		)
 	}
 }
 
-export default withRedux(store)(MyApp);
+export default DiscussionApp

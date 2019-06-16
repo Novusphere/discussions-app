@@ -1,0 +1,529 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="ChangeListManager">
+    <list default="true" id="2d14133e-344f-4fbf-9bb7-c9e5e96ae697" name="Default Changelist" comment="">
+      <change beforePath="$PROJECT_DIR$/.babelrc" beforeDir="false" afterPath="$PROJECT_DIR$/.babelrc" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.env.test" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/.gitignore" beforeDir="false" afterPath="$PROJECT_DIR$/.gitignore" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.travis.yml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/LICENSE" beforeDir="false" afterPath="$PROJECT_DIR$/LICENSE" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/README.md" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/__mocks__/mocks.js" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/proxy.js" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/routes.js" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/server.js" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/base.json" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/bundles/client.html" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/jest.config.js" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/jest.setup.ts" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/jest.tsconfig.json" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/next.config.js" beforeDir="false" afterPath="$PROJECT_DIR$/next.config.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/package-lock.json" beforeDir="false" afterPath="$PROJECT_DIR$/package-lock.json" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/package.json" beforeDir="false" afterPath="$PROJECT_DIR$/package.json" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/pages/_app.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/pages/_app.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/pages/_document.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/pages/_document.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/pages/home/index.scss" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/pages/home/index.tsx" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/pages/index.ts" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/pages/threadView/index.tsx" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/pages/threadView/style.scss" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/postcss.config.js" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/project-cli/LICENSE" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/project-cli/README.md" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/project-cli/cli.gif" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/project-cli/config.ts" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/project-cli/files/collection.txt" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/project-cli/index.ts" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/project-cli/package-lock.json" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/project-cli/package.json" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/project-cli/src/definations/Defination.d.ts" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/project-cli/src/definations/class-component.ts" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/project-cli/src/definations/common.ts" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/project-cli/src/definations/functional-component.ts" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/project-cli/src/definations/helper.ts" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/project-cli/src/definations/page-component.ts" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/project-cli/src/templates/components/class.mustache" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/project-cli/src/templates/components/functional.mustache" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/project-cli/src/templates/components/hook.mustache" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/project-cli/src/templates/components/index.mustache" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/project-cli/src/templates/interfaces/component-index.d.mustache" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/project-cli/src/templates/interfaces/component.d.mustache" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/project-cli/src/templates/interfaces/page-index.d.mustache" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/project-cli/src/templates/interfaces/redux-import.d.mustache" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/project-cli/src/templates/interfaces/redux-store.d.mustache" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/project-cli/src/templates/reducers/action-const.mustache" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/project-cli/src/templates/reducers/action-index.mustache" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/project-cli/src/templates/reducers/action.mustache" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/project-cli/src/templates/reducers/index.mustache" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/project-cli/src/templates/reducers/reducer.mustache" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/project-cli/src/templates/reducers/store.mustache" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/project-cli/src/templates/routes.mustache" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/project-cli/src/templates/styles.mustache" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/project-cli/test/unit/helper.spec.ts" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/project-cli/test/unit/mock.setup.js" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/project-cli/tsconfig.json" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/project-cli/tslint.json" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/Actions/HomeActions.ts" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/Actions/index.ts" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/Components/MainLayout/index.tsx" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/Components/SplashHeader/index.tsx" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/Components/SplashHeader/style.scss" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/Components/TopNavbar/index.tsx" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/Components/TopNavbar/style.scss" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/Components/index.ts" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/Definations/ActionConsts.ts" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/Definations/index.ts" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/Interfaces/Components/Heading.d.ts" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/Interfaces/Components/MainLayout.d.ts" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/Interfaces/Components/SplashHeader.d.ts" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/Interfaces/Components/TopNavbar.d.ts" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/Interfaces/Pages/App.d.ts" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/Interfaces/Pages/Home.d.ts" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/Interfaces/Pages/ThreadView.d.ts" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/Interfaces/Redux/Action.d.ts" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/Interfaces/Redux/Store.d.ts" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/Interfaces/Services/API/Http.d.ts" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/Interfaces/Services/API/Planetary/ApodPayload.d.ts" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/Interfaces/Services/API/Planetary/ApodResponse.d.ts" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/Interfaces/Services/API/Planetary/Planetary.d.ts" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/Interfaces/index.ts" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/Redux/Reducers/home.ts" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/Redux/Reducers/index.ts" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/Redux/store.ts" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/Services/API/Http.spec.ts" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/Services/API/Http.ts" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/Services/API/Planetary.spec.ts" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/Services/API/Planetary.ts" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/Services/index.ts" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/static/images/AWnzTB3pyy.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/static/images/atmos2.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/tsconfig.json" beforeDir="false" afterPath="$PROJECT_DIR$/tsconfig.json" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/tslint.json" beforeDir="false" />
+    </list>
+    <ignored path="$PROJECT_DIR$/.tmp/" />
+    <ignored path="$PROJECT_DIR$/temp/" />
+    <ignored path="$PROJECT_DIR$/tmp/" />
+    <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
+    <option name="SHOW_DIALOG" value="false" />
+    <option name="HIGHLIGHT_CONFLICTS" value="true" />
+    <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
+    <option name="LAST_RESOLUTION" value="IGNORE" />
+  </component>
+  <component name="FileEditorManager">
+    <splitter split-orientation="horizontal" split-proportion="0.5">
+      <split-first>
+        <leaf SIDE_TABS_SIZE_LIMIT_KEY="300">
+          <file pinned="false" current-in-tab="true">
+            <entry file="file://$PROJECT_DIR$/package.json">
+              <provider selected="true" editor-type-id="text-editor">
+                <state relative-caret-position="496">
+                  <caret line="31" column="25" selection-start-line="31" selection-start-column="25" selection-end-line="31" selection-end-column="25" />
+                </state>
+              </provider>
+            </entry>
+          </file>
+          <file pinned="false" current-in-tab="false">
+            <entry file="file://$PROJECT_DIR$/styles/style.scss">
+              <provider selected="true" editor-type-id="text-editor">
+                <state relative-caret-position="32">
+                  <caret line="2" selection-start-line="2" selection-end-line="2" />
+                </state>
+              </provider>
+            </entry>
+          </file>
+        </leaf>
+      </split-first>
+      <split-second>
+        <splitter split-orientation="vertical" split-proportion="0.5">
+          <split-first>
+            <leaf SIDE_TABS_SIZE_LIMIT_KEY="300">
+              <file pinned="false" current-in-tab="true">
+                <entry file="file://$PROJECT_DIR$/pages/index.tsx">
+                  <provider selected="true" editor-type-id="text-editor">
+                    <state relative-caret-position="160">
+                      <caret line="13" lean-forward="true" selection-start-line="13" selection-end-line="13" />
+                      <folding>
+                        <element signature="e#0#31#0" expanded="true" />
+                      </folding>
+                    </state>
+                  </provider>
+                </entry>
+              </file>
+              <file pinned="false" current-in-tab="false">
+                <entry file="file://$PROJECT_DIR$/pages/_app.tsx">
+                  <provider selected="true" editor-type-id="text-editor">
+                    <state relative-caret-position="153">
+                      <caret line="22" selection-start-line="22" selection-end-line="22" />
+                      <folding>
+                        <element signature="e#0#41#0" expanded="true" />
+                      </folding>
+                    </state>
+                  </provider>
+                </entry>
+              </file>
+              <file pinned="false" current-in-tab="false">
+                <entry file="file://$PROJECT_DIR$/pages/_document.tsx">
+                  <provider selected="true" editor-type-id="text-editor">
+                    <state relative-caret-position="128">
+                      <caret line="8" column="30" selection-start-line="8" selection-start-column="30" selection-end-line="8" selection-end-column="30" />
+                    </state>
+                  </provider>
+                </entry>
+              </file>
+              <file pinned="false" current-in-tab="false">
+                <entry file="file://$PROJECT_DIR$/.babelrc">
+                  <provider selected="true" editor-type-id="text-editor">
+                    <state relative-caret-position="144">
+                      <caret line="9" column="1" selection-start-line="9" selection-start-column="1" selection-end-line="9" selection-end-column="1" />
+                    </state>
+                  </provider>
+                </entry>
+              </file>
+            </leaf>
+          </split-first>
+          <split-second>
+            <leaf>
+              <file pinned="false" current-in-tab="true">
+                <entry file="file://$PROJECT_DIR$/stores/index.ts">
+                  <provider selected="true" editor-type-id="text-editor">
+                    <state relative-caret-position="48">
+                      <caret line="3" column="44" selection-start-line="3" selection-start-column="44" selection-end-line="3" selection-end-column="44" />
+                    </state>
+                  </provider>
+                </entry>
+              </file>
+            </leaf>
+          </split-second>
+        </splitter>
+      </split-second>
+    </splitter>
+  </component>
+  <component name="FindInProjectRecents">
+    <findStrings>
+      <find>banner.jpg</find>
+      <find>TopNavbarReducer</find>
+      <find>object-literal-sort</find>
+      <find>ordered-impo</find>
+      <find>arrow-return-</find>
+      <find>whitespace</find>
+      <find>completed-dics</find>
+      <find>typedef</find>
+      <find>newline</find>
+      <find>no-console</find>
+      <find>no-shadow-ed</find>
+      <find>no-any</find>
+      <find>trailing-comm</find>
+      <find>space</find>
+      <find>trailing</find>
+      <find>align</find>
+      <find>body {</find>
+      <find>8px</find>
+      <find>tachyons</find>
+      <find>array-typ</find>
+      <find>props.dispatch</find>
+    </findStrings>
+  </component>
+  <component name="Git.Settings">
+    <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
+  </component>
+  <component name="IdeDocumentHistory">
+    <option name="CHANGED_PATHS">
+      <list>
+        <option value="$PROJECT_DIR$/README.md" />
+        <option value="$PROJECT_DIR$/.gitignore" />
+        <option value="$PROJECT_DIR$/src/Components/SplashHeader/style.scss" />
+        <option value="$PROJECT_DIR$/tsconfig.json" />
+        <option value="$PROJECT_DIR$/src/Components/TopNavbar/style.scss" />
+        <option value="$PROJECT_DIR$/src/Redux/Reducers/topNavbar.ts" />
+        <option value="$PROJECT_DIR$/src/Redux/store.ts" />
+        <option value="$PROJECT_DIR$/src/Components/SplashHeader/index.tsx" />
+        <option value="$PROJECT_DIR$/src/Interfaces/index.ts" />
+        <option value="$PROJECT_DIR$/src/Interfaces/Pages/ThreadView.d.ts" />
+        <option value="$PROJECT_DIR$/src/Definations/ActionConsts.ts" />
+        <option value="$PROJECT_DIR$/src/Actions/index.ts" />
+        <option value="$PROJECT_DIR$/src/Actions/HomeActions.ts" />
+        <option value="$PROJECT_DIR$/pages/threadView/index.tsx" />
+        <option value="$PROJECT_DIR$/src/Components/TopNavbar/index.tsx" />
+        <option value="$PROJECT_DIR$/pages/_document.tsx" />
+        <option value="$PROJECT_DIR$/src/Components/MainLayout/index.tsx" />
+        <option value="$PROJECT_DIR$/pages/app.scss" />
+        <option value="$PROJECT_DIR$/src/Components/index.ts" />
+        <option value="$PROJECT_DIR$/tslint.json" />
+        <option value="$PROJECT_DIR$/src/Interfaces/Components/SubscribedSubs.d.ts" />
+        <option value="$PROJECT_DIR$/src/Components/SubscribedSubs/index.tsx" />
+        <option value="$PROJECT_DIR$/src/Redux/Reducers/subs.ts" />
+        <option value="$PROJECT_DIR$/src/Redux/Reducers/index.ts" />
+        <option value="$PROJECT_DIR$/src/Interfaces/Redux/Store.d.ts" />
+        <option value="$PROJECT_DIR$/src/Interfaces/Components/SubscribedSubList.d.ts" />
+        <option value="$PROJECT_DIR$/pages/home/index.tsx" />
+        <option value="$PROJECT_DIR$/src/Interfaces/Pages/Home.d.ts" />
+        <option value="$PROJECT_DIR$/src/Redux/Reducers/home.ts" />
+        <option value="$PROJECT_DIR$/next.config.js" />
+        <option value="$PROJECT_DIR$/package.json" />
+        <option value="$PROJECT_DIR$/.babelrc" />
+        <option value="$PROJECT_DIR$/stores/index.ts" />
+        <option value="$PROJECT_DIR$/pages/_app.tsx" />
+        <option value="$PROJECT_DIR$/stores/user.ts" />
+        <option value="$PROJECT_DIR$/pages/styles.scss" />
+        <option value="$PROJECT_DIR$/styles/_base.scss" />
+        <option value="$PROJECT_DIR$/pages/index.tsx" />
+      </list>
+    </option>
+  </component>
+  <component name="ProjectFrameBounds" extendedState="6">
+    <option name="x" value="-8" />
+    <option name="y" value="-8" />
+    <option name="width" value="2576" />
+    <option name="height" value="1416" />
+  </component>
+  <component name="ProjectLevelVcsManager" settingsEditedManually="true">
+    <ConfirmationsSetting value="1" id="Add" />
+  </component>
+  <component name="ProjectView">
+    <navigator proportions="" version="1">
+      <foldersAlwaysOnTop value="true" />
+    </navigator>
+    <panes>
+      <pane id="ProjectPane">
+        <subPane>
+          <expand>
+            <path>
+              <item name="discussions-app" type="b2602c69:ProjectViewProjectNode" />
+              <item name="discussions-app" type="462c0819:PsiDirectoryNode" />
+            </path>
+            <path>
+              <item name="discussions-app" type="b2602c69:ProjectViewProjectNode" />
+              <item name="discussions-app" type="462c0819:PsiDirectoryNode" />
+              <item name="pages" type="462c0819:PsiDirectoryNode" />
+            </path>
+            <path>
+              <item name="discussions-app" type="b2602c69:ProjectViewProjectNode" />
+              <item name="discussions-app" type="462c0819:PsiDirectoryNode" />
+              <item name="stores" type="462c0819:PsiDirectoryNode" />
+            </path>
+            <path>
+              <item name="discussions-app" type="b2602c69:ProjectViewProjectNode" />
+              <item name="discussions-app" type="462c0819:PsiDirectoryNode" />
+              <item name="styles" type="462c0819:PsiDirectoryNode" />
+            </path>
+          </expand>
+          <select />
+        </subPane>
+      </pane>
+      <pane id="Scope" />
+    </panes>
+  </component>
+  <component name="PropertiesComponent">
+    <property name="WebServerToolWindowFactoryState" value="false" />
+    <property name="last_opened_file_path" value="$PROJECT_DIR$/tsconfig.json" />
+    <property name="node.js.detected.package.tslint" value="true" />
+    <property name="node.js.path.for.package.tslint" value="project" />
+    <property name="node.js.selected.package.tslint" value="E:\Work\discussions-app\node_modules\tslint" />
+    <property name="nodejs_interpreter_path.stuck_in_default_project" value="undefined stuck path" />
+    <property name="nodejs_npm_path_reset_for_default_project" value="true" />
+    <property name="nodejs_package_manager_path" value="yarn" />
+    <property name="ts.external.directory.path" value="E:\Work\discussions-app\node_modules\typescript\lib" />
+  </component>
+  <component name="RecentsManager">
+    <key name="MoveFile.RECENT_KEYS">
+      <recent name="E:\Work\discussions-app" />
+    </key>
+  </component>
+  <component name="RunDashboard">
+    <option name="ruleStates">
+      <list>
+        <RuleState>
+          <option name="name" value="ConfigurationTypeDashboardGroupingRule" />
+        </RuleState>
+        <RuleState>
+          <option name="name" value="StatusDashboardGroupingRule" />
+        </RuleState>
+      </list>
+    </option>
+  </component>
+  <component name="SvnConfiguration">
+    <configuration />
+  </component>
+  <component name="TaskManager">
+    <task active="true" id="Default" summary="Default task">
+      <changelist id="2d14133e-344f-4fbf-9bb7-c9e5e96ae697" name="Default Changelist" comment="" />
+      <created>1559870470636</created>
+      <option name="number" value="Default" />
+      <option name="presentableId" value="Default" />
+      <updated>1559870470636</updated>
+      <workItem from="1559870471733" duration="5918000" />
+      <workItem from="1560018496350" duration="1826000" />
+      <workItem from="1560131543569" duration="1174000" />
+      <workItem from="1560187685554" duration="76000" />
+      <workItem from="1560301933549" duration="865000" />
+      <workItem from="1560382222190" duration="53000" />
+      <workItem from="1560475824100" duration="1166000" />
+      <workItem from="1560567310376" duration="3935000" />
+      <workItem from="1560699944594" duration="990000" />
+    </task>
+    <servers />
+  </component>
+  <component name="TimeTrackingManager">
+    <option name="totallyTimeSpent" value="16003000" />
+  </component>
+  <component name="ToolWindowManager">
+    <frame x="-8" y="-8" width="2576" height="1416" extended-state="6" />
+    <editor active="true" />
+    <layout>
+      <window_info active="true" content_ui="combo" id="Project" order="0" visible="true" weight="0.1394799" />
+      <window_info id="Structure" order="1" side_tool="true" weight="0.25" />
+      <window_info id="Favorites" order="2" side_tool="true" />
+      <window_info anchor="bottom" id="Message" order="0" />
+      <window_info anchor="bottom" id="Find" order="1" weight="0.32969603" />
+      <window_info anchor="bottom" id="Run" order="2" />
+      <window_info anchor="bottom" id="Debug" order="3" weight="0.4" />
+      <window_info anchor="bottom" id="Cvs" order="4" weight="0.25" />
+      <window_info anchor="bottom" id="Inspection" order="5" weight="0.4" />
+      <window_info anchor="bottom" id="TODO" order="6" />
+      <window_info anchor="bottom" id="Version Control" order="7" />
+      <window_info anchor="bottom" id="Docker" order="8" show_stripe_button="false" />
+      <window_info anchor="bottom" id="TypeScript" order="9" />
+      <window_info anchor="bottom" id="Terminal" order="10" visible="true" weight="0.26266563" />
+      <window_info anchor="bottom" id="Event Log" order="11" side_tool="true" />
+      <window_info anchor="right" id="Commander" internal_type="SLIDING" order="0" type="SLIDING" weight="0.4" />
+      <window_info anchor="right" id="Ant Build" order="1" weight="0.25" />
+      <window_info anchor="right" content_ui="combo" id="Hierarchy" order="2" weight="0.25" />
+    </layout>
+  </component>
+  <component name="TypeScriptGeneratedFilesManager">
+    <option name="version" value="1" />
+  </component>
+  <component name="editorHistoryManager">
+    <entry file="file://$PROJECT_DIR$/app/server.js" />
+    <entry file="file://$PROJECT_DIR$/README.md" />
+    <entry file="file://$PROJECT_DIR$/base.json" />
+    <entry file="file://$PROJECT_DIR$/src/Interfaces/Components/SplashHeader.d.ts" />
+    <entry file="file://$PROJECT_DIR$/pages/home/index.scss" />
+    <entry file="file://$PROJECT_DIR$/pages/index.ts" />
+    <entry file="file://$PROJECT_DIR$/src/Components/SplashHeader/style.scss" />
+    <entry file="file://$PROJECT_DIR$/src/Interfaces/Components/TopNavbar.d.ts" />
+    <entry file="file://$PROJECT_DIR$/src/Redux/Reducers/topNavbar.ts" />
+    <entry file="file://$PROJECT_DIR$/src/Redux/store.ts" />
+    <entry file="file://$PROJECT_DIR$/src/Interfaces/index.ts" />
+    <entry file="file://$PROJECT_DIR$/src/Definations/ActionConsts.ts" />
+    <entry file="file://$PROJECT_DIR$/src/Actions/index.ts" />
+    <entry file="file://$PROJECT_DIR$/novusphere-js/nsdb.ts" />
+    <entry file="file://$PROJECT_DIR$/app/routes.js" />
+    <entry file="file://$PROJECT_DIR$/src/Components/SplashHeader/index.tsx" />
+    <entry file="file://$PROJECT_DIR$/src/Interfaces/Pages/ThreadView.d.ts" />
+    <entry file="file://$PROJECT_DIR$/src/Services/index.ts" />
+    <entry file="file://$PROJECT_DIR$/novusphere-js/index.ts" />
+    <entry file="file://$PROJECT_DIR$/src/Components/TopNavbar/style.scss" />
+    <entry file="jar://$APPLICATION_HOME_DIR$/plugins/NodeJS/lib/NodeJS.jar!/com/jetbrains/nodejs/packageJson/packageJsonSchema.json">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="319">
+          <caret line="32" column="6" selection-start-line="32" selection-start-column="6" selection-end-line="32" selection-end-column="6" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/pages/app.scss" />
+    <entry file="file://$PROJECT_DIR$/tslint.json" />
+    <entry file="file://$PROJECT_DIR$/src/Components/index.ts" />
+    <entry file="file://$PROJECT_DIR$/src/Redux/Reducers/subs.ts" />
+    <entry file="file://$PROJECT_DIR$/src/Redux/Reducers/index.ts" />
+    <entry file="file://$PROJECT_DIR$/src/Components/SubscribedSubList/index.tsx" />
+    <entry file="file://$PROJECT_DIR$/src/Interfaces/Components/SubscribedSubList.d.ts" />
+    <entry file="file://$PROJECT_DIR$/src/Components/SubscribedSubs/index.tsx" />
+    <entry file="file://$PROJECT_DIR$/pages/home/index.tsx" />
+    <entry file="file://$PROJECT_DIR$/src/Actions/HomeActions.ts" />
+    <entry file="file://$PROJECT_DIR$/src/Interfaces/Pages/Home.d.ts" />
+    <entry file="file://$PROJECT_DIR$/pages/threadView/index.tsx" />
+    <entry file="file://$PROJECT_DIR$/src/Interfaces/Redux/Store.d.ts" />
+    <entry file="file://$PROJECT_DIR$/src/Redux/Reducers/home.ts" />
+    <entry file="file://$PROJECT_DIR$/src/Components/TopNavbar/index.tsx" />
+    <entry file="file://$PROJECT_DIR$/src/Components/MainLayout/index.tsx" />
+    <entry file="file://$PROJECT_DIR$/src/Interfaces/Components/SubscribedSubs.d.ts" />
+    <entry file="file://$PROJECT_DIR$/.gitignore">
+      <provider selected="true" editor-type-id="text-editor">
+        <state>
+          <caret column="6" lean-forward="true" selection-start-column="6" selection-end-column="6" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/next.config.js">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="48">
+          <caret line="3" lean-forward="true" selection-start-line="3" selection-end-line="3" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/pages/interfaces.d.ts" />
+    <entry file="file://$PROJECT_DIR$/tsconfig.json">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="224">
+          <caret line="14" column="22" lean-forward="true" selection-start-line="14" selection-start-column="22" selection-end-line="14" selection-end-column="22" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/pages/_document.tsx">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="128">
+          <caret line="8" column="30" selection-start-line="8" selection-start-column="30" selection-end-line="8" selection-end-column="30" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/.babelrc">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="144">
+          <caret line="9" column="1" selection-start-line="9" selection-start-column="1" selection-end-line="9" selection-end-column="1" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/stores/index.ts">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="48">
+          <caret line="3" column="44" selection-start-line="3" selection-start-column="44" selection-end-line="3" selection-end-column="44" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/stores/user.ts">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="112">
+          <caret line="8" column="2" lean-forward="true" selection-start-line="8" selection-start-column="2" selection-end-line="8" selection-end-column="2" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/pages/_app.tsx">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="153">
+          <caret line="22" selection-start-line="22" selection-end-line="22" />
+          <folding>
+            <element signature="e#0#41#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/pages/styles.scss">
+      <provider selected="true" editor-type-id="text-editor" />
+    </entry>
+    <entry file="file://$PROJECT_DIR$/styles/style.scss">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="32">
+          <caret line="2" selection-start-line="2" selection-end-line="2" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/package.json">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="496">
+          <caret line="31" column="25" selection-start-line="31" selection-start-column="25" selection-end-line="31" selection-end-column="25" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/pages/index.tsx">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="160">
+          <caret line="13" lean-forward="true" selection-start-line="13" selection-end-line="13" />
+          <folding>
+            <element signature="e#0#31#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+  </component>
+</project>

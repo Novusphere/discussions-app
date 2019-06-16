@@ -4,9 +4,6 @@ logs
 npm-debug.log*
 yarn-debug.log*
 yarn-error.log*
-.idea
-
-
 
 # Runtime data
 pids
@@ -39,8 +36,6 @@ build/Release
 node_modules/
 jspm_packages/
 
-
-
 # TypeScript v1 declaration files
 typings/
 
@@ -64,13 +59,3 @@ typings/
 
 # next.js build output
 .next
-
-# nyc build output
-.nyc_output
-
-# project cli builds
-/project-cli/dist
-/project-cli2/dist
-
-# local history plugin
-.history
