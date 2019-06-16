@@ -11,6 +11,8 @@ export const STEEMIT_URL = /https?:\/\/(www\.)?steemit\.com\//;
 
 export const IMAGE_TYPES = /\.(png|jpg|jpeg|gif)$/i;
 
+import { nsdb } from '../index';
+
 export enum AttachmentType {
     Undefined = '',
     IPFS = 'ipfs',
@@ -35,12 +37,8 @@ export class Attachment {
     trust_provider: string | undefined;
 
     private async setFromOEmbed(url: string) {
-        url = 'http://db.novusphere.io/service/cors/?' + url;
-
-        let oembed;
         try {
-            let response = await window.fetch(url);
-            oembed = await response.json();
+            let oembed = JSON.parse(await nsdb.cors(url));
 
             this.trust_provider = oembed.provider_url;
             this.value = oembed.html;

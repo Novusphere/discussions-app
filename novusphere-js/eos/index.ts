@@ -103,15 +103,13 @@ export class EOS {
         }
 
         let transitActions = actions.map(a => ({
-            account: a.account,
-            name: a.name,
+            ...a,
             authorization: [
                 {
                     actor: auth.accountName,
                     permission: auth.permission
                 }
-            ],
-            data: a.data
+            ]
         }));
 
         let tx: any = await this.wallet.eosApi

@@ -2,7 +2,7 @@ import App, { Container } from 'next/app'
 import React from 'react'
 import Stores from '../stores';
 import { Provider } from 'mobx-react'
-import {MainLayout} from "../components";
+import { MainLayout } from "../components";
 
 class DiscussionApp extends App {
 	private stores: any;
@@ -12,7 +12,7 @@ class DiscussionApp extends App {
 		const isServer = !!ctx.req;
 
 		if (isServer === true) {
-			const User = Stores('__userStore__',{});
+			const User = Stores('__userStore__', {});
 			userState = User.getUserFromCookie(ctx.req);
 		}
 
@@ -27,6 +27,14 @@ class DiscussionApp extends App {
 		this.stores = {
 			userStore: Stores('__userStore__', props.userState),
 			uiStore: Stores('__uiStore__', {}),
+		}
+	}
+
+	async componentDidMount() {
+		if (!this.props.isServer) {
+			const njs = await import('../novusphere-js');
+			await njs.init();
+			await njs.eos.detectWallet();
 		}
 	}
 
