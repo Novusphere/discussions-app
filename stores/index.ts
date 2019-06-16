@@ -1,7 +1,9 @@
 import User from './user';
+import UI from './ui';
 
 const stores = {
 	__userStore__: initialState => new User(initialState),
+	__uiStore__: initialState => new UI(initialState),
 };
 
 export default (store, initialState) => {

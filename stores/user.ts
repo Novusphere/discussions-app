@@ -1,11 +1,6 @@
 import { extendObservable, observable } from 'mobx';
 
 const defaultState = {
-	error: null,
-	displayName: null,
-	photoURL: null,
-	auth: false,
-	uid: false
 };
 
 export default class User {

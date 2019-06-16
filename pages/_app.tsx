@@ -26,6 +26,7 @@ class DiscussionApp extends App {
 		super(props);
 		this.stores = {
 			userStore: Stores('__userStore__', props.userState),
+			uiStore: Stores('__uiStore__', {}),
 		}
 	}
 
@@ -34,7 +35,7 @@ class DiscussionApp extends App {
 		return (
 			<Container>
 				<Provider {...this.stores}>
-					<MainLayout>
+					<MainLayout activeBanner={this.stores.uiStore.activeBanner}>
 						<Component {...pageProps} />
 					</MainLayout>
 				</Provider>

@@ -1,8 +1,6 @@
 import * as React from 'react';
 import { observer, inject } from 'mobx-react';
 
-import '../styles/style.scss';
-
 @inject('userStore')
 @observer
 class Index extends React.Component<any, any> {
