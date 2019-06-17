@@ -24,4 +24,4 @@ class TitleHeader extends React.Component<ITitleHeaderProps> {
     }
 }
 
-export default TitleHeader
+export default TitleHeader as any

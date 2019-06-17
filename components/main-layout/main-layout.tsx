@@ -1,13 +1,14 @@
 import * as React from 'react'
 import Head from 'next/head';
 import {observer} from "mobx-react";
+import TagStore from "../../stores/tag";
+import '../../styles/style.scss';
+import {TagList, TitleHeader} from "../index";
 
 interface IMainLayoutProps {
     activeBanner: string
+    tags: TagStore['tags']
 }
-
-import '../../styles/style.scss';
-import {TitleHeader} from "../index";
 
 @observer
 class MainLayout extends React.Component<IMainLayoutProps> {
@@ -22,7 +23,14 @@ class MainLayout extends React.Component<IMainLayoutProps> {
                     {this.props.activeBanner}
                 </div>
                 <TitleHeader/>
-                {this.props.children}
+                <div className={'container flex'}>
+                    <div className={'w-20'}>
+                        <TagList tags={this.props.tags}/>
+                    </div>
+                    <div className={'w-80'}>
+                        {this.props.children}
+                    </div>
+                </div>
             </>
         );
     }
