@@ -1,39 +1,25 @@
-import {
-    DiscussionService,
-    RedditService,
-    Post,
-    AttachmentType,
-    AttachmentDisplay,
-    Attachment,
-    Thread
-} from './discussions';
+export * from './discussions';
+export * from './eos';
+
+import { RedditService, DiscussionService } from './discussions';
 import { EOS } from "./eos";
 import { NSDB } from './nsdb';
 import { Settings } from "./settings";
 
-const reddit = new RedditService();
-const discussions = new DiscussionService();
-const nsdb = new NSDB();
-const eos =  new EOS();
-const settings = new Settings();
-
-export {
-    // helper objects
-    discussions,
-    nsdb,
-    reddit,
-    eos,
-    settings,
-    // types
-    Post,
-    AttachmentType,
-    AttachmentDisplay,
-    Attachment,
-    Thread
-}
+export const reddit = new RedditService();
+export const discussions = new DiscussionService();
+export const nsdb = new NSDB();
+export const eos =  new EOS();
+export const settings = new Settings();
 
 export async function init() {
     await settings.init();
-    if (eos)
+    await nsdb.init(settings.novusphereEndPoint);   
     await eos.init(settings.eosNetwork);
+}
+
+export function sleep(timeMilliseconds: number) : Promise<void> {
+    return new Promise((resolve) => {
+        setTimeout(resolve, timeMilliseconds);
+    });
 }

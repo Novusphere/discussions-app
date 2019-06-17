@@ -31,6 +31,14 @@ class DiscussionApp extends App {
         }
     }
 
+    async componentDidMount() {
+        if (!(this as any).props.isServer) {
+            const njs = await import('../novusphere-js');
+            await njs.init();
+            await njs.eos.detectWallet();
+        }
+    }
+
     public render() {
         const {Component, pageProps} = (this as any).props;
         return (

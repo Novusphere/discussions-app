@@ -2,12 +2,14 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="2d14133e-344f-4fbf-9bb7-c9e5e96ae697" name="Default Changelist" comment="">
-      <change beforePath="$PROJECT_DIR$/components/index.ts" beforeDir="false" afterPath="$PROJECT_DIR$/components/index.ts" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/components/main-layout/main-layout.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/components/main-layout/main-layout.tsx" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/components/title-header/title-header.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/components/title-header/title-header.tsx" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/models/tagModel.ts" beforeDir="false" afterPath="$PROJECT_DIR$/models/tagModel.ts" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/package-lock.json" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/novusphere-js/discussions/attachment.ts" beforeDir="false" afterPath="$PROJECT_DIR$/novusphere-js/discussions/attachment.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/novusphere-js/eos/index.ts" beforeDir="false" afterPath="$PROJECT_DIR$/novusphere-js/eos/index.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/novusphere-js/index.ts" beforeDir="false" afterPath="$PROJECT_DIR$/novusphere-js/index.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/novusphere-js/nsdb.ts" beforeDir="false" afterPath="$PROJECT_DIR$/novusphere-js/nsdb.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/novusphere-js/settings.ts" beforeDir="false" afterPath="$PROJECT_DIR$/novusphere-js/settings.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/package.json" beforeDir="false" afterPath="$PROJECT_DIR$/package.json" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/pages/_app.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/pages/_app.tsx" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/stores/tag.ts" beforeDir="false" afterPath="$PROJECT_DIR$/stores/tag.ts" afterDir="false" />
     </list>
     <ignored path="$PROJECT_DIR$/.tmp/" />
     <ignored path="$PROJECT_DIR$/temp/" />
@@ -34,7 +36,7 @@
               </provider>
             </entry>
           </file>
-          <file pinned="false" current-in-tab="true">
+          <file pinned="false" current-in-tab="false">
             <entry file="file://$PROJECT_DIR$/components/tag-list/tag-list.tsx">
               <provider selected="true" editor-type-id="text-editor">
                 <state relative-caret-position="176">
@@ -73,13 +75,13 @@
               </provider>
             </entry>
           </file>
-          <file pinned="false" current-in-tab="false">
+          <file pinned="false" current-in-tab="true">
             <entry file="file://$PROJECT_DIR$/pages/_app.tsx">
               <provider selected="true" editor-type-id="text-editor">
-                <state relative-caret-position="176">
-                  <caret line="11" column="35" selection-start-line="11" selection-start-column="35" selection-end-line="11" selection-end-column="35" />
+                <state relative-caret-position="496">
+                  <caret line="31" column="5" lean-forward="true" selection-start-line="31" selection-start-column="5" selection-end-line="31" selection-end-column="5" />
                   <folding>
-                    <element signature="e#0#41#0" expanded="true" />
+                    <element signature="e#0#39#0" expanded="true" />
                   </folding>
                 </state>
               </provider>
@@ -134,8 +136,8 @@
           <file pinned="false" current-in-tab="true">
             <entry file="file://$PROJECT_DIR$/models/tagModel.ts">
               <provider selected="true" editor-type-id="text-editor">
-                <state relative-caret-position="160">
-                  <caret line="10" column="28" selection-start-line="10" selection-start-column="28" selection-end-line="10" selection-end-column="38" />
+                <state relative-caret-position="176">
+                  <caret line="11" column="25" selection-start-line="11" selection-start-column="25" selection-end-line="11" selection-end-column="25" />
                   <folding>
                     <element signature="e#0#40#0" expanded="true" />
                   </folding>
@@ -235,12 +237,12 @@
         <option value="$PROJECT_DIR$/styles/style.scss" />
         <option value="$PROJECT_DIR$/components/index.ts" />
         <option value="$PROJECT_DIR$/components/title-header/title-header.tsx" />
-        <option value="$PROJECT_DIR$/pages/_app.tsx" />
         <option value="$PROJECT_DIR$/components/main-layout/main-layout.tsx" />
         <option value="$PROJECT_DIR$/models/baseModel.ts" />
         <option value="$PROJECT_DIR$/stores/tag.ts" />
         <option value="$PROJECT_DIR$/models/tagModel.ts" />
         <option value="$PROJECT_DIR$/components/tag-list/tag-list.tsx" />
+        <option value="$PROJECT_DIR$/pages/_app.tsx" />
       </list>
     </option>
   </component>
@@ -367,12 +369,12 @@
       <workItem from="1560382222190" duration="53000" />
       <workItem from="1560475824100" duration="1166000" />
       <workItem from="1560567310376" duration="3935000" />
-      <workItem from="1560699944594" duration="6844000" />
+      <workItem from="1560699944594" duration="6913000" />
     </task>
     <servers />
   </component>
   <component name="TimeTrackingManager">
-    <option name="totallyTimeSpent" value="21857000" />
+    <option name="totallyTimeSpent" value="21926000" />
   </component>
   <component name="ToolWindowManager">
     <frame x="-8" y="-8" width="2576" height="1416" extended-state="6" />
@@ -566,16 +568,6 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/pages/_app.tsx">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="176">
-          <caret line="11" column="35" selection-start-line="11" selection-start-column="35" selection-end-line="11" selection-end-column="35" />
-          <folding>
-            <element signature="e#0#41#0" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/components/main-layout/main-layout.tsx">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="464">
@@ -612,8 +604,8 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/models/tagModel.ts">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="160">
-          <caret line="10" column="28" selection-start-line="10" selection-start-column="28" selection-end-line="10" selection-end-column="38" />
+        <state relative-caret-position="176">
+          <caret line="11" column="25" selection-start-line="11" selection-start-column="25" selection-end-line="11" selection-end-column="25" />
           <folding>
             <element signature="e#0#40#0" expanded="true" />
           </folding>
@@ -626,6 +618,16 @@
           <caret line="11" column="77" selection-start-line="11" selection-start-column="77" selection-end-line="11" selection-end-column="77" />
           <folding>
             <element signature="e#0#30#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/pages/_app.tsx">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="496">
+          <caret line="31" column="5" lean-forward="true" selection-start-line="31" selection-start-column="5" selection-end-line="31" selection-end-column="5" />
+          <folding>
+            <element signature="e#0#39#0" expanded="true" />
           </folding>
         </state>
       </provider>
