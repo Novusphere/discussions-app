@@ -1,0 +1,30 @@
+.post-preview {
+	@extend .mb2;
+	@extend .pointer;
+	@extend .ba;
+	@extend .b--white;
+
+	&:hover {
+		@extend .ba;
+		@extend .b--black;
+	}
+
+	margin-bottom: 20px;
+
+	.post-content {
+		@extend .pa3;
+		background: white;
+		max-height: 485px;
+		overflow: hidden;
+		position: relative;
+		text-overflow: ellipsis;
+		content: "";
+	}
+}
+
+.vote {
+	svg {
+		@extend .pr1;
+		width: 0.625em;
+	}
+}
