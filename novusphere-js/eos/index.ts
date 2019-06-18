@@ -23,7 +23,7 @@ export class EOS {
     }
 
     async init(network: NetworkConfig) {
-        if (window) { // client?
+        if (process.browser) { // client?
             const transit = await import('eos-transit');
 
             const scatter  = await import('eos-transit-scatter-provider');
