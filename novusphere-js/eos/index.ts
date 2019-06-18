@@ -1,8 +1,4 @@
-import { initAccessContext, DiscoveryData, WalletAuth, Wallet, WalletAccessContext, NetworkConfig } from 'eos-transit';
-import scatter from 'eos-transit-scatter-provider';
-import lynx from 'eos-transit-lynx-provider';
-import tokenpocket from 'eos-transit-tokenpocket-provider';
-import meetone from 'eos-transit-meetone-provider';
+import { DiscoveryData, WalletAuth, Wallet, WalletAccessContext, NetworkConfig } from 'eos-transit';
 import { IToken, getTokens, IAccountBalance, getAccountTokens } from './tokens';
 
 export const DEFAULT_EOS_NETWORK: NetworkConfig = {
@@ -27,16 +23,25 @@ export class EOS {
     }
 
     async init(network: NetworkConfig) {
-        this.accessContext = initAccessContext({
-            appName: 'discussions',
-            network: network,
-            walletProviders: [
-                lynx(),
-                tokenpocket(),
-                meetone(),
-                scatter()
-            ]
-        });
+        if (window) { // client?
+            const transit = await import('eos-transit');
+
+            const scatter  = await import('eos-transit-scatter-provider');
+            const lynx  = await import('eos-transit-lynx-provider');
+            const tokenpocket  = await import('eos-transit-tokenpocket-provider');
+            const meetone  = await import('eos-transit-meetone-provider');
+
+            this.accessContext = transit.initAccessContext({
+                appName: 'discussions',
+                network: network,
+                walletProviders: [
+                    lynx.default(),
+                    tokenpocket.default(),
+                    meetone.default(),
+                    scatter.default()
+                ]
+            });
+        }
 
         this.tokens = await getTokens();
     }
@@ -134,22 +139,24 @@ export class EOS {
         if (!this.tokens) return undefined;
         return this.tokens.find(t => t.account == account && t.symbol == symbol);
     }
-    async getSuggestAccounts(accountPartial: string, limit: number = 10) : Promise<string[]> {
+    async getSuggestAccounts(accountPartial: string, limit: number = 10): Promise<string[]> {
         let request = await window.fetch(`https://www.api.bloks.io/topholders?account_name[$search]=${accountPartial}&$limit=${limit}`);
         let json = await request.json();
         return json.data.map(d => d.account_name);
     }
-    async getAccountTokens(account: string) : Promise<IAccountBalance[]> {
+    async getAccountTokens(account: string): Promise<IAccountBalance[]> {
         if (!this.tokens) return [];
         return getAccountTokens(account, this.tokens);
     }
-    async login(account?: string, permission?: string) {
-        if (!this.wallet) return;
+    async login(account?: string, permission?: string): Promise<boolean> {
+        if (!this.wallet) return false;
         await this.wallet.login(account, permission);
 
         if (this.auth) {
             window.dispatchEvent(new Event('eosAccountChange'));
+            return true;
         }
+        return false;
     }
     async logout() {
         if (!this.wallet) return;
