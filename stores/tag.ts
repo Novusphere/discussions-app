@@ -1,5 +1,5 @@
 import {extendObservable, observable} from "mobx";
-import {TagModel} from "../models/tagModel";
+import {TagModel} from "@models/tagModel";
 
 const defaultState = {
     activeTag: null,
@@ -13,10 +13,12 @@ export default class Tag {
     constructor(Tag = null) {
         extendObservable(this, Tag || defaultState);
 
+        // set top level tags
+        this.setTopLevelTags()
+
         // hard code tags
-        [
+        ;[
             "faq",
-            "all",
             "novusphere",
             "bounties",
             "eos",
@@ -52,7 +54,6 @@ export default class Tag {
             "telos",
             "everipedia",
             "eosdac",
-            "referendum",
             "anon-r-eos",
             "atticlab",
             "liquiddapps",
@@ -95,6 +96,14 @@ export default class Tag {
             "Voice"
         ].map(tag => {
             this.tags.set(tag, new TagModel(tag, ''))
+        })
+    }
+
+    private setTopLevelTags = () => {
+        ['home', 'feed', 'all', 'referendum'].map(topLevelTag => {
+            this.tags.set(topLevelTag, new TagModel(topLevelTag, '', {
+                root: true,
+            }))
         })
     }
 }

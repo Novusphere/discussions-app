@@ -54,7 +54,7 @@ export default class DummyService {
 
     }
 
-    async getThread(chain: string, id: number) : Promise<Thread | undefined> {
+    async getThread(_chain: string, id: number) : Promise<Thread | undefined> {
 
         if (id == TEST_POSTS[1].id) {
 
@@ -68,11 +68,11 @@ export default class DummyService {
         return undefined;
     }
 
-    async getPostsForSubs(subs : string[]) : Promise<Post[]> {
+    async getPostsForSubs(_subs : string[]) : Promise<Post[]> {
         return TEST_POSTS;
     }
     
-    async getPostsForTags(tags: string[]) : Promise<Post[]> {
+    async getPostsForTags(_tags: string[]) : Promise<Post[]> {
         return TEST_POSTS;
     }
 }

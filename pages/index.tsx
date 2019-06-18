@@ -1,23 +1,12 @@
 import * as React from 'react';
-import { observer, inject } from 'mobx-react';
+import {observer} from 'mobx-react';
+import {Feed} from "@components";
 
-@inject('userStore')
 @observer
 class Index extends React.Component<any, any> {
-	constructor(props: any) {
-		super(props);
-	}
-
-	render() {
-
-		return (
-			<>
-				<p>
-					{this.props.userStore.username}
-				</p>
-			</>
-		);
-	}
+    public render(): React.ReactNode {
+        return <Feed/>
+    }
 }
 
 export default Index;

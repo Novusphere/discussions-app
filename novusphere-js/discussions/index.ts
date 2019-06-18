@@ -1,4 +1,3 @@
-import DiscussionsService from "./service/discussions";
 import DummyService from "./service/dummy";
 import RedditService from "./service/reddit";
 import Post from "./post";

@@ -1,8 +1,8 @@
 import App, {Container} from 'next/app'
 import React from 'react'
-import Stores from '../stores';
+import Stores from "@stores/index"
 import {Provider} from 'mobx-react'
-import {MainLayout} from "../components";
+import {MainLayout} from "@components"
 
 class DiscussionApp extends App {
     private stores: any;
@@ -28,6 +28,8 @@ class DiscussionApp extends App {
             userStore: Stores('__userStore__', props.userState),
             uiStore: Stores('__uiStore__', {}),
             tagStore: Stores('__tagStore__', {}),
+            authStore: Stores('__authStore__', {}),
+            postsStore: Stores('__postsStore__', {}),
         }
     }
 

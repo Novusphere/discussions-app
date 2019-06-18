@@ -1,3 +1,5 @@
 export { default as MainLayout } from './main-layout/main-layout'
 export { default as TitleHeader } from './title-header/title-header'
 export { default as TagList } from './tag-list/tag-list'
+export { default as Feed } from './feed/feed'
+export { default as PostPreview } from './feed/post-preview/post-preview'

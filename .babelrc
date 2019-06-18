@@ -1,10 +1,37 @@
 {
   "presets": [
     "next/babel",
-    "@zeit/next-typescript/babel",
+    "@zeit/next-typescript/babel"
   ],
   "plugins": [
-    ["@babel/plugin-proposal-decorators", { "legacy": true }],
-    ["@babel/plugin-proposal-class-properties", { "loose": true }]
+    [
+      "@babel/plugin-proposal-decorators",
+      {
+        "legacy": true
+      }
+    ],
+    [
+      "@babel/plugin-proposal-class-properties",
+      {
+        "loose": true
+      }
+    ],
+    [
+      "module-resolver",
+      {
+        "root": [
+          "."
+        ],
+        "alias": {
+          "@components": "./components/index",
+          "@models": "./models",
+          "@pages": "./pages",
+          "@novuspherejs": "./novusphere-js",
+          "@stores": "./stores",
+          "@styles": "./styles",
+          "@utils": "./utils"
+        }
+      }
+    ]
   ]
 }
