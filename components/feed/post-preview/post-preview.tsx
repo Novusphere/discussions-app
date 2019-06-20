@@ -3,11 +3,12 @@ import {IPost} from "@stores/posts";
 import moment from 'moment'
 
 interface IPostPreviewProps {
+    onClick: (post) => void
     post: IPost
 }
 
-const PostPreview: React.FC<IPostPreviewProps> = ({post}) => (
-    <div className={'post-preview'}>
+const PostPreview: React.FC<IPostPreviewProps> = ({post, onClick}) => (
+    <div className={'post-preview'} onClick={() => onClick(post)}>
         <div className={'post-content'}>
             <div className={'flex justify-between'}>
             <span className={'black f4 b'}>
