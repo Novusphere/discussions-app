@@ -29,7 +29,8 @@
           "@novuspherejs": "./novusphere-js",
           "@stores": "./stores",
           "@styles": "./styles",
-          "@utils": "./utils"
+          "@utils": "./utils",
+          "@router": "./routes.ts"
         }
       }
     ]

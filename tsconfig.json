@@ -1,46 +1,30 @@
 {
-  "compileOnSave": false,
-  "compilerOptions": {
-    "target": "esnext",
-    "module": "esnext",
-    "jsx": "preserve",
-    "allowJs": true,
-    "moduleResolution": "node",
-    "experimentalDecorators": true,
-    "allowSyntheticDefaultImports": true,
-    "noUnusedLocals": true,
-    "noUnusedParameters": true,
-    "removeComments": false,
-    "preserveConstEnums": true,
-    "sourceMap": true,
-    "skipLibCheck": true,
-    "baseUrl": ".",
-    "paths": {
-      "@components": [
-        "./components/index"
-      ],
-      "@models/*": [
-        "./models/*"
-      ],
-      "@pages/": [
-        "./pages/*"
-      ],
-      "@novuspherejs/*": [
-        "./novusphere-js/*"
-      ],
-      "@stores/*": [
-        "./stores/*"
-      ],
-      "@styles/*": [
-        "./styles/*"
-      ],
-      "@utils": [
-        "./utils/index"
-      ]
-    },
-    "lib": [
-      "dom",
-      "es2016"
-    ]
-  }
+	"compileOnSave": false,
+	"compilerOptions": {
+		"target": "esnext",
+		"module": "esnext",
+		"jsx": "preserve",
+		"allowJs": true,
+		"moduleResolution": "node",
+		"experimentalDecorators": true,
+		"allowSyntheticDefaultImports": true,
+		"noUnusedLocals": true,
+		"noUnusedParameters": true,
+		"removeComments": false,
+		"preserveConstEnums": true,
+		"sourceMap": true,
+		"skipLibCheck": true,
+		"baseUrl": ".",
+		"paths": {
+			"@components": ["./components/index"],
+			"@models/*": ["./models/*"],
+			"@pages/": ["./pages/*"],
+			"@novuspherejs/*": ["./novusphere-js/*"],
+			"@stores/*": ["./stores/*"],
+			"@styles/*": ["./styles/*"],
+			"@utils": ["./utils/index"],
+			"@router": ["./routes.ts"]
+		},
+		"lib": ["dom", "es2015", "es2016"]
+	}
 }
