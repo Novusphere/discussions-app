@@ -64,15 +64,10 @@ export default class Posts {
 
     @task
     public fetchPost = async () => {
-        if (!this.activePostId) {
-            return
-        }
-
         try {
             return await discussions.getThread('', Number(this.activePostId))
         } catch (error) {
-            console.log(error);
-            return error
+            throw error
         }
     }
 };

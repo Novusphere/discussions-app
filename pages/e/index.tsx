@@ -24,25 +24,28 @@ class E extends React.Component<IEPage, any> {
     componentWillMount(): void {
         this.props.postsStore.setActivePostId(
             this.props.query.id
-        )
+        );
     }
 
     componentDidMount(): void {
         this.props.postsStore.fetchPost()
+            .catch(err => {
+                console.log(err)
+            })
     }
+
 
     public render(): React.ReactNode {
         const {fetchPost} = this.props.postsStore;
 
         return (fetchPost as any).match({
             pending: () => <span>Loading...</span>,
-            rejected: () => <span>Something went wrong</span>,
-            resolved: () => null
-            // resolved: ({ openingPost }) => {
-            //     return (
-            //         <MainPost openingPost={openingPost}/>
-            //     );
-            // }
+            rejected: (err) => <span>{err.message}</span>,
+            resolved: ({openingPost}) => {
+                return (
+                    <MainPost openingPost={openingPost}/>
+                );
+            }
         })
     }
 }

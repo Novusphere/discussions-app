@@ -54,22 +54,16 @@ export default class DummyService {
     }
 
     async getThread(_chain: string, id: number): Promise<Thread | Error> {
+        if (id == TEST_POSTS[1].id) {
+            const posts = [TEST_POSTS[1]];
+            const thread = new Thread();
 
-        try {
-            if (id == TEST_POSTS[1].id) {
-                const posts = [TEST_POSTS[1]];
-                const thread = new Thread();
-
-                thread.makePost(posts);
-                await thread.normalize();
-                return thread;
-            }
-
-            return new Error('No thread found')
-        } catch (error) {
-            console.log(error);
-            return error
+            thread.makePost(posts);
+            await thread.normalize();
+            return thread;
         }
+
+        throw new Error('No thread found')
     }
 
     async getPostsForSubs(_subs: string[]): Promise<Post[]> {
