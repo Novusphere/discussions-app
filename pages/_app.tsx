@@ -16,9 +16,17 @@ class DiscussionApp extends App {
             userState = User.getUserFromCookie(ctx.req);
         }
 
+        let pageProps = {}
+
+        if (ctx.Component.getInitialProps) {
+            pageProps = await ctx.Component.getInitialProps(ctx)
+        }
+
+
         return {
             isServer,
             userState,
+            pageProps,
         };
     }
 

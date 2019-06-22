@@ -1,5 +1,5 @@
 import Post from './post';
-import { REDDIT_URL } from "./attachment";
+import {REDDIT_URL} from "./attachment";
 import RedditService from './service/reddit';
 
 export default class Thread {
@@ -18,32 +18,36 @@ export default class Thread {
         return this.openingPost ? this.openingPost.totalReplies : 0;
     }
 
-    constructor(posts: Post[]) {
-        this.map = {};
+    makePost = (posts) => {
+        try {
+            this.map = {};
 
-        if (posts.length == 0) throw new Error('Cannot create thread with zero posts');
-        const threadUuid = posts[0].threadUuid;
+            if (posts.length == 0) return new Error('Cannot create thread with zero posts');
+            const threadUuid = posts[0].threadUuid;
 
-        this.openingPost = posts.find(p => p.uuid == threadUuid);
-        if (!this.openingPost) throw new Error('No opening post found!');
+            this.openingPost = posts.find(p => p.uuid == threadUuid);
+            if (!this.openingPost) return new Error('No opening post found!');
 
-        for (let i = 0; i < posts.length; i++) {
-            const p = posts[i];
-            if (p.uuid in this.map) continue;
+            for (let i = 0; i < posts.length; i++) {
+                const p = posts[i];
+                if (p.uuid in this.map) continue;
 
-            if (!p.edit) {
-                if (this.map[p.uuid] == undefined) {
-                    this.map[p.uuid] = p;
+                if (!p.edit) {
+                    if (this.map[p.uuid] == undefined) {
+                        this.map[p.uuid] = p;
+                    }
+                } else if (p.parentUuid) {
+                    const parent = this.map[p.parentUuid];
+                    if (parent) {
+                        parent.applyEdit(p);
+                    }
                 }
             }
-            else if (p.parentUuid) {
-                const parent = this.map[p.parentUuid];
-                if (parent) {
-                    parent.applyEdit(p);
-                }
-            }
+        } catch (error) {
+            console.log(error);
+            throw error
         }
-    }
+    };
 
     async importRedditReplies() {
         if (!this.openingPost) return;

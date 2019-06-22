@@ -1,5 +1,6 @@
-import {extendObservable, observable} from 'mobx';
+import {action, extendObservable, observable} from 'mobx';
 import {discussions} from "@novuspherejs/index";
+import {task} from "mobx-task";
 
 const defaultState = {};
 
@@ -37,7 +38,11 @@ export interface IPost {
 }
 
 export default class Posts {
+    // all posts by filter
     @observable posts: IPost[] = [];
+
+    // active post
+    @observable activePostId = '';
 
     /**
      * Must have constructor to set default state from SSR
@@ -48,6 +53,26 @@ export default class Posts {
 
         discussions.getPostsForTags(['all']).then(data => {
             this.posts = data as unknown as IPost[]
-        })
+        });
+
+        this.fetchPost = this.fetchPost.bind(this)
+    }
+
+    @action setActivePostId = (id: string) => {
+        this.activePostId = id;
+    };
+
+    @task
+    public fetchPost = async () => {
+        if (!this.activePostId) {
+            return
+        }
+
+        try {
+            return await discussions.getThread('', Number(this.activePostId))
+        } catch (error) {
+            console.log(error);
+            return error
+        }
     }
 };
