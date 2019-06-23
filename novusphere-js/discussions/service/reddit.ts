@@ -31,7 +31,7 @@ export default class RedditService {
         }
         p.poster = data.author;
         p.title = data.title;
-        p.content = data.selftext;
+        p.content = data.selftext || data.body;
         p.createdAt = new Date(data.created_utc * 1000);
         p.votes = data.ups;
         return p;
