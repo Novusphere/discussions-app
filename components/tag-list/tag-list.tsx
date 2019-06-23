@@ -9,11 +9,11 @@ interface ITagListProps {
 
 const TagList: React.FC<ITagListProps> = ({ tags }) => {
     return Array.from(tags.values()).map(tag => (
-        <Link route={tag.url ? tag.url : `/tag/${tag.name}`}>
-            <span className={'db black dim pointer pb1'} key={tag.id}>
+        <Link route={tag.url ? tag.url : `/tag/${tag.name}`} key={tag.id}>
+            <a className={'db black dim pointer pb1 no-underline'}>
                 {tag.root ? null : '#'}
                 {tag.name}
-            </span>
+            </a>
         </Link>
     ))
 }

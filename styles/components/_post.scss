@@ -10,16 +10,16 @@
     }
 
     margin-bottom: 20px;
-}
-
-.post-content {
-    @extend .pa3;
-    background: white;
     max-height: 485px;
     overflow: hidden;
     position: relative;
     text-overflow: ellipsis;
     content: '';
+}
+
+.post-content {
+    @extend .pa3;
+    background: white;
 }
 
 .opening-post {
@@ -28,6 +28,7 @@
 }
 
 .opening-post,
+.post-reply,
 .post-preview {
     a {
         @extend .dim;
@@ -52,4 +53,15 @@ button.reply {
     border: 1px solid teal;
     border-radius: 4px;
     padding: 2px;
+}
+
+.post-reply {
+    @extend .b--black;
+    @extend .bl;
+    @extend .ml2;
+    @extend .mb2;
+
+    .header {
+        @extend .flex;
+    }
 }

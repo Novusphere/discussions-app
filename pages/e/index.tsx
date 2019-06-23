@@ -1,7 +1,7 @@
 import * as React from 'react'
 import { inject, observer } from 'mobx-react'
 import { IStores } from '@stores/index'
-import { MainPost } from '@components'
+import { MainPost, Replies } from '@components'
 
 interface IEPage {
     postsStore: IStores['postsStore']
@@ -48,15 +48,30 @@ class E extends React.Component<IEPage> {
 
     public render(): React.ReactNode {
         if (this.props.isTagView) {
-            return <span>Tag View!</span>
+            return (
+                <span className={'b'}>
+                    No posts found for specified tag: {this.props.query.tag}
+                </span>
+            )
         }
 
         const { fetchPost } = this.props.postsStore
         return (fetchPost as any).match({
             pending: () => <span>Loading...</span>,
             rejected: err => <span>{err.message}</span>,
-            resolved: ({ openingPost }) => {
-                return <MainPost openingPost={openingPost} />
+            resolved: ({ openingPost, map }) => {
+                return (
+                    <div className={'post-content'}>
+                        <MainPost openingPost={openingPost} />
+                        {Object.keys(map).map(post => {
+                            if (post === openingPost.threadUuid) {
+                                return null
+                            }
+
+                            return <Replies post={map[post]} key={map[post]['uuid']} />
+                        })}
+                    </div>
+                )
             },
         })
     }
