@@ -1,12 +1,22 @@
-import * as React from 'react';
-import {observer} from 'mobx-react';
-import {Feed} from "@components";
+import * as React from 'react'
+import { observer, inject } from 'mobx-react'
+import { Feed } from '@components'
+import { IStores } from '@stores/index'
 
+interface IIndexPage {
+    postsStore: IStores['postsStore']
+}
+
+@inject('postsStore')
 @observer
-class Index extends React.Component<any, any> {
+class Index extends React.Component<IIndexPage> {
+    componentWillMount(): void {
+        this.props.postsStore.getPostsByTag(['home'])
+    }
+
     public render(): React.ReactNode {
-        return <Feed/>
+        return <Feed />
     }
 }
 
-export default Index;
+export default Index

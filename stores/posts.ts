@@ -49,12 +49,13 @@ export default class Posts {
      */
     constructor(Posts = null) {
         extendObservable(this, Posts || defaultState)
+        this.fetchPost = this.fetchPost.bind(this)
+    }
 
-        discussions.getPostsForTags(['all']).then(data => {
+    @action getPostsByTag = (tags: string[]) => {
+        discussions.getPostsForTags(tags).then(data => {
             this.posts = (data as unknown) as IPost[]
         })
-
-        this.fetchPost = this.fetchPost.bind(this)
     }
 
     @action setActivePostId = (id: string) => {

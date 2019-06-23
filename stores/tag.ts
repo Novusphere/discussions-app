@@ -112,6 +112,7 @@ export default class Tag {
         } else {
             tagModel = this.tags.get(tagName)
         }
+
         this.activeTag = tagModel
     }
 
@@ -124,15 +125,34 @@ export default class Tag {
         } else {
             subModel = this.tags.get(subName)
         }
+
         this.activeTag = subModel
     }
 
     private setTopLevelTags = () => {
-        ;['home', 'feed', 'all', 'referendum'].map(topLevelTag => {
+        ;[
+            {
+                name: 'home',
+                url: '/',
+            },
+            {
+                name: 'feed',
+                url: '/feed',
+            },
+            {
+                name: 'all',
+                url: '/e/all',
+            },
+            {
+                name: 'referendum',
+                url: '/e/referendum',
+            },
+        ].map(topLevelTag => {
             this.tags.set(
-                topLevelTag,
-                new TagModel(topLevelTag, '', {
+                topLevelTag.name,
+                new TagModel(topLevelTag.name, '', {
                     root: true,
+                    url: topLevelTag.url,
                 })
             )
         })
