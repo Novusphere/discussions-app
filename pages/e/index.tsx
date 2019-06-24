@@ -17,7 +17,8 @@ interface IEPage {
 @inject('postsStore', 'tagStore')
 @observer
 class E extends React.Component<IEPage> {
-    static async getInitialProps({ ctx: { query } }) {
+    static async getInitialProps({ ctx: { query }, stores }) {
+        console.log(stores)
         const isTagView = typeof query.id === 'undefined' && typeof query.title === 'undefined'
         return {
             query,
@@ -61,15 +62,26 @@ class E extends React.Component<IEPage> {
             rejected: err => <span>{err.message}</span>,
             resolved: ({ openingPost, map }) => {
                 return (
-                    <div className={'post-content'}>
+                    <div className={'thread-container'}>
                         <MainPost openingPost={openingPost} />
-                        {Object.keys(map).map(post => {
-                            if (post === openingPost.threadUuid) {
-                                return null
-                            }
+                        <div className={'mb2'}>
+                            <span className={'b f6 pb2'}>
+                                viewing all {Object.keys(map).length} comments
+                            </span>
+                        </div>
+                        <div className={'bg-white pr2 pv1'}>
+                            {Object.keys(map).map(post => {
+                                if (post === openingPost.threadUuid) {
+                                    return null
+                                }
 
-                            return <Replies post={map[post]} key={map[post]['uuid']} />
-                        })}
+                                if (map[post]['parentUuid'] !== openingPost.uuid) {
+                                    return null
+                                }
+
+                                return <Replies post={map[post]} key={map[post]['uuid']} />
+                            })}
+                        </div>
                     </div>
                 )
             },

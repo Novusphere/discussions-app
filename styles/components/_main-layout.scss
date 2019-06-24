@@ -4,3 +4,11 @@
 	@extend .flex;
 	height: 278px;
 }
+
+footer {
+	a {
+		@extend .no-underline;
+		@extend .black;
+		@extend .dim;
+	}
+}

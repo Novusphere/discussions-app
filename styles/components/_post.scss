@@ -56,12 +56,27 @@ button.reply {
 }
 
 .post-reply {
-    @extend .b--black;
-    @extend .bl;
+    @extend .ba;
     @extend .ml2;
-    @extend .mb2;
+    @extend .mv3;
+
+    border-color: #e3e3e3;
 
     .header {
         @extend .flex;
     }
+}
+
+.child > .child,
+.child > .child > .child > .child {
+    background: #fff;
+}
+
+/**
+ 5 levels deep
+ */
+.child,
+.child > .child > .child,
+.child > .child > .child > .child > .child {
+    background-color: #f7f7f7;
 }

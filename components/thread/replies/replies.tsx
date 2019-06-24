@@ -45,6 +45,10 @@ const Replies: React.FC<IReplies> = ({ post, ...props }) => (
                 mark as spam
             </span>
         </div>
+
+        {post.replies.map(reply => (
+            <Replies post={reply} key={reply.id} className={'post-content post-reply black child'} />
+        ))}
     </div>
 )
 
