@@ -10,9 +10,17 @@ let TEST_POSTS: Post[] = (function() {
     post1.parentUuid = ''
     post1.threadUuid = '5be1adec-1310-4b04-a7ee-7fbe16d6ed67'
     post1.uuid = '5be1adec-1310-4b04-a7ee-7fbe16d6ed67'
-    post1.title = 'Hello world!'
+    post1.title = 'First time here? Read this guide to learn how to use Discussions.app & earn tips'
     post1.poster = 'asphyxiating'
-    post1.content = 'Hey, **wasa** #wasa wasssupppp!! @asphyxiating'
+    post1.content = `Welcome to Discussions.app, the EOS DApp powered by Novusphere. This is a guide to help you get started using this website.
+
+Discussions.app is a blockchain based social network. It has some similarity to reddit. You can post threads and blog posts here. You make money if people like your content and tip you.
+
+There are two ways to post content here. One is by using an ID and the other is by using an EOS account. To post content using your ID, you need to set this up in the settings page. After visiting the site, click Set ID from the top left corner of the site to set your ID.
+
+After clicking on Set ID, you will visit the settings page where you can set your ID name. Set a name you want (it must be less than 13 characters) and then click save. In the key field, you will see a large key that starts with 5. This is like your password. It will be used to claim the money you earn in this site. Make sure to save it.
+
+After clicking save, a text file will be downloaded to your computer which includes this password key and your ID name. I have shown this process in a screenshot below. I set my ID name as “exampleidname”.`
     post1.createdAt = new Date(1559864468276)
     post1.sub = 'eos'
     post1.tags = ['wasa']

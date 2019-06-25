@@ -22,7 +22,7 @@ class MainLayout extends React.Component<IMainLayoutProps> {
                 <div className={'w-100 header-image o-50'}>{this.props.activeBanner}</div>
                 <TitleHeader />
                 <div className={'content'}>
-                    <div className={'container flex pt1 pb1'}>
+                    <div className={'container flex pv3'}>
                         <div className={'w-20'}>
                             <TagList tags={this.props.tags} />
                         </div>
