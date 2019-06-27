@@ -37,6 +37,7 @@ export default class Post {
     totalReplies: number; // only used if isOpeningPost()
     score: number; // only used if isOpeningPost()
     votes: number;
+    depth: number; // only used if Thread object created with
 
     // Aggregate Data
     alreadyVoted: boolean; // have I already voted for this post?
@@ -85,6 +86,7 @@ export default class Post {
         this.totalReplies = 0;
         this.score = 0;
         this.votes = 0;
+        this.depth = 0;
         this.alreadyVoted = false;
     }
 

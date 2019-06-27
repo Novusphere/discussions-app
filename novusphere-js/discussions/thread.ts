@@ -77,6 +77,7 @@ export default class Thread {
             if (post.parentUuid) {
                 const parent: Post = this.map[post.parentUuid]
                 if (parent) {
+                    post.depth = parent.depth + 1;
                     parent.replies.push(post)
                 }
             }
