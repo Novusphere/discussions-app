@@ -12,7 +12,7 @@ interface ITitleHeaderProps {
 class TitleHeader extends React.Component<ITitleHeaderProps> {
     public render(): React.ReactNode {
         return (
-            <div className={'title-header flex items-center'}>
+            <div className={'title-header flex items-center z-999'}>
                 <div className={'container flex items-center justify-between'}>
                     <span className={'f4'}>
                         {this.props.tagStore.activeTag
@@ -24,9 +24,7 @@ class TitleHeader extends React.Component<ITitleHeaderProps> {
                             Login
                         </a>
                         <Link route={'/settings'}>
-                            <a className="f5 link dim br3 ph3 pv2 dib white bg-black">
-                                Set ID
-                            </a>
+                            <a className="f5 link dim br3 ph3 pv2 dib white bg-black">Set ID</a>
                         </Link>
                     </div>
                 </div>

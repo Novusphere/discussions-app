@@ -1,17 +1,25 @@
 import * as React from 'react'
 import Head from 'next/head'
-import { observer } from 'mobx-react'
+import { inject, observer } from 'mobx-react'
 import TagStore from '../../stores/tag'
+import { Sidebar, TitleHeader } from '../index'
+import { TagModel } from '@models/tagModel'
+
 import '../../styles/style.scss'
-import { TagList, TitleHeader } from '../index'
 
 interface IMainLayoutProps {
     activeBanner: string
+    tagStore: TagStore
     tags: TagStore['tags']
 }
 
+@inject('tagStore')
 @observer
 class MainLayout extends React.Component<IMainLayoutProps> {
+    public onClickTag = (tag: TagModel) => {
+        this.props.tagStore.setActiveTag(tag.name)
+    }
+
     public render() {
         return (
             <>
@@ -24,7 +32,7 @@ class MainLayout extends React.Component<IMainLayoutProps> {
                 <div className={'content'}>
                     <div className={'container flex pv3'}>
                         <div className={'w-20 card mr3'}>
-                            <TagList tags={this.props.tags} />
+                            <Sidebar tags={this.props.tags} onClick={this.onClickTag} />
                         </div>
                         <div className={'w-80'}>{this.props.children}</div>
                     </div>
@@ -52,4 +60,4 @@ class MainLayout extends React.Component<IMainLayoutProps> {
     }
 }
 
-export default MainLayout
+export default MainLayout as any

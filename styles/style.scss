@@ -47,6 +47,14 @@ a {
     color: black;
 }
 
+.sidebar {
+	ul {
+		max-height: calc(100vh - 55px - 15px);
+		overflow: auto;
+		position: sticky;
+	}
+}
+
 .card {
     background-color: #fff;
     border-radius: 2px;
@@ -56,7 +64,7 @@ a {
     ul {
         margin: 0;
         padding: 0;
-    }
+		}
 
     li {
         @extend .ph3;

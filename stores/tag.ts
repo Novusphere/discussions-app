@@ -9,7 +9,7 @@ const defaultState = {
 }
 
 export default class Tag {
-    @observable activeTag: TagModel | null = null
+    @observable activeTag: TagModel | null = defaultState.activeTag
     @observable activeSub: SubModel | null = null
     @observable tags = observable.map<string, TagModel>()
     @observable subs = observable.map<string, TagModel>()

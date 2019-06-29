@@ -7,6 +7,7 @@ interface IEPage {
     postsStore: IStores['postsStore']
     tagStore: IStores['tagStore']
     isTagView: boolean
+    subName: string | undefined
     query: {
         tag: string
         id: string
@@ -17,16 +18,20 @@ interface IEPage {
 @inject('postsStore', 'tagStore')
 @observer
 class E extends React.Component<IEPage> {
-    static async getInitialProps({ ctx: { query }, stores }) {
-        console.log(stores)
+    static async getInitialProps({ router, ctx: { query } }) {
         const isTagView = typeof query.id === 'undefined' && typeof query.title === 'undefined'
         return {
             query,
+            subName: router.query.tag,
             isTagView,
         }
     }
 
     componentWillMount(): void {
+        if (this.props.subName) {
+            this.props.tagStore.setActiveTag(this.props.subName)
+        }
+
         if (this.props.isTagView) {
             this.props.postsStore.getPostsByTag([this.props.query.tag])
         }
@@ -37,9 +42,8 @@ class E extends React.Component<IEPage> {
             this.props.postsStore
                 .fetchPost()
                 .then((thread: any) => {
-                    console.log(thread)
+                    console.log('Thread fetched!:', thread)
                     this.props.tagStore.setActiveTag(thread.openingPost.sub)
-                    console.log(this.props.tagStore)
                 })
                 .catch(err => {
                     console.log(err)

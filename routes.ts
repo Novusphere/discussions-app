@@ -7,6 +7,7 @@ const routes = require('next-routes')
  */
 export const Routes = routes()
     .add('e', '/e/:tag/:id?/:title?')
+    .add('tag', '/tag/:name')
     .add('settings', '/settings')
 
 export const Link = Routes.Link
