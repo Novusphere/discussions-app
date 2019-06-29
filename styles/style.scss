@@ -1,48 +1,86 @@
 @import '~tachyons';
-@import "~react-tabs/style/react-tabs.css";
+@import '~react-tabs/style/react-tabs.css';
 @import 'components/all';
 
 body {
-	font-family: Open Sans Light,sans-serif;
-	font-size: 14px;
-	color: #989c9e;
-	padding-right: 0!important;
+    font-family: Open Sans Light, sans-serif;
+    font-size: 14px;
+    color: #989c9e;
+    padding-right: 0 !important;
 }
 
 .container {
-	width: 100%;
-	padding-right: 15px;
-	padding-left: 15px;
-	margin-right: auto;
-	margin-left: auto;
+    width: 100%;
+    padding-right: 15px;
+    padding-left: 15px;
+    margin-right: auto;
+    margin-left: auto;
 }
 @media (min-width: 576px) {
-	.container {
-		max-width: 540px;
-	}
+    .container {
+        max-width: 540px;
+    }
 }
 @media (min-width: 768px) {
-	.container {
-		max-width: 720px;
-	}
+    .container {
+        max-width: 720px;
+    }
 }
 @media (min-width: 992px) {
-	.container {
-		max-width: 960px;
-	}
+    .container {
+        max-width: 960px;
+    }
 }
 @media (min-width: 1200px) {
-	.container {
-		max-width: 1140px;
-	}
+    .container {
+        max-width: 1140px;
+    }
 }
 
 .content {
-	background-color: #ecf0f1;
+    background-color: #ecf0f1;
 }
 
 a {
-	@extend .dim;
-	@extend .no-underline;
-	color: black;
+    @extend .dim;
+    @extend .no-underline;
+    color: black;
+}
+
+.card {
+    background-color: #fff;
+    border-radius: 2px;
+    box-shadow: 0 1px 2px #c9cccd;
+    margin-bottom: 20px;
+
+    ul {
+        margin: 0;
+        padding: 0;
+    }
+
+    li {
+        @extend .ph3;
+        @extend .pv1;
+        list-style-type: none;
+
+        &.active {
+            text-decoration: none;
+            background-color: #007bff;
+
+            a {
+                color: #fff !important;
+            }
+
+            &:hover {
+                text-decoration: none;
+                background-color: #007bff;
+            }
+        }
+
+        &:hover {
+            color: #16181b;
+            text-decoration: none;
+            background-color: #f8f9fa;
+        }
+    }
 }

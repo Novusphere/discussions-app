@@ -47,7 +47,17 @@ class Settings extends React.Component<ISettings> {
     }
 
     private renderRawComponent = () => {
-        return <span>Test</span>
+        const { rawForm } = this.props.settingsStore
+        return (
+            <>
+                <span className={'lh-copy'}>
+                    <span className={'b'}>Warning:</span> You should not modify these settings
+                    unless you know what you're doing! If you incorrectly change something, click
+                    "reset" then "save" to restore the default settings.
+                </span>
+                <Form form={rawForm} hideSubmitButton />
+            </>
+        )
     }
 
     private renderAccountComponent = () => {

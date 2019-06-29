@@ -53,7 +53,7 @@ export default class Settings {
                 {
                     name: 'known',
                     label: `Known`,
-                    placeholder: 'Enter your desired ID',
+                    placeholder: 'Select a url',
                     rules: 'required|string',
                     type: 'dropdown',
                     extra: {
@@ -66,13 +66,42 @@ export default class Settings {
                                 value: 'rama3wi4o324',
                                 label: 'rama3wi4o324 (spacefun.github.io)',
                             },
-                        ]
+                        ],
                     },
                 },
                 {
                     name: 'key',
                     label: null,
                     placeholder: 'endpoint',
+                    rules: 'required|string',
+                },
+            ]
+        )
+    }
+
+    get rawForm() {
+        return new CreateForm(
+            {
+                onSuccess: form => {
+                    console.log(form)
+                },
+            },
+            [
+                {
+                    name: 'key',
+                    label: null,
+                    type: 'text',
+                    value: `{
+                              "atmos_upvotes": true,
+                              "scatter_timeout": 3000,
+                              "theme": "https://eos-forum.org/static/css/theme/day.css",
+                              "novusphere_api": "https://db.novusphere.io",
+                              "eos_api": {
+                                "host": "eos.greymass.com",
+                                "port": "443",
+                                "protocol": "https"
+                              }
+                            }`,
                     rules: 'required|string',
                 },
             ]
