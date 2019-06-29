@@ -3,6 +3,7 @@ import UI from '@stores/ui';
 import Tag from "@stores/tag";
 import Auth from '@stores/auth';
 import Posts from "@stores/posts";
+import Settings from '@stores/settings'
 
 export interface IStores {
 	userStore: User
@@ -10,6 +11,7 @@ export interface IStores {
 	tagStore: Tag
 	authStore: Auth
 	postsStore: Posts
+	settingsStore: Settings
 }
 
 export const stores = {
@@ -18,6 +20,7 @@ export const stores = {
 	__tagStore__: initialState => new Tag(initialState),
 	__authStore__: initialState => new Auth(initialState),
 	__postsStore__: initialState => new Posts(initialState),
+	__settingsStore__: initialState => new Settings(initialState),
 };
 
 export default (store, initialState) => {

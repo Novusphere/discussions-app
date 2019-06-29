@@ -38,6 +38,7 @@ class DiscussionApp extends App {
             tagStore: Stores('__tagStore__', {}),
             authStore: Stores('__authStore__', {}),
             postsStore: Stores('__postsStore__', {}),
+            settingsStore: Stores('__settingsStore__', {})
         }
     }
 

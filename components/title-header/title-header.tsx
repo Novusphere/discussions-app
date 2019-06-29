@@ -1,6 +1,7 @@
 import * as React from 'react'
 import { inject, observer } from 'mobx-react'
 import TagStore from '../../stores/tag'
+import { Link } from '@router'
 
 interface ITitleHeaderProps {
     tagStore: TagStore
@@ -22,9 +23,11 @@ class TitleHeader extends React.Component<ITitleHeaderProps> {
                         <a className="f5 link dim br3 ph3 pv2 dib white bg-black mr2" href="#0">
                             Login
                         </a>
-                        <a className="f5 link dim br3 ph3 pv2 dib white bg-black" href="#0">
-                            Set ID
-                        </a>
+                        <Link route={'/settings'}>
+                            <a className="f5 link dim br3 ph3 pv2 dib white bg-black">
+                                Set ID
+                            </a>
+                        </Link>
                     </div>
                 </div>
             </div>

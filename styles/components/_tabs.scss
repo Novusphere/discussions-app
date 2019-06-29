@@ -1,0 +1,13 @@
+.react-tabs__tab {
+	display: none;
+	padding: .5em 1em !important;
+
+	&--selected {
+		border-radius: 3px 3px 0 0 !important;
+		border-color: #dee2e6 #dee2e6 #fff !important;
+	}
+
+	&:hover {
+		color: blue;
+	}
+}

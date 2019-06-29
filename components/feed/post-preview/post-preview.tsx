@@ -33,10 +33,19 @@ const PostPreview: React.FC<IPostPreviewProps> = ({ post, onClick }) => (
 
                 <span className={'black lh-copy measure-wide'}>{post.content}</span>
 
-                <div className={'flex z-2 relative mt3 footer'}>
-                    <span className={'o-80 f6'}>
+                <div className={'flex z-2 relative mt3 footer b'}>
+                    <span className={'o-80 f6 ml2 dim pointer'}>
                         <FontAwesomeIcon icon={faComment} className={'pr2'} />
                         {post.totalReplies} comments
+                    </span>
+                    <span className={'o-80 f6 ml2 dim pointer'}>
+                        share
+                    </span>
+                    <span className={'o-80 f6 ml2 dim pointer'}>
+                        reply
+                    </span>
+                    <span className={'o-80 f6 ml2 dim pointer'}>
+                        mark as spam
                     </span>
                 </div>
             </div>

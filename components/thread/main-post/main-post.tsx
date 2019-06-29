@@ -7,7 +7,6 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import {
     faReply,
     faUserCircle,
-    faClock,
     faLink,
     faShare,
     faExclamationTriangle,
@@ -32,22 +31,26 @@ const MainPost: React.FC<IMainPost> = ({ openingPost }) => {
             </div>
             <div className={'opening-post'}>
                 <div className={'post-content'}>
-                    <div className={'flex justify-between items-center pb1'}>
-                        <span className={'black f4 b'}>{openingPost.title}</span>
-                        <Votes votes={openingPost.votes} />
-                    </div>
-
                     <div className={'meta pb2'}>
+                        <Link route={`/e/${openingPost.sub}`}>
+                            <a>
+                                <span className={'b'}>{openingPost.sub}</span>
+                            </a>
+                        </Link>
+                        <span className={'ph1 b'}>&#183;</span>
                         <Link route={`/u/${openingPost.poster}`}>
                             <a>
                                 <FontAwesomeIcon icon={faUserCircle} className={'pr1'} />
                                 <span>{openingPost.poster}</span>
                             </a>
-                        </Link>{' '}
-                        in{' '}
-                        <Link route={`/e/${openingPost.sub}`}>
-                            <a>{openingPost.sub}</a>
                         </Link>
+                        <span className={'ph1 b'}>&#183;</span>
+                        <span> {moment(openingPost.createdAt).fromNow()}</span>
+                    </div>
+
+                    <div className={'flex justify-between items-center pb1'}>
+                        <span className={'black f4 b'}>{openingPost.title}</span>
+                        <Votes votes={openingPost.votes} />
                     </div>
 
                     <span className={'black f6 lh-copy'}>{openingPost.content}</span>
@@ -59,11 +62,6 @@ const MainPost: React.FC<IMainPost> = ({ openingPost }) => {
                             <FontAwesomeIcon icon={faReply} className={'pr1'} />
                             reply
                         </button>
-
-                        <span className={'f6 mr3'}>
-                            <FontAwesomeIcon icon={faClock} className={'pr1'} />
-                            {moment(openingPost.createdAt).fromNow()}
-                        </span>
 
                         <FontAwesomeIcon icon={faLink} className={'pr2 black f6'} />
                         <FontAwesomeIcon icon={faShare} className={'pr2 black f6'} />
