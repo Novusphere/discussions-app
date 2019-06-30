@@ -6,14 +6,13 @@
 }
 
 .tooltip {
-    @extend .pv2;
     color: #212529;
     background-color: #fff;
     background-clip: padding-box;
     border: 1px solid rgba(0, 0, 0, 0.15);
     border-radius: 0.25rem;
 
-		span,
+    span,
     a {
         @extend .w-100;
         @extend .pv2;
@@ -25,6 +24,7 @@
             opacity: 100;
             @extend .w-100;
             background: #f8f9fa;
+            border-radius: 0.25rem;
         }
     }
 }

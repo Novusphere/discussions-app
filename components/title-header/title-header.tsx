@@ -24,9 +24,9 @@ class TitleHeader extends React.Component<ITitleHeaderProps> {
                         settings
                     </a>
                 </Link>
-                <span title={'ATMOS Balance'} className={'db mb2'}>
+                <a title={'ATMOS Balance'} className={'db mb2'}>
                     {ATMOSBalance} ATMOS
-                </span>
+                </a>
                 <a
                     rel={'Open settings'}
                     className={'db pointer'}
@@ -59,13 +59,12 @@ class TitleHeader extends React.Component<ITitleHeaderProps> {
                             <FontAwesomeIcon icon={faPen} className={'ph2'} />
                         </a>
                     </Link>
-                    <Link route={'/messages'}>
-                        <a rel={'Open your messages'}>
+                    <Link route={'/notifications'}>
+                        <a rel={'Open your notifications'}>
                             <FontAwesomeIcon icon={faEnvelope} className={'ph2'} />
                         </a>
                     </Link>
                     <Tooltip
-                        open
                         interactive
                         html={this.renderUserSettings()}
                         position={'bottom-end'}

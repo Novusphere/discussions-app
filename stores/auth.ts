@@ -26,8 +26,8 @@ export default class Auth {
         return this.accountName !== '' && this.permission !== '' && this.publicKey !== ''
     }
 
-    @computed get ATMOSBalance(): number | undefined {
-        return this.balances.get('ATMOS')
+    @computed get ATMOSBalance(): number {
+        return this.balances.get('ATMOS') || 0
     }
 
     @action clearAuth = () => {
@@ -52,21 +52,10 @@ export default class Auth {
             this.setAuth(eos.auth)
 
             // fetch balances
-            const whiteList = ['ATMOS']
-
-            await Promise.all(
-                whiteList.map(async whiteListToken => {
-                    eos.tokens.map(async token => {
-                        if (token.name === whiteListToken) {
-                            const balances = await eos.getAccountTokens(token.account)
-
-                            balances.forEach(balance => {
-                                this.balances.set(balance.token.name, balance.amount)
-                            })
-                        }
-                    })
-                })
-            )
+            const balances = await eos.getAccountTokens(this.accountName)
+            balances.forEach(balance => {
+                this.balances.set(balance.token.name, balance.amount)
+            })
         }
     }
 

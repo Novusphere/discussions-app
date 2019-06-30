@@ -145,10 +145,17 @@ export class EOS {
         let json = await request.json();
         return json.data.map(d => d.account_name);
     }
+
+    /**
+     * Returns non-zero balances for a given username.
+     * @param account {string} - The name of the account (username)
+     * @returns {IAccountBalance[]}
+     */
     async getAccountTokens(account: string): Promise<IAccountBalance[]> {
         if (!this.tokens) return [];
         return getAccountTokens(account, this.tokens);
     }
+
     async login(account?: string, permission?: string): Promise<boolean> {
         if (!this.wallet) return false;
         await this.wallet.login(account, permission);
