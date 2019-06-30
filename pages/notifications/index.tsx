@@ -8,12 +8,14 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { reaction } from 'mobx'
 import { IPost } from '@stores/posts'
 import { Notification } from '@components'
+import { TagModel } from '@models/tagModel'
 
 interface INotificationsProps {
     authStore: IStores['authStore']
+    tagStore: IStores['tagStore']
 }
 
-@inject('authStore')
+@inject('authStore', 'tagStore')
 @observer
 class Notifications extends React.Component<INotificationsProps> {
     @task.resolved
@@ -23,6 +25,14 @@ class Notifications extends React.Component<INotificationsProps> {
         }
 
         return <span>No notifications found</span>
+    }
+
+    componentWillMount(): void {
+        this.props.tagStore.activeTag = new TagModel({
+            name: 'notifications',
+            url: '/notifications',
+            logo: '',
+        })
     }
 
     componentDidMount(): void {
@@ -49,7 +59,11 @@ class Notifications extends React.Component<INotificationsProps> {
                 }
 
                 return notifications.posts.map(notificationPosts => (
-                    <Notification notification={notificationPosts} key={notificationPosts.id} onClick={this.clickNotification} />
+                    <Notification
+                        notification={notificationPosts}
+                        key={notificationPosts.id}
+                        onClick={this.clickNotification}
+                    />
                 ))
             },
         })
