@@ -1,4 +1,6 @@
 import { action, computed, extendObservable, observable } from 'mobx'
+import { task } from 'mobx-task'
+import { eos } from '@novuspherejs/index'
 
 const defaultState = {
     accountName: '',
@@ -10,6 +12,7 @@ export default class Auth {
     @observable accountName = ''
     @observable permission = ''
     @observable publicKey = ''
+    @observable balances = observable.map<string, number>()
 
     /**
      * Must have constructor to set default state from SSR
@@ -21,6 +24,10 @@ export default class Auth {
 
     @computed get isLoggedIn(): boolean {
         return this.accountName !== '' && this.permission !== '' && this.publicKey !== ''
+    }
+
+    @computed get ATMOSBalance(): number | undefined {
+        return this.balances.get('ATMOS')
     }
 
     @action clearAuth = () => {
@@ -39,9 +46,32 @@ export default class Auth {
         this.publicKey = eosAuthObject.publicKey
     }
 
-    @action logOut = async () => {
-        const njs = await import('../novusphere-js')
-        await njs.eos.logout()
+    @task.resolved logIn = async () => {
+        await eos.login()
+        if (eos.auth) {
+            this.setAuth(eos.auth)
+
+            // fetch balances
+            const whiteList = ['ATMOS']
+
+            await Promise.all(
+                whiteList.map(async whiteListToken => {
+                    eos.tokens.map(async token => {
+                        if (token.name === whiteListToken) {
+                            const balances = await eos.getAccountTokens(token.account)
+
+                            balances.forEach(balance => {
+                                this.balances.set(balance.token.name, balance.amount)
+                            })
+                        }
+                    })
+                })
+            )
+        }
+    }
+
+    @task.resolved logOut = async () => {
+        await eos.logout()
         this.clearAuth()
     }
 }

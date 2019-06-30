@@ -3,7 +3,7 @@ import { inject, observer } from 'mobx-react'
 import { Link } from '@router'
 import { IStores } from '@stores/index'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
-import { faEnvelope, faPen, faUser } from '@fortawesome/free-solid-svg-icons'
+import { faEnvelope, faPen, faSpinner, faUser } from '@fortawesome/free-solid-svg-icons'
 import { Tooltip } from 'react-tippy'
 
 interface ITitleHeaderProps {
@@ -15,26 +15,41 @@ interface ITitleHeaderProps {
 @observer
 class TitleHeader extends React.Component<ITitleHeaderProps> {
     private renderUserSettings = () => {
-        const { logOut } = this.props.authStore
+        const { logOut, ATMOSBalance } = this.props.authStore
 
         return (
-            <div className={'tooltip'} style={{ width: 150 }}>
+            <div className={'tooltip'} style={{ width: 200 }}>
                 <Link route={'/settings'}>
                     <a rel={'Open settings'} className={'db mb2'}>
                         settings
                     </a>
                 </Link>
-                <a rel={'Open settings'} className={'db pointer'} onClick={() => {
-                    logOut()
-                }}>
-                    disconnect
+                <span title={'ATMOS Balance'} className={'db mb2'}>
+                    {ATMOSBalance} ATMOS
+                </span>
+                <a
+                    rel={'Open settings'}
+                    className={'db pointer'}
+                    onClick={() => {
+                        logOut()
+                    }}
+                >
+                    {logOut['match']({
+                        pending: () => <FontAwesomeIcon icon={faSpinner} spin />,
+                        rejected: () => 'Unable to disconnect',
+                        resolved: () => 'disconnect',
+                    })}
                 </a>
             </div>
         )
     }
 
     private renderAuthActions = () => {
-        const { isLoggedIn, accountName } = this.props.authStore
+        const { isLoggedIn, accountName, logIn } = this.props.authStore
+
+        if (logIn['state'] === 'pending') {
+            return <FontAwesomeIcon icon={faSpinner} spin />
+        }
 
         if (isLoggedIn) {
             return (
@@ -50,6 +65,7 @@ class TitleHeader extends React.Component<ITitleHeaderProps> {
                         </a>
                     </Link>
                     <Tooltip
+                        open
                         interactive
                         html={this.renderUserSettings()}
                         position={'bottom-end'}
@@ -71,7 +87,10 @@ class TitleHeader extends React.Component<ITitleHeaderProps> {
 
         return (
             <>
-                <a className="f6 link dim br2 ph3 pv2 dib white bg-green mr2" href="#0">
+                <a
+                    className="f6 link dim br2 ph3 pv2 dib white bg-green mr2 pointer"
+                    onClick={() => logIn()}
+                >
                     Login
                 </a>
                 <Link route={'/settings'}>

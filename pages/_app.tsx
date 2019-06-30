@@ -3,6 +3,7 @@ import React from 'react'
 import Stores from '@stores/index'
 import { Provider } from 'mobx-react'
 import { MainLayout } from '@components'
+import { init, eos } from '@novuspherejs/index'
 
 class DiscussionApp extends App {
     private stores: any
@@ -45,16 +46,11 @@ class DiscussionApp extends App {
     }
 
     async componentDidMount() {
-        const njs = await import('../novusphere-js')
-        await njs.init()
-        const wallet = await njs.eos.detectWallet()
+        await init()
+        const wallet = await eos.detectWallet()
 
         if (typeof wallet !== 'boolean' && wallet) {
-            await njs.eos.login()
-
-            if (wallet.auth) {
-                this.stores.authStore.setAuth(wallet.auth)
-            }
+            this.stores.authStore.logIn()
         }
     }
 

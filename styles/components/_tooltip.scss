@@ -13,6 +13,7 @@
     border: 1px solid rgba(0, 0, 0, 0.15);
     border-radius: 0.25rem;
 
+		span,
     a {
         @extend .w-100;
         @extend .pv2;

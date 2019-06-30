@@ -2,6 +2,8 @@ import * as React from 'react'
 import { inject, observer } from 'mobx-react'
 import { IStores } from '@stores/index'
 import { MainPost, Replies } from '@components'
+import { faSpinner } from '@fortawesome/free-solid-svg-icons'
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 
 interface IEPage {
     postsStore: IStores['postsStore']
@@ -62,7 +64,7 @@ class E extends React.Component<IEPage> {
 
         const { fetchPost } = this.props.postsStore
         return (fetchPost as any).match({
-            pending: () => <span>Loading...</span>,
+            pending: () => <FontAwesomeIcon icon={faSpinner} spin />,
             rejected: err => <span>{err.message}</span>,
             resolved: ({ openingPost, map }) => {
                 return (
