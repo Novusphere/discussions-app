@@ -3,6 +3,7 @@ import { inject, observer } from 'mobx-react'
 import { Tab, Tabs, TabList, TabPanel } from 'react-tabs'
 import { Form } from '@components'
 import { IStores } from '@stores/index'
+import { settings } from '@novuspherejs/index'
 
 interface ISettings {
     settingsStore: IStores['settingsStore']
@@ -62,6 +63,10 @@ class Settings extends React.Component<ISettings> {
 
     private renderAccountComponent = () => {
         return <span>Test</span>
+    }
+
+    componentDidMount(): void {
+        console.log(settings)
     }
 
     public render() {

@@ -13,9 +13,10 @@ interface ITagListProps {
 
 const Sidebar: React.FC<ITagListProps> = ({ tags, onClick, ...props }) => {
     return (
-        <div className={'sidebar'}>
-            <ul className={'w-100'}>
-                {Array.from(tags.values()).map(tag => (
+        <ul className={'w-100'}>
+            {Array.from(tags.values())
+                .filter(tag => tag.root)
+                .map(tag => (
                     <li
                         key={tag.id}
                         className={classNames([
@@ -29,14 +30,39 @@ const Sidebar: React.FC<ITagListProps> = ({ tags, onClick, ...props }) => {
                                 className={'db black pointer pb1 no-underline'}
                                 onClick={() => onClick(tag)}
                             >
-                                {tag.root ? null : '#'}
                                 {tag.name}
                             </a>
                         </Link>
                     </li>
                 ))}
-            </ul>
-        </div>
+            <div className={'divider-line'} />
+            {Array.from(tags.values())
+                .filter(tag => !tag.root)
+                .map(tag => (
+                    <li
+                        key={tag.id}
+                        className={classNames([
+                            {
+                                active: props.router.asPath === tag.url,
+                            },
+                        ])}
+                    >
+                        <Link route={tag.url}>
+                            <span className={'flex items-center pb1 pointer'} onClick={() => onClick(tag)}>
+                                <img
+                                    className={'tag-icon pr2'}
+                                    src={tag.icon}
+                                    alt={`${tag.name} icon`}
+                                />
+                                <a className={'db black no-underline'}>
+                                    {'#'}
+                                    {tag.name}
+                                </a>
+                            </span>
+                        </Link>
+                    </li>
+                ))}
+        </ul>
     )
 }
 

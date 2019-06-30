@@ -44,6 +44,7 @@ form {
         }
     }
 
+    textarea,
     input {
         display: block;
         height: calc(1.5em + .75rem + 2px);
@@ -57,6 +58,12 @@ form {
         border: 1px solid #ced4da;
         border-radius: .25rem;
         transition: border-color .15s ease-in-out,box-shadow .15s ease-in-out;
+    }
+
+    textarea {
+        @extend .w-100;
+        min-height: 200px;
+        height: auto;
     }
 
     .checkbox-label {

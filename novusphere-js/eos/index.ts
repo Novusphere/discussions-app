@@ -70,7 +70,7 @@ export class EOS {
         }
     }
 
-    async detectWallet(attempts: number = 1): Promise<boolean> {
+    async detectWallet(attempts: number = 1): Promise<Wallet | boolean> {
         if (!this.accessContext) return false;
         const providers = this.accessContext.getWalletProviders();
         for (let i = 0; i < attempts && !this.wallet; i++) {
@@ -95,8 +95,9 @@ export class EOS {
             }
         }
 
-        return this.wallet != undefined;
+        return this.wallet
     }
+
     async transact(actions: any): Promise<string | undefined> {
         if (!this.wallet) return undefined;
 

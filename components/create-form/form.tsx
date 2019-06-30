@@ -118,6 +118,12 @@ const Form: React.FC<FormProps> = ({ form, children, hideSubmitButton, ...props 
                             />
                         </div>
                     )
+                case 'textarea':
+                    return (
+                        <div className={'field-container'} key={field.name}>
+                            <textarea {...bind} />
+                        </div>
+                    )
                 case 'button':
                     const { type, ...rest } = bind as any
                     return (

@@ -48,11 +48,9 @@ a {
 }
 
 .sidebar {
-	ul {
-		max-height: calc(100vh - 55px - 15px);
-		overflow: auto;
-		position: sticky;
-	}
+    max-height: calc(100vh - 55px - 15px);
+    overflow: auto;
+    position: sticky;
 }
 
 .card {
@@ -64,7 +62,7 @@ a {
     ul {
         margin: 0;
         padding: 0;
-		}
+    }
 
     li {
         @extend .ph3;
@@ -91,4 +89,15 @@ a {
             background-color: #f8f9fa;
         }
     }
+}
+
+.divider-line {
+    height: 1px;
+    line-height: 1px;
+    border-bottom: 1px solid #f1f1f1;
+}
+
+.tag-icon {
+    max-width: 24px;
+    height: 24px;
 }

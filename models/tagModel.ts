@@ -13,12 +13,12 @@ export class TagModel extends BaseModel {
     @observable root = false
     @observable url = ''
 
-    constructor(tag, icon, opts?: TagOptions) {
+    constructor(tag, opts?: TagOptions) {
         super()
         this.id = BaseModel.generateId()
         this.name = tag.name
         this.url = tag.url
-        this.icon = icon
+        this.icon = tag.logo
 
         if (opts && opts.url) {
             this.url = opts.url

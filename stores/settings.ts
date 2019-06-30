@@ -90,7 +90,7 @@ export default class Settings {
                 {
                     name: 'key',
                     label: null,
-                    type: 'text',
+                    type: 'textarea',
                     value: `{
                               "atmos_upvotes": true,
                               "scatter_timeout": 3000,

@@ -41,14 +41,20 @@ class DiscussionApp extends App {
         }
 
         // FIXME: this might be necessary later
-        // props.pageProps.stores = this.stores
+        props.pageProps.stores = this.stores
     }
 
     async componentDidMount() {
-        if (!(this as any).props.isServer) {
-            const njs = await import('../novusphere-js')
-            await njs.init()
-            await njs.eos.detectWallet()
+        const njs = await import('../novusphere-js')
+        await njs.init()
+        const wallet = await njs.eos.detectWallet()
+
+        if (typeof wallet !== 'boolean' && wallet) {
+            await njs.eos.login()
+
+            if (wallet.auth) {
+                this.stores.authStore.setAuth(wallet.auth)
+            }
         }
     }
 

@@ -6,10 +6,11 @@ import { Sidebar, TitleHeader } from '../index'
 import { TagModel } from '@models/tagModel'
 
 import '../../styles/style.scss'
+import { IStores } from '@stores/index'
 
 interface IMainLayoutProps {
     activeBanner: string
-    tagStore: TagStore
+    tagStore: IStores['tagStore']
     tags: TagStore['tags']
 }
 
@@ -31,7 +32,7 @@ class MainLayout extends React.Component<IMainLayoutProps> {
                 <TitleHeader />
                 <div className={'content'}>
                     <div className={'container flex pv3'}>
-                        <div className={'w-20 card mr3'}>
+                        <div className={'w-20 card sidebar mr3'}>
                             <Sidebar tags={this.props.tags} onClick={this.onClickTag} />
                         </div>
                         <div className={'w-80'}>{this.props.children}</div>
