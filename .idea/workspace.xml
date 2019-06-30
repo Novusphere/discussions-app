@@ -2,8 +2,7 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="2d14133e-344f-4fbf-9bb7-c9e5e96ae697" name="Default Changelist" comment="">
-      <change beforePath="$PROJECT_DIR$/components/index.ts" beforeDir="false" afterPath="$PROJECT_DIR$/components/index.ts" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/pages/notifications/index.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/pages/notifications/index.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/components/notification-feed/notification.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/components/notification-feed/notification.tsx" afterDir="false" />
     </list>
     <ignored path="$PROJECT_DIR$/.tmp/" />
     <ignored path="$PROJECT_DIR$/temp/" />
@@ -151,8 +150,8 @@
           <file pinned="false" current-in-tab="true">
             <entry file="file://$PROJECT_DIR$/components/notification-feed/notification.tsx">
               <provider selected="true" editor-type-id="text-editor">
-                <state relative-caret-position="544">
-                  <caret line="34" column="66" lean-forward="true" selection-start-line="34" selection-start-column="66" selection-end-line="34" selection-end-column="66" />
+                <state relative-caret-position="624">
+                  <caret line="39" column="17" selection-end-line="56" />
                   <folding>
                     <element signature="e#0#30#0" expanded="true" />
                   </folding>
@@ -425,18 +424,18 @@
       <workItem from="1561755345381" duration="31000" />
       <workItem from="1561821340621" duration="12231000" />
       <workItem from="1561843222591" duration="3380000" />
-      <workItem from="1561911865693" duration="11816000" />
+      <workItem from="1561911865693" duration="11896000" />
     </task>
     <servers />
   </component>
   <component name="TimeTrackingManager">
-    <option name="totallyTimeSpent" value="94468000" />
+    <option name="totallyTimeSpent" value="94548000" />
   </component>
   <component name="ToolWindowManager">
     <frame x="-8" y="-8" width="2576" height="1416" extended-state="6" />
     <editor active="true" />
     <layout>
-      <window_info active="true" content_ui="combo" id="Project" order="0" visible="true" weight="0.1394799" />
+      <window_info content_ui="combo" id="Project" order="0" visible="true" weight="0.1394799" />
       <window_info id="Structure" order="1" side_tool="true" weight="0.25" />
       <window_info id="Favorites" order="2" side_tool="true" />
       <window_info anchor="bottom" id="Message" order="0" />
@@ -449,7 +448,7 @@
       <window_info anchor="bottom" id="Version Control" order="7" />
       <window_info anchor="bottom" id="Docker" order="8" show_stripe_button="false" />
       <window_info anchor="bottom" id="TypeScript" order="9" />
-      <window_info anchor="bottom" id="Terminal" order="10" visible="true" weight="0.11691348" />
+      <window_info active="true" anchor="bottom" id="Terminal" order="10" visible="true" weight="0.11691348" />
       <window_info anchor="bottom" id="Event Log" order="11" side_tool="true" />
       <window_info anchor="right" id="Commander" internal_type="SLIDING" order="0" type="SLIDING" weight="0.4" />
       <window_info anchor="right" id="Ant Build" order="1" weight="0.25" />
@@ -913,8 +912,8 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/components/notification-feed/notification.tsx">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="544">
-          <caret line="34" column="66" lean-forward="true" selection-start-line="34" selection-start-column="66" selection-end-line="34" selection-end-column="66" />
+        <state relative-caret-position="624">
+          <caret line="39" column="17" selection-end-line="56" />
           <folding>
             <element signature="e#0#30#0" expanded="true" />
           </folding>

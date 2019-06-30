@@ -13,7 +13,7 @@ const Notification: React.FC<IPostPreviewProps> = ({ notification, onClick }) =>
     <div className={'post-preview'}>
         <div className={'flex flex-auto'}>
             {/*<div className={'bg-light-gray flex tc justify-center ph2 pv4 relative z-2 flex-auto'}>*/}
-                {/*<Votes votes={notification.votes} />*/}
+            {/*<Votes votes={notification.votes} />*/}
             {/*</div>*/}
 
             <div
@@ -24,13 +24,20 @@ const Notification: React.FC<IPostPreviewProps> = ({ notification, onClick }) =>
                     <span className={'b ttu'}>{notification.data.json_metadata.sub}</span>
                     <span className={'ph1 b'}>&#183;</span>
                     <span className={'o-80'}>by {notification.data.poster}</span>
-                    <span className={'o-50 pl2'}>{moment(notification.createdAt * 1000).fromNow()}</span>
+                    <span className={'o-50 pl2'}>
+                        {moment(notification.createdAt * 1000).fromNow()}
+                    </span>
                 </div>
                 <div className={'flex justify-between items-center pv3'}>
-                    <span className={'black f3 b lh-title'}>{notification.data.json_metadata.title}</span>
+                    <span className={'black f3 b lh-title'}>
+                        {notification.data.json_metadata.title}
+                    </span>
                 </div>
 
-                <span className={'black lh-copy measure-wide'}>{notification.data.content}</span>
+                <span
+                    className={'black lh-copy measure-wide'}
+                    dangerouslySetInnerHTML={{ __html: notification.data.content }}
+                />
 
                 <div className={'flex z-2 relative mt3 footer b'}>
                     <span className={'o-80 f6 ml2 dim pointer'}>
