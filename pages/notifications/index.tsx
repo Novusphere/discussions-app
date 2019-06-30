@@ -6,9 +6,9 @@ import { discussions } from '@novuspherejs/index'
 import { faSpinner } from '@fortawesome/free-solid-svg-icons'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { reaction } from 'mobx'
-import { IPost } from '@stores/posts'
 import { Notification } from '@components'
 import { TagModel } from '@models/tagModel'
+import { INotificationPost } from '@novuspherejs/discussions/notification'
 
 interface INotificationsProps {
     authStore: IStores['authStore']
@@ -41,8 +41,8 @@ class Notifications extends React.Component<INotificationsProps> {
         })
     }
 
-    public clickNotification = (post: IPost) => {
-        console.log(post)
+    public clickNotification = (notificationPost: INotificationPost) => {
+        console.log(notificationPost)
     }
 
     public render(): React.ReactNode {
