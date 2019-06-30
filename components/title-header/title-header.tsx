@@ -4,6 +4,7 @@ import { Link } from '@router'
 import { IStores } from '@stores/index'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { faEnvelope, faPen, faUser } from '@fortawesome/free-solid-svg-icons'
+import { Tooltip } from 'react-tippy'
 
 interface ITitleHeaderProps {
     tagStore: IStores['tagStore']
@@ -13,8 +14,27 @@ interface ITitleHeaderProps {
 @inject('tagStore', 'authStore')
 @observer
 class TitleHeader extends React.Component<ITitleHeaderProps> {
+    private renderUserSettings = () => {
+        const { logOut } = this.props.authStore
+
+        return (
+            <div className={'tooltip'} style={{ width: 150 }}>
+                <Link route={'/settings'}>
+                    <a rel={'Open settings'} className={'db mb2'}>
+                        settings
+                    </a>
+                </Link>
+                <a rel={'Open settings'} className={'db pointer'} onClick={() => {
+                    logOut()
+                }}>
+                    disconnect
+                </a>
+            </div>
+        )
+    }
+
     private renderAuthActions = () => {
-        const { isLoggedIn } = this.props.authStore
+        const { isLoggedIn, accountName } = this.props.authStore
 
         if (isLoggedIn) {
             return (
@@ -29,11 +49,22 @@ class TitleHeader extends React.Component<ITitleHeaderProps> {
                             <FontAwesomeIcon icon={faEnvelope} className={'ph2'} />
                         </a>
                     </Link>
-                    <Link route={'/profile'}>
-                        <a rel={'Open your profile'}>
-                            <FontAwesomeIcon icon={faUser} className={'pl2'} />
+                    <Tooltip
+                        interactive
+                        html={this.renderUserSettings()}
+                        position={'bottom-end'}
+                        trigger={'mouseenter'}
+                        animation={'none'}
+                        duration={0}
+                    >
+                        <a
+                            rel={'Open your profile'}
+                            className={'flex items-center user-container pointer dim'}
+                        >
+                            <FontAwesomeIcon icon={faUser} />
+                            <span className={'b f6 pl3 pr1'}>{accountName}</span>
                         </a>
-                    </Link>
+                    </Tooltip>
                 </div>
             )
         }

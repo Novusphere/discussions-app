@@ -38,4 +38,10 @@ export default class Auth {
         this.permission = eosAuthObject.permission
         this.publicKey = eosAuthObject.publicKey
     }
+
+    @action logOut = async () => {
+        const njs = await import('../novusphere-js')
+        await njs.eos.logout()
+        this.clearAuth()
+    }
 }

@@ -29,6 +29,7 @@
     "react-dom": "16.8.6",
     "react-select": "latest",
     "react-tabs": "^3.0.0",
+    "react-tippy": "^1.2.3",
     "tachyons": "4.11.1",
     "typescript": "3.5.2",
     "validatorjs": "3.15.1"
