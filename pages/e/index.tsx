@@ -4,6 +4,8 @@ import { IStores } from '@stores/index'
 import { MainPost, Replies } from '@components'
 import { faSpinner } from '@fortawesome/free-solid-svg-icons'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
+import { Thread } from '@novuspherejs/discussions'
+import { isServer } from '@utils'
 
 interface IEPage {
     postsStore: IStores['postsStore']

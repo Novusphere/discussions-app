@@ -6,7 +6,7 @@ import { MainLayout } from '@components'
 import { init, eos } from '@novuspherejs/index'
 import { withMobx } from 'next-mobx-wrapper'
 
-const isServer = !(process as any).browser
+export const isServer = !(process as any).browser
 
 // import { configure } from 'mobx'
 // configure({ enforceActions: 'observed' })
@@ -16,18 +16,15 @@ class DiscussionApp extends App {
     private props: any
 
     static async getInitialProps(ctx) {
-        let userState = null
         const isServer = !!ctx.req
-
         let pageProps = {}
-
+        //
         if (ctx.Component.getInitialProps) {
             pageProps = await ctx.Component.getInitialProps(ctx)
         }
 
         return {
             isServer,
-            userState,
             pageProps,
         }
     }
