@@ -10,6 +10,7 @@ export const Routes = routes()
     .add('tag', '/tag/:name')
     .add('settings', '/settings')
     .add('notifications', '/notifications')
+    .add('new', '/new')
 
 export const Link = Routes.Link
 

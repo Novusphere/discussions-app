@@ -54,7 +54,7 @@ class TitleHeader extends React.Component<ITitleHeaderProps> {
         if (isLoggedIn) {
             return (
                 <div className={'f4 flex items-center'}>
-                    <Link route={'/e/all/new'}>
+                    <Link route={`/new`}>
                         <a rel={'Create a new post'}>
                             <FontAwesomeIcon icon={faPen} className={'ph2'} />
                         </a>

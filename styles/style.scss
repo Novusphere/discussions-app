@@ -42,6 +42,10 @@ body {
     background-color: #ecf0f1;
 }
 
+button {
+    border: 0;
+}
+
 a {
     @extend .dim;
     @extend .no-underline;

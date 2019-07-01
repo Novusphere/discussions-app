@@ -38,10 +38,7 @@ class Settings extends React.Component<ISettings> {
                     </a>
                     .
                 </span>
-                <div className={'flex mv3'}>
-                    <div className={'w-10 mt2'}>Known</div>
-                    <Form form={moderationForm} hideSubmitButton className={'w-60'} />
-                </div>
+                <Form form={moderationForm} hideSubmitButton className={'mv3'} />
             </>
         )
     }

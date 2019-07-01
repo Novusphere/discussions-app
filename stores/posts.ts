@@ -1,7 +1,10 @@
 import { action, observable } from 'mobx'
 import { discussions } from '@novuspherejs/index'
 import { task } from 'mobx-task'
-import {BaseStore, getOrCreateStore} from 'next-mobx-wrapper';
+import { BaseStore, getOrCreateStore } from 'next-mobx-wrapper'
+import { CreateForm } from '@components'
+import { getTagStore } from '@stores/tag'
+import { IStores } from '@stores/index'
 
 export interface IAttachment {
     value: string
@@ -39,11 +42,13 @@ export interface IPost {
 export default class Posts extends BaseStore {
     // all posts by filter
     @observable posts: IPost[] = []
-
     @observable activePostId = ''
-    constructor() {
-        super()
-        this.fetchPost = this.fetchPost.bind(this)
+
+    private tagsStore: IStores['tagStore']
+
+    constructor(props) {
+        super(props)
+        this.tagsStore = getTagStore()
     }
 
     @action getPostsByTag = (tags: string[]) => {
@@ -63,6 +68,42 @@ export default class Posts extends BaseStore {
         } catch (error) {
             throw error
         }
+    }
+
+    get newPostForm() {
+        return new CreateForm(
+            {
+                onSuccess: form => {
+                    console.log(form)
+                },
+            },
+            [
+                {
+                    name: 'title',
+                    label: `Title`,
+                    placeholder: 'Enter a post title',
+                    rules: 'required|string',
+                },
+                {
+                    name: 'Sub',
+                    label: 'Sub',
+                    placeholder: 'Select a sub',
+                    rules: 'required',
+                    type: 'dropdown',
+                    extra: {
+                        options: [
+                            { value: 'all', label: 'all' },
+                            ...Array.from(this.tagsStore.tags.values())
+                                .filter(tag => !tag.root)
+                                .map(tag => ({
+                                    value: tag.name,
+                                    label: tag.name,
+                                })),
+                        ],
+                    },
+                },
+            ]
+        )
     }
 }
 

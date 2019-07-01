@@ -16,18 +16,12 @@ export default class Settings extends BaseStore {
                     label: `Name`,
                     placeholder: 'Enter your desired ID',
                     rules: 'required|string',
-                    extra: {
-                        leftLabel: 'Name',
-                    },
                 },
                 {
                     name: 'key',
                     label: `Key`,
                     value: '123123123',
                     rules: 'required|string',
-                    extra: {
-                        leftLabel: 'Key',
-                    },
                 },
             ]
         )
@@ -62,7 +56,7 @@ export default class Settings extends BaseStore {
                 },
                 {
                     name: 'key',
-                    label: null,
+                    label: 'Key',
                     placeholder: 'endpoint',
                     rules: 'required|string',
                 },
