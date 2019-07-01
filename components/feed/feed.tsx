@@ -7,9 +7,10 @@ import { IPost } from '@stores/posts'
 
 interface IFeedProps {
     postsStore: IStores['postsStore']
+    tagStore: IStores['tagStore']
 }
 
-@inject('postsStore')
+@inject('postsStore', 'tagStore')
 @observer
 class Feed extends React.Component<IFeedProps> {
     public clickPost = (post: IPost) => {
@@ -20,7 +21,12 @@ class Feed extends React.Component<IFeedProps> {
 
     public render(): React.ReactNode {
         return this.props.postsStore.posts.map(post => (
-            <PostPreview post={post} key={post.uuid} onClick={this.clickPost} />
+            <PostPreview
+                post={post}
+                key={post.uuid}
+                onClick={this.clickPost}
+                tag={this.props.tagStore.tags.get(post.sub)}
+            />
         ))
     }
 }

@@ -47,15 +47,26 @@ export default class Auth {
     }
 
     @task.resolved logIn = async () => {
-        await eos.login()
-        if (eos.auth) {
-            this.setAuth(eos.auth)
+        try {
+            let wallet = eos.wallet
 
-            // fetch balances
-            const balances = await eos.getAccountTokens(this.accountName)
-            balances.forEach(balance => {
-                this.balances.set(balance.token.name, balance.amount)
-            })
+            if (typeof wallet !== 'boolean' && wallet) {
+                await eos.login()
+                console.log(eos.auth)
+                if (eos.auth) {
+                    this.setAuth(eos.auth)
+
+                    // fetch balances
+                    const balances = await eos.getAccountTokens(this.accountName)
+                    balances.forEach(balance => {
+                        this.balances.set(balance.token.name, balance.amount)
+                    })
+                }
+            } else {
+                await eos.detectWallet()
+            }
+        } catch (error) {
+            return error
         }
     }
 

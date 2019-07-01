@@ -1,8 +1,7 @@
 import * as React from 'react'
 import Head from 'next/head'
 import { inject, observer } from 'mobx-react'
-import TagStore from '../../stores/tag'
-import { Sidebar, TitleHeader } from '../index'
+import { AppModals, Sidebar, TitleHeader } from '@components'
 import { TagModel } from '@models/tagModel'
 
 import '../../styles/style.scss'
@@ -11,7 +10,7 @@ import { IStores } from '@stores/index'
 interface IMainLayoutProps {
     activeBanner: string
     tagStore: IStores['tagStore']
-    tags: TagStore['tags']
+    tags: IStores['tagStore']['tags']
 }
 
 @inject('tagStore')
@@ -30,12 +29,13 @@ class MainLayout extends React.Component<IMainLayoutProps> {
 
                 <div className={'w-100 header-image o-50'}>{this.props.activeBanner}</div>
                 <TitleHeader />
+                <AppModals />
                 <div className={'content'}>
                     <div className={'container flex pv3'}>
-                        <div className={'w-20 card sidebar mr3'}>
+                        <div className={'w-30 card sidebar mr3'}>
                             <Sidebar tags={this.props.tags} onClick={this.onClickTag} />
                         </div>
-                        <div className={'w-80'}>{this.props.children}</div>
+                        <div className={'w-70'}>{this.props.children}</div>
                     </div>
                 </div>
 

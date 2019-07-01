@@ -18,7 +18,7 @@ export const stores = {
 	__userStore__: initialState => new User(initialState),
 	__uiStore__: initialState => new UI(initialState),
 	__tagStore__: initialState => new Tag(initialState),
-	__authStore__: initialState => new Auth(initialState),
+	__authStore__: (initialState) => new Auth(initialState),
 	__postsStore__: initialState => new Posts(initialState),
 	__settingsStore__: initialState => new Settings(initialState),
 };

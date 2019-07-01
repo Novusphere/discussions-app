@@ -8,7 +8,7 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { reaction } from 'mobx'
 import { Notification } from '@components'
 import { TagModel } from '@models/tagModel'
-import { INotificationPost } from '@novuspherejs/discussions/notification'
+import { INotificationPost, INotifications } from '@novuspherejs/discussions/notification'
 
 interface INotificationsProps {
     authStore: IStores['authStore']
@@ -49,7 +49,7 @@ class Notifications extends React.Component<INotificationsProps> {
         return this.fetchNotifications['match']({
             pending: () => <FontAwesomeIcon icon={faSpinner} spin />,
             rejected: () => 'Something went wrong fetching notifications',
-            resolved: notifications => {
+            resolved: (notifications: INotifications) => {
                 if (!notifications || !notifications.posts) {
                     return <span>No notifications</span>
                 }
@@ -58,11 +58,12 @@ class Notifications extends React.Component<INotificationsProps> {
                     return <FontAwesomeIcon icon={faSpinner} spin />
                 }
 
-                return notifications.posts.map(notificationPosts => (
+                return notifications.posts.map((notificationPosts) => (
                     <Notification
                         notification={notificationPosts}
                         key={notificationPosts.id}
                         onClick={this.clickNotification}
+                        tag={this.props.tagStore.tags.get(notificationPosts.data.json_metadata.sub)}
                     />
                 ))
             },

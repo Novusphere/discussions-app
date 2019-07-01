@@ -121,6 +121,7 @@ class TitleHeader extends React.Component<ITitleHeaderProps> {
         )
     }
 
+
     public render(): React.ReactNode {
         return (
             <div className={'title-header flex items-center z-999'}>
