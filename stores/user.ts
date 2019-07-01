@@ -1,16 +1,8 @@
-import { extendObservable, observable } from 'mobx';
+import { observable } from 'mobx';
+import {BaseStore, getOrCreateStore} from 'next-mobx-wrapper';
 
-const defaultState = {
-};
-
-export default class User {
+export default class User extends BaseStore {
 	@observable username = 'Test';
-
-	/**
-	 * Must have constructor to set default state from SSR
-	 * @param User
-	 */
-	constructor(User = null) {
-		extendObservable(this, User || defaultState);
-	}
 };
+
+export const getUserStore = getOrCreateStore('userStore', User)

@@ -1,25 +1,21 @@
-import { action, computed, extendObservable, observable } from 'mobx'
+import { action, computed, observable } from 'mobx'
 import { task } from 'mobx-task'
 import { eos } from '@novuspherejs/index'
+import { BaseStore, getOrCreateStore } from 'next-mobx-wrapper'
+import { getUiStore } from '@stores/ui'
+import { IStores } from '@stores/index'
+import { ModalOptions } from '../constants/globals'
 
-const defaultState = {
-    accountName: '',
-    permission: '',
-    publicKey: '',
-}
-
-export default class Auth {
+export default class Auth extends BaseStore {
     @observable accountName = ''
     @observable permission = ''
     @observable publicKey = ''
     @observable balances = observable.map<string, number>()
 
-    /**
-     * Must have constructor to set default state from SSR
-     * @param Auth
-     */
-    constructor(Auth = null) {
-        extendObservable(this, Auth || defaultState)
+    private uiStore: IStores['uiStore'] = getUiStore()
+
+    constructor() {
+        super()
     }
 
     @computed get isLoggedIn(): boolean {
@@ -66,6 +62,7 @@ export default class Auth {
                 await eos.detectWallet()
             }
         } catch (error) {
+            this.uiStore.showModal(ModalOptions.walletUndetected)
             return error
         }
     }
@@ -75,3 +72,5 @@ export default class Auth {
         this.clearAuth()
     }
 }
+
+export const getAuthStore = getOrCreateStore('authStore', Auth)

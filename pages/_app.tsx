@@ -1,21 +1,23 @@
 import App, { Container } from 'next/app'
 import React from 'react'
-import Stores from '@stores/index'
-import { Provider } from 'mobx-react'
+import * as Stores from '@stores/index'
+import { Provider, useStaticRendering } from 'mobx-react'
 import { MainLayout } from '@components'
 import { init, eos } from '@novuspherejs/index'
+import { withMobx } from 'next-mobx-wrapper'
+
+const isServer = !(process as any).browser
+
+// import { configure } from 'mobx'
+// configure({ enforceActions: 'observed' })
+useStaticRendering(isServer) // NOT `true` value
 
 class DiscussionApp extends App {
-    private stores: any
+    private props: any
 
     static async getInitialProps(ctx) {
         let userState = null
         const isServer = !!ctx.req
-
-        if (isServer === true) {
-            const User = Stores('__userStore__', {})
-            userState = User.getUserFromCookie(ctx.req)
-        }
 
         let pageProps = {}
 
@@ -30,38 +32,25 @@ class DiscussionApp extends App {
         }
     }
 
-    constructor(props) {
-        super(props)
-        this.stores = {
-            userStore: Stores('__userStore__', props.userState),
-            uiStore: Stores('__uiStore__', {}),
-            tagStore: Stores('__tagStore__', {}),
-            authStore: Stores('__authStore__', {}),
-            postsStore: Stores('__postsStore__', {}),
-            settingsStore: Stores('__settingsStore__', {}),
-        }
-
-        // FIXME: this might be necessary later
-        props.pageProps.stores = this.stores
-    }
-
     async componentDidMount() {
-        await init()
-        const wallet = await eos.detectWallet()
+        if (!isServer) {
+            await init()
+            const wallet = await eos.detectWallet()
 
-        if (typeof wallet !== 'boolean' && wallet) {
-            this.stores.authStore.logIn()
+            if (typeof wallet !== 'boolean' && wallet) {
+                this.props.stores.authStore.logIn()
+            }
         }
     }
 
     public render() {
-        const { Component, pageProps } = (this as any).props
+        const { Component, pageProps, store } = (this as any).props
         return (
             <Container>
-                <Provider {...this.stores}>
+                <Provider {...store}>
                     <MainLayout
-                        activeBanner={this.stores.uiStore.activeBanner}
-                        tags={this.stores.tagStore.tags}
+                        activeBanner={store.uiStore.activeBanner}
+                        tags={store.tagStore.tags}
                     >
                         <Component {...pageProps} />
                     </MainLayout>
@@ -71,4 +60,4 @@ class DiscussionApp extends App {
     }
 }
 
-export default DiscussionApp
+export default withMobx(Stores)(DiscussionApp)

@@ -1,6 +1,7 @@
-import { extendObservable, observable } from 'mobx'
+import { observable } from 'mobx'
 import { TagModel } from '@models/tagModel'
 import { SubModel } from '@models/subModel'
+import {BaseStore, getOrCreateStore} from 'next-mobx-wrapper';
 
 const defaultState = {
     activeTag: null,
@@ -8,14 +9,14 @@ const defaultState = {
     tags: [],
 }
 
-export default class Tag {
+export default class Tag extends BaseStore {
     @observable activeTag: TagModel | null = defaultState.activeTag
     @observable activeSub: SubModel | null = null
     @observable tags = observable.map<string, TagModel>()
     @observable subs = observable.map<string, TagModel>()
 
-    constructor(Tag = null) {
-        extendObservable(this, Tag || defaultState)
+    constructor() {
+        super()
 
         // set top level tags
         this.setTopLevelTags()
@@ -462,3 +463,5 @@ export default class Tag {
         })
     }
 }
+
+export const getTagStore = getOrCreateStore('tagStore', Tag)

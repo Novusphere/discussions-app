@@ -1,8 +1,7 @@
-import { action, extendObservable, observable } from 'mobx'
+import { action, observable } from 'mobx'
 import { discussions } from '@novuspherejs/index'
 import { task } from 'mobx-task'
-
-const defaultState = {}
+import {BaseStore, getOrCreateStore} from 'next-mobx-wrapper';
 
 export interface IAttachment {
     value: string
@@ -37,18 +36,13 @@ export interface IPost {
     alreadyVoted: boolean
 }
 
-export default class Posts {
+export default class Posts extends BaseStore {
     // all posts by filter
     @observable posts: IPost[] = []
 
     @observable activePostId = ''
-
-    /**
-     * Must have constructor to set default state from SSR
-     * @param Posts
-     */
-    constructor(Posts = null) {
-        extendObservable(this, Posts || defaultState)
+    constructor() {
+        super()
         this.fetchPost = this.fetchPost.bind(this)
     }
 
@@ -71,3 +65,5 @@ export default class Posts {
         }
     }
 }
+
+export const getPostsStore = getOrCreateStore('postsStore', Posts)

@@ -1,17 +1,8 @@
-import { extendObservable } from 'mobx'
 import { CreateForm } from '@components'
+import {BaseStore, getOrCreateStore} from 'next-mobx-wrapper';
 
-const defaultState = {}
 
-export default class Settings {
-    /**
-     * Must have constructor to set default state from SSR
-     * @param Settings
-     */
-    constructor(Settings = null) {
-        extendObservable(this, Settings || defaultState)
-    }
-
+export default class Settings extends BaseStore {
     get setIdForm() {
         return new CreateForm(
             {
@@ -108,3 +99,5 @@ export default class Settings {
         )
     }
 }
+
+export const getSettingsStore = getOrCreateStore('settingsStore', Settings)

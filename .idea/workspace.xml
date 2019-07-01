@@ -2,21 +2,17 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="2d14133e-344f-4fbf-9bb7-c9e5e96ae697" name="Default Changelist" comment="">
-      <change beforePath="$PROJECT_DIR$/.gitignore" beforeDir="false" afterPath="$PROJECT_DIR$/.gitignore" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/components/feed/feed.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/components/feed/feed.tsx" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/components/feed/post-preview/post-preview.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/components/feed/post-preview/post-preview.tsx" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/components/index.ts" beforeDir="false" afterPath="$PROJECT_DIR$/components/index.ts" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/components/main-layout/main-layout.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/components/main-layout/main-layout.tsx" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/components/notification-feed/notification.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/components/notification-feed/notification.tsx" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/components/title-header/title-header.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/components/title-header/title-header.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.babelrc" beforeDir="false" afterPath="$PROJECT_DIR$/.babelrc" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/package-lock.json" beforeDir="false" afterPath="$PROJECT_DIR$/package-lock.json" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/package.json" beforeDir="false" afterPath="$PROJECT_DIR$/package.json" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/pages/notifications/index.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/pages/notifications/index.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/pages/_app.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/pages/_app.tsx" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/stores/auth.ts" beforeDir="false" afterPath="$PROJECT_DIR$/stores/auth.ts" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/stores/index.ts" beforeDir="false" afterPath="$PROJECT_DIR$/stores/index.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/stores/posts.ts" beforeDir="false" afterPath="$PROJECT_DIR$/stores/posts.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/stores/settings.ts" beforeDir="false" afterPath="$PROJECT_DIR$/stores/settings.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/stores/tag.ts" beforeDir="false" afterPath="$PROJECT_DIR$/stores/tag.ts" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/stores/ui.ts" beforeDir="false" afterPath="$PROJECT_DIR$/stores/ui.ts" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/styles/components/_all.scss" beforeDir="false" afterPath="$PROJECT_DIR$/styles/components/_all.scss" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/stores/user.ts" beforeDir="false" afterPath="$PROJECT_DIR$/stores/user.ts" afterDir="false" />
     </list>
     <ignored path="$PROJECT_DIR$/.tmp/" />
     <ignored path="$PROJECT_DIR$/temp/" />
@@ -30,98 +26,78 @@
   <component name="FileEditorManager">
     <splitter split-orientation="horizontal" split-proportion="0.5">
       <split-first>
-        <splitter split-orientation="vertical" split-proportion="0.6204209">
-          <split-first>
-            <leaf SIDE_TABS_SIZE_LIMIT_KEY="300">
-              <file pinned="false" current-in-tab="false">
-                <entry file="file://$PROJECT_DIR$/stores/auth.ts">
-                  <provider selected="true" editor-type-id="text-editor">
-                    <state relative-caret-position="144">
-                      <caret line="15" lean-forward="true" selection-start-line="15" selection-end-line="15" />
-                      <folding>
-                        <element signature="e#0#69#0" expanded="true" />
-                      </folding>
-                    </state>
-                  </provider>
-                </entry>
-              </file>
-              <file pinned="false" current-in-tab="true">
-                <entry file="file://$PROJECT_DIR$/stores/index.ts">
-                  <provider selected="true" editor-type-id="text-editor">
-                    <state relative-caret-position="432">
-                      <caret line="27" column="40" lean-forward="true" selection-start-line="27" selection-start-column="40" selection-end-line="27" selection-end-column="40" />
-                      <folding>
-                        <element signature="e#0#32#0" expanded="true" />
-                      </folding>
-                    </state>
-                  </provider>
-                </entry>
-              </file>
-              <file pinned="false" current-in-tab="false">
-                <entry file="file://$PROJECT_DIR$/novusphere-js/eos/index.ts">
-                  <provider selected="true" editor-type-id="text-editor">
-                    <state relative-caret-position="315">
-                      <caret line="72" column="10" selection-start-line="72" selection-start-column="10" selection-end-line="72" selection-end-column="10" />
-                      <folding>
-                        <element signature="e#0#100#0" expanded="true" />
-                      </folding>
-                    </state>
-                  </provider>
-                </entry>
-              </file>
-            </leaf>
-          </split-first>
-          <split-second>
-            <leaf>
-              <file pinned="false" current-in-tab="true">
-                <entry file="file://$PROJECT_DIR$/components/modal/modal-container.tsx">
-                  <provider selected="true" editor-type-id="text-editor">
-                    <state relative-caret-position="272">
-                      <caret line="17" column="36" lean-forward="true" selection-start-line="17" selection-start-column="36" selection-end-line="17" selection-end-column="36" />
-                      <folding>
-                        <element signature="e#0#30#0" expanded="true" />
-                      </folding>
-                    </state>
-                  </provider>
-                </entry>
-              </file>
-            </leaf>
-          </split-second>
-        </splitter>
+        <leaf>
+          <file pinned="false" current-in-tab="true">
+            <entry file="file://$PROJECT_DIR$/stores/index.ts">
+              <provider selected="true" editor-type-id="text-editor">
+                <state relative-caret-position="192">
+                  <caret line="12" column="18" selection-start-line="12" selection-start-column="18" selection-end-line="12" selection-end-column="18" />
+                  <folding>
+                    <element signature="e#0#32#0" expanded="true" />
+                  </folding>
+                </state>
+              </provider>
+            </entry>
+          </file>
+          <file pinned="false" current-in-tab="false">
+            <entry file="file://$PROJECT_DIR$/pages/_app.tsx">
+              <provider selected="true" editor-type-id="text-editor">
+                <state relative-caret-position="720">
+                  <caret line="45" column="21" lean-forward="true" selection-start-line="45" selection-start-column="21" selection-end-line="45" selection-end-column="21" />
+                  <folding>
+                    <element signature="e#0#41#0" expanded="true" />
+                  </folding>
+                </state>
+              </provider>
+            </entry>
+          </file>
+        </leaf>
       </split-first>
       <split-second>
         <leaf>
-          <file pinned="false" current-in-tab="false">
-            <entry file="file://$PROJECT_DIR$/components/main-layout/main-layout.tsx">
-              <provider selected="true" editor-type-id="text-editor">
-                <state relative-caret-position="417">
-                  <caret line="31" column="23" selection-start-line="31" selection-start-column="23" selection-end-line="31" selection-end-column="23" />
-                  <folding>
-                    <element signature="e#0#30#0" expanded="true" />
-                  </folding>
-                </state>
-              </provider>
-            </entry>
-          </file>
-          <file pinned="false" current-in-tab="false">
-            <entry file="file://$PROJECT_DIR$/components/modal/modal-switcher.tsx">
-              <provider selected="true" editor-type-id="text-editor">
-                <state relative-caret-position="528">
-                  <caret line="33" lean-forward="true" selection-start-line="33" selection-end-line="33" />
-                  <folding>
-                    <element signature="e#0#30#0" expanded="true" />
-                  </folding>
-                </state>
-              </provider>
-            </entry>
-          </file>
           <file pinned="false" current-in-tab="true">
-            <entry file="file://$PROJECT_DIR$/pages/_app.tsx">
+            <entry file="file://$PROJECT_DIR$/stores/auth.ts">
               <provider selected="true" editor-type-id="text-editor">
-                <state relative-caret-position="496">
-                  <caret line="40" column="59" lean-forward="true" selection-start-line="40" selection-start-column="59" selection-end-line="40" selection-end-column="59" />
+                <state relative-caret-position="560">
+                  <caret line="35" column="27" lean-forward="true" selection-start-line="35" selection-start-column="27" selection-end-line="35" selection-end-column="27" />
                   <folding>
-                    <element signature="e#0#41#0" expanded="true" />
+                    <element signature="e#0#51#0" expanded="true" />
+                  </folding>
+                </state>
+              </provider>
+            </entry>
+          </file>
+          <file pinned="false" current-in-tab="false">
+            <entry file="file://$PROJECT_DIR$/novusphere-js/eos/index.ts">
+              <provider selected="true" editor-type-id="text-editor">
+                <state relative-caret-position="291">
+                  <caret line="72" column="10" selection-start-line="72" selection-start-column="10" selection-end-line="72" selection-end-column="10" />
+                  <folding>
+                    <element signature="e#0#100#0" expanded="true" />
+                  </folding>
+                </state>
+              </provider>
+            </entry>
+          </file>
+          <file pinned="false" current-in-tab="false">
+            <entry file="file://$PROJECT_DIR$/components/thread/main-post/main-post.tsx">
+              <provider selected="true" editor-type-id="text-editor">
+                <state relative-caret-position="384">
+                  <caret line="24" selection-start-line="24" selection-end-line="24" />
+                  <folding>
+                    <element signature="e#0#30#0" expanded="true" />
+                  </folding>
+                </state>
+              </provider>
+            </entry>
+          </file>
+          <file pinned="false" current-in-tab="false">
+            <entry file="file://$PROJECT_DIR$/stores/user.ts">
+              <provider selected="true" editor-type-id="text-editor">
+                <state relative-caret-position="128">
+                  <caret line="8" lean-forward="true" selection-start-line="8" selection-end-line="8" />
+                  <folding>
+                    <element signature="e#0#52#0" expanded="true" />
                   </folding>
                 </state>
               </provider>
@@ -133,8 +109,6 @@
   </component>
   <component name="FindInProjectRecents">
     <findStrings>
-      <find>TagList</find>
-      <find>Login</find>
       <find>depth</find>
       <find>Hey, **wasa** #wasa</find>
       <find>.indent</find>
@@ -163,6 +137,8 @@
       <find>getThread</find>
       <find>modal-content</find>
       <find>modal-backdrop</find>
+      <find>next-mobx-wrapper</find>
+      <find>next</find>
     </findStrings>
     <replaceStrings>
       <replace>.child</replace>
@@ -175,12 +151,9 @@
   <component name="IdeDocumentHistory">
     <option name="CHANGED_PATHS">
       <list>
-        <option value="$PROJECT_DIR$/stores/user.ts" />
-        <option value="$PROJECT_DIR$/novusphere-js/discussions/service/reddit.ts" />
         <option value="$PROJECT_DIR$/.prettierrc" />
         <option value="$PROJECT_DIR$/novusphere-js/discussions/thread.ts" />
         <option value="$PROJECT_DIR$/models/subModel.ts" />
-        <option value="$PROJECT_DIR$/stores/posts.ts" />
         <option value="$PROJECT_DIR$/pages/index.tsx" />
         <option value="$PROJECT_DIR$/components/attachments/attachments.tsx" />
         <option value="$PROJECT_DIR$/components/thread/replies/replies.tsx" />
@@ -196,9 +169,7 @@
         <option value="$PROJECT_DIR$/pages/tag/index.tsx" />
         <option value="$PROJECT_DIR$/types/form.d.ts" />
         <option value="$PROJECT_DIR$/styles/components/_form.scss" />
-        <option value="$PROJECT_DIR$/stores/settings.ts" />
         <option value="$PROJECT_DIR$/models/tagModel.ts" />
-        <option value="$PROJECT_DIR$/stores/tag.ts" />
         <option value="$PROJECT_DIR$/components/sidebar/sidebar.tsx" />
         <option value="$PROJECT_DIR$/styles/components/_post.scss" />
         <option value="$PROJECT_DIR$/components/create-form/form.tsx" />
@@ -219,13 +190,18 @@
         <option value="$PROJECT_DIR$/constants/globals.ts" />
         <option value="$PROJECT_DIR$/components/main-layout/main-layout.tsx" />
         <option value="$PROJECT_DIR$/components/index.ts" />
-        <option value="$PROJECT_DIR$/stores/ui.ts" />
         <option value="$PROJECT_DIR$/components/modal/modal-container.tsx" />
         <option value="$PROJECT_DIR$/components/modal/modal-switcher.tsx" />
         <option value="$PROJECT_DIR$/components/title-header/title-header.tsx" />
+        <option value="$PROJECT_DIR$/stores/tag.ts" />
+        <option value="$PROJECT_DIR$/stores/posts.ts" />
+        <option value="$PROJECT_DIR$/stores/settings.ts" />
+        <option value="$PROJECT_DIR$/stores/ui.ts" />
+        <option value="$PROJECT_DIR$/stores/user.ts" />
+        <option value="$PROJECT_DIR$/stores/index.ts" />
+        <option value="$PROJECT_DIR$/.babelrc" />
         <option value="$PROJECT_DIR$/pages/_app.tsx" />
         <option value="$PROJECT_DIR$/stores/auth.ts" />
-        <option value="$PROJECT_DIR$/stores/index.ts" />
       </list>
     </option>
   </component>
@@ -254,52 +230,12 @@
             <path>
               <item name="discussions-app" type="b2602c69:ProjectViewProjectNode" />
               <item name="discussions-app" type="462c0819:PsiDirectoryNode" />
-              <item name="components" type="462c0819:PsiDirectoryNode" />
-            </path>
-            <path>
-              <item name="discussions-app" type="b2602c69:ProjectViewProjectNode" />
-              <item name="discussions-app" type="462c0819:PsiDirectoryNode" />
-              <item name="components" type="462c0819:PsiDirectoryNode" />
-              <item name="main-layout" type="462c0819:PsiDirectoryNode" />
-            </path>
-            <path>
-              <item name="discussions-app" type="b2602c69:ProjectViewProjectNode" />
-              <item name="discussions-app" type="462c0819:PsiDirectoryNode" />
-              <item name="components" type="462c0819:PsiDirectoryNode" />
-              <item name="title-header" type="462c0819:PsiDirectoryNode" />
-            </path>
-            <path>
-              <item name="discussions-app" type="b2602c69:ProjectViewProjectNode" />
-              <item name="discussions-app" type="462c0819:PsiDirectoryNode" />
               <item name="pages" type="462c0819:PsiDirectoryNode" />
-            </path>
-            <path>
-              <item name="discussions-app" type="b2602c69:ProjectViewProjectNode" />
-              <item name="discussions-app" type="462c0819:PsiDirectoryNode" />
-              <item name="pages" type="462c0819:PsiDirectoryNode" />
-              <item name="e" type="462c0819:PsiDirectoryNode" />
-            </path>
-            <path>
-              <item name="discussions-app" type="b2602c69:ProjectViewProjectNode" />
-              <item name="discussions-app" type="462c0819:PsiDirectoryNode" />
-              <item name="pages" type="462c0819:PsiDirectoryNode" />
-              <item name="notifications" type="462c0819:PsiDirectoryNode" />
             </path>
             <path>
               <item name="discussions-app" type="b2602c69:ProjectViewProjectNode" />
               <item name="discussions-app" type="462c0819:PsiDirectoryNode" />
               <item name="stores" type="462c0819:PsiDirectoryNode" />
-            </path>
-            <path>
-              <item name="discussions-app" type="b2602c69:ProjectViewProjectNode" />
-              <item name="discussions-app" type="462c0819:PsiDirectoryNode" />
-              <item name="styles" type="462c0819:PsiDirectoryNode" />
-            </path>
-            <path>
-              <item name="discussions-app" type="b2602c69:ProjectViewProjectNode" />
-              <item name="discussions-app" type="462c0819:PsiDirectoryNode" />
-              <item name="styles" type="462c0819:PsiDirectoryNode" />
-              <item name="components" type="462c0819:PsiDirectoryNode" />
             </path>
           </expand>
           <select />
@@ -374,12 +310,12 @@
       <workItem from="1561821340621" duration="12231000" />
       <workItem from="1561843222591" duration="3380000" />
       <workItem from="1561911865693" duration="17403000" />
-      <workItem from="1561945494144" duration="3389000" />
+      <workItem from="1561945494144" duration="4565000" />
     </task>
     <servers />
   </component>
   <component name="TimeTrackingManager">
-    <option name="totallyTimeSpent" value="103444000" />
+    <option name="totallyTimeSpent" value="104620000" />
   </component>
   <component name="ToolWindowManager">
     <frame x="-8" y="-8" width="2576" height="1416" extended-state="6" />
@@ -398,7 +334,7 @@
       <window_info anchor="bottom" id="Version Control" order="7" />
       <window_info anchor="bottom" id="Docker" order="8" show_stripe_button="false" />
       <window_info anchor="bottom" id="TypeScript" order="9" />
-      <window_info active="true" anchor="bottom" id="Terminal" order="10" visible="true" weight="0.22603273" />
+      <window_info active="true" anchor="bottom" id="Terminal" order="10" visible="true" weight="0.28215122" />
       <window_info anchor="bottom" id="Event Log" order="11" side_tool="true" />
       <window_info anchor="right" id="Commander" internal_type="SLIDING" order="0" type="SLIDING" weight="0.4" />
       <window_info anchor="right" id="Ant Build" order="1" weight="0.25" />
@@ -429,23 +365,6 @@
     <option name="version" value="1" />
   </component>
   <component name="editorHistoryManager">
-    <entry file="file://$PROJECT_DIR$/novusphere-js/discussions/service/discussions.ts">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="336">
-          <caret line="23" selection-end-line="23" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/components/vote/vote.tsx">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="176">
-          <caret line="11" column="70" selection-start-line="11" selection-start-column="70" selection-end-line="11" selection-end-column="70" />
-          <folding>
-            <element signature="e#0#30#0" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/styles/components/_tabs.scss">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="160">
@@ -506,16 +425,6 @@
           <caret line="9" column="19" lean-forward="true" selection-start-line="9" selection-start-column="19" selection-end-line="9" selection-end-column="19" />
           <folding>
             <element signature="e#0#30#0" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/stores/settings.ts">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="787">
-          <caret line="88" column="13" lean-forward="true" selection-start-line="88" selection-start-column="13" selection-end-line="88" selection-end-column="13" />
-          <folding>
-            <element signature="e#0#39#0" expanded="true" />
           </folding>
         </state>
       </provider>
@@ -582,27 +491,10 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/package.json">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="352">
-          <caret line="22" column="14" selection-start-line="22" selection-start-column="10" selection-end-line="22" selection-end-column="14" />
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/node_modules/eos-transit/lib/types.d.ts">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="342">
           <caret line="64" column="4" selection-start-line="64" selection-start-column="4" selection-end-line="64" selection-end-column="4" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/components/thread/main-post/main-post.tsx">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="672">
-          <caret line="42" column="57" lean-forward="true" selection-start-line="42" selection-start-column="57" selection-end-line="42" selection-end-column="57" />
-          <folding>
-            <element signature="e#0#30#0" expanded="true" />
-          </folding>
         </state>
       </provider>
     </entry>
@@ -657,16 +549,6 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/stores/tag.ts">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="361">
-          <caret line="409" column="11" selection-start-line="409" selection-start-column="11" selection-end-line="409" selection-end-column="11" />
-          <folding>
-            <element signature="e#0#51#0" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/models/tagModel.ts">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="240">
@@ -688,16 +570,6 @@
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="369">
           <caret line="185" column="20" lean-forward="true" selection-start-line="185" selection-start-column="19" selection-end-line="185" selection-end-column="20" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/stores/posts.ts">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="337">
-          <caret line="41" column="16" selection-start-line="41" selection-start-column="16" selection-end-line="41" selection-end-column="16" />
-          <folding>
-            <element signature="e#0#59#0" expanded="true" />
-          </folding>
         </state>
       </provider>
     </entry>
@@ -790,7 +662,7 @@
     <entry file="file://$PROJECT_DIR$/components/modal/modal-container.tsx">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="272">
-          <caret line="17" column="36" lean-forward="true" selection-start-line="17" selection-start-column="36" selection-end-line="17" selection-end-column="36" />
+          <caret line="17" column="36" selection-start-line="17" selection-start-column="36" selection-end-line="17" selection-end-column="36" />
           <folding>
             <element signature="e#0#30#0" expanded="true" />
           </folding>
@@ -800,17 +672,10 @@
     <entry file="file://$PROJECT_DIR$/components/modal/modal-switcher.tsx">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="528">
-          <caret line="33" lean-forward="true" selection-start-line="33" selection-end-line="33" />
+          <caret line="33" selection-start-line="33" selection-end-line="33" />
           <folding>
             <element signature="e#0#30#0" expanded="true" />
           </folding>
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/stores/ui.ts">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="288">
-          <caret line="18" column="30" lean-forward="true" selection-start-line="18" selection-start-column="30" selection-end-line="18" selection-end-column="30" />
         </state>
       </provider>
     </entry>
@@ -824,29 +689,103 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/pages/_app.tsx">
+    <entry file="file://$PROJECT_DIR$/stores/settings.ts">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="496">
-          <caret line="40" column="59" lean-forward="true" selection-start-line="40" selection-start-column="59" selection-end-line="40" selection-end-column="59" />
+        <state relative-caret-position="329">
+          <caret line="75" column="31" selection-start-line="75" selection-start-column="31" selection-end-line="75" selection-end-column="31" />
           <folding>
-            <element signature="e#0#41#0" expanded="true" />
+            <element signature="e#0#40#0" expanded="true" />
           </folding>
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/stores/auth.ts">
+    <entry file="file://$PROJECT_DIR$/stores/posts.ts">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="144">
-          <caret line="15" lean-forward="true" selection-start-line="15" selection-end-line="15" />
+          <caret line="9" column="1" lean-forward="true" selection-start-line="9" selection-start-column="1" selection-end-line="9" selection-end-column="1" />
+          <folding>
+            <element signature="e#0#59#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/stores/tag.ts">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="192">
+          <caret line="12" column="26" selection-start-line="12" selection-start-column="26" selection-end-line="12" selection-end-column="26" />
+          <folding>
+            <element signature="e#0#51#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/stores/ui.ts">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="208">
+          <caret line="13" column="5" lean-forward="true" selection-start-line="13" selection-start-column="4" selection-end-line="13" selection-end-column="5" />
           <folding>
             <element signature="e#0#69#0" expanded="true" />
           </folding>
         </state>
       </provider>
     </entry>
+    <entry file="file://$PROJECT_DIR$/package.json">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="377">
+          <caret line="40" column="18" selection-start-line="40" selection-start-column="14" selection-end-line="40" selection-end-column="18" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/.babelrc">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="176">
+          <caret line="11" column="6" lean-forward="true" selection-start-line="11" selection-start-column="6" selection-end-line="11" selection-end-column="6" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/pages/_app.tsx">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="720">
+          <caret line="45" column="21" lean-forward="true" selection-start-line="45" selection-start-column="21" selection-end-line="45" selection-end-column="21" />
+          <folding>
+            <element signature="e#0#41#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/stores/index.ts">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="192">
+          <caret line="12" column="18" selection-start-line="12" selection-start-column="18" selection-end-line="12" selection-end-column="18" />
+          <folding>
+            <element signature="e#0#32#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/components/thread/main-post/main-post.tsx">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="384">
+          <caret line="24" selection-start-line="24" selection-end-line="24" />
+          <folding>
+            <element signature="e#0#30#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/stores/user.ts">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="128">
+          <caret line="8" lean-forward="true" selection-start-line="8" selection-end-line="8" />
+          <folding>
+            <element signature="e#0#52#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
     <entry file="file://$PROJECT_DIR$/novusphere-js/eos/index.ts">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="315">
+        <state relative-caret-position="291">
           <caret line="72" column="10" selection-start-line="72" selection-start-column="10" selection-end-line="72" selection-end-column="10" />
           <folding>
             <element signature="e#0#100#0" expanded="true" />
@@ -854,12 +793,12 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/stores/index.ts">
+    <entry file="file://$PROJECT_DIR$/stores/auth.ts">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="432">
-          <caret line="27" column="40" lean-forward="true" selection-start-line="27" selection-start-column="40" selection-end-line="27" selection-end-column="40" />
+        <state relative-caret-position="560">
+          <caret line="35" column="27" lean-forward="true" selection-start-line="35" selection-start-column="27" selection-end-line="35" selection-end-column="27" />
           <folding>
-            <element signature="e#0#32#0" expanded="true" />
+            <element signature="e#0#51#0" expanded="true" />
           </folding>
         </state>
       </provider>

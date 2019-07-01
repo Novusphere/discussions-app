@@ -1,16 +1,9 @@
-import { action, computed, extendObservable, observable } from 'mobx'
+import { action, computed, observable } from 'mobx'
+import {BaseStore, getOrCreateStore} from 'next-mobx-wrapper';
 
-const defaultState = {
-    activeBanner: 'test',
-}
-
-export default class Ui {
+export default class Ui extends BaseStore {
     @observable activeBanner = '123'
     @observable activeModal = ''
-
-    constructor(UI = null) {
-        extendObservable(this, UI || defaultState)
-    }
 
     @computed get isModalOpen(): boolean {
         return this.activeModal !== ''
@@ -24,3 +17,5 @@ export default class Ui {
         this.activeModal = ''
     }
 }
+
+export const getUiStore = getOrCreateStore('uiStore', Ui)

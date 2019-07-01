@@ -23,6 +23,7 @@
     "mobx-task": "1.0.3",
     "moment": "2.24.0",
     "next": "8.1.0",
+    "next-mobx-wrapper": "^0.4.0",
     "next-routes": "1.4.2",
     "node-sass": "4.12.0",
     "react": "16.8.6",
