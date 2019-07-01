@@ -12,6 +12,7 @@ interface IEditorProps {
     className?: string
 }
 
+// https://jpuri.github.io/react-draft-wysiwyg/#/docs
 class Editor extends React.Component<IEditorProps> {
     state = {
         mounted: false, // https://github.com/jpuri/react-draft-wysiwyg/issues/660
