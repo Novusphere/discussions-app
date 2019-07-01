@@ -6,6 +6,8 @@ declare interface Form$ {
     set: (...args: any) => void
     $extra?: any
     value?: any
+
+    update(value: any): void
 }
 
 declare interface IForm {
@@ -14,7 +16,7 @@ declare interface IForm {
     onSubmit: (event?: FormEvent<HTMLFormElement>) => void
     onClear: (event?: FormEvent<HTMLFormElement>) => void
     form: {
-        onSubmit: () => void
+        onSubmit: (event?: FormEvent<HTMLFormElement>) => void
         select: (key: string) => string
         $: (key: string) => Form$
         size: number
@@ -37,6 +39,7 @@ declare interface IForm {
         hasNestedFields: boolean
         hasIncrementalKeys: boolean
     }
+
 }
 
 declare interface FormField {
@@ -50,7 +53,7 @@ declare interface FormField {
 
     input?: (value) => any
     output?: (value) => any
-    type?: 'password' | 'text' | 'checkbox' | 'interval' | 'button' | 'slider' | 'dropdown' | 'textarea'
+    type?: 'password' | 'text' | 'checkbox' | 'button' | 'dropdown' | 'textarea' | 'richtext'
     render?: boolean
     observers?: any[]
     extra?: any
@@ -61,7 +64,7 @@ declare interface FormField {
     bindings?: string
     validating?: boolean
     submitting?: boolean
-    value?: string | {value: string, className?: string}[]
+    value?: string | { value: string; className?: string }[]
 
     options?: {
         validateOnChange?: boolean

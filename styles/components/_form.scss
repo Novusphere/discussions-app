@@ -8,6 +8,10 @@ form {
     color: red;
 }
 
+.rs__menu {
+    z-index: 5 !important;
+}
+
 .form-input {
     height: 50px !important;
 }
@@ -21,7 +25,6 @@ form {
         @extend .flex;
         @extend .items-center;
         @extend .justify-between;
-        @extend .w-50;
 
         input {
             @extend .w-80;

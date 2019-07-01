@@ -63,19 +63,21 @@ class Settings extends React.Component<ISettings> {
 
     public render() {
         return (
-            <Tabs>
-                <TabList>
-                    <Tab>Set ID</Tab>
-                    <Tab>Moderation</Tab>
-                    <Tab>Raw</Tab>
-                    <Tab>Account</Tab>
-                </TabList>
+            <div className={'card pa4'}>
+                <Tabs>
+                    <TabList>
+                        <Tab>Set ID</Tab>
+                        <Tab>Moderation</Tab>
+                        <Tab>Raw</Tab>
+                        <Tab>Account</Tab>
+                    </TabList>
 
-                <TabPanel>{this.renderSetIdComponent()}</TabPanel>
-                <TabPanel>{this.renderModerationComponent()}</TabPanel>
-                <TabPanel>{this.renderRawComponent()}</TabPanel>
-                <TabPanel>{this.renderAccountComponent()}</TabPanel>
-            </Tabs>
+                    <TabPanel>{this.renderSetIdComponent()}</TabPanel>
+                    <TabPanel>{this.renderModerationComponent()}</TabPanel>
+                    <TabPanel>{this.renderRawComponent()}</TabPanel>
+                    <TabPanel>{this.renderAccountComponent()}</TabPanel>
+                </Tabs>
+            </div>
         )
     }
 }

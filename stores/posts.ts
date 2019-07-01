@@ -39,10 +39,17 @@ export interface IPost {
     alreadyVoted: boolean
 }
 
+export interface IPreviewPost {
+    title: string
+    sub: { value: string; label: string }
+    content: string
+}
+
 export default class Posts extends BaseStore {
     // all posts by filter
     @observable posts: IPost[] = []
     @observable activePostId = ''
+    @observable preview: IPreviewPost | null = null
 
     private tagsStore: IStores['tagStore']
 
@@ -70,11 +77,15 @@ export default class Posts extends BaseStore {
         }
     }
 
+    @action clearPreview = () => {
+        this.preview = null
+    }
+
     get newPostForm() {
         return new CreateForm(
             {
                 onSuccess: form => {
-                    console.log(form)
+                    console.log(form.values())
                 },
             },
             [
@@ -82,10 +93,10 @@ export default class Posts extends BaseStore {
                     name: 'title',
                     label: `Title`,
                     placeholder: 'Enter a post title',
-                    rules: 'required|string',
+                    rules: 'required|string|min:5|max:45',
                 },
                 {
-                    name: 'Sub',
+                    name: 'sub',
                     label: 'Sub',
                     placeholder: 'Select a sub',
                     rules: 'required',
@@ -99,6 +110,36 @@ export default class Posts extends BaseStore {
                                     value: tag.name,
                                     label: tag.name,
                                 })),
+                        ],
+                    },
+                },
+                {
+                    name: 'content',
+                    label: 'Content',
+                    placeholder: 'Enter your content',
+                    rules: 'required',
+                    type: 'richtext',
+                },
+                {
+                    name: 'buttons',
+                    type: 'button',
+                    extra: {
+                        options: [
+                            {
+                                value: 'Post',
+                            },
+                            {
+                                value: 'Post ID',
+                            },
+                            {
+                                value: 'Preview',
+                                className: 'white bg-gray',
+                                onClick: form => {
+                                    if (form.isValid) {
+                                        this.preview = form.values()
+                                    }
+                                },
+                            },
                         ],
                     },
                 },

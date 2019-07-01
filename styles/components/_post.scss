@@ -89,6 +89,14 @@ button.reply {
     }
 }
 
+.post-preview-content {
+    // target first <p> for previews via rich text editor
+    > p {
+        margin: 0;
+        padding: 0;
+    }
+}
+
 .child > .child,
 .child > .child > .child > .child {
     background: #fff;

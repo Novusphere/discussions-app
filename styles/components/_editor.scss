@@ -1,0 +1,27 @@
+/**
+	WYIWYG Editor styles
+ */
+
+.editor-wrapper {
+    background-color: #fff;
+    border: 1px solid #ced4da;
+    border-top-left-radius: 0.25rem;
+    border-top-right-radius: 0.25rem;
+    border-bottom-left-radius: 0.25rem;
+    border-bottom-right-radius: 0.25rem;
+}
+
+.editor-toolbar {
+    background-color: #fff;
+    border: none !important;
+    border-bottom: 1px solid #ced4da;
+}
+
+.editor-content {
+    @extend .ph3;
+    @extend .pv1;
+    @extend .black;
+    background-color: #fff;
+    border-bottom-left-radius: 0.25rem;
+    border-bottom-right-radius: 0.25rem;
+}

@@ -30,26 +30,23 @@ const PostPreview: React.FC<IPostPreviewProps> = ({ post, onClick, tag }) => (
                     <span className={'o-80'}>by {post.poster}</span>
                     <span className={'o-50 pl2'}>{moment(post.createdAt).fromNow()}</span>
                 </div>
-                <div className={'flex justify-between items-center pt1 pb3'}>
+                <div className={'flex justify-between items-center pt1'}>
                     <span className={'black f3 b lh-title'}>{post.title}</span>
                 </div>
 
-                <span className={'black lh-copy measure-wide'}>{post.content}</span>
+                <span
+                    className={'black lh-copy measure-wide pt2 post-preview-content'}
+                    dangerouslySetInnerHTML={{ __html: post.content }}
+                />
 
-                <div className={'flex z-2 relative mt3 footer b'}>
+                <div className={'flex z-2 relative mt4 footer b'}>
                     <span className={'o-80 f6 ml2 dim pointer'}>
                         <FontAwesomeIcon icon={faComment} className={'pr2'} />
                         {post.totalReplies} comments
                     </span>
-                    <span className={'o-80 f6 ml2 dim pointer'}>
-                        share
-                    </span>
-                    <span className={'o-80 f6 ml2 dim pointer'}>
-                        reply
-                    </span>
-                    <span className={'o-80 f6 ml2 dim pointer'}>
-                        mark as spam
-                    </span>
+                    <span className={'o-80 f6 ml2 dim pointer'}>share</span>
+                    <span className={'o-80 f6 ml2 dim pointer'}>reply</span>
+                    <span className={'o-80 f6 ml2 dim pointer'}>mark as spam</span>
                 </div>
             </div>
         </div>
