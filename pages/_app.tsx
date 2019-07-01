@@ -38,7 +38,7 @@ class DiscussionApp extends App {
             const wallet = await eos.detectWallet()
 
             if (typeof wallet !== 'boolean' && wallet) {
-                this.props.stores.authStore.logIn()
+                this.props.store.authStore.logIn()
             }
         }
     }

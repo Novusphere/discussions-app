@@ -3,5 +3,5 @@
  * for the uiStore to pick from
  */
 export const ModalOptions = {
-    walletUndetected: 'walletUndected'
+    walletUndetected: 'walletUndetected'
 }

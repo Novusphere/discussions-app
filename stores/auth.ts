@@ -48,7 +48,6 @@ export default class Auth extends BaseStore {
 
             if (typeof wallet !== 'boolean' && wallet) {
                 await eos.login()
-                console.log(eos.auth)
                 if (eos.auth) {
                     this.setAuth(eos.auth)
 
@@ -59,10 +58,13 @@ export default class Auth extends BaseStore {
                     })
                 }
             } else {
-                await eos.detectWallet()
+                const wallet = await eos.detectWallet()
+
+                if (!wallet) {
+                    this.uiStore.showModal(ModalOptions.walletUndetected)
+                }
             }
         } catch (error) {
-            this.uiStore.showModal(ModalOptions.walletUndetected)
             return error
         }
     }

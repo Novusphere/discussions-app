@@ -148,6 +148,8 @@
     line-height: 1.5;
 }
 .modal-body {
+    @extend .lh-copy;
+
     position: relative;
     -ms-flex: 1 1 auto;
     -webkit-box-flex: 1;

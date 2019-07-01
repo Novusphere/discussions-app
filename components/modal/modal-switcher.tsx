@@ -8,6 +8,8 @@ interface IModalSwitcherProps {
     uiStore: IStores['uiStore']
 }
 
+// TODO: Split modals out into components
+
 @inject('uiStore')
 @observer
 class ModalSwitcher extends React.Component<IModalSwitcherProps> {
@@ -16,14 +18,20 @@ class ModalSwitcher extends React.Component<IModalSwitcherProps> {
             case ModalOptions.walletUndetected:
                 return (
                     <Modal>
-                        <div className={'modal-header'}>I am a modal</div>
-                        <div className={'modal-body'}>
-                            Failed to detect a compatible EOS wallet! If your wallet is open, and we
-                            failed to detect it try refreshing the page. However if you don't have a
-                            compatible EOS wallet, you can still post to the forum anonymously for
-                            free!
-                        </div>
-                        <div className={'modal-footer'}>Footer</div>
+                        {({ CloseButton }) => (
+                            <>
+                                <div className={'modal-header'}>Unable to detect wallet</div>
+                                <div className={'modal-body'}>
+                                    Failed to detect a compatible EOS wallet! If your wallet is
+                                    open, and we failed to detect it try refreshing the page.
+                                    However if you don't have a compatible EOS wallet, you can still
+                                    post to the forum anonymously for free!
+                                </div>
+                                <div className={'modal-footer'}>
+                                    <CloseButton />
+                                </div>
+                            </>
+                        )}
                     </Modal>
                 )
             default:
