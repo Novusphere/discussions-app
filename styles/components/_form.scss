@@ -23,11 +23,11 @@ form {
     &.inline-labels {
         @extend input;
         @extend .flex;
-        @extend .items-center;
+        //@extend .items-center;
         @extend .justify-between;
 
         input {
-            @extend .w-80;
+            @extend .w-100;
             @extend .f6;
 
             display: block;

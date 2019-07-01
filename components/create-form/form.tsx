@@ -68,14 +68,18 @@ const Form: React.FC<FormProps> = ({ form, children, hideSubmitButton, ...props 
                         <div key={field.name}>
                             <div className={'field-container pt1 pb3 inline-labels'}>
                                 <label htmlFor={field.accessor.id}>{field.accessor.label}</label>
-                                <Select
-                                    className={'w-80 db f6 react-select-dropdown'}
-                                    classNamePrefix={'rs'}
-                                    options={field.accessor.$extra.options}
-                                    {...bind}
-                                />
+                                <div className={'w-80 flex flex-column'}>
+                                    <Select
+                                        className={'db f6 react-select-dropdown'}
+                                        classNamePrefix={'rs'}
+                                        options={field.accessor.$extra.options}
+                                        {...bind}
+                                    />
+                                    <span className={'error f6 db pv2'}>
+                                        {field.accessor.error}
+                                    </span>
+                                </div>
                             </div>
-                            <span className={'error f6 db pv2'}>{field.accessor.error}</span>
                         </div>
                     )
                 case 'textarea':
@@ -87,15 +91,19 @@ const Form: React.FC<FormProps> = ({ form, children, hideSubmitButton, ...props 
                 case 'richtext':
                     return (
                         <div key={field.name}>
-                            <div className={'field-container pt1 inline-labels'}>
+                            <div className={'field-container pt1 pb3 inline-labels'}>
                                 <label htmlFor={field.accessor.id}>{field.accessor.label}</label>
-                                <Editor
-                                    placeholder={field.placeholder}
-                                    className={'db f6 w-80'}
-                                    {...bind}
-                                />
+                                <div className={'w-80 h-100 flex flex-column'}>
+                                    <Editor
+                                        placeholder={field.placeholder}
+                                        className={'db f6'}
+                                        {...bind}
+                                    />
+                                    <span className={'error f6 db pv2'}>
+                                        {field.accessor.error}
+                                    </span>
+                                </div>
                             </div>
-                            <span className={'error f6 db pv2'}>{field.accessor.error}</span>
                         </div>
                     )
                 case 'button':
@@ -111,11 +119,15 @@ const Form: React.FC<FormProps> = ({ form, children, hideSubmitButton, ...props 
                 default:
                     return (
                         <div key={field.name}>
-                            <div className={'field-container pt1 inline-labels'}>
+                            <div className={'field-container pt1 pb3 inline-labels'}>
                                 <label htmlFor={field.accessor.id}>{field.accessor.label}</label>
-                                <input {...bind} className={'db f6 w-100 form-input'} />
+                                <div className={'w-80 flex flex-column'}>
+                                    <input {...bind} className={'db f6 form-input'} />
+                                    <span className={'error f6 db pv2'}>
+                                        {field.accessor.error}
+                                    </span>
+                                </div>
                             </div>
-                            <span className={'error f6 db pv2'}>{field.accessor.error}</span>
                         </div>
                     )
             }
