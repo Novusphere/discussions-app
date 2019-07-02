@@ -13,30 +13,34 @@ interface FormProps extends React.HTMLAttributes<HTMLFormElement> {
 const Form: React.FC<FormProps> = ({ form, children, hideSubmitButton, ...props }) => {
     const renderButton = (field, type, rest) => {
         if (Array.isArray(field.accessor.$extra.options)) {
-            return field.accessor.$extra.options.map(({ value, className, onClick }) => (
-                <button
-                    datatype={type}
-                    onClick={e => {
-                        form.onSubmit(e)
+            return field.accessor.$extra.options.map(
+                ({ value, disabled, title, className, onClick }) => (
+                    <button
+                        datatype={type}
+                        onClick={e => {
+                            form.onSubmit(e)
 
-                        if (onClick) {
-                            onClick(form.form)
-                        }
+                            if (onClick) {
+                                onClick(form.form)
+                            }
 
-                        e.preventDefault()
-                    }}
-                    key={`${field.name}-${value}`}
-                    className={classNames([
-                        'mt3 f6 link dim br2 ph3 pv2 dib mr2 pointer',
-                        {
-                            'white bg-green': !className,
-                            [className]: className,
-                        },
-                    ])}
-                >
-                    {value}
-                </button>
-            ))
+                            e.preventDefault()
+                        }}
+                        disabled={disabled || false}
+                        key={`${field.name}-${value}`}
+                        title={title || null}
+                        className={classNames([
+                            'mt3 f6 link dim br2 ph3 pv2 dib mr2 pointer',
+                            {
+                                'white bg-green': !className,
+                                [className]: className,
+                            },
+                        ])}
+                    >
+                        {value}
+                    </button>
+                )
+            )
         }
 
         return (
@@ -58,14 +62,14 @@ const Form: React.FC<FormProps> = ({ form, children, hideSubmitButton, ...props 
         return fields.map(field => {
             const bind = field.accessor.bind()
 
-            if (field.render === false) {
+            if (field.accessor.$extra && field.accessor.$extra.render === false) {
                 return null
             }
 
             switch (form.types[field.name]) {
                 case 'dropdown':
                     return (
-                        <div key={field.name}>
+                        <React.Fragment key={field.name}>
                             <div className={'field-container pt1 pb3 inline-labels'}>
                                 <label htmlFor={field.accessor.id}>{field.accessor.label}</label>
                                 <div className={'w-80 flex flex-column'}>
@@ -80,7 +84,7 @@ const Form: React.FC<FormProps> = ({ form, children, hideSubmitButton, ...props 
                                     </span>
                                 </div>
                             </div>
-                        </div>
+                        </React.Fragment>
                     )
                 case 'textarea':
                     return (
@@ -90,7 +94,7 @@ const Form: React.FC<FormProps> = ({ form, children, hideSubmitButton, ...props 
                     )
                 case 'richtext':
                     return (
-                        <div key={field.name}>
+                        <React.Fragment key={field.name}>
                             <div className={'field-container pt1 pb3 inline-labels'}>
                                 <label htmlFor={field.accessor.id}>{field.accessor.label}</label>
                                 <div className={'w-80 h-100 flex flex-column'}>
@@ -104,7 +108,7 @@ const Form: React.FC<FormProps> = ({ form, children, hideSubmitButton, ...props 
                                     </span>
                                 </div>
                             </div>
-                        </div>
+                        </React.Fragment>
                     )
                 case 'button':
                     const { type, ...rest } = bind as any
@@ -116,9 +120,35 @@ const Form: React.FC<FormProps> = ({ form, children, hideSubmitButton, ...props 
                             <div className={'w-80'}>{renderButton(field, type, rest)}</div>
                         </div>
                     )
+                case 'radiogroup':
+                    return (
+                        <div key={field.name} className={'flex self-end w-80 mb3'}>
+                            {field.accessor.$extra.options.map(option => (
+                                <div className={'flex items-center'} key={option.value}>
+                                    <input
+                                        type={'radio'}
+                                        id={option.value}
+                                        name={option.value}
+                                        value={option.value}
+                                        checked={field.accessor.value === option.value}
+                                        onChange={e => {
+                                            field.accessor.onChange(e)
+
+                                            if (option.onClick) {
+                                                option.onClick(form)
+                                            }
+                                        }}
+                                    />
+                                    <label htmlFor={option.value} className={'pl1 mr3 f6 lh-copy'}>
+                                        {option.value}
+                                    </label>
+                                </div>
+                            ))}
+                        </div>
+                    )
                 default:
                     return (
-                        <div key={field.name}>
+                        <React.Fragment key={field.name}>
                             <div className={'field-container pt1 pb3 inline-labels'}>
                                 <label htmlFor={field.accessor.id}>{field.accessor.label}</label>
                                 <div className={'w-80 flex flex-column'}>
@@ -128,7 +158,7 @@ const Form: React.FC<FormProps> = ({ form, children, hideSubmitButton, ...props 
                                     </span>
                                 </div>
                             </div>
-                        </div>
+                        </React.Fragment>
                     )
             }
         })

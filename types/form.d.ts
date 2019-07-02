@@ -53,7 +53,7 @@ declare interface FormField {
 
     input?: (value) => any
     output?: (value) => any
-    type?: 'password' | 'text' | 'checkbox' | 'button' | 'dropdown' | 'textarea' | 'richtext'
+    type?: 'password' | 'text' | 'checkbox' | 'button' | 'dropdown' | 'textarea' | 'richtext' | 'radiogroup'
     render?: boolean
     observers?: any[]
     extra?: any

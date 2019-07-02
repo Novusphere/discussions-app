@@ -4,7 +4,7 @@ import { task } from 'mobx-task'
 import { BaseStore, getOrCreateStore } from 'next-mobx-wrapper'
 import { CreateForm } from '@components'
 import { getTagStore } from '@stores/tag'
-import { IStores } from '@stores/index'
+import { getAuthStore, IStores } from '@stores/index'
 
 export interface IAttachment {
     value: string
@@ -52,10 +52,12 @@ export default class Posts extends BaseStore {
     @observable preview: IPreviewPost | null = null
 
     private tagsStore: IStores['tagStore']
+    private authStore: IStores['authStore']
 
     constructor(props) {
         super(props)
         this.tagsStore = getTagStore()
+        this.authStore = getAuthStore()
     }
 
     @action getPostsByTag = (tags: string[]) => {
@@ -93,13 +95,13 @@ export default class Posts extends BaseStore {
                     name: 'title',
                     label: `Title`,
                     placeholder: 'Enter a post title',
-                    rules: 'required|string|min:5|max:45',
+                    // rules: 'required|string|min:5|max:45',
                 },
                 {
                     name: 'sub',
                     label: 'Sub',
                     placeholder: 'Select a sub',
-                    rules: 'required',
+                    // rules: 'required',
                     type: 'dropdown',
                     extra: {
                         options: [
@@ -117,8 +119,94 @@ export default class Posts extends BaseStore {
                     name: 'content',
                     label: 'Content',
                     placeholder: 'Enter your content',
-                    rules: 'required',
+                    // rules: 'required',
                     type: 'richtext',
+                },
+                {
+                    name: 'attachmentType',
+                    type: 'radiogroup',
+                    extra: {
+                        options: [
+                            {
+                                value: 'No Attachment',
+                                onClick: ({ form }) => {
+                                    form.$('urlType').$extra.render = false
+                                    form.$('hash').$extra.render = false
+                                    form.$('txidType').$extra.render = false
+
+                                    // reset values
+                                    form.$('urlType').value = ''
+                                    form.$('hash').value = ''
+                                    form.$('txidType').value = ''
+                                },
+                            },
+                            {
+                                value: 'URL',
+                                onClick: ({ form }) => {
+                                    form.$('urlType').$extra.render = true
+                                    form.$('hash').$extra.render = true
+                                    form.$('txidType').$extra.render = false
+                                },
+                            },
+                            {
+                                value: 'IPFS',
+                                onClick: ({ form }) => {
+                                    form.$('urlType').$extra.render = true
+                                    form.$('hash').$extra.render = true
+                                    form.$('txidType').$extra.render = false
+                                },
+                            },
+                            {
+                                value: 'TXID',
+                                onClick: ({ form }) => {
+                                    form.$('urlType').$extra.render = false
+                                    form.$('hash').$extra.render = true
+                                    form.$('txidType').$extra.render = true
+                                },
+                            },
+                        ],
+                    },
+                },
+                {
+                    name: 'urlType',
+                    type: 'radiogroup',
+                    extra: {
+                        render: false,
+                        options: [
+                            {
+                                value: 'link',
+                            },
+                            {
+                                value: 'iframe',
+                            },
+                            {
+                                value: 'mp4',
+                            },
+                            {
+                                value: 'mp3',
+                            },
+                        ],
+                    },
+                },
+                {
+                    name: 'txidType',
+                    type: 'radiogroup',
+                    extra: {
+                        render: false,
+                        options: [
+                            {
+                                value: 'referendum',
+                            },
+                        ],
+                    },
+                },
+                {
+                    name: 'hash',
+                    label: 'Hash',
+                    placeholder: 'IPFS Hash / URL / TXID',
+                    extra: {
+                        render: false,
+                    },
                 },
                 {
                     name: 'buttons',
@@ -127,13 +215,19 @@ export default class Posts extends BaseStore {
                         options: [
                             {
                                 value: 'Post',
+                                disabled: !this.authStore.isLoggedIn,
+                                title: !this.authStore.isLoggedIn
+                                    ? 'You need to be logged in to post'
+                                    : 'Post with your logged in username',
                             },
                             {
                                 value: 'Post ID',
+                                title: 'Post with an anonymous ID',
                             },
                             {
                                 value: 'Preview',
                                 className: 'white bg-gray',
+                                title: 'Preview the post before submitting',
                                 onClick: form => {
                                     if (form.isValid) {
                                         this.preview = form.values()

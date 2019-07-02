@@ -26,6 +26,7 @@ class CreateForm {
                 hooks,
             }
         )
+        _form.init(fields)
         this.fields = fields.map((field) => ({
             name: field.name,
             accessor: _form.$(field.name),
