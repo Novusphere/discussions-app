@@ -95,13 +95,13 @@ export default class Posts extends BaseStore {
                     name: 'title',
                     label: `Title`,
                     placeholder: 'Enter a post title',
-                    // rules: 'required|string|min:5|max:45',
+                    rules: 'required|string|min:5|max:45',
                 },
                 {
                     name: 'sub',
                     label: 'Sub',
                     placeholder: 'Select a sub',
-                    // rules: 'required',
+                    rules: 'required',
                     type: 'dropdown',
                     extra: {
                         options: [
@@ -119,12 +119,13 @@ export default class Posts extends BaseStore {
                     name: 'content',
                     label: 'Content',
                     placeholder: 'Enter your content',
-                    // rules: 'required',
+                    rules: 'required',
                     type: 'richtext',
                 },
                 {
                     name: 'attachmentType',
                     type: 'radiogroup',
+                    value: 'No Attachment',
                     extra: {
                         options: [
                             {

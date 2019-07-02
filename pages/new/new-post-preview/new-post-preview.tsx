@@ -49,11 +49,18 @@ class NewPostPreview extends React.Component<IPostPreviewProps> {
         }
 
         return (
-            <PostPreview
-                post={post}
-                onClick={() => false}
-                tag={this.props.tagStore.tags.get(post.sub)}
-            />
+            <>
+                <span className={'lh-copy f6'}>
+                    This is what your post will look like before you post.
+                </span>
+                <div className={'mt3'}>
+                    <PostPreview
+                        post={post}
+                        onClick={() => false}
+                        tag={this.props.tagStore.tags.get(post.sub)}
+                    />
+                </div>
+            </>
         )
     }
 }

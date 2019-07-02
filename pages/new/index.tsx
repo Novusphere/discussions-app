@@ -21,7 +21,9 @@ class NewPage extends React.Component<INewPageProps> {
         return (
             <div className={'card pa4'}>
                 <Form form={newPostForm} hideSubmitButton />
-                {/*<NewPostPreview />*/}
+                <div className={'pv3'}>
+                    <NewPostPreview />
+                </div>
             </div>
         )
     }
