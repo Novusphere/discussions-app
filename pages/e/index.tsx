@@ -59,7 +59,6 @@ class E extends React.Component<IEPageProps, IEPageState> {
         console.error(error, errorInfo)
     }
 
-
     public render(): React.ReactNode {
         if (this.props.isTagView) {
             return (
@@ -77,6 +76,7 @@ class E extends React.Component<IEPageProps, IEPageState> {
             submitReplyingPostReply,
             openingPostReplyOpen,
             setOpeningPostContent,
+            setOpeningPostToggle,
             submitOpeningPostReply,
         } = this.props.postsStore
 
@@ -86,7 +86,7 @@ class E extends React.Component<IEPageProps, IEPageState> {
             resolved: ({ openingPost, map }) => {
                 return (
                     <div className={'thread-container'}>
-                        <MainPost openingPost={openingPost} />
+                        <MainPost openingPost={openingPost} replyHandler={setOpeningPostToggle} />
                         {openingPostReplyOpen ? (
                             <div className={'mb3'}>
                                 <Reply

@@ -17,9 +17,10 @@ import ReactMarkdown from 'react-markdown'
 
 interface IMainPost {
     openingPost: IPost
+    replyHandler: () => void
 }
 
-const MainPost: React.FC<IMainPost> = ({ openingPost }) => {
+const MainPost: React.FC<IMainPost> = ({ openingPost, replyHandler }) => {
     return (
         <>
             <div className={'pb2'}>
@@ -59,16 +60,19 @@ const MainPost: React.FC<IMainPost> = ({ openingPost }) => {
                     <Attachments attachment={openingPost.attachment} />
 
                     <div className={'footer flex items-center pt3'}>
-                        <button className={'reply mr3'}>
+                        <button className={'reply mr3 pointer dim'} onClick={replyHandler}>
                             <FontAwesomeIcon icon={faReply} className={'pr1'} />
                             reply
                         </button>
 
-                        <FontAwesomeIcon icon={faLink} className={'pr2 black f6'} />
-                        <FontAwesomeIcon icon={faShare} className={'pr2 black f6'} />
+                        <FontAwesomeIcon icon={faLink} className={'pr2 black f6 pointer dim'} />
+                        <FontAwesomeIcon icon={faShare} className={'pr2 black f6 pointer dim'} />
 
                         <span className={'f6 black f6'}>
-                            <FontAwesomeIcon icon={faExclamationTriangle} className={'pr1'} />
+                            <FontAwesomeIcon
+                                icon={faExclamationTriangle}
+                                className={'pr1 pointer dim'}
+                            />
                             mark as spam
                         </span>
                     </div>
