@@ -1,11 +1,11 @@
 import * as React from 'react'
 import { inject, observer } from 'mobx-react'
 import { IStores } from '@stores/index'
-import { MainPost, Replies } from '@components'
+import { MainPost, Replies, Reply } from '@components'
 import { faSpinner } from '@fortawesome/free-solid-svg-icons'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 
-interface IEPage {
+interface IEPageProps {
     postsStore: IStores['postsStore']
     tagStore: IStores['tagStore']
     isTagView: boolean
@@ -17,9 +17,11 @@ interface IEPage {
     }
 }
 
+interface IEPageState {}
+
 @inject('postsStore', 'tagStore')
 @observer
-class E extends React.Component<IEPage> {
+class E extends React.Component<IEPageProps, IEPageState> {
     static async getInitialProps({ router, ctx: { query } }) {
         const isTagView = typeof query.id === 'undefined' && typeof query.title === 'undefined'
         return {
@@ -48,10 +50,15 @@ class E extends React.Component<IEPage> {
                     this.props.tagStore.setActiveTag(thread.openingPost.sub)
                 })
                 .catch(err => {
-                    console.log(err)
+                    console.error(err)
                 })
         }
     }
+
+    componentDidCatch(error: Error, errorInfo: React.ErrorInfo): void {
+        console.error(error, errorInfo)
+    }
+
 
     public render(): React.ReactNode {
         if (this.props.isTagView) {
@@ -67,7 +74,10 @@ class E extends React.Component<IEPage> {
             replyingPostUUID,
             setReplyingPostUUID,
             setReplyPostContent,
-            submitReply,
+            submitReplyingPostReply,
+            openingPostReplyOpen,
+            setOpeningPostContent,
+            submitOpeningPostReply,
         } = this.props.postsStore
 
         return (fetchPost as any).match({
@@ -77,6 +87,14 @@ class E extends React.Component<IEPage> {
                 return (
                     <div className={'thread-container'}>
                         <MainPost openingPost={openingPost} />
+                        {openingPostReplyOpen ? (
+                            <div className={'mb3'}>
+                                <Reply
+                                    onContentChange={setOpeningPostContent}
+                                    onSubmit={submitOpeningPostReply}
+                                />
+                            </div>
+                        ) : null}
                         <div className={'mb2'}>
                             <span className={'b f6 pb2'}>
                                 viewing all {Object.keys(map).length} comments
@@ -99,7 +117,7 @@ class E extends React.Component<IEPage> {
                                         replyingPostUUID={replyingPostUUID}
                                         replyPostHandler={setReplyPostContent}
                                         replyOpenHandler={setReplyingPostUUID}
-                                        submitReplyHandler={submitReply}
+                                        submitReplyHandler={submitReplyingPostReply}
                                     />
                                 )
                             })}

@@ -50,9 +50,19 @@ export default class Posts extends BaseStore {
     // all posts by filter
     @observable posts: IPost[] = []
     @observable activePostId = ''
+    @observable preview: IPreviewPost | null = null
+
+    /**
+     * Manage replies within a post (not opening post)
+     */
     @observable replyingPostUUID = '' // which post the user is currently replying to
     @observable replyingPostContent = '' // which post the user is currently replying to
-    @observable preview: IPreviewPost | null = null
+
+    /**
+     * Manage replies of the opening post
+     */
+    @observable openingPostReplyOpen = true // by default leave it open
+    @observable openingPostReplyContent = ''
 
     private tagsStore: IStores['tagStore']
     private authStore: IStores['authStore']
@@ -69,21 +79,20 @@ export default class Posts extends BaseStore {
         })
     }
 
-    /**
-     * Fire when a reply has been posted/wants to be cleared
-     */
-    @action clearReply = () => {
-        this.replyingPostUUID = ''
-        this.replyingPostContent = ''
-    }
-
     @action setActivePostId = (id: string) => {
         this.activePostId = id
     }
 
+    //  START: Manage replies within a post methods (not an opening post)
+
+    @action clearReplyingPost = () => {
+        this.replyingPostUUID = ''
+        this.replyingPostContent = ''
+    }
+
     @action setReplyingPostUUID = (id: string) => {
         // check if the user is currently posting a reply
-        if (this.submitReply['state'] !== 'pending') {
+        if (this.submitReplyingPostReply['state'] !== 'pending') {
             // works as a toggle
             if (this.replyingPostUUID === id) {
                 this.replyingPostUUID = ''
@@ -99,13 +108,52 @@ export default class Posts extends BaseStore {
     }
 
     @task.resolved({ error: Error('Something went wrong, please try again.') })
-    public submitReply = async () => {
+    public submitReplyingPostReply = async () => {
         try {
+            if (!this.replyingPostContent) {
+                throw Error('Post cannot be empty')
+            }
+            // TODO: Add reply to post programmatically rather than re-fetching.
+            // TODO: Add actual methods to post the reply
             await sleep(3000)
         } catch (error) {
             throw error
         }
     }
+
+    //  END: Manage replies within a post methods (not an opening post)
+
+    //  START: Manage replies of the opening post (opening post)
+
+    @action clearOpeningPostReply = () => {
+        this.openingPostReplyContent = ''
+    }
+
+    @action setOpeningPostToggle = () => {
+        this.openingPostReplyOpen = !this.openingPostReplyOpen
+    }
+
+    @action setOpeningPostContent = (content: string) => {
+        this.openingPostReplyContent = content
+    }
+
+    @task.resolved({ error: Error('Something went wrong, please try again.') })
+    public submitOpeningPostReply = async () => {
+        try {
+            if (!this.openingPostReplyContent) {
+                throw Error('Post cannot be empty')
+            }
+            // TODO: Add reply to post programmatically rather than re-fetching.
+            // TODO: Add actual methods to post the reply
+            await sleep(3000)
+            return true
+        } catch (error) {
+            throw error
+        }
+    }
+
+    //  END: Manage replies of the opening post (opening post)
+
 
     @task
     public fetchPost = async () => {

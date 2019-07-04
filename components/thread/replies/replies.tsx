@@ -6,12 +6,11 @@ import {
     faLink,
     faReply,
     faShare,
-    faSpinner,
     faUserCircle,
 } from '@fortawesome/free-solid-svg-icons'
 import moment from 'moment'
 import { Link } from '@router'
-import { Editor, Votes } from '@components'
+import { Votes, Reply } from '@components'
 import ReactMarkdown from 'react-markdown'
 import { observer } from 'mobx-react'
 
@@ -21,7 +20,7 @@ interface IReplies {
     replyingPostUUID: string
     replyOpenHandler: (id: string) => void
     replyPostHandler: (content: string) => void
-    submitReplyHandler: () => void
+    submitReplyHandler: () => Promise<void>
 }
 
 const Replies: React.FC<IReplies> = ({
@@ -66,45 +65,7 @@ const Replies: React.FC<IReplies> = ({
         </div>
 
         {replyingPostUUID === post.uuid ? (
-            <div className={'mt3'}>
-                <Editor
-                    placeholder={'Enter your reply'}
-                    className={'db f6'}
-                    onChange={replyPostHandler}
-                />
-                {submitReplyHandler['match']({
-                    pending: () => (
-                        <button
-                            disabled
-                            className={'mt3 f6 link dim br2 ph3 pv2 dib mr2 pointer white bg-green'}
-                        >
-                            <FontAwesomeIcon icon={faSpinner} spin />
-                        </button>
-                    ),
-                    rejected: (error) => (
-                        <div className={'flex flex-column'}>
-                            <span className={'red f6 pt3'}>
-                                {error.message}
-                            </span>
-                            <button
-                                className={
-                                    'mt3 f6 link dim br2 ph3 pv2 dib mr2 pointer white bg-green'
-                                }
-                            >
-                                Post reply
-                            </button>
-                        </div>
-                    ),
-                    resolved: () => (
-                        <button
-                            onClick={submitReplyHandler}
-                            className={'mt3 f6 link dim br2 ph3 pv2 dib mr2 pointer white bg-green'}
-                        >
-                            Post reply
-                        </button>
-                    ),
-                })}
-            </div>
+            <Reply onContentChange={replyPostHandler} onSubmit={submitReplyHandler} />
         ) : null}
 
         {post.replies.map(reply => (
