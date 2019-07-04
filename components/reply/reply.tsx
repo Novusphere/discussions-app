@@ -22,7 +22,7 @@ const Reply: React.FC<IReplyProps> = ({ onContentChange, onSubmit }) => (
                 </button>
             ),
             rejected: error => (
-                <div className={'flex flex-column'}>
+                <div className={'flex flex-column items-start'}>
                     <span className={'red f6 pt3'}>{error.message}</span>
                     <button
                         onClick={() =>
@@ -37,7 +37,7 @@ const Reply: React.FC<IReplyProps> = ({ onContentChange, onSubmit }) => (
                 </div>
             ),
             resolved: status => (
-                <div className={'flex flex-column'}>
+                <div className={'flex flex-column items-start'}>
                     {status ? <span className={'green f6 pt3'}>Post submitted!</span> : null}
                     <button
                         onClick={() =>
