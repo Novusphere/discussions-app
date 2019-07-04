@@ -21,7 +21,6 @@ class Editor extends React.Component<IEditorProps> {
 
     private onContentStateChange = () => {
         const content = draftToMarkdown(convertToRaw(this.state.editorState.getCurrentContent()))
-        console.log(content)
         this.props.onChange(content)
     }
 

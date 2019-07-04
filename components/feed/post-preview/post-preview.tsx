@@ -5,6 +5,7 @@ import { Votes } from '@components'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { faComment } from '@fortawesome/free-solid-svg-icons'
 import { TagModel } from '@models/tagModel'
+import ReactMarkdown from 'react-markdown'
 
 interface IPostPreviewProps {
     onClick: (post) => void
@@ -34,9 +35,9 @@ const PostPreview: React.FC<IPostPreviewProps> = ({ post, onClick, tag }) => (
                     <span className={'black f3 b lh-title'}>{post.title}</span>
                 </div>
 
-                <span
+                <ReactMarkdown
                     className={'black lh-copy measure-wide pt2 post-preview-content'}
-                    dangerouslySetInnerHTML={{ __html: post.content }}
+                    source={post.content}
                 />
 
                 <div className={'flex z-2 relative mt4 footer b'}>

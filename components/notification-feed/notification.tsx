@@ -4,6 +4,7 @@ import { faComment } from '@fortawesome/free-solid-svg-icons'
 import moment from 'moment'
 import { INotificationPost } from '@novuspherejs/discussions/notification'
 import { TagModel } from '@models/tagModel'
+import ReactMarkdown from 'react-markdown'
 
 interface IPostPreviewProps {
     onClick: (post) => void
@@ -37,9 +38,9 @@ const Notification: React.FC<IPostPreviewProps> = ({ notification, onClick, tag 
                     </span>
                 </div>
 
-                <span
+                <ReactMarkdown
                     className={'black lh-copy measure-wide'}
-                    dangerouslySetInnerHTML={{ __html: notification.data.content }}
+                    source={notification.data.content}
                 />
 
                 <div className={'flex z-2 relative mt3 footer b'}>
