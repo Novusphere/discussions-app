@@ -13,6 +13,7 @@ import {
     faArrowLeft,
 } from '@fortawesome/free-solid-svg-icons'
 import moment from 'moment'
+import ReactMarkdown from 'react-markdown'
 
 interface IMainPost {
     openingPost: IPost
@@ -29,7 +30,7 @@ const MainPost: React.FC<IMainPost> = ({ openingPost }) => {
                     </a>
                 </Link>
             </div>
-            <div className={'opening-post'}>
+            <div className={'opening-post card'}>
                 <div className={'post-content'}>
                     <div className={'meta pb2'}>
                         <Link route={`/e/${openingPost.sub}`}>
@@ -53,7 +54,7 @@ const MainPost: React.FC<IMainPost> = ({ openingPost }) => {
                         <Votes votes={openingPost.votes} />
                     </div>
 
-                    <span className={'black f6 lh-copy'}>{openingPost.content}</span>
+                    <ReactMarkdown className={'black f6 lh-copy'} source={openingPost.content} />
 
                     <Attachments attachment={openingPost.attachment} />
 

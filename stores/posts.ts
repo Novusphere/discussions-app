@@ -5,6 +5,7 @@ import { BaseStore, getOrCreateStore } from 'next-mobx-wrapper'
 import { CreateForm } from '@components'
 import { getTagStore } from '@stores/tag'
 import { getAuthStore, IStores } from '@stores/index'
+import { sleep } from '@utils'
 
 export interface IAttachment {
     value: string
@@ -49,6 +50,8 @@ export default class Posts extends BaseStore {
     // all posts by filter
     @observable posts: IPost[] = []
     @observable activePostId = ''
+    @observable replyingPostUUID = '' // which post the user is currently replying to
+    @observable replyingPostContent = '' // which post the user is currently replying to
     @observable preview: IPreviewPost | null = null
 
     private tagsStore: IStores['tagStore']
@@ -66,8 +69,42 @@ export default class Posts extends BaseStore {
         })
     }
 
+    /**
+     * Fire when a reply has been posted/wants to be cleared
+     */
+    @action clearReply = () => {
+        this.replyingPostUUID = ''
+        this.replyingPostContent = ''
+    }
+
     @action setActivePostId = (id: string) => {
         this.activePostId = id
+    }
+
+    @action setReplyingPostUUID = (id: string) => {
+        // check if the user is currently posting a reply
+        if (this.submitReply['state'] !== 'pending') {
+            // works as a toggle
+            if (this.replyingPostUUID === id) {
+                this.replyingPostUUID = ''
+            } else {
+                this.replyingPostContent = ''
+                this.replyingPostUUID = id
+            }
+        }
+    }
+
+    @action setReplyPostContent = (content: string) => {
+        this.replyingPostContent = content
+    }
+
+    @task.resolved({ error: Error('Something went wrong, please try again.') })
+    public submitReply = async () => {
+        try {
+            await sleep(3000)
+        } catch (error) {
+            throw error
+        }
     }
 
     @task

@@ -62,7 +62,14 @@ class E extends React.Component<IEPage> {
             )
         }
 
-        const { fetchPost } = this.props.postsStore
+        const {
+            fetchPost,
+            replyingPostUUID,
+            setReplyingPostUUID,
+            setReplyPostContent,
+            submitReply,
+        } = this.props.postsStore
+
         return (fetchPost as any).match({
             pending: () => <FontAwesomeIcon icon={faSpinner} spin />,
             rejected: err => <span>{err.message}</span>,
@@ -75,7 +82,7 @@ class E extends React.Component<IEPage> {
                                 viewing all {Object.keys(map).length} comments
                             </span>
                         </div>
-                        <div className={'bg-white pr2 pv1'}>
+                        <div className={'card pr2 pv1'}>
                             {Object.keys(map).map(post => {
                                 if (post === openingPost.threadUuid) {
                                     return null
@@ -85,7 +92,16 @@ class E extends React.Component<IEPage> {
                                     return null
                                 }
 
-                                return <Replies post={map[post]} key={map[post]['uuid']} />
+                                return (
+                                    <Replies
+                                        post={map[post]}
+                                        key={map[post]['uuid']}
+                                        replyingPostUUID={replyingPostUUID}
+                                        replyPostHandler={setReplyPostContent}
+                                        replyOpenHandler={setReplyingPostUUID}
+                                        submitReplyHandler={submitReply}
+                                    />
+                                )
                             })}
                         </div>
                     </div>
