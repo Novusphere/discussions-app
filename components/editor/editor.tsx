@@ -2,8 +2,8 @@ import * as React from 'react'
 import { Editor as ReactDraftEditor } from 'react-draft-wysiwyg'
 import { faSpinner } from '@fortawesome/free-solid-svg-icons'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
-import { EditorState } from 'draft-js'
-import { stateToHTML } from 'draft-js-export-html'
+import { EditorState, convertToRaw } from 'draft-js'
+import draftToMarkdown from 'draftjs-to-markdown'
 import classNames from 'classnames'
 
 interface IEditorProps {
@@ -20,7 +20,8 @@ class Editor extends React.Component<IEditorProps> {
     }
 
     private onContentStateChange = () => {
-        const content = stateToHTML(this.state.editorState.getCurrentContent())
+        const content = draftToMarkdown(convertToRaw(this.state.editorState.getCurrentContent()))
+        console.log(content)
         this.props.onChange(content)
     }
 
