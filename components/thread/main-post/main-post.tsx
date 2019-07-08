@@ -52,7 +52,7 @@ const MainPost: React.FC<IMainPost> = ({ openingPost, replyHandler }) => {
 
                     <div className={'flex justify-between items-center pb1'}>
                         <span className={'black f4 b'}>{openingPost.title}</span>
-                        <Votes votes={openingPost.votes} />
+                        <Votes votes={openingPost.upvotes} />
                     </div>
 
                     <ReactMarkdown className={'black f6 lh-copy'} source={openingPost.content} />

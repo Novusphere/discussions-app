@@ -1,7 +1,11 @@
 // https://www.reddit.com/prefs/apps
 // https://github.com/JubbeArt/removeddit/blob/master/src/api/reddit/auth.js
 
-import Post from "../post";
+// https://api.pushshift.io/reddit/search/comment?sort=asc&link_id=....&limit=10000
+// https://api.pushshift.io/reddit/search/submission?ids=....
+
+const fetch = require('node-fetch');
+import { Post } from "../post";
 //import { AttachmentType, AttachmentDisplay, Attachment } from "../attachment";
 
 let clientId: string = 'Gu4d7t1AglWJVg';
@@ -33,7 +37,7 @@ export default class RedditService {
         p.title = data.title;
         p.content = data.selftext || data.body;
         p.createdAt = new Date(data.created_utc * 1000);
-        p.votes = data.ups;
+        p.upvotes = data.ups;
         return p;
     }
 
@@ -42,7 +46,7 @@ export default class RedditService {
 
         let posts: Post[] = [];
         let auth = await this.getAuth();
-        let response = await window.fetch(`https://oauth.reddit.com/r/${subreddit}/comments/${threadId}/_/`, auth);
+        let response = await fetch(`https://oauth.reddit.com/r/${subreddit}/comments/${threadId}/_/`, auth);
         let json = await response.json();
 
         posts.push(this.redditDataToPost(json[0].data.children[0].data));
@@ -144,7 +148,7 @@ export default class RedditService {
             body: `grant_type=${encodeURIComponent('https://oauth.reddit.com/grants/installed_client')}&device_id=DO_NOT_TRACK_THIS_DEVICE`
         }
 
-        let response = await window.fetch('https://www.reddit.com/api/v1/access_token', tokenInit);
+        let response = await fetch('https://www.reddit.com/api/v1/access_token', tokenInit);
         let json = await response.json();
         token = json.access_token;
         return token || '';
@@ -152,7 +156,7 @@ export default class RedditService {
 
     async getPost(subreddit: string, threadId: string) {
         let auth = await this.getAuth();
-        let response = await window.fetch(`https://oauth.reddit.com/r/${subreddit}/comments/${threadId}/_/`, auth);
+        let response = await fetch(`https://oauth.reddit.com/r/${subreddit}/comments/${threadId}/_/`, auth);
         let json = await response.json();
         let post = json[0].data.children[0].data;
         return json;
@@ -167,7 +171,7 @@ export default class RedditService {
             }
         }
 
-        let response = await window.fetch('https://elastic.pushshift.io/rs/submissions/_search?source=' + JSON.stringify(elasticQuery));
+        let response = await fetch('https://elastic.pushshift.io/rs/submissions/_search?source=' + JSON.stringify(elasticQuery));
         let json = await response.json();
         let post = json.hits.hits[0]._source;
         post.id = toBase36(post.id)
@@ -180,7 +184,7 @@ export default class RedditService {
         for (let i = 0; i < commentIds.length; i += 100) {
             let ids = commentIds.slice(i, i + 100);
             promises.push(new Promise(async (resolve) => {
-                let response = await window.fetch(`https://oauth.reddit.com/api/info?id=${ids.map(id => `t1_${id}`).join()}`, auth);
+                let response = await fetch(`https://oauth.reddit.com/api/info?id=${ids.map(id => `t1_${id}`).join()}`, auth);
                 let json = await response.json();
                 let commentsData = json.data.children;
                 return resolve(commentsData.map(commentData => commentData.data));
@@ -203,7 +207,7 @@ export default class RedditService {
             ]
         }
 
-        let response = await window.fetch('https://elastic.pushshift.io/rc/comments/_search?source=' + JSON.stringify(elasticQuery));
+        let response = await fetch('https://elastic.pushshift.io/rc/comments/_search?source=' + JSON.stringify(elasticQuery));
         let json = await response.json();
 
         const comments = json.hits.hits

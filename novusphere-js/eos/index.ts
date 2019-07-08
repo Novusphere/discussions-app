@@ -1,3 +1,4 @@
+const fetch = require('node-fetch');
 import { DiscoveryData, WalletAuth, Wallet, WalletAccessContext, NetworkConfig } from 'eos-transit';
 import { IToken, getTokens, IAccountBalance, getAccountTokens } from './tokens';
 
@@ -141,7 +142,7 @@ export class EOS {
         return this.tokens.find(t => t.account == account && t.symbol == symbol);
     }
     async getSuggestAccounts(accountPartial: string, limit: number = 10): Promise<string[]> {
-        let request = await window.fetch(`https://www.api.bloks.io/topholders?account_name[$search]=${accountPartial}&$limit=${limit}`);
+        let request = await fetch(`https://www.api.bloks.io/topholders?account_name[$search]=${accountPartial}&$limit=${limit}`);
         let json = await request.json();
         return json.data.map(d => d.account_name);
     }

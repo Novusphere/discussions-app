@@ -43,7 +43,7 @@ const Replies: React.FC<IReplies> = ({
         </div>
         <ReactMarkdown className={'f6 lh-copy'} source={post.content} />
         <div className={'footer flex items-center pt3'}>
-            <Votes votes={post.votes} className={'mr2'} />
+            <Votes votes={post.upvotes} className={'mr2'} />
 
             <button
                 className={'reply mr3 pointer dim'}

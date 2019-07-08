@@ -16,7 +16,7 @@ const Notification: React.FC<IPostPreviewProps> = ({ notification, onClick, tag 
     <div className={'post-preview'}>
         <div className={'flex flex-auto'}>
             {/*<div className={'bg-light-gray flex tc justify-center ph2 pv4 relative z-2 flex-auto'}>*/}
-            {/*<Votes votes={notification.votes} />*/}
+            {/*<Votes votes={notification.upvotes} />*/}
             {/*</div>*/}
 
             <div

@@ -17,7 +17,7 @@ const PostPreview: React.FC<IPostPreviewProps> = ({ post, onClick, tag }) => (
     <div className={'post-preview'}>
         <div className={'flex flex-auto'}>
             <div className={'bg-light-gray flex tc justify-center ph2 pv4 relative z-2 flex-auto'}>
-                <Votes votes={post.votes} />
+                <Votes votes={post.upvotes} />
             </div>
 
             <div

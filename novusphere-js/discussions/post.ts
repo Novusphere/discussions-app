@@ -2,7 +2,14 @@
 import ecc from 'eosjs-ecc';
 import { Attachment} from './attachment';
 
-export default class Post {
+export interface PostMetaData {
+    title?: string;
+    pub?: string;
+    sig?: string;
+    attachment?: Attachment;
+}
+
+export class Post {
     // Blockchain Specific
     id: number;
     transaction: string;
@@ -22,10 +29,10 @@ export default class Post {
     mentions: string[];
     edit: boolean;
 
-    // Anonymous Post Data
-    anonymousId: string;
-    anonymousSignature: string;
-    private verifyAnonymousSignature: string;
+    // Discussion ID Post Data
+    pub: string;
+    sig: string;
+    private verifySig: string;
 
     // Attachment
     attachment: Attachment;
@@ -36,7 +43,8 @@ export default class Post {
     // State Data
     totalReplies: number; // only used if isOpeningPost()
     score: number; // only used if isOpeningPost()
-    votes: number;
+    upvotes: number;
+    downvotes: number;
     depth: number; // only used if Thread object created with
 
     // Aggregate Data
@@ -51,15 +59,15 @@ export default class Post {
     }
 
     isAnonymousVerified(): boolean {
-        if (!this.verifyAnonymousSignature) {
-            if (!ecc.isValidPublic(this.anonymousId)) {
-                this.verifyAnonymousSignature = 'INVALID_PUB_KEY';
+        if (!this.verifySig) {
+            if (!ecc.isValidPublic(this.pub)) {
+                this.verifySig = 'INVALID_PUB_KEY';
                 return false;
             }
-            this.verifyAnonymousSignature = ecc.recover(this.anonymousSignature, this.content);
+            this.verifySig = ecc.recover(this.sig, this.content);
         }
 
-        return (this.verifyAnonymousSignature == this.anonymousId);
+        return (this.verifySig == this.pub);
     }
 
     constructor(chain: string) {
@@ -78,23 +86,53 @@ export default class Post {
         this.tags = [];
         this.mentions = [];
         this.edit = false;
-        this.anonymousId = '';
-        this.anonymousSignature = '';
-        this.verifyAnonymousSignature = '';
+        this.pub = '';
+        this.sig = '';
+        this.verifySig = '';
         this.attachment = new Attachment();
         this.replies = [];
         this.totalReplies = 0;
         this.score = 0;
-        this.votes = 0;
+        this.upvotes = 0;
+        this.downvotes = 0;
         this.depth = 0;
         this.alreadyVoted = false;
+    }
+
+    static fromDbObject(o: any) : Post {
+        let p = new Post(o.chain);
+        p.id = o.id;
+        p.transaction = o.transaction;
+        p.blockApprox = o.blockApprox;
+        p.uuid = o.uuid;
+        p.parentUuid = o.parentUuid;
+        p.threadUuid = o.threadUuid;
+        p.title = o.title;
+        p.poster = o.poster;
+        p.content = o.content;
+        p.createdAt = o.created;
+        p.sub = o.sub;
+        p.tags = o.tags;
+        p.mentions = o.mentions;
+        p.edit = o.edit;
+        p.pub = o.pub;
+        p.sig = o.sig;
+        if (o.attachment) {
+            p.attachment.value = o.attachment.value || p.attachment.value;
+            p.attachment.type = o.attachment.type || p.attachment.type;
+            p.attachment.display = o.attachment.display || p.attachment.display;
+        }
+        p.totalReplies = o.totalReplies;
+        p.upvotes = o.upvotes;
+        p.downvotes = o.downvotes;
+        return p;
     }
 
     toAction() : any {
         return {};
     }
 
-    applyEdit(p: Post) {
+    /*applyEdit(p: Post) {
         if (!p.edit || p.parentUuid != this.uuid) return;
         if (p.chain != this.chain) return;
         if (p.poster != this.poster) return;
@@ -114,7 +152,7 @@ export default class Post {
         this.verifyAnonymousSignature = p.verifyAnonymousSignature;
 
         this.attachment = p.attachment;
-    }
+    }*/
 
     private autoImage() {
         if (!this.content) return;

@@ -1,4 +1,6 @@
-export const DEFAULT_NSDB_ENDPOINT = 'https://db.novusphere.io';
+const fetch = require('node-fetch');
+
+export const DEFAULT_NSDB_ENDPOINT = 'https://atmosdb.novusphere.io';
 
 export class NSDB {
     api: string;
@@ -9,86 +11,25 @@ export class NSDB {
         this.api = apiEndpoint;
     }
     async cors(url: string) {
-        const request = await window.fetch(`${this.api}/service/cors/?${url}`);
+        const request = await fetch(`https://db.novusphere.io/service/cors/?${url}`);
         const result = await request.text();
         return result;
     }
-    async queryOne(q: any) {
-        const result = await this.query(q);
-        if (!result) return undefined;
-        if (!result.cursor) return undefined;
-        if (!result.cursor.firstBatch) return undefined;
-        if (!result.cursor.firstBatch.length) return undefined;
-        return result.cursor.firstBatch[0];
-    }
-    async query(q: any) {
-        const request = await window.fetch(`${this.api}/api`, {
-            method: 'POST',
+    async search(c: any, q: any, s: any) {
+        const qs = `c=${c ? c : ''}&q=${q ? JSON.stringify(q) : ''}&s=${s ? JSON.stringify(s) : ''}`;
+        const request = await fetch(`${this.api}/discussions/search?${qs}`, {
+            method: 'GET',
             headers: {
                 'Accept': 'application/json',
-                'Content-Type': 'application/json'
+                'Content-Type': 'text/plain'
             },
-            body: JSON.stringify(q)
         });
+        
         const result = await request.json();
         if (result.error) {
-            console.log(q);
             console.log(result);
             throw new Error(result.error);
         }
-        return result;
-    }
-    async isAccountAuthorized(sessionKey: string, name: string, key: string) {
-        let endpoint = `${this.api}/service/accountstate/authorized?` +
-            `sessionKey=${sessionKey}&` +
-            `key=${key}&` +
-            `name=${name}&`;
-
-        const request = await window.fetch(endpoint);
-        const result = await request.json();
-
-        if (result.error) return undefined;
-        return result.authorized;
-    }
-    async authorizeAccount(name: string, key: string, nonce: number, sig: string) {
-        const request = await window.fetch(`${this.api}/service/accountstate/authorize`, {
-            method: 'POST',
-            headers: {
-                'Accept': 'application/json',
-                'Content-Type': 'application/json'
-            },
-            body: JSON.stringify({
-                name: name,
-                key: key,
-                nonce: nonce,
-                sig: sig
-            })
-        });
-        const result = await request.json();
-        return result;
-    }
-    async saveAccount(state: any) {
-        const request = await window.fetch(`${this.api}/service/accountstate/save`, {
-            method: 'POST',
-            headers: {
-                'Accept': 'application/json',
-                'Content-Type': 'application/json'
-            },
-            body: JSON.stringify(state)
-        });
-        const result = await request.json();
-        return result;
-    }
-    async getAccount(nameOrKey: string) {
-        const endpoint = `${this.api}/service/accountstate/get` +
-            (nameOrKey.length >= 13) ?
-            `?key=${nameOrKey}` :
-            `?name=${nameOrKey}`;
-
-        const request = await window.fetch(endpoint);
-        const result = await request.json();
-
-        if (result.error) return undefined;
         return result;
     }
 };

@@ -1,3 +1,5 @@
+const fetch = require('node-fetch');
+
 export interface IToken {
     name: string;
     logo: string;
@@ -20,7 +22,7 @@ export async function getTokens() : Promise<IToken[]> {
     let tokens : IToken[] = [];
 
     for (let i = 0; i < TOKEN_ENDPOINTS.length; i++) {
-        let request = await window.fetch(TOKEN_ENDPOINTS[i]);
+        let request = await fetch(TOKEN_ENDPOINTS[i]);
         let json = await request.json();
         for (let key in json) {
             if (key in tokens) {
@@ -38,7 +40,7 @@ export async function getTokens() : Promise<IToken[]> {
 export async function getAccountTokens(account: string, tokens: IToken[]) : Promise<IAccountBalance[]> {
     let balances: IAccountBalance[] = [];
 
-    let request = await window.fetch(`https://www.api.bloks.io/account/${account}?type=getAccountTokens`);
+    let request = await fetch(`https://www.api.bloks.io/account/${account}?type=getAccountTokens`);
     let json = await request.json();
 
     for (let i = 0; i < json.tokens.length; i++) {

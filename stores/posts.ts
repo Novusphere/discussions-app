@@ -36,7 +36,8 @@ export interface IPost {
     replies: any[]
     totalReplies: number
     score: number
-    votes: number
+    upvotes: number
+    downvotes: number
     alreadyVoted: boolean
 }
 
