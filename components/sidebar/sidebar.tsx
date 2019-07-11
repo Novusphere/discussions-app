@@ -8,10 +8,9 @@ import classNames from 'classnames'
 interface ITagListProps {
     tags: TagStore['tags']
     router: any
-    onClick: (tag: any) => void
 }
 
-const Sidebar: React.FC<ITagListProps> = ({ tags, onClick, ...props }) => {
+const Sidebar: React.FC<ITagListProps> = ({ tags, ...props }) => {
     return (
         <ul className={'w-100'}>
             {Array.from(tags.values())
@@ -26,12 +25,7 @@ const Sidebar: React.FC<ITagListProps> = ({ tags, onClick, ...props }) => {
                         ])}
                     >
                         <Link route={tag.url}>
-                            <a
-                                className={'db black pointer pb1 no-underline'}
-                                onClick={() => onClick(tag)}
-                            >
-                                {tag.name}
-                            </a>
+                            <a className={'db black pointer pb1 no-underline'}>{tag.name}</a>
                         </Link>
                     </li>
                 ))}
@@ -47,18 +41,18 @@ const Sidebar: React.FC<ITagListProps> = ({ tags, onClick, ...props }) => {
                             },
                         ])}
                     >
-                        <Link route={tag.url}>
-                            <span className={'flex items-center pb1 pointer'} onClick={() => onClick(tag)}>
+                        <Link route={'tag'} params={{ name: tag.name }}>
+                            <a className={'flex items-center pb1 pointer'}>
                                 <img
                                     className={'tag-icon pr2'}
                                     src={tag.icon}
                                     alt={`${tag.name} icon`}
                                 />
-                                <a className={'db black no-underline'}>
+                                <span className={'db black no-underline'}>
                                     {'#'}
                                     {tag.name}
-                                </a>
-                            </span>
+                                </span>
+                            </a>
                         </Link>
                     </li>
                 ))}

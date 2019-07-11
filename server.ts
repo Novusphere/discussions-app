@@ -8,12 +8,13 @@ const handler = Routes.getRequestHandler(app)
 app.prepare().then(() => {
 	const server = express()
 
-	server.get('*', (req, res) => {
-		return handler(req, res)
-	})
+	// server.get('*', (req, res) => {
+	// 	return handler(req, res)
+	// })
 
-	server.listen(port, err => {
+	server.use(handler).listen(port, err => {
 		if (err) throw err
 		console.log(`> Ready on http://localhost:${port}`)
 	})
+
 })

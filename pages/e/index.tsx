@@ -33,9 +33,9 @@ class E extends React.Component<IEPageProps, IEPageState> {
 
     // TODO: Move this into getInitialProps
     componentWillMount(): void {
-        if (this.props.subName) {
-            this.props.tagStore.setActiveTag(this.props.subName)
-        }
+        // if (this.props.subName) {
+        //     this.props.tagStore.setActiveTag(this.props.subName)
+        // }
 
         if (this.props.isTagView) {
             this.props.postsStore.getPostsByTag([this.props.query.tag])

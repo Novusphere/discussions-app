@@ -1,33 +1,65 @@
 import * as React from 'react'
 import { inject, observer } from 'mobx-react'
 import { IStores } from '@stores/index'
+import { IPost } from '@stores/posts'
+import { PostPreview } from '@components'
+import { Router } from '@router'
+import { TagModel } from '@models/tagModel'
 
 interface ITagProps {
     tagStore: IStores['tagStore']
+    postsStore: IStores['postsStore']
     tagName: undefined | string
+    posts: IPost[]
+    tagModel: TagModel
 }
 
-@inject('tagStore')
+@inject('tagStore', 'postsStore')
 @observer
 class Tag extends React.Component<ITagProps> {
-    static async getInitialProps({ router }) {
+    static async getInitialProps({ ctx: { store, query }}) {
+        const tag = query.name
+        const postsStore: IStores['postsStore'] = store.postsStore
+        const tagStore: IStores['tagStore'] = store.tagStore
+        const tagModel = tagStore.setActiveTag(tag)
+        const posts = await postsStore.getPostsByTag([tag])
         return {
-            tagName: router.query.name,
+            tagName: tag,
+            posts: posts,
+            tagModel: tagModel,
         }
     }
 
-    componentWillMount(): void {
-        if (this.props.tagName && this.props.tagStore.tags.has(this.props.tagName)) {
-            this.props.tagStore.setActiveTag(this.props.tagName)
-        }
+    // componentWillMount(): void {
+    //     if (this.props.tagName && this.props.tagStore.tags.has(this.props.tagName)) {
+    //         this.props.tagStore.setActiveTag(this.props.tagName)
+    //     }
+    // }
+
+    public clickPost = (post: IPost) => {
+        Router.pushRoute(
+            `/e/${post.sub}/${post.id}/${decodeURIComponent(post.title.replace(/ /g, '_'))}`
+        )
     }
 
     public render() {
-        if (!this.props.tagStore.activeTag) {
+        if (!this.props.tagModel) {
             return <span>Tag: {this.props.tagName} not found</span>
         }
 
-        return <span>{this.props.tagStore.activeTag.name}</span>
+        if (!this.props.posts.length) {
+            return <span>No posts found for {this.props.tagName}</span>
+        }
+
+        return this.props.posts.map(post => (
+            <PostPreview
+                post={post}
+                key={post.uuid}
+                onClick={this.clickPost}
+                tag={this.props.tagStore.tags.get(post.sub)}
+                voteHandler={this.props.postsStore.vote}
+            />
+        ))
     }
 }
 

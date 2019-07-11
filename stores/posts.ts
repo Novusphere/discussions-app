@@ -101,10 +101,10 @@ export default class Posts extends BaseStore {
      * Active thread getters used to update boxed values
      */
 
-    @action getPostsByTag = (tags: string[]) => {
-        discussions.getPostsForTags(tags).then(data => {
-            this.posts = (data as unknown) as IPost[]
-        })
+    @task.resolved getPostsByTag = async (tags: string[]) => {
+        const posts = await discussions.getPostsForTags(tags)
+        this.posts = posts as any
+        return this.posts
     }
 
     @action setActiveThreadId = (id: string) => {
@@ -187,7 +187,7 @@ export default class Posts extends BaseStore {
         try {
             const thread = await discussions.getThread('', Number(this.activeThreadId))
             this.activeThread.set(thread)
-            this.tagsStore.setActiveTag(thread.openingPost.sub)
+            // this.tagsStore.setActiveTag(thread.openingPost.sub)
         } catch (error) {
             throw error
         }

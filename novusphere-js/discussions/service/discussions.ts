@@ -73,9 +73,9 @@ export default class DiscussionsService {
         return thread;
     }
 
-    async getPostsForSubs(_subs: string[]): Promise<Post[]> {
+    async getPostsForSubs(subs: string[]): Promise<Post[]> {
         const query = await nsdb.search(0, {
-            "sub": { "$in": _subs }
+            "sub": { "$in": subs }
         }, {
                 "createdAt": -1
             });
@@ -84,16 +84,16 @@ export default class DiscussionsService {
         return query.payload.map(o => Post.fromDbObject(o));
     }
 
-    async getPostsForTags(_tags: string[]): Promise<Post[]> {
+    async getPostsForTags(tags: string[]): Promise<Post[]> {
         const query = await nsdb.search(0, {
-            "tags": { "$in": ['test'] }
+            "tags": { "$in": tags }
         }, {
                 "createdAt": -1
             });
 
         this.cursorId = query.cursorId;
         let posts = query.payload.map(o => Post.fromDbObject(o));
-        console.log(posts);
+        // console.log(tags, posts);
         return posts;
     }
 };
