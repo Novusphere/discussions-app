@@ -31,6 +31,7 @@ class E extends React.Component<IEPageProps, IEPageState> {
         }
     }
 
+    // TODO: Move this into getInitialProps
     componentWillMount(): void {
         if (this.props.subName) {
             this.props.tagStore.setActiveTag(this.props.subName)
@@ -41,17 +42,10 @@ class E extends React.Component<IEPageProps, IEPageState> {
         }
 
         if (!this.props.isTagView) {
-            this.props.postsStore.setActivePostId(this.props.query.id)
-            ;(this.props.postsStore.fetchPost as any).reset()
-            this.props.postsStore
-                .fetchPost()
-                .then((thread: any) => {
-                    console.log('Thread fetched!:', thread)
-                    this.props.tagStore.setActiveTag(thread.openingPost.sub)
-                })
-                .catch(err => {
-                    console.error(err)
-                })
+            this.props.postsStore.setActiveThreadId(this.props.query.id)
+            this.props.postsStore.fetchPost().catch(err => {
+                console.error(err)
+            })
         }
     }
 
@@ -78,42 +72,52 @@ class E extends React.Component<IEPageProps, IEPageState> {
             setOpeningPostContent,
             setOpeningPostToggle,
             submitOpeningPostReply,
+            vote,
+            threadMap,
+            threadOpeningPost,
         } = this.props.postsStore
 
-        return (fetchPost as any).match({
-            pending: () => <FontAwesomeIcon icon={faSpinner} spin />,
-            rejected: err => <span>{err.message}</span>,
-            resolved: ({ openingPost, map }) => {
-                return (
-                    <div className={'thread-container'}>
-                        <MainPost openingPost={openingPost} replyHandler={setOpeningPostToggle} />
-                        {openingPostReplyOpen ? (
-                            <div className={'mb3'}>
-                                <Reply
-                                    onContentChange={setOpeningPostContent}
-                                    onSubmit={submitOpeningPostReply}
-                                />
-                            </div>
-                        ) : null}
+        if ((fetchPost as any).state === 'pending') return <FontAwesomeIcon icon={faSpinner} spin />
+        if ((fetchPost as any).state === 'rejected')
+            return <span>{(fetchPost as any).error.message}</span>
+
+        return (
+            <div className={'thread-container'}>
+                <MainPost
+                    openingPost={threadOpeningPost}
+                    replyHandler={setOpeningPostToggle}
+                    voteHandler={vote}
+                />
+                {openingPostReplyOpen ? (
+                    <div className={'mb3'}>
+                        <Reply
+                            onContentChange={setOpeningPostContent}
+                            onSubmit={submitOpeningPostReply}
+                        />
+                    </div>
+                ) : null}
+                {threadOpeningPost.totalReplies ? (
+                    <>
                         <div className={'mb2'}>
                             <span className={'b f6 pb2'}>
-                                viewing all {Object.keys(map).length} comments
+                                viewing all {Object.keys(threadMap).length} comments
                             </span>
                         </div>
+
                         <div className={'card pr2 pv1'}>
-                            {Object.keys(map).map(post => {
-                                if (post === openingPost.threadUuid) {
+                            {Object.keys(threadMap).map(post => {
+                                if (post === threadOpeningPost.threadUuid) {
                                     return null
                                 }
 
-                                if (map[post]['parentUuid'] !== openingPost.uuid) {
+                                if (threadMap[post]['parentUuid'] !== threadOpeningPost.uuid) {
                                     return null
                                 }
 
                                 return (
                                     <Replies
-                                        post={map[post]}
-                                        key={map[post]['uuid']}
+                                        post={threadMap[post]}
+                                        key={threadMap[post]['uuid']}
                                         replyingPostUUID={replyingPostUUID}
                                         replyPostHandler={setReplyPostContent}
                                         replyOpenHandler={setReplyingPostUUID}
@@ -122,10 +126,10 @@ class E extends React.Component<IEPageProps, IEPageState> {
                                 )
                             })}
                         </div>
-                    </div>
-                )
-            },
-        })
+                    </>
+                ) : null}
+            </div>
+        )
     }
 }
 

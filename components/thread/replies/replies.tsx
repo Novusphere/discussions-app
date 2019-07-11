@@ -1,5 +1,4 @@
 import * as React from 'react'
-import { IPost } from '@stores/posts'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import {
     faExclamationTriangle,
@@ -13,9 +12,10 @@ import { Link } from '@router'
 import { Votes, Reply } from '@components'
 import ReactMarkdown from 'react-markdown'
 import { observer } from 'mobx-react'
+import { Post } from '@novuspherejs/discussions/post'
 
 interface IReplies {
-    post: IPost
+    post: Post
     className?: string
     replyingPostUUID: string
     replyOpenHandler: (id: string) => void
@@ -43,7 +43,7 @@ const Replies: React.FC<IReplies> = ({
         </div>
         <ReactMarkdown className={'f6 lh-copy'} source={post.content} />
         <div className={'footer flex items-center pt3'}>
-            <Votes votes={post.upvotes} className={'mr2'} />
+            <Votes votes={post.upvotes} className={'mr2'} handler={(...args) => console.log(args)} />
 
             <button
                 className={'reply mr3 pointer dim'}

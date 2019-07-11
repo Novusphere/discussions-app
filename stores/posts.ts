@@ -1,5 +1,5 @@
-import { action, observable } from 'mobx'
-import { discussions } from '@novuspherejs/index'
+import { action, computed, observable } from 'mobx'
+import { discussions, Thread } from '@novuspherejs/index'
 import { task } from 'mobx-task'
 import { BaseStore, getOrCreateStore } from 'next-mobx-wrapper'
 import { CreateForm } from '@components'
@@ -50,8 +50,13 @@ export interface IPreviewPost {
 export default class Posts extends BaseStore {
     // all posts by filter
     @observable posts: IPost[] = []
-    @observable activePostId = ''
     @observable preview: IPreviewPost | null = null
+
+    /**
+     * Active thread
+     */
+    @observable activeThreadId = ''
+    activeThread = observable.box<Thread>(null)
 
     /**
      * Manage replies within a post (not opening post)
@@ -74,14 +79,36 @@ export default class Posts extends BaseStore {
         this.authStore = getAuthStore()
     }
 
+    /**
+     * START
+     * Active thread getters used to update boxed values
+     */
+    @computed get getActiveThread() {
+        return this.activeThread.get()
+    }
+
+    @computed get threadOpeningPost() {
+        if (!this.getActiveThread) return null
+        return this.getActiveThread.openingPost
+    }
+
+    @computed get threadMap() {
+        if (!this.getActiveThread) return null
+        return this.getActiveThread.map
+    }
+    /**
+     * END
+     * Active thread getters used to update boxed values
+     */
+
     @action getPostsByTag = (tags: string[]) => {
         discussions.getPostsForTags(tags).then(data => {
             this.posts = (data as unknown) as IPost[]
         })
     }
 
-    @action setActivePostId = (id: string) => {
-        this.activePostId = id
+    @action setActiveThreadId = (id: string) => {
+        this.activeThreadId = id
     }
 
     //  START: Manage replies within a post methods (not an opening post)
@@ -155,11 +182,46 @@ export default class Posts extends BaseStore {
 
     //  END: Manage replies of the opening post (opening post)
 
-
     @task
     public fetchPost = async () => {
         try {
-            return await discussions.getThread('', Number(this.activePostId))
+            const thread = await discussions.getThread('', Number(this.activeThreadId))
+            this.activeThread.set(thread)
+            this.tagsStore.setActiveTag(thread.openingPost.sub)
+        } catch (error) {
+            throw error
+        }
+    }
+
+    @action updateActiveThread = (update) => {
+        this.activeThread.set({
+            uuid: this.getActiveThread.uuid,
+            totalReplies: this.getActiveThread.totalReplies,
+            map: this.threadMap,
+            openingPost: this.threadOpeningPost,
+            ...update,
+        } as any)
+    }
+
+    @action
+    public vote = async (type: string, value: number) => {
+        try {
+            const uuid = this.getActiveThread['uuid']
+            // await discussions.vote(uuid, value)
+
+            // set result in opening post
+            if (uuid === this.threadOpeningPost['uuid']) {
+                this.updateActiveThread({
+                    openingPost: { ...this.threadOpeningPost, [type]: value },
+                })
+            }
+
+            // also set the result in the map
+            this.updateActiveThread({
+                map: {
+                    [uuid]: { ...this.threadMap[uuid], [type]: value },
+                },
+            })
         } catch (error) {
             throw error
         }

@@ -1,5 +1,4 @@
 import * as React from 'react'
-import { IPost } from '@stores/posts'
 import { observer } from 'mobx-react'
 import { Attachments, Votes } from '@components'
 import { Link } from '@router'
@@ -14,13 +13,15 @@ import {
 } from '@fortawesome/free-solid-svg-icons'
 import moment from 'moment'
 import ReactMarkdown from 'react-markdown'
+import { Post } from '@novuspherejs/discussions/post'
 
 interface IMainPost {
-    openingPost: IPost
+    openingPost: Post
     replyHandler: () => void
+    voteHandler: (type: string, value: number) => Promise<void>
 }
 
-const MainPost: React.FC<IMainPost> = ({ openingPost, replyHandler }) => {
+const MainPost: React.FC<IMainPost> = ({ openingPost, replyHandler, voteHandler }) => {
     return (
         <>
             <div className={'pb2'}>
@@ -52,7 +53,13 @@ const MainPost: React.FC<IMainPost> = ({ openingPost, replyHandler }) => {
 
                     <div className={'flex justify-between items-center pb1'}>
                         <span className={'black f4 b'}>{openingPost.title}</span>
-                        <Votes votes={openingPost.upvotes} />
+                        <pre>{openingPost.upvotes} </pre>
+                        <pre>{openingPost.downvotes} </pre>
+                        <Votes
+                            upVotes={openingPost.upvotes}
+                            downVotes={openingPost.downvotes}
+                            handler={voteHandler}
+                        />
                     </div>
 
                     <ReactMarkdown className={'black f6 lh-copy'} source={openingPost.content} />

@@ -1,10 +1,9 @@
 import { Post } from './post'
 import { REDDIT_URL } from './attachment'
 import RedditService from './service/reddit'
-import { observable } from 'mobx'
 
 export default class Thread {
-    @observable openingPost: Post | undefined
+    openingPost: Post | undefined
     map: { [uuid: string]: Post }
 
     get title(): string | undefined {
