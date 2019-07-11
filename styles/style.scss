@@ -107,3 +107,7 @@ a {
     max-width: 24px;
     height: 24px;
 }
+
+.disable-user-select {
+    user-select: none;
+}

@@ -193,7 +193,7 @@ export default class Posts extends BaseStore {
         }
     }
 
-    @action updateActiveThread = (update) => {
+    @action updateActiveThread = update => {
         this.activeThread.set({
             uuid: this.getActiveThread.uuid,
             totalReplies: this.getActiveThread.totalReplies,
@@ -204,24 +204,25 @@ export default class Posts extends BaseStore {
     }
 
     @action
-    public vote = async (type: string, value: number) => {
+    public vote = async (uuid: string, type: string, value: number) => {
         try {
-            const uuid = this.getActiveThread['uuid']
-            // await discussions.vote(uuid, value)
+            if (this.authStore.isLoggedIn) {
+                await discussions.vote(uuid, value)
 
-            // set result in opening post
-            if (uuid === this.threadOpeningPost['uuid']) {
+                // set result in opening post
+                if (uuid === this.threadOpeningPost['uuid']) {
+                    this.updateActiveThread({
+                        openingPost: { ...this.threadOpeningPost, [type]: value },
+                    })
+                }
+
+                // also set the result in the map
                 this.updateActiveThread({
-                    openingPost: { ...this.threadOpeningPost, [type]: value },
+                    map: {
+                        [uuid]: { ...this.threadMap[uuid], [type]: value },
+                    },
                 })
             }
-
-            // also set the result in the map
-            this.updateActiveThread({
-                map: {
-                    [uuid]: { ...this.threadMap[uuid], [type]: value },
-                },
-            })
         } catch (error) {
             throw error
         }
