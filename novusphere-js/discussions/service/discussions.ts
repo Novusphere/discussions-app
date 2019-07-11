@@ -38,19 +38,23 @@ export default class DiscussionsService {
             metadata.sig = p.sig;
         }
 
+        const data = {
+            poster: p.poster,
+            content: p.content,
+            uuid: p.uuid,
+            threadUuid: p.threadUuid,
+            parentUuid: p.parentUuid,
+            tags: Array.from(tags),
+            mentions: Array.from(mentions),
+            metadata: JSON.stringify(metadata)
+        };
+
+        //console.log(data);
+
         return await eos.transact({
-            contract: "discussionsx",
+            account: "discussionsx",
             name: "post",
-            data: {
-                poster: p.poster,
-                content: p.content,
-                uuid: p.uuid,
-                threadUuid: p.threadUuid,
-                parentUuid: p.parentUuid,
-                tags: Array.from(tags),
-                mentions: Array.from(mentions),
-                metadata: JSON.stringify(metadata)
-            }
+            data: data
         });
     }
 

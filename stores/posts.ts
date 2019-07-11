@@ -375,6 +375,7 @@ export default class Posts extends BaseStore {
                                     const post = form.values()
                                     const uuid = generateUuid()
                                     await discussions.post({
+                                        poster: this.authStore.accountName,
                                         title: post.title,
                                         content: post.content,
                                         sub: post.sub.value,
@@ -382,8 +383,8 @@ export default class Posts extends BaseStore {
                                         mentions: [],
                                         tags: [post.sub.value],
                                         uuid: uuid,
-                                        parentUuid: uuid,
-                                        threadUuid: null,
+                                        parentUuid: '',
+                                        threadUuid: uuid,
                                         attachment: getAttachmentValue(post),
                                     } as any)
                                 },
