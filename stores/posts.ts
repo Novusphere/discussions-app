@@ -233,181 +233,176 @@ export default class Posts extends BaseStore {
     }
 
     get newPostForm() {
-        return new CreateForm(
+        return new CreateForm({}, [
             {
-                onSuccess: form => {
-                    console.log(form.values())
+                name: 'title',
+                label: `Title`,
+                placeholder: 'Enter a post title',
+                rules: 'required|string|min:5|max:45',
+                value: 'Zoomies!',
+            },
+            {
+                name: 'sub',
+                label: 'Sub',
+                placeholder: 'Select a sub',
+                rules: 'required',
+                type: 'dropdown',
+                value: { value: 'test', label: 'test' },
+                extra: {
+                    options: [
+                        { value: 'all', label: 'all' },
+                        ...Array.from(this.tagsStore.tags.values())
+                            .filter(tag => !tag.root)
+                            .map(tag => ({
+                                value: tag.name,
+                                label: tag.name,
+                            })),
+                    ],
                 },
             },
-            [
-                {
-                    name: 'title',
-                    label: `Title`,
-                    placeholder: 'Enter a post title',
-                    rules: 'required|string|min:5|max:45',
-                    value: 'Zoomies!',
-                },
-                {
-                    name: 'sub',
-                    label: 'Sub',
-                    placeholder: 'Select a sub',
-                    rules: 'required',
-                    type: 'dropdown',
-                    value: {value: "test", label: "test"},
-                    extra: {
-                        options: [
-                            { value: 'all', label: 'all' },
-                            ...Array.from(this.tagsStore.tags.values())
-                                .filter(tag => !tag.root)
-                                .map(tag => ({
-                                    value: tag.name,
-                                    label: tag.name,
-                                })),
-                        ],
-                    },
-                },
-                {
-                    name: 'content',
-                    label: 'Content',
-                    placeholder: 'Enter your content',
-                    rules: 'required',
-                    type: 'richtext',
-                },
-                {
-                    name: 'attachmentType',
-                    type: 'radiogroup',
-                    value: 'No Attachment',
-                    extra: {
-                        options: [
-                            {
-                                value: 'No Attachment',
-                                onClick: ({ form }) => {
-                                    form.$('urlType').$extra.render = false
-                                    form.$('hash').$extra.render = false
-                                    form.$('txidType').$extra.render = false
+            {
+                name: 'content',
+                label: 'Content',
+                placeholder: 'Enter your content',
+                // rules: 'required',
+                type: 'richtext',
+            },
+            {
+                name: 'attachmentType',
+                type: 'radiogroup',
+                value: 'No Attachment',
+                extra: {
+                    options: [
+                        {
+                            value: 'No Attachment',
+                            onClick: ({ form }) => {
+                                form.$('urlType').$extra.render = false
+                                form.$('hash').$extra.render = false
+                                form.$('txidType').$extra.render = false
 
-                                    // reset values
-                                    form.$('urlType').value = ''
-                                    form.$('hash').value = ''
-                                    form.$('txidType').value = ''
-                                },
+                                // reset values
+                                form.$('urlType').value = ''
+                                form.$('hash').value = ''
+                                form.$('txidType').value = ''
                             },
-                            {
-                                value: 'URL',
-                                onClick: ({ form }) => {
-                                    form.$('urlType').$extra.render = true
-                                    form.$('hash').$extra.render = true
-                                    form.$('txidType').$extra.render = false
-                                },
+                        },
+                        {
+                            value: 'URL',
+                            onClick: ({ form }) => {
+                                form.$('urlType').$extra.render = true
+                                form.$('hash').$extra.render = true
+                                form.$('txidType').$extra.render = false
                             },
-                            {
-                                value: 'IPFS',
-                                onClick: ({ form }) => {
-                                    form.$('urlType').$extra.render = true
-                                    form.$('hash').$extra.render = true
-                                    form.$('txidType').$extra.render = false
-                                },
+                        },
+                        {
+                            value: 'IPFS',
+                            onClick: ({ form }) => {
+                                form.$('urlType').$extra.render = true
+                                form.$('hash').$extra.render = true
+                                form.$('txidType').$extra.render = false
                             },
-                            {
-                                value: 'TXID',
-                                onClick: ({ form }) => {
-                                    form.$('urlType').$extra.render = false
-                                    form.$('hash').$extra.render = true
-                                    form.$('txidType').$extra.render = true
-                                },
+                        },
+                        {
+                            value: 'TXID',
+                            onClick: ({ form }) => {
+                                form.$('urlType').$extra.render = false
+                                form.$('hash').$extra.render = true
+                                form.$('txidType').$extra.render = true
                             },
-                        ],
-                    },
+                        },
+                    ],
                 },
-                {
-                    name: 'urlType',
-                    type: 'radiogroup',
-                    extra: {
-                        render: false,
-                        options: [
-                            {
-                                value: 'link',
-                            },
-                            {
-                                value: 'iframe',
-                            },
-                            {
-                                value: 'mp4',
-                            },
-                            {
-                                value: 'mp3',
-                            },
-                        ],
-                    },
+            },
+            {
+                name: 'urlType',
+                type: 'radiogroup',
+                extra: {
+                    render: false,
+                    options: [
+                        {
+                            value: 'link',
+                        },
+                        {
+                            value: 'iframe',
+                        },
+                        {
+                            value: 'mp4',
+                        },
+                        {
+                            value: 'mp3',
+                        },
+                    ],
                 },
-                {
-                    name: 'txidType',
-                    type: 'radiogroup',
-                    extra: {
-                        render: false,
-                        options: [
-                            {
-                                value: 'referendum',
-                            },
-                        ],
-                    },
+            },
+            {
+                name: 'txidType',
+                type: 'radiogroup',
+                extra: {
+                    render: false,
+                    options: [
+                        {
+                            value: 'referendum',
+                        },
+                    ],
                 },
-                {
-                    name: 'hash',
-                    label: 'Hash',
-                    placeholder: 'IPFS Hash / URL / TXID',
-                    extra: {
-                        render: false,
-                    },
+            },
+            {
+                name: 'hash',
+                label: 'Hash',
+                placeholder: 'IPFS Hash / URL / TXID',
+                extra: {
+                    render: false,
                 },
-                {
-                    name: 'buttons',
-                    type: 'button',
-                    extra: {
-                        options: [
-                            {
-                                value: 'Post',
-                                disabled: !this.authStore.isLoggedIn,
-                                title: !this.authStore.isLoggedIn
-                                    ? 'You need to be logged in to post'
-                                    : 'Post with your logged as ' + this.authStore.accountName,
-                                onClick: async (form) => {
-                                    const post = form.values()
-                                    const uuid = generateUuid()
-                                    await discussions.post({
-                                        poster: this.authStore.accountName,
-                                        title: post.title,
-                                        content: post.content,
-                                        sub: post.sub.value,
-                                        chain: 'eos',
-                                        mentions: [],
-                                        tags: [post.sub.value],
-                                        uuid: uuid,
-                                        parentUuid: '',
-                                        threadUuid: uuid,
-                                        attachment: getAttachmentValue(post),
-                                    } as any)
-                                },
+            },
+            {
+                name: 'buttons',
+                type: 'button',
+                extra: {
+                    options: [
+                        {
+                            value: 'Post',
+                            disabled: !this.authStore.isLoggedIn,
+                            title: !this.authStore.isLoggedIn
+                                ? 'You need to be logged in to post'
+                                : 'Post with your logged as ' + this.authStore.accountName,
+                            onClick: task.resolved(async form => {
+                                const post = form.values()
+                                const uuid = generateUuid()
+                                await discussions.post({
+                                    poster: this.authStore.accountName,
+                                    title: post.title,
+                                    content: post.content,
+                                    sub: post.sub.value,
+                                    chain: 'eos',
+                                    mentions: [],
+                                    tags: [post.sub.value],
+                                    uuid: uuid,
+                                    parentUuid: '',
+                                    threadUuid: uuid,
+                                    attachment: getAttachmentValue(post),
+                                } as any)
+
+                                this.clearPreview()
+                            }),
+                        },
+                        {
+                            value: 'Post ID',
+                            title: 'Post with an anonymous ID',
+                        },
+                        {
+                            value: 'Preview',
+                            className: 'white bg-gray',
+                            title: 'Preview the post before submitting',
+                            onClick: form => {
+                                if (form.isValid) {
+                                    this.preview = form.values()
+                                }
                             },
-                            {
-                                value: 'Post ID',
-                                title: 'Post with an anonymous ID',
-                            },
-                            {
-                                value: 'Preview',
-                                className: 'white bg-gray',
-                                title: 'Preview the post before submitting',
-                                onClick: form => {
-                                    if (form.isValid) {
-                                        this.preview = form.values()
-                                    }
-                                },
-                            },
-                        ],
-                    },
+                        },
+                    ],
                 },
-            ],
-        )
+            },
+        ])
     }
 }
 

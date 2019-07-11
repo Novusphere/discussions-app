@@ -3,6 +3,8 @@ import { observer } from 'mobx-react'
 import classNames from 'classnames'
 import Select from 'react-select'
 import { Editor } from '@components'
+import { faSpinner } from '@fortawesome/free-solid-svg-icons'
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 
 interface FormProps extends React.HTMLAttributes<HTMLFormElement> {
     form: IForm
@@ -26,7 +28,11 @@ const Form: React.FC<FormProps> = ({ form, children, hideSubmitButton, ...props 
 
                             e.preventDefault()
                         }}
-                        disabled={disabled || false}
+                        disabled={
+                            disabled ||
+                            (onClick && onClick['state'] && onClick['state'] === 'pending') ||
+                            false
+                        }
                         key={`${field.name}-${value}`}
                         title={title || null}
                         className={classNames([
@@ -37,6 +43,9 @@ const Form: React.FC<FormProps> = ({ form, children, hideSubmitButton, ...props 
                             },
                         ])}
                     >
+                        {onClick && onClick['state'] && onClick['state'] === 'pending' ? (
+                            <FontAwesomeIcon icon={faSpinner} spin className={'mr1'} />
+                        ) : null}
                         {value}
                     </button>
                 )
