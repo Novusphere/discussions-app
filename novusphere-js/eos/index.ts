@@ -15,6 +15,10 @@ export class EOS {
     discoveryData?: DiscoveryData;
     tokens?: IToken[];
 
+    get accountName() : string | undefined {
+        return this.wallet ? this.wallet.auth.accountName : undefined;
+    }
+
     get auth(): WalletAuth | undefined {
         return this.wallet ? this.wallet.auth : undefined;
     }
