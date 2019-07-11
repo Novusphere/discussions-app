@@ -5,7 +5,7 @@ import { BaseStore, getOrCreateStore } from 'next-mobx-wrapper'
 import { CreateForm } from '@components'
 import { getTagStore } from '@stores/tag'
 import { getAuthStore, IStores } from '@stores/index'
-import { sleep } from '@utils'
+import { generateUuid, sleep, getAttachmentValue } from '@utils'
 
 export interface IAttachment {
     value: string
@@ -245,6 +245,7 @@ export default class Posts extends BaseStore {
                     label: `Title`,
                     placeholder: 'Enter a post title',
                     rules: 'required|string|min:5|max:45',
+                    value: 'Zoomies!',
                 },
                 {
                     name: 'sub',
@@ -252,6 +253,7 @@ export default class Posts extends BaseStore {
                     placeholder: 'Select a sub',
                     rules: 'required',
                     type: 'dropdown',
+                    value: {value: "test", label: "test"},
                     extra: {
                         options: [
                             { value: 'all', label: 'all' },
@@ -368,7 +370,23 @@ export default class Posts extends BaseStore {
                                 disabled: !this.authStore.isLoggedIn,
                                 title: !this.authStore.isLoggedIn
                                     ? 'You need to be logged in to post'
-                                    : 'Post with your logged in username',
+                                    : 'Post with your logged as ' + this.authStore.accountName,
+                                onClick: async (form) => {
+                                    const post = form.values()
+                                    const uuid = generateUuid()
+                                    await discussions.post({
+                                        title: post.title,
+                                        content: post.content,
+                                        sub: post.sub.value,
+                                        chain: 'eos',
+                                        mentions: [],
+                                        tags: [post.sub.value],
+                                        uuid: uuid,
+                                        parentUuid: uuid,
+                                        threadUuid: null,
+                                        attachment: getAttachmentValue(post),
+                                    } as any)
+                                },
                             },
                             {
                                 value: 'Post ID',
@@ -387,7 +405,7 @@ export default class Posts extends BaseStore {
                         ],
                     },
                 },
-            ]
+            ],
         )
     }
 }

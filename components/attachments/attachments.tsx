@@ -7,6 +7,8 @@ interface IAttachments {
 
 const Attachments: React.FC<IAttachments> = ({ attachment }) => {
     switch (attachment.display) {
+        case '':
+            return null
         case 'html':
             return <div dangerouslySetInnerHTML={{ __html: attachment.value }} />
         default:
