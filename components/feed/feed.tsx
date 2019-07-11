@@ -26,6 +26,7 @@ class Feed extends React.Component<IFeedProps> {
                 key={post.uuid}
                 onClick={this.clickPost}
                 tag={this.props.tagStore.tags.get(post.sub)}
+                voteHandler={this.props.postsStore.vote}
             />
         ))
     }

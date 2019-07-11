@@ -44,7 +44,8 @@ class NewPostPreview extends React.Component<IPostPreviewProps> {
             replies: [],
             totalReplies: 0,
             score: 0,
-            votes: 0,
+            upvotes: 0,
+            downvotes: 0,
             alreadyVoted: false,
         }
 
@@ -58,6 +59,7 @@ class NewPostPreview extends React.Component<IPostPreviewProps> {
                         post={post}
                         onClick={() => false}
                         tag={this.props.tagStore.tags.get(post.sub)}
+                        disableVoteHandler
                     />
                 </div>
             </>

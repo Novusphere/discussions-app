@@ -11,13 +11,28 @@ interface IPostPreviewProps {
     onClick: (post) => void
     post: IPost
     tag: TagModel
+    voteHandler?: (uuid: string, type: string, value: number) => Promise<void>
+    disableVoteHandler?: boolean
 }
 
-const PostPreview: React.FC<IPostPreviewProps> = ({ post, onClick, tag }) => (
+const PostPreview: React.FC<IPostPreviewProps> = ({
+    disableVoteHandler,
+    post,
+    onClick,
+    tag,
+    voteHandler,
+}) => (
     <div className={'post-preview'}>
         <div className={'flex flex-auto'}>
             <div className={'bg-light-gray flex tc justify-center ph2 pv4 relative z-2 flex-auto'}>
-                <Votes votes={post.upvotes} />
+                {disableVoteHandler ? null : (
+                    <Votes
+                        upVotes={post.upvotes}
+                        downVotes={post.downvotes}
+                        handler={voteHandler}
+                        uuid={post.uuid}
+                    />
+                )}
             </div>
 
             <div

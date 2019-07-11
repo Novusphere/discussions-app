@@ -122,6 +122,7 @@ class E extends React.Component<IEPageProps, IEPageState> {
                                         replyPostHandler={setReplyPostContent}
                                         replyOpenHandler={setReplyingPostUUID}
                                         submitReplyHandler={submitReplyingPostReply}
+                                        voteHandler={vote}
                                     />
                                 )
                             })}

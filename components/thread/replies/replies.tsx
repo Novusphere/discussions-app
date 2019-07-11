@@ -21,6 +21,7 @@ interface IReplies {
     replyOpenHandler: (id: string) => void
     replyPostHandler: (content: string) => void
     submitReplyHandler: () => Promise<void>
+    voteHandler: (uuid: string, type: string, value: number) => Promise<void>
 }
 
 const Replies: React.FC<IReplies> = ({
@@ -29,6 +30,7 @@ const Replies: React.FC<IReplies> = ({
     replyPostHandler,
     replyOpenHandler,
     submitReplyHandler,
+    voteHandler,
     ...props
 }) => (
     <div className={'post-content post-reply black'} {...props}>
@@ -43,7 +45,13 @@ const Replies: React.FC<IReplies> = ({
         </div>
         <ReactMarkdown className={'f6 lh-copy'} source={post.content} />
         <div className={'footer flex items-center pt3'}>
-            <Votes votes={post.upvotes} className={'mr2'} handler={(...args) => console.log(args)} />
+            <Votes
+                upVotes={post.upvotes}
+                downVotes={post.downvotes}
+                uuid={post.uuid}
+                className={'mr2'}
+                handler={voteHandler}
+            />
 
             <button
                 className={'reply mr3 pointer dim'}
@@ -77,6 +85,7 @@ const Replies: React.FC<IReplies> = ({
                 replyPostHandler={replyPostHandler}
                 submitReplyHandler={submitReplyHandler}
                 className={'post-content post-reply black child'}
+                voteHandler={voteHandler}
             />
         ))}
     </div>
