@@ -67,11 +67,10 @@ class E extends React.Component<IEPageProps, IEPageState> {
             replyingPostUUID,
             setReplyingPostUUID,
             setReplyPostContent,
-            submitReplyingPostReply,
             openingPostReplyOpen,
             setOpeningPostContent,
             setOpeningPostToggle,
-            submitOpeningPostReply,
+            submitReply,
             vote,
             threadMap,
             threadOpeningPost,
@@ -91,8 +90,9 @@ class E extends React.Component<IEPageProps, IEPageState> {
                 {openingPostReplyOpen ? (
                     <div className={'mb3'}>
                         <Reply
+                            uid={threadOpeningPost.uuid}
                             onContentChange={setOpeningPostContent}
-                            onSubmit={submitOpeningPostReply}
+                            onSubmit={submitReply}
                         />
                     </div>
                 ) : null}
@@ -100,7 +100,7 @@ class E extends React.Component<IEPageProps, IEPageState> {
                     <>
                         <div className={'mb2'}>
                             <span className={'b f6 pb2'}>
-                                viewing all {Object.keys(threadMap).length} comments
+                                viewing all {threadOpeningPost.totalReplies} comments
                             </span>
                         </div>
 
@@ -121,7 +121,7 @@ class E extends React.Component<IEPageProps, IEPageState> {
                                         replyingPostUUID={replyingPostUUID}
                                         replyPostHandler={setReplyPostContent}
                                         replyOpenHandler={setReplyingPostUUID}
-                                        submitReplyHandler={submitReplyingPostReply}
+                                        submitReplyHandler={submitReply}
                                         voteHandler={vote}
                                     />
                                 )

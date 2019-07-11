@@ -17,24 +17,24 @@ interface ITagProps {
 @inject('tagStore', 'postsStore')
 @observer
 class Tag extends React.Component<ITagProps> {
+    constructor(props) {
+        super(props)
+        props.tagStore.setActiveTag(props.tagName)
+    }
+
     static async getInitialProps({ ctx: { store, query }}) {
         const tag = query.name
         const postsStore: IStores['postsStore'] = store.postsStore
         const tagStore: IStores['tagStore'] = store.tagStore
         const tagModel = tagStore.setActiveTag(tag)
         const posts = await postsStore.getPostsByTag([tag])
+        const onlyOpeningPosts = posts.filter(post => !post.parentUuid)
         return {
             tagName: tag,
-            posts: posts,
+            posts: onlyOpeningPosts,
             tagModel: tagModel,
         }
     }
-
-    // componentWillMount(): void {
-    //     if (this.props.tagName && this.props.tagStore.tags.has(this.props.tagName)) {
-    //         this.props.tagStore.setActiveTag(this.props.tagName)
-    //     }
-    // }
 
     public clickPost = (post: IPost) => {
         Router.pushRoute(

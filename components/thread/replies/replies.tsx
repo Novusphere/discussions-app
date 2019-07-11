@@ -20,7 +20,7 @@ interface IReplies {
     replyingPostUUID: string
     replyOpenHandler: (id: string) => void
     replyPostHandler: (content: string) => void
-    submitReplyHandler: () => Promise<void>
+    submitReplyHandler: (uid: string) => Promise<boolean | void>
     voteHandler: (uuid: string, type: string, value: number) => Promise<void>
 }
 
@@ -73,7 +73,11 @@ const Replies: React.FC<IReplies> = ({
         </div>
 
         {replyingPostUUID === post.uuid ? (
-            <Reply onContentChange={replyPostHandler} onSubmit={submitReplyHandler} />
+            <Reply
+                uid={post.uuid}
+                onContentChange={replyPostHandler}
+                onSubmit={submitReplyHandler}
+            />
         ) : null}
 
         {post.replies.map(reply => (

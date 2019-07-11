@@ -5,11 +5,12 @@ import { faSpinner } from '@fortawesome/free-solid-svg-icons'
 import { observer } from 'mobx-react'
 
 interface IReplyProps {
+    uid: string // the uid of the post this component is active for
     onContentChange: (content: string) => void
-    onSubmit: () => Promise<boolean | void>
+    onSubmit: (uid: string) => Promise<boolean | void>
 }
 
-const Reply: React.FC<IReplyProps> = ({ onContentChange, onSubmit }) => (
+const Reply: React.FC<IReplyProps> = ({ uid, onContentChange, onSubmit }) => (
     <div className={'mt3'}>
         <Editor placeholder={'Enter your reply'} className={'db f6'} onChange={onContentChange} />
         {onSubmit['match']({
@@ -26,7 +27,7 @@ const Reply: React.FC<IReplyProps> = ({ onContentChange, onSubmit }) => (
                     <span className={'red f6 pt3'}>{error.message}</span>
                     <button
                         onClick={() =>
-                            onSubmit().catch(err => {
+                            onSubmit(uid).catch(err => {
                                 console.error(err)
                             })
                         }
@@ -41,7 +42,7 @@ const Reply: React.FC<IReplyProps> = ({ onContentChange, onSubmit }) => (
                     {status ? <span className={'green f6 pt3'}>Post submitted!</span> : null}
                     <button
                         onClick={() =>
-                            onSubmit().catch(err => {
+                            onSubmit(uid).catch(err => {
                                 console.error(err)
                             })
                         }

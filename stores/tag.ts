@@ -7,8 +7,8 @@ export default class Tag extends BaseStore {
     // the amount of subs that are base
     static baseSubLength = 4
 
-    @observable activeTag: TagModel | null = null
-    @observable activeSub: SubModel | null = null
+    @observable activeTag: TagModel
+    @observable activeSub: SubModel
     @observable tags = observable.map<string, TagModel>()
     @observable subs = observable.map<string, TagModel>()
 

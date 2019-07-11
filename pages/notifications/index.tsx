@@ -2,7 +2,7 @@ import * as React from 'react'
 import { task } from 'mobx-task'
 import { inject, observer } from 'mobx-react'
 import { IStores } from '@stores/index'
-import { discussions } from '@novuspherejs/index'
+// import { discussions } from '@novuspherejs/index'
 import { faSpinner } from '@fortawesome/free-solid-svg-icons'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { reaction } from 'mobx'
@@ -21,7 +21,7 @@ class Notifications extends React.Component<INotificationsProps> {
     @task.resolved
     private fetchNotifications = async () => {
         if (this.props.authStore.isLoggedIn) {
-            return await discussions.getNotifications()
+            // return await discussions.getNotifications()
         }
 
         return <span>No notifications found</span>
@@ -58,7 +58,7 @@ class Notifications extends React.Component<INotificationsProps> {
                     return <FontAwesomeIcon icon={faSpinner} spin />
                 }
 
-                return notifications.posts.map((notificationPosts) => (
+                return notifications.posts.map(notificationPosts => (
                     <Notification
                         notification={notificationPosts}
                         key={notificationPosts.id}

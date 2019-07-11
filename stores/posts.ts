@@ -56,6 +56,7 @@ export default class Posts extends BaseStore {
      * Active thread
      */
     @observable activeThreadId = ''
+    // TODO: Use model
     activeThread = observable.box<Thread>(null)
 
     /**
@@ -120,7 +121,7 @@ export default class Posts extends BaseStore {
 
     @action setReplyingPostUUID = (id: string) => {
         // check if the user is currently posting a reply
-        if (this.submitReplyingPostReply['state'] !== 'pending') {
+        if (this.submitReply['state'] !== 'pending') {
             // works as a toggle
             if (this.replyingPostUUID === id) {
                 this.replyingPostUUID = ''
@@ -133,20 +134,6 @@ export default class Posts extends BaseStore {
 
     @action setReplyPostContent = (content: string) => {
         this.replyingPostContent = content
-    }
-
-    @task.resolved({ error: Error('Something went wrong, please try again.') })
-    public submitReplyingPostReply = async () => {
-        try {
-            if (!this.replyingPostContent) {
-                throw Error('Post cannot be empty')
-            }
-            // TODO: Add reply to post programmatically rather than re-fetching.
-            // TODO: Add actual methods to post the reply
-            await sleep(3000)
-        } catch (error) {
-            throw error
-        }
     }
 
     //  END: Manage replies within a post methods (not an opening post)
@@ -166,16 +153,54 @@ export default class Posts extends BaseStore {
     }
 
     @task.resolved({ error: Error('Something went wrong, please try again.') })
-    public submitOpeningPostReply = async () => {
+    public submitReply = async (replyingToUid: string) => {
         try {
             if (!this.openingPostReplyContent) {
                 throw Error('Post cannot be empty')
             }
-            // TODO: Add reply to post programmatically rather than re-fetching.
-            // TODO: Add actual methods to post the reply
-            await sleep(3000)
-            return true
+
+            const post = this.threadMap[replyingToUid]
+            const threadId = this.threadOpeningPost.uuid
+            const generatedUid = generateUuid()
+
+            // const newPost = await discussions.post({
+            //     poster: this.authStore.accountName,
+            //     title: '',
+            //     content: this.openingPostReplyContent,
+            //     sub: post.sub,
+            //     chain: 'eos',
+            //     mentions: [],
+            //     tags: [post.sub],
+            //     uuid: generatedUid,
+            //     parentUuid: replyingToUid,
+            //     threadUuid: threadId,
+            //     attachment: getAttachmentValue(post),
+            // } as any)
+
+            // TODO: Use model for this
+            const newPost = {
+                poster: this.authStore.accountName,
+                title: '',
+                content: this.openingPostReplyContent,
+                sub: post.sub,
+                chain: 'eos',
+                mentions: [],
+                tags: [post.sub],
+                uuid: generatedUid,
+                parentUuid: replyingToUid,
+                threadUuid: threadId,
+                attachment: getAttachmentValue(post),
+            } as any
+
+            console.log({ [generatedUid]: newPost})
+
+            this.updateActiveThread({
+                map: {
+                    [generatedUid]: newPost,
+                }
+            })
         } catch (error) {
+            console.log(error)
             throw error
         }
     }
@@ -187,7 +212,6 @@ export default class Posts extends BaseStore {
         try {
             const thread = await discussions.getThread('', Number(this.activeThreadId))
             this.activeThread.set(thread)
-            // this.tagsStore.setActiveTag(thread.openingPost.sub)
         } catch (error) {
             throw error
         }
@@ -239,7 +263,6 @@ export default class Posts extends BaseStore {
                 label: `Title`,
                 placeholder: 'Enter a post title',
                 rules: 'required|string|min:5|max:45',
-                value: 'Zoomies!',
             },
             {
                 name: 'sub',
@@ -247,7 +270,6 @@ export default class Posts extends BaseStore {
                 placeholder: 'Select a sub',
                 rules: 'required',
                 type: 'dropdown',
-                value: { value: 'test', label: 'test' },
                 extra: {
                     options: [
                         { value: 'all', label: 'all' },
