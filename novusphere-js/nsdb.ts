@@ -2,6 +2,14 @@ const fetch = require('node-fetch');
 
 export const DEFAULT_NSDB_ENDPOINT = 'https://atmosdb.novusphere.io';
 
+export interface INSDBSearchQuery {
+    cursorId?: number;
+    query: any;
+    sort?: any;
+    account?: string;
+    payload?: any;
+}
+
 export class NSDB {
     api: string;
     constructor() {
@@ -15,8 +23,14 @@ export class NSDB {
         const result = await request.text();
         return result;
     }
-    async search(c: any, q: any, s: any) {
-        const qs = `c=${c ? c : ''}&q=${q ? JSON.stringify(q) : ''}&s=${s ? JSON.stringify(s) : ''}`;
+    async search(sq : INSDBSearchQuery) : Promise<INSDBSearchQuery> {
+
+        const qs = 
+            `c=${sq.cursorId ? sq.cursorId : ''}&` +
+            `q=${sq.query ? JSON.stringify(sq.query) : ''}&` +
+            `s=${sq.sort ? JSON.stringify(sq.sort) : ''}&` +
+            `u=${sq.account ? sq.account : ''}`;
+
         const request = await fetch(`${this.api}/discussions/search?${qs}`, {
             method: 'GET',
             headers: {
@@ -30,6 +44,10 @@ export class NSDB {
             console.log(result);
             throw new Error(result.error);
         }
-        return result;
+
+        sq.cursorId = result.cursorId;
+        sq.payload = result.payload;
+
+        return sq;
     }
 };

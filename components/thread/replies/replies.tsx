@@ -80,18 +80,20 @@ const Replies: React.FC<IReplies> = ({
             />
         ) : null}
 
-        {post.replies.map(reply => (
-            <Replies
-                post={reply}
-                key={reply.id}
-                replyingPostUUID={replyingPostUUID}
-                replyOpenHandler={replyOpenHandler}
-                replyPostHandler={replyPostHandler}
-                submitReplyHandler={submitReplyHandler}
-                className={'post-content post-reply black child'}
-                voteHandler={voteHandler}
-            />
-        ))}
+        {post.replies
+            ? post.replies.map(reply => (
+                  <Replies
+                      post={reply}
+                      key={reply.id}
+                      replyingPostUUID={replyingPostUUID}
+                      replyOpenHandler={replyOpenHandler}
+                      replyPostHandler={replyPostHandler}
+                      submitReplyHandler={submitReplyHandler}
+                      className={'post-content post-reply black child'}
+                      voteHandler={voteHandler}
+                  />
+              ))
+            : null}
     </div>
 )
 

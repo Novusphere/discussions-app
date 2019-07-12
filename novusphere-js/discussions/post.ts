@@ -48,7 +48,7 @@ export class Post {
     depth: number; // only used if Thread object created with
 
     // Aggregate Data
-    alreadyVoted: boolean; // have I already voted for this post?
+    myVote: number; // have I already voted for this post?
 
     hasAttachment(): boolean {
         return (this.attachment.value != '' && this.attachment.type != '' && this.attachment.display != '');
@@ -96,7 +96,7 @@ export class Post {
         this.upvotes = 0;
         this.downvotes = 0;
         this.depth = 0;
-        this.alreadyVoted = false;
+        this.myVote = 0;
     }
 
     static fromDbObject(o: any) : Post {
@@ -125,6 +125,9 @@ export class Post {
         p.totalReplies = o.totalReplies;
         p.upvotes = o.upvotes;
         p.downvotes = o.downvotes;
+        if (o.myVote && o.myVote.length > 0) {
+            p.myVote = o.myVote[0].value;
+        }
         return p;
     }
 

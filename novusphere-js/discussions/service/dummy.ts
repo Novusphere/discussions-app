@@ -28,7 +28,7 @@ After clicking save, a text file will be downloaded to your computer which inclu
   post1.totalReplies = 2
   post1.score = 1.1
   post1.upvotes = 10
-  post1.alreadyVoted = true
+  post1.myVote = 1
 
   // regular post, attachment (youtube url)
   var post2 = new Post('eos')

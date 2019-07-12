@@ -3,15 +3,13 @@ import Thread from "../thread";
 import { eos, nsdb } from "../../index";
 
 export default class DiscussionsService {
-    cursorId: number;
 
     constructor() {
-        this.cursorId = 0;
     }
 
     async vote(uuid: string, value: number): Promise<string> {
         return await eos.transact({
-            contract: "discussionsx",
+            account: "discussionsx",
             name: "vote",
             data: {
                 voter: eos.auth.accountName,
@@ -21,7 +19,7 @@ export default class DiscussionsService {
         });
     }
 
-    async post(p: Post): Promise<Post> {
+    async post(p: Post): Promise<string> {
         if (p.chain != 'eos') throw new Error('Unknown chain');
 
         const tags = new Set();
@@ -52,53 +50,73 @@ export default class DiscussionsService {
 
         //console.log(data);
 
-        const transaction = await eos.transact({
+        return await eos.transact([{
             account: "discussionsx",
             name: "post",
             data: data
-        });
-
-        data.transaction = transaction
-
-        return data as any
+        }, {
+            account: "discussionsx", // self up vote
+            name: "vote",
+            data: {
+                voter: p.poster,
+                uuid: p.uuid,
+                value: 1
+            }
+        }]);
     }
 
     async getThread(_chain: string, _id: number): Promise<Thread | undefined> {
-        let query = await nsdb.search(0, { id: _id }, null);
-        if (query.payload.length == 0) return undefined;
+        let sq = await nsdb.search({ query: { id: _id } });
+        if (sq.payload.length == 0) return undefined;
 
-        let op = Post.fromDbObject(query.payload[0]);
-        query = await nsdb.search(0, { threadUuid: op.threadUuid, sub: op.sub }, null);
+        let posts: Post[] = [];
+        let op = Post.fromDbObject(sq.payload[0]);
 
-        this.cursorId = query.cursorId;
+        sq = {
+            query:
+            {
+                threadUuid: op.threadUuid,
+                sub: op.sub
+            },
+            account: eos.accountName || ''
+        };
 
-        let posts = query.payload.map(o => Post.fromDbObject(o));
+        do {
+            sq = await nsdb.search(sq);
+            posts = [...posts, ...sq.payload.map(o => Post.fromDbObject(o))];
+        }
+        while (sq.cursorId);
+
         let thread = new Thread();
         thread.init(posts);
         return thread;
     }
 
     async getPostsForSubs(subs: string[]): Promise<Post[]> {
-        const query = await nsdb.search(0, {
-            "sub": { "$in": subs }
-        }, {
+        const query = await nsdb.search({
+            query: {
+                "sub": { "$in": subs }
+            },
+            sort: {
                 "createdAt": -1
-            });
+            },
+            account: eos.accountName || ''
+        });
 
-        this.cursorId = query.cursorId;
         return query.payload.map(o => Post.fromDbObject(o));
     }
 
     async getPostsForTags(tags: string[]): Promise<Post[]> {
-        const query = await nsdb.search(0, {
-            "tags": { "$in": tags }
-        }, {
+        const query = await nsdb.search({
+            query: {
+                "tags": { "$in": tags }
+            }, sort: {
                 "createdAt": -1
-            });
+            },
+            account: eos.accountName || ''
+        });
 
-        this.cursorId = query.cursorId;
         let posts = query.payload.map(o => Post.fromDbObject(o));
-        // console.log(tags, posts);
         return posts;
     }
 };

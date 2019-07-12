@@ -185,10 +185,13 @@ export default class Posts extends BaseStore {
                 sub: post.sub,
                 chain: 'eos',
                 mentions: [],
+                id: generatedUid,
                 tags: [post.sub],
                 uuid: generatedUid,
                 parentUuid: replyingToUid,
                 threadUuid: threadId,
+                upvotes: 0,
+                downvotes: 0,
                 attachment: getAttachmentValue(post),
             } as any
 
@@ -196,6 +199,7 @@ export default class Posts extends BaseStore {
 
             this.updateActiveThread({
                 map: {
+                    ...this.threadMap,
                     [generatedUid]: newPost,
                 }
             })
