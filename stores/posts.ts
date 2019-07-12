@@ -214,7 +214,7 @@ export default class Posts extends BaseStore {
     @task
     public fetchPost = async () => {
         try {
-            const thread = await discussions.getThread('', Number(this.activeThreadId))
+            const thread = await discussions.getThread(this.activeThreadId)
             this.activeThread.set(thread)
         } catch (error) {
             throw error

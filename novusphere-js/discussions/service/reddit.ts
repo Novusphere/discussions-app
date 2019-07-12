@@ -20,7 +20,7 @@ export const isDeleted = textBody => textBody === '\\[deleted\\]' || textBody ==
 // Reddits way of indicating that something is deleted
 export const isRemoved = textBody => textBody === '\\[removed\\]' || textBody === '[removed]'
 
-export default class RedditService {
+export class RedditService {
     constructor() {
 
     }

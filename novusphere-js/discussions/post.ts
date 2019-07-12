@@ -1,6 +1,7 @@
 //@ts-ignore
 import ecc from 'eosjs-ecc';
 import { Attachment} from './attachment';
+const BigInt = require('big-integer');
 
 export interface PostMetaData {
     title?: string;
@@ -110,7 +111,7 @@ export class Post {
         p.title = o.title;
         p.poster = o.poster;
         p.content = o.content;
-        p.createdAt = o.created;
+        p.createdAt = new Date(o.createdAt);
         p.sub = o.sub;
         p.tags = o.tags;
         p.mentions = o.mentions;
@@ -131,8 +132,23 @@ export class Post {
         return p;
     }
 
-    toAction() : any {
-        return {};
+    static decodeId(id: string) {
+        let n = new BigInt(id, 36);
+        let txid32 = n.shiftRight(32);
+        let timeOffset = n.and(new BigInt('ffffffff', 16));
+        let time = (timeOffset.valueOf() * 1000) + new Date('2017/1/1').getTime();
+        return {
+            txid32: txid32.toString(16),
+            timeGte: time - 1000*60*3,
+            timeLte: time + 1000*60*3
+        }
+    }
+
+    static encodeId(transaction: string, createdAt: Date) : string {
+        let txid32 = new BigInt(transaction.substring(0, 8), 16);
+        let timeOffset = new BigInt(Math.floor((createdAt.getTime() - new Date('2017/1/1').getTime()) / 1000), 10);
+        let id = txid32.shiftLeft(32).or(timeOffset);
+        return id.toString(36);
     }
 
     /*applyEdit(p: Post) {
