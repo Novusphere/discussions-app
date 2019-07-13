@@ -62,8 +62,6 @@ class E extends React.Component<IEPageProps, IEPageState> {
         if ((fetchPost as any).state === 'rejected')
             return <span>{(fetchPost as any).error.message}</span>
 
-        console.log(this.thread)
-
         return (
             <div className={'thread-container'}>
                 <MainPost

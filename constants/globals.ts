@@ -5,3 +5,9 @@
 export const ModalOptions = {
     walletUndetected: 'walletUndetected'
 }
+
+export const Messages = {
+    ERROR: {
+        POST_EMPTY: 'Post cannot be empty.'
+    }
+}

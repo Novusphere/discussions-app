@@ -26,7 +26,9 @@ export class ThreadModel {
         /**
          * Set reply box open for the opening post by default
          */
-        this.replyBoxStatuses.set(this.uuid, new ReplyModel(this.uuid))
+        const openingPostReplyModel = new ReplyModel(this.uuid, this.openingPost)
+        openingPostReplyModel.toggleOpen()
+        this.replyBoxStatuses.set(this.uuid, openingPostReplyModel)
     }
 
     /**
@@ -37,7 +39,7 @@ export class ThreadModel {
             if (this.replyBoxStatuses.has(uid)) {
                 return this.replyBoxStatuses.get(uid)
             }
-            const model = new ReplyModel(uid)
+            const model = new ReplyModel(uid, this.map[uid])
             this.replyBoxStatuses.set(uid, model)
             return model
         }
@@ -66,7 +68,7 @@ export class ThreadModel {
             replyModel.toggleOpen()
             this.replyBoxStatuses.set(uid, replyModel)
         } else {
-            this.replyBoxStatuses.set(uid, new ReplyModel(uid))
+            this.replyBoxStatuses.set(uid, new ReplyModel(uid, this.map[uid]))
         }
     }
 
@@ -74,10 +76,15 @@ export class ThreadModel {
         const replies = []
 
         Object.keys(this.map).map(post => {
-            if (post === this.uuid && this.map[post].parentUuid === this.uuid) {
+            if (post === this.uuid) {
                 return null
             }
-            replies.push(this.map[post])
+
+            if (this.map[post].parentUuid !== this.uuid) {
+                return null
+            }
+
+            return replies.push(this.map[post])
         })
 
         return replies

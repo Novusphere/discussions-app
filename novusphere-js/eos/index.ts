@@ -16,7 +16,7 @@ export class EOS {
     tokens?: IToken[];
 
     get accountName() : string | undefined {
-        return this.wallet ? this.wallet.auth.accountName : undefined;
+        return this.wallet && this.wallet.auth ? this.wallet.auth.accountName : undefined;
     }
 
     get auth(): WalletAuth | undefined {

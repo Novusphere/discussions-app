@@ -70,7 +70,7 @@ export default class DiscussionsService {
     async getThread(_id: string): Promise<Thread | undefined> {
         let sq;
         
-        if (Number.isInteger(parseInt(_id))) {
+        // if (isNaN(parseInt(_id))) {
             let dId = Post.decodeId(_id);
             sq = await nsdb.search({
                 query: {
@@ -78,10 +78,10 @@ export default class DiscussionsService {
                     transaction: { $regex: `^${dId.txid32}` }
                 }
             })
-        }
-        else {
-            sq = await nsdb.search({ query: { id: parseInt(_id) } });
-        }
+        // }
+        // else {
+        //     sq = await nsdb.search({ query: { id: parseInt(_id) } });
+        // }
         
         if (sq.payload.length == 0) return undefined;
 
