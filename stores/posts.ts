@@ -81,6 +81,10 @@ export default class Posts extends BaseStore {
         return Post.encodeId(post.transaction, new Date(post.createdAt))
     }
 
+    public decodeId(id: string) {
+        return Post.decodeId(id)
+    }
+
     /**
      * START
      * Active thread getters used to update boxed values
