@@ -1,5 +1,5 @@
 import { action, observable } from 'mobx'
-import { discussions } from '@novuspherejs/index'
+import { discussions, Post } from '@novuspherejs/index'
 import { task } from 'mobx-task'
 import { BaseStore, getOrCreateStore } from 'next-mobx-wrapper'
 import { CreateForm } from '@components'
@@ -40,7 +40,6 @@ export interface IPost {
     upvotes: number
     downvotes: number
     alreadyVoted: boolean
-    encodeId() : string
 }
 
 export interface IPreviewPost {
@@ -51,7 +50,7 @@ export interface IPreviewPost {
 
 export default class Posts extends BaseStore {
     // all posts by filter
-    @observable posts: IPost[] = []
+    @observable posts: Post[] = []
     @observable preview: IPreviewPost | null = null
 
     @observable activeThreadId = ''
@@ -78,6 +77,10 @@ export default class Posts extends BaseStore {
         this.authStore = getAuthStore()
     }
 
+    public encodeId(post: IPost) {
+        return Post.encodeId(post.transaction, new Date(post.createdAt))
+    }
+
     /**
      * START
      * Active thread getters used to update boxed values
@@ -101,9 +104,7 @@ export default class Posts extends BaseStore {
      */
 
     @task.resolved getPostsByTag = async (tags: string[]) => {
-        const posts = await discussions.getPostsForTags(tags)
-        this.posts = posts as any
-        //console.log(this.posts.map(p => p.encodeId()));
+        this.posts = await discussions.getPostsForTags(tags)
         return this.posts
     }
 

@@ -1,6 +1,7 @@
 import * as React from 'react'
 import { inject, observer } from 'mobx-react'
 import { IStores } from '@stores/index'
+// @ts-ignore
 import { MainPost, Replies, Reply } from '@components'
 import { faSpinner } from '@fortawesome/free-solid-svg-icons'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
@@ -76,16 +77,15 @@ class E extends React.Component<IEPageProps, IEPageState> {
 
         const {
             fetchPost,
-            replyingPostUUID,
-            setReplyingPostUUID,
-            setReplyPostContent,
+            // replyingPostUUID,
+            // setReplyingPostUUID,
+            // setReplyPostContent,
             openingPostReplyOpen,
             setOpeningPostContent,
             setOpeningPostToggle,
             submitReply,
             vote,
-            threadMap,
-            threadOpeningPost,
+            activeThread,
         } = this.props.postsStore
 
         if ((fetchPost as any).state === 'pending') return <FontAwesomeIcon icon={faSpinner} spin />
@@ -95,52 +95,52 @@ class E extends React.Component<IEPageProps, IEPageState> {
         return (
             <div className={'thread-container'}>
                 <MainPost
-                    openingPost={threadOpeningPost}
+                    openingPost={activeThread.openingPost}
                     replyHandler={setOpeningPostToggle}
                     voteHandler={vote}
                 />
                 {openingPostReplyOpen ? (
                     <div className={'mb3'}>
                         <Reply
-                            uid={threadOpeningPost.uuid}
+                            uid={activeThread.id}
                             onContentChange={setOpeningPostContent}
                             onSubmit={submitReply}
                         />
                     </div>
                 ) : null}
-                {threadOpeningPost.totalReplies ? (
-                    <>
-                        <div className={'mb2'}>
-                            <span className={'b f6 pb2'}>
-                                viewing all {threadOpeningPost.totalReplies} comments
-                            </span>
-                        </div>
+                {/*{threadOpeningPost.totalReplies ? (*/}
+                {/*    <>*/}
+                {/*        <div className={'mb2'}>*/}
+                {/*            <span className={'b f6 pb2'}>*/}
+                {/*                viewing all {threadOpeningPost.totalReplies} comments*/}
+                {/*            </span>*/}
+                {/*        </div>*/}
 
-                        <div className={'card pr2 pv1'}>
-                            {Object.keys(threadMap).map(post => {
-                                if (post === threadOpeningPost.threadUuid) {
-                                    return null
-                                }
+                {/*        <div className={'card pr2 pv1'}>*/}
+                {/*            {Object.keys(threadMap).map(post => {*/}
+                {/*                if (post === threadOpeningPost.threadUuid) {*/}
+                {/*                    return null*/}
+                {/*                }*/}
 
-                                if (threadMap[post]['parentUuid'] !== threadOpeningPost.uuid) {
-                                    return null
-                                }
+                {/*                if (threadMap[post]['parentUuid'] !== threadOpeningPost.uuid) {*/}
+                {/*                    return null*/}
+                {/*                }*/}
 
-                                return (
-                                    <Replies
-                                        post={threadMap[post]}
-                                        key={threadMap[post]['uuid']}
-                                        replyingPostUUID={replyingPostUUID}
-                                        replyPostHandler={setReplyPostContent}
-                                        replyOpenHandler={setReplyingPostUUID}
-                                        submitReplyHandler={submitReply}
-                                        voteHandler={vote}
-                                    />
-                                )
-                            })}
-                        </div>
-                    </>
-                ) : null}
+                {/*                return (*/}
+                {/*                    <Replies*/}
+                {/*                        post={threadMap[post]}*/}
+                {/*                        key={threadMap[post]['uuid']}*/}
+                {/*                        replyingPostUUID={replyingPostUUID}*/}
+                {/*                        replyPostHandler={setReplyPostContent}*/}
+                {/*                        replyOpenHandler={setReplyingPostUUID}*/}
+                {/*                        submitReplyHandler={submitReply}*/}
+                {/*                        voteHandler={vote}*/}
+                {/*                    />*/}
+                {/*                )*/}
+                {/*            })}*/}
+                {/*        </div>*/}
+                {/*    </>*/}
+                {/*) : null}*/}
             </div>
         )
     }

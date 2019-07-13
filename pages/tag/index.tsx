@@ -22,7 +22,7 @@ class Tag extends React.Component<ITagProps> {
         props.tagStore.setActiveTag(props.tagName)
     }
 
-    static async getInitialProps({ ctx: { store, query }}) {
+    static async getInitialProps({ ctx: { store, query } }) {
         const tag = query.name
         const postsStore: IStores['postsStore'] = store.postsStore
         const tagStore: IStores['tagStore'] = store.tagStore
@@ -37,7 +37,7 @@ class Tag extends React.Component<ITagProps> {
     }
 
     public clickPost = (post: IPost) => {
-        const id = post.encodeId(); // Post.encodeId(post.transaction, new Date(post.createdAt));
+        const id = this.props.postsStore.encodeId(post) // Post.encodeId(post.transaction, new Date(post.createdAt));
         Router.pushRoute(
             `/e/${post.sub}/${id}/${decodeURIComponent(post.title.replace(/ /g, '_'))}`
         )
