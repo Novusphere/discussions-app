@@ -67,8 +67,21 @@ export default class DiscussionsService {
         return data as any
     }
 
-    async getThread(_chain: string, _id: number): Promise<Thread | undefined> {
-        let sq = await nsdb.search({ query: { id: _id } });
+    async getThread(_id: string): Promise<Thread | undefined> {
+        let sq;
+        
+        if (isNaN(parseInt(_id))) {
+            let dId = Post.decodeId(_id);
+            sq = await nsdb.search({
+                query: {
+                    createdAt: { $gte: dId.timeGte, $lte: dId.timeLte },
+                    transaction: { $regex: `^${dId.txid32}` }
+                }
+            })
+        }
+        else {
+            sq = await nsdb.search({ query: { id: parseInt(_id) } });
+        }
         if (sq.payload.length == 0) return undefined;
 
         let posts: Post[] = [];

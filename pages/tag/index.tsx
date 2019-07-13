@@ -5,6 +5,7 @@ import { IPost } from '@stores/posts'
 import { PostPreview } from '@components'
 import { Router } from '@router'
 import { TagModel } from '@models/tagModel'
+import { Post } from '../../novusphere-js/discussions';
 
 interface ITagProps {
     tagStore: IStores['tagStore']
@@ -37,8 +38,9 @@ class Tag extends React.Component<ITagProps> {
     }
 
     public clickPost = (post: IPost) => {
+        const id = Post.encodeId(post.transaction, new Date(post.createdAt));
         Router.pushRoute(
-            `/e/${post.sub}/${post.id}/${decodeURIComponent(post.title.replace(/ /g, '_'))}`
+            `/e/${post.sub}/${id}/${decodeURIComponent(post.title.replace(/ /g, '_'))}`
         )
     }
 

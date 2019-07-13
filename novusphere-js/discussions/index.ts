@@ -1,5 +1,5 @@
 import DummyService from "./service/dummy";
-import RedditService from "./service/reddit";
+import { RedditService } from "./service/reddit";
 import DiscussionService from "./service/discussions";
 import { Post } from "./post";
 import { AttachmentType, AttachmentDisplay, Attachment } from "./attachment";

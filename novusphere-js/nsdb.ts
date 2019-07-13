@@ -8,6 +8,8 @@ export interface INSDBSearchQuery {
     sort?: any;
     account?: string;
     payload?: any;
+    count?: number;
+    limit?: number;
 }
 
 export class NSDB {
@@ -29,7 +31,9 @@ export class NSDB {
             `c=${sq.cursorId ? sq.cursorId : ''}&` +
             `q=${sq.query ? JSON.stringify(sq.query) : ''}&` +
             `s=${sq.sort ? JSON.stringify(sq.sort) : ''}&` +
-            `u=${sq.account ? sq.account : ''}`;
+            `u=${sq.account ? sq.account : ''}&` +
+            `lim=${sq.limit ? sq.limit : 20}&` +
+            `p=${sq.count ? sq.count : 0}`;
 
         const request = await fetch(`${this.api}/discussions/search?${qs}`, {
             method: 'GET',
@@ -46,6 +50,8 @@ export class NSDB {
         }
 
         sq.cursorId = result.cursorId;
+        sq.count = result.count;
+        sq.limit = result.limit;
         sq.payload = result.payload;
 
         return sq;

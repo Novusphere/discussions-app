@@ -1,7 +1,7 @@
 export * from './discussions';
 export * from './eos';
 
-import { RedditService, DiscussionService } from './discussions';
+import { RedditService, DiscussionService } from './discussions/index';
 import { EOS } from "./eos";
 import { NSDB } from './nsdb';
 import { Settings } from "./settings";
