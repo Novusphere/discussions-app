@@ -40,6 +40,7 @@ export interface IPost {
     upvotes: number
     downvotes: number
     alreadyVoted: boolean
+    encodeId() : string
 }
 
 export interface IPreviewPost {
@@ -102,6 +103,7 @@ export default class Posts extends BaseStore {
     @task.resolved getPostsByTag = async (tags: string[]) => {
         const posts = await discussions.getPostsForTags(tags)
         this.posts = posts as any
+        //console.log(this.posts.map(p => p.encodeId()));
         return this.posts
     }
 

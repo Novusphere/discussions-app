@@ -151,6 +151,10 @@ export class Post {
         return id.toString(36);
     }
 
+    encodeId() : string {
+        return Post.encodeId(this.transaction, this.createdAt);
+    }
+
     /*applyEdit(p: Post) {
         if (!p.edit || p.parentUuid != this.uuid) return;
         if (p.chain != this.chain) return;
