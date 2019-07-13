@@ -19,7 +19,7 @@ export default class DiscussionsService {
         });
     }
 
-    async post(p: Post): Promise<string> {
+    async post(p: Post): Promise<Post> {
         if (p.chain != 'eos') throw new Error('Unknown chain');
 
         const tags = new Set();
@@ -48,9 +48,7 @@ export default class DiscussionsService {
             transaction: '',
         };
 
-        //console.log(data);
-
-        return await eos.transact([{
+        const transaction = await eos.transact([{
             account: "discussionsx",
             name: "post",
             data: data
@@ -63,6 +61,10 @@ export default class DiscussionsService {
                 value: 1
             }
         }]);
+
+        data.transaction = transaction
+
+        return data as any
     }
 
     async getThread(_id: string): Promise<Thread | undefined> {
@@ -102,6 +104,7 @@ export default class DiscussionsService {
 
         let thread = new Thread();
         thread.init(posts);
+        thread.normalize();
         return thread;
     }
 
