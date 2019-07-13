@@ -49,7 +49,11 @@ export class Post {
     depth: number; // only used if Thread object created with
 
     // Aggregate Data
-    myVote: number; // have I already voted for this post?
+    myVote: number;
+
+    _rogueReplies: any // used for front-end model management
+
+    // have I already voted for this post?
 
     hasAttachment(): boolean {
         return (this.attachment.value != '' && this.attachment.type != '' && this.attachment.display != '');

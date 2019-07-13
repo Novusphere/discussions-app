@@ -3,8 +3,8 @@ import { task } from 'mobx-task'
 import { eos } from '@novuspherejs/index'
 import { BaseStore, getOrCreateStore } from 'next-mobx-wrapper'
 import { getUiStore } from '@stores/ui'
-import { IStores } from '@stores/index'
-import { ModalOptions } from '../constants/globals'
+import { IStores } from '@stores'
+import { ModalOptions } from '@globals'
 
 export default class Auth extends BaseStore {
     @observable accountName = ''

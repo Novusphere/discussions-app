@@ -20,10 +20,13 @@
 			"@models/*": ["./models/*"],
 			"@pages/": ["./pages/*"],
 			"@novuspherejs/*": ["./novusphere-js/*"],
+			"@novuspherejs": ["./novusphere-js/index"],
 			"@stores/*": ["./stores/*"],
+			"@stores": ["./stores/index"],
 			"@styles/*": ["./styles/*"],
 			"@utils": ["./utils/index"],
-			"@router": ["./routes.ts"]
+			"@router": ["./routes.ts"],
+			"@globals": ["./constants/globals.ts"]
 		},
 		"lib": ["dom", "es2015", "es2016"]
 	}

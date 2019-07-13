@@ -1,10 +1,10 @@
 import { action, observable } from 'mobx'
-import { discussions, Post } from '@novuspherejs/index'
+import { discussions, Post } from '@novuspherejs'
 import { task } from 'mobx-task'
 import { BaseStore, getOrCreateStore } from 'next-mobx-wrapper'
 import { CreateForm } from '@components'
 import { getTagStore } from '@stores/tag'
-import { getAuthStore, IStores } from '@stores/index'
+import { getAuthStore, IStores } from '@stores'
 import { generateUuid, getAttachmentValue } from '@utils'
 import { ThreadModel } from '@models/threadModel'
 
@@ -80,32 +80,6 @@ export default class Posts extends BaseStore {
         return Post.encodeId(post.transaction, new Date(post.createdAt))
     }
 
-    public decodeId(id: string) {
-        return Post.decodeId(id)
-    }
-
-    /**
-     * START
-     * Active thread getters used to update boxed values
-     */
-    // @computed get getActiveThread() {
-    //     return this.activeThread.get()
-    // }
-    //
-    // @computed get threadOpeningPost() {
-    //     if (!this.getActiveThread) return null
-    //     return this.getActiveThread.openingPost
-    // }
-    //
-    // @computed get threadMap() {
-    //     if (!this.getActiveThread) return null
-    //     return this.getActiveThread.map
-    // }
-    /**
-     * END
-     * Active thread getters used to update boxed values
-     */
-
     @task.resolved getPostsByTag = async (tags: string[]) => {
         this.posts = await discussions.getPostsForTags(tags)
         return this.posts
@@ -114,62 +88,6 @@ export default class Posts extends BaseStore {
     @action setActiveThreadId = (id: string) => {
         this.activeThreadId = id
     }
-
-    @task.resolved({ error: Error('Something went wrong, please try again.') })
-    public submitReply = async (replyingToUid: string) => {
-        try {
-            if (!this.openingPostReplyContent) {
-                throw Error('Post cannot be empty')
-            }
-
-            const post = this.activeThread.map[replyingToUid]
-            const threadId = this.activeThread.uuid
-            const generatedUid = generateUuid()
-
-            // const newPost = await discussions.post({
-            //     poster: this.authStore.accountName,
-            //     title: '',
-            //     content: this.openingPostReplyContent,
-            //     sub: post.sub,
-            //     chain: 'eos',
-            //     mentions: [],
-            //     tags: [post.sub],
-            //     uuid: generatedUid,
-            //     parentUuid: replyingToUid,
-            //     threadUuid: threadId,
-            //     attachment: getAttachmentValue(post),
-            // } as any)
-
-            const newPost = {
-                poster: this.authStore.accountName,
-                title: '',
-                content: this.openingPostReplyContent,
-                sub: post.sub,
-                chain: 'eos',
-                mentions: [],
-                tags: [post.sub],
-                id: generatedUid,
-                uuid: generatedUid,
-                parentUuid: replyingToUid,
-                threadUuid: threadId,
-                attachment: getAttachmentValue(post),
-            } as any
-
-            console.log(newPost)
-
-            // this.updateActiveThread({
-            //     map: {
-            //         ...this.activeThread.map,
-            //         [generatedUid]: newPost,
-            //     }
-            // })
-        } catch (error) {
-            console.log(error)
-            throw error
-        }
-    }
-
-    //  END: Manage replies of the opening post (opening post)
 
     @task
     public fetchPost = async () => {
@@ -181,16 +99,6 @@ export default class Posts extends BaseStore {
             throw error
         }
     }
-
-    // @action updateActiveThread = update => {
-    //     this.activeThread.set({
-    //         uuid: this.getActiveThread.uuid,
-    //         totalReplies: this.getActiveThread.totalReplies,
-    //         map: this.threadMap,
-    //         openingPost: this.threadOpeningPost,
-    //         ...update,
-    //     } as any)
-    // }
 
     @action
     // @ts-ignore

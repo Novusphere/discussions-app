@@ -1,7 +1,7 @@
 import * as React from 'react'
 import { observer, inject } from 'mobx-react'
 import { Feed } from '@components'
-import { IStores } from '@stores/index'
+import { IStores } from '@stores'
 
 interface IIndexPage {
     postsStore: IStores['postsStore']

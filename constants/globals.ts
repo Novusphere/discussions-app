@@ -7,6 +7,9 @@ export const ModalOptions = {
 }
 
 export const Messages = {
+    SUCCESS: {
+        REPLY_SUCCESS: 'Reply succesfully posted!'
+    },
     ERROR: {
         POST_EMPTY: 'Post cannot be empty.'
     }

@@ -44,7 +44,7 @@ const Form: React.FC<FormProps> = ({ form, children, hideSubmitButton, ...props 
                         ])}
                     >
                         {onClick && onClick['state'] && onClick['state'] === 'pending' ? (
-                            <FontAwesomeIcon icon={faSpinner} spin className={'mr1'} />
+                            <FontAwesomeIcon width={13} icon={faSpinner} spin className={'mr1'} />
                         ) : null}
                         {value}
                     </button>

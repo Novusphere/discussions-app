@@ -38,7 +38,7 @@ class Editor extends React.Component<IEditorProps> {
 
     public render(): React.ReactNode {
         if (!this.state.mounted) {
-            return <FontAwesomeIcon icon={faSpinner} spin className={'w-10'} />
+            return <FontAwesomeIcon width={13} icon={faSpinner} spin className={'w-10'} />
         }
 
         const { placeholder, className, ...rest } = this.props

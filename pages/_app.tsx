@@ -1,10 +1,15 @@
 import App, { Container } from 'next/app'
 import React from 'react'
-import * as Stores from '@stores/index'
+import * as Stores from '@stores'
 import { Provider, useStaticRendering } from 'mobx-react'
 import { MainLayout } from '@components'
-import { init, eos } from '@novuspherejs/index'
+import { init, eos } from '@novuspherejs'
 import { withMobx } from 'next-mobx-wrapper'
+
+import '../styles/style.scss'
+import { config } from '@fortawesome/fontawesome-svg-core'
+
+config.autoAddCss = false
 
 export const isServer = !(process as any).browser
 
@@ -32,7 +37,9 @@ class DiscussionApp extends App {
     async componentDidMount() {
         if (!isServer) {
             await init()
+            // TODO: Resolve detectWallet to fire immediately
             const wallet = await eos.detectWallet()
+            console.log('wallet detected?', wallet)
 
             if (typeof wallet !== 'boolean' && wallet) {
                 this.props.store.authStore.logIn()

@@ -1,6 +1,6 @@
 import * as React from 'react'
 import { inject, observer } from 'mobx-react'
-import { IStores } from '@stores/index'
+import { IStores } from '@stores'
 import { IPost } from '@stores/posts'
 import { PostPreview } from '@components'
 import { Router } from '@router'

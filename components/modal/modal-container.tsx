@@ -1,6 +1,6 @@
 import * as React from 'react'
 import Modal from 'react-modal'
-import { IStores } from '@stores/index'
+import { IStores } from '@stores'
 import { inject, observer } from 'mobx-react'
 
 interface IModalContainerProps {

@@ -35,7 +35,8 @@
                     "@stores": "./stores",
                     "@styles": "./styles",
                     "@utils": "./utils",
-                    "@router": "./routes.ts"
+                    "@router": "./routes.ts",
+                    "@globals": "./constants/globals"
                 }
             }
         ]

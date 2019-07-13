@@ -1,8 +1,8 @@
 @import '~tachyons';
 @import '~react-tabs/style/react-tabs.css';
 @import '~react-tippy/dist/tippy.css';
-@import 'components/all';
 @import '~react-draft-wysiwyg/dist/react-draft-wysiwyg.css';
+@import 'components/all';
 
 body {
     font-family: Open Sans Light, sans-serif;
@@ -110,4 +110,12 @@ a {
 
 .disable-user-select {
     user-select: none;
+}
+
+.svg-inline--fa {
+    display: inline-block;
+    font-size: inherit;
+    height: 1em;
+    overflow: visible;
+    vertical-align: -0.125em;
 }

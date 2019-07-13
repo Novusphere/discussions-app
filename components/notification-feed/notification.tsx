@@ -45,7 +45,7 @@ const Notification: React.FC<IPostPreviewProps> = ({ notification, onClick, tag 
 
                 <div className={'flex z-2 relative mt3 footer b'}>
                     <span className={'o-80 f6 ml2 dim pointer'}>
-                        <FontAwesomeIcon icon={faComment} className={'pr2'} />
+                        <FontAwesomeIcon width={13} icon={faComment} className={'pr2'} />
                         {notification.replies.length} comments
                     </span>
                     <span className={'o-80 f6 ml2 dim pointer'}>share</span>

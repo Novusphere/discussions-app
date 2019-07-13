@@ -3,8 +3,7 @@ import Head from 'next/head'
 import { inject, observer } from 'mobx-react'
 import { AppModals, Sidebar, TitleHeader } from '@components'
 
-import '../../styles/style.scss'
-import { IStores } from '@stores/index'
+import { IStores } from '@stores'
 
 interface IMainLayoutProps {
     activeBanner: string

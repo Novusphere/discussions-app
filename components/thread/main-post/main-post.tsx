@@ -27,7 +27,7 @@ const MainPost: React.FC<IMainPost> = ({ openingPost, replyHandler, voteHandler 
             <div className={'pb2'}>
                 <Link route={`/e/${openingPost.sub}`}>
                     <a className="f6 link dim br2 ph3 pv2 dib white bg-green mr2">
-                        <FontAwesomeIcon icon={faArrowLeft} className={'pr1'} />
+                        <FontAwesomeIcon width={13} icon={faArrowLeft} className={'pr1'} />
                         {`e/${openingPost.sub}`}
                     </a>
                 </Link>
@@ -43,7 +43,7 @@ const MainPost: React.FC<IMainPost> = ({ openingPost, replyHandler, voteHandler 
                         <span className={'ph1 b'}>&#183;</span>
                         <Link route={`/u/${openingPost.poster}`}>
                             <a>
-                                <FontAwesomeIcon icon={faUserCircle} className={'pr1'} />
+                                <FontAwesomeIcon width={13} icon={faUserCircle} className={'pr1'} />
                                 <span>{openingPost.poster}</span>
                             </a>
                         </Link>
@@ -68,16 +68,33 @@ const MainPost: React.FC<IMainPost> = ({ openingPost, replyHandler, voteHandler 
                     <Attachments attachment={openingPost.attachment} />
 
                     <div className={'footer flex items-center pt3'}>
-                        <button className={'reply mr3 pointer dim'} onClick={() => replyHandler(openingPost.uuid)}>
-                            <FontAwesomeIcon icon={faReply} className={'pr1'} />
+                        <button
+                            className={'reply mr3 pointer dim'}
+                            onClick={() => replyHandler(openingPost.uuid)}
+                        >
+                            <FontAwesomeIcon
+                                fixedWidth
+                                width={13}
+                                icon={faReply}
+                                className={'pr1'}
+                            />
                             reply
                         </button>
 
-                        <FontAwesomeIcon icon={faLink} className={'pr2 black f6 pointer dim'} />
-                        <FontAwesomeIcon icon={faShare} className={'pr2 black f6 pointer dim'} />
+                        <FontAwesomeIcon
+                            width={13}
+                            icon={faLink}
+                            className={'pr2 black f6 pointer dim'}
+                        />
+                        <FontAwesomeIcon
+                            width={13}
+                            icon={faShare}
+                            className={'pr2 black f6 pointer dim'}
+                        />
 
                         <span className={'f6 black f6'}>
                             <FontAwesomeIcon
+                                width={13}
                                 icon={faExclamationTriangle}
                                 className={'pr1 pointer dim'}
                             />

@@ -1,7 +1,7 @@
 import * as React from 'react'
 import { task } from 'mobx-task'
 import { inject, observer } from 'mobx-react'
-import { IStores } from '@stores/index'
+import { IStores } from '@stores'
 // import { discussions } from '@novuspherejs/index'
 import { faSpinner } from '@fortawesome/free-solid-svg-icons'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
@@ -47,7 +47,7 @@ class Notifications extends React.Component<INotificationsProps> {
 
     public render(): React.ReactNode {
         return this.fetchNotifications['match']({
-            pending: () => <FontAwesomeIcon icon={faSpinner} spin />,
+            pending: () => <FontAwesomeIcon width={13} icon={faSpinner} spin />,
             rejected: () => 'Something went wrong fetching notifications',
             resolved: (notifications: INotifications) => {
                 if (!notifications || !notifications.posts) {
@@ -55,7 +55,7 @@ class Notifications extends React.Component<INotificationsProps> {
                 }
 
                 if (this.fetchNotifications['state'] === 'pending') {
-                    return <FontAwesomeIcon icon={faSpinner} spin />
+                    return <FontAwesomeIcon width={13} icon={faSpinner} spin />
                 }
 
                 return notifications.posts.map(notificationPosts => (

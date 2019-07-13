@@ -15,7 +15,7 @@ export class EOS {
     discoveryData?: DiscoveryData;
     tokens?: IToken[];
 
-    get accountName() : string | undefined {
+    get accountName(): string | undefined {
         return this.wallet && this.wallet.auth ? this.wallet.auth.accountName : undefined;
     }
 
@@ -31,10 +31,10 @@ export class EOS {
         if (process.browser) { // client?
             const transit = await import('eos-transit');
 
-            const scatter  = await import('eos-transit-scatter-provider');
-            const lynx  = await import('eos-transit-lynx-provider');
-            const tokenpocket  = await import('eos-transit-tokenpocket-provider');
-            const meetone  = await import('eos-transit-meetone-provider');
+            const scatter = await import('eos-transit-scatter-provider');
+            const lynx = await import('eos-transit-lynx-provider');
+            const tokenpocket = await import('eos-transit-tokenpocket-provider');
+            const meetone = await import('eos-transit-meetone-provider');
 
             this.accessContext = transit.initAccessContext({
                 appName: 'discussions',
@@ -78,6 +78,7 @@ export class EOS {
     async detectWallet(attempts: number = 1): Promise<Wallet | boolean> {
         if (!this.accessContext) return false;
         const providers = this.accessContext.getWalletProviders();
+
         for (let i = 0; i < attempts && !this.wallet; i++) {
             console.log('Wallet detection round ' + i);
 
@@ -123,17 +124,22 @@ export class EOS {
             ]
         }));
 
-        let tx: any = await this.wallet.eosApi
-            .transact({ actions: transitActions },
-                {
-                    broadcast: true,
-                    blocksBehind: 3,
-                    expireSeconds: 180
-                }
-            );
+        try {
+            let tx: any = await this.wallet.eosApi
+                .transact({ actions: transitActions },
+                    {
+                        broadcast: true,
+                        blocksBehind: 3,
+                        expireSeconds: 180
+                    }
+                );
 
-        return tx ? tx.transaction_id : undefined;
+            return tx ? tx.transaction_id : undefined;
+        } catch (error) {
+            throw error
+        }
     }
+
     async getTransaction(txid: string) {
         if (!this.wallet) return undefined;
 
@@ -141,10 +147,12 @@ export class EOS {
         const tx = (await eos.rpc.history_get_transaction(txid));
         return tx;
     }
+
     async getToken(account: string, symbol: string): Promise<IToken | undefined> {
         if (!this.tokens) return undefined;
         return this.tokens.find(t => t.account == account && t.symbol == symbol);
     }
+
     async getSuggestAccounts(accountPartial: string, limit: number = 10): Promise<string[]> {
         let request = await fetch(`https://www.api.bloks.io/topholders?account_name[$search]=${accountPartial}&$limit=${limit}`);
         let json = await request.json();

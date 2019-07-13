@@ -11,68 +11,82 @@ import moment from 'moment'
 import { Link } from '@router'
 import { Votes, Reply } from '@components'
 import ReactMarkdown from 'react-markdown'
-import { observer } from 'mobx-react'
+import { Observer } from 'mobx-react'
 import { Post } from '@novuspherejs/discussions/post'
 import { ReplyModel } from '@models/replyModel'
 
 interface IReplies {
     post: Post
     className?: string
-    reply: ReplyModel
+    getModel: (post: Post) => ReplyModel
     voteHandler: (uuid: string, type: string, value: number) => Promise<void>
 }
 
-const Replies: React.FC<IReplies> = ({ post, voteHandler, reply, ...props }) => (
-    <div className={'post-content post-reply black'} {...props}>
-        <div className={'header pb2'}>
-            <Link route={`/u/${post.poster}`}>
-                <a>
-                    <FontAwesomeIcon icon={faUserCircle} className={'pr1'} />
-                    <span>{post.poster}</span>
-                </a>
-            </Link>
-            <span className={'pl2 o-50 f6'}>{moment(post.createdAt).fromNow()}</span>
-        </div>
-        <ReactMarkdown className={'f6 lh-copy'} source={post.content} />
-        <div className={'footer flex items-center pt3'}>
-            <Votes
-                upVotes={post.upvotes}
-                downVotes={post.downvotes}
-                uuid={post.uuid}
-                className={'mr2'}
-                handler={voteHandler}
-            />
+const Replies: React.FC<IReplies> = ({ post, voteHandler, getModel, ...props }) => {
+    const replyModel = getModel(post)
+    return (
+        <Observer>
+            {() => (
+                <div className={'post-content post-reply black'} {...props}>
+                    <div className={'header pb2'}>
+                        <Link route={`/u/${post.poster}`}>
+                            <a>
+                                <FontAwesomeIcon width={13} icon={faUserCircle} className={'pr1'} />
+                                <span>{post.poster}</span>
+                            </a>
+                        </Link>
+                        <span className={'pl2 o-50 f6'}>{moment(post.createdAt).fromNow()}</span>
+                    </div>
+                    <ReactMarkdown className={'f6 lh-copy'} source={post.content} />
+                    <div className={'footer flex items-center pt3'}>
+                        <Votes
+                            upVotes={post.upvotes}
+                            downVotes={post.downvotes}
+                            uuid={post.uuid}
+                            className={'mr2'}
+                            handler={voteHandler}
+                        />
 
-            <button className={'reply mr3 pointer dim'} onClick={reply.toggleOpen}>
-                <FontAwesomeIcon icon={faReply} className={'pr1'} />
-                reply
-            </button>
+                        <button className={'reply mr3 pointer dim'} onClick={replyModel.toggleOpen}>
+                            <FontAwesomeIcon width={13} icon={faReply} className={'pr1'} />
+                            reply
+                        </button>
 
-            <FontAwesomeIcon icon={faLink} className={'pr2 black f6 pointer dim'} />
-            <FontAwesomeIcon icon={faShare} className={'pr2 black f6 pointer dim'} />
+                        <FontAwesomeIcon width={13} icon={faLink} className={'pr2 black f6 pointer dim'} />
+                        <FontAwesomeIcon width={13} icon={faShare} className={'pr2 black f6 pointer dim'} />
 
-            <span className={'f6 black f6 pointer dim'}>
-                <FontAwesomeIcon icon={faExclamationTriangle} className={'pr1'} />
-                mark as spam
-            </span>
-        </div>
+                        <span className={'f6 black f6 pointer dim'}>
+                            <FontAwesomeIcon width={13} icon={faExclamationTriangle} className={'pr1'} />
+                            mark as spam
+                        </span>
+                    </div>
 
-        {reply.open ? (
-            <Reply uid={post.uuid} onContentChange={reply.setContent} onSubmit={reply.onSubmit} />
-        ) : null}
+                    {replyModel.open ? (
+                        <Reply
+                            uid={post.uuid}
+                            onContentChange={replyModel.setContent}
+                            onSubmit={replyModel.onSubmit}
+                        />
+                    ) : null}
 
-        {post.replies
-            ? post.replies.map(postReply => (
-                  <Replies
-                      post={postReply}
-                      key={postReply.id}
-                      reply={reply}
-                      className={'post-content post-reply black child'}
-                      voteHandler={voteHandler}
-                  />
-              ))
-            : null}
-    </div>
-)
+                    <pre> {JSON.stringify(post.replies.length)}</pre>
+                    {post.replies.length
+                        ? post.replies.map(postReply => {
+                              return (
+                                  <Replies
+                                      post={postReply}
+                                      key={postReply.uuid}
+                                      getModel={getModel}
+                                      className={'post-content post-reply black child'}
+                                      voteHandler={voteHandler}
+                                  />
+                              )
+                          })
+                        : null}
+                </div>
+            )}
+        </Observer>
+    )
+}
 
-export default observer(Replies)
+export default Replies

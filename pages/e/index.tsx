@@ -1,7 +1,7 @@
 import * as React from 'react'
 import { inject, observer } from 'mobx-react'
-import { IStores } from '@stores/index'
-import { MainPost, Replies, Reply } from '@components'
+import { IStores } from '@stores'
+import { Thread } from '@components'
 import { ThreadModel } from '@models/threadModel'
 
 interface IEPageProps {
@@ -49,6 +49,10 @@ class E extends React.Component<IEPageProps, IEPageState> {
     }
 
     componentWillMount(): void {
+        /**
+         * Due to serialization, we lose the ThreadModel prototype
+         * as a result we have to instantiate a new one before component mount.
+         */
         this.thread = new ThreadModel(this.props.thread)
     }
 
@@ -64,42 +68,7 @@ class E extends React.Component<IEPageProps, IEPageState> {
 
         return (
             <div className={'thread-container'}>
-                <MainPost
-                    openingPost={this.thread.openingPost}
-                    replyHandler={this.thread.toggleReplyBoxStatus}
-                    voteHandler={vote}
-                />
-                {this.thread.isReplyBoxOpen(this.thread.uuid) ? (
-                    <div className={'mb3'}>
-                        <Reply
-                            uid={this.thread.uuid}
-                            onContentChange={
-                                this.thread.getReplyBoxModel(this.thread.uuid).setContent
-                            }
-                            onSubmit={this.thread.getReplyBoxModel(this.thread.uuid).onSubmit}
-                        />
-                    </div>
-                ) : null}
-                {this.thread.totalReplies ? (
-                    <>
-                        <div className={'mb2'}>
-                            <span className={'b f6 pb2'}>
-                                viewing all {this.thread.totalReplies} comments
-                            </span>
-                        </div>
-
-                        <div className={'card pr2 pv1'}>
-                            {this.thread.replies.map(reply => (
-                                <Replies
-                                    post={reply}
-                                    key={reply.uuid}
-                                    reply={this.thread.getReplyBoxModel(reply.uuid)}
-                                    voteHandler={vote}
-                                />
-                            ))}
-                        </div>
-                    </>
-                ) : null}
+                <Thread thread={this.thread} vote={vote} />
             </div>
         )
     }

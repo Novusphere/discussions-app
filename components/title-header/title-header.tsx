@@ -1,7 +1,7 @@
 import * as React from 'react'
 import { inject, observer } from 'mobx-react'
 import { Link } from '@router'
-import { IStores } from '@stores/index'
+import { IStores } from '@stores'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { faEnvelope, faPen, faSpinner, faUser } from '@fortawesome/free-solid-svg-icons'
 import { Tooltip } from 'react-tippy'
@@ -35,7 +35,7 @@ class TitleHeader extends React.Component<ITitleHeaderProps> {
                     }}
                 >
                     {logOut['match']({
-                        pending: () => <FontAwesomeIcon icon={faSpinner} spin />,
+                        pending: () => <FontAwesomeIcon width={13} icon={faSpinner} spin />,
                         rejected: () => 'Unable to disconnect',
                         resolved: () => 'disconnect',
                     })}
@@ -48,7 +48,7 @@ class TitleHeader extends React.Component<ITitleHeaderProps> {
         const { isLoggedIn, accountName, logIn } = this.props.authStore
 
         if (logIn['state'] === 'pending') {
-            return <FontAwesomeIcon icon={faSpinner} spin />
+            return <FontAwesomeIcon width={13} icon={faSpinner} spin />
         }
 
         if (isLoggedIn) {
@@ -56,12 +56,12 @@ class TitleHeader extends React.Component<ITitleHeaderProps> {
                 <div className={'f4 flex items-center'}>
                     <Link route={`/new`}>
                         <a rel={'Create a new post'}>
-                            <FontAwesomeIcon icon={faPen} className={'ph2'} />
+                            <FontAwesomeIcon width={13} icon={faPen} className={'ph2'} />
                         </a>
                     </Link>
                     <Link route={'/notifications'}>
                         <a rel={'Open your notifications'}>
-                            <FontAwesomeIcon icon={faEnvelope} className={'ph2'} />
+                            <FontAwesomeIcon width={13} icon={faEnvelope} className={'ph2'} />
                         </a>
                     </Link>
                     <Tooltip
@@ -76,7 +76,7 @@ class TitleHeader extends React.Component<ITitleHeaderProps> {
                             rel={'Open your profile'}
                             className={'flex items-center user-container pointer dim'}
                         >
-                            <FontAwesomeIcon icon={faUser} />
+                            <FontAwesomeIcon width={13} icon={faUser} />
                             <span className={'b f6 pl3 pr1'}>{accountName}</span>
                         </a>
                     </Tooltip>

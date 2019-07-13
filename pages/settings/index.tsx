@@ -2,7 +2,7 @@ import * as React from 'react'
 import { inject, observer } from 'mobx-react'
 import { Tab, Tabs, TabList, TabPanel } from 'react-tabs'
 import { Form } from '@components'
-import { IStores } from '@stores/index'
+import { IStores } from '@stores'
 
 interface ISettings {
     settingsStore: IStores['settingsStore']

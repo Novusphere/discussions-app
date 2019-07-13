@@ -57,7 +57,7 @@ const PostPreview: React.FC<IPostPreviewProps> = ({
 
                 <div className={'flex z-2 relative mt4 footer b'}>
                     <span className={'o-80 f6 ml2 dim pointer'}>
-                        <FontAwesomeIcon icon={faComment} className={'pr2'} />
+                        <FontAwesomeIcon width={13} icon={faComment} className={'pr2'} />
                         {post.totalReplies} comments
                     </span>
                     <span className={'o-80 f6 ml2 dim pointer'}>share</span>

@@ -48,41 +48,47 @@ export default class DiscussionsService {
             transaction: '',
         };
 
-        const transaction = await eos.transact([{
-            account: "discussionsx",
-            name: "post",
-            data: data
-        }, {
-            account: "discussionsx", // self up vote
-            name: "vote",
-            data: {
-                voter: p.poster,
-                uuid: p.uuid,
-                value: 1
-            }
-        }]);
+        try {
+            const transaction = await eos.transact([{
+                account: "discussionsx",
+                name: "post",
+                data: data
+            },
+            // {
+            //     account: "discussionsx", // self up vote
+            //     name: "vote",
+            //     data: {
+            //         voter: p.poster,
+            //         uuid: p.uuid,
+            //         value: 1
+            //     }
+            // }
+            ]);
 
-        data.transaction = transaction
-
-        return data as any
+            console.log(transaction)
+            p.transaction = transaction
+            return p
+        } catch (error) {
+            throw error
+        }
     }
 
     async getThread(_id: string): Promise<Thread | undefined> {
         let sq;
-        
+
         // if (isNaN(parseInt(_id))) {
-            let dId = Post.decodeId(_id);
-            sq = await nsdb.search({
-                query: {
-                    createdAt: { $gte: dId.timeGte, $lte: dId.timeLte },
-                    transaction: { $regex: `^${dId.txid32}` }
-                }
-            })
+        let dId = Post.decodeId(_id);
+        sq = await nsdb.search({
+            query: {
+                createdAt: { $gte: dId.timeGte, $lte: dId.timeLte },
+                transaction: { $regex: `^${dId.txid32}` }
+            }
+        })
         // }
         // else {
         //     sq = await nsdb.search({ query: { id: parseInt(_id) } });
         // }
-        
+
         if (sq.payload.length == 0) return undefined;
 
         let posts: Post[] = [];

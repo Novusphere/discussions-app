@@ -1,7 +1,7 @@
 import * as React from 'react'
 import { inject, observer } from 'mobx-react'
-import { IStores } from '@stores/index'
-import { ModalOptions } from '../../constants/globals'
+import { IStores } from '@stores'
+import { ModalOptions } from '@globals'
 import { Modal } from '@components'
 
 interface IModalSwitcherProps {

@@ -17,11 +17,11 @@ const Vote: React.FC<IVoteProps> = ({ uuid, upVotes, downVotes, handler, ...prop
         {...props}
     >
         <span onClick={async () => await handler(uuid, 'upvotes', upVotes + 1)}>
-            <FontAwesomeIcon icon={faArrowUp} className={'o-50 dim pointer'} />
+            <FontAwesomeIcon width={13} icon={faArrowUp} className={'o-50 dim pointer'} />
         </span>
         <span className={'f6 b pr1'}>{upVotes + downVotes}</span>
         <span onClick={async () => await handler(uuid, 'downvotes', downVotes - 1)}>
-            <FontAwesomeIcon icon={faArrowDown} className={'o-50 dim pointer'} />
+            <FontAwesomeIcon width={13} icon={faArrowDown} className={'o-50 dim pointer'} />
         </span>
     </span>
 )

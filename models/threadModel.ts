@@ -26,39 +26,40 @@ export class ThreadModel {
         /**
          * Set reply box open for the opening post by default
          */
-        const openingPostReplyModel = new ReplyModel(this.uuid, this.openingPost)
+        const openingPostReplyModel = new ReplyModel(this.openingPost, this.map)
         openingPostReplyModel.toggleOpen()
         this.replyBoxStatuses.set(this.uuid, openingPostReplyModel)
     }
 
     /**
      * Get the reply box model for a particular post uid
+     * @return {ReplyModel}
      */
-    getReplyBoxModel: (...args: any[]) => ReplyModel = computedFn(
-        (uid: string): ReplyModel => {
+    rbModel: (...args: any[]) => ReplyModel = computedFn(
+        (post: Post): ReplyModel => {
+            const uid = post.uuid
+
             if (this.replyBoxStatuses.has(uid)) {
                 return this.replyBoxStatuses.get(uid)
             }
-            const model = new ReplyModel(uid, this.map[uid])
+
+            let model: ReplyModel
+
+            if (this.map[uid]) {
+                model = new ReplyModel(this.map[uid], this.map)
+            } else {
+                model = new ReplyModel(post, this.map)
+            }
+
             this.replyBoxStatuses.set(uid, model)
             return model
         }
     )
 
     /**
-     * See if a reply box is open for a particular post id
-     */
-    isReplyBoxOpen = computedFn((uid: string): boolean => {
-        if (this.replyBoxStatuses.has(uid)) {
-            const model = this.replyBoxStatuses.get(uid)
-            return model.open
-        }
-        return false
-    })
-
-    /**
      * Toggle the status of the reply box
      * @param {string} uid
+     * @return {void}
      */
     toggleReplyBoxStatus = (uid: string) => {
         let replyModel: ReplyModel
@@ -68,10 +69,16 @@ export class ThreadModel {
             replyModel.toggleOpen()
             this.replyBoxStatuses.set(uid, replyModel)
         } else {
-            this.replyBoxStatuses.set(uid, new ReplyModel(uid, this.map[uid]))
+            if (this.map[uid]) {
+                this.replyBoxStatuses.set(uid, new ReplyModel(this.map[uid], this.map))
+            }
         }
     }
 
+    /**
+     * Get only a openingPost's replies
+     * @return {Post[]}
+     */
     @computed get replies(): Post[] {
         const replies = []
 

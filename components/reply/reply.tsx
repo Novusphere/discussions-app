@@ -19,7 +19,7 @@ const Reply: React.FC<IReplyProps> = ({ uid, onContentChange, onSubmit }) => (
                     disabled
                     className={'mt3 f6 link dim br2 ph3 pv2 dib mr2 pointer white bg-green'}
                 >
-                    <FontAwesomeIcon icon={faSpinner} spin />
+                    <FontAwesomeIcon width={13} icon={faSpinner} spin />
                 </button>
             ),
             rejected: error => (
