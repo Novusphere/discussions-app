@@ -21,10 +21,6 @@ export const isDeleted = textBody => textBody === '\\[deleted\\]' || textBody ==
 export const isRemoved = textBody => textBody === '\\[removed\\]' || textBody === '[removed]'
 
 export class RedditService {
-    constructor() {
-
-    }
-
     redditDataToPost(data: any): Post {
         let p = new Post('reddit');
         p.id = toBase10(data.id);

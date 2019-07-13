@@ -1,11 +1,12 @@
-import { action, computed, observable } from 'mobx'
-import { discussions, Thread } from '@novuspherejs/index'
+import { action, observable } from 'mobx'
+import { discussions } from '@novuspherejs/index'
 import { task } from 'mobx-task'
 import { BaseStore, getOrCreateStore } from 'next-mobx-wrapper'
 import { CreateForm } from '@components'
 import { getTagStore } from '@stores/tag'
 import { getAuthStore, IStores } from '@stores/index'
 import { generateUuid, getAttachmentValue } from '@utils'
+import { ThreadModel } from '@models/threadModel'
 
 export interface IAttachment {
     value: string
@@ -52,12 +53,8 @@ export default class Posts extends BaseStore {
     @observable posts: IPost[] = []
     @observable preview: IPreviewPost | null = null
 
-    /**
-     * Active thread
-     */
     @observable activeThreadId = ''
-    // TODO: Use model
-    activeThread = observable.box<Thread>(null)
+    @observable activeThread: ThreadModel = null
 
     /**
      * Manage replies within a post (not opening post)
@@ -84,19 +81,19 @@ export default class Posts extends BaseStore {
      * START
      * Active thread getters used to update boxed values
      */
-    @computed get getActiveThread() {
-        return this.activeThread.get()
-    }
-
-    @computed get threadOpeningPost() {
-        if (!this.getActiveThread) return null
-        return this.getActiveThread.openingPost
-    }
-
-    @computed get threadMap() {
-        if (!this.getActiveThread) return null
-        return this.getActiveThread.map
-    }
+    // @computed get getActiveThread() {
+    //     return this.activeThread.get()
+    // }
+    //
+    // @computed get threadOpeningPost() {
+    //     if (!this.getActiveThread) return null
+    //     return this.getActiveThread.openingPost
+    // }
+    //
+    // @computed get threadMap() {
+    //     if (!this.getActiveThread) return null
+    //     return this.getActiveThread.map
+    // }
     /**
      * END
      * Active thread getters used to update boxed values
@@ -159,8 +156,8 @@ export default class Posts extends BaseStore {
                 throw Error('Post cannot be empty')
             }
 
-            const post = this.threadMap[replyingToUid]
-            const threadId = this.threadOpeningPost.uuid
+            const post = this.activeThread.map[replyingToUid]
+            const threadId = this.activeThread.id
             const generatedUid = generateUuid()
 
             // const newPost = await discussions.post({
@@ -192,12 +189,14 @@ export default class Posts extends BaseStore {
                 attachment: getAttachmentValue(post),
             } as any
 
-            this.updateActiveThread({
-                map: {
-                    ...this.threadMap,
-                    [generatedUid]: newPost,
-                }
-            })
+            console.log(newPost)
+
+            // this.updateActiveThread({
+            //     map: {
+            //         ...this.activeThread.map,
+            //         [generatedUid]: newPost,
+            //     }
+            // })
         } catch (error) {
             console.log(error)
             throw error
@@ -210,45 +209,47 @@ export default class Posts extends BaseStore {
     public fetchPost = async () => {
         try {
             const thread = await discussions.getThread(this.activeThreadId)
-            this.activeThread.set(thread)
+            this.activeThread = new ThreadModel(thread)
+            // this.activeThread.set(thread)
         } catch (error) {
             throw error
         }
     }
 
-    @action updateActiveThread = update => {
-        this.activeThread.set({
-            uuid: this.getActiveThread.uuid,
-            totalReplies: this.getActiveThread.totalReplies,
-            map: this.threadMap,
-            openingPost: this.threadOpeningPost,
-            ...update,
-        } as any)
-    }
+    // @action updateActiveThread = update => {
+    //     this.activeThread.set({
+    //         uuid: this.getActiveThread.uuid,
+    //         totalReplies: this.getActiveThread.totalReplies,
+    //         map: this.threadMap,
+    //         openingPost: this.threadOpeningPost,
+    //         ...update,
+    //     } as any)
+    // }
 
     @action
+    // @ts-ignore
     public vote = async (uuid: string, type: string, value: number) => {
-        try {
-            if (this.authStore.isLoggedIn) {
-                await discussions.vote(uuid, value)
-
-                // set result in opening post
-                if (uuid === this.threadOpeningPost['uuid']) {
-                    this.updateActiveThread({
-                        openingPost: { ...this.threadOpeningPost, [type]: value },
-                    })
-                }
-
-                // also set the result in the map
-                this.updateActiveThread({
-                    map: {
-                        [uuid]: { ...this.threadMap[uuid], [type]: value },
-                    },
-                })
-            }
-        } catch (error) {
-            throw error
-        }
+        // try {
+        //     if (this.authStore.isLoggedIn) {
+        //         await discussions.vote(uuid, value)
+        //
+        //         // set result in opening post
+        //         if (uuid === this.threadOpeningPost['uuid']) {
+        //             this.updateActiveThread({
+        //                 openingPost: { ...this.threadOpeningPost, [type]: value },
+        //             })
+        //         }
+        //
+        //         // also set the result in the map
+        //         this.updateActiveThread({
+        //             map: {
+        //                 [uuid]: { ...this.threadMap[uuid], [type]: value },
+        //             },
+        //         })
+        //     }
+        // } catch (error) {
+        //     throw error
+        // }
     }
 
     @action clearPreview = () => {

@@ -26,6 +26,7 @@
     "mobx-react": "6.0.3",
     "mobx-react-form": "^2.0.3",
     "mobx-task": "1.0.3",
+    "mobx-utils": "^5.4.1",
     "moment": "2.24.0",
     "next": "8.1.0",
     "next-mobx-wrapper": "^0.4.0",
