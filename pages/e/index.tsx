@@ -22,8 +22,20 @@ interface IEPageState {}
 @inject('postsStore', 'tagStore')
 @observer
 class E extends React.Component<IEPageProps, IEPageState> {
-    static async getInitialProps({ router, ctx: { query } }) {
+    static async getInitialProps({ router, ctx: { query, store } }) {
         const isTagView = typeof query.id === 'undefined' && typeof query.title === 'undefined'
+        const postsStore: IStores['postsStore'] = store.postsStore
+
+        if (isTagView) {
+            await postsStore.getPostsByTag([query.tag])
+        }
+
+        if (!isTagView) {
+            postsStore.setActiveThreadId(query.id)
+            await postsStore.fetchPost().catch(error => {
+                console.log(error)
+            })
+        }
         return {
             query,
             subName: router.query.tag,
@@ -32,22 +44,22 @@ class E extends React.Component<IEPageProps, IEPageState> {
     }
 
     // TODO: Move this into getInitialProps
-    componentWillMount(): void {
-        // if (this.props.subName) {
-        //     this.props.tagStore.setActiveTag(this.props.subName)
-        // }
-
-        if (this.props.isTagView) {
-            this.props.postsStore.getPostsByTag([this.props.query.tag])
-        }
-
-        if (!this.props.isTagView) {
-            this.props.postsStore.setActiveThreadId(this.props.query.id)
-            this.props.postsStore.fetchPost().catch(err => {
-                console.error(err)
-            })
-        }
-    }
+    // componentWillMount(): void {
+    //     // if (this.props.subName) {
+    //     //     this.props.tagStore.setActiveTag(this.props.subName)
+    //     // }
+    //
+    //     if (this.props.isTagView) {
+    //         this.props.postsStore.getPostsByTag([this.props.query.tag])
+    //     }
+    //
+    //     if (!this.props.isTagView) {
+    //         this.props.postsStore.setActiveThreadId(this.props.query.id)
+    //         this.props.postsStore.fetchPost().catch(err => {
+    //             console.error(err)
+    //         })
+    //     }
+    // }
 
     componentDidCatch(error: Error, errorInfo: React.ErrorInfo): void {
         console.error(error, errorInfo)

@@ -5,7 +5,7 @@ import { BaseStore, getOrCreateStore } from 'next-mobx-wrapper'
 import { CreateForm } from '@components'
 import { getTagStore } from '@stores/tag'
 import { getAuthStore, IStores } from '@stores/index'
-import { generateUuid, sleep, getAttachmentValue } from '@utils'
+import { generateUuid, getAttachmentValue } from '@utils'
 
 export interface IAttachment {
     value: string
@@ -177,7 +177,6 @@ export default class Posts extends BaseStore {
             //     attachment: getAttachmentValue(post),
             // } as any)
 
-            // TODO: Use model for this
             const newPost = {
                 poster: this.authStore.accountName,
                 title: '',
@@ -185,17 +184,13 @@ export default class Posts extends BaseStore {
                 sub: post.sub,
                 chain: 'eos',
                 mentions: [],
-                id: generatedUid,
                 tags: [post.sub],
+                id: generatedUid,
                 uuid: generatedUid,
                 parentUuid: replyingToUid,
                 threadUuid: threadId,
-                upvotes: 0,
-                downvotes: 0,
                 attachment: getAttachmentValue(post),
             } as any
-
-            console.log({ [generatedUid]: newPost})
 
             this.updateActiveThread({
                 map: {
