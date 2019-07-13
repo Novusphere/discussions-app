@@ -1,16 +1,15 @@
 import * as React from 'react'
 import { inject, observer } from 'mobx-react'
 import { IStores } from '@stores/index'
-// @ts-ignore
 import { MainPost, Replies, Reply } from '@components'
-import { faSpinner } from '@fortawesome/free-solid-svg-icons'
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
+import { ThreadModel } from '@models/threadModel'
 
 interface IEPageProps {
     postsStore: IStores['postsStore']
     tagStore: IStores['tagStore']
     isTagView: boolean
-    subName: string | undefined
+    tag: string | undefined
+    thread: ThreadModel
     query: {
         tag: string
         id: string
@@ -23,9 +22,14 @@ interface IEPageState {}
 @inject('postsStore', 'tagStore')
 @observer
 class E extends React.Component<IEPageProps, IEPageState> {
-    static async getInitialProps({ router, ctx: { query, store } }) {
+    private thread: ThreadModel
+
+    static async getInitialProps({ ctx: { query, store } }) {
         const isTagView = typeof query.id === 'undefined' && typeof query.title === 'undefined'
         const postsStore: IStores['postsStore'] = store.postsStore
+        const tag = query.tag
+
+        let thread
 
         if (isTagView) {
             await postsStore.getPostsByTag([query.tag])
@@ -33,114 +37,71 @@ class E extends React.Component<IEPageProps, IEPageState> {
 
         if (!isTagView) {
             postsStore.setActiveThreadId(query.id)
-            await postsStore.fetchPost().catch(error => {
-                console.log(error)
-            })
+            thread = await postsStore.fetchPost()
         }
+
         return {
             query,
-            subName: router.query.tag,
+            tag,
             isTagView,
+            thread,
         }
     }
 
-    // TODO: Move this into getInitialProps
-    // componentWillMount(): void {
-    //     // if (this.props.subName) {
-    //     //     this.props.tagStore.setActiveTag(this.props.subName)
-    //     // }
-    //
-    //     if (this.props.isTagView) {
-    //         this.props.postsStore.getPostsByTag([this.props.query.tag])
-    //     }
-    //
-    //     if (!this.props.isTagView) {
-    //         this.props.postsStore.setActiveThreadId(this.props.query.id)
-    //         this.props.postsStore.fetchPost().catch(err => {
-    //             console.error(err)
-    //         })
-    //     }
-    // }
-
-    componentDidCatch(error: Error, errorInfo: React.ErrorInfo): void {
-        console.error(error, errorInfo)
+    componentWillMount(): void {
+        this.thread = new ThreadModel(this.props.thread)
     }
 
     public render(): React.ReactNode {
         if (this.props.isTagView) {
-            return (
-                <span className={'b'}>
-                    No posts found for specified tag: {this.props.query.tag}
-                </span>
-            )
+            return <span>No posts found for specified tag: {this.props.query.tag}</span>
         }
 
-        const {
-            fetchPost,
-            // replyingPostUUID,
-            // setReplyingPostUUID,
-            // setReplyPostContent,
-            openingPostReplyOpen,
-            setOpeningPostContent,
-            setOpeningPostToggle,
-            submitReply,
-            vote,
-            activeThread,
-        } = this.props.postsStore
+        const { fetchPost, vote } = this.props.postsStore
 
-        if ((fetchPost as any).state === 'pending') return <FontAwesomeIcon icon={faSpinner} spin />
         if ((fetchPost as any).state === 'rejected')
             return <span>{(fetchPost as any).error.message}</span>
+
+        console.log(this.thread)
 
         return (
             <div className={'thread-container'}>
                 <MainPost
-                    openingPost={activeThread.openingPost}
-                    replyHandler={setOpeningPostToggle}
+                    openingPost={this.thread.openingPost}
+                    replyHandler={this.thread.toggleReplyBoxStatus}
                     voteHandler={vote}
                 />
-                {openingPostReplyOpen ? (
+                {this.thread.isReplyBoxOpen(this.thread.uuid) ? (
                     <div className={'mb3'}>
                         <Reply
-                            uid={activeThread.id}
-                            onContentChange={setOpeningPostContent}
-                            onSubmit={submitReply}
+                            uid={this.thread.uuid}
+                            onContentChange={
+                                this.thread.getReplyBoxModel(this.thread.uuid).setContent
+                            }
+                            onSubmit={this.thread.getReplyBoxModel(this.thread.uuid).onSubmit}
                         />
                     </div>
                 ) : null}
-                {/*{threadOpeningPost.totalReplies ? (*/}
-                {/*    <>*/}
-                {/*        <div className={'mb2'}>*/}
-                {/*            <span className={'b f6 pb2'}>*/}
-                {/*                viewing all {threadOpeningPost.totalReplies} comments*/}
-                {/*            </span>*/}
-                {/*        </div>*/}
+                {this.thread.totalReplies ? (
+                    <>
+                        <div className={'mb2'}>
+                            <span className={'b f6 pb2'}>
+                                viewing all {this.thread.totalReplies} comments
+                            </span>
+                        </div>
 
-                {/*        <div className={'card pr2 pv1'}>*/}
-                {/*            {Object.keys(threadMap).map(post => {*/}
-                {/*                if (post === threadOpeningPost.threadUuid) {*/}
-                {/*                    return null*/}
-                {/*                }*/}
-
-                {/*                if (threadMap[post]['parentUuid'] !== threadOpeningPost.uuid) {*/}
-                {/*                    return null*/}
-                {/*                }*/}
-
-                {/*                return (*/}
-                {/*                    <Replies*/}
-                {/*                        post={threadMap[post]}*/}
-                {/*                        key={threadMap[post]['uuid']}*/}
-                {/*                        replyingPostUUID={replyingPostUUID}*/}
-                {/*                        replyPostHandler={setReplyPostContent}*/}
-                {/*                        replyOpenHandler={setReplyingPostUUID}*/}
-                {/*                        submitReplyHandler={submitReply}*/}
-                {/*                        voteHandler={vote}*/}
-                {/*                    />*/}
-                {/*                )*/}
-                {/*            })}*/}
-                {/*        </div>*/}
-                {/*    </>*/}
-                {/*) : null}*/}
+                        <div className={'card pr2 pv1'}>
+                            {this.thread.replies.map(reply => (
+                                <Replies
+                                    post={reply}
+                                    key={reply.uuid}
+                                    reply={this.thread.getReplyBoxModel(reply.uuid)}
+                                    voteHandler={vote}
+                                />
+                            ))}
+                        </div>
+                    </>
+                ) : null}
             </div>
         )
     }

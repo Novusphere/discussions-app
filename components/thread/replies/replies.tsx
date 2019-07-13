@@ -13,26 +13,16 @@ import { Votes, Reply } from '@components'
 import ReactMarkdown from 'react-markdown'
 import { observer } from 'mobx-react'
 import { Post } from '@novuspherejs/discussions/post'
+import { ReplyModel } from '@models/replyModel'
 
 interface IReplies {
     post: Post
     className?: string
-    replyingPostUUID: string
-    replyOpenHandler: (id: string) => void
-    replyPostHandler: (content: string) => void
-    submitReplyHandler: (uid: string) => Promise<boolean | void>
+    reply: ReplyModel
     voteHandler: (uuid: string, type: string, value: number) => Promise<void>
 }
 
-const Replies: React.FC<IReplies> = ({
-    post,
-    replyingPostUUID,
-    replyPostHandler,
-    replyOpenHandler,
-    submitReplyHandler,
-    voteHandler,
-    ...props
-}) => (
+const Replies: React.FC<IReplies> = ({ post, voteHandler, reply, ...props }) => (
     <div className={'post-content post-reply black'} {...props}>
         <div className={'header pb2'}>
             <Link route={`/u/${post.poster}`}>
@@ -53,12 +43,7 @@ const Replies: React.FC<IReplies> = ({
                 handler={voteHandler}
             />
 
-            <button
-                className={'reply mr3 pointer dim'}
-                onClick={() => {
-                    replyOpenHandler(post.uuid)
-                }}
-            >
+            <button className={'reply mr3 pointer dim'} onClick={reply.toggleOpen}>
                 <FontAwesomeIcon icon={faReply} className={'pr1'} />
                 reply
             </button>
@@ -72,23 +57,16 @@ const Replies: React.FC<IReplies> = ({
             </span>
         </div>
 
-        {replyingPostUUID === post.uuid ? (
-            <Reply
-                uid={post.uuid}
-                onContentChange={replyPostHandler}
-                onSubmit={submitReplyHandler}
-            />
+        {reply.open ? (
+            <Reply uid={post.uuid} onContentChange={reply.setContent} onSubmit={reply.onSubmit} />
         ) : null}
 
         {post.replies
-            ? post.replies.map(reply => (
+            ? post.replies.map(postReply => (
                   <Replies
-                      post={reply}
-                      key={reply.id}
-                      replyingPostUUID={replyingPostUUID}
-                      replyOpenHandler={replyOpenHandler}
-                      replyPostHandler={replyPostHandler}
-                      submitReplyHandler={submitReplyHandler}
+                      post={postReply}
+                      key={postReply.id}
+                      reply={reply}
                       className={'post-content post-reply black child'}
                       voteHandler={voteHandler}
                   />

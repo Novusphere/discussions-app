@@ -65,7 +65,6 @@ export default class Posts extends BaseStore {
     /**
      * Manage replies of the opening post
      */
-    @observable openingPostReplyOpen = true // by default leave it open
     @observable openingPostReplyContent = ''
 
     private tagsStore: IStores['tagStore']
@@ -116,46 +115,6 @@ export default class Posts extends BaseStore {
         this.activeThreadId = id
     }
 
-    //  START: Manage replies within a post methods (not an opening post)
-
-    @action clearReplyingPost = () => {
-        this.replyingPostUUID = ''
-        this.replyingPostContent = ''
-    }
-
-    @action setReplyingPostUUID = (id: string) => {
-        // check if the user is currently posting a reply
-        if (this.submitReply['state'] !== 'pending') {
-            // works as a toggle
-            if (this.replyingPostUUID === id) {
-                this.replyingPostUUID = ''
-            } else {
-                this.replyingPostContent = ''
-                this.replyingPostUUID = id
-            }
-        }
-    }
-
-    @action setReplyPostContent = (content: string) => {
-        this.replyingPostContent = content
-    }
-
-    //  END: Manage replies within a post methods (not an opening post)
-
-    //  START: Manage replies of the opening post (opening post)
-
-    @action clearOpeningPostReply = () => {
-        this.openingPostReplyContent = ''
-    }
-
-    @action setOpeningPostToggle = () => {
-        this.openingPostReplyOpen = !this.openingPostReplyOpen
-    }
-
-    @action setOpeningPostContent = (content: string) => {
-        this.openingPostReplyContent = content
-    }
-
     @task.resolved({ error: Error('Something went wrong, please try again.') })
     public submitReply = async (replyingToUid: string) => {
         try {
@@ -164,7 +123,7 @@ export default class Posts extends BaseStore {
             }
 
             const post = this.activeThread.map[replyingToUid]
-            const threadId = this.activeThread.id
+            const threadId = this.activeThread.uuid
             const generatedUid = generateUuid()
 
             // const newPost = await discussions.post({
@@ -217,7 +176,7 @@ export default class Posts extends BaseStore {
         try {
             const thread = await discussions.getThread(this.activeThreadId)
             this.activeThread = new ThreadModel(thread)
-            // this.activeThread.set(thread)
+            return this.activeThread
         } catch (error) {
             throw error
         }

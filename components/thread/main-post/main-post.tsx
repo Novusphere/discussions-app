@@ -17,7 +17,7 @@ import { Post } from '@novuspherejs/discussions/post'
 
 interface IMainPost {
     openingPost: Post
-    replyHandler: () => void
+    replyHandler: (uid: string) => void
     voteHandler: (uuid: string, type: string, value: number) => Promise<void>
 }
 
@@ -68,7 +68,7 @@ const MainPost: React.FC<IMainPost> = ({ openingPost, replyHandler, voteHandler 
                     <Attachments attachment={openingPost.attachment} />
 
                     <div className={'footer flex items-center pt3'}>
-                        <button className={'reply mr3 pointer dim'} onClick={replyHandler}>
+                        <button className={'reply mr3 pointer dim'} onClick={() => replyHandler(openingPost.uuid)}>
                             <FontAwesomeIcon icon={faReply} className={'pr1'} />
                             reply
                         </button>
