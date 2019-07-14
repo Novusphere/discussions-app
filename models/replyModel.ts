@@ -2,13 +2,14 @@ import { action, observable } from 'mobx'
 import { task } from 'mobx-task'
 import { Post } from '@novuspherejs/discussions/post'
 import { Messages } from '@globals'
-import { generateUuid, getAttachmentValue } from '@utils'
+import { generateUuid, getAttachmentValue, sleep } from '@utils'
 import { getAuthStore } from '@stores/auth'
-import { IStores } from '@stores'
-// import { discussions } from '@novuspherejs'
+import { getPostsStore, IStores } from '@stores'
+import { discussions } from '@novuspherejs'
 
 export class ReplyModel {
     private authStore: IStores['authStore']
+    private postsStore: IStores['postsStore']
 
     @observable uid = ''
     @observable content = ''
@@ -21,6 +22,7 @@ export class ReplyModel {
     constructor(post: Post, map: { [p: string]: Post }) {
         this.uid = post.uuid
         this.authStore = getAuthStore()
+        this.postsStore = getPostsStore()
         this.map = map
     }
 
@@ -33,6 +35,12 @@ export class ReplyModel {
     }
 
     @task.resolved onSubmit = async () => {
+        // post being replied to is the openingPost
+        let post: Post
+        if (!this.post) {
+            post = this.map[this.uid]
+        }
+
         if (!this.content) {
             throw Error(Messages.ERROR.POST_EMPTY)
         }
@@ -43,32 +51,23 @@ export class ReplyModel {
             poster: this.authStore.accountName,
             title: '',
             content: this.content,
-            sub: this.post.sub,
+            sub: post.sub,
             chain: 'eos',
             mentions: [],
-            tags: [this.post.sub],
+            tags: [post.sub],
             id: generatedUid,
             uuid: generatedUid,
-            parentUuid: this.post.uuid,
-            threadUuid: this.post.threadUuid,
-            attachment: getAttachmentValue(this.post),
+            parentUuid: post.uuid,
+            threadUuid: post.threadUuid,
+            attachment: getAttachmentValue(this.content),
             upvotes: 0,
             downvotes: 0,
         }
 
         try {
-            console.log(this.post.content, this.post.replies.length)
-            const rogueReply = {
-                ...reply,
-                replies: [],
-            } as any
-            // const post = await discussions.post(reply as any)
-            this.post.replies.push(rogueReply)
-            console.log(this.post.replies.length)
-
-            Object.assign(this.map, {
-                [reply.uuid]: rogueReply,
-            })
+            await discussions.post(reply as any)
+            await sleep(3000)
+            await this.postsStore.fetchPost()
         } catch (error) {
             console.log(error)
             throw error

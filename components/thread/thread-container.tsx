@@ -1,45 +1,54 @@
 import * as React from 'react'
 import { MainPost, Replies, Reply } from '@components'
-import { ThreadModel } from '@models/threadModel'
 import { observer } from 'mobx-react'
+import { Post } from '@novuspherejs'
+import { ReplyModel } from '@models/replyModel'
 
 interface IThreadContainerProps {
-    thread: ThreadModel
+    opening: Post
+    replies: Post[]
+    openingModel: ReplyModel
+    totalReplies: number
+    getModel: (post: Post) => ReplyModel
     vote: (uuid: string, type: string, value: number) => Promise<any>
 }
 
-const ThreadContainer: React.FC<IThreadContainerProps> = ({ thread, vote }) => {
-    const reply = thread.rbModel(thread)
+const ThreadContainer: React.FC<IThreadContainerProps> = ({
+    opening,
+    openingModel,
+    replies,
+    totalReplies,
+    getModel,
+    vote,
+}) => {
     return (
         <>
             <MainPost
-                openingPost={thread.openingPost}
-                replyHandler={thread.toggleReplyBoxStatus}
+                openingPost={opening}
+                replyHandler={openingModel.toggleOpen}
                 voteHandler={vote}
             />
-            {reply.open ? (
+            {openingModel.open ? (
                 <div className={'mb3'}>
                     <Reply
-                        uid={thread.uuid}
-                        onContentChange={reply.setContent}
-                        onSubmit={reply.onSubmit}
+                        uid={opening.uuid}
+                        onContentChange={openingModel.setContent}
+                        onSubmit={openingModel.onSubmit}
                     />
                 </div>
             ) : null}
-            {thread.totalReplies ? (
+            {totalReplies ? (
                 <>
                     <div className={'mb2'}>
-                        <span className={'b f6 pb2'}>
-                            viewing all {thread.totalReplies} comments
-                        </span>
+                        <span className={'b f6 pb2'}>viewing all {totalReplies} comments</span>
                     </div>
 
                     <div className={'card pr2 pv1'}>
-                        {thread.replies.map(reply => (
+                        {replies.map(reply => (
                             <Replies
                                 post={reply}
                                 key={reply.uuid}
-                                getModel={thread.rbModel}
+                                getModel={getModel}
                                 voteHandler={vote}
                             />
                         ))}

@@ -54,18 +54,17 @@ export default class DiscussionsService {
                 name: "post",
                 data: data
             },
-            // {
-            //     account: "discussionsx", // self up vote
-            //     name: "vote",
-            //     data: {
-            //         voter: p.poster,
-            //         uuid: p.uuid,
-            //         value: 1
-            //     }
-            // }
+            {
+                account: "discussionsx", // self up vote
+                name: "vote",
+                data: {
+                    voter: p.poster,
+                    uuid: p.uuid,
+                    value: 1
+                }
+            }
             ]);
 
-            console.log(transaction)
             p.transaction = transaction
             return p
         } catch (error) {

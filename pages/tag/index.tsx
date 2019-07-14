@@ -28,7 +28,7 @@ class Tag extends React.Component<ITagProps> {
         const tagStore: IStores['tagStore'] = store.tagStore
         const tagModel = tagStore.setActiveTag(tag)
         const posts = await postsStore.getPostsByTag([tag])
-        const onlyOpeningPosts = posts.filter(post => !post.parentUuid)
+        const onlyOpeningPosts = posts.filter(post => post.title.length)
         return {
             tagName: tag,
             posts: onlyOpeningPosts,

@@ -52,11 +52,23 @@ const Replies: React.FC<IReplies> = ({ post, voteHandler, getModel, ...props }) 
                             reply
                         </button>
 
-                        <FontAwesomeIcon width={13} icon={faLink} className={'pr2 black f6 pointer dim'} />
-                        <FontAwesomeIcon width={13} icon={faShare} className={'pr2 black f6 pointer dim'} />
+                        <FontAwesomeIcon
+                            width={13}
+                            icon={faLink}
+                            className={'pr2 black f6 pointer dim'}
+                        />
+                        <FontAwesomeIcon
+                            width={13}
+                            icon={faShare}
+                            className={'pr2 black f6 pointer dim'}
+                        />
 
                         <span className={'f6 black f6 pointer dim'}>
-                            <FontAwesomeIcon width={13} icon={faExclamationTriangle} className={'pr1'} />
+                            <FontAwesomeIcon
+                                width={13}
+                                icon={faExclamationTriangle}
+                                className={'pr1'}
+                            />
                             mark as spam
                         </span>
                     </div>
@@ -69,19 +81,16 @@ const Replies: React.FC<IReplies> = ({ post, voteHandler, getModel, ...props }) 
                         />
                     ) : null}
 
-                    <pre> {JSON.stringify(post.replies.length)}</pre>
                     {post.replies.length
-                        ? post.replies.map(postReply => {
-                              return (
-                                  <Replies
-                                      post={postReply}
-                                      key={postReply.uuid}
-                                      getModel={getModel}
-                                      className={'post-content post-reply black child'}
-                                      voteHandler={voteHandler}
-                                  />
-                              )
-                          })
+                        ? post.replies.map(postReply => (
+                              <Replies
+                                  post={postReply}
+                                  key={postReply.uuid}
+                                  getModel={getModel}
+                                  className={'post-content post-reply black child'}
+                                  voteHandler={voteHandler}
+                              />
+                          ))
                         : null}
                 </div>
             )}

@@ -3,13 +3,15 @@ import { inject, observer } from 'mobx-react'
 import { IStores } from '@stores'
 import { Thread } from '@components'
 import { ThreadModel } from '@models/threadModel'
+import { autorun, observable } from 'mobx'
+import { Thread as ThreadType } from '@novuspherejs'
 
 interface IEPageProps {
     postsStore: IStores['postsStore']
     tagStore: IStores['tagStore']
     isTagView: boolean
     tag: string | undefined
-    thread: ThreadModel
+    thread: ThreadType
     query: {
         tag: string
         id: string
@@ -22,18 +24,18 @@ interface IEPageState {}
 @inject('postsStore', 'tagStore')
 @observer
 class E extends React.Component<IEPageProps, IEPageState> {
-    private thread: ThreadModel
+    @observable public thread: ThreadModel
 
     static async getInitialProps({ ctx: { query, store } }) {
         const isTagView = typeof query.id === 'undefined' && typeof query.title === 'undefined'
         const postsStore: IStores['postsStore'] = store.postsStore
         const tag = query.tag
 
-        let thread
-
         if (isTagView) {
             await postsStore.getPostsByTag([query.tag])
         }
+
+        let thread
 
         if (!isTagView) {
             postsStore.setActiveThreadId(query.id)
@@ -53,7 +55,15 @@ class E extends React.Component<IEPageProps, IEPageState> {
          * Due to serialization, we lose the ThreadModel prototype
          * as a result we have to instantiate a new one before component mount.
          */
-        this.thread = new ThreadModel(this.props.thread)
+        autorun(() => {
+            if (this.props.postsStore.activeThread) {
+                if (this.thread instanceof ThreadModel) {
+                    this.thread = this.props.postsStore.activeThread
+                } else {
+                    this.thread = new ThreadModel(this.props.thread)
+                }
+            }
+        })
     }
 
     public render(): React.ReactNode {
@@ -68,7 +78,14 @@ class E extends React.Component<IEPageProps, IEPageState> {
 
         return (
             <div className={'thread-container'}>
-                <Thread thread={this.thread} vote={vote} />
+                <Thread
+                    opening={this.thread.openingPost}
+                    openingModel={this.thread.rbModel(this.thread.openingPost)}
+                    getModel={this.thread.rbModel}
+                    vote={vote}
+                    replies={this.thread.replies}
+                    totalReplies={this.thread.totalReplies}
+                />
             </div>
         )
     }

@@ -7,9 +7,6 @@ import { init, eos } from '@novuspherejs'
 import { withMobx } from 'next-mobx-wrapper'
 
 import '../styles/style.scss'
-import { config } from '@fortawesome/fontawesome-svg-core'
-
-config.autoAddCss = false
 
 export const isServer = !(process as any).browser
 
@@ -42,7 +39,7 @@ class DiscussionApp extends App {
             console.log('wallet detected?', wallet)
 
             if (typeof wallet !== 'boolean' && wallet) {
-                this.props.store.authStore.logIn()
+                await this.props.store.authStore.logIn()
             }
         }
     }

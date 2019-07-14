@@ -93,6 +93,7 @@ export default class Posts extends BaseStore {
     public fetchPost = async () => {
         try {
             const thread = await discussions.getThread(this.activeThreadId)
+            if (!thread) throw Error('Failed to fetch thread')
             this.activeThread = new ThreadModel(thread)
             return this.activeThread
         } catch (error) {

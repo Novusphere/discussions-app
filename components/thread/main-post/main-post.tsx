@@ -17,7 +17,7 @@ import { Post } from '@novuspherejs/discussions/post'
 
 interface IMainPost {
     openingPost: Post
-    replyHandler: (uid: string) => void
+    replyHandler: () => void
     voteHandler: (uuid: string, type: string, value: number) => Promise<void>
 }
 
@@ -53,8 +53,6 @@ const MainPost: React.FC<IMainPost> = ({ openingPost, replyHandler, voteHandler 
 
                     <div className={'flex justify-between items-center pb1'}>
                         <span className={'black f4 b'}>{openingPost.title}</span>
-                        <pre>{openingPost.upvotes} </pre>
-                        <pre>{openingPost.downvotes} </pre>
                         <Votes
                             uuid={openingPost.uuid}
                             upVotes={openingPost.upvotes}
@@ -70,7 +68,7 @@ const MainPost: React.FC<IMainPost> = ({ openingPost, replyHandler, voteHandler 
                     <div className={'footer flex items-center pt3'}>
                         <button
                             className={'reply mr3 pointer dim'}
-                            onClick={() => replyHandler(openingPost.uuid)}
+                            onClick={replyHandler}
                         >
                             <FontAwesomeIcon
                                 fixedWidth
