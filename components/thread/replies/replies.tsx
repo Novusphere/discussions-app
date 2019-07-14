@@ -20,9 +20,16 @@ interface IReplies {
     className?: string
     getModel: (post: Post) => ReplyModel
     voteHandler: (uuid: string, type: string, value: number) => Promise<void>
+    getRepliesFromMap: (uid: string) => Post[]
 }
 
-const Replies: React.FC<IReplies> = ({ post, voteHandler, getModel, ...props }) => {
+const Replies: React.FC<IReplies> = ({
+    post,
+    voteHandler,
+    getModel,
+    getRepliesFromMap,
+    ...props
+}) => {
     const replyModel = getModel(post)
     return (
         <Observer>
@@ -82,11 +89,12 @@ const Replies: React.FC<IReplies> = ({ post, voteHandler, getModel, ...props }) 
                     ) : null}
 
                     {post.replies.length
-                        ? post.replies.map(postReply => (
+                        ? getRepliesFromMap(post.uuid).map(postReply => (
                               <Replies
                                   post={postReply}
                                   key={postReply.uuid}
                                   getModel={getModel}
+                                  getRepliesFromMap={getRepliesFromMap}
                                   className={'post-content post-reply black child'}
                                   voteHandler={voteHandler}
                               />

@@ -61,6 +61,7 @@ class E extends React.Component<IEPageProps, IEPageState> {
                     this.thread = this.props.postsStore.activeThread
                 } else {
                     this.thread = new ThreadModel(this.props.thread)
+                    this.props.postsStore.activeThread = this.thread
                 }
             }
         })
@@ -82,8 +83,9 @@ class E extends React.Component<IEPageProps, IEPageState> {
                     opening={this.thread.openingPost}
                     openingModel={this.thread.rbModel(this.thread.openingPost)}
                     getModel={this.thread.rbModel}
+                    getRepliesFromMap={this.thread.getRepliesFromMap}
                     vote={vote}
-                    replies={this.thread.replies}
+                    openingPostReplies={this.thread.openingPostReplies}
                     totalReplies={this.thread.totalReplies}
                 />
             </div>

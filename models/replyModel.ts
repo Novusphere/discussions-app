@@ -3,14 +3,10 @@ import { task } from 'mobx-task'
 import { Post } from '@novuspherejs/discussions/post'
 import { Messages } from '@globals'
 import { generateUuid, getAttachmentValue, sleep } from '@utils'
-import { getAuthStore } from '@stores/auth'
-import { getPostsStore, IStores } from '@stores'
+import { getPostsStore, getAuthStore } from '@stores'
 import { discussions } from '@novuspherejs'
 
 export class ReplyModel {
-    private authStore: IStores['authStore']
-    private postsStore: IStores['postsStore']
-
     @observable uid = ''
     @observable content = ''
     @observable open = false
@@ -21,8 +17,6 @@ export class ReplyModel {
 
     constructor(post: Post, map: { [p: string]: Post }) {
         this.uid = post.uuid
-        this.authStore = getAuthStore()
-        this.postsStore = getPostsStore()
         this.map = map
     }
 
@@ -48,7 +42,7 @@ export class ReplyModel {
         const generatedUid = generateUuid()
 
         const reply = {
-            poster: this.authStore.accountName,
+            poster: getAuthStore().accountName,
             title: '',
             content: this.content,
             sub: post.sub,
@@ -67,7 +61,7 @@ export class ReplyModel {
         try {
             await discussions.post(reply as any)
             await sleep(3000)
-            await this.postsStore.fetchPost()
+            await getPostsStore().fetchPost()
         } catch (error) {
             console.log(error)
             throw error

@@ -6,19 +6,21 @@ import { ReplyModel } from '@models/replyModel'
 
 interface IThreadContainerProps {
     opening: Post
-    replies: Post[]
+    openingPostReplies: Post[]
     openingModel: ReplyModel
     totalReplies: number
     getModel: (post: Post) => ReplyModel
+    getRepliesFromMap: (uid: string) => Post[]
     vote: (uuid: string, type: string, value: number) => Promise<any>
 }
 
 const ThreadContainer: React.FC<IThreadContainerProps> = ({
     opening,
     openingModel,
-    replies,
+    openingPostReplies,
     totalReplies,
     getModel,
+    getRepliesFromMap,
     vote,
 }) => {
     return (
@@ -39,17 +41,18 @@ const ThreadContainer: React.FC<IThreadContainerProps> = ({
             ) : null}
             {totalReplies ? (
                 <>
-                    <div className={'mb2'}>
+                    <div className={'mb2a'}>
                         <span className={'b f6 pb2'}>viewing all {totalReplies} comments</span>
                     </div>
 
                     <div className={'card pr2 pv1'}>
-                        {replies.map(reply => (
+                        {openingPostReplies.map(reply => (
                             <Replies
                                 post={reply}
                                 key={reply.uuid}
                                 getModel={getModel}
                                 voteHandler={vote}
+                                getRepliesFromMap={getRepliesFromMap}
                             />
                         ))}
                     </div>

@@ -66,6 +66,7 @@ export default class DiscussionsService {
             ]);
 
             p.transaction = transaction
+            p.myVote = 1
             return p
         } catch (error) {
             throw error

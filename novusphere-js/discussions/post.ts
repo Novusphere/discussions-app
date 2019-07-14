@@ -51,8 +51,6 @@ export class Post {
     // Aggregate Data
     myVote: number;
 
-    _rogueReplies: any // used for front-end model management
-
     // have I already voted for this post?
 
     hasAttachment(): boolean {

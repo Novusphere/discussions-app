@@ -57,13 +57,13 @@ export default class Posts extends BaseStore {
     @observable activeThread: ThreadModel = null
 
     /**
-     * Manage replies within a post (not opening post)
+     * Manage getRepliesFromMap within a post (not opening post)
      */
     @observable replyingPostUUID = '' // which post the user is currently replying to
     @observable replyingPostContent = '' // which post the user is currently replying to
 
     /**
-     * Manage replies of the opening post
+     * Manage getRepliesFromMap of the opening post
      */
     @observable openingPostReplyContent = ''
 
@@ -102,29 +102,15 @@ export default class Posts extends BaseStore {
     }
 
     @action
-    // @ts-ignore
     public vote = async (uuid: string, type: string, value: number) => {
-        // try {
-        //     if (this.authStore.isLoggedIn) {
-        //         await discussions.vote(uuid, value)
-        //
-        //         // set result in opening post
-        //         if (uuid === this.threadOpeningPost['uuid']) {
-        //             this.updateActiveThread({
-        //                 openingPost: { ...this.threadOpeningPost, [type]: value },
-        //             })
-        //         }
-        //
-        //         // also set the result in the map
-        //         this.updateActiveThread({
-        //             map: {
-        //                 [uuid]: { ...this.threadMap[uuid], [type]: value },
-        //             },
-        //         })
-        //     }
-        // } catch (error) {
-        //     throw error
-        // }
+        try {
+            if (this.authStore.isLoggedIn) {
+                // await discussions.vote(uuid, value)
+                this.activeThread.vote(uuid, type, value)
+            }
+        } catch (error) {
+            throw error
+        }
     }
 
     @action clearPreview = () => {
