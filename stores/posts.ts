@@ -102,12 +102,12 @@ export default class Posts extends BaseStore {
     }
 
     @action
-    public vote = async (uuid: string, type: string, value: number) => {
+    public vote = async (uuid: string, value: number) => {
         try {
-            if (this.authStore.isLoggedIn) {
+            // if (this.authStore.isLoggedIn) {
                 // await discussions.vote(uuid, value)
-                this.activeThread.vote(uuid, type, value)
-            }
+                this.activeThread.vote(uuid, value)
+            // }
         } catch (error) {
             throw error
         }

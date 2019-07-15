@@ -18,7 +18,7 @@ import { Post } from '@novuspherejs/discussions/post'
 interface IMainPost {
     openingPost: Post
     replyHandler: () => void
-    voteHandler: (uuid: string, type: string, value: number) => Promise<void>
+    voteHandler: (uuid: string, value: number) => Promise<void>
 }
 
 const MainPost: React.FC<IMainPost> = ({ openingPost, replyHandler, voteHandler }) => {
@@ -55,6 +55,7 @@ const MainPost: React.FC<IMainPost> = ({ openingPost, replyHandler, voteHandler 
                         <span className={'black f4 b'}>{openingPost.title}</span>
                         <Votes
                             uuid={openingPost.uuid}
+                            myVote={openingPost.myVote}
                             upVotes={openingPost.upvotes}
                             downVotes={openingPost.downvotes}
                             handler={voteHandler}

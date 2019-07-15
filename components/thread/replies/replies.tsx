@@ -19,7 +19,7 @@ interface IReplies {
     post: Post
     className?: string
     getModel: (post: Post) => ReplyModel
-    voteHandler: (uuid: string, type: string, value: number) => Promise<void>
+    voteHandler: (uuid: string, value: number) => Promise<void>
     getRepliesFromMap: (uid: string) => Post[]
 }
 
@@ -45,10 +45,12 @@ const Replies: React.FC<IReplies> = ({
                         <span className={'pl2 o-50 f6'}>{moment(post.createdAt).fromNow()}</span>
                     </div>
                     <ReactMarkdown className={'f6 lh-copy'} source={post.content} />
+                    {post.myVote}
                     <div className={'footer flex items-center pt3'}>
                         <Votes
                             upVotes={post.upvotes}
                             downVotes={post.downvotes}
+                            myVote={post.myVote}
                             uuid={post.uuid}
                             className={'mr2'}
                             handler={voteHandler}

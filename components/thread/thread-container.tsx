@@ -11,7 +11,7 @@ interface IThreadContainerProps {
     totalReplies: number
     getModel: (post: Post) => ReplyModel
     getRepliesFromMap: (uid: string) => Post[]
-    vote: (uuid: string, type: string, value: number) => Promise<any>
+    vote: (uuid: string, value: number) => Promise<any>
 }
 
 const ThreadContainer: React.FC<IThreadContainerProps> = ({

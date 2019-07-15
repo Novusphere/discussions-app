@@ -4,6 +4,7 @@ import { action, computed, observable } from 'mobx'
 import { computedFn } from 'mobx-utils'
 import { ReplyModel } from '@models/replyModel'
 import _ from 'lodash'
+import { discussions } from '@novuspherejs'
 
 export class ThreadModel {
     @observable map: { [p: string]: Post }
@@ -96,16 +97,43 @@ export class ThreadModel {
         }
     }
 
-    @action vote = (uuid: string, type: string, value: number) => {
+    /**
+     * Set the vote of a post given it's uuid.
+     * This will set a phantom vote for the user, to prevent unnecessary fetching of the post afterwards.
+     * @param {string} uuid - The uuid of the post the user is voting on
+     * @param {number} myNewVote - +1 (upvote), 0 (neutral), -1 (downvote)
+     * @return {void}
+     */
+    @action vote = async (uuid: string, myNewVote: number) => {
+        const type = myNewVote === 1 ? 'upvotes' : 'downvotes'
+
         try {
             // opening post
             if (uuid === this.uuid) {
-                this.openingPost[type] = value
+                if (this.openingPost.myVote === 0) {
+                    this.openingPost[type] = this.openingPost[type] + myNewVote
+                    this.openingPost.myVote = myNewVote
+                } else if (this.openingPost.myVote === 1) {
+                    this.openingPost['upvotes'] = this.openingPost['upvotes'] - 1
+                    this.openingPost.myVote = 0
+                } else if (this.openingPost.myVote === -1) {
+                    this.openingPost['downvotes'] = this.openingPost['downvotes'] + 1
+                    this.openingPost.myVote = 0
+                }
             }
 
-            this.map[uuid][type] = value
+            if (this.map[uuid].myVote === 0) {
+                this.map[uuid][type] = this.map[uuid][type] + myNewVote
+                this.map[uuid].myVote = myNewVote
+            } else if (this.map[uuid].myVote === 1) {
+                this.map[uuid]['upvotes'] = this.map[uuid]['upvotes'] - 1
+                this.map[uuid].myVote = 0
+            } else if (this.map[uuid].myVote === -1) {
+                this.map[uuid]['downvotes'] = this.map[uuid]['downvotes'] + 1
+                this.map[uuid].myVote = 0
+            }
 
-            console.log(type, value)
+            await discussions.vote(uuid, myNewVote)
         } catch (error) {
             throw error
         }
