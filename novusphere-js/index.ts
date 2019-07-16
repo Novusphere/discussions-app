@@ -5,9 +5,11 @@ import { RedditService, DiscussionService } from './discussions/index';
 import { EOS } from "./eos";
 import { NSDB } from './nsdb';
 import { Settings } from "./settings";
+import DummyService from './discussions/service/dummy';
 
 export const reddit = new RedditService();
 export const discussions = new DiscussionService();
+export const dummy = new DummyService()
 export const nsdb = new NSDB();
 export const eos =  new EOS();
 export const settings = new Settings();

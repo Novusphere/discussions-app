@@ -79,7 +79,9 @@ export default class Posts extends BaseStore {
             () => this.authStore.isLoggedIn,
             async isLoggedIn => {
                 if (isLoggedIn) {
-                    await this.getPostsByTag([this.tagsStore.activeTag.name])
+                   if (this.tagsStore.activeTag) {
+                       await this.getPostsByTag([this.tagsStore.activeTag.name])
+                   }
                 }
             }
         )
