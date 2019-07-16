@@ -4,7 +4,8 @@ import { Post } from '@novuspherejs/discussions/post'
 import { Messages } from '@globals'
 import { generateUuid, getAttachmentValue, sleep } from '@utils'
 import { getPostsStore, getAuthStore } from '@stores'
-import { discussions } from '@novuspherejs'
+import { discussions, Thread } from '@novuspherejs'
+import { ThreadModel } from '@models/threadModel'
 
 export class ReplyModel {
     @observable uid = ''
@@ -15,7 +16,7 @@ export class ReplyModel {
     // the post replying to
     @observable post: Post = null
 
-    constructor(post: Post, map: { [p: string]: Post }) {
+    constructor(post: Thread | ThreadModel | Post, map: { [p: string]: Post }) {
         this.uid = post.uuid
         this.map = map
     }

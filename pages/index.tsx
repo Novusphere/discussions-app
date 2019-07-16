@@ -1,21 +1,45 @@
 import * as React from 'react'
 import { observer, inject } from 'mobx-react'
-import { Feed } from '@components'
+import { PostPreview } from '@components'
 import { IStores } from '@stores'
+import { IPost } from '@stores/posts'
+import { Router } from '@router'
+import { Post } from '@novuspherejs/discussions/post'
 
 interface IIndexPage {
     postsStore: IStores['postsStore']
+    tagStore: IStores['tagStore']
 }
 
-@inject('postsStore')
+@inject('postsStore', 'tagStore')
 @observer
 class Index extends React.Component<IIndexPage> {
-    componentWillMount(): void {
-        this.props.postsStore.getPostsByTag(['home'])
+    async componentWillMount(): Promise<void> {
+        await this.props.postsStore.getPostsByTag(['home'])
+    }
+
+    public clickPost = (post: IPost) => {
+        Router.pushRoute(
+            `/e/${post.sub}/${post.id}/${decodeURIComponent(post.title.replace(/ /g, '_'))}`
+        )
     }
 
     public render(): React.ReactNode {
-        return <Feed />
+        console.log('inside index')
+
+        return this.props.postsStore.posts.map(post => {
+            if (post instanceof Post) {
+                return (
+                    <PostPreview
+                        post={post.openingPost as Post}
+                        key={post.uuid}
+                        onClick={this.clickPost}
+                        tag={this.props.tagStore.tags.get(post.sub)}
+                        voteHandler={this.props.postsStore.vote}
+                    />
+                )
+            }
+        })
     }
 }
 

@@ -4,11 +4,10 @@ import { action, computed, observable } from 'mobx'
 import { computedFn } from 'mobx-utils'
 import { ReplyModel } from '@models/replyModel'
 import _ from 'lodash'
-import { discussions } from '@novuspherejs'
 
 export class ThreadModel {
-    @observable map: { [p: string]: Post }
-    @observable openingPost: Post
+    @observable map: { [p: string]: Post } | undefined
+    @observable openingPost: Thread | ThreadModel | Post
     @observable uuid: string
     @observable title: string
     @observable totalReplies: number
@@ -54,12 +53,19 @@ export class ThreadModel {
     /**
      * Reply box open status for a particular post id
      */
-    constructor(thread: Thread | ThreadModel) {
-        this.openingPost = thread.openingPost
-        this.map = thread.map
+    constructor(thread: Thread | ThreadModel | Post) {
         this.uuid = thread.uuid
         this.title = thread.title
         this.totalReplies = thread.totalReplies
+
+        if (!(thread instanceof Post) && thread.map) {
+            this.openingPost = thread.openingPost
+            this.map = thread.map
+        } else if (thread instanceof ThreadModel) {
+            this.openingPost = thread.openingPost
+        } else {
+            this.openingPost = thread
+        }
 
         /**
          * Set reply box open for the opening post by default
@@ -109,7 +115,7 @@ export class ThreadModel {
 
         try {
             // opening post
-            if (uuid === this.uuid) {
+            if (uuid === this.uuid && this.openingPost instanceof Post) {
                 if (this.openingPost.myVote === 0) {
                     this.openingPost[type] = this.openingPost[type] + myNewVote
                     this.openingPost.myVote = myNewVote
@@ -122,19 +128,24 @@ export class ThreadModel {
                 }
             }
 
-            if (this.map[uuid].myVote === 0) {
-                this.map[uuid][type] = this.map[uuid][type] + myNewVote
-                this.map[uuid].myVote = myNewVote
-            } else if (this.map[uuid].myVote === 1) {
-                this.map[uuid]['upvotes'] = this.map[uuid]['upvotes'] - 1
-                this.map[uuid].myVote = 0
-            } else if (this.map[uuid].myVote === -1) {
-                this.map[uuid]['downvotes'] = this.map[uuid]['downvotes'] + 1
-                this.map[uuid].myVote = 0
+            if (this.map) {
+                if (this.map[uuid].myVote === 0) {
+                    this.map[uuid][type] = this.map[uuid][type] + myNewVote
+                    this.map[uuid].myVote = myNewVote
+                } else if (this.map[uuid].myVote === 1) {
+                    this.map[uuid]['upvotes'] = this.map[uuid]['upvotes'] - 1
+                    this.map[uuid].myVote = 0
+                } else if (this.map[uuid].myVote === -1) {
+                    this.map[uuid]['downvotes'] = this.map[uuid]['downvotes'] + 1
+                    this.map[uuid].myVote = 0
+                }
             }
 
-            await discussions.vote(uuid, myNewVote)
+            console.log(this, uuid, myNewVote)
+
+            // await discussions.vote(uuid, myNewVote)
         } catch (error) {
+            console.log(error)
             throw error
         }
     }

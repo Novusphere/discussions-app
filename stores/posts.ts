@@ -1,4 +1,4 @@
-import { action, observable } from 'mobx'
+import { action, computed, observable, reaction } from 'mobx'
 import { discussions, Post } from '@novuspherejs'
 import { task } from 'mobx-task'
 import { BaseStore, getOrCreateStore } from 'next-mobx-wrapper'
@@ -50,7 +50,7 @@ export interface IPreviewPost {
 
 export default class Posts extends BaseStore {
     // all posts by filter
-    @observable posts: Post[] = []
+    @observable posts: ThreadModel[] = []
     @observable preview: IPreviewPost | null = null
 
     @observable activeThreadId = ''
@@ -74,6 +74,15 @@ export default class Posts extends BaseStore {
         super(props)
         this.tagsStore = getTagStore()
         this.authStore = getAuthStore()
+
+        reaction(
+            () => this.authStore.isLoggedIn,
+            async isLoggedIn => {
+                if (isLoggedIn) {
+                    await this.getPostsByTag([this.tagsStore.activeTag.name])
+                }
+            }
+        )
     }
 
     public encodeId(post: IPost) {
@@ -81,8 +90,19 @@ export default class Posts extends BaseStore {
     }
 
     @task.resolved getPostsByTag = async (tags: string[]) => {
-        this.posts = await discussions.getPostsForTags(tags)
+        const posts = await discussions.getPostsForTags(tags)
+        this.posts = posts.map(post => {
+            return new ThreadModel(post)
+        })
+
         return this.posts
+    }
+
+    /**
+     * Threads shown in the feed for an active tag/sub
+     */
+    @computed get feedThreads() {
+        return this.posts.filter(post => post.title.length)
     }
 
     @action setActiveThreadId = (id: string) => {
@@ -104,10 +124,9 @@ export default class Posts extends BaseStore {
     @action
     public vote = async (uuid: string, value: number) => {
         try {
-            // if (this.authStore.isLoggedIn) {
-                // await discussions.vote(uuid, value)
-                this.activeThread.vote(uuid, value)
-            // }
+            if (this.authStore.isLoggedIn) {
+                await this.activeThread.vote(uuid, value)
+            }
         } catch (error) {
             throw error
         }

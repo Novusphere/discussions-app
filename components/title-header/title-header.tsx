@@ -72,13 +72,15 @@ class TitleHeader extends React.Component<ITitleHeaderProps> {
                         animation={'none'}
                         duration={0}
                     >
-                        <a
-                            rel={'Open your profile'}
-                            className={'flex items-center user-container pointer dim'}
-                        >
-                            <FontAwesomeIcon width={13} icon={faUser} />
-                            <span className={'b f6 pl3 pr1'}>{accountName}</span>
-                        </a>
+                        <Link route={`/u/${accountName}`}>
+                           <a
+                               rel={'Open your profile'}
+                               className={'flex items-center user-container pointer dim'}
+                           >
+                               <FontAwesomeIcon width={13} icon={faUser} />
+                               <span className={'b f6 pl3 pr1'}>{accountName}</span>
+                           </a>
+                       </Link>
                     </Tooltip>
                 </div>
             )

@@ -4,7 +4,7 @@ import { IStores } from '@stores'
 import { Thread } from '@components'
 import { ThreadModel } from '@models/threadModel'
 import { autorun, observable } from 'mobx'
-import { Thread as ThreadType } from '@novuspherejs'
+import { Thread as ThreadType, Post } from '@novuspherejs'
 
 interface IEPageProps {
     postsStore: IStores['postsStore']
@@ -80,7 +80,7 @@ class E extends React.Component<IEPageProps, IEPageState> {
         return (
             <div className={'thread-container'}>
                 <Thread
-                    opening={this.thread.openingPost}
+                    opening={this.thread.openingPost as Post}
                     openingModel={this.thread.rbModel(this.thread.openingPost)}
                     getModel={this.thread.rbModel}
                     getRepliesFromMap={this.thread.getRepliesFromMap}

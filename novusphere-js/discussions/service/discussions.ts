@@ -8,15 +8,21 @@ export default class DiscussionsService {
     }
 
     async vote(uuid: string, value: number): Promise<string> {
-        return await eos.transact({
-            account: "discussionsx",
-            name: "vote",
-            data: {
-                voter: eos.auth.accountName,
-                uuid: uuid,
-                value: value
+        try {
+            if (eos.auth && eos.auth.accountName) {
+                return await eos.transact({
+                    account: "discussionsx",
+                    name: "vote",
+                    data: {
+                        voter: eos.auth.accountName,
+                        uuid: uuid,
+                        value: value
+                    }
+                });
             }
-        });
+        } catch (error) {
+            throw error
+        }
     }
 
     async post(p: Post): Promise<Post> {

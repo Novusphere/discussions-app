@@ -1,17 +1,17 @@
 import * as React from 'react'
-import { IPost } from '@stores/posts'
 import moment from 'moment'
 import { Votes } from '@components'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { faComment } from '@fortawesome/free-solid-svg-icons'
 import { TagModel } from '@models/tagModel'
 import ReactMarkdown from 'react-markdown'
+import { Post } from '@novuspherejs'
 
 interface IPostPreviewProps {
     onClick: (post) => void
-    post: IPost
+    post: Post
     tag: TagModel
-    voteHandler?: (uuid: string, type: string, value: number) => Promise<void>
+    voteHandler?: (uuid: string, value: number) => Promise<void>
     disableVoteHandler?: boolean
 }
 
@@ -29,6 +29,7 @@ const PostPreview: React.FC<IPostPreviewProps> = ({
                     <Votes
                         upVotes={post.upvotes}
                         downVotes={post.downvotes}
+                        myVote={post.myVote}
                         handler={voteHandler}
                         uuid={post.uuid}
                     />
