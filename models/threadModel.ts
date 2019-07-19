@@ -115,16 +115,18 @@ export class ThreadModel {
 
         try {
             // opening post
-            if (uuid === this.uuid && this.openingPost instanceof Post) {
-                if (this.openingPost.myVote === 0) {
-                    this.openingPost[type] = this.openingPost[type] + myNewVote
-                    this.openingPost.myVote = myNewVote
-                } else if (this.openingPost.myVote === 1) {
-                    this.openingPost['upvotes'] = this.openingPost['upvotes'] - 1
-                    this.openingPost.myVote = 0
-                } else if (this.openingPost.myVote === -1) {
-                    this.openingPost['downvotes'] = this.openingPost['downvotes'] + 1
-                    this.openingPost.myVote = 0
+            if (uuid === this.uuid) {
+                if (this.openingPost instanceof Post) {
+                    if (this.openingPost.myVote === 0) {
+                        this.openingPost[type] = this.openingPost[type] + myNewVote
+                        this.openingPost.myVote = myNewVote
+                    } else if (this.openingPost.myVote === 1) {
+                        this.openingPost['upvotes'] = this.openingPost['upvotes'] - 1
+                        this.openingPost.myVote = 0
+                    } else if (this.openingPost.myVote === -1) {
+                        this.openingPost['downvotes'] = this.openingPost['downvotes'] + 1
+                        this.openingPost.myVote = 0
+                    }
                 }
             }
 
@@ -141,7 +143,7 @@ export class ThreadModel {
                 }
             }
 
-            console.log(this, uuid, myNewVote)
+            console.log(this.openingPost, uuid, myNewVote)
 
             // await discussions.vote(uuid, myNewVote)
         } catch (error) {

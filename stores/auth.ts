@@ -1,6 +1,6 @@
 import { action, computed, observable } from 'mobx'
 import { task } from 'mobx-task'
-import { eos } from '@novuspherejs/index'
+import { eos } from '@novuspherejs'
 import { BaseStore, getOrCreateStore } from 'next-mobx-wrapper'
 import { getUiStore } from '@stores/ui'
 import { IStores } from '@stores'
@@ -42,6 +42,21 @@ export default class Auth extends BaseStore {
         this.publicKey = eosAuthObject.publicKey
     }
 
+    @task fetchSuggestedAccounts = async (
+        partialName: string
+    ): Promise<{ text: string; value: string }[]> => {
+        try {
+            const accounts = await eos.getSuggestAccounts(partialName)
+            return accounts.map(account => ({
+                text: account,
+                value: account,
+            }))
+        } catch (error) {
+            console.error(error)
+            return error
+        }
+    }
+
     @task.resolved logIn = async () => {
         try {
             let wallet = eos.wallet
@@ -50,7 +65,6 @@ export default class Auth extends BaseStore {
                 await eos.login()
                 if (eos.auth) {
                     this.setAuth(eos.auth)
-
                     // fetch balances
                     const balances = await eos.getAccountTokens(this.accountName)
                     balances.forEach(balance => {

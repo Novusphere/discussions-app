@@ -39,7 +39,9 @@ class E extends React.Component<IEPageProps, IEPageState> {
 
         if (!isTagView) {
             postsStore.setActiveThreadId(query.id)
-            thread = await postsStore.fetchPost()
+            thread = await postsStore.fetchPost().catch(
+                (error) => error
+            )
         }
 
         return {
@@ -74,8 +76,8 @@ class E extends React.Component<IEPageProps, IEPageState> {
 
         const { fetchPost, vote } = this.props.postsStore
 
-        if ((fetchPost as any).state === 'rejected')
-            return <span>{(fetchPost as any).error.message}</span>
+        if ((fetchPost as any).state === 'rejected' || !this.thread)
+            return <span>Unable to fetch post</span>
 
         return (
             <div className={'thread-container'}>

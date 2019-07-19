@@ -1,8 +1,9 @@
 @import '~tachyons';
 @import '~react-tabs/style/react-tabs.css';
 @import '~react-tippy/dist/tippy.css';
-@import '~react-draft-wysiwyg/dist/react-draft-wysiwyg.css';
 @import 'components/all';
+
+@import '~react-quill/dist/quill.snow.css';
 
 body {
     font-family: Open Sans Light, sans-serif;

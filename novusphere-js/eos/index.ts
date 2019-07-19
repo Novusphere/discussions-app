@@ -153,10 +153,25 @@ export class EOS {
         return this.tokens.find(t => t.account == account && t.symbol == symbol);
     }
 
+    /**
+     * Fetch a list of suggested users for mentions.
+     * @param accountPartial {string} - The partial name of the account
+     * @param limit 
+     * @returns {string[]}
+     */
     async getSuggestAccounts(accountPartial: string, limit: number = 10): Promise<string[]> {
-        let request = await fetch(`https://www.api.bloks.io/topholders?account_name[$search]=${accountPartial}&$limit=${limit}`);
+        let request = await fetch(`https://eos.greymass.com/v1/chain/get_table_by_scope`, {
+            method: 'POST',
+            body: JSON.stringify({
+                "code": "eosio",
+                "table": "userres",
+                "lower_bound": accountPartial,
+                "upper_bound": accountPartial.padEnd(12, 'z'),
+                "limit": 5
+            })
+        });
         let json = await request.json();
-        return json.data.map(d => d.account_name);
+        return json.rows.map(d => d.scope);
     }
 
     /**

@@ -1,69 +1,42 @@
 import * as React from 'react'
-import { Editor as ReactDraftEditor } from 'react-draft-wysiwyg'
-import { faSpinner } from '@fortawesome/free-solid-svg-icons'
+import { inject, observer } from 'mobx-react'
+import { IStores } from '@stores'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
-import { EditorState, convertToRaw } from 'draft-js'
-import draftToMarkdown from 'draftjs-to-markdown'
-import classNames from 'classnames'
+import { faSpinner } from '@fortawesome/free-solid-svg-icons'
+import dynamic from 'next/dynamic'
 
 interface IEditorProps {
+    authStore?: IStores['authStore']
     onChange: (html: any) => void // passed in via spread (bind) in form.tsx
     placeholder: string
     className?: string
 }
 
+const Quill = dynamic(import('react-quill'), {
+    ssr: false,
+    loading: () => <FontAwesomeIcon width={13} icon={faSpinner} spin />,
+})
+
 // https://jpuri.github.io/react-draft-wysiwyg/#/docs
+@inject('authStore')
+@observer
 class Editor extends React.Component<IEditorProps> {
     state = {
-        mounted: false, // https://github.com/jpuri/react-draft-wysiwyg/issues/660
-        editorState: EditorState.createEmpty(),
+        text: ''
     }
 
-    private onContentStateChange = () => {
-        const content = draftToMarkdown(convertToRaw(this.state.editorState.getCurrentContent()))
-        this.props.onChange(content)
-    }
-
-    private onEditorStateChange = editorState => {
+    onChange = (text) => {
         this.setState({
-            editorState,
-        })
-    }
-
-    componentDidMount(): void {
-        this.setState({
-            mounted: true,
+            text,
         })
     }
 
     public render(): React.ReactNode {
-        if (!this.state.mounted) {
-            return <FontAwesomeIcon width={13} icon={faSpinner} spin className={'w-10'} />
-        }
-
-        const { placeholder, className, ...rest } = this.props
-
         return (
-            <>
-                <ReactDraftEditor
-                    {...rest}
-                    placeholder={placeholder}
-                    editorState={this.state.editorState}
-                    onEditorStateChange={this.onEditorStateChange}
-                    onChange={this.onContentStateChange}
-                    editorClassName={'editor-content'}
-                    wrapperClassName={classNames([
-                        'editor-wrapper',
-                        {
-                            [className]: !!className,
-                        },
-                    ])}
-                    toolbarClassName={'editor-toolbar'}
-                    toolbar={{
-                        options: ['inline', 'blockType', 'link', 'image', 'emoji'],
-                    }}
-                />
-            </>
+            <Quill
+                value={this.state.text}
+                onChange={this.onChange}
+            />
         )
     }
 }
