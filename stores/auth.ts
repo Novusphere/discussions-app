@@ -44,11 +44,11 @@ export default class Auth extends BaseStore {
 
     @task fetchSuggestedAccounts = async (
         partialName: string
-    ): Promise<{ text: string; value: string }[]> => {
+    ): Promise<{ id: string; value: string }[]> => {
         try {
             const accounts = await eos.getSuggestAccounts(partialName)
             return accounts.map(account => ({
-                text: account,
+                id: account,
                 value: account,
             }))
         } catch (error) {
