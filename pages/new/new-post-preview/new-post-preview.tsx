@@ -56,7 +56,7 @@ class NewPostPreview extends React.Component<IPostPreviewProps> {
                 </span>
                 <div className={'mt3'}>
                     <PostPreview
-                        post={post}
+                        post={post as any}
                         onClick={() => false}
                         tag={this.props.tagStore.tags.get(post.sub)}
                         disableVoteHandler

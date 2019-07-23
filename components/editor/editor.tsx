@@ -9,6 +9,7 @@ interface IEditorProps {
     onChange: (html: any) => void // passed in via spread (bind) in form.tsx
     placeholder: string
     className?: string
+    value?: any
 }
 
 @inject('authStore')
@@ -29,6 +30,10 @@ class Editor extends React.Component<IEditorProps> {
     }
 
     async componentDidMount(): Promise<void> {
+        /**
+         * This is how we get around SSR problems
+         * using async imports.
+         */
         const quillEditor = await import('react-quill')
         this.quillBase = {
             Editor: quillEditor.default,
@@ -68,6 +73,11 @@ class Editor extends React.Component<IEditorProps> {
             },
         }
 
+        /**
+         * Set loaded to true at the end
+         * to ensure our component won't throw errors due to
+         * Quill SSR imports.
+         */
         this.setState({
             loaded: true,
         })
@@ -80,10 +90,12 @@ class Editor extends React.Component<IEditorProps> {
 
         const { Editor } = this.quillBase
 
+        const { value, onChange } = this.props
+
         return (
             <Editor
-                value={this.state.text}
-                onChange={this.onChange}
+                value={value}
+                onChange={onChange}
                 formats={[
                     'header',
                     'font',

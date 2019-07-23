@@ -28,7 +28,7 @@ export class EOS {
     }
 
     async init(network: NetworkConfig) {
-        if (process.browser) { // client?
+        if ((process as any).browser) { // client?
             const transit = await import('eos-transit');
 
             const scatter = await import('eos-transit-scatter-provider');
@@ -159,7 +159,7 @@ export class EOS {
      * @param limit 
      * @returns {string[]}
      */
-    async getSuggestAccounts(accountPartial: string, limit: number = 10): Promise<string[]> {
+    async getSuggestAccounts(accountPartial: string, _limit: number = 10): Promise<string[]> {
         let request = await fetch(`https://eos.greymass.com/v1/chain/get_table_by_scope`, {
             method: 'POST',
             body: JSON.stringify({

@@ -2403,7 +2403,7 @@ export default class DummyService {
     }
   }
 
-  async getUser(username: string) {
+  async getUser(_username: string) {
      return {
        comments: [], // comment interface
        threads: [], // Post[]

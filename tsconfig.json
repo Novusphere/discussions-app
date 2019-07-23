@@ -1,33 +1,74 @@
 {
-	"compileOnSave": false,
-	"compilerOptions": {
-		"target": "esnext",
-		"module": "esnext",
-		"jsx": "preserve",
-		"allowJs": true,
-		"moduleResolution": "node",
-		"experimentalDecorators": true,
-		"allowSyntheticDefaultImports": true,
-		"noUnusedLocals": true,
-		"noUnusedParameters": true,
-		"removeComments": false,
-		"preserveConstEnums": true,
-		"sourceMap": true,
-		"skipLibCheck": true,
-		"baseUrl": ".",
-		"paths": {
-			"@components": ["./components/index"],
-			"@models/*": ["./models/*"],
-			"@pages/": ["./pages/*"],
-			"@novuspherejs/*": ["./novusphere-js/*"],
-			"@novuspherejs": ["./novusphere-js/index"],
-			"@stores/*": ["./stores/*"],
-			"@stores": ["./stores/index"],
-			"@styles/*": ["./styles/*"],
-			"@utils": ["./utils/index"],
-			"@router": ["./routes.ts"],
-			"@globals": ["./constants/globals.ts"]
-		},
-		"lib": ["dom", "es2015", "es2016"]
-	}
+  "compileOnSave": false,
+  "compilerOptions": {
+    "target": "esnext",
+    "module": "esnext",
+    "jsx": "preserve",
+    "allowJs": true,
+    "moduleResolution": "node",
+    "experimentalDecorators": true,
+    "allowSyntheticDefaultImports": true,
+    "noUnusedLocals": true,
+    "noUnusedParameters": true,
+    "removeComments": false,
+    "preserveConstEnums": true,
+    "sourceMap": true,
+    "skipLibCheck": true,
+    "baseUrl": ".",
+    "paths": {
+      "@components": [
+        "./components/index"
+      ],
+      "@models/*": [
+        "./models/*"
+      ],
+      "@pages/": [
+        "./pages/*"
+      ],
+      "@novuspherejs/*": [
+        "./novusphere-js/*"
+      ],
+      "@novuspherejs": [
+        "./novusphere-js/index"
+      ],
+      "@stores/*": [
+        "./stores/*"
+      ],
+      "@stores": [
+        "./stores/index"
+      ],
+      "@styles/*": [
+        "./styles/*"
+      ],
+      "@utils": [
+        "./utils/index"
+      ],
+      "@router": [
+        "./routes.ts"
+      ],
+      "@globals": [
+        "./constants/globals.ts"
+      ]
+    },
+    "lib": [
+      "dom",
+      "es2015",
+      "es2016"
+    ],
+    "strict": false,
+    "forceConsistentCasingInFileNames": true,
+    "noEmit": true,
+    "esModuleInterop": true,
+    "resolveJsonModule": true,
+    "isolatedModules": true
+  },
+  "exclude": [
+    "node_modules",
+    "novusphere-js"
+  ],
+  "include": [
+    "next-env.d.ts",
+    "**/*.ts",
+    "**/*.tsx"
+  ]
 }

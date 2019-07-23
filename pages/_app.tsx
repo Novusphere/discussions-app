@@ -15,7 +15,7 @@ export const isServer = !(process as any).browser
 useStaticRendering(isServer) // NOT `true` value
 
 class DiscussionApp extends App {
-    private props: any
+    public props: any
 
     static async getInitialProps(ctx) {
         const isServer = !!ctx.req

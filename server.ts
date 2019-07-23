@@ -2,7 +2,7 @@ import * as express from 'express'
 import * as next from 'next'
 import { Routes } from './routes'
 const port = 3000
-const app = next({ dev: process.env.NODE_ENV !== 'production' })
+const app = (next as any)({ dev: process.env.NODE_ENV !== 'production' })
 const handler = Routes.getRequestHandler(app)
 
 app.prepare().then(() => {

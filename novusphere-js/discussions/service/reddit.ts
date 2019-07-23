@@ -154,7 +154,7 @@ export class RedditService {
         let auth = await this.getAuth();
         let response = await fetch(`https://oauth.reddit.com/r/${subreddit}/comments/${threadId}/_/`, auth);
         let json = await response.json();
-        let post = json[0].data.children[0].data;
+        // let post = json[0].data.children[0].data;
         return json;
     }
 
