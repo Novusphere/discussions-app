@@ -17,7 +17,6 @@ interface IEditorProps {
 class Editor extends React.Component<IEditorProps> {
     state = {
         loaded: false,
-        text: '',
     }
 
     public turndownService: any
@@ -65,12 +64,18 @@ class Editor extends React.Component<IEditorProps> {
                         renderList(values, searchTerm)
                     } else {
                         const matches = []
-                        for (let i = 0; i < values.length; i++)
-                            if (~values[i].value.toLowerCase().indexOf(searchTerm.toLowerCase()))
+                        for (let i = 0; i < values.length; i++) {
+                            if (~values[i].value.toLowerCase().indexOf(searchTerm.toLowerCase())) {
                                 matches.push(values[i])
+                            }
+                        }
                         renderList(matches, searchTerm)
                     }
                 },
+                onSelect: (item, insertItem) => {
+                    item.value = `<a href='${window.location.origin + '/u/' + item.value}'>${item.value}</a>`
+                    return insertItem(item)
+                }
             },
         }
 
@@ -86,12 +91,7 @@ class Editor extends React.Component<IEditorProps> {
 
     public onChange = (text: string) => {
         const markdown = this.turndownService.turndown(text)
-
-        this.setState({
-            text: markdown,
-        })
-
-        console.log(this.state.text)
+        this.props.onChange(markdown)
     }
 
     public render(): React.ReactNode {
@@ -103,10 +103,8 @@ class Editor extends React.Component<IEditorProps> {
 
         return (
             <>
-                <span>{this.state.text}</span>
                 <Editor
                     key={'editor'}
-                    // value={this.state.text}
                     onChange={this.onChange}
                     formats={[
                         'header',
