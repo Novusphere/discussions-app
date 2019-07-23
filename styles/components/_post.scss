@@ -44,6 +44,12 @@
     background: white;
 }
 
+.reply-content {
+    a {
+        color: #007bff !important;
+    }
+}
+
 .opening-post {
     @extend .mb2;
     margin-bottom: 20px;

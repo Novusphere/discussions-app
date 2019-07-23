@@ -44,7 +44,7 @@ const Replies: React.FC<IReplies> = ({
                         </Link>
                         <span className={'pl2 o-50 f6'}>{moment(post.createdAt).fromNow()}</span>
                     </div>
-                    <ReactMarkdown className={'f6 lh-copy'} source={post.content} />
+                    <ReactMarkdown className={'f6 lh-copy reply-content'} source={post.content} />
                     {post.myVote}
                     <div className={'footer flex items-center pt3'}>
                         <Votes
