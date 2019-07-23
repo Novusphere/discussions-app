@@ -64,7 +64,11 @@
   },
   "exclude": [
     "node_modules",
-    "novusphere-js"
+    "novusphere-js",
+    "dist",
+    ".next",
+    "out",
+    "next.config.js"
   ],
   "include": [
     "next-env.d.ts",

@@ -102,6 +102,7 @@ const Form: React.FC<FormProps> = ({ form, children, hideSubmitButton, ...props 
                         </div>
                     )
                 case 'richtext':
+                    console.log(bind)
                     return (
                         <React.Fragment key={field.name}>
                             <div className={'field-container pt1 pb3 inline-labels'}>
