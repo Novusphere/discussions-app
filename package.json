@@ -52,7 +52,8 @@
   "scripts": {
     "dev": "nodemon server.ts",
     "build": "cross-env NODE_ENV=production next build && tsc --project tsconfig.server.json",
-    "start": "cross-env NODE_ENV=production node dist/index.js"
+    "start": "cross-env NODE_ENV=production node dist/server.js",
+    "start2": "cross-env NODE_ENV=production next start"
   },
   "devDependencies": {
     "@babel/plugin-transform-runtime": "7.4.4",
