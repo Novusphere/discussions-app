@@ -4,7 +4,7 @@ import { PostPreview } from '@components'
 import { IStores } from '@stores'
 import { IPost } from '@stores/posts'
 import { Router } from '@router'
-import { Post } from '@novuspherejs/discussions/post'
+import { discussions, Post } from '@novuspherejs'
 
 interface IIndexPage {
     postsStore: IStores['postsStore']
@@ -26,6 +26,14 @@ class Index extends React.Component<IIndexPage> {
 
     public render(): React.ReactNode {
         console.log('inside index')
+
+        /*if (typeof window !== 'undefined') {
+            (async function () {
+                const bk = discussions.bkCreate();
+                const keys = await discussions.bkToKeys(bk);
+                console.log(keys);
+            })();
+        }*/
 
         return this.props.postsStore.posts.map(post => {
             if (post instanceof Post) {

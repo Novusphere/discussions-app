@@ -157,6 +157,12 @@ export class Post {
         return Post.encodeId(this.transaction, this.createdAt);
     }
 
+    sign(privKey: string) {
+        this.pub = ecc.privateToPublic(privKey);
+        this.sig = ecc.sign(ecc.sha256(this.uuid+ecc.sha256(this.content)), privKey);
+        this.verifySig = this.pub;
+    }
+
     /*applyEdit(p: Post) {
         if (!p.edit || p.parentUuid != this.uuid) return;
         if (p.chain != this.chain) return;
