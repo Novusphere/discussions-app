@@ -11,6 +11,7 @@
     "@zeit/next-sass": "1.0.1",
     "@zeit/next-typescript": "1.1.1",
     "big-integer": "^1.6.44",
+    "bip39": "^3.0.2",
     "classnames": "^2.2.6",
     "eos-transit": "3.1.0",
     "eos-transit-lynx-provider": "3.1.0",
