@@ -22,3 +22,4 @@ export const getAttachmentValue = (post: any) => {
         type,
     }
 }
+

@@ -20,14 +20,10 @@ class Editor extends React.Component<IEditorProps> {
         text: '',
     }
 
+    public turndownService: any
+
     private quillBase: any
     private modules: any = null
-
-    onChange = text => {
-        this.setState({
-            text,
-        })
-    }
 
     async componentDidMount(): Promise<void> {
         /**
@@ -42,6 +38,11 @@ class Editor extends React.Component<IEditorProps> {
 
         const mention = await import('quill-mention')
         const Mention = mention.default
+
+        const turndownImport = await import('turndown')
+        const Turndown = turndownImport.default
+
+        this.turndownService = new Turndown()
 
         this.quillBase.Quill.register('modules/mention', Mention)
 
@@ -83,6 +84,16 @@ class Editor extends React.Component<IEditorProps> {
         })
     }
 
+    public onChange = (text: string) => {
+        const markdown = this.turndownService.turndown(text)
+
+        this.setState({
+            text: markdown,
+        })
+
+        console.log(this.state.text)
+    }
+
     public render(): React.ReactNode {
         if (!this.state.loaded) {
             return <FontAwesomeIcon width={13} icon={faSpinner} spin />
@@ -90,33 +101,35 @@ class Editor extends React.Component<IEditorProps> {
 
         const { Editor } = this.quillBase
 
-        const { value, onChange } = this.props
-
         return (
-            <Editor
-                value={value}
-                onChange={onChange}
-                formats={[
-                    'header',
-                    'font',
-                    'size',
-                    'bold',
-                    'italic',
-                    'underline',
-                    'strike',
-                    'blockquote',
-                    'list',
-                    'bullet',
-                    'indent',
-                    'link',
-                    'image',
-                    'video',
-                    'mention',
-                ]}
-                modules={{
-                    mention: this.modules.mention,
-                }}
-            />
+            <>
+                <span>{this.state.text}</span>
+                <Editor
+                    key={'editor'}
+                    // value={this.state.text}
+                    onChange={this.onChange}
+                    formats={[
+                        'header',
+                        'font',
+                        'size',
+                        'bold',
+                        'italic',
+                        'underline',
+                        'strike',
+                        'blockquote',
+                        'list',
+                        'bullet',
+                        'indent',
+                        'link',
+                        'image',
+                        'video',
+                        'mention',
+                    ]}
+                    modules={{
+                        mention: this.modules.mention,
+                    }}
+                />
+            </>
         )
     }
 }

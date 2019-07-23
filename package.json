@@ -41,7 +41,9 @@
     "react-select": "latest",
     "react-tabs": "^3.0.0",
     "react-tippy": "^1.2.3",
+    "showdown": "^1.9.0",
     "tachyons": "4.11.1",
+    "turndown": "^5.0.3",
     "typescript": "3.5.2",
     "uuidv4": "^4.0.0",
     "validatorjs": "3.15.1"
