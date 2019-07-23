@@ -1,8 +1,9 @@
-import * as express from 'express'
+const express = require('express')
+
 import * as next from 'next'
 import { Routes } from './routes'
 const port = 3000
-const app = (next as any)({ dev: process.env.NODE_ENV !== 'production' })
+const app = next.default({ dev: process.env.NODE_ENV !== 'production' })
 const handler = Routes.getRequestHandler(app)
 
 app.prepare().then(() => {
