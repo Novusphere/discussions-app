@@ -1,11 +1,13 @@
 import { Post, PostMetaData } from '../post';
 import Thread from "../thread";
 import { eos, nsdb } from "@novuspherejs";
+const aesjs = require('aes-js');
+//const crypto = require('crypto');
 const bip39 = require('bip39');
 import * as bip32 from 'bip32';
 import ecc from 'eosjs-ecc';
 
-export interface IBrianKeyPair {
+export interface IBrainKeyPair {
     priv: string;
     pub: string;
 }
@@ -24,15 +26,56 @@ export default class DiscussionsService {
     }
 
     /*private bkGetBitcoin(node: bip32.BIP32Interface) {
-        let child = node.derivePath("m/44'/0'/0'/0");
-        return {
-            priv: child.privateKey.toString('hex'),
-            pub: child.publicKey.toString('hex'),
-            address: child.toBase58()
+
+        function hash160(data: Buffer) {
+            var hash = crypto.createHash('ripemd160');
+            let res = hash.update(data);
+            return res.digest();
         }
+
+        return;
     }*/
 
-    private bkGetEOS(node: bip32.BIP32Interface, n: number) : IBrianKeyPair {
+    private aesEncrypt(data: string, password: string): string {
+        var key = aesjs.utils.hex.toBytes(ecc.sha256(password));
+        var textBytes = aesjs.utils.utf8.toBytes(data);
+        var aesCtr = new aesjs.ModeOfOperation.ctr(key, new aesjs.Counter(5));
+        var encryptedBytes = aesCtr.encrypt(textBytes);
+        var encryptedHex = aesjs.utils.hex.fromBytes(encryptedBytes);
+        return encryptedHex;
+    }
+
+    private aesDecrypt(data: string, password: string): string {
+        var key = aesjs.utils.hex.toBytes(ecc.sha256(password));
+        var aesCtr = new aesjs.ModeOfOperation.ctr(key, new aesjs.Counter(5));
+        var encryptedBytes = aesjs.utils.hex.toBytes(data);
+        var decryptedBytes = aesCtr.decrypt(encryptedBytes);
+        var decryptedText = aesjs.utils.utf8.fromBytes(decryptedBytes);
+        return decryptedText;
+    }
+
+    bkFromStatusJson(statusJson: string, password: string): string {
+        let status = JSON.parse(statusJson);
+        let bkc = status['bkc'];
+        let bk = status['bk'];
+        if (!bkc || !bk) throw new Error('No brian key found');
+        let test = this.aesDecrypt(bkc, password);
+        if (test != 'test') throw new Error('Incorrect brian key pasword');
+        return this.aesDecrypt(bk, password);
+    }
+
+    async bkToStatusJson(bk: string, password: string, status: any): Promise<string> {
+        if (!status) status = {};
+        const keys = await this.bkToKeys(bk);
+        for (var k in keys) {
+            status[k] = keys[k].pub;
+        }
+        status['bk'] = this.aesEncrypt(bk, password);
+        status['bkc'] = this.aesEncrypt('test', password);
+        return JSON.stringify(status);
+    }
+
+    private bkGetEOS(node: bip32.BIP32Interface, n: number): IBrainKeyPair {
         let child = node.derivePath(`m/80'/0'/0'/${n}`);
         const wif = child.toWIF();
         return {
@@ -44,12 +87,41 @@ export default class DiscussionsService {
     async bkToKeys(bk: string) {
         const seed = await bip39.mnemonicToSeed(bk);
         const node = await bip32.fromSeed(seed);
-        
+
         const keys = {};
         //keys['BTC'] = this.bkGetBitcoin(node);
         keys['post'] = this.bkGetEOS(node, 0);
         keys['tip'] = this.bkGetEOS(node, 1);
         return keys;
+    }
+
+    async bkRetrieveStatusEOS(account: string): Promise<string | undefined> {
+        let result = await eos.wallet.eosApi.rpc.get_table_rows({
+            code: 'discussionsx',
+            scope: 'discussionsx',
+            table: 'status',
+            table_key: account
+        });
+
+        if (result.rows.length == 0) return undefined;
+        return result.rows[0].content;
+    }
+
+    async bkUpdateStatusEOS(statusJson: string): Promise<string> {
+        try {
+            if (eos.auth && eos.auth.accountName) {
+                return await eos.transact({
+                    account: "discussionsx",
+                    name: "status",
+                    data: {
+                        account: eos.auth.accountName,
+                        content: statusJson
+                    }
+                });
+            }
+        } catch (error) {
+            throw error
+        }
     }
 
     async vote(uuid: string, value: number): Promise<string> {
