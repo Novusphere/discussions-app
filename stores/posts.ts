@@ -1,5 +1,5 @@
 import { action, computed, observable, reaction } from 'mobx'
-import { discussions, Post } from '@novuspherejs'
+import { discussions, Post, Thread } from '@novuspherejs'
 import { task } from 'mobx-task'
 import { BaseStore, getOrCreateStore } from 'next-mobx-wrapper'
 import { CreateForm } from '@components'
@@ -7,6 +7,7 @@ import { getTagStore } from '@stores/tag'
 import { getAuthStore, IStores } from '@stores'
 import { generateUuid, getAttachmentValue } from '@utils'
 import { ThreadModel } from '@models/threadModel'
+import FeedModel from '@models/feedModel'
 
 export interface IAttachment {
     value: string
@@ -50,11 +51,10 @@ export interface IPreviewPost {
 
 export default class Posts extends BaseStore {
     // all posts by filter
-    @observable posts: ThreadModel[] = []
+    @observable posts: FeedModel[]
     @observable preview: IPreviewPost | null = null
 
     @observable activeThreadId = ''
-    @observable activeThread: ThreadModel = null
 
     /**
      * Manage getRepliesFromMap within a post (not opening post)
@@ -79,9 +79,9 @@ export default class Posts extends BaseStore {
             () => this.authStore.isLoggedIn,
             async isLoggedIn => {
                 if (isLoggedIn) {
-                   if (this.tagsStore.activeTag) {
-                       await this.getPostsByTag([this.tagsStore.activeTag.name])
-                   }
+                    if (this.tagsStore.activeTag) {
+                        await this.getPostsByTag([this.tagsStore.activeTag.name])
+                    }
                 }
             }
         )
@@ -94,31 +94,43 @@ export default class Posts extends BaseStore {
     @task.resolved getPostsByTag = async (tags: string[]) => {
         const posts = await discussions.getPostsForTags(tags)
         this.posts = posts.map(post => {
-            return new ThreadModel(post)
+            return new FeedModel(post)
         })
-
-        return this.posts
+        return posts
     }
 
     /**
      * Threads shown in the feed for an active tag/sub
      */
-    @computed get feedThreads() {
-        return this.posts.filter(post => post.title.length)
+    @computed get feedThreads(): FeedModel[] | null {
+        if (!this.posts || !this.posts.length) {
+            return null
+        }
+        return this.posts
+            .filter(post => post.title.length)
+            .map(post => new FeedModel(post as any))
+    }
+
+    @computed get activeThread(): ThreadModel | null {
+        const thread = this.fetchPost['result']
+        if (!thread) {
+            return null
+        }
+        return new ThreadModel(thread)
     }
 
     @action setActiveThreadId = (id: string) => {
         this.activeThreadId = id
     }
 
-    @task
-    public fetchPost = async () => {
+    @task({ swallow: true })
+    public fetchPost = async (): Promise<Thread> => {
         try {
             const thread = await discussions.getThread(this.activeThreadId)
             if (!thread) throw Error('Failed to fetch thread')
-            this.activeThread = new ThreadModel(thread)
-            return this.activeThread
+            return thread
         } catch (error) {
+            console.log(error)
             throw error
         }
     }

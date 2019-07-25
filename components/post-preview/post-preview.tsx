@@ -6,13 +6,14 @@ import { faComment } from '@fortawesome/free-solid-svg-icons'
 import { TagModel } from '@models/tagModel'
 import ReactMarkdown from 'react-markdown'
 import { Post } from '@novuspherejs'
+import { observer } from 'mobx-react'
 
 interface IPostPreviewProps {
     onClick: (post) => void
     post: Post
     tag: TagModel
     voteHandler?: (uuid: string, value: number) => Promise<void>
-    disableVoteHandler?: boolean
+    disableVoteHandler?: boolean // in case voting needs to be disabled
 }
 
 const PostPreview: React.FC<IPostPreviewProps> = ({
@@ -70,4 +71,4 @@ const PostPreview: React.FC<IPostPreviewProps> = ({
     </div>
 )
 
-export default PostPreview
+export default observer(PostPreview)

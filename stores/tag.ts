@@ -1,6 +1,5 @@
 import { observable } from 'mobx'
 import { TagModel } from '@models/tagModel'
-import { SubModel } from '@models/subModel'
 import { BaseStore, getOrCreateStore } from 'next-mobx-wrapper'
 
 export default class Tag extends BaseStore {
@@ -8,9 +7,7 @@ export default class Tag extends BaseStore {
     static baseSubLength = 4
 
     @observable activeTag: TagModel
-    @observable activeSub: SubModel
     @observable tags = observable.map<string, TagModel>()
-    @observable subs = observable.map<string, TagModel>()
 
     constructor() {
         super()
@@ -408,7 +405,7 @@ export default class Tag extends BaseStore {
         }
     }
 
-    public setActiveTag = (tagName: string) => {
+    public setActiveTag = (tagName: string): TagModel => {
         let tagModel
 
         if (!this.tags.get(tagName)) {
@@ -420,19 +417,6 @@ export default class Tag extends BaseStore {
 
         this.activeTag = tagModel
         return tagModel
-    }
-
-    public setActiveSub = (sub: string) => {
-        let subModel
-
-        if (!this.subs.get(sub)) {
-            subModel = new TagModel(sub)
-            this.subs.set(sub, subModel)
-        } else {
-            subModel = this.tags.get(sub)
-        }
-
-        this.activeTag = subModel
     }
 
     private setTopLevelTags = () => {

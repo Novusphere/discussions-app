@@ -25,11 +25,11 @@
       "@pages/": [
         "./pages/*"
       ],
-      "@novuspherejs/*": [
-        "./novusphere-js/*"
-      ],
       "@novuspherejs": [
         "./novusphere-js/index"
+      ],
+      "@novuspherejs/*": [
+        "./novusphere-js/*"
       ],
       "@stores/*": [
         "./stores/*"

@@ -4,10 +4,11 @@ import { action, computed, observable } from 'mobx'
 import { computedFn } from 'mobx-utils'
 import { ReplyModel } from '@models/replyModel'
 import _ from 'lodash'
+// import { discussions } from '@novuspherejs'
 
 export class ThreadModel {
     @observable map: { [p: string]: Post } | undefined
-    @observable openingPost: Thread | ThreadModel | Post
+    @observable.deep openingPost: Thread | ThreadModel | Post
     @observable uuid: string
     @observable title: string
     @observable totalReplies: number
@@ -54,17 +55,17 @@ export class ThreadModel {
      * Reply box open status for a particular post id
      */
     constructor(thread: Thread | ThreadModel | Post) {
-        this.uuid = thread.uuid
-        this.title = thread.title
-        this.totalReplies = thread.totalReplies
-
-        if (!(thread instanceof Post) && thread.map) {
+        if (!(thread instanceof Post) || thread instanceof Thread) {
             this.openingPost = thread.openingPost
+            this.uuid = thread.openingPost.uuid
             this.map = thread.map
-        } else if (thread instanceof ThreadModel) {
-            this.openingPost = thread.openingPost
+            this.title = thread.openingPost.title
+            this.totalReplies = thread.openingPost.totalReplies
         } else {
             this.openingPost = thread
+            this.uuid = thread.uuid
+            this.title = thread.title
+            this.totalReplies = thread.totalReplies
         }
 
         /**
@@ -114,19 +115,20 @@ export class ThreadModel {
         const type = myNewVote === 1 ? 'upvotes' : 'downvotes'
 
         try {
+            // await discussions.vote(uuid, myNewVote)
+
+
             // opening post
             if (uuid === this.uuid) {
-                if (this.openingPost instanceof Post) {
-                    if (this.openingPost.myVote === 0) {
-                        this.openingPost[type] = this.openingPost[type] + myNewVote
-                        this.openingPost.myVote = myNewVote
-                    } else if (this.openingPost.myVote === 1) {
-                        this.openingPost['upvotes'] = this.openingPost['upvotes'] - 1
-                        this.openingPost.myVote = 0
-                    } else if (this.openingPost.myVote === -1) {
-                        this.openingPost['downvotes'] = this.openingPost['downvotes'] + 1
-                        this.openingPost.myVote = 0
-                    }
+                if (this.openingPost['myVote'] === 0) {
+                    this.openingPost[type] = this.openingPost[type] + myNewVote
+                    this.openingPost['myVote'] = myNewVote
+                } else if (this.openingPost['myVote'] === 1) {
+                    this.openingPost['upvotes'] = this.openingPost['upvotes'] - 1
+                    this.openingPost['myVote'] = 0
+                } else if (this.openingPost['myVote'] === -1) {
+                    this.openingPost['downvotes'] = this.openingPost['downvotes'] + 1
+                    this.openingPost['myVote'] = 0
                 }
             }
 
@@ -143,9 +145,16 @@ export class ThreadModel {
                 }
             }
 
-            console.log(this.openingPost, uuid, myNewVote)
+            console.log('params:', uuid, myNewVote)
+            console.log(type)
 
-            // await discussions.vote(uuid, myNewVote)
+            console.log(
+                this.uuid,
+                this.openingPost['myVote'],
+                this.openingPost['upvotes'],
+                this.openingPost['downvotes']
+            )
+
         } catch (error) {
             console.log(error)
             throw error

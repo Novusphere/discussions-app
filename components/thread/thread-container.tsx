@@ -11,7 +11,7 @@ interface IThreadContainerProps {
     totalReplies: number
     getModel: (post: Post) => ReplyModel
     getRepliesFromMap: (uid: string) => Post[]
-    vote: (uuid: string, value: number) => Promise<any>
+    vote: (uuid: string, value: number) => void
 }
 
 const ThreadContainer: React.FC<IThreadContainerProps> = ({
@@ -41,7 +41,7 @@ const ThreadContainer: React.FC<IThreadContainerProps> = ({
             ) : null}
             {totalReplies ? (
                 <>
-                    <div className={'mb2a'}>
+                    <div className={'mb2'}>
                         <span className={'b f6 pb2'}>viewing all {totalReplies} comments</span>
                     </div>
 

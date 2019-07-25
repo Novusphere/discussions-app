@@ -10,7 +10,7 @@ interface IVoteProps {
     downVotes: number
     myVote: number
     className?: string
-    handler: (uuid: string, value: number) => Promise<void>
+    handler: (uuid: string, value: number) => void
 }
 
 const Vote: React.FC<IVoteProps> = ({ uuid, upVotes, downVotes, myVote, handler, ...props }) => (

@@ -19,7 +19,7 @@ interface IReplies {
     post: Post
     className?: string
     getModel: (post: Post) => ReplyModel
-    voteHandler: (uuid: string, value: number) => Promise<void>
+    voteHandler: (uuid: string, value: number) => void
     getRepliesFromMap: (uid: string) => Post[]
 }
 
