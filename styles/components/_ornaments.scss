@@ -1,0 +1,12 @@
+/**
+	Ui Ornaments
+ */
+
+.bb-ornament {
+	&:before {
+		content: '';
+	}
+	
+	width: 40px;
+	border-bottom: 2.5px solid #079E99;
+}

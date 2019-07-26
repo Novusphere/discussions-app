@@ -5,13 +5,15 @@ import { IStores } from '@stores'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { faEnvelope, faPen, faSpinner, faUser } from '@fortawesome/free-solid-svg-icons'
 import { Tooltip } from 'react-tippy'
+import { ModalOptions } from '@globals'
 
 interface ITitleHeaderProps {
     tagStore: IStores['tagStore']
     authStore: IStores['authStore']
+    uiStore: IStores['uiStore']
 }
 
-@inject('tagStore', 'authStore')
+@inject('tagStore', 'authStore', 'uiStore')
 @observer
 class TitleHeader extends React.Component<ITitleHeaderProps> {
     private renderUserSettings = () => {
@@ -46,6 +48,7 @@ class TitleHeader extends React.Component<ITitleHeaderProps> {
 
     private renderAuthActions = () => {
         const { isLoggedIn, accountName, logIn } = this.props.authStore
+        const { showModal } = this.props.uiStore
 
         if (logIn['state'] === 'pending') {
             return <FontAwesomeIcon width={13} icon={faSpinner} spin />
@@ -73,14 +76,14 @@ class TitleHeader extends React.Component<ITitleHeaderProps> {
                         duration={0}
                     >
                         <Link route={`/u/${accountName}`}>
-                           <a
-                               rel={'Open your profile'}
-                               className={'flex items-center user-container pointer dim'}
-                           >
-                               <FontAwesomeIcon width={13} icon={faUser} />
-                               <span className={'b f6 pl3 pr1'}>{accountName}</span>
-                           </a>
-                       </Link>
+                            <a
+                                rel={'Open your profile'}
+                                className={'flex items-center user-container pointer dim'}
+                            >
+                                <FontAwesomeIcon width={13} icon={faUser} />
+                                <span className={'b f6 pl3 pr1'}>{accountName}</span>
+                            </a>
+                        </Link>
                     </Tooltip>
                 </div>
             )
@@ -90,7 +93,7 @@ class TitleHeader extends React.Component<ITitleHeaderProps> {
             <>
                 <a
                     className="f6 link dim br2 ph3 pv2 dib white bg-green mr2 pointer"
-                    onClick={() => logIn()}
+                    onClick={() => showModal(ModalOptions.signIn)}
                 >
                     Login
                 </a>
@@ -122,7 +125,6 @@ class TitleHeader extends React.Component<ITitleHeaderProps> {
             </span>
         )
     }
-
 
     public render(): React.ReactNode {
         return (

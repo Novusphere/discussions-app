@@ -1,10 +1,11 @@
 import { action, computed, observable } from 'mobx'
 import { task } from 'mobx-task'
-import { eos } from '@novuspherejs'
+import { eos, discussions } from '@novuspherejs'
 import { BaseStore, getOrCreateStore } from 'next-mobx-wrapper'
 import { getUiStore } from '@stores/ui'
 import { IStores } from '@stores'
 import { ModalOptions } from '@globals'
+import { sleep } from '@utils'
 
 export default class Auth extends BaseStore {
     @observable accountName = ''
@@ -86,6 +87,17 @@ export default class Auth extends BaseStore {
     @task.resolved logOut = async () => {
         await eos.logout()
         this.clearAuth()
+    }
+
+    /**
+     * Login methods
+     */
+
+    @task.resolved generateBrianKey = async () => {
+        await sleep(1000)
+        const key =  discussions.bkCreate()
+        console.log(key)
+        return key
     }
 }
 

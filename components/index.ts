@@ -15,3 +15,6 @@ export { default as Editor } from './editor/editor'
 export { default as Reply } from './reply/reply'
 export { default as Thread } from './thread/thread-container'
 export { default as Feed } from './feed/feed'
+
+// modals
+export { default as SignInModal } from './modal/sign-in/sign-in-modal'

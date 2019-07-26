@@ -1,3 +1,5 @@
+@import url('https://fonts.googleapis.com/css?family=IBM+Plex+Sans&display=swap');
+
 @import '~tachyons';
 @import '~react-tabs/style/react-tabs.css';
 @import '~react-tippy/dist/tippy.css';
@@ -6,7 +8,7 @@
 @import '~react-quill/dist/quill.snow.css';
 
 body {
-    font-family: Open Sans Light, sans-serif;
+    font-family: 'IBM Plex Sans', sans-serif;
     font-size: 14px;
     color: #989c9e;
     padding-right: 0 !important;
@@ -52,6 +54,14 @@ a {
     @extend .dim;
     @extend .no-underline;
     color: black;
+}
+
+.bg-green {
+    background: #079E99 !important;
+}
+
+.green {
+    color: #079E99 !important;
 }
 
 .sidebar {
@@ -111,6 +121,10 @@ a {
 
 .disable-user-select {
     user-select: none;
+}
+
+.enable-user-select {
+    user-select: text;
 }
 
 .svg-inline--fa {

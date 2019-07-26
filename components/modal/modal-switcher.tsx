@@ -2,7 +2,7 @@ import * as React from 'react'
 import { inject, observer } from 'mobx-react'
 import { IStores } from '@stores'
 import { ModalOptions } from '@globals'
-import { Modal } from '@components'
+import { Modal, SignInModal } from '@components'
 
 interface IModalSwitcherProps {
     uiStore: IStores['uiStore']
@@ -34,6 +34,8 @@ class ModalSwitcher extends React.Component<IModalSwitcherProps> {
                         )}
                     </Modal>
                 )
+            case ModalOptions.signIn:
+                return <SignInModal />
             default:
                 return null
         }

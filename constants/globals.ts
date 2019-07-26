@@ -3,7 +3,8 @@
  * for the uiStore to pick from
  */
 export const ModalOptions = {
-    walletUndetected: 'walletUndetected'
+    walletUndetected: 'walletUndetected',
+    signIn: 'signIn',
 }
 
 export const Messages = {
