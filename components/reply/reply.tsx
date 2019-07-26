@@ -17,7 +17,7 @@ const Reply: React.FC<IReplyProps> = ({ uid, onContentChange, onSubmit }) => (
             pending: () => (
                 <button
                     disabled
-                    className={'mt3 f6 link dim br2 ph3 pv2 dib mr2 pointer white bg-green'}
+                    className={'mt3 f6 link dim ph3 pv2 dib mr2 pointer white bg-green'}
                 >
                     <FontAwesomeIcon width={13} icon={faSpinner} spin />
                 </button>
@@ -31,7 +31,7 @@ const Reply: React.FC<IReplyProps> = ({ uid, onContentChange, onSubmit }) => (
                                 console.error(err)
                             })
                         }
-                        className={'mt3 f6 link dim br2 ph3 pv2 dib mr2 pointer white bg-green'}
+                        className={'mt3 f6 link dim ph3 pv2 dib mr2 pointer white bg-green'}
                     >
                         Post reply
                     </button>
@@ -46,7 +46,7 @@ const Reply: React.FC<IReplyProps> = ({ uid, onContentChange, onSubmit }) => (
                                 console.error(err)
                             })
                         }
-                        className={'mt3 f6 link dim br2 ph3 pv2 dib mr2 pointer white bg-green'}
+                        className={'mt3 f6 link dim ph3 pv2 dib mr2 pointer white bg-green'}
                     >
                         Post reply
                     </button>

@@ -106,7 +106,7 @@ class SignInModal extends React.Component<any, ISignInModalState> {
                 </span>
                 <div className={'flex items-center justify-between'}>
                     <button
-                        className={'mt3 f6 link dim br2 ph3 pv2 dib mr2 pointer white bg-green'}
+                        className={'mt3 f6 link dim ph3 pv2 dib mr2 pointer white bg-green'}
                         onClick={this.goNext}
                     >
                         Verify this key
@@ -146,7 +146,7 @@ class SignInModal extends React.Component<any, ISignInModalState> {
                             <button
                                 disabled={generateBrianKey['pending']}
                                 className={
-                                    'mt3 f6 link dim br2 ph3 pv2 dib mr2 pointer white bg-green'
+                                    'mt3 f6 link dim ph3 pv2 dib mr2 pointer white bg-green'
                                 }
                                 onClick={async () => {
                                     try {
@@ -186,7 +186,7 @@ class SignInModal extends React.Component<any, ISignInModalState> {
                     <div className={'flex items-center justify-start'}>
                         <button
                             className={
-                                'mt3 f6 link dim br2 ph3 pv2 dib mr2 pointer white bg-near-black'
+                                'mt3 f6 link dim ph3 pv2 dib mr2 pointer white bg-near-black'
                             }
                             onClick={this.goBack}
                         >
@@ -214,7 +214,7 @@ class SignInModal extends React.Component<any, ISignInModalState> {
                         <div className={'modal-footer'}>
                             <button
                                 className={
-                                    'mt3 f6 link dim br2 ph3 pv2 dib mr2 pointer white bg-green'
+                                    'mt3 f6 link dim ph3 pv2 dib mr2 pointer white bg-green'
                                 }
                                 onClick={() => console.log('finish!')}
                             >

@@ -29,13 +29,13 @@ class U extends React.Component<IUPageProps> {
                     <span>
                         <button
                             onClick={() => console.log('add follow logic')}
-                            className={'f6 link dim br2 ph3 pv2 dib pointer white bg-green mr2'}
+                            className={'f6 link dim ph3 pv2 dib pointer white bg-green mr2'}
                         >
                             Follow
                         </button>
                         <button
                             onClick={() => console.log('add block logic')}
-                            className={'f6 link dim br2 ph3 pv2 dib pointer white bg-red'}
+                            className={'f6 link dim ph3 pv2 dib pointer white bg-red'}
                         >
                             Block
                         </button>

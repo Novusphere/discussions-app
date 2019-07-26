@@ -36,7 +36,7 @@ const Form: React.FC<FormProps> = ({ form, children, hideSubmitButton, ...props 
                         key={`${field.name}-${value}`}
                         title={title || null}
                         className={classNames([
-                            'mt3 f6 link dim br2 ph3 pv2 dib mr2 pointer',
+                            'mt3 f6 link dim ph3 pv2 dib mr2 pointer',
                             {
                                 'white bg-green': !className,
                                 [className]: className,
@@ -178,7 +178,7 @@ const Form: React.FC<FormProps> = ({ form, children, hideSubmitButton, ...props 
             {renderFields(form.fields)}
             {hideSubmitButton ? null : (
                 <button
-                    className={'mt3 f6 link dim br2 ph3 pv2 dib white bg-green mr2 pointer'}
+                    className={'mt3 f6 link dim ph3 pv2 dib white bg-green mr2 pointer'}
                     type="submit"
                     onClick={form.onSubmit}
                 >

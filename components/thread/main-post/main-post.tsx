@@ -26,7 +26,7 @@ const MainPost: React.FC<IMainPost> = ({ openingPost, replyHandler, voteHandler 
         <>
             <div className={'pb2'}>
                 <Link route={`/e/${openingPost.sub}`}>
-                    <a className="f6 link dim br2 ph3 pv2 dib white bg-green mr2">
+                    <a className="f6 link dim ph3 pv2 dib white bg-green mr2">
                         <FontAwesomeIcon width={13} icon={faArrowLeft} className={'pr1'} />
                         {`e/${openingPost.sub}`}
                     </a>

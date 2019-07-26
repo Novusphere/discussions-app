@@ -92,13 +92,13 @@ class TitleHeader extends React.Component<ITitleHeaderProps> {
         return (
             <>
                 <a
-                    className="f6 link dim br2 ph3 pv2 dib white bg-green mr2 pointer"
+                    className="f6 link dim ph3 pv2 dib white bg-green mr2 pointer"
                     onClick={() => showModal(ModalOptions.signIn)}
                 >
                     Login
                 </a>
                 <Link route={'/settings'}>
-                    <a className="f6 link dim br2 ph3 pv2 dib white bg-green mr2">Set ID</a>
+                    <a className="f6 link dim ph3 pv2 dib white bg-green mr2">Set ID</a>
                 </Link>
             </>
         )
