@@ -6,8 +6,6 @@ import { observer, inject } from 'mobx-react'
 import { IStores } from '@stores'
 import { faSpinner } from '@fortawesome/free-solid-svg-icons'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
-import StepWizard from 'react-step-wizard'
-import { observable } from 'mobx'
 
 interface ISignInModalState {
     authStore?: IStores['authStore']
@@ -20,8 +18,6 @@ class SignInModal extends React.Component<any, ISignInModalState> {
     state = {
         currentStep: 1,
     }
-
-    @observable private instance: any
 
     public goNext = () => {
         this.setState(prevState => ({
@@ -95,65 +91,28 @@ class SignInModal extends React.Component<any, ISignInModalState> {
         const results = generateBrianKey['result'].split(' ')
 
         return (
-            <div className={'db enable-user-select'}>
-                <StepWizard instance={instance => (this.instance = instance)}>
-                    <div>
-                        <>
-                            <span className={'b f6 black lh-copy db mb3'}>Memorize it!</span>
-                            <span className={'flex flex-wrap'}>
-                                {results.map((result, index) => (
-                                    <span
-                                        key={result}
-                                        className={'b f5 pa2 dark-gray ba b--black-10 mr3 mb3 mw3'}
-                                    >
-                                        <span className={'f6 o-50 db'}>{index + 1}</span>
-                                        {result}
-                                    </span>
-                                ))}
-                            </span>
-                            {this.instance && (
-                                <div className={'flex items-center justify-between'}>
-                                    <button
-                                        className={
-                                            'mt3 f6 link dim br2 ph3 pv2 dib mr2 pointer white bg-green'
-                                        }
-                                        onClick={this.instance.nextStep}
-                                    >
-                                        Verify this key
-                                    </button>
-                                </div>
-                            )}
-                        </>
-                    </div>
-                    <div>
-                        <span className={'b f6 black lh-copy db mb3'}>
-                            Re-type your key with each word separated by a space.
+            <>
+                <span className={'b f6 black lh-copy db mb3'}>Memorize it!</span>
+                <span className={'flex flex-wrap'}>
+                    {results.map((result, index) => (
+                        <span
+                            key={result}
+                            className={'b f5 pa2 dark-gray ba b--black-10 mr3 mb3 mw3'}
+                        >
+                            <span className={'f6 o-50 db'}>{index + 1}</span>
+                            {result}
                         </span>
-                        <textarea className={'db w-100'} placeholder={'Enter your brian key words'} />
-
-                        {this.instance && (
-                            <div className={'flex items-center justify-between'}>
-                                <button
-                                    className={
-                                        'mt3 f6 link dim br2 ph3 pv2 dib mr2 pointer white bg-near-black'
-                                    }
-                                    onClick={this.instance.previousStep}
-                                >
-                                    Go Back
-                                </button>
-                                <button
-                                    className={
-                                        'mt3 f6 link dim br2 ph3 pv2 dib mr2 pointer white bg-green'
-                                    }
-                                    onClick={this.instance.nextStep}
-                                >
-                                    Continue
-                                </button>
-                            </div>
-                        )}
-                    </div>
-                </StepWizard>
-            </div>
+                    ))}
+                </span>
+                <div className={'flex items-center justify-between'}>
+                    <button
+                        className={'mt3 f6 link dim br2 ph3 pv2 dib mr2 pointer white bg-green'}
+                        onClick={this.goNext}
+                    >
+                        Verify this key
+                    </button>
+                </div>
+            </>
         )
     }
 
@@ -219,11 +178,21 @@ class SignInModal extends React.Component<any, ISignInModalState> {
 
             <Collapse isOpened={this.state.currentStep === 3}>
                 <div className={'mv2 field-container w-50'}>
-                    <span className={'b ttu f6 black tracked-tight db mb2'}>Name</span>
-                    <input className={'db w-100'} placeholder={'Enter an account name'} />
-                    <span className={'hint pt2 db'}>
-                        must be 12 characters, lowercase, and only numerals 1-5 allowed
+                    <span className={'b f6 black lh-copy db mb3'}>
+                        Re-type your key with each word separated by a space.
                     </span>
+                    <textarea className={'db w-100'} placeholder={'Enter your brian key words'} />
+
+                    <div className={'flex items-center justify-start'}>
+                        <button
+                            className={
+                                'mt3 f6 link dim br2 ph3 pv2 dib mr2 pointer white bg-near-black'
+                            }
+                            onClick={this.goBack}
+                        >
+                            Go Back
+                        </button>
+                    </div>
                 </div>
             </Collapse>
         </>
@@ -241,6 +210,16 @@ class SignInModal extends React.Component<any, ISignInModalState> {
                             {this.renderChooseAccountName()}
                             <div className={'mt2'}>{this.renderGenerateKey()}</div>
                             <div className={'mt3'}>{this.renderVerification()}</div>
+                        </div>
+                        <div className={'modal-footer'}>
+                            <button
+                                className={
+                                    'mt3 f6 link dim br2 ph3 pv2 dib mr2 pointer white bg-green'
+                                }
+                                onClick={() => console.log('finish!')}
+                            >
+                                Continue
+                            </button>
                         </div>
                     </>
                 )}
