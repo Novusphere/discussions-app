@@ -64,12 +64,13 @@ export default class DiscussionsService {
         return this.aesDecrypt(bk, password);
     }
 
-    async bkToStatusJson(bk: string, password: string, status: any): Promise<string> {
+    async bkToStatusJson(bk: string, displayName: string,  password: string, status: any): Promise<string> {
         if (!status) status = {};
         const keys = await this.bkToKeys(bk);
         for (var k in keys) {
             status[k] = keys[k].pub;
         }
+        status['displayName'] = displayName;
         status['bk'] = this.aesEncrypt(bk, password);
         status['bkc'] = this.aesEncrypt('test', password);
         return JSON.stringify(status);
