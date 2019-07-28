@@ -104,10 +104,7 @@ class TitleHeader extends React.Component<ITitleHeaderProps> {
                 >
                     Login
                 </button>
-                <button onClick={() => showModal(ModalOptions.signIn)}>Sign Up</button>
-                {/*<Link route={'/settings'}>*/}
-                {/*    <button className="button f6 link dim ph3 pv2 dib white bg-green mr2">Set ID</button>*/}
-                {/*</Link>*/}
+                <button onClick={() => showModal(ModalOptions.signUp)}>Sign Up</button>
             </>
         )
     }

@@ -2,14 +2,19 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="2d14133e-344f-4fbf-9bb7-c9e5e96ae697" name="Default Changelist" comment="">
-      <change beforePath="$PROJECT_DIR$/components/create-form/form.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/components/create-form/form.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/components/index.ts" beforeDir="false" afterPath="$PROJECT_DIR$/components/index.ts" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/components/modal/modal-switcher.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/components/modal/modal-switcher.tsx" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/components/thread/main-post/main-post.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/components/thread/main-post/main-post.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/components/modal/sign-in/choose-account-name.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/components/modal/sign-up/choose-account-name.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/components/modal/sign-in/generate-key.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/components/modal/sign-up/generate-key.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/components/modal/sign-in/generated-key.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/components/modal/sign-up/generated-key.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/components/modal/sign-in/header.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/components/modal/sign-up/header.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/components/modal/sign-in/sign-in-modal.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/components/modal/sign-up/sign-up-modal.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/components/modal/sign-in/verification.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/components/modal/sign-up/verification.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/components/modal/welcome-back/welcome-back-modal.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/components/modal/welcome-back/welcome-back-modal.tsx" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/components/title-header/title-header.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/components/title-header/title-header.tsx" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/constants/globals.ts" beforeDir="false" afterPath="$PROJECT_DIR$/constants/globals.ts" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/stores/auth.ts" beforeDir="false" afterPath="$PROJECT_DIR$/stores/auth.ts" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/styles/components/_form.scss" beforeDir="false" afterPath="$PROJECT_DIR$/styles/components/_form.scss" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/styles/style.scss" beforeDir="false" afterPath="$PROJECT_DIR$/styles/style.scss" afterDir="false" />
     </list>
     <ignored path="$PROJECT_DIR$/.tmp/" />
@@ -22,36 +27,70 @@
     <option name="LAST_RESOLUTION" value="IGNORE" />
   </component>
   <component name="FileEditorManager">
-    <leaf SIDE_TABS_SIZE_LIMIT_KEY="300">
-      <file pinned="false" current-in-tab="true">
-        <entry file="file://$PROJECT_DIR$/components/title-header/title-header.tsx">
-          <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="178">
-              <caret line="118" column="20" selection-end-line="168" />
-              <folding>
-                <element signature="e#0#30#0" expanded="true" />
-              </folding>
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/styles/style.scss">
-          <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="386">
-              <caret line="67" column="30" selection-start-line="67" selection-start-column="30" selection-end-line="67" selection-end-column="30" />
-            </state>
-          </provider>
-        </entry>
-      </file>
-    </leaf>
+    <splitter split-orientation="horizontal" split-proportion="0.5">
+      <split-first>
+        <leaf SIDE_TABS_SIZE_LIMIT_KEY="300">
+          <file pinned="false" current-in-tab="true">
+            <entry file="file://$PROJECT_DIR$/components/modal/sign-in/sign-in-modal.tsx">
+              <provider selected="true" editor-type-id="text-editor">
+                <state relative-caret-position="608">
+                  <caret line="74" column="90" selection-start-line="74" selection-start-column="90" selection-end-line="74" selection-end-column="90" />
+                  <folding>
+                    <element signature="e#0#30#0" expanded="true" />
+                  </folding>
+                </state>
+              </provider>
+            </entry>
+          </file>
+        </leaf>
+      </split-first>
+      <split-second>
+        <leaf>
+          <file pinned="false" current-in-tab="false">
+            <entry file="file://$PROJECT_DIR$/components/title-header/title-header.tsx">
+              <provider selected="true" editor-type-id="text-editor">
+                <state relative-caret-position="210">
+                  <caret line="90" column="57" selection-start-line="90" selection-start-column="57" selection-end-line="90" selection-end-column="57" />
+                  <folding>
+                    <element signature="e#0#30#0" expanded="true" />
+                  </folding>
+                </state>
+              </provider>
+            </entry>
+          </file>
+          <file pinned="false" current-in-tab="true">
+            <entry file="file://$PROJECT_DIR$/stores/auth.ts">
+              <provider selected="true" editor-type-id="text-editor">
+                <state relative-caret-position="272">
+                  <caret line="25" column="62" selection-start-line="25" selection-start-column="56" selection-end-line="25" selection-end-column="62" />
+                </state>
+              </provider>
+            </entry>
+          </file>
+          <file pinned="false" current-in-tab="false">
+            <entry file="file://$PROJECT_DIR$/constants/sign-in-options.ts">
+              <provider selected="true" editor-type-id="text-editor">
+                <state relative-caret-position="176">
+                  <caret line="11" column="19" selection-start-line="11" selection-start-column="19" selection-end-line="11" selection-end-column="19" />
+                </state>
+              </provider>
+            </entry>
+          </file>
+          <file pinned="false" current-in-tab="false">
+            <entry file="file://$PROJECT_DIR$/components/thread/main-post/main-post.tsx">
+              <provider selected="true" editor-type-id="text-editor">
+                <state relative-caret-position="64">
+                  <caret line="4" column="20" lean-forward="true" selection-start-line="4" selection-end-line="5" />
+                </state>
+              </provider>
+            </entry>
+          </file>
+        </leaf>
+      </split-second>
+    </splitter>
   </component>
   <component name="FindInProjectRecents">
     <findStrings>
-      <find>FontA</find>
-      <find>dialog</find>
-      <find>modal-content</find>
-      <find>.modal {</find>
       <find>size=</find>
       <find>max-width</find>
       <find>modal-body</find>
@@ -78,6 +117,10 @@
       <find>inline-labels</find>
       <find>.green</find>
       <find>this.props.tagStore.</find>
+      <find>a {</find>
+      <find>border-</find>
+      <find>&lt;Font</find>
+      <find>user-selec</find>
     </findStrings>
     <replaceStrings>
       <replace>.child</replace>
@@ -104,9 +147,6 @@
   <component name="IdeDocumentHistory">
     <option name="CHANGED_PATHS">
       <list>
-        <option value="$PROJECT_DIR$/tsconfig.server.json" />
-        <option value="$PROJECT_DIR$/.gitignore" />
-        <option value="$PROJECT_DIR$/next.config.js" />
         <option value="$PROJECT_DIR$/server.ts" />
         <option value="$PROJECT_DIR$/styles/components/_editor.scss" />
         <option value="$PROJECT_DIR$/styles/components/_post.scss" />
@@ -138,23 +178,26 @@
         <option value="$PROJECT_DIR$/components/modal/sign-in/generate-key.tsx" />
         <option value="$PROJECT_DIR$/components/collapse/collapse.tsx" />
         <option value="$PROJECT_DIR$/styles/components/_modal.scss" />
-        <option value="$PROJECT_DIR$/components/modal/sign-in/sign-in-modal.tsx" />
         <option value="$PROJECT_DIR$/components/main-layout/main-layout.tsx" />
         <option value="$PROJECT_DIR$/styles/components/_main-layout.scss" />
         <option value="$PROJECT_DIR$/styles/components/_header.scss" />
         <option value="$PROJECT_DIR$/components/modal/welcome-back/welcome-back.tsx" />
-        <option value="$PROJECT_DIR$/components/index.ts" />
-        <option value="$PROJECT_DIR$/constants/globals.ts" />
-        <option value="$PROJECT_DIR$/components/modal/modal-switcher.tsx" />
         <option value="$PROJECT_DIR$/stores/ui.ts" />
         <option value="$PROJECT_DIR$/components/thread/main-post/main-post.tsx" />
         <option value="$PROJECT_DIR$/styles/components/_button.scss" />
-        <option value="$PROJECT_DIR$/stores/auth.ts" />
         <option value="$PROJECT_DIR$/styles/components/_form.scss" />
-        <option value="$PROJECT_DIR$/components/modal/welcome-back/welcome-back-modal.tsx" />
         <option value="$PROJECT_DIR$/components/create-form/form.tsx" />
+        <option value="$PROJECT_DIR$/components/modal/log-in/log-in-modal.tsx" />
         <option value="$PROJECT_DIR$/styles/style.scss" />
         <option value="$PROJECT_DIR$/components/title-header/title-header.tsx" />
+        <option value="$PROJECT_DIR$/components/modal/welcome-back/welcome-back-modal.tsx" />
+        <option value="$PROJECT_DIR$/constants/globals.ts" />
+        <option value="$PROJECT_DIR$/components/modal/modal-switcher.tsx" />
+        <option value="$PROJECT_DIR$/components/modal/sign-up/sign-up-modal.tsx" />
+        <option value="$PROJECT_DIR$/components/index.ts" />
+        <option value="$PROJECT_DIR$/constants/sign-in-options.ts" />
+        <option value="$PROJECT_DIR$/components/modal/sign-in/sign-in-modal.tsx" />
+        <option value="$PROJECT_DIR$/stores/auth.ts" />
       </list>
     </option>
   </component>
@@ -210,6 +253,20 @@
               <item name="discussions-app" type="462c0819:PsiDirectoryNode" />
               <item name="components" type="462c0819:PsiDirectoryNode" />
               <item name="modal" type="462c0819:PsiDirectoryNode" />
+              <item name="sign-in" type="462c0819:PsiDirectoryNode" />
+            </path>
+            <path>
+              <item name="discussions-app" type="b2602c69:ProjectViewProjectNode" />
+              <item name="discussions-app" type="462c0819:PsiDirectoryNode" />
+              <item name="components" type="462c0819:PsiDirectoryNode" />
+              <item name="modal" type="462c0819:PsiDirectoryNode" />
+              <item name="sign-up" type="462c0819:PsiDirectoryNode" />
+            </path>
+            <path>
+              <item name="discussions-app" type="b2602c69:ProjectViewProjectNode" />
+              <item name="discussions-app" type="462c0819:PsiDirectoryNode" />
+              <item name="components" type="462c0819:PsiDirectoryNode" />
+              <item name="modal" type="462c0819:PsiDirectoryNode" />
               <item name="welcome-back" type="462c0819:PsiDirectoryNode" />
             </path>
             <path>
@@ -217,6 +274,11 @@
               <item name="discussions-app" type="462c0819:PsiDirectoryNode" />
               <item name="components" type="462c0819:PsiDirectoryNode" />
               <item name="title-header" type="462c0819:PsiDirectoryNode" />
+            </path>
+            <path>
+              <item name="discussions-app" type="b2602c69:ProjectViewProjectNode" />
+              <item name="discussions-app" type="462c0819:PsiDirectoryNode" />
+              <item name="constants" type="462c0819:PsiDirectoryNode" />
             </path>
             <path>
               <item name="discussions-app" type="b2602c69:ProjectViewProjectNode" />
@@ -282,7 +344,7 @@
   <component name="PropertiesComponent">
     <property name="SHARE_PROJECT_CONFIGURATION_FILES" value="true" />
     <property name="WebServerToolWindowFactoryState" value="false" />
-    <property name="last_opened_file_path" value="$PROJECT_DIR$/components/modal/sign-in" />
+    <property name="last_opened_file_path" value="$PROJECT_DIR$/components/modal" />
     <property name="node.js.detected.package.tslint" value="true" />
     <property name="node.js.path.for.package.tslint" value="project" />
     <property name="node.js.selected.package.tslint" value="$PROJECT_DIR$/node_modules/tslint" />
@@ -290,17 +352,18 @@
     <property name="nodejs_npm_path_reset_for_default_project" value="true" />
     <property name="nodejs_package_manager_path" value="yarn" />
     <property name="prettierjs.PrettierConfiguration.Package" value="E:\Work\discussions-app\node_modules\prettier" />
-    <property name="settings.editor.selected.configurable" value="web-ide.project.structure" />
+    <property name="settings.editor.selected.configurable" value="preferences.keymap" />
     <property name="ts.external.directory.path" value="E:\Work\discussions-app\node_modules\typescript\lib" />
   </component>
   <component name="RecentsManager">
-    <key name="CopyFile.RECENT_KEYS">
-      <recent name="E:\Work\discussions-app\components\modal\sign-in" />
-      <recent name="E:\Work\discussions-app\models" />
-    </key>
     <key name="MoveFile.RECENT_KEYS">
       <recent name="E:\Work\discussions-app\components" />
       <recent name="E:\Work\discussions-app" />
+    </key>
+    <key name="CopyFile.RECENT_KEYS">
+      <recent name="E:\Work\discussions-app\components\modal" />
+      <recent name="E:\Work\discussions-app\components\modal\sign-in" />
+      <recent name="E:\Work\discussions-app\models" />
     </key>
   </component>
   <component name="RunDashboard">
@@ -371,12 +434,12 @@
       <workItem from="1564057468002" duration="4000" />
       <workItem from="1564099132633" duration="9054000" />
       <workItem from="1564194434186" duration="1202000" />
-      <workItem from="1564326118572" duration="7836000" />
+      <workItem from="1564326118572" duration="9856000" />
     </task>
     <servers />
   </component>
   <component name="TimeTrackingManager">
-    <option name="totallyTimeSpent" value="251182000" />
+    <option name="totallyTimeSpent" value="253202000" />
   </component>
   <component name="ToolWindowManager">
     <frame x="-8" y="-8" width="2576" height="1416" extended-state="6" />
@@ -407,23 +470,6 @@
     <option name="version" value="1" />
   </component>
   <component name="editorHistoryManager">
-    <entry file="file://$PROJECT_DIR$/stores/tag.ts">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="160">
-          <caret line="10" lean-forward="true" selection-start-line="10" selection-end-line="10" />
-          <folding>
-            <element signature="e#0#33#0" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/novusphere-js/discussions/thread.ts">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="32">
-          <caret line="4" column="21" selection-start-line="4" selection-start-column="21" selection-end-line="4" selection-end-column="21" />
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/components/thread/replies/replies.tsx">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="33">
@@ -561,7 +607,7 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/components/modal/sign-in/generated-key.tsx">
+    <entry file="file://$PROJECT_DIR$/components/modal/sign-up/generated-key.tsx">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="246">
           <caret line="18" column="7" lean-forward="true" selection-start-line="18" selection-start-column="7" selection-end-line="18" selection-end-column="7" />
@@ -571,7 +617,7 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/components/modal/sign-in/header.tsx">
+    <entry file="file://$PROJECT_DIR$/components/modal/sign-up/header.tsx">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="80">
           <caret line="5" column="23" lean-forward="true" selection-start-line="5" selection-start-column="23" selection-end-line="5" selection-end-column="23" />
@@ -622,7 +668,7 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/components/modal/sign-in/verification.tsx">
+    <entry file="file://$PROJECT_DIR$/components/modal/sign-up/verification.tsx">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="160">
           <caret line="10" column="53" lean-forward="true" selection-start-line="10" selection-start-column="52" selection-end-line="14" selection-end-column="1" />
@@ -632,7 +678,7 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/components/modal/sign-in/choose-account-name.tsx">
+    <entry file="file://$PROJECT_DIR$/components/modal/sign-up/choose-account-name.tsx">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="80">
           <caret line="5" column="35" lean-forward="true" selection-start-line="5" selection-start-column="35" selection-end-line="5" selection-end-column="35" />
@@ -652,7 +698,7 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/components/modal/sign-in/generate-key.tsx">
+    <entry file="file://$PROJECT_DIR$/components/modal/sign-up/generate-key.tsx">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="416">
           <caret line="45" column="58" lean-forward="true" selection-start-line="45" selection-start-column="58" selection-end-line="45" selection-end-column="58" />
@@ -697,40 +743,6 @@
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="48">
           <caret line="3" column="27" lean-forward="true" selection-start-line="3" selection-start-column="27" selection-end-line="3" selection-end-column="27" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/components/modal/sign-in/sign-in-modal.tsx">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="726">
-          <caret line="108" column="20" lean-forward="true" selection-start-line="83" selection-start-column="12" selection-end-line="108" selection-end-column="20" />
-          <folding>
-            <element signature="e#0#30#0" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/components/index.ts">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="464">
-          <caret line="29" lean-forward="true" selection-end-line="29" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/constants/globals.ts">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="112">
-          <caret line="7" column="30" selection-start-line="7" selection-start-column="30" selection-end-line="7" selection-end-column="30" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/components/modal/modal-switcher.tsx">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="304">
-          <caret line="19" column="42" lean-forward="true" selection-start-line="19" selection-start-column="42" selection-end-line="19" selection-end-column="42" />
-          <folding>
-            <element signature="e#0#30#0" expanded="true" />
-          </folding>
         </state>
       </provider>
     </entry>
@@ -781,23 +793,6 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/components/thread/main-post/main-post.tsx">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="464">
-          <caret line="29" column="46" selection-start-line="29" selection-start-column="46" selection-end-line="29" selection-end-column="46" />
-          <folding>
-            <element signature="e#0#30#0" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/stores/auth.ts">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="400">
-          <caret line="36" column="18" selection-start-line="36" selection-start-column="8" selection-end-line="36" selection-end-column="18" />
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/stores/settings.ts">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="64">
@@ -822,30 +817,92 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/components/modal/welcome-back/welcome-back-modal.tsx">
+    <entry file="file://$PROJECT_DIR$/styles/style.scss">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="640">
-          <caret line="40" column="57" selection-start-line="40" selection-start-column="57" selection-end-line="40" selection-end-column="57" />
-          <folding>
-            <element signature="e#0#30#0" expanded="true" />
-          </folding>
+        <state relative-caret-position="377">
+          <caret line="56" column="21" selection-start-line="56" selection-start-column="21" selection-end-line="56" selection-end-column="21" />
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/styles/style.scss">
+    <entry file="file://$PROJECT_DIR$/components/modal/welcome-back/welcome-back-modal.tsx">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="386">
-          <caret line="67" column="30" selection-start-line="67" selection-start-column="30" selection-end-line="67" selection-end-column="30" />
+        <state relative-caret-position="32">
+          <caret line="3" column="35" selection-start-line="3" selection-start-column="35" selection-end-line="3" selection-end-column="35" />
         </state>
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/components/title-header/title-header.tsx">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="178">
-          <caret line="118" column="20" selection-end-line="168" />
+        <state relative-caret-position="210">
+          <caret line="90" column="57" selection-start-line="90" selection-start-column="57" selection-end-line="90" selection-end-column="57" />
           <folding>
             <element signature="e#0#30#0" expanded="true" />
           </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/constants/globals.ts">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="112">
+          <caret line="7" column="17" selection-start-line="7" selection-start-column="17" selection-end-line="7" selection-end-column="17" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/components/modal/sign-up/sign-up-modal.tsx">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="256">
+          <caret line="24" column="25" lean-forward="true" selection-start-line="24" selection-start-column="25" selection-end-line="24" selection-end-column="25" />
+          <folding>
+            <element signature="e#0#30#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/components/index.ts">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="464">
+          <caret line="29" column="25" lean-forward="true" selection-start-line="29" selection-start-column="25" selection-end-line="29" selection-end-column="25" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/components/modal/modal-switcher.tsx">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="256">
+          <caret line="16" column="31" lean-forward="true" selection-start-line="16" selection-start-column="31" selection-end-line="16" selection-end-column="31" />
+          <folding>
+            <element signature="e#0#30#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/components/thread/main-post/main-post.tsx">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="64">
+          <caret line="4" column="20" lean-forward="true" selection-start-line="4" selection-end-line="5" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/constants/sign-in-options.ts">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="176">
+          <caret line="11" column="19" selection-start-line="11" selection-start-column="19" selection-end-line="11" selection-end-column="19" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/components/modal/sign-in/sign-in-modal.tsx">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="608">
+          <caret line="74" column="90" selection-start-line="74" selection-start-column="90" selection-end-line="74" selection-end-column="90" />
+          <folding>
+            <element signature="e#0#30#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/stores/auth.ts">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="272">
+          <caret line="25" column="62" selection-start-line="25" selection-start-column="56" selection-end-line="25" selection-end-column="62" />
         </state>
       </provider>
     </entry>

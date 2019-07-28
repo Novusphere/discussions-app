@@ -23,7 +23,7 @@ export default class Auth extends BaseStore {
             () => this.isLoggedIn,
             status => {
                 if (!status) {
-                    this.uiStore.showModal(ModalOptions.welcomeBack)
+                    this.uiStore.showModal(ModalOptions.signIn)
                 }
             },
             {

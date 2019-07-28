@@ -2,16 +2,19 @@ import * as React from 'react'
 import { Modal, Form } from '@components'
 import { IStores } from '@stores'
 import { observer, inject } from 'mobx-react'
+import { ModalOptions } from '@globals'
 
 interface IWelcomeBackModalProps {
     authStore: IStores['authStore']
+    uiStore: IStores['uiStore']
 }
 
-@inject('authStore')
+@inject('authStore', 'uiStore')
 @observer
 class WelcomeBackModal extends React.Component<IWelcomeBackModalProps> {
     public render() {
         const { signInForm } = this.props.authStore
+        const { showModal } = this.props.uiStore
 
         return (
             <Modal>
@@ -46,7 +49,10 @@ class WelcomeBackModal extends React.Component<IWelcomeBackModalProps> {
                             </button>
 
                             <span className={'f5 b mt3'}>
-                                Don't have one? Create an account for free.
+                                Don't have one?{' '}
+                                <a onClick={() => showModal(ModalOptions.signUp)}>
+                                    Create an account for free.
+                                </a>
                             </span>
                         </div>
                     </>

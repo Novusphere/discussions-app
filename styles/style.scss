@@ -51,9 +51,10 @@ button {
 }
 
 a {
+    @extend .green;
     @extend .dim;
     @extend .no-underline;
-    color: black;
+    @extend .pointer;
 }
 
 .bg-green {
