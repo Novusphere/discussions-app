@@ -1,14 +1,13 @@
 import { faKey, faWallet } from '@fortawesome/free-solid-svg-icons'
+import { SignInMethods } from '@globals'
 
 export const SignInOptions = [
     {
-        slug: 'eosWallet',
-        name: 'EOS Wallet',
+        name: SignInMethods.eosWallet,
         icon: faWallet,
     },
     {
-        slug: 'brianKey',
-        name: 'Brian Key',
+        name: SignInMethods.brianKey,
         icon: faKey,
     },
 ]

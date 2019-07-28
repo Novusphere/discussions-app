@@ -5,6 +5,7 @@ import { observer, inject } from 'mobx-react'
 import { SignInOptions } from '../../../constants/sign-in-options'
 import classNames from 'classnames'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
+import { faSpinner } from '@fortawesome/free-solid-svg-icons'
 
 interface IWelcomeBackModalProps {
     authStore: IStores['authStore']
@@ -21,15 +22,56 @@ class SignInModal extends React.Component<IWelcomeBackModalProps, IWelcomeBackMo
         clickedSignInOption: '',
     }
 
-    private clickSignIn = (slug: string) => {
-        if (this.state.clickedSignInOption === slug) {
+    private clickSignIn = (name: string) => {
+        if (this.state.clickedSignInOption === name) {
             this.setState({
                 clickedSignInOption: '',
             })
         } else {
             this.setState({
-                clickedSignInOption: slug,
+                clickedSignInOption: name,
             })
+        }
+    }
+
+    renderButtons = () => {
+        const { signInViaWallet } = this.props.authStore
+
+        if (!this.state.clickedSignInOption) {
+            return (
+                <button
+                    className={'f6 link dim ph3 pv2 dib pointer white bg-green'}
+                    disabled={!this.state.clickedSignInOption}
+                >
+                    Select a sign in method
+                </button>
+            )
+        }
+
+        switch (this.state.clickedSignInOption) {
+            case 'EOS Wallet':
+                return (
+                    <button
+                        onClick={signInViaWallet}
+                        className={'f6 link dim ph3 pv2 dib pointer white bg-green'}
+                        disabled={!this.state.clickedSignInOption || signInViaWallet['pending']}
+                    >
+                        {signInViaWallet['pending'] ? (
+                            <FontAwesomeIcon width={13} icon={faSpinner} spin />
+                        ) : (
+                            'Sign in via EOS Wallet'
+                        )}
+                    </button>
+                )
+            case 'Brian Key':
+                return (
+                    <button
+                        className={'f6 link dim ph3 pv2 dib pointer white bg-green'}
+                        disabled={!this.state.clickedSignInOption}
+                    >
+                        Sign in via Brian Key
+                    </button>
+                )
         }
     }
 
@@ -61,14 +103,14 @@ class SignInModal extends React.Component<IWelcomeBackModalProps, IWelcomeBackMo
                             >
                                 {SignInOptions.map(option => (
                                     <span
-                                        title={`Toggle ${option.slug} sign in`}
-                                        onClick={() => this.clickSignIn(option.slug)}
-                                        key={option.slug}
+                                        title={`Toggle ${option.name} sign in`}
+                                        onClick={() => this.clickSignIn(option.name)}
+                                        key={option.name}
                                         className={classNames([
                                             'w-40 ba b--black-10 br4 mr2 pa2 tc pointer f2',
                                             {
                                                 'bg-green white':
-                                                    this.state.clickedSignInOption === option.slug,
+                                                    this.state.clickedSignInOption === option.name,
                                             },
                                         ])}
                                     >
@@ -81,6 +123,30 @@ class SignInModal extends React.Component<IWelcomeBackModalProps, IWelcomeBackMo
                             <span className={'f5 b mt3'}>
                                 Don't have one? <a>Create an account for free.</a>
                             </span>
+                        </div>
+
+                        <div className={'modal-footer'}>
+                            <span className={'flex items-center'}>
+                                <input
+                                    onChange={() =>
+                                        this.props.authStore.setPreferredSignInMethod(
+                                            this.state.clickedSignInOption
+                                        )
+                                    }
+                                    disabled={!this.state.clickedSignInOption}
+                                    type="checkbox"
+                                    id="rememberOption"
+                                    name="rememberOption"
+                                    checked={
+                                        this.props.authStore.preferredSignInMethod ===
+                                        this.state.clickedSignInOption
+                                    }
+                                />
+                                <label htmlFor="rememberOption" className={'ml2 f6'}>
+                                    Automatically select this option next time
+                                </label>
+                            </span>
+                            <div>{this.renderButtons()}</div>
                         </div>
                     </>
                 )}

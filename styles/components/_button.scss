@@ -19,4 +19,10 @@ button {
 		background: transparent !important;
 		color: #079E99;
 	}
+
+	&:disabled {
+		@extend .o-50;
+
+		cursor: not-allowed !important;
+	}
 }

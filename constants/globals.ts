@@ -17,3 +17,8 @@ export const Messages = {
         POST_EMPTY: 'Post cannot be empty.'
     }
 }
+
+export const SignInMethods = {
+    eosWallet: 'EOS Wallet',
+    brianKey: 'Brian Key'
+}

@@ -1,18 +1,21 @@
 import { action, computed, observable, reaction } from 'mobx'
 import { task } from 'mobx-task'
-import { eos, discussions } from '@novuspherejs'
+import { eos, discussions, init } from '@novuspherejs'
 import { BaseStore, getOrCreateStore } from 'next-mobx-wrapper'
 import { getUiStore } from '@stores/ui'
-import { IStores } from '@stores'
-import { ModalOptions } from '@globals'
+import { hydrate, IStores } from '@stores'
+import { ModalOptions, SignInMethods } from '@globals'
 import { sleep } from '@utils'
 import CreateForm from '../components/create-form/create-form'
+import { persist } from 'mobx-persist'
 
 export default class Auth extends BaseStore {
     @observable accountName = ''
     @observable permission = ''
     @observable publicKey = ''
     @observable balances = observable.map<string, number>()
+
+    @persist @observable preferredSignInMethod = ''
 
     private uiStore: IStores['uiStore'] = getUiStore()
 
@@ -32,6 +35,8 @@ export default class Auth extends BaseStore {
         )
 
         showModalReaction()
+
+        hydrate('auth', this)
     }
 
     get signInForm() {
@@ -58,12 +63,30 @@ export default class Auth extends BaseStore {
         )
     }
 
+    @task.resolved signInViaWallet = async () => {
+        try {
+            this.preferredSignInMethod = SignInMethods.eosWallet
+
+            await init()
+            const wallet = await eos.detectWallet()
+            if (typeof wallet !== 'boolean' && wallet) {
+                await this.logIn()
+            }
+        } catch (error) {
+            console.log(error)
+        }
+    }
+
     @computed get isLoggedIn(): boolean {
         return this.accountName !== '' && this.permission !== '' && this.publicKey !== ''
     }
 
     @computed get ATMOSBalance(): number {
         return this.balances.get('ATMOS') || 0
+    }
+
+    @action setPreferredSignInMethod = (method: string) => {
+        this.preferredSignInMethod = method
     }
 
     @action clearAuth = () => {

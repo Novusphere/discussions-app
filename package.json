@@ -25,6 +25,7 @@
     "immutable": "^4.0.0-rc.12",
     "lodash": "^4.17.14",
     "mobx": "5.10.1",
+    "mobx-persist": "^0.4.1",
     "mobx-react": "6.0.3",
     "mobx-react-form": "^2.0.3",
     "mobx-task": "1.0.3",

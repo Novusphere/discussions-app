@@ -3,7 +3,6 @@ import React from 'react'
 import * as Stores from '@stores'
 import { Provider, useStaticRendering } from 'mobx-react'
 import { MainLayout } from '@components'
-import { init, eos } from '@novuspherejs'
 import { withMobx } from 'next-mobx-wrapper'
 
 import '../styles/style.scss'
@@ -28,19 +27,6 @@ class DiscussionApp extends App {
         return {
             isServer,
             pageProps,
-        }
-    }
-
-    async componentDidMount() {
-        if (!isServer) {
-            await init()
-            // TODO: Resolve detectWallet to fire immediately
-            const wallet = await eos.detectWallet()
-            console.log('wallet detected?', wallet)
-
-            if (typeof wallet !== 'boolean' && wallet) {
-                await this.props.store.authStore.logIn()
-            }
         }
     }
 
