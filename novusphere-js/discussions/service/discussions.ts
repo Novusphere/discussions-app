@@ -84,7 +84,7 @@ export default class DiscussionsService {
         };
     }
 
-    async bkToKeys(bk: string) {
+    async bkToKeys(bk: string): Promise<any> {
         const seed = await bip39.mnemonicToSeed(bk);
         const node = await bip32.fromSeed(seed);
 

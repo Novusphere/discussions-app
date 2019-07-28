@@ -15,7 +15,11 @@ export default class Auth extends BaseStore {
     @observable publicKey = ''
     @observable balances = observable.map<string, number>()
 
+    @observable brianKey = ''
+
     @persist @observable preferredSignInMethod = ''
+    @persist @observable postPriv = ''
+    @persist @observable tipPub = ''
 
     private uiStore: IStores['uiStore'] = getUiStore()
 
@@ -26,7 +30,7 @@ export default class Auth extends BaseStore {
             () => this.isLoggedIn,
             status => {
                 if (!status) {
-                    this.uiStore.showModal(ModalOptions.signIn)
+                    this.uiStore.showModal(ModalOptions.signUp)
                 }
             },
             {
@@ -70,8 +74,19 @@ export default class Auth extends BaseStore {
             await init()
             const wallet = await eos.detectWallet()
             if (typeof wallet !== 'boolean' && wallet) {
-                await this.logIn()
+                await this.logInAndInitializeAccount()
             }
+        } catch (error) {
+            console.log(error)
+        }
+    }
+
+    @task.resolved signInWithBrianKey = async () => {
+        try {
+            const keys = await discussions.bkToKeys(this.brianKey)
+            this.postPriv = keys.post.priv
+            this.tipPub = keys.tip.pub
+            return keys
         } catch (error) {
             console.log(error)
         }
@@ -120,7 +135,7 @@ export default class Auth extends BaseStore {
         }
     }
 
-    @task.resolved logIn = async () => {
+    @task.resolved logInAndInitializeAccount = async () => {
         try {
             let wallet = eos.wallet
 
@@ -158,7 +173,7 @@ export default class Auth extends BaseStore {
     @task.resolved generateBrianKey = async () => {
         await sleep(1000)
         const key = discussions.bkCreate()
-        console.log(key)
+        this.brianKey = key
         return key
     }
 }

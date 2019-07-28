@@ -7,15 +7,19 @@ import {
 } from '@components'
 import { observer, inject } from 'mobx-react'
 import { IStores } from '@stores'
+import { faSpinner } from '@fortawesome/free-solid-svg-icons'
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 
+interface ISignInModalProps {
+    authStore: IStores['authStore']
+}
 interface ISignInModalState {
-    authStore?: IStores['authStore']
     currentStep: number
 }
 
 @inject('authStore')
 @observer
-class SignUpModal extends React.Component<any, ISignInModalState> {
+class SignUpModal extends React.Component<ISignInModalProps, ISignInModalState> {
     state = {
         currentStep: 1,
     }
@@ -38,28 +42,22 @@ class SignUpModal extends React.Component<any, ISignInModalState> {
         })
     }
 
-    private finishSignIn = () => {
-        console.log('finished!')
-    }
-
     private renderNextButtons = () => {
         const renderButton = (text: string, color: string, onClick) => {
+            const loading = onClick && onClick['state'] && onClick['pending']
             return (
                 <button
+                    disabled={loading || false}
                     className={'f6 link dim ph3 pv2 dib pointer white ' + color}
                     onClick={onClick}
                 >
-                    {text}
+                    {loading ? <FontAwesomeIcon width={13} icon={faSpinner} spin /> : text}
                 </button>
             )
         }
         switch (this.state.currentStep) {
             case 1:
-                return (
-                    <>
-                        {renderButton('Next', 'bg-green', this.goNext)}
-                    </>
-                )
+                return <>{renderButton('Next', 'bg-green', this.goNext)}</>
             case 2:
                 return (
                     <>
@@ -71,7 +69,7 @@ class SignUpModal extends React.Component<any, ISignInModalState> {
                 return (
                     <>
                         {renderButton('Previous', 'bg-blue', this.goBack)}
-                        {renderButton('Finish', 'bg-red', this.finishSignIn)}
+                        {renderButton('Finish', 'bg-red', this.props.authStore.signInWithBrianKey)}
                     </>
                 )
         }
@@ -111,4 +109,4 @@ class SignUpModal extends React.Component<any, ISignInModalState> {
     }
 }
 
-export default SignUpModal
+export default SignUpModal as any
