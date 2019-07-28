@@ -96,7 +96,7 @@ export default class DiscussionsService {
     }
 
     async bkRetrieveStatusEOS(account: string): Promise<string | undefined> {
-        let result = await eos.wallet.eosApi.rpc.get_table_rows({
+        let result = await eos.api.rpc.get_table_rows({
             code: 'discussionsx',
             scope: 'discussionsx',
             table: 'status',
