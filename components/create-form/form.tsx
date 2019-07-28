@@ -79,7 +79,7 @@ const Form: React.FC<FormProps> = ({ form, children, hideSubmitButton, ...props 
                 case 'dropdown':
                     return (
                         <React.Fragment key={field.name}>
-                            <div className={'field-container pt1 pb3 inline-labels'}>
+                            <div className={'field-container pb3 inline-labels'}>
                                 <label htmlFor={field.accessor.id}>{field.accessor.label}</label>
                                 <div className={'w-80 flex flex-column'}>
                                     <Select
@@ -104,7 +104,7 @@ const Form: React.FC<FormProps> = ({ form, children, hideSubmitButton, ...props 
                 case 'richtext':
                     return (
                         <React.Fragment key={field.name}>
-                            <div className={'field-container pt1 pb3 inline-labels'}>
+                            <div className={'field-container pb3 inline-labels'}>
                                 <label htmlFor={field.accessor.id}>{field.accessor.label}</label>
                                 <div className={'w-80 h-100 flex flex-column'}>
                                     <Editor
@@ -158,11 +158,11 @@ const Form: React.FC<FormProps> = ({ form, children, hideSubmitButton, ...props 
                 default:
                     return (
                         <React.Fragment key={field.name}>
-                            <div className={'field-container pt1 pb3 inline-labels'}>
+                            <div className={'field-container pb3 inline-labels'}>
                                 <label htmlFor={field.accessor.id}>{field.accessor.label}</label>
                                 <div className={'w-80 flex flex-column'}>
                                     <input {...bind} className={'db f6 form-input'} />
-                                    <span className={'error f6 db pv2'}>
+                                    <span className={'error f6 db pv2 tl'}>
                                         {field.accessor.error}
                                     </span>
                                 </div>
@@ -178,7 +178,7 @@ const Form: React.FC<FormProps> = ({ form, children, hideSubmitButton, ...props 
             {renderFields(form.fields)}
             {hideSubmitButton ? null : (
                 <button
-                    className={'mt3 f6 link dim ph3 pv2 dib white bg-green mr2 pointer'}
+                    className={'mt3 f6 link dim ph3 pv2 dib white bg-green pointer'}
                     type="submit"
                     onClick={form.onSubmit}
                 >

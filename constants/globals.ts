@@ -5,6 +5,7 @@
 export const ModalOptions = {
     walletUndetected: 'walletUndetected',
     signIn: 'signIn',
+    welcomeBack: 'welcomeBack'
 }
 
 export const Messages = {

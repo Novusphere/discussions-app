@@ -3,7 +3,14 @@ import { inject, observer } from 'mobx-react'
 import { Link } from '@router'
 import { IStores } from '@stores'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
-import { faEnvelope, faPen, faSearch, faSpinner, faUser } from '@fortawesome/free-solid-svg-icons'
+import {
+    faEnvelope,
+    faPen,
+    faPenAlt,
+    faSearch,
+    faSpinner,
+    faUser,
+} from '@fortawesome/free-solid-svg-icons'
 import { Tooltip } from 'react-tippy'
 import { ModalOptions } from '@globals'
 
@@ -109,21 +116,27 @@ class TitleHeader extends React.Component<ITitleHeaderProps> {
         const { activeTag } = this.props.tagStore
 
         if (!activeTag) {
-            return <>home</>
+            return (
+                <Link route={'/'}>
+                    <a>home</a>
+                </Link>
+            )
         }
 
         return (
-            <span className={'flex items-center'}>
-                {!activeTag.icon ? null : (
-                    <img
-                        className={'tag-icon pr2'}
-                        src={this.props.tagStore.activeTag.icon}
-                        alt={`${this.props.tagStore.activeTag.name} icon`}
-                    />
-                )}
+            <Link route={activeTag.url}>
+                <a className={'flex items-center'}>
+                    {!activeTag.icon ? null : (
+                        <img
+                            className={'tag-icon pr2'}
+                            src={activeTag.icon}
+                            alt={`${activeTag.name} icon`}
+                        />
+                    )}
 
-                <span>{this.props.tagStore.activeTag.name}</span>
-            </span>
+                    <span>{activeTag.name}</span>
+                </a>
+            </Link>
         )
     }
 
@@ -134,8 +147,17 @@ class TitleHeader extends React.Component<ITitleHeaderProps> {
                     <span className={'f4 black'}>{this.renderActiveTag()}</span>
                     <div className={'mh4 flex-auto relative flex items-center'}>
                         <input className={'w-100 main-search pl4'} placeholder={'Search EOS'} />
-                        <FontAwesomeIcon width={13} icon={faSearch} className={'absolute left-0 ml2 pl1'} />
+                        <FontAwesomeIcon
+                            width={13}
+                            icon={faSearch}
+                            className={'absolute left-0 ml2 pl1'}
+                        />
                     </div>
+                    <Link route={'/new'}>
+                        <button className={'button-outline ph3 mr2'}>
+                            <FontAwesomeIcon icon={faPenAlt} />
+                        </button>
+                    </Link>
                     <div className={'flex'}>{this.renderAuthActions()}</div>
                 </div>
             </div>

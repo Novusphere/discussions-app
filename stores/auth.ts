@@ -1,4 +1,4 @@
-import { action, computed, observable } from 'mobx'
+import { action, computed, observable, reaction } from 'mobx'
 import { task } from 'mobx-task'
 import { eos, discussions } from '@novuspherejs'
 import { BaseStore, getOrCreateStore } from 'next-mobx-wrapper'
@@ -6,6 +6,7 @@ import { getUiStore } from '@stores/ui'
 import { IStores } from '@stores'
 import { ModalOptions } from '@globals'
 import { sleep } from '@utils'
+import CreateForm from '../components/create-form/create-form'
 
 export default class Auth extends BaseStore {
     @observable accountName = ''
@@ -17,6 +18,44 @@ export default class Auth extends BaseStore {
 
     constructor() {
         super()
+
+        const showModalReaction = reaction(
+            () => this.isLoggedIn,
+            status => {
+                if (!status) {
+                    this.uiStore.showModal(ModalOptions.welcomeBack)
+                }
+            },
+            {
+                fireImmediately: true,
+            }
+        )
+
+        showModalReaction()
+    }
+
+    get signInForm() {
+        return new CreateForm(
+            {
+                onSuccess: form => {
+                    console.log(form.values())
+                },
+            },
+            [
+                {
+                    name: 'email',
+                    label: 'Email',
+                    placeholder: 'Your email address',
+                    rules: 'required|email',
+                },
+                {
+                    name: 'password',
+                    label: 'Password',
+                    placeholder: 'Your password',
+                    rules: 'required|password',
+                },
+            ]
+        )
     }
 
     @computed get isLoggedIn(): boolean {
@@ -95,7 +134,7 @@ export default class Auth extends BaseStore {
 
     @task.resolved generateBrianKey = async () => {
         await sleep(1000)
-        const key =  discussions.bkCreate()
+        const key = discussions.bkCreate()
         console.log(key)
         return key
     }

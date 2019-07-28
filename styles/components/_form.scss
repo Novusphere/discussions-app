@@ -23,7 +23,7 @@ form {
     &.inline-labels {
         @extend input;
         @extend .flex;
-        //@extend .items-center;
+        @extend .items-center;
         @extend .justify-between;
 
         input {

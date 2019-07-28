@@ -26,9 +26,11 @@ const MainPost: React.FC<IMainPost> = ({ openingPost, replyHandler, voteHandler 
         <>
             <div className={'pb2'}>
                 <Link route={`/e/${openingPost.sub}`}>
-                    <a className="f6 link dim ph3 pv2 dib white bg-green mr2">
-                        <FontAwesomeIcon width={13} icon={faArrowLeft} className={'pr1'} />
-                        {`e/${openingPost.sub}`}
+                    <a>
+                        <button className={'tl'}>
+                            <FontAwesomeIcon width={13} icon={faArrowLeft} className={'pr1'} />
+                            {`e/${openingPost.sub}`}
+                        </button>
                     </a>
                 </Link>
             </div>
@@ -73,10 +75,7 @@ const MainPost: React.FC<IMainPost> = ({ openingPost, replyHandler, voteHandler 
                     <Attachments attachment={openingPost.attachment} />
 
                     <div className={'footer flex items-center pt3'}>
-                        <button
-                            className={'reply mr3 pointer dim'}
-                            onClick={replyHandler}
-                        >
+                        <button className={'reply mr3 pointer dim'} onClick={replyHandler}>
                             <FontAwesomeIcon
                                 fixedWidth
                                 width={13}

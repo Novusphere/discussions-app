@@ -26,3 +26,4 @@ export { default as SignInModalVerification } from './modal/sign-in/verification
 // modals
 export { default as SignInModal } from './modal/sign-in/sign-in-modal'
 export { default as WalletUndetectedModal } from './modal/wallet-undetected/wallet-undetected-modal'
+export { default as WelcomeBackModal } from './modal/welcome-back/welcome-back-modal'
