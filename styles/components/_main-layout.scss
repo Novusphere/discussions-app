@@ -3,6 +3,10 @@
 	@extend .items-center;
 	@extend .flex;
 	height: 278px;
+
+	img {
+		height: 278px;
+	}
 }
 
 footer {

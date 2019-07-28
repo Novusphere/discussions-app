@@ -21,8 +21,14 @@ class MainLayout extends React.Component<IMainLayoutProps> {
                     <title>A decentralized forum | Home</title>
                 </Head>
 
-                <div className={'w-100 header-image o-50'}>{this.props.activeBanner}</div>
                 <TitleHeader />
+                <div className={'w-100 header-image'}>
+                    <img
+                        src={this.props.activeBanner}
+                        title={'Active banner'}
+                        alt={'Active banner image'}
+                    />
+                </div>
                 <AppModals />
                 <div className={'content'}>
                     <div className={'container flex pv3'}>

@@ -134,3 +134,14 @@ a {
     overflow: visible;
     vertical-align: -0.125em;
 }
+
+.dim {
+    @extend .dim;
+    &:focus {
+        opacity: 1 !important;
+
+        &:hover {
+            opacity: 0.5 !important;
+        }
+    }
+}

@@ -15,6 +15,14 @@ export { default as Editor } from './editor/editor'
 export { default as Reply } from './reply/reply'
 export { default as Thread } from './thread/thread-container'
 export { default as Feed } from './feed/feed'
+export { default as Collapse } from './collapse/collapse'
+
+export { default as SignInModalChooseAccountName } from './modal/sign-in/choose-account-name'
+export { default as SignInModalSectionHeader } from './modal/sign-in/header'
+export { default as SignInModalGenerateKey } from './modal/sign-in/generate-key'
+export { default as SignInModalGeneratedKey } from './modal/sign-in/generated-key'
+export { default as SignInModalVerification } from './modal/sign-in/verification'
 
 // modals
 export { default as SignInModal } from './modal/sign-in/sign-in-modal'
+export { default as WalletUndetectedModal } from './modal/wallet-undetected/wallet-undetected-modal'

@@ -3,7 +3,7 @@ import { inject, observer } from 'mobx-react'
 import { Link } from '@router'
 import { IStores } from '@stores'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
-import { faEnvelope, faPen, faSpinner, faUser } from '@fortawesome/free-solid-svg-icons'
+import { faEnvelope, faPen, faSearch, faSpinner, faUser } from '@fortawesome/free-solid-svg-icons'
 import { Tooltip } from 'react-tippy'
 import { ModalOptions } from '@globals'
 
@@ -91,15 +91,16 @@ class TitleHeader extends React.Component<ITitleHeaderProps> {
 
         return (
             <>
-                <a
-                    className="f6 link dim ph3 pv2 dib white bg-green mr2 pointer"
+                <button
+                    className={'button-outline mr2'}
                     onClick={() => showModal(ModalOptions.signIn)}
                 >
                     Login
-                </a>
-                <Link route={'/settings'}>
-                    <a className="f6 link dim ph3 pv2 dib white bg-green mr2">Set ID</a>
-                </Link>
+                </button>
+                <button onClick={() => showModal(ModalOptions.signIn)}>Sign Up</button>
+                {/*<Link route={'/settings'}>*/}
+                {/*    <button className="button f6 link dim ph3 pv2 dib white bg-green mr2">Set ID</button>*/}
+                {/*</Link>*/}
             </>
         )
     }
@@ -131,6 +132,10 @@ class TitleHeader extends React.Component<ITitleHeaderProps> {
             <div className={'title-header flex items-center z-999'}>
                 <div className={'container flex items-center justify-between'}>
                     <span className={'f4 black'}>{this.renderActiveTag()}</span>
+                    <div className={'mh4 flex-auto relative flex items-center'}>
+                        <input className={'w-100 main-search pl4'} placeholder={'Search EOS'} />
+                        <FontAwesomeIcon width={13} icon={faSearch} className={'absolute left-0 ml2 pl1'} />
+                    </div>
                     <div className={'flex'}>{this.renderAuthActions()}</div>
                 </div>
             </div>

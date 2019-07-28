@@ -1,6 +1,22 @@
 button {
+	@extend .f6;
+	@extend .link;
+	@extend .dim;
+	@extend .ph4;
+	@extend .pv2;
+	@extend .dib;
+	@extend .white;
+	@extend .pointer;
+	@extend .ttu;
+
 	background: #079E99;
-	border: 1.91707px solid #079E99;
+	border: 1px solid #079E99;
 	box-sizing: border-box !important;
-	border-radius: 1.27805px !important;
+	border-radius: 4px !important;
+
+	&.button-outline {
+		border: 1px solid #079E99 !important;
+		background: transparent !important;
+		color: #079E99;
+	}
 }

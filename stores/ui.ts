@@ -1,8 +1,8 @@
 import { action, computed, observable } from 'mobx'
-import {BaseStore, getOrCreateStore} from 'next-mobx-wrapper';
+import { BaseStore, getOrCreateStore } from 'next-mobx-wrapper'
 
 export default class Ui extends BaseStore {
-    @observable activeBanner = '123'
+    @observable activeBanner = '/static/banners/default.png'
     @observable activeModal = ''
 
     @computed get isModalOpen(): boolean {
