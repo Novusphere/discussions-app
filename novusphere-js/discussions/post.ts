@@ -7,6 +7,7 @@ export interface PostMetaData {
     title?: string;
     pub?: string;
     sig?: string;
+    displayName?: string;
     attachment?: Attachment;
 }
 
@@ -23,6 +24,7 @@ export class Post {
     uuid: string;
     title: string;
     poster: string;
+    displayName: string;
     content: string;
     createdAt: Date;
     sub: string;
@@ -50,8 +52,6 @@ export class Post {
 
     // Aggregate Data
     myVote: number;
-
-    // have I already voted for this post?
 
     hasAttachment(): boolean {
         return (this.attachment.value != '' && this.attachment.type != '' && this.attachment.display != '');
@@ -83,6 +83,7 @@ export class Post {
         this.uuid = '';
         this.title = '';
         this.poster = '';
+        this.displayName = '';
         this.content = '';
         this.createdAt = new Date(0);
         this.sub = '';
@@ -112,6 +113,7 @@ export class Post {
         p.threadUuid = o.threadUuid;
         p.title = o.title;
         p.poster = o.poster;
+        p.displayName = o.displayName;
         p.content = o.content;
         p.createdAt = new Date(o.createdAt);
         p.sub = o.sub;

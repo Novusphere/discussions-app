@@ -158,6 +158,7 @@ export default class DiscussionsService {
             metadata.pub = p.pub;
             metadata.sig = p.sig;
         }
+        metadata.displayName = p.displayName || p.poster;
 
         const data = {
             poster: p.poster,
