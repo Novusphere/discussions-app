@@ -1,4 +1,6 @@
 const fetch = require('node-fetch');
+import { Api, JsonRpc } from 'eosjs';
+import { JsSignatureProvider } from 'eosjs/dist/eosjs-jssig';  
 import { DiscoveryData, WalletAuth, Wallet, WalletAccessContext, NetworkConfig } from 'eos-transit';
 import { IToken, getTokens, IAccountBalance, getAccountTokens } from './tokens';
 
@@ -15,12 +17,37 @@ export class EOS {
     discoveryData?: DiscoveryData;
     tokens?: IToken[];
 
+    private _api: Api;
+
     get accountName(): string | undefined {
         return this.wallet && this.wallet.auth ? this.wallet.auth.accountName : undefined;
     }
 
     get auth(): WalletAuth | undefined {
         return this.wallet ? this.wallet.auth : undefined;
+    }
+
+    get api(): Api {
+        if (this.wallet)
+            return this.wallet.eosApi;
+
+        if (this._api)
+            return this._api;
+
+        const net = DEFAULT_EOS_NETWORK;
+        const rpc = new JsonRpc(`${net.protocol}://${net.host}:${net.port}`, { fetch });
+        const signatureProvider = new JsSignatureProvider([]);
+        const api = new Api({
+            rpc,
+            signatureProvider,
+            chainId: net.chainId,
+            textDecoder: new TextDecoder(),
+            textEncoder: new TextEncoder()
+        });
+
+        this._api = api;
+
+        return api;
     }
 
     constructor() {

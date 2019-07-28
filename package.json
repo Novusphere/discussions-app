@@ -20,6 +20,7 @@
     "eos-transit-meetone-provider": "3.1.0",
     "eos-transit-scatter-provider": "3.2.0",
     "eos-transit-tokenpocket-provider": "3.1.2",
+    "eosjs": "^20.0.0",
     "eosjs-ecc": "4.0.4",
     "express": "4.17.1",
     "immutable": "^4.0.0-rc.12",
