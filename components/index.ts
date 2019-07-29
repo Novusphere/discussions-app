@@ -16,11 +16,11 @@ export { default as Reply } from './reply/reply'
 export { default as Thread } from './thread/thread-container'
 export { default as Feed } from './feed/feed'
 export { default as Collapse } from './collapse/collapse'
+export { default as BrianKey } from './brian-key/brian-key'
 
 export { default as SignInModalChooseAccountName } from './modal/sign-up/choose-account-name'
 export { default as SignInModalSectionHeader } from './modal/sign-up/header'
 export { default as SignInModalGenerateKey } from './modal/sign-up/generate-key'
-export { default as SignInModalGeneratedKey } from './modal/sign-up/generated-key'
 export { default as SignInModalVerification } from './modal/sign-up/verification'
 
 // modals
@@ -29,3 +29,5 @@ export { default as WalletUndetectedModal } from './modal/wallet-undetected/wall
 export { default as WelcomeBackModal } from './modal/welcome-back/welcome-back-modal'
 export { default as SignInModal } from './modal/sign-in/sign-in-modal'
 export { default as SelectSignInOption } from './modal/sign-in/select-sign-in-option'
+export { default as SetBrianKey } from './modal/sign-in/set-brian-key'
+export { default as SetPassword } from './modal/sign-in/set-password'

@@ -1,5 +1,5 @@
 import * as React from 'react'
-import { SignInModalGeneratedKey, SignInModalSectionHeader } from '@components'
+import { BrianKey, SignInModalSectionHeader } from '@components'
 import { Collapse } from '@components'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { faSpinner } from '@fortawesome/free-solid-svg-icons'
@@ -40,7 +40,7 @@ const GenerateKey: React.FC<IGenerateKeyProps> = ({
                     </span>
 
                     {generateBrianKey['result'] ? (
-                        <SignInModalGeneratedKey results={generateBrianKey['result'].split(' ')} />
+                        <BrianKey results={generateBrianKey['result'].split(' ')} />
                     ) : (
                         <button
                             disabled={generateBrianKey['pending']}

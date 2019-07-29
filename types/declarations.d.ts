@@ -8,4 +8,8 @@ export interface StepProps {
     nextStep?: () => void
     previousStep?: () => void
     goToStep?: (step: number) => void
+
+    state?: {
+        activeStep: number
+    }
 }

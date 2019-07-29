@@ -65,7 +65,36 @@ export default class Auth extends BaseStore {
         )
     }
 
-    @task.resolved signInViaWallet = async () => {
+    get choosePassword() {
+        return new CreateForm(
+            {
+                onSuccess: form => {
+                    console.log(form.values())
+                },
+            },
+            [
+                {
+                    name: 'password',
+                    label: 'Password',
+                    type: 'password',
+                    placeholder: 'Your password',
+                    rules: 'required|string|between:5,25',
+                },
+                {
+                    name: 'passwordConfirm',
+                    label: 'Password Confirmation',
+                    type: 'password',
+                    placeholder: 'Confirm Password',
+                    rules: 'required|string|same:password',
+                },
+            ]
+        )
+    }
+
+    /**
+     * @return {boolean} True if bk is set, undefined if it is not set, false if the wallet failed to be set
+     */
+    @task.resolved signInViaWallet = async (): Promise<boolean | undefined> => {
         try {
             this.preferredSignInMethod = SignInMethods.scatter
 
@@ -76,7 +105,11 @@ export default class Auth extends BaseStore {
 
                 const status = await discussions.bkRetrieveStatusEOS(this.accountName)
                 console.log(status)
+
+                return !!status
             }
+
+            return false
         } catch (error) {
             console.log(error)
         }
