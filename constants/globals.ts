@@ -19,6 +19,5 @@ export const Messages = {
 }
 
 export const SignInMethods = {
-    eosWallet: 'EOS Wallet',
-    brianKey: 'Brian Key'
+    scatter: 'Scatter',
 }

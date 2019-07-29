@@ -3,7 +3,7 @@ import { task } from 'mobx-task'
 import { eos, discussions, init } from '@novuspherejs'
 import { BaseStore, getOrCreateStore } from 'next-mobx-wrapper'
 import { getUiStore } from '@stores/ui'
-import { hydrate, IStores } from '@stores'
+import { IStores } from '@stores'
 import { ModalOptions, SignInMethods } from '@globals'
 import { sleep } from '@utils'
 import CreateForm from '../components/create-form/create-form'
@@ -30,7 +30,7 @@ export default class Auth extends BaseStore {
             () => this.isLoggedIn,
             status => {
                 if (!status) {
-                    this.uiStore.showModal(ModalOptions.signUp)
+                    // this.uiStore.showModal(ModalOptions.signUp)
                 }
             },
             {
@@ -39,8 +39,6 @@ export default class Auth extends BaseStore {
         )
 
         showModalReaction()
-
-        hydrate('auth', this)
     }
 
     get signInForm() {
@@ -69,12 +67,15 @@ export default class Auth extends BaseStore {
 
     @task.resolved signInViaWallet = async () => {
         try {
-            this.preferredSignInMethod = SignInMethods.eosWallet
+            this.preferredSignInMethod = SignInMethods.scatter
 
             await init()
             const wallet = await eos.detectWallet()
             if (typeof wallet !== 'boolean' && wallet) {
                 await this.logInAndInitializeAccount()
+
+                const status = await discussions.bkRetrieveStatusEOS(this.accountName)
+                console.log(status)
             }
         } catch (error) {
             console.log(error)

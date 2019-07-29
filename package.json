@@ -24,6 +24,7 @@
     "eosjs-ecc": "4.0.4",
     "express": "4.17.1",
     "immutable": "^4.0.0-rc.12",
+    "localforage": "^1.7.3",
     "lodash": "^4.17.14",
     "mobx": "5.10.1",
     "mobx-persist": "^0.4.1",

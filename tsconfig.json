@@ -25,6 +25,12 @@
       "@pages/": [
         "./pages/*"
       ],
+      "@d.ts/*": [
+        "./types/*"
+      ],
+      "@constants/*": [
+        "./constants/*"
+      ],
       "@novuspherejs": [
         "./novusphere-js/index"
       ],

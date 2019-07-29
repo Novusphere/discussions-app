@@ -4,7 +4,6 @@ import Tag, { getTagStore } from '@stores/tag'
 import Auth, { getAuthStore } from '@stores/auth'
 import Posts, { getPostsStore } from '@stores/posts'
 import Settings, { getSettingsStore } from '@stores/settings'
-import { create } from 'mobx-persist'
 
 export interface IStores {
     userStore: User
@@ -15,12 +14,8 @@ export interface IStores {
     settingsStore: Settings
 }
 
-const hydrate = create({
-    jsonify: true,
-})
 
 export {
-    hydrate,
     getAuthStore,
     getPostsStore,
     getSettingsStore,

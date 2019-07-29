@@ -4,10 +4,11 @@ import * as Stores from '@stores'
 import { Provider, useStaticRendering } from 'mobx-react'
 import { MainLayout } from '@components'
 import { withMobx } from 'next-mobx-wrapper'
+import localForage from 'localforage'
+import { isServer } from '@utils'
+import { create } from 'mobx-persist'
 
 import '../styles/style.scss'
-
-export const isServer = !(process as any).browser
 
 // import { configure } from 'mobx'
 // configure({ enforceActions: 'observed' })
@@ -27,6 +28,22 @@ class DiscussionApp extends App {
         return {
             isServer,
             pageProps,
+        }
+    }
+
+    /**
+     * Hydrate the store for LS here
+     * Due to SSR, we have to execute this part
+     * on the client.
+     */
+    async componentDidMount(): Promise<void> {
+        if (!isServer) {
+            const hydrate = create({
+                storage: localForage,
+                jsonify: false
+            })
+
+            hydrate('auth', this.props.store.authStore)
         }
     }
 

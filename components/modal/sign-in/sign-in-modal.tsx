@@ -1,11 +1,12 @@
 import * as React from 'react'
-import { Modal } from '@components'
+import { Modal, SelectSignInOption } from '@components'
 import { IStores } from '@stores'
 import { observer, inject } from 'mobx-react'
-import { SignInOptions } from '../../../constants/sign-in-options'
-import classNames from 'classnames'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { faSpinner } from '@fortawesome/free-solid-svg-icons'
+import { SignInMethods } from '@globals'
+import StepWizard from 'react-step-wizard'
+import { SignInOptions } from '../../../constants/sign-in-options'
 
 interface IWelcomeBackModalProps {
     authStore: IStores['authStore']
@@ -49,7 +50,7 @@ class SignInModal extends React.Component<IWelcomeBackModalProps, IWelcomeBackMo
         }
 
         switch (this.state.clickedSignInOption) {
-            case 'EOS Wallet':
+            case SignInMethods.scatter:
                 return (
                     <button
                         onClick={signInViaWallet}
@@ -59,17 +60,8 @@ class SignInModal extends React.Component<IWelcomeBackModalProps, IWelcomeBackMo
                         {signInViaWallet['pending'] ? (
                             <FontAwesomeIcon width={13} icon={faSpinner} spin />
                         ) : (
-                            'Sign in via EOS Wallet'
+                            'Sign in via Scatter'
                         )}
-                    </button>
-                )
-            case 'Brian Key':
-                return (
-                    <button
-                        className={'f6 link dim ph3 pv2 dib pointer white bg-green'}
-                        disabled={!this.state.clickedSignInOption}
-                    >
-                        Sign in via Brian Key
                     </button>
                 )
         }
@@ -84,46 +76,13 @@ class SignInModal extends React.Component<IWelcomeBackModalProps, IWelcomeBackMo
                             <CloseIcon />
                         </div>
 
-                        <div className={'tc ph2 mv3'}>
-                            <span className={'black f2 b db'}>Sign in with your EOS account</span>
-                            <span className={'f5 b db mt2'}>
-                                Choose an account type from below to continue!
-                            </span>
-                        </div>
-
-                        <div
-                            className={
-                                'mt3 pb5 ph5-l ph2-m ph0-s flex flex-column items-center justify-center'
-                            }
-                        >
-                            <div
-                                className={
-                                    'w-80-l w-100-s flex flex-wrap items-center justify-center'
-                                }
-                            >
-                                {SignInOptions.map(option => (
-                                    <span
-                                        title={`Toggle ${option.name} sign in`}
-                                        onClick={() => this.clickSignIn(option.name)}
-                                        key={option.name}
-                                        className={classNames([
-                                            'w-40 ba b--black-10 br4 mr2 pa2 tc pointer f2',
-                                            {
-                                                'bg-green white':
-                                                    this.state.clickedSignInOption === option.name,
-                                            },
-                                        ])}
-                                    >
-                                        <FontAwesomeIcon icon={option.icon} className={'db'} />
-                                        <span className={'mt2 db f5'}>{option.name}</span>
-                                    </span>
-                                ))}
-                            </div>
-
-                            <span className={'f5 b mt3'}>
-                                Don't have one? <a>Create an account for free.</a>
-                            </span>
-                        </div>
+                        <StepWizard>
+                            <SelectSignInOption
+                                signInOptions={SignInOptions}
+                                optionOnClick={this.clickSignIn}
+                                clickedSignInOption={this.state.clickedSignInOption}
+                            />
+                        </StepWizard>
 
                         <div className={'modal-footer'}>
                             <span className={'flex items-center'}>
