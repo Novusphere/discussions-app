@@ -1,6 +1,6 @@
 import { action, computed, observable, reaction } from 'mobx'
 import { task } from 'mobx-task'
-import { eos, discussions, init } from '@novuspherejs'
+import { discussions, eos, init } from '@novuspherejs'
 import { BaseStore, getOrCreateStore } from 'next-mobx-wrapper'
 import { getUiStore } from '@stores/ui'
 import { IStores } from '@stores'
@@ -91,10 +91,49 @@ export default class Auth extends BaseStore {
         )
     }
 
+    get setUsername() {
+        return new CreateForm(
+            {
+                onSubmit: form => {
+                    console.log(form.values())
+                },
+            },
+            [
+                {
+                    name: 'username',
+                    label: 'Username',
+                    placeholder: 'Set your Discussions app username',
+                    rules: 'required|string|between:3,25',
+                },
+            ]
+        )
+    }
+
+    get setPassword() {
+        return new CreateForm(
+            {
+                onSubmit: form => {
+                    console.log(form.values())
+                },
+            },
+            [
+                {
+                    name: 'password',
+                    label: 'Password',
+                    type: 'password',
+                    placeholder: 'Your password',
+                    rules: 'required|string|between:5,25',
+                },
+            ]
+        )
+    }
+
     /**
-     * @return {boolean} True if bk is set, undefined if it is not set, false if the wallet failed to be set
+     * @return {boolean} false if the wallet failed to be set
+     * @return {undefined} undefined if it is not set
+     * @return {string} string if bk is set
      */
-    @task.resolved signInViaWallet = async (): Promise<boolean | undefined> => {
+    @task.resolved signInViaWallet = async (): Promise<boolean | undefined | string> => {
         try {
             this.preferredSignInMethod = SignInMethods.scatter
 
@@ -102,11 +141,7 @@ export default class Auth extends BaseStore {
             const wallet = await eos.detectWallet()
             if (typeof wallet !== 'boolean' && wallet) {
                 await this.logInAndInitializeAccount()
-
-                const status = await discussions.bkRetrieveStatusEOS(this.accountName)
-                console.log(status)
-
-                return !!status
+                return await discussions.bkRetrieveStatusEOS(this.accountName)
             }
 
             return false

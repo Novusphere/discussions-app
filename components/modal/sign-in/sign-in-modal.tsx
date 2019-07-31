@@ -1,5 +1,13 @@
 import * as React from 'react'
-import { Modal, SelectSignInOption, SetBrianKey, SetPassword, SuccessSetup } from '@components'
+import {
+    Modal,
+    SelectSignInOption,
+    SetBrianKey,
+    SetPassword,
+    SuccessSetup,
+    AskForPassword,
+    SetUsername,
+} from '@components'
 import { IStores } from '@stores'
 import { observer, inject } from 'mobx-react'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
@@ -26,8 +34,10 @@ interface IWelcomeBackModalState {
 @inject('authStore', 'uiStore')
 @observer
 class SignInModal extends React.Component<IWelcomeBackModalProps, IWelcomeBackModalState> {
+    static CurrentDefaultStep = 3
+
     state = {
-        currentStep: 3,
+        currentStep: SignInModal.CurrentDefaultStep,
         clickedSignInOption: '',
     }
 
@@ -47,50 +57,43 @@ class SignInModal extends React.Component<IWelcomeBackModalProps, IWelcomeBackMo
 
     private setStepInState = (stepNumber: number) => {
         this.setState({ currentStep: stepNumber })
+        this.instance.setActiveStep(stepNumber - 1)
     }
 
     private nextStep = () => {
         this.setStepInState(this.state.currentStep + 1)
-        this.instance.nextStep()
-        this.instance.setActiveStep(this.instance.state.activeStep + 1)
     }
 
     private prevStep = () => {
         this.setStepInState(this.state.currentStep - 1)
-        this.instance.previousStep()
-        this.instance.setActiveStep(this.instance.state.activeStep - 1)
     }
 
     @task.resolved
     private signInViaWallet = async () => {
-        const { generateBrianKey } = this.props.authStore
+        const { signInViaWallet, generateBrianKey } = this.props.authStore
 
-        this.nextStep()
-        await generateBrianKey()
+        const result = await signInViaWallet()
 
-        // const { signInViaWallet, generateBrianKey } = this.props.authStore
-        //
-        // const result = await signInViaWallet()
-        //
-        // if (typeof result === 'undefined') {
-        //     this.nextStep()
-        //     await generateBrianKey()
-        // }
-        //
-        // if (result === false) {
-        //     console.log('no wallet detected')
-        // }
-        //
-        // if (result) {
-        //     console.log('it worked!')
-        // }
+        if (typeof result === 'undefined') {
+            this.setStepInState(2)
+            await generateBrianKey()
+        }
+
+        if (result === false) {
+            console.log('no wallet detected')
+        }
+
+        if (result) {
+            this.setStepInState(5)
+            console.log('it worked!')
+        }
     }
 
     closeModal = () => {
         this.props.uiStore.hideModal()
     }
 
-    renderButtons = (choosePasswordForm: any) => {
+    renderButtons = (choosePasswordForm: any, setPassword: any) => {
         if (this.instance) {
             switch (this.state.currentStep) {
                 case 1:
@@ -157,12 +160,7 @@ class SignInModal extends React.Component<IWelcomeBackModalProps, IWelcomeBackMo
                                     choosePasswordForm.form.isEmpty
                                 }
                                 type="submit"
-                                onClick={e => {
-                                    choosePasswordForm.onSubmit(e)
-                                    if (!choosePasswordForm.form.hasError) {
-                                        this.nextStep()
-                                    }
-                                }}
+                                onClick={choosePasswordForm.onSubmit}
                                 className={'f6 link dim ph3 pv2 dib pointer white bg-green'}
                             >
                                 Continue
@@ -175,7 +173,16 @@ class SignInModal extends React.Component<IWelcomeBackModalProps, IWelcomeBackMo
                             onClick={this.closeModal}
                             className={'f6 link dim ph3 pv2 dib pointer white bg-red'}
                         >
-                            Finish
+                            Log In
+                        </button>
+                    )
+                case 5:
+                    return (
+                        <button
+                            onClick={setPassword.onSubmit}
+                            className={'f6 link dim ph3 pv2 dib pointer white bg-red'}
+                        >
+                            Log In
                         </button>
                     )
             }
@@ -211,6 +218,8 @@ class SignInModal extends React.Component<IWelcomeBackModalProps, IWelcomeBackMo
 
     public render() {
         const choosePasswordForm = this.props.authStore.choosePassword
+        const setPassword = this.props.authStore.setPassword
+        const setUsername = this.props.authStore.setUsername
         return (
             <Modal>
                 {({ CloseIcon }) => (
@@ -221,7 +230,7 @@ class SignInModal extends React.Component<IWelcomeBackModalProps, IWelcomeBackMo
 
                         <StepWizard
                             instance={instance => (this.instance = instance)}
-                            initialStep={3}
+                            initialStep={SignInModal.CurrentDefaultStep}
                         >
                             <SelectSignInOption
                                 signInOptions={SignInOptions}
@@ -229,14 +238,16 @@ class SignInModal extends React.Component<IWelcomeBackModalProps, IWelcomeBackMo
                                 clickedSignInOption={this.state.clickedSignInOption}
                             />
                             <SetBrianKey generateBrianKey={this.props.authStore.generateBrianKey} />
+                            <SetUsername setUsernameForm={setUsername} />
                             <SetPassword setPasswordForm={choosePasswordForm} />
                             <SuccessSetup />
+
+                            <AskForPassword askPasswordForm={setPassword} />
                         </StepWizard>
 
                         <div className={'modal-footer'}>
                             {this.renderRememberOption()}
-
-                            {this.renderButtons(choosePasswordForm)}
+                            {this.renderButtons(choosePasswordForm, setPassword)}
                         </div>
                     </>
                 )}

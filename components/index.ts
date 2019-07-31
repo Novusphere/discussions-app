@@ -32,3 +32,5 @@ export { default as SelectSignInOption } from './modal/sign-in/select-sign-in-op
 export { default as SetBrianKey } from './modal/sign-in/set-brian-key'
 export { default as SetPassword } from './modal/sign-in/set-password'
 export { default as SuccessSetup } from './modal/sign-in/success-setup'
+export { default as AskForPassword } from './modal/sign-in/ask-password'
+export { default as SetUsername } from './modal/sign-in/set-username'

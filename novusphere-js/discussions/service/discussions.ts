@@ -101,7 +101,8 @@ export default class DiscussionsService {
             code: 'discussionsx',
             scope: 'discussionsx',
             table: 'status',
-            table_key: account
+            lower_bound: account,
+            upper_bound: account
         });
 
         if (result.rows.length == 0) return undefined;
