@@ -12,4 +12,6 @@ export interface StepProps {
     state?: {
         activeStep: number
     }
+
+    setActiveStep?: any
 }

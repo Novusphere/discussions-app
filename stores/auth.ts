@@ -68,7 +68,7 @@ export default class Auth extends BaseStore {
     get choosePassword() {
         return new CreateForm(
             {
-                onSuccess: form => {
+                onSubmit: form => {
                     console.log(form.values())
                 },
             },

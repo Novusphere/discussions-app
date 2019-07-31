@@ -15,6 +15,7 @@ class CreateForm {
     form: IForm['form']
     fields: MappedFields[]
     onSubmit: IForm['form']['onSubmit']
+    validate: IForm['form']['validate']
     onClear: IForm['onClear']
     types: IForm['types']
 
@@ -26,7 +27,7 @@ class CreateForm {
                 hooks,
             }
         )
-        _form.init(fields)
+        // _form.init(fields)
         this.fields = fields.map((field) => ({
             name: field.name,
             accessor: _form.$(field.name),

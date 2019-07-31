@@ -16,6 +16,8 @@ declare interface IForm {
     onSubmit: (event?: FormEvent<HTMLFormElement>) => void
     onClear: (event?: FormEvent<HTMLFormElement>) => void
     form: {
+        fields: any[]
+        validate?: any
         onSubmit: (event?: FormEvent<HTMLFormElement>) => void
         select: (key: string) => string
         $: (key: string) => Form$

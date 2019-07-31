@@ -1,5 +1,5 @@
 import * as React from 'react'
-import { Modal, SelectSignInOption, SetBrianKey, SetPassword } from '@components'
+import { Modal, SelectSignInOption, SetBrianKey, SetPassword, SuccessSetup } from '@components'
 import { IStores } from '@stores'
 import { observer, inject } from 'mobx-react'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
@@ -15,20 +15,23 @@ const StepWizard: any = dynamic(() => import('react-step-wizard'))
 
 interface IWelcomeBackModalProps {
     authStore: IStores['authStore']
+    uiStore: IStores['uiStore']
 }
 
 interface IWelcomeBackModalState {
+    currentStep: number
     clickedSignInOption: string
 }
 
-@inject('authStore')
+@inject('authStore', 'uiStore')
 @observer
 class SignInModal extends React.Component<IWelcomeBackModalProps, IWelcomeBackModalState> {
     state = {
+        currentStep: 3,
         clickedSignInOption: '',
     }
 
-    @observable private instance: StepProps
+    @observable.deep private instance: StepProps
 
     private clickSignIn = (name: string) => {
         if (this.state.clickedSignInOption === name) {
@@ -42,11 +45,27 @@ class SignInModal extends React.Component<IWelcomeBackModalProps, IWelcomeBackMo
         }
     }
 
+    private setStepInState = (stepNumber: number) => {
+        this.setState({ currentStep: stepNumber })
+    }
+
+    private nextStep = () => {
+        this.setStepInState(this.state.currentStep + 1)
+        this.instance.nextStep()
+        this.instance.setActiveStep(this.instance.state.activeStep + 1)
+    }
+
+    private prevStep = () => {
+        this.setStepInState(this.state.currentStep - 1)
+        this.instance.previousStep()
+        this.instance.setActiveStep(this.instance.state.activeStep - 1)
+    }
+
     @task.resolved
     private signInViaWallet = async () => {
         const { generateBrianKey } = this.props.authStore
 
-        this.instance.nextStep()
+        this.nextStep()
         await generateBrianKey()
 
         // const { signInViaWallet, generateBrianKey } = this.props.authStore
@@ -54,7 +73,7 @@ class SignInModal extends React.Component<IWelcomeBackModalProps, IWelcomeBackMo
         // const result = await signInViaWallet()
         //
         // if (typeof result === 'undefined') {
-        //     this.instance.nextStep()
+        //     this.nextStep()
         //     await generateBrianKey()
         // }
         //
@@ -67,10 +86,14 @@ class SignInModal extends React.Component<IWelcomeBackModalProps, IWelcomeBackMo
         // }
     }
 
-    renderButtons = () => {
+    closeModal = () => {
+        this.props.uiStore.hideModal()
+    }
+
+    renderButtons = (choosePasswordForm: any) => {
         if (this.instance) {
-            switch (this.instance.state.activeStep) {
-                case 0:
+            switch (this.state.currentStep) {
+                case 1:
                     if (!this.state.clickedSignInOption) {
                         return (
                             <button
@@ -102,13 +125,57 @@ class SignInModal extends React.Component<IWelcomeBackModalProps, IWelcomeBackMo
                             )
                     }
                     break
-                case 1:
+                case 2:
+                    return (
+                        <>
+                            <button
+                                onClick={this.prevStep}
+                                className={'f6 link dim ph3 pv2 dib pointer white bg-green'}
+                            >
+                                Back
+                            </button>
+                            <button
+                                onClick={this.nextStep}
+                                className={'f6 link dim ph3 pv2 dib pointer white bg-green'}
+                            >
+                                Choose password
+                            </button>
+                        </>
+                    )
+                case 3:
+                    return (
+                        <>
+                            <button
+                                onClick={this.prevStep}
+                                className={'f6 link dim ph3 pv2 dib pointer white bg-green'}
+                            >
+                                Back
+                            </button>
+                            <button
+                                disabled={
+                                    choosePasswordForm.form.hasError ||
+                                    choosePasswordForm.form.isEmpty
+                                }
+                                type="submit"
+                                onClick={e => {
+                                    choosePasswordForm.onSubmit(e)
+                                    if (!choosePasswordForm.form.hasError) {
+                                        this.nextStep()
+                                    }
+                                }}
+                                className={'f6 link dim ph3 pv2 dib pointer white bg-green'}
+                            >
+                                Continue
+                            </button>
+                        </>
+                    )
+                case 4:
                     return (
                         <button
-                            onClick={this.instance.nextStep}
-                            className={'f6 link dim ph3 pv2 dib pointer white bg-green'}
+                            onClick={this.closeModal}
+                            className={'f6 link dim ph3 pv2 dib pointer white bg-red'}
                         >
-                            Choose password
+                            Finish
                         </button>
                     )
             }
@@ -116,7 +183,7 @@ class SignInModal extends React.Component<IWelcomeBackModalProps, IWelcomeBackMo
     }
 
     private renderRememberOption = () => {
-        if (this.instance && this.instance.state.activeStep === 0) {
+        if (this.state.currentStep === 1) {
             return (
                 <span className={'flex items-center'}>
                     <input
@@ -143,6 +210,7 @@ class SignInModal extends React.Component<IWelcomeBackModalProps, IWelcomeBackMo
     }
 
     public render() {
+        const choosePasswordForm = this.props.authStore.choosePassword
         return (
             <Modal>
                 {({ CloseIcon }) => (
@@ -151,19 +219,24 @@ class SignInModal extends React.Component<IWelcomeBackModalProps, IWelcomeBackMo
                             <CloseIcon />
                         </div>
 
-                        <StepWizard instance={instance => (this.instance = instance)} initialStep={3}>
+                        <StepWizard
+                            instance={instance => (this.instance = instance)}
+                            initialStep={3}
+                        >
                             <SelectSignInOption
                                 signInOptions={SignInOptions}
                                 optionOnClick={this.clickSignIn}
                                 clickedSignInOption={this.state.clickedSignInOption}
                             />
                             <SetBrianKey generateBrianKey={this.props.authStore.generateBrianKey} />
-                            <SetPassword setPasswordForm={this.props.authStore.choosePassword} />
+                            <SetPassword setPasswordForm={choosePasswordForm} />
+                            <SuccessSetup />
                         </StepWizard>
 
                         <div className={'modal-footer'}>
                             {this.renderRememberOption()}
-                            {this.renderButtons()}
+
+                            {this.renderButtons(choosePasswordForm)}
                         </div>
                     </>
                 )}

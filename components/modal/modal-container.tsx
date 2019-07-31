@@ -1,7 +1,7 @@
 import * as React from 'react'
 import Modal from 'react-modal'
 import { IStores } from '@stores'
-import { inject, observer } from 'mobx-react'
+import { inject, observer, Observer } from 'mobx-react'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { faTimes } from '@fortawesome/free-solid-svg-icons'
 
@@ -27,21 +27,25 @@ class ModalContainer extends React.Component<IModalContainerProps> {
                 portalClassName={'modal modal-backdrop'}
                 ariaHideApp={false}
             >
-                {(this.props.children as any)({
-                    CloseButton: () => (
-                        <a
-                            className="f6 link dim ph3 pv2 dib white bg-green mr2 pointer"
-                            onClick={() => hideModal()}
-                        >
-                            Close
-                        </a>
-                    ),
-                    CloseIcon: () => (
-                        <span className={'black dim pointer'} onClick={() => hideModal()}>
-                            <FontAwesomeIcon icon={faTimes} size={'3x'} className={'pa4'} />
-                        </span>
-                    ),
-                })}
+                <Observer>
+                    {() =>
+                        (this.props.children as any)({
+                            CloseButton: () => (
+                                <a
+                                    className="f6 link dim ph3 pv2 dib white bg-green mr2 pointer"
+                                    onClick={() => hideModal()}
+                                >
+                                    Close
+                                </a>
+                            ),
+                            CloseIcon: () => (
+                                <span className={'black dim pointer'} onClick={() => hideModal()}>
+                                    <FontAwesomeIcon icon={faTimes} size={'3x'} className={'pa4'} />
+                                </span>
+                            ),
+                        })
+                    }
+                </Observer>
             </Modal>
         )
     }

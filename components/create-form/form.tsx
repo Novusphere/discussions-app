@@ -80,8 +80,10 @@ const Form: React.FC<FormProps> = ({ form, children, hideSubmitButton, ...props 
                     return (
                         <React.Fragment key={field.name}>
                             <div className={'field-container pb3 inline-labels'}>
-                                <label htmlFor={field.accessor.id}>{field.accessor.label}</label>
-                                <div className={'w-80 flex flex-column'}>
+                                <label htmlFor={field.accessor.id} className={'w-40'}>
+                                    {field.accessor.label}
+                                </label>
+                                <div className={'w-60 flex flex-column'}>
                                     <Select
                                         className={'db f6 react-select-dropdown'}
                                         classNamePrefix={'rs'}
@@ -105,8 +107,10 @@ const Form: React.FC<FormProps> = ({ form, children, hideSubmitButton, ...props 
                     return (
                         <React.Fragment key={field.name}>
                             <div className={'field-container pb3 inline-labels'}>
-                                <label htmlFor={field.accessor.id}>{field.accessor.label}</label>
-                                <div className={'w-80 h-100 flex flex-column'}>
+                                <label htmlFor={field.accessor.id} className={'w-40'}>
+                                    {field.accessor.label}
+                                </label>
+                                <div className={'w-60 h-100 flex flex-column'}>
                                     <Editor
                                         placeholder={field.placeholder}
                                         className={'db f6'}
@@ -159,8 +163,10 @@ const Form: React.FC<FormProps> = ({ form, children, hideSubmitButton, ...props 
                     return (
                         <React.Fragment key={field.name}>
                             <div className={'field-container pb3 inline-labels'}>
-                                <label htmlFor={field.accessor.id}>{field.accessor.label}</label>
-                                <div className={'w-80 flex flex-column'}>
+                                <label htmlFor={field.accessor.id} className={'w-40'}>
+                                    {field.accessor.label}
+                                </label>
+                                <div className={'w-60 flex flex-column'}>
                                     <input {...bind} className={'db f6 form-input'} />
                                     <span className={'error f6 db pv2 tl'}>
                                         {field.accessor.error}
@@ -176,7 +182,7 @@ const Form: React.FC<FormProps> = ({ form, children, hideSubmitButton, ...props 
     return (
         <form {...props}>
             {renderFields(form.fields)}
-            {hideSubmitButton ? null : (
+            {!hideSubmitButton && (
                 <button
                     className={'mt3 f6 link dim ph3 pv2 dib white bg-green pointer'}
                     type="submit"
@@ -185,6 +191,7 @@ const Form: React.FC<FormProps> = ({ form, children, hideSubmitButton, ...props 
                     Submit
                 </button>
             )}
+            {children}
         </form>
     )
 }

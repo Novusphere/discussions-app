@@ -2,6 +2,7 @@ import * as React from 'react'
 import { BrianKey } from '@components'
 import { faSpinner } from '@fortawesome/free-solid-svg-icons'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
+import { observer } from 'mobx-react'
 
 interface ISetBrianKeyProps {
     generateBrianKey: any
@@ -18,7 +19,10 @@ const SetBrianKey: React.FC<ISetBrianKeyProps> = ({ generateBrianKey }) => (
             {generateBrianKey['pending'] && <FontAwesomeIcon size={'10x'} icon={faSpinner} spin />}
             {generateBrianKey['result'] ? (
                 <>
-                    <BrianKey results={generateBrianKey['result'].split(' ')} />
+                    <BrianKey
+                        results={generateBrianKey['result'].split(' ')}
+                        className={'flex flex-wrap'}
+                    />
                     <span className={'mt2'}>Please note down this key</span>
                 </>
             ) : null}
@@ -26,4 +30,4 @@ const SetBrianKey: React.FC<ISetBrianKeyProps> = ({ generateBrianKey }) => (
     </div>
 )
 
-export default SetBrianKey
+export default observer(SetBrianKey)
