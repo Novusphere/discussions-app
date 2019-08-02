@@ -69,7 +69,7 @@ class SignUpModal extends React.Component<ISignInModalProps, ISignInModalState> 
                 return (
                     <>
                         {renderButton('Previous', 'bg-blue', this.goBack)}
-                        {renderButton('Finish', 'bg-red', this.props.authStore.signInWithBrianKey)}
+                        {renderButton('Finish', 'bg-red', this.props.authStore.storeKeys)}
                     </>
                 )
         }

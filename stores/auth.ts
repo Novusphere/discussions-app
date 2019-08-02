@@ -8,8 +8,18 @@ import { ModalOptions, SignInMethods } from '@globals'
 import { sleep } from '@utils'
 import CreateForm from '../components/create-form/create-form'
 import { persist } from 'mobx-persist'
+import { StepProps } from '@d.ts/declarations'
+
+interface signUpObject {
+    currentStep: number
+    instance: StepProps
+    username: string
+    password: string
+}
 
 export default class Auth extends BaseStore {
+    static CurrentDefaultStep = 1
+
     @observable accountName = ''
     @observable permission = ''
     @observable publicKey = ''
@@ -20,6 +30,16 @@ export default class Auth extends BaseStore {
     @persist @observable preferredSignInMethod = ''
     @persist @observable postPriv = ''
     @persist @observable tipPub = ''
+
+    @observable.deep signUpObject: signUpObject = {
+        currentStep: Auth.CurrentDefaultStep,
+        instance: null, // step instance
+        username: '',
+        password: '',
+    }
+
+    // when a user logins, store statusJson result here
+    @observable statusJson: string
 
     private uiStore: IStores['uiStore'] = getUiStore()
 
@@ -39,6 +59,73 @@ export default class Auth extends BaseStore {
         )
 
         showModalReaction()
+    }
+
+    public setStepInState = (stepNumber: number) => {
+        this.signUpObject.currentStep = stepNumber
+        this.signUpObject.instance.setActiveStep(stepNumber - 1)
+    }
+
+    public nextStep = () => {
+        this.setStepInState(this.signUpObject.currentStep + 1)
+    }
+
+    public prevStep = () => {
+        this.setStepInState(this.signUpObject.currentStep - 1)
+    }
+
+    /**
+     * Signup forms
+     */
+    get choosePassword() {
+        return new CreateForm(
+            {
+                onSuccess: form => {
+                    const { password } = form.values()
+                    this.signUpObject.password = password
+                    this.setupBKKeysToScatter()
+                },
+            },
+            [
+                {
+                    name: 'password',
+                    label: 'Password',
+                    type: 'password',
+                    placeholder: 'Your password',
+                    rules: 'required|string|between:5,25',
+                },
+                {
+                    name: 'passwordConfirm',
+                    label: 'Password Confirmation',
+                    type: 'password',
+                    placeholder: 'Confirm Password',
+                    rules: 'required|string|same:password',
+                },
+            ]
+        )
+    }
+
+    /**
+     * Login forms
+     */
+    get setPassword() {
+        return new CreateForm(
+            {
+                onSubmit: form => {
+                    const { password } = form.values()
+                    this.loginWithPassword(password)
+                },
+            },
+            [
+                {
+                    name: 'password',
+                    label: 'Password',
+                    type: 'password',
+                    placeholder: 'Your password',
+                    rules: 'required|string|between:5,25',
+                },
+            ]
+        )
     }
 
     get signInForm() {
@@ -65,94 +152,73 @@ export default class Auth extends BaseStore {
         )
     }
 
-    get choosePassword() {
-        return new CreateForm(
-            {
-                onSubmit: form => {
-                    console.log(form.values())
-                },
-            },
-            [
-                {
-                    name: 'password',
-                    label: 'Password',
-                    type: 'password',
-                    placeholder: 'Your password',
-                    rules: 'required|string|between:5,25',
-                },
-                {
-                    name: 'passwordConfirm',
-                    label: 'Password Confirmation',
-                    type: 'password',
-                    placeholder: 'Confirm Password',
-                    rules: 'required|string|same:password',
-                },
-            ]
-        )
+    @task.resolved loginWithPassword = async (password: string): Promise<void> => {
+        try {
+            await sleep(3000)
+            const bk = await discussions.bkFromStatusJson(this.statusJson, password)
+            await this.storeKeys(bk)
+
+            console.log('keys stored!')
+
+            this.uiStore.hideModal()
+        } catch (error) {
+            console.log(error)
+            return error
+        }
     }
 
-    get setUsername() {
-        return new CreateForm(
-            {
-                onSubmit: form => {
-                    console.log(form.values())
-                },
-            },
-            [
-                {
-                    name: 'username',
-                    label: 'Username',
-                    placeholder: 'Set your Discussions app username',
-                    rules: 'required|string|between:3,25',
-                },
-            ]
-        )
+    @task.resolved setupBKKeysToScatter = async (): Promise<string | Error> => {
+        try {
+            this.signUpObject.username = this.accountName
+            const json = await this.bkToStatusJson()
+            return await discussions.bkUpdateStatusEOS(json)
+        } catch (error) {
+            return error
+        }
     }
 
-    get setPassword() {
-        return new CreateForm(
-            {
-                onSubmit: form => {
-                    console.log(form.values())
-                },
-            },
-            [
-                {
-                    name: 'password',
-                    label: 'Password',
-                    type: 'password',
-                    placeholder: 'Your password',
-                    rules: 'required|string|between:5,25',
-                },
-            ]
-        )
+    @task.resolved bkToStatusJson = async (): Promise<string> => {
+        try {
+            return await discussions.bkToStatusJson(
+                this.brianKey,
+                this.signUpObject.username,
+                this.signUpObject.password,
+                null
+            )
+        } catch (error) {
+            return error
+        }
     }
 
-    /**
-     * @return {boolean} false if the wallet failed to be set
-     * @return {undefined} undefined if it is not set
-     * @return {string} string if bk is set
-     */
-    @task.resolved signInViaWallet = async (): Promise<boolean | undefined | string> => {
+    @task.resolved signInViaWallet = async (): Promise<void> => {
         try {
             this.preferredSignInMethod = SignInMethods.scatter
-
             await init()
             const wallet = await eos.detectWallet()
+
             if (typeof wallet !== 'boolean' && wallet) {
                 await this.logInAndInitializeAccount()
-                return await discussions.bkRetrieveStatusEOS(this.accountName)
-            }
+                const statusJson = await discussions.bkRetrieveStatusEOS(this.accountName)
 
-            return false
+                this.statusJson = statusJson
+
+                if (typeof statusJson === 'undefined') {
+                    this.setStepInState(2)
+                    await this.generateBrianKey()
+                }
+
+                if (statusJson) {
+                    this.setStepInState(5)
+                }
+            }
         } catch (error) {
             console.log(error)
         }
     }
 
-    @task.resolved signInWithBrianKey = async () => {
+    @task.resolved storeKeys = async (key: string) => {
         try {
-            const keys = await discussions.bkToKeys(this.brianKey)
+            const keys = await discussions.bkToKeys(key)
             this.postPriv = keys.post.priv
             this.tipPub = keys.tip.pub
             return keys
