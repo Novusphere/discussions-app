@@ -17,7 +17,6 @@ import { StepProps } from '@d.ts/declarations'
 import dynamic from 'next/dynamic'
 import { observable } from 'mobx'
 import Auth from '@stores/auth'
-import { toast } from 'react-toastify';
 
 const StepWizard: any = dynamic(() => import('react-step-wizard'))
 
@@ -49,10 +48,6 @@ class SignInModal extends React.Component<IWelcomeBackModalProps, IWelcomeBackMo
                 clickedSignInOption: name,
             })
         }
-    }
-
-    componentDidMount(): void {
-        toast.error("Wow so easy !");
     }
 
     closeModal = () => {

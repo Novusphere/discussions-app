@@ -1,5 +1,6 @@
 import { action, computed, observable } from 'mobx'
 import { BaseStore, getOrCreateStore } from 'next-mobx-wrapper'
+import { toast } from 'react-toastify'
 
 export default class Ui extends BaseStore {
     @observable activeBanner = '/static/banners/default.png'
@@ -15,6 +16,16 @@ export default class Ui extends BaseStore {
 
     @action hideModal = () => {
         this.activeModal = ''
+    }
+
+    showToast = (message: string, type: 'error' | 'info' | 'success' | 'warn') => {
+        return toast[type](message, {
+            autoClose: false,
+        })
+    }
+
+    hideToast = (toastId?: number) => {
+        return toast.dismiss(toastId)
     }
 }
 

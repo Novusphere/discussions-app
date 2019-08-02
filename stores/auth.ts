@@ -190,8 +190,12 @@ export default class Auth extends BaseStore {
         }
     }
 
-    @task.resolved signInViaWallet = async (): Promise<void> => {
+    @task.resolved signInViaWallet = async (): Promise<any> => {
         try {
+            this.uiStore.showToast('Failed to detect wallet', 'success')
+
+            return false
+
             this.preferredSignInMethod = SignInMethods.scatter
             await init()
             const wallet = await eos.detectWallet()
@@ -210,8 +214,11 @@ export default class Auth extends BaseStore {
                 if (statusJson) {
                     this.setStepInState(5)
                 }
+            } else {
+                this.uiStore.showToast('Failed to detect wallet', 'error')
             }
         } catch (error) {
+            this.uiStore.showToast('Failed to detect wallet', 'error')
             console.log(error)
         }
     }
