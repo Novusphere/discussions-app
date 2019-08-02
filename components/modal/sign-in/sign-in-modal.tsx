@@ -17,6 +17,7 @@ import { StepProps } from '@d.ts/declarations'
 import dynamic from 'next/dynamic'
 import { observable } from 'mobx'
 import Auth from '@stores/auth'
+import { toast } from 'react-toastify';
 
 const StepWizard: any = dynamic(() => import('react-step-wizard'))
 
@@ -50,6 +51,10 @@ class SignInModal extends React.Component<IWelcomeBackModalProps, IWelcomeBackMo
         }
     }
 
+    componentDidMount(): void {
+        toast.error("Wow so easy !");
+    }
+
     closeModal = () => {
         this.props.uiStore.hideModal()
     }
@@ -71,20 +76,23 @@ class SignInModal extends React.Component<IWelcomeBackModalProps, IWelcomeBackMo
 
                     switch (this.state.clickedSignInOption) {
                         case SignInMethods.scatter:
+                            if (this.props.authStore.signInViaWallet['pending']) {
+                                return (
+                                    <button
+                                        className={'f6 link dim ph3 pv2 dib pointer white bg-green'}
+                                        disabled={this.props.authStore.signInViaWallet['pending']}
+                                    >
+                                        <FontAwesomeIcon width={13} icon={faSpinner} spin />
+                                    </button>
+                                )
+                            }
                             return (
                                 <button
                                     onClick={this.props.authStore.signInViaWallet}
                                     className={'f6 link dim ph3 pv2 dib pointer white bg-green'}
-                                    disabled={
-                                        !this.state.clickedSignInOption ||
-                                        this.props.authStore.signInViaWallet['pending']
-                                    }
+                                    disabled={!this.state.clickedSignInOption}
                                 >
-                                    {this.props.authStore.signInViaWallet['pending'] ? (
-                                        <FontAwesomeIcon width={13} icon={faSpinner} spin />
-                                    ) : (
-                                        'Sign in via Scatter'
-                                    )}
+                                    Sign in via Scatter
                                 </button>
                             )
                     }
@@ -107,36 +115,70 @@ class SignInModal extends React.Component<IWelcomeBackModalProps, IWelcomeBackMo
                         </>
                     )
                 case 3:
-                    return (
-                        <>
-                            <button
-                                onClick={this.props.authStore.prevStep}
-                                className={'f6 link dim ph3 pv2 dib pointer white bg-green'}
-                            >
-                                Back
-                            </button>
-                            <button
-                                disabled={
-                                    choosePasswordForm.form.hasError ||
-                                    choosePasswordForm.form.isEmpty ||
-                                    this.props.authStore.setupBKKeysToScatter['pending']
-                                }
-                                type="submit"
-                                onClick={choosePasswordForm.onSubmit}
-                                className={'f6 link dim ph3 pv2 dib pointer white bg-green'}
-                            >
-                                {this.props.authStore.setupBKKeysToScatter['pending'] && (
-                                    <FontAwesomeIcon
-                                        width={13}
-                                        icon={faSpinner}
-                                        spin
-                                        className={'mr2'}
-                                    />
-                                )}
-                                Finish
-                            </button>
-                        </>
-                    )
+                    return this.props.authStore.setupBKKeysToScatter['match']({
+                        rejected: error => (
+                            <>
+                                {JSON.stringify(error)}
+                                <button
+                                    onClick={this.props.authStore.prevStep}
+                                    className={'f6 link dim ph3 pv2 dib pointer white bg-green'}
+                                >
+                                    Back
+                                </button>
+                                <button
+                                    disabled={
+                                        choosePasswordForm.form.hasError ||
+                                        choosePasswordForm.form.isEmpty
+                                    }
+                                    type="submit"
+                                    onClick={choosePasswordForm.onSubmit}
+                                    className={'f6 link dim ph3 pv2 dib pointer white bg-green'}
+                                >
+                                    Finish
+                                </button>
+                            </>
+                        ),
+                        pending: () => (
+                            <>
+                                <button
+                                    disabled={this.props.authStore.setupBKKeysToScatter['pending']}
+                                    onClick={this.props.authStore.prevStep}
+                                    className={'f6 link dim ph3 pv2 dib pointer white bg-green'}
+                                >
+                                    Back
+                                </button>
+                                <button
+                                    disabled={this.props.authStore.setupBKKeysToScatter['pending']}
+                                    type="submit"
+                                    onClick={choosePasswordForm.onSubmit}
+                                    className={'f6 link dim ph3 pv2 dib pointer white bg-green'}
+                                >
+                                    <FontAwesomeIcon width={13} icon={faSpinner} spin />
+                                </button>
+                            </>
+                        ),
+                        resolved: () => (
+                            <>
+                                <button
+                                    onClick={this.props.authStore.prevStep}
+                                    className={'f6 link dim ph3 pv2 dib pointer white bg-green'}
+                                >
+                                    Back
+                                </button>
+                                <button
+                                    disabled={
+                                        choosePasswordForm.form.hasError ||
+                                        choosePasswordForm.form.isEmpty
+                                    }
+                                    type="submit"
+                                    onClick={choosePasswordForm.onSubmit}
+                                    className={'f6 link dim ph3 pv2 dib pointer white bg-green'}
+                                >
+                                    Finish
+                                </button>
+                            </>
+                        ),
+                    })
                 case 4:
                     return (
                         <button
@@ -147,23 +189,38 @@ class SignInModal extends React.Component<IWelcomeBackModalProps, IWelcomeBackMo
                         </button>
                     )
                 case 5:
-                    return (
-                        <button
-                            disabled={this.props.authStore.loginWithPassword['pending']}
-                            onClick={setPassword.onSubmit}
-                            className={'f6 link dim ph3 pv2 dib pointer white bg-red'}
-                        >
-                            {this.props.authStore.loginWithPassword['pending'] && (
-                                <FontAwesomeIcon
-                                    width={13}
-                                    icon={faSpinner}
-                                    spin
-                                    className={'mr2'}
-                                />
-                            )}
-                            Log In
-                        </button>
-                    )
+                    return this.props.authStore.loginWithPassword['match']({
+                        rejected: error => (
+                            <>
+                                {JSON.stringify(error)}
+                                <button
+                                    disabled={this.props.authStore.loginWithPassword['pending']}
+                                    onClick={setPassword.onSubmit}
+                                    className={'f6 link dim ph3 pv2 dib pointer white bg-red'}
+                                >
+                                    Log In
+                                </button>
+                            </>
+                        ),
+                        pending: () => (
+                            <button
+                                disabled={this.props.authStore.loginWithPassword['pending']}
+                                onClick={setPassword.onSubmit}
+                                className={'f6 link dim ph3 pv2 dib pointer white bg-red'}
+                            >
+                                <FontAwesomeIcon width={13} icon={faSpinner} spin />
+                            </button>
+                        ),
+                        resolved: () => (
+                            <button
+                                disabled={this.props.authStore.loginWithPassword['pending']}
+                                onClick={setPassword.onSubmit}
+                                className={'f6 link dim ph3 pv2 dib pointer white bg-red'}
+                            >
+                                Log In
+                            </button>
+                        ),
+                    })
             }
         }
     }

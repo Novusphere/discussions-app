@@ -6,7 +6,6 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import {
     faEnvelope,
     faPen,
-    faPenAlt,
     faSearch,
     faSpinner,
     faUser,
@@ -142,6 +141,7 @@ class TitleHeader extends React.Component<ITitleHeaderProps> {
             <div className={'title-header flex items-center z-999'}>
                 <div className={'container flex items-center justify-between'}>
                     <span className={'f4 black'}>{this.renderActiveTag()}</span>
+
                     <div className={'mh4 flex-auto relative flex items-center'}>
                         <input className={'w-100 main-search pl4'} placeholder={'Search EOS'} />
                         <FontAwesomeIcon
@@ -150,11 +150,7 @@ class TitleHeader extends React.Component<ITitleHeaderProps> {
                             className={'absolute left-0 ml2 pl1'}
                         />
                     </div>
-                    <Link route={'/new'}>
-                        <button className={'button-outline ph3 mr2'}>
-                            <FontAwesomeIcon icon={faPenAlt} />
-                        </button>
-                    </Link>
+
                     <div className={'flex'}>{this.renderAuthActions()}</div>
                 </div>
             </div>

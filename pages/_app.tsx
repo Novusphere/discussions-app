@@ -7,12 +7,14 @@ import { withMobx } from 'next-mobx-wrapper'
 import localForage from 'localforage'
 import { isServer } from '@utils'
 import { create } from 'mobx-persist'
+import { toast } from 'react-toastify';
 
 import '../styles/style.scss'
 
 // import { configure } from 'mobx'
 // configure({ enforceActions: 'observed' })
 useStaticRendering(isServer) // NOT `true` value
+toast.configure()
 
 class DiscussionApp extends App {
     public props: any
