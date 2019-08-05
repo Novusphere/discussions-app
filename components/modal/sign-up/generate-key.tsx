@@ -1,5 +1,5 @@
 import * as React from 'react'
-import { BrianKey, SignInModalSectionHeader } from '@components'
+import { BrianKey, SectionHeader } from '@components'
 import { Collapse } from '@components'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { faSpinner } from '@fortawesome/free-solid-svg-icons'
@@ -18,9 +18,9 @@ const GenerateKey: React.FC<IGenerateKeyProps> = ({
     onHeaderClick,
 }) => (
     <>
-        <SignInModalSectionHeader
+        <SectionHeader
             currentStep={currentStep}
-            header={'2. Generate A Key'}
+            header={'2. Generate a brain key'}
             onClick={onHeaderClick}
         />
 

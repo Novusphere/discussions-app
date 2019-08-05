@@ -20,4 +20,5 @@ export const Messages = {
 
 export const SignInMethods = {
     scatter: 'Scatter',
+    brainKey: 'Brain Key',
 }

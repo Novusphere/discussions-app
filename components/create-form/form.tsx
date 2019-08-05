@@ -99,9 +99,24 @@ const Form: React.FC<FormProps> = ({ form, children, hideSubmitButton, ...props 
                     )
                 case 'textarea':
                     return (
-                        <div className={'field-container'} key={field.name}>
-                            <textarea {...bind} />
-                        </div>
+                        <React.Fragment key={field.name}>
+                            <div className={'field-container pb3 inline-labels'}>
+                                <label htmlFor={field.accessor.id} className={'w-40'}>
+                                    {field.accessor.label}
+                                </label>
+                                <div className={'w-60 flex flex-column'}>
+                                    <textarea
+                                        rows="4"
+                                        cols="50"
+                                        {...bind}
+                                        className={'db f6 form-input'}
+                                    />
+                                    <span className={'error f6 db pv2 tl'}>
+                                        {field.accessor.error}
+                                    </span>
+                                </div>
+                            </div>
+                        </React.Fragment>
                     )
                 case 'richtext':
                     return (

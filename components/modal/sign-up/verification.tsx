@@ -1,36 +1,28 @@
 import * as React from 'react'
-import { SignInModalSectionHeader, Collapse } from '@components'
+import { SectionHeader, Collapse, Form } from '@components'
 import { presets } from 'react-motion'
+import CreateForm from '../../create-form/create-form'
 
 interface IVerificationProps {
+    form: CreateForm
     currentStep: number
     onHeaderClick: () => void
-    generateBrianKey: any
 }
 
 const Verification: React.FC<IVerificationProps> = ({
+    form,
     currentStep,
     onHeaderClick,
-    generateBrianKey,
 }) => (
     <>
-        <SignInModalSectionHeader
+        <SectionHeader
             currentStep={currentStep}
-            header={'3. Verification'}
+            header={'3. Verify your brain key'}
             onClick={onHeaderClick}
         />
 
         <Collapse isOpened={currentStep === 3} springConfig={presets.stiff}>
-            <div className={'mv2 field-container w-50'}>
-                <span className={'b f6 black lh-copy db mb3'}>
-                    {generateBrianKey['result']
-                        ? 'Re-type your key with each word separated by a space.'
-                        : 'Generate a brian key first!'}
-                </span>
-                {generateBrianKey['result'] && (
-                    <textarea className={'db w-100'} placeholder={'Enter your brian key words'} />
-                )}
-            </div>
+            <Form form={form} hideSubmitButton />
         </Collapse>
     </>
 )

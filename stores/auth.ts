@@ -17,10 +17,17 @@ interface signUpObject {
     password: string
 }
 
+interface anonSignInObject {
+    username: string
+    password: string
+    bk: string
+    bkVerify: string
+}
+
 export default class Auth extends BaseStore {
     static CurrentDefaultStep = 1
 
-    @observable accountName = ''
+    @persist @observable accountName = ''
     @observable permission = ''
     @observable publicKey = ''
     @observable balances = observable.map<string, number>()
@@ -38,8 +45,14 @@ export default class Auth extends BaseStore {
         password: '',
     }
 
-    // when a user logins, store statusJson result here
-    @observable statusJson: string
+    @observable.deep anonymousObject: anonSignInObject = {
+        username: '',
+        password: '',
+        bk: '',
+        bkVerify: '',
+    }
+
+    @persist @observable statusJson: string
 
     private uiStore: IStores['uiStore'] = getUiStore()
 
@@ -61,21 +74,65 @@ export default class Auth extends BaseStore {
         showModalReaction()
     }
 
-    public setStepInState = (stepNumber: number) => {
-        this.signUpObject.currentStep = stepNumber
-        this.signUpObject.instance.setActiveStep(stepNumber - 1)
+    /**
+     * Signup forms
+     */
+    get setAccountAndPassword() {
+        return new CreateForm(
+            {
+                onSuccess: form => {
+                    const { displayName, password } = form.values()
+                    this.anonymousObject.username = displayName
+                    this.anonymousObject.password = password
+                },
+            },
+            [
+                {
+                    name: 'displayName',
+                    label: 'Display Name',
+                    type: 'text',
+                    placeholder: 'Your display name',
+                    rules: 'required|string|between:3,25',
+                },
+                {
+                    name: 'password',
+                    label: 'Password',
+                    type: 'password',
+                    placeholder: 'Your password',
+                    rules: 'required|string|between:5,25',
+                },
+                {
+                    name: 'passwordConfirm',
+                    label: 'Password Confirmation',
+                    type: 'password',
+                    placeholder: 'Confirm Password',
+                    rules: 'required|string|same:password',
+                },
+            ]
+        )
     }
 
-    public nextStep = () => {
-        this.setStepInState(this.signUpObject.currentStep + 1)
-    }
-
-    public prevStep = () => {
-        this.setStepInState(this.signUpObject.currentStep - 1)
+    get verifyBKForm() {
+        return new CreateForm(
+            {
+                onSubmit: form => {
+                    const { bkVerify } = form.values()
+                    this.anonymousObject.bkVerify = bkVerify
+                },
+            },
+            [
+                {
+                    name: 'bkVerify',
+                    label: 'Verify your brain key',
+                    type: 'textarea',
+                    rules: 'required|string',
+                },
+            ]
+        )
     }
 
     /**
-     * Signup forms
+     * Login forms
      */
     get choosePassword() {
         return new CreateForm(
@@ -105,9 +162,6 @@ export default class Auth extends BaseStore {
         )
     }
 
-    /**
-     * Login forms
-     */
     get setPassword() {
         return new CreateForm(
             {
@@ -137,32 +191,49 @@ export default class Auth extends BaseStore {
             },
             [
                 {
-                    name: 'email',
-                    label: 'Email',
-                    placeholder: 'Your email address',
-                    rules: 'required|email',
-                },
-                {
                     name: 'password',
                     label: 'Password',
+                    type: 'password',
                     placeholder: 'Your password',
-                    rules: 'required|password',
+                    rules: 'required|string',
                 },
             ]
         )
     }
 
+    @computed get isLoggedIn(): boolean {
+        return this.accountName !== '' && this.permission !== '' && this.publicKey !== ''
+    }
+
+    @computed get ATMOSBalance(): number {
+        return this.balances.get('ATMOS') || 0
+    }
+
+    public signUpObjectState = (stepNumber: number) => {
+        this.signUpObject.currentStep = stepNumber
+        this.signUpObject.instance.setActiveStep(stepNumber - 1)
+    }
+
+    public signUpObject_nextStep = () => {
+        this.signUpObjectState(this.signUpObject.currentStep + 1)
+    }
+
+    public signUpObject_prevStep = () => {
+        this.signUpObjectState(this.signUpObject.currentStep - 1)
+    }
+
     @task.resolved loginWithPassword = async (password: string): Promise<void> => {
         try {
+            console.log('Logging in with password')
             await sleep(3000)
             const bk = await discussions.bkFromStatusJson(this.statusJson, password)
             await this.storeKeys(bk)
-
-            console.log('keys stored!')
-
             this.uiStore.hideModal()
+            console.log('Login success! Keys stored in LS!')
         } catch (error) {
+            console.log('Login failed!')
             console.log(error)
+            this.uiStore.showToast(error.message, 'error')
             return error
         }
     }
@@ -170,21 +241,26 @@ export default class Auth extends BaseStore {
     @task.resolved setupBKKeysToScatter = async (): Promise<string | Error> => {
         try {
             this.signUpObject.username = this.accountName
-            const json = await this.bkToStatusJson()
+            const json = await this.bkToStatusJson(
+                this.brianKey,
+                this.signUpObject.username,
+                this.signUpObject.password,
+                null
+            )
             return await discussions.bkUpdateStatusEOS(json)
         } catch (error) {
             return error
         }
     }
 
-    @task.resolved bkToStatusJson = async (): Promise<string> => {
+    @task.resolved bkToStatusJson = async (
+        bk: string,
+        username: string,
+        password: string,
+        status: any
+    ): Promise<string> => {
         try {
-            return await discussions.bkToStatusJson(
-                this.brianKey,
-                this.signUpObject.username,
-                this.signUpObject.password,
-                null
-            )
+            return await discussions.bkToStatusJson(bk, username, password, status)
         } catch (error) {
             return error
         }
@@ -192,10 +268,6 @@ export default class Auth extends BaseStore {
 
     @task.resolved signInViaWallet = async (): Promise<any> => {
         try {
-            this.uiStore.showToast('Failed to detect wallet', 'success')
-
-            return false
-
             this.preferredSignInMethod = SignInMethods.scatter
             await init()
             const wallet = await eos.detectWallet()
@@ -207,18 +279,29 @@ export default class Auth extends BaseStore {
                 this.statusJson = statusJson
 
                 if (typeof statusJson === 'undefined') {
-                    this.setStepInState(2)
+                    this.signUpObjectState(2)
                     await this.generateBrianKey()
                 }
 
                 if (statusJson) {
-                    this.setStepInState(5)
+                    this.signUpObjectState(4)
                 }
             } else {
                 this.uiStore.showToast('Failed to detect wallet', 'error')
             }
         } catch (error) {
             this.uiStore.showToast('Failed to detect wallet', 'error')
+            console.log(error)
+        }
+    }
+
+    @task.resolved signInWithBrainKey = async (): Promise<any> => {
+        try {
+            await sleep(1000)
+            console.log('Going to step 4: enter password!')
+            this.signUpObjectState(4)
+        } catch (error) {
+            this.uiStore.showToast('Failed to sign in with Brain Key', 'error')
             console.log(error)
         }
     }
@@ -234,12 +317,50 @@ export default class Auth extends BaseStore {
         }
     }
 
-    @computed get isLoggedIn(): boolean {
-        return this.accountName !== '' && this.permission !== '' && this.publicKey !== ''
-    }
+    @task.resolved
+    public signUpAsAnonymousId = async () => {
+        const { generateBrianKey, anonymousObject, storeKeys } = this
 
-    @computed get ATMOSBalance(): number {
-        return this.balances.get('ATMOS') || 0
+        try {
+            if (generateBrianKey['result'] === anonymousObject.bkVerify) {
+                await storeKeys(generateBrianKey['result'])
+                const statusEOS = await discussions.bkRetrieveStatusEOS(anonymousObject.username)
+                const brainKey = generateBrianKey['result']
+
+                if (!statusEOS) {
+                    const statusJson = await this.bkToStatusJson(
+                        brainKey,
+                        anonymousObject.username,
+                        anonymousObject.password,
+                        null
+                    )
+
+                    console.log('statusJson Confirmed: ', statusJson)
+
+                    this.statusJson = statusJson
+                    await discussions.bkUpdateStatusEOS(statusJson)
+                    await this.storeKeys(brainKey)
+
+                    this.accountName = anonymousObject.username
+
+                    this.uiStore.hideModal()
+                    this.uiStore.showToast(
+                        'Successfully signed up! You are now logged in!',
+                        'success'
+                    )
+                }
+            } else {
+                this.uiStore.showToast(
+                    'Failed to verify your Brain Key. Ensure you are entering it correctly.',
+                    'error'
+                )
+                console.error('bk not verified')
+            }
+        } catch (error) {
+            this.uiStore.showToast(error.message, 'error')
+            console.error(error)
+            return error
+        }
     }
 
     @action setPreferredSignInMethod = (method: string) => {

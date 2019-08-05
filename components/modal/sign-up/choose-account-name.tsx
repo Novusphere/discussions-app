@@ -1,29 +1,29 @@
 import * as React from 'react'
-import { SignInModalSectionHeader } from '@components'
+import { SectionHeader, Form } from '@components'
 import { Collapse } from '@components'
 import { observer } from 'mobx-react'
+import CreateForm from '../../create-form/create-form'
 
 interface IChooseAccountNameProps {
+    form: CreateForm
     currentStep: number
     onHeaderClick: () => void
 }
 
-const ChooseAccountName: React.FC<IChooseAccountNameProps> = ({ currentStep, onHeaderClick }) => (
+const ChooseAccountName: React.FC<IChooseAccountNameProps> = ({
+    form,
+    currentStep,
+    onHeaderClick,
+}) => (
     <>
-        <SignInModalSectionHeader
+        <SectionHeader
             currentStep={currentStep}
-            header={'1. Choose An Account Name'}
+            header={'1. Setup an account name and password'}
             onClick={onHeaderClick}
         />
 
         <Collapse isOpened={currentStep === 1}>
-            <div className={'mv2 field-container w-50'}>
-                <span className={'b ttu f6 black tracked-tight db mb2'}>Name</span>
-                <input className={'db w-100'} placeholder={'Enter an account name'} />
-                <span className={'hint pt2 db'}>
-                    must be 12 characters, lowercase, and only numerals 1-5 allowed
-                </span>
-            </div>
+            <Form form={form} hideSubmitButton />
         </Collapse>
     </>
 )

@@ -1,6 +1,5 @@
 import * as React from 'react'
-import CreateForm from '../../create-form/create-form'
-import { Form } from '@components'
+import { Form, CreateForm } from '@components'
 
 interface IAskPasswordProps {
     askPasswordForm: CreateForm
