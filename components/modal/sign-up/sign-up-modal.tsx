@@ -133,17 +133,17 @@ class SignUpModal extends React.Component<ISignInModalProps, ISignInModalState> 
                             <ChooseAccountName
                                 form={setAccountAndPasswordForm}
                                 currentStep={this.state.currentStep}
-                                onHeaderClick={() => this.setStep(1)}
+                                onHeaderClick={() => null}
                             />
                             <GenerateKey
                                 generateBrianKey={generateBrianKey}
                                 currentStep={this.state.currentStep}
-                                onHeaderClick={() => this.setStep(2)}
+                                onHeaderClick={() => null}
                             />
                             <VerifyKey
                                 form={verifyBKFormForm}
                                 currentStep={this.state.currentStep}
-                                onHeaderClick={() => this.setStep(3)}
+                                onHeaderClick={() => null}
                             />
                         </div>
                         <div className={'modal-footer'}>
