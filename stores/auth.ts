@@ -27,6 +27,8 @@ interface anonSignInObject {
 export default class Auth extends BaseStore {
     static CurrentDefaultStep = 1
 
+    @observable isLoggedIn = false
+
     @persist @observable accountName = ''
     @observable permission = ''
     @observable publicKey = ''
@@ -201,10 +203,6 @@ export default class Auth extends BaseStore {
         )
     }
 
-    @computed get isLoggedIn(): boolean {
-        return this.accountName !== '' && this.permission !== '' && this.publicKey !== ''
-    }
-
     @computed get ATMOSBalance(): number {
         return this.balances.get('ATMOS') || 0
     }
@@ -229,6 +227,7 @@ export default class Auth extends BaseStore {
             const bk = await discussions.bkFromStatusJson(this.statusJson, password)
             await this.storeKeys(bk)
             this.uiStore.hideModal()
+            this.isLoggedIn = true
             console.log('Login success! Keys stored in LS!')
         } catch (error) {
             console.log('Login failed!')
@@ -266,14 +265,14 @@ export default class Auth extends BaseStore {
         }
     }
 
-    @task.resolved signInViaWallet = async (): Promise<any> => {
+    @task.resolved loginWithWallet = async (): Promise<any> => {
         try {
             this.preferredSignInMethod = SignInMethods.scatter
             await init()
             const wallet = await eos.detectWallet()
 
             if (typeof wallet !== 'boolean' && wallet) {
-                await this.logInAndInitializeAccount()
+                await this.initializeScatterAndSetBalance()
                 const statusJson = await discussions.bkRetrieveStatusEOS(this.accountName)
 
                 this.statusJson = statusJson
@@ -295,7 +294,7 @@ export default class Auth extends BaseStore {
         }
     }
 
-    @task.resolved signInWithBrainKey = async (): Promise<any> => {
+    @task.resolved loginWithBrainKey = async (): Promise<any> => {
         try {
             await sleep(1000)
             console.log('Going to step 4: enter password!')
@@ -398,19 +397,23 @@ export default class Auth extends BaseStore {
         }
     }
 
-    @task.resolved logInAndInitializeAccount = async () => {
+    @task.resolved initializeScatterAndSetBalance = async () => {
         try {
             let wallet = eos.wallet
 
             if (typeof wallet !== 'boolean' && wallet) {
                 await eos.login()
+
                 if (eos.auth) {
                     this.setAuth(eos.auth)
+
                     // fetch balances
                     const balances = await eos.getAccountTokens(this.accountName)
                     balances.forEach(balance => {
                         this.balances.set(balance.token.name, balance.amount)
                     })
+
+                    this.isLoggedIn = true
                 }
             } else {
                 const wallet = await eos.detectWallet()
@@ -428,10 +431,6 @@ export default class Auth extends BaseStore {
         await eos.logout()
         this.clearAuth()
     }
-
-    /**
-     * Login methods
-     */
 
     @task.resolved generateBrianKey = async () => {
         await sleep(1000)

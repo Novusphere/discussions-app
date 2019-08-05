@@ -71,11 +71,11 @@ class SignInModal extends React.Component<IWelcomeBackModalProps, IWelcomeBackMo
 
                     switch (this.state.clickedSignInOption) {
                         case SignInMethods.scatter:
-                            if (this.props.authStore.signInViaWallet['pending']) {
+                            if (this.props.authStore.loginWithWallet['pending']) {
                                 return (
                                     <button
                                         className={'f6 link dim ph3 pv2 dib pointer white bg-green'}
-                                        disabled={this.props.authStore.signInViaWallet['pending']}
+                                        disabled={this.props.authStore.loginWithWallet['pending']}
                                     >
                                         <FontAwesomeIcon width={13} icon={faSpinner} spin />
                                     </button>
@@ -83,7 +83,7 @@ class SignInModal extends React.Component<IWelcomeBackModalProps, IWelcomeBackMo
                             }
                             return (
                                 <button
-                                    onClick={this.props.authStore.signInViaWallet}
+                                    onClick={this.props.authStore.loginWithWallet}
                                     className={'f6 link dim ph3 pv2 dib pointer white bg-green'}
                                     disabled={!this.state.clickedSignInOption}
                                 >
@@ -91,12 +91,12 @@ class SignInModal extends React.Component<IWelcomeBackModalProps, IWelcomeBackMo
                                 </button>
                             )
                         case SignInMethods.brainKey:
-                            if (this.props.authStore.signInWithBrainKey['pending']) {
+                            if (this.props.authStore.loginWithBrainKey['pending']) {
                                 return (
                                     <button
                                         className={'f6 link dim ph3 pv2 dib pointer white bg-green'}
                                         disabled={
-                                            this.props.authStore.signInWithBrainKey['pending']
+                                            this.props.authStore.loginWithBrainKey['pending']
                                         }
                                     >
                                         <FontAwesomeIcon width={13} icon={faSpinner} spin />
@@ -105,7 +105,7 @@ class SignInModal extends React.Component<IWelcomeBackModalProps, IWelcomeBackMo
                             }
                             return (
                                 <button
-                                    onClick={this.props.authStore.signInWithBrainKey}
+                                    onClick={this.props.authStore.loginWithBrainKey}
                                     className={'f6 link dim ph3 pv2 dib pointer white bg-green'}
                                     disabled={!this.state.clickedSignInOption}
                                 >
