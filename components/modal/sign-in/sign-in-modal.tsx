@@ -14,7 +14,6 @@ import { faSpinner } from '@fortawesome/free-solid-svg-icons'
 import { SignInMethods } from '@globals'
 import { SignInOptions } from '@constants/sign-in-options'
 import dynamic from 'next/dynamic'
-import Auth from '@stores/auth'
 
 const StepWizard: any = dynamic(() => import('react-step-wizard'))
 
@@ -97,9 +96,7 @@ class SignInModal extends React.Component<IWelcomeBackModalProps, IWelcomeBackMo
                                 return (
                                     <button
                                         className={'f6 link dim ph3 pv2 dib pointer white bg-green'}
-                                        disabled={
-                                            this.props.authStore.loginWithBrainKey['pending']
-                                        }
+                                        disabled={this.props.authStore.loginWithBrainKey['pending']}
                                     >
                                         <FontAwesomeIcon width={13} icon={faSpinner} spin />
                                     </button>
@@ -283,7 +280,7 @@ class SignInModal extends React.Component<IWelcomeBackModalProps, IWelcomeBackMo
 
                         <StepWizard
                             instance={this.setInstance}
-                            initialStep={Auth.CurrentDefaultStep}
+                            initialStep={this.props.authStore.signInObject.currentStep}
                         >
                             {/* Scatter Steps */}
                             <ScatterSelectSignInOption

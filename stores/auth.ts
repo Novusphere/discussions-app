@@ -1,4 +1,4 @@
-import { action, computed, observable, reaction } from 'mobx'
+import { action, computed, observable, reaction, when } from 'mobx'
 import { task } from 'mobx-task'
 import { discussions, eos, init } from '@novuspherejs'
 import { BaseStore, getOrCreateStore } from 'next-mobx-wrapper'
@@ -74,6 +74,17 @@ export default class Auth extends BaseStore {
         )
 
         showModalReaction()
+
+        when(
+            () => !!this.statusJson,
+            async () => {
+                if (!this.isLoggedIn) {
+                    this.uiStore.showModal(ModalOptions.signIn)
+                    await sleep(50)
+                    this.signInObject.currentStep = 4
+                }
+            }
+        )
     }
 
     /**
