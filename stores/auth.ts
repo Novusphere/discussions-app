@@ -353,14 +353,18 @@ export default class Auth extends BaseStore {
             if (generateBrianKey['result'] === anonymousObject.bkVerify) {
                 await storeKeys(generateBrianKey['result'])
                 const brainKey = generateBrianKey['result']
-                const statusJson = await this.bkToStatusJson(
+                let statusJson = await this.bkToStatusJson(
                     brainKey,
                     anonymousObject.username,
                     anonymousObject.password,
                     null
                 )
 
-                console.log('statusJson Confirmed: ', statusJson)
+                if (statusJson === 'test') {
+                    statusJson = undefined
+                }
+
+                console.log('statusJson: ', statusJson)
 
                 this.statusJson = statusJson
                 await discussions.bkUpdateStatusEOS(statusJson)

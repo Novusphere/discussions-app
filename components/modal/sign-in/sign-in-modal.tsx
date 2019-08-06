@@ -222,13 +222,22 @@ class SignInModal extends React.Component<IWelcomeBackModalProps, IWelcomeBackMo
                             </button>
                         ),
                         resolved: () => (
-                            <button
-                                disabled={this.props.authStore.loginWithPassword['pending']}
-                                onClick={setPassword.onSubmit}
-                                className={'f6 link dim ph3 pv2 dib pointer white bg-red'}
-                            >
-                                Log In
-                            </button>
+                            <>
+                                <span
+                                    className={'b pointer dim'}
+                                    title={'Sign in with another sign in boost'}
+                                    onClick={() => this.props.authStore.signInObjectState(1)}
+                                >
+                                    Or log in with another sign in method
+                                </span>{' '}
+                                <button
+                                    disabled={this.props.authStore.loginWithPassword['pending']}
+                                    onClick={setPassword.onSubmit}
+                                    className={'f6 link dim ph3 pv2 dib pointer white bg-red'}
+                                >
+                                    Log In
+                                </button>
+                            </>
                         ),
                     })
             }
