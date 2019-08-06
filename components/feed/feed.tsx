@@ -17,6 +17,9 @@ interface IFeedProps {
 @observer
 class Feed extends React.Component<IFeedProps> {
     public render() {
+        if (!this.props.threads) {
+            return <span>No posts found</span>
+        }
         return this.props.threads.map(post => {
             return (
                 <PostPreview
