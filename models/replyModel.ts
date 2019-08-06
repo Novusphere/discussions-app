@@ -3,7 +3,7 @@ import { task } from 'mobx-task'
 import { Post } from '@novuspherejs/discussions/post'
 import { Messages } from '@globals'
 import { generateUuid, getAttachmentValue, sleep } from '@utils'
-import { getPostsStore, getAuthStore } from '@stores'
+import { getPostsStore, getAuthStore, IStores } from '@stores'
 import { discussions, Thread } from '@novuspherejs'
 import { ThreadModel } from '@models/threadModel'
 
@@ -13,12 +13,17 @@ export class ReplyModel {
     @observable open = false
     @observable map: { [p: string]: Post }
 
+    private authStore: IStores['authStore']
+
+
     // the post replying to
     @observable post: Post = null
 
     constructor(post: Thread | ThreadModel | Post, map: { [p: string]: Post }) {
         this.uid = post.uuid
         this.map = map
+
+        this.authStore = getAuthStore()
     }
 
     @action setContent = (content: string) => {
@@ -60,6 +65,7 @@ export class ReplyModel {
         }
 
         try {
+            await post.sign(this.authStore.postPriv)
             await discussions.post(reply as any)
             await sleep(3000)
             await getPostsStore().fetchPost()

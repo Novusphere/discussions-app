@@ -25,17 +25,15 @@ class Index extends React.Component<IIndexPage> {
     }
 
     public render(): React.ReactNode {
-        console.log('inside index')
-
         if (typeof window !== 'undefined') {
-            setTimeout(async function () { 
+            // setTimeout(async function () {
                 //const bk = discussions.bkCreate();
                 //const json = await discussions.bkToStatusJson(bk, 'testp', {});
                 //const bk2 = discussions.bkFromStatusJson(json, 'testp');
 
                 
                 //await discussions.bkRetrieveFromEOS('asphyxiating');
-            }, 5000);
+            // }, 5000);
         }
 
         return null

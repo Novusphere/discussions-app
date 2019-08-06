@@ -40,7 +40,7 @@ export default class Auth extends BaseStore {
     @persist @observable postPriv = ''
     @persist @observable tipPub = ''
 
-    @observable.deep signUpObject: signUpObject = {
+    @observable.deep signInObject: signUpObject = {
         currentStep: Auth.CurrentDefaultStep,
         instance: null, // step instance
         username: '',
@@ -93,6 +93,7 @@ export default class Auth extends BaseStore {
                     name: 'displayName',
                     label: 'Display Name',
                     type: 'text',
+                    value: this.anonymousObject.username,
                     placeholder: 'Your display name',
                     rules: 'required|string|between:3,25',
                 },
@@ -100,6 +101,7 @@ export default class Auth extends BaseStore {
                     name: 'password',
                     label: 'Password',
                     type: 'password',
+                    value: this.anonymousObject.password,
                     placeholder: 'Your password',
                     rules: 'required|string|between:5,25',
                 },
@@ -107,6 +109,7 @@ export default class Auth extends BaseStore {
                     name: 'passwordConfirm',
                     label: 'Password Confirmation',
                     type: 'password',
+                    value: this.anonymousObject.password,
                     placeholder: 'Confirm Password',
                     rules: 'required|string|same:password',
                 },
@@ -139,10 +142,14 @@ export default class Auth extends BaseStore {
     get choosePassword() {
         return new CreateForm(
             {
-                onSuccess: form => {
+                onSuccess: async form => {
                     const { password } = form.values()
-                    this.signUpObject.password = password
-                    this.setupBKKeysToScatter()
+                    console.log(password)
+
+                    this.signInObject.password = password
+
+                    await this.setupBKKeysToScatter()
+                    await this.signUpSuccess()
                 },
             },
             [
@@ -207,28 +214,32 @@ export default class Auth extends BaseStore {
         return this.balances.get('ATMOS') || 0
     }
 
-    public signUpObjectState = (stepNumber: number) => {
-        this.signUpObject.currentStep = stepNumber
-        this.signUpObject.instance.setActiveStep(stepNumber - 1)
+    public signInObjectState = (stepNumber: number) => {
+        this.signInObject.currentStep = stepNumber
+        this.signInObject.instance.setActiveStep(stepNumber - 1)
     }
 
-    public signUpObject_nextStep = () => {
-        this.signUpObjectState(this.signUpObject.currentStep + 1)
+    public signInObject_nextStep = () => {
+        this.signInObjectState(this.signInObject.currentStep + 1)
     }
 
-    public signUpObject_prevStep = () => {
-        this.signUpObjectState(this.signUpObject.currentStep - 1)
+    public signInObject_prevStep = () => {
+        this.signInObjectState(this.signInObject.currentStep - 1)
+    }
+
+    private signUpSuccess = async () => {
+        this.uiStore.hideModal()
+        this.isLoggedIn = true
+        console.log('Login success! Keys stored in LS!')
     }
 
     @task.resolved loginWithPassword = async (password: string): Promise<void> => {
         try {
             console.log('Logging in with password')
-            await sleep(3000)
+            await sleep(1000)
             const bk = await discussions.bkFromStatusJson(this.statusJson, password)
             await this.storeKeys(bk)
-            this.uiStore.hideModal()
-            this.isLoggedIn = true
-            console.log('Login success! Keys stored in LS!')
+            await this.signUpSuccess()
         } catch (error) {
             console.log('Login failed!')
             console.log(error)
@@ -239,14 +250,16 @@ export default class Auth extends BaseStore {
 
     @task.resolved setupBKKeysToScatter = async (): Promise<string | Error> => {
         try {
-            this.signUpObject.username = this.accountName
+            this.signInObject.username = this.accountName
             const json = await this.bkToStatusJson(
                 this.brianKey,
-                this.signUpObject.username,
-                this.signUpObject.password,
+                this.signInObject.username,
+                this.signInObject.password,
                 null
             )
-            return await discussions.bkUpdateStatusEOS(json)
+            const transact = await discussions.bkUpdateStatusEOS(json)
+            await this.storeKeys(this.brianKey)
+            return transact
         } catch (error) {
             return error
         }
@@ -265,7 +278,7 @@ export default class Auth extends BaseStore {
         }
     }
 
-    @task.resolved loginWithWallet = async (): Promise<any> => {
+    @task.resolved loginWithScatter = async (): Promise<any> => {
         try {
             this.preferredSignInMethod = SignInMethods.scatter
             await init()
@@ -274,16 +287,17 @@ export default class Auth extends BaseStore {
             if (typeof wallet !== 'boolean' && wallet) {
                 await this.initializeScatterAndSetBalance()
                 const statusJson = await discussions.bkRetrieveStatusEOS(this.accountName)
-
                 this.statusJson = statusJson
 
-                if (typeof statusJson === 'undefined') {
-                    this.signUpObjectState(2)
-                    await this.generateBrianKey()
-                }
+                console.log('found statusJSON', this.statusJson)
 
                 if (statusJson) {
-                    this.signUpObjectState(4)
+                    console.log('Going to step 4, enter password')
+                    this.signInObjectState(4)
+                } else {
+                    console.log('You gotta generate a BK!')
+                    this.signInObjectState(2)
+                    await this.generateBrianKey()
                 }
             } else {
                 this.uiStore.showToast('Failed to detect wallet', 'error')
@@ -296,9 +310,13 @@ export default class Auth extends BaseStore {
 
     @task.resolved loginWithBrainKey = async (): Promise<any> => {
         try {
-            await sleep(1000)
-            console.log('Going to step 4: enter password!')
-            this.signUpObjectState(4)
+            if (this.statusJson) {
+                console.log('Going to step 4: enter password!')
+                this.signInObjectState(4)
+            } else {
+                this.uiStore.showModal(ModalOptions.signUp)
+                this.uiStore.showToast("You don't have an account. Create one now!", 'info')
+            }
         } catch (error) {
             this.uiStore.showToast('Failed to sign in with Brain Key', 'error')
             console.log(error)
@@ -323,31 +341,22 @@ export default class Auth extends BaseStore {
         try {
             if (generateBrianKey['result'] === anonymousObject.bkVerify) {
                 await storeKeys(generateBrianKey['result'])
-                const statusEOS = await discussions.bkRetrieveStatusEOS(anonymousObject.username)
                 const brainKey = generateBrianKey['result']
+                const statusJson = await this.bkToStatusJson(
+                    brainKey,
+                    anonymousObject.username,
+                    anonymousObject.password,
+                    null
+                )
 
-                if (!statusEOS) {
-                    const statusJson = await this.bkToStatusJson(
-                        brainKey,
-                        anonymousObject.username,
-                        anonymousObject.password,
-                        null
-                    )
+                console.log('statusJson Confirmed: ', statusJson)
 
-                    console.log('statusJson Confirmed: ', statusJson)
+                this.statusJson = statusJson
+                await discussions.bkUpdateStatusEOS(statusJson)
+                await this.storeKeys(brainKey)
 
-                    this.statusJson = statusJson
-                    await discussions.bkUpdateStatusEOS(statusJson)
-                    await this.storeKeys(brainKey)
-
-                    this.accountName = anonymousObject.username
-
-                    this.uiStore.hideModal()
-                    this.uiStore.showToast(
-                        'Successfully signed up! You are now logged in!',
-                        'success'
-                    )
-                }
+                this.accountName = anonymousObject.username
+                this.signUpSuccess()
             } else {
                 this.uiStore.showToast(
                     'Failed to verify your Brain Key. Ensure you are entering it correctly.',
@@ -367,9 +376,7 @@ export default class Auth extends BaseStore {
     }
 
     @action clearAuth = () => {
-        this.accountName = ''
-        this.permission = ''
-        this.publicKey = ''
+        this.isLoggedIn = false
     }
 
     @action setAuth = (eosAuthObject: {
@@ -412,8 +419,6 @@ export default class Auth extends BaseStore {
                     balances.forEach(balance => {
                         this.balances.set(balance.token.name, balance.amount)
                     })
-
-                    this.isLoggedIn = true
                 }
             } else {
                 const wallet = await eos.detectWallet()

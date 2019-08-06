@@ -1,10 +1,5 @@
 import * as React from 'react'
-import {
-    Modal,
-    ChooseAccountName,
-    GenerateKey,
-    VerifyKey,
-} from '@components'
+import { Modal, ChooseAccountName, GenerateKey, VerifyKey } from '@components'
 import { observer, inject } from 'mobx-react'
 import { IStores } from '@stores'
 import { faSpinner } from '@fortawesome/free-solid-svg-icons'
@@ -36,6 +31,10 @@ class SignUpModal extends React.Component<ISignInModalProps, ISignInModalState> 
         this.setState(prevState => ({
             currentStep: prevState.currentStep - 1,
         }))
+    }
+
+    componentDidMount(): void {
+        this.setStep(1)
     }
 
     public setStep = step => {
@@ -89,10 +88,15 @@ class SignUpModal extends React.Component<ISignInModalProps, ISignInModalState> 
                 return (
                     <>
                         {renderButton('Previous', 'bg-blue', this.goBack)}
-                        {renderButton('Next', 'bg-green', () => {
-                            this.saveBKToStore()
-                            this.goNext()
-                        })}
+                        {renderButton(
+                            'Next',
+                            'bg-green',
+                            () => {
+                                this.saveBKToStore()
+                                this.goNext()
+                            },
+                            !this.props.authStore.generateBrianKey['result']
+                        )}
                     </>
                 )
             case 3:

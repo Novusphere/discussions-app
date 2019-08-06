@@ -284,6 +284,7 @@ export default class Posts extends BaseStore {
                             onClick: task.resolved(async form => {
                                 const post = form.values()
                                 const uuid = generateUuid()
+                                await post.sign(this.authStore.postPriv)
                                 await discussions.post({
                                     poster: this.authStore.accountName,
                                     title: post.title,

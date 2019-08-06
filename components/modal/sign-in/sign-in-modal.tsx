@@ -13,9 +13,7 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { faSpinner } from '@fortawesome/free-solid-svg-icons'
 import { SignInMethods } from '@globals'
 import { SignInOptions } from '@constants/sign-in-options'
-import { StepProps } from '@d.ts/declarations'
 import dynamic from 'next/dynamic'
-import { observable } from 'mobx'
 import Auth from '@stores/auth'
 
 const StepWizard: any = dynamic(() => import('react-step-wizard'))
@@ -36,8 +34,6 @@ class SignInModal extends React.Component<IWelcomeBackModalProps, IWelcomeBackMo
         clickedSignInOption: '',
     }
 
-    @observable.deep private instance: StepProps
-
     private clickSignIn = (name: string) => {
         if (this.state.clickedSignInOption === name) {
             this.setState({
@@ -50,13 +46,19 @@ class SignInModal extends React.Component<IWelcomeBackModalProps, IWelcomeBackMo
         }
     }
 
+    // componentDidMount(): void {
+    //     if (this.props.authStore.signInObject.instance) {
+    //         this.props.authStore.signInObjectState(1)
+    //     }
+    // }
+
     closeModal = () => {
         this.props.uiStore.hideModal()
     }
 
     renderButtons = (choosePasswordForm: any, setPassword: any) => {
-        if (this.instance) {
-            switch (this.props.authStore.signUpObject.currentStep) {
+        if (this.props.authStore.signInObject.instance) {
+            switch (this.props.authStore.signInObject.currentStep) {
                 case 1:
                     if (!this.state.clickedSignInOption) {
                         return (
@@ -71,11 +73,11 @@ class SignInModal extends React.Component<IWelcomeBackModalProps, IWelcomeBackMo
 
                     switch (this.state.clickedSignInOption) {
                         case SignInMethods.scatter:
-                            if (this.props.authStore.loginWithWallet['pending']) {
+                            if (this.props.authStore.loginWithScatter['pending']) {
                                 return (
                                     <button
                                         className={'f6 link dim ph3 pv2 dib pointer white bg-green'}
-                                        disabled={this.props.authStore.loginWithWallet['pending']}
+                                        disabled={this.props.authStore.loginWithScatter['pending']}
                                     >
                                         <FontAwesomeIcon width={13} icon={faSpinner} spin />
                                     </button>
@@ -83,7 +85,7 @@ class SignInModal extends React.Component<IWelcomeBackModalProps, IWelcomeBackMo
                             }
                             return (
                                 <button
-                                    onClick={this.props.authStore.loginWithWallet}
+                                    onClick={this.props.authStore.loginWithScatter}
                                     className={'f6 link dim ph3 pv2 dib pointer white bg-green'}
                                     disabled={!this.state.clickedSignInOption}
                                 >
@@ -118,13 +120,13 @@ class SignInModal extends React.Component<IWelcomeBackModalProps, IWelcomeBackMo
                     return (
                         <>
                             <button
-                                onClick={this.props.authStore.signUpObject_prevStep}
+                                onClick={this.props.authStore.signInObject_prevStep}
                                 className={'f6 link dim ph3 pv2 dib pointer white bg-green'}
                             >
                                 Back
                             </button>
                             <button
-                                onClick={this.props.authStore.signUpObject_nextStep}
+                                onClick={this.props.authStore.signInObject_nextStep}
                                 className={'f6 link dim ph3 pv2 dib pointer white bg-green'}
                             >
                                 Next step: set password
@@ -137,7 +139,7 @@ class SignInModal extends React.Component<IWelcomeBackModalProps, IWelcomeBackMo
                             <>
                                 {JSON.stringify(error)}
                                 <button
-                                    onClick={this.props.authStore.signUpObject_prevStep}
+                                    onClick={this.props.authStore.signInObject_prevStep}
                                     className={'f6 link dim ph3 pv2 dib pointer white bg-green'}
                                 >
                                     Back
@@ -159,7 +161,7 @@ class SignInModal extends React.Component<IWelcomeBackModalProps, IWelcomeBackMo
                             <>
                                 <button
                                     disabled={this.props.authStore.setupBKKeysToScatter['pending']}
-                                    onClick={this.props.authStore.signUpObject_prevStep}
+                                    onClick={this.props.authStore.signInObject_prevStep}
                                     className={'f6 link dim ph3 pv2 dib pointer white bg-green'}
                                 >
                                     Back
@@ -177,7 +179,7 @@ class SignInModal extends React.Component<IWelcomeBackModalProps, IWelcomeBackMo
                         resolved: () => (
                             <>
                                 <button
-                                    onClick={this.props.authStore.signUpObject_prevStep}
+                                    onClick={this.props.authStore.signInObject_prevStep}
                                     className={'f6 link dim ph3 pv2 dib pointer white bg-green'}
                                 >
                                     Back
@@ -237,7 +239,7 @@ class SignInModal extends React.Component<IWelcomeBackModalProps, IWelcomeBackMo
     }
 
     private renderRememberOption = () => {
-        if (this.props.authStore.signUpObject.currentStep === 1) {
+        if (this.props.authStore.signInObject.currentStep === 1) {
             return (
                 <span className={'flex items-center'}>
                     <input
@@ -264,8 +266,7 @@ class SignInModal extends React.Component<IWelcomeBackModalProps, IWelcomeBackMo
     }
 
     setInstance = instance => {
-        this.instance = instance
-        this.props.authStore.signUpObject.instance = instance
+        this.props.authStore.signInObject.instance = instance
     }
 
     public render() {
@@ -300,7 +301,6 @@ class SignInModal extends React.Component<IWelcomeBackModalProps, IWelcomeBackMo
                         </StepWizard>
 
                         <div className={'modal-footer'}>
-                            {this.props.authStore.signUpObject.currentStep}
                             {this.renderRememberOption()}
                             {this.renderButtons(choosePasswordForm, setPassword)}
                         </div>
