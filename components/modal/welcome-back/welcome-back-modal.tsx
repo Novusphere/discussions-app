@@ -13,7 +13,7 @@ interface IWelcomeBackModalProps {
 @observer
 class WelcomeBackModal extends React.Component<IWelcomeBackModalProps> {
     public render() {
-        const { signInForm } = this.props.authStore
+        const { DEPRECATED_signInForm } = this.props.authStore
         const { showModal } = this.props.uiStore
 
         return (
@@ -36,14 +36,14 @@ class WelcomeBackModal extends React.Component<IWelcomeBackModalProps> {
                         >
                             <Form
                                 hideSubmitButton
-                                form={signInForm}
+                                form={DEPRECATED_signInForm}
                                 className={'w-80-l w-100-s db tc'}
                             />
 
                             <button
                                 className={'mt1 f5 link dim ph4 pv3 dib white bg-green pointer'}
                                 type="submit"
-                                onClick={signInForm.onSubmit}
+                                onClick={DEPRECATED_signInForm.onSubmit}
                             >
                                 Sign In
                             </button>

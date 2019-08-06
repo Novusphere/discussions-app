@@ -2,8 +2,7 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="2d14133e-344f-4fbf-9bb7-c9e5e96ae697" name="Default Changelist" comment="">
-      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/components/modal/sign-in/sign-in-modal.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/components/modal/sign-in/sign-in-modal.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/components/modal/welcome-back/welcome-back-modal.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/components/modal/welcome-back/welcome-back-modal.tsx" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/stores/auth.ts" beforeDir="false" afterPath="$PROJECT_DIR$/stores/auth.ts" afterDir="false" />
     </list>
     <ignored path="$PROJECT_DIR$/.tmp/" />
@@ -21,11 +20,11 @@
         <splitter split-orientation="vertical" split-proportion="0.6944661">
           <split-first>
             <leaf SIDE_TABS_SIZE_LIMIT_KEY="300">
-              <file pinned="false" current-in-tab="false">
+              <file pinned="false" current-in-tab="true">
                 <entry file="file://$PROJECT_DIR$/components/modal/sign-up/sign-up-modal.tsx">
                   <provider selected="true" editor-type-id="text-editor">
-                    <state relative-caret-position="-439">
-                      <caret line="93" column="35" lean-forward="true" selection-start-line="93" selection-start-column="35" selection-end-line="93" selection-end-column="35" />
+                    <state relative-caret-position="195">
+                      <caret line="123" column="55" selection-start-line="123" selection-start-column="34" selection-end-line="123" selection-end-column="55" />
                       <folding>
                         <element signature="e#0#30#0" expanded="true" />
                       </folding>
@@ -33,7 +32,7 @@
                   </provider>
                 </entry>
               </file>
-              <file pinned="false" current-in-tab="true">
+              <file pinned="false" current-in-tab="false">
                 <entry file="file://$PROJECT_DIR$/components/modal/sign-in/sign-in-modal.tsx">
                   <provider selected="true" editor-type-id="text-editor">
                     <state relative-caret-position="2928">
@@ -112,8 +111,8 @@
           <file pinned="false" current-in-tab="true">
             <entry file="file://$PROJECT_DIR$/stores/auth.ts">
               <provider selected="true" editor-type-id="text-editor">
-                <state relative-caret-position="304">
-                  <caret line="366" column="39" selection-start-line="366" selection-start-column="39" selection-end-line="366" selection-end-column="39" />
+                <state relative-caret-position="309">
+                  <caret line="201" column="9" lean-forward="true" selection-start-line="201" selection-start-column="9" selection-end-line="201" selection-end-column="9" />
                   <folding>
                     <element signature="e#0#61#0" expanded="true" />
                   </folding>
@@ -127,7 +126,6 @@
   </component>
   <component name="FindInProjectRecents">
     <findStrings>
-      <find>modal/sign-in/</find>
       <find>bg-red</find>
       <find>.loginWithPassword</find>
       <find>setPassword</find>
@@ -157,6 +155,7 @@
       <find>post</find>
       <find>d</find>
       <find>discussions.post(</find>
+      <find>password</find>
     </findStrings>
     <replaceStrings>
       <replace>.child</replace>
@@ -316,6 +315,13 @@
               <item name="discussions-app" type="b2602c69:ProjectViewProjectNode" />
               <item name="discussions-app" type="462c0819:PsiDirectoryNode" />
               <item name="components" type="462c0819:PsiDirectoryNode" />
+              <item name="modal" type="462c0819:PsiDirectoryNode" />
+              <item name="welcome-back" type="462c0819:PsiDirectoryNode" />
+            </path>
+            <path>
+              <item name="discussions-app" type="b2602c69:ProjectViewProjectNode" />
+              <item name="discussions-app" type="462c0819:PsiDirectoryNode" />
+              <item name="components" type="462c0819:PsiDirectoryNode" />
               <item name="title-header" type="462c0819:PsiDirectoryNode" />
             </path>
             <path>
@@ -466,12 +472,12 @@
       <workItem from="1564543063543" duration="125000" />
       <workItem from="1564704627882" duration="8942000" />
       <workItem from="1564757608880" duration="832000" />
-      <workItem from="1565024381978" duration="15589000" />
+      <workItem from="1565024381978" duration="15879000" />
     </task>
     <servers />
   </component>
   <component name="TimeTrackingManager">
-    <option name="totallyTimeSpent" value="308095000" />
+    <option name="totallyTimeSpent" value="308385000" />
   </component>
   <component name="ToolWindowManager">
     <frame x="-8" y="-8" width="2576" height="1416" extended-state="6" />
@@ -810,13 +816,6 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/components/modal/welcome-back/welcome-back-modal.tsx">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="544">
-          <caret line="38" column="48" selection-start-line="38" selection-start-column="38" selection-end-line="38" selection-end-column="48" />
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/novusphere-js/discussions/service/discussions.ts">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="288">
@@ -848,16 +847,6 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/components/modal/sign-up/sign-up-modal.tsx">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="-439">
-          <caret line="93" column="35" lean-forward="true" selection-start-line="93" selection-start-column="35" selection-end-line="93" selection-end-column="35" />
-          <folding>
-            <element signature="e#0#30#0" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/components/modal/sign-in/scatter/set-password.tsx">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="96">
@@ -878,10 +867,27 @@
         </state>
       </provider>
     </entry>
+    <entry file="file://$PROJECT_DIR$/components/modal/sign-up/sign-up-modal.tsx">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="195">
+          <caret line="123" column="55" selection-start-line="123" selection-start-column="34" selection-end-line="123" selection-end-column="55" />
+          <folding>
+            <element signature="e#0#30#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/components/modal/welcome-back/welcome-back-modal.tsx">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="176">
+          <caret line="15" column="16" selection-start-line="15" selection-start-column="16" selection-end-line="15" selection-end-column="16" />
+        </state>
+      </provider>
+    </entry>
     <entry file="file://$PROJECT_DIR$/stores/auth.ts">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="304">
-          <caret line="366" column="39" selection-start-line="366" selection-start-column="39" selection-end-line="366" selection-end-column="39" />
+        <state relative-caret-position="309">
+          <caret line="201" column="9" lean-forward="true" selection-start-line="201" selection-start-column="9" selection-end-line="201" selection-end-column="9" />
           <folding>
             <element signature="e#0#61#0" expanded="true" />
           </folding>

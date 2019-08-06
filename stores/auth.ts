@@ -93,7 +93,7 @@ export default class Auth extends BaseStore {
     get setAccountAndPassword() {
         return new CreateForm(
             {
-                onSuccess: form => {
+                onSubmit: form => {
                     const { displayName, password } = form.values()
                     this.anonymousObject.username = displayName
                     this.anonymousObject.password = password
@@ -153,7 +153,7 @@ export default class Auth extends BaseStore {
     get choosePassword() {
         return new CreateForm(
             {
-                onSuccess: async form => {
+                onSubmit: async form => {
                     const { password } = form.values()
                     console.log(password)
 
@@ -202,10 +202,10 @@ export default class Auth extends BaseStore {
         )
     }
 
-    get signInForm() {
+    get DEPRECATED_signInForm() {
         return new CreateForm(
             {
-                onSuccess: form => {
+                onSubmit: form => {
                     console.log(form.values())
                 },
             },
