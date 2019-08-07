@@ -56,7 +56,14 @@ export default class DiscussionsService {
 
     bkFromStatusJson(statusJson: string, password: string): string {
         console.log('bkFromStatusJSON un-parsed:', statusJson)
-        let status = JSON.parse(statusJson);
+        let status
+
+        if (statusJson === 'test') {
+            status = statusJson
+        } else {
+            status = JSON.parse(statusJson);
+        }
+
         console.log('bkFromStatusJSON parsed:', status)
         let bkc = status['bkc'];
         let bk = status['bk'];
