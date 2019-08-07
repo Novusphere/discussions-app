@@ -81,7 +81,7 @@ export default class Auth extends BaseStore {
                 if (!this.isLoggedIn) {
                     this.uiStore.showModal(ModalOptions.signIn)
                     await sleep(50)
-                    this.signInObject.currentStep = 4
+                    this.signInObjectState(4)
                 }
             }
         )
@@ -187,7 +187,9 @@ export default class Auth extends BaseStore {
             {
                 onSubmit: form => {
                     const { password } = form.values()
-                    this.loginWithPassword(password)
+                    if (password) {
+                        this.loginWithPassword(password)
+                    }
                 },
             },
             [
@@ -252,8 +254,7 @@ export default class Auth extends BaseStore {
             await this.storeKeys(bk)
             await this.signUpSuccess()
         } catch (error) {
-            console.log('Login failed!')
-            console.log(error)
+            console.error('Login failed!', error)
             this.uiStore.showToast(error.message, 'error')
             return error
         }
