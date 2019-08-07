@@ -155,12 +155,14 @@ export default class Auth extends BaseStore {
             {
                 onSubmit: async form => {
                     const { password } = form.values()
-                    console.log(password)
-
+                    console.log('password set!')
                     this.signInObject.password = password
-
-                    await this.setupBKKeysToScatter()
-                    await this.signUpSuccess()
+                    try {
+                        await this.setupBKKeysToScatter()
+                        await this.signUpSuccess()
+                    } catch (error) {
+                        console.error(error)
+                    }
                 },
             },
             [
@@ -256,6 +258,11 @@ export default class Auth extends BaseStore {
         } catch (error) {
             console.error('Login failed!', error)
             this.uiStore.showToast(error.message, 'error')
+
+            if (error.message === 'No brian key found') {
+                await this.generateBrianKey()
+                this.signInObjectState(2)
+            }
             return error
         }
     }
