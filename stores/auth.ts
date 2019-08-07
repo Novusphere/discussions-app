@@ -80,7 +80,7 @@ export default class Auth extends BaseStore {
             async () => {
                 if (!this.isLoggedIn) {
                     this.uiStore.showModal(ModalOptions.signIn)
-                    await sleep(50)
+                    await sleep(200)
                     this.signInObjectState(4)
                 }
             }
