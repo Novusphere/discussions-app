@@ -79,9 +79,31 @@ export default class Auth extends BaseStore {
             () => !!this.statusJson,
             async () => {
                 if (!this.isLoggedIn) {
-                    this.uiStore.showModal(ModalOptions.signIn)
-                    await sleep(200)
-                    this.signInObjectState(4)
+                    if (this.preferredSignInMethod === SignInMethods.scatter) {
+                        const statusJson = await discussions.bkRetrieveStatusEOS(this.accountName)
+
+                        if (statusJson) {
+                            const parsedJSON = JSON.parse(statusJson)
+                            if (parsedJSON.tip !== this.tipPub) {
+                                console.log('in here')
+                                this.uiStore.showModal(ModalOptions.signIn)
+                                await sleep(200)
+                                this.signInObjectState(4)
+                            } else {
+                                await init()
+                                const wallet = await eos.detectWallet()
+
+                                if (typeof wallet !== 'boolean' && wallet) {
+                                    await this.initializeScatterAndSetBalance()
+                                    this.isLoggedIn = true
+                                }
+                            }
+                        }
+                    } else if (this.preferredSignInMethod === SignInMethods.brainKey) {
+                        if (this.postPriv && this.tipPub) {
+                            this.isLoggedIn = true
+                        }
+                    }
                 }
             }
         )
@@ -348,9 +370,9 @@ export default class Auth extends BaseStore {
         }
     }
 
-    @task.resolved storeKeys = async (key: string) => {
+    @task.resolved storeKeys = async (bk: string) => {
         try {
-            const keys = await discussions.bkToKeys(key)
+            const keys = await discussions.bkToKeys(bk)
             this.postPriv = keys.post.priv
             this.tipPub = keys.tip.pub
             return keys
