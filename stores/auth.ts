@@ -95,8 +95,10 @@ export default class Auth extends BaseStore {
             {
                 onSubmit: form => {
                     const { displayName, password } = form.values()
-                    this.anonymousObject.username = displayName
-                    this.anonymousObject.password = password
+                    if (displayName && password) {
+                        this.anonymousObject.username = displayName
+                        this.anonymousObject.password = password
+                    }
                 },
             },
             [
@@ -133,7 +135,9 @@ export default class Auth extends BaseStore {
             {
                 onSubmit: form => {
                     const { bkVerify } = form.values()
-                    this.anonymousObject.bkVerify = bkVerify
+                    if (bkVerify) {
+                        this.anonymousObject.bkVerify = bkVerify
+                    }
                 },
             },
             [
@@ -155,13 +159,15 @@ export default class Auth extends BaseStore {
             {
                 onSubmit: async form => {
                     const { password } = form.values()
-                    console.log('password set!')
-                    this.signInObject.password = password
-                    try {
-                        await this.setupBKKeysToScatter()
-                        await this.signUpSuccess()
-                    } catch (error) {
-                        console.error(error)
+                    if (password) {
+                        console.log('password set!')
+                        this.signInObject.password = password
+                        try {
+                            await this.setupBKKeysToScatter()
+                            await this.signUpSuccess()
+                        } catch (error) {
+                            console.error(error)
+                        }
                     }
                 },
             },
@@ -305,7 +311,8 @@ export default class Auth extends BaseStore {
 
             if (typeof wallet !== 'boolean' && wallet) {
                 await this.initializeScatterAndSetBalance()
-                const statusJson = await discussions.bkRetrieveStatusEOS(this.accountName)
+                // const statusJson = await discussions.bkRetrieveStatusEOS(this.accountName)
+                const statusJson = undefined
                 this.statusJson = statusJson
 
                 console.log('found statusJSON', this.statusJson)
