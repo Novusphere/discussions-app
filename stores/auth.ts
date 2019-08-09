@@ -311,8 +311,7 @@ export default class Auth extends BaseStore {
 
             if (typeof wallet !== 'boolean' && wallet) {
                 await this.initializeScatterAndSetBalance()
-                // const statusJson = await discussions.bkRetrieveStatusEOS(this.accountName)
-                const statusJson = undefined
+                const statusJson = await discussions.bkRetrieveStatusEOS(this.accountName)
                 this.statusJson = statusJson
 
                 console.log('found statusJSON', this.statusJson)
