@@ -1,29 +1,29 @@
-import { action, observable } from 'mobx'
+import { action, observable, set } from 'mobx'
 import { task } from 'mobx-task'
 import { Post } from '@novuspherejs/discussions/post'
 import { Messages } from '@globals'
-import { generateUuid, getAttachmentValue, sleep } from '@utils'
-import { getPostsStore, getAuthStore, IStores } from '@stores'
-import { discussions, Thread } from '@novuspherejs'
-import { ThreadModel } from '@models/threadModel'
+import { generateUuid, getAttachmentValue } from '@utils'
+import { getAuthStore, getPostsStore, IStores } from '@stores'
+import PostModel from '@models/postModel'
+import { discussions } from '@novuspherejs'
 
 export class ReplyModel {
     @observable uid = ''
     @observable content = ''
     @observable open = false
-    @observable map: { [p: string]: Post }
+    @observable map: { [p: string]: PostModel }
 
-    private authStore: IStores['authStore']
-
+    public readonly authStore: IStores['authStore']
+    public readonly postStore: IStores['postsStore']
 
     // the post replying to
     @observable post: Post = null
 
-    constructor(post: Thread | ThreadModel | Post, map: { [p: string]: Post }) {
+    constructor(post: PostModel, map: { [p: string]: PostModel }) {
         this.uid = post.uuid
         this.map = map
-
         this.authStore = getAuthStore()
+        this.postStore = getPostsStore()
     }
 
     @action setContent = (content: string) => {
@@ -35,8 +35,8 @@ export class ReplyModel {
     }
 
     @task.resolved onSubmit = async () => {
-        // post being replied to is the openingPost
-        let post: Post
+        let post: PostModel
+
         if (!this.post) {
             post = this.map[this.uid]
         }
@@ -65,10 +65,29 @@ export class ReplyModel {
         }
 
         try {
-            await post.sign(this.authStore.postPriv)
-            await discussions.post(reply as any)
-            await sleep(3000)
-            await getPostsStore().fetchPost()
+            const activeThread = this.postStore.activeThread
+
+            if (activeThread) {
+                const model = new PostModel(reply as any)
+
+                const signedReply = model.sign(this.authStore.postPriv)
+                const confirmedReply = await discussions.post(signedReply as any)
+                console.log('Class: ReplyModel, Function: onSubmit, Line 75 confirmedReply: ', confirmedReply);
+
+                set(activeThread, {
+                    totalReplies: activeThread.totalReplies + 1,
+                    map: {
+                        ...activeThread.map,
+                        [reply.id]: new PostModel(confirmedReply),
+                    },
+                })
+
+                this.content = ''
+                this.toggleOpen()
+            }
+
+            // await discussions.post.sign(this.authStore.postPriv)
+            // await discussions.post(reply as any)
         } catch (error) {
             console.log(error)
             throw error

@@ -7,6 +7,7 @@ import { Router } from '@router'
 import { TagModel } from '@models/tagModel'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { faSpinner } from '@fortawesome/free-solid-svg-icons'
+import FeedModel from '@models/feedModel'
 
 interface ITagProps {
     tagStore: IStores['tagStore']
@@ -50,18 +51,20 @@ class Tag extends React.Component<ITagProps> {
         Router.pushRoute(
             `/e/${post.sub}/${id}/${decodeURIComponent(post.title.replace(/ /g, '_'))}`
         )
+        this.props.postsStore.setActiveThreadId(id)
     }
 
     public render() {
+        const {
+            clickPost,
+            props: { tagModel },
+        } = this
+
         return this.props.postsStore.getPostsByTag['match']({
             pending: () => <FontAwesomeIcon width={13} icon={faSpinner} spin />,
             rejected: () => <span>No posts found for specified tag: {this.props.tagName}</span>,
-            resolved: () => (
-                <Feed
-                    threads={this.props.postsStore.feedThreads}
-                    onClick={this.clickPost}
-                    tagModel={this.props.tagModel}
-                />
+            resolved: (feed: FeedModel[]) => (
+                <Feed threads={feed} onClick={clickPost} tagModel={tagModel} />
             ),
         })
     }

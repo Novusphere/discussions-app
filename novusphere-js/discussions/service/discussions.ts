@@ -201,9 +201,11 @@ export default class DiscussionsService {
             ]);
 
             p.transaction = transaction
+            console.log('transaction set: !', transaction)
             p.myVote = 1
             return p
         } catch (error) {
+            console.error(error)
             throw error
         }
     }

@@ -4,14 +4,19 @@ import { action, computed, observable } from 'mobx'
 import { computedFn } from 'mobx-utils'
 import { ReplyModel } from '@models/replyModel'
 import _ from 'lodash'
+import PostModel from '@models/postModel'
+import { discussions } from '@novuspherejs'
+
 // import { discussions } from '@novuspherejs'
 
 export class ThreadModel {
-    @observable map: { [p: string]: Post } | undefined
-    @observable.deep openingPost: Thread | ThreadModel | Post
-    @observable uuid: string
-    @observable title: string
-    @observable totalReplies: number
+    @observable public map: { [p: string]: PostModel } | undefined
+    @observable.deep public openingPost: PostModel
+    @observable public uuid: string
+    @observable public title: string
+    @observable public totalReplies: number
+
+    @observable public replies: PostModel[]
 
     public replyBoxStatuses = observable.map<string, ReplyModel>()
     /**
@@ -19,7 +24,7 @@ export class ThreadModel {
      * @return {ReplyModel}
      */
     rbModel: (...args: any[]) => ReplyModel = computedFn(
-        (post: Post): ReplyModel => {
+        (post: PostModel): ReplyModel => {
             const uid = post.uuid
 
             if (this.replyBoxStatuses.has(uid)) {
@@ -41,9 +46,9 @@ export class ThreadModel {
     /**
      * Get posts based on a parent uuid
      * @param {string} uid - The post uid that you want getRepliesFromMap for
-     * @return {Post[]}
+     * @return {PostModel[]}
      */
-    getRepliesFromMap: (...args: any[]) => Post[] = computedFn((uid: string): Post[] => {
+    getRepliesFromMap: (...args: any[]) => PostModel[] = computedFn((uid: string): PostModel[] => {
         if (this.map[uid]) {
             return _.filter(this.map, post => post.parentUuid === uid)
         }
@@ -54,18 +59,25 @@ export class ThreadModel {
     /**
      * Reply box open status for a particular post id
      */
-    constructor(thread: Thread | ThreadModel | Post) {
+    constructor(thread: Thread) {
         if (!(thread instanceof Post) || thread instanceof Thread) {
-            this.openingPost = thread.openingPost
+            this.openingPost = new PostModel(thread.openingPost)
             this.uuid = thread.openingPost.uuid
-            this.map = thread.map
+
+            const map = {}
+
+            Object.keys(thread.map).map(id => {
+                map[id] = new PostModel(thread.map[id])
+            })
+
+            this.map = map
             this.title = thread.openingPost.title
             this.totalReplies = thread.openingPost.totalReplies
         } else {
             this.openingPost = thread
-            this.uuid = thread.uuid
-            this.title = thread.title
-            this.totalReplies = thread.totalReplies
+            this.uuid = thread!.uuid
+            this.title = thread!.title
+            this.totalReplies = thread!.totalReplies
         }
 
         /**
@@ -78,11 +90,13 @@ export class ThreadModel {
 
     @computed get openingPostReplies(): any[] {
         const openingPostReplies = this.getRepliesFromMap(this.uuid)
-
-        return openingPostReplies.map(reply => ({
-            ...reply,
-            replies: this.getRepliesFromMap(reply.uuid),
-        }))
+        
+        return openingPostReplies.map(reply => {
+            return ({
+                ...reply,
+                replies: this.getRepliesFromMap(reply.uuid),
+            })
+        })
     }
 
     /**
@@ -115,8 +129,7 @@ export class ThreadModel {
         const type = myNewVote === 1 ? 'upvotes' : 'downvotes'
 
         try {
-            // await discussions.vote(uuid, myNewVote)
-
+            await discussions.vote(uuid, myNewVote)
 
             // opening post
             if (uuid === this.uuid) {
@@ -144,16 +157,6 @@ export class ThreadModel {
                     this.map[uuid].myVote = 0
                 }
             }
-
-            console.log('params:', uuid, myNewVote)
-            console.log(type)
-
-            console.log(
-                this.uuid,
-                this.openingPost['myVote'],
-                this.openingPost['upvotes'],
-                this.openingPost['downvotes']
-            )
 
         } catch (error) {
             console.log(error)

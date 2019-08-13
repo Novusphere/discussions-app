@@ -163,6 +163,7 @@ export class EOS {
 
             return tx ? tx.transaction_id : undefined;
         } catch (error) {
+            console.error(error)
             throw error
         }
     }

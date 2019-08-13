@@ -67,6 +67,8 @@ export default class Posts extends BaseStore {
      */
     @observable openingPostReplyContent = ''
 
+    @observable.deep activeThread: ThreadModel | undefined
+
     private tagsStore: IStores['tagStore']
     private authStore: IStores['authStore']
 
@@ -85,18 +87,35 @@ export default class Posts extends BaseStore {
                 }
             }
         )
+
+        reaction(
+            () => this.activeThreadId,
+            async threadId => {
+                if (threadId) {
+                    const thread = await this.getThreadById(threadId)
+                    if (thread) {
+                        this.activeThread = new ThreadModel(thread)
+                    }
+                }
+            },
+            {
+                fireImmediately: true,
+            }
+        )
     }
 
     public encodeId(post: IPost) {
         return Post.encodeId(post.transaction, new Date(post.createdAt))
     }
 
-    @task.resolved getPostsByTag = async (tags: string[]) => {
+    @task getPostsByTag = async (tags: string[]) => {
         const posts = await discussions.getPostsForTags(tags)
-        this.posts = posts.map(post => {
+        const postsAsModels = posts.map(post => {
             return new FeedModel(post)
         })
-        return posts
+
+        this.posts = postsAsModels
+        return postsAsModels
     }
 
     /**
@@ -106,17 +125,7 @@ export default class Posts extends BaseStore {
         if (!this.posts || !this.posts.length) {
             return null
         }
-        return this.posts
-            .filter(post => post.title.length)
-            .map(post => new FeedModel(post as any))
-    }
-
-    @computed get activeThread(): ThreadModel | null {
-        const thread = this.fetchPost['result']
-        if (!thread) {
-            return null
-        }
-        return new ThreadModel(thread)
+        return this.posts.filter(post => post.title.length).map(post => new FeedModel(post as any))
     }
 
     @action setActiveThreadId = (id: string) => {
@@ -124,13 +133,22 @@ export default class Posts extends BaseStore {
     }
 
     @task({ swallow: true })
-    public fetchPost = async (): Promise<Thread> => {
+    public fetchActiveThread = async (): Promise<Thread> => {
         try {
-            const thread = await discussions.getThread(this.activeThreadId)
+            const thread = this.getThreadById(this.activeThreadId)
             if (!thread) throw Error('Failed to fetch thread')
             return thread
         } catch (error) {
             console.log(error)
+            throw error
+        }
+    }
+
+    @task
+    public getThreadById = async (id: any) => {
+        try {
+            return await discussions.getThread(id)
+        } catch (error) {
             throw error
         }
     }

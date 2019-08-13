@@ -3,14 +3,15 @@ import { MainPost, Replies, Reply } from '@components'
 import { observer } from 'mobx-react'
 import { Post } from '@novuspherejs'
 import { ReplyModel } from '@models/replyModel'
+import PostModel from '@models/postModel'
 
 interface IThreadContainerProps {
-    opening: Post
+    opening: PostModel
     openingPostReplies: Post[]
     openingModel: ReplyModel
     totalReplies: number
-    getModel: (post: Post) => ReplyModel
-    getRepliesFromMap: (uid: string) => Post[]
+    getModel: (post: PostModel) => ReplyModel
+    getRepliesFromMap: (uid: string) => PostModel[]
     vote: (uuid: string, value: number) => void
 }
 
@@ -48,7 +49,7 @@ const ThreadContainer: React.FC<IThreadContainerProps> = ({
                     <div className={'card pr2 pv1'}>
                         {openingPostReplies.map(reply => (
                             <Replies
-                                post={reply}
+                                post={reply as any}
                                 key={reply.uuid}
                                 getModel={getModel}
                                 voteHandler={vote}

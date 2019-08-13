@@ -13,10 +13,10 @@ import {
 } from '@fortawesome/free-solid-svg-icons'
 import moment from 'moment'
 import ReactMarkdown from 'react-markdown'
-import { Post } from '@novuspherejs/discussions/post'
+import PostModel from '@models/postModel'
 
 interface IMainPost {
-    openingPost: Post
+    openingPost: PostModel
     replyHandler: () => void
     voteHandler: (uuid: string, value: number) => void
 }

@@ -11,16 +11,16 @@ import moment from 'moment'
 import { Link } from '@router'
 import { Votes, Reply } from '@components'
 import ReactMarkdown from 'react-markdown'
-import { Observer } from 'mobx-react'
-import { Post } from '@novuspherejs/discussions/post'
+import { observer, Observer } from 'mobx-react'
 import { ReplyModel } from '@models/replyModel'
+import PostModel from '@models/postModel'
 
 interface IReplies {
-    post: Post
+    post: PostModel
     className?: string
-    getModel: (post: Post) => ReplyModel
+    getModel: (post: PostModel) => ReplyModel
     voteHandler: (uuid: string, value: number) => void
-    getRepliesFromMap: (uid: string) => Post[]
+    getRepliesFromMap: (uid: string) => PostModel[]
 }
 
 const Replies: React.FC<IReplies> = ({
@@ -31,6 +31,8 @@ const Replies: React.FC<IReplies> = ({
     ...props
 }) => {
     const replyModel = getModel(post)
+    const replies = getRepliesFromMap(post.uuid)
+
     return (
         <Observer>
             {() => (
@@ -45,7 +47,6 @@ const Replies: React.FC<IReplies> = ({
                         <span className={'pl2 o-50 f6'}>{moment(post.createdAt).fromNow()}</span>
                     </div>
                     <ReactMarkdown className={'f6 lh-copy reply-content'} source={post.content} />
-                    {post.myVote}
                     <div className={'footer flex items-center pt3'}>
                         <Votes
                             upVotes={post.upvotes}
@@ -90,7 +91,7 @@ const Replies: React.FC<IReplies> = ({
                         />
                     ) : null}
 
-                    {post.replies.length
+                    {replies && replies.length
                         ? getRepliesFromMap(post.uuid).map(postReply => (
                               <Replies
                                   post={postReply}
@@ -108,4 +109,4 @@ const Replies: React.FC<IReplies> = ({
     )
 }
 
-export default Replies
+export default observer(Replies)

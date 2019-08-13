@@ -20,6 +20,7 @@ class Feed extends React.Component<IFeedProps> {
         if (!this.props.threads) {
             return <span>No posts found</span>
         }
+
         return this.props.threads.map(post => {
             return (
                 <PostPreview
