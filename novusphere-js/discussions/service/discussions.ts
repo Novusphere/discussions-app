@@ -73,7 +73,7 @@ export default class DiscussionsService {
         return this.aesDecrypt(bk, password);
     }
 
-    async bkToStatusJson(bk: string, displayName: string,  password: string, status: any): Promise<string> {
+    async bkToStatusJson(bk: string, displayName: string, password: string, status: any): Promise<string> {
         if (!status) status = {};
         const keys = await this.bkToKeys(bk);
         for (var k in keys) {
@@ -184,24 +184,37 @@ export default class DiscussionsService {
         };
 
         try {
-            const transaction = await eos.transact([{
-                account: "discussionsx",
-                name: "post",
-                data: data
-            },
-            {
-                account: "discussionsx", // self up vote
-                name: "vote",
-                data: {
-                    voter: p.poster,
-                    uuid: p.uuid,
-                    value: 1
-                }
-            }
-            ]);
 
-            p.transaction = transaction
-            console.log('transaction set: !', transaction)
+            if (!p.poster) {
+                const resp = await fetch(`${nsdb.api}/discussions/post?data=${JSON.stringify(data)}`);
+                const res = await resp.json();
+                if (res.error)
+                    throw new Error(res.message);
+                
+                p.transaction = res.transaction;
+            }
+            else {
+
+                const transaction = await eos.transact([{
+                    account: "discussionsx",
+                    name: "post",
+                    data: data
+                },
+                {
+                    account: "discussionsx", // self up vote
+                    name: "vote",
+                    data: {
+                        voter: p.poster,
+                        uuid: p.uuid,
+                        value: 1
+                    }
+                }
+                ]);
+
+                p.transaction = transaction
+            }
+
+            console.log('transaction set: !', p.transaction)
             p.myVote = 1
             return p
         } catch (error) {
