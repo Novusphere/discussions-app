@@ -5,12 +5,12 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { faComment } from '@fortawesome/free-solid-svg-icons'
 import { TagModel } from '@models/tagModel'
 import ReactMarkdown from 'react-markdown'
-import { Post } from '@novuspherejs'
 import { observer } from 'mobx-react'
+import FeedModel from '@models/feedModel'
 
 interface IPostPreviewProps {
     onClick: (post) => void
-    post: Post
+    post: FeedModel
     tag: TagModel
     voteHandler?: (uuid: string, value: number) => Promise<void>
     disableVoteHandler?: boolean // in case voting needs to be disabled
@@ -38,7 +38,7 @@ const PostPreview: React.FC<IPostPreviewProps> = ({
             </div>
 
             <div
-                className={'flex flex-column post-content w-100 content-fade'}
+                className={'flex flex-column post-content w-100'}
                 onClick={() => onClick(post)}
             >
                 <div className={'flex f6 lh-copy black items-center'}>
@@ -53,11 +53,11 @@ const PostPreview: React.FC<IPostPreviewProps> = ({
                 </div>
 
                 <ReactMarkdown
-                    className={'black lh-copy measure-wide pt2 post-preview-content'}
+                    className={'black lh-copy measure-wide pt2 post-preview-content content-fade'}
                     source={post.content}
                 />
 
-                <div className={'flex z-2 relative mt4 footer b'}>
+                <div className={'flex z-2 footer b'}>
                     <span className={'o-80 f6 ml2 dim pointer'}>
                         <FontAwesomeIcon width={13} icon={faComment} className={'pr2'} />
                         {post.totalReplies} comments

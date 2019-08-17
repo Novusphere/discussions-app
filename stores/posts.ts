@@ -4,7 +4,7 @@ import { task } from 'mobx-task'
 import { BaseStore, getOrCreateStore } from 'next-mobx-wrapper'
 import { CreateForm } from '@components'
 import { getTagStore } from '@stores/tag'
-import { getAuthStore, IStores } from '@stores'
+import { getAuthStore, getUiStore, IStores } from '@stores'
 import { generateUuid, getAttachmentValue } from '@utils'
 import { ThreadModel } from '@models/threadModel'
 import FeedModel from '@models/feedModel'
@@ -71,11 +71,13 @@ export default class Posts extends BaseStore {
 
     private tagsStore: IStores['tagStore']
     private authStore: IStores['authStore']
+    private uiStore: IStores['uiStore']
 
     constructor(props) {
         super(props)
         this.tagsStore = getTagStore()
         this.authStore = getAuthStore()
+        this.uiStore = getUiStore()
 
         reaction(
             () => this.authStore.isLoggedIn,
@@ -85,21 +87,6 @@ export default class Posts extends BaseStore {
                         await this.getPostsByTag([this.tagsStore.activeTag.name])
                     }
                 }
-            }
-        )
-
-        reaction(
-            () => this.activeThreadId,
-            async threadId => {
-                if (threadId) {
-                    const thread = await this.getThreadById(threadId)
-                    if (thread) {
-                        this.activeThread = new ThreadModel(thread)
-                    }
-                }
-            },
-            {
-                fireImmediately: true,
             }
         )
     }
@@ -128,26 +115,14 @@ export default class Posts extends BaseStore {
         return this.posts.filter(post => post.title.length).map(post => new FeedModel(post as any))
     }
 
-    @action setActiveThreadId = (id: string) => {
-        this.activeThreadId = id
-    }
-
-    @task({ swallow: true })
-    public fetchActiveThread = async (): Promise<Thread> => {
-        try {
-            const thread = this.getThreadById(this.activeThreadId)
-            if (!thread) throw Error('Failed to fetch thread')
-            return thread
-        } catch (error) {
-            console.log(error)
-            throw error
-        }
-    }
-
     @task
     public getThreadById = async (id: any) => {
         try {
-            return await discussions.getThread(id)
+            const thread = await discussions.getThread(id)
+            if (!thread) {
+                return null
+            }
+            return new ThreadModel(thread)
         } catch (error) {
             throw error
         }
@@ -302,9 +277,9 @@ export default class Posts extends BaseStore {
                             onClick: task.resolved(async form => {
                                 const post = form.values()
                                 const uuid = generateUuid()
-                                await post.sign(this.authStore.postPriv)
+                                
                                 await discussions.post({
-                                    poster: this.authStore.accountName,
+                                    poster: this.authStore.posterName,
                                     title: post.title,
                                     content: post.content,
                                     sub: post.sub.value,
@@ -316,6 +291,8 @@ export default class Posts extends BaseStore {
                                     threadUuid: uuid,
                                     attachment: getAttachmentValue(post),
                                 } as any)
+
+                                this.uiStore.showToast('Your post has been created!', 'success')
 
                                 this.clearPreview()
                             }),

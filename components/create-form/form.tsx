@@ -5,6 +5,7 @@ import Select from 'react-select'
 import { Editor } from '@components'
 import { faSpinner } from '@fortawesome/free-solid-svg-icons'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
+import { isServer } from '@utils'
 
 interface FormProps extends React.HTMLAttributes<HTMLFormElement> {
     form: IForm
@@ -26,7 +27,7 @@ class Form extends React.Component<FormProps> {
         window.addEventListener('keypress', this.enterKeyEventListener)
     }
 
-    componentWillMount(): void {
+    componentWillUnmount(): void {
         window.removeEventListener('keypress', this.enterKeyEventListener)
     }
 

@@ -9,10 +9,17 @@ class FeedModel {
 
     @observable verifySig: any
     @observable uuid: any
+    @observable map: any
+    @observable sub: any
+    @observable poster: any
+    @observable content: any
+    @observable createdAt: any
+    @observable totalReplies: any
 
     constructor(post: Post) {
         set(this, post)
     }
+
 
     vote = async (_uuid: string, myNewVote: number) => {
         const type = myNewVote === 1 ? 'upvotes' : 'downvotes'

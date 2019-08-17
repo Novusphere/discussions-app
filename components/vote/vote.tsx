@@ -31,7 +31,7 @@ const Vote: React.FC<IVoteProps> = ({ uuid, upVotes, downVotes, myVote, handler,
                 ])}
             />
         </span>
-        <span className={'f6 b pr1  disable-user-select'}>{upVotes + downVotes}</span>
+        <span className={'f6 b pr1  disable-user-select ph1'}>{upVotes + downVotes}</span>
         <span onClick={async () => await handler(uuid, -1)}>
             <FontAwesomeIcon
                 width={13}

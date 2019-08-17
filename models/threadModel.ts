@@ -14,11 +14,21 @@ export class ThreadModel {
     @observable.deep public openingPost: PostModel
     @observable public uuid: string
     @observable public title: string
-    @observable public totalReplies: number
 
     @observable public replies: PostModel[]
 
     public replyBoxStatuses = observable.map<string, ReplyModel>()
+
+    @computed get totalReplies() {
+        const map = Object.keys(this.map)
+
+        if (map.length) {
+            return map.length - 1
+        }
+
+        return 0
+    }
+
     /**
      * Get the reply box model for a particular post uid
      * @return {ReplyModel}
@@ -72,12 +82,10 @@ export class ThreadModel {
 
             this.map = map
             this.title = thread.openingPost.title
-            this.totalReplies = thread.openingPost.totalReplies
         } else {
             this.openingPost = thread
             this.uuid = thread!.uuid
             this.title = thread!.title
-            this.totalReplies = thread!.totalReplies
         }
 
         /**
@@ -90,12 +98,12 @@ export class ThreadModel {
 
     @computed get openingPostReplies(): any[] {
         const openingPostReplies = this.getRepliesFromMap(this.uuid)
-        
+
         return openingPostReplies.map(reply => {
-            return ({
+            return {
                 ...reply,
                 replies: this.getRepliesFromMap(reply.uuid),
-            })
+            }
         })
     }
 
@@ -157,7 +165,6 @@ export class ThreadModel {
                     this.map[uuid].myVote = 0
                 }
             }
-
         } catch (error) {
             console.log(error)
             throw error

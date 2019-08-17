@@ -5,8 +5,6 @@ import { IPost } from '@stores/posts'
 import { Feed } from '@components'
 import { Router } from '@router'
 import { TagModel } from '@models/tagModel'
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
-import { faSpinner } from '@fortawesome/free-solid-svg-icons'
 import FeedModel from '@models/feedModel'
 
 interface ITagProps {
@@ -14,6 +12,7 @@ interface ITagProps {
     postsStore: IStores['postsStore']
     tagName: undefined | string
     tagModel: TagModel
+    feed: FeedModel[]
 }
 
 // TODO: Merge logic between e/page and tag/page. Right now it's separated.
@@ -28,22 +27,13 @@ class Tag extends React.Component<ITagProps> {
 
         const tagModel = tagStore.setActiveTag(tag)
 
-        if (
-            !postsStore.feedThreads ||
-            !postsStore.feedThreads.length ||
-            postsStore.feedThreads.some(thread => thread['tags'].indexOf(tag) === -1)
-        ) {
-            await postsStore.getPostsByTag([tag])
-        }
+        const feed = await postsStore.getPostsByTag([tag])
 
         return {
             tagName: tag,
             tagModel: tagModel,
+            feed: feed,
         }
-    }
-
-    async componentWillMount(): Promise<void> {
-        await this.props.postsStore.getPostsByTag([this.props.tagName])
     }
 
     public clickPost = (post: IPost) => {
@@ -51,22 +41,19 @@ class Tag extends React.Component<ITagProps> {
         Router.pushRoute(
             `/e/${post.sub}/${id}/${decodeURIComponent(post.title.replace(/ /g, '_'))}`
         )
-        this.props.postsStore.setActiveThreadId(id)
     }
 
     public render() {
         const {
             clickPost,
-            props: { tagModel },
+            props: { postsStore, tagModel, feed, tagName },
         } = this
 
-        return this.props.postsStore.getPostsByTag['match']({
-            pending: () => <FontAwesomeIcon width={13} icon={faSpinner} spin />,
-            rejected: () => <span>No posts found for specified tag: {this.props.tagName}</span>,
-            resolved: (feed: FeedModel[]) => (
-                <Feed threads={feed} onClick={clickPost} tagModel={tagModel} />
-            ),
-        })
+        if (!feed.length) {
+            return <span>No posts found for specified tag: {tagName}</span>
+        }
+
+        return <Feed threads={postsStore.feedThreads} onClick={clickPost} tagModel={tagModel} />
     }
 }
 

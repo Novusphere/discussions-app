@@ -25,7 +25,7 @@ const MainPost: React.FC<IMainPost> = ({ openingPost, replyHandler, voteHandler 
     return (
         <>
             <div className={'pb2'}>
-                <Link route={`/e/${openingPost.sub}`}>
+                <Link route={`/tag/${openingPost.sub}`}>
                     <a>
                         <button className={'tl'}>
                             <FontAwesomeIcon width={13} icon={faArrowLeft} className={'pr1'} />

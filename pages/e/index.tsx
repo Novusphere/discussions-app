@@ -4,10 +4,12 @@ import { IStores } from '@stores'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { faSpinner } from '@fortawesome/free-solid-svg-icons'
 import { Thread } from '@components'
+import { ThreadModel } from '@models/threadModel'
 
 interface IEPageProps {
     postsStore: IStores['postsStore']
     tagStore: IStores['tagStore']
+    thread: ThreadModel
     query: {
         tag: string
         id: string
@@ -22,34 +24,37 @@ interface IEPageState {}
 class E extends React.Component<IEPageProps, IEPageState> {
     static async getInitialProps({ ctx: { query, store } }) {
         const postsStore: IStores['postsStore'] = store.postsStore
-        postsStore.setActiveThreadId(query.id)
+        const thread = await postsStore.getThreadById(query.id)
+
         return {
             query,
+            thread,
         }
     }
 
     public render(): React.ReactNode {
-        const { getThreadById, activeThread } = this.props.postsStore
-        return getThreadById['match']({
-            pending: () => <FontAwesomeIcon width={13} icon={faSpinner} spin />,
-            rejected: () => <span>No posts found for specified sub: {this.props.query.tag}</span>,
-            resolved: (thread) => {
-                if (!thread || !activeThread) return null
-                return (
-                    <div className={'thread-container'}>
-                        <Thread
-                            opening={activeThread.openingPost}
-                            openingModel={activeThread.rbModel(activeThread.openingPost)}
-                            getModel={activeThread.rbModel}
-                            getRepliesFromMap={activeThread.getRepliesFromMap}
-                            vote={activeThread.vote}
-                            openingPostReplies={activeThread.openingPostReplies}
-                            totalReplies={activeThread.totalReplies}
-                        />
-                    </div>
-                )
-            },
-        })
+        let {
+            thread,
+            query: { id, tag },
+        } = this.props
+
+        if (!thread) {
+            return <span>No posts found for specified thread: {id}</span>
+        }
+
+        return (
+            <div className={'thread-container'}>
+                <Thread
+                    opening={thread.openingPost}
+                    openingModel={thread.rbModel(thread.openingPost)}
+                    getModel={thread.rbModel}
+                    getRepliesFromMap={thread.getRepliesFromMap}
+                    vote={thread.vote}
+                    openingPostReplies={thread.openingPostReplies}
+                    totalReplies={thread.totalReplies}
+                />
+            </div>
+        )
     }
 }
 

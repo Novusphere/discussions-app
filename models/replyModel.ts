@@ -46,9 +46,10 @@ export class ReplyModel {
         }
 
         const generatedUid = generateUuid()
+        const posterName = getAuthStore().posterName
 
         const reply = {
-            poster: getAuthStore().accountName,
+            poster: posterName,
             title: '',
             content: this.content,
             sub: post.sub,
@@ -72,13 +73,19 @@ export class ReplyModel {
 
                 const signedReply = model.sign(this.authStore.postPriv)
                 const confirmedReply = await discussions.post(signedReply as any)
-                console.log('Class: ReplyModel, Function: onSubmit, Line 75 confirmedReply: ', confirmedReply);
+                console.log(
+                    'Class: ReplyModel, Function: onSubmit, Line 75 confirmedReply: ',
+                    confirmedReply
+                )
 
                 set(activeThread, {
-                    totalReplies: activeThread.totalReplies + 1,
                     map: {
                         ...activeThread.map,
-                        [reply.id]: new PostModel(confirmedReply),
+                        [reply.id]: new PostModel({
+                            ...confirmedReply,
+                            poster: 'eosforumanon',
+                            myVote: posterName ? 1 : 0,
+                        } as any),
                     },
                 })
 

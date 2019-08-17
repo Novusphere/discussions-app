@@ -125,7 +125,7 @@ export default class Auth extends BaseStore {
             },
             [
                 {
-                    name: 'displayName',
+                    name: 'posterName',
                     label: 'Display Name',
                     type: 'text',
                     value: this.anonymousObject.username,
@@ -255,6 +255,18 @@ export default class Auth extends BaseStore {
 
     @computed get ATMOSBalance(): number {
         return this.balances.get('ATMOS') || 0
+    }
+
+    /**
+     * Used for posting, returns empty string if the
+     * user is logged in via a non-scatter method
+     */
+    @computed get posterName(): string {
+        if (this.preferredSignInMethod === SignInMethods.brainKey) {
+            return ''
+        }
+
+        return this.accountName
     }
 
     public signInObjectState = (stepNumber: number) => {
