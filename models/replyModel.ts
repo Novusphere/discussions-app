@@ -73,10 +73,6 @@ export class ReplyModel {
 
                 const signedReply = model.sign(this.authStore.postPriv)
                 const confirmedReply = await discussions.post(signedReply as any)
-                console.log(
-                    'Class: ReplyModel, Function: onSubmit, Line 75 confirmedReply: ',
-                    confirmedReply
-                )
 
                 set(activeThread, {
                     map: {

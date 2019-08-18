@@ -7,11 +7,11 @@ import { withMobx } from 'next-mobx-wrapper'
 import localForage from 'localforage'
 import { isServer } from '@utils'
 import { create } from 'mobx-persist'
-import { toast } from 'react-toastify';
+import { toast } from 'react-toastify'
+import { configure } from 'mobx'
 
 import '../styles/style.scss'
 
-// import { configure } from 'mobx'
 // configure({ enforceActions: 'observed' })
 useStaticRendering(isServer) // NOT `true` value
 toast.configure()
@@ -19,12 +19,12 @@ toast.configure()
 class DiscussionApp extends App {
     public props: any
 
-    static async getInitialProps(ctx) {
+    static async getInitialProps({ ctx, Component }) {
         const isServer = !!ctx.req
         let pageProps = {}
         //
-        if (ctx.Component.getInitialProps) {
-            pageProps = await ctx.Component.getInitialProps(ctx)
+        if (Component.getInitialProps) {
+            pageProps = await Component.getInitialProps(ctx)
         }
 
         return {
@@ -42,7 +42,7 @@ class DiscussionApp extends App {
         if (!isServer) {
             const hydrate = create({
                 storage: localForage,
-                jsonify: false
+                jsonify: false,
             })
 
             hydrate('auth', this.props.store.authStore)

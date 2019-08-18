@@ -14,7 +14,6 @@ export interface IStores {
     settingsStore: Settings
 }
 
-
 export {
     getAuthStore,
     getPostsStore,

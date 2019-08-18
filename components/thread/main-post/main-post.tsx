@@ -22,6 +22,7 @@ interface IMainPost {
 }
 
 const MainPost: React.FC<IMainPost> = ({ openingPost, replyHandler, voteHandler }) => {
+    console.log(openingPost.sub)
     return (
         <>
             <div className={'pb2'}>
@@ -62,12 +63,6 @@ const MainPost: React.FC<IMainPost> = ({ openingPost, replyHandler, voteHandler 
                             downVotes={openingPost.downvotes}
                             handler={voteHandler}
                         />
-                    </div>
-
-                    <div className={'flex'}>
-                        <pre>{openingPost.myVote}</pre>
-                        <pre>{openingPost.upvotes}</pre>
-                        <pre>{openingPost.downvotes}</pre>
                     </div>
 
                     <ReactMarkdown className={'black f6 lh-copy'} source={openingPost.content} />

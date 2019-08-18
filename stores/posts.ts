@@ -79,16 +79,16 @@ export default class Posts extends BaseStore {
         this.authStore = getAuthStore()
         this.uiStore = getUiStore()
 
-        reaction(
-            () => this.authStore.isLoggedIn,
-            async isLoggedIn => {
-                if (isLoggedIn) {
-                    if (this.tagsStore.activeTag) {
-                        await this.getPostsByTag([this.tagsStore.activeTag.name])
-                    }
-                }
-            }
-        )
+        // reaction(
+        //     () => this.authStore.isLoggedIn,
+        //     async isLoggedIn => {
+        //         if (isLoggedIn) {
+        //             if (this.tagsStore.activeTag) {
+        //                 await this.getPostsByTag([this.tagsStore.activeTag.name])
+        //             }
+        //         }
+        //     }
+        // )
     }
 
     public encodeId(post: IPost) {
@@ -277,7 +277,7 @@ export default class Posts extends BaseStore {
                             onClick: task.resolved(async form => {
                                 const post = form.values()
                                 const uuid = generateUuid()
-                                
+
                                 await discussions.post({
                                     poster: this.authStore.posterName,
                                     title: post.title,

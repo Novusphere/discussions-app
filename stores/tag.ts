@@ -1,12 +1,13 @@
-import { observable } from 'mobx'
+import { action, observable } from 'mobx'
 import { TagModel } from '@models/tagModel'
 import { BaseStore, getOrCreateStore } from 'next-mobx-wrapper'
+import { task } from 'mobx-task'
 
 export default class Tag extends BaseStore {
     // the amount of subs that are base
     static baseSubLength = 4
 
-    @observable activeTag: TagModel
+    @observable activeTag: TagModel = null
     @observable tags = observable.map<string, TagModel>()
 
     constructor() {
@@ -19,8 +20,8 @@ export default class Tag extends BaseStore {
         if (this.tags.size === Tag.baseSubLength) {
             ;[
                 {
-                    name: 'UXfyre',
-                    url: '/tag/UXfyre',
+                    name: 'uxfyre',
+                    url: '/tag/uxfyre',
                     logo: 'https://uxfyre.io/public/img/fyreicon.png',
                 },
                 {
@@ -405,7 +406,8 @@ export default class Tag extends BaseStore {
         }
     }
 
-    public setActiveTag = (tagName: string): TagModel => {
+    @task
+    public setActiveTag(tagName: string): TagModel {
         let tagModel
 
         if (!this.tags.get(tagName)) {

@@ -3,15 +3,10 @@ import { inject, observer } from 'mobx-react'
 import { Link } from '@router'
 import { IStores } from '@stores'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
-import {
-    faEnvelope,
-    faPen,
-    faSearch,
-    faSpinner,
-    faUser,
-} from '@fortawesome/free-solid-svg-icons'
+import { faEnvelope, faPen, faSearch, faSpinner, faUser } from '@fortawesome/free-solid-svg-icons'
 import { Tooltip } from 'react-tippy'
 import { ModalOptions } from '@globals'
+import { TagModel } from '@models/tagModel'
 
 interface ITitleHeaderProps {
     tagStore: IStores['tagStore']
@@ -109,31 +104,31 @@ class TitleHeader extends React.Component<ITitleHeaderProps> {
     }
 
     private renderActiveTag = () => {
-        const { activeTag } = this.props.tagStore
+        const { setActiveTag } = this.props.tagStore
 
-        if (!activeTag) {
-            return (
+        return setActiveTag['match']({
+            pending: () => <FontAwesomeIcon width={13} icon={faSpinner} spin />,
+            rejected: () => (
                 <Link route={'/'}>
                     <a>home</a>
                 </Link>
-            )
-        }
+            ),
+            resolved: (tagModel: TagModel) => (
+                <Link route={tagModel.url}>
+                    <a className={'flex items-center'}>
+                        {!tagModel.icon ? null : (
+                            <img
+                                className={'tag-icon pr2'}
+                                src={tagModel.icon}
+                                alt={`${tagModel.name} icon`}
+                            />
+                        )}
 
-        return (
-            <Link route={activeTag.url}>
-                <a className={'flex items-center'}>
-                    {!activeTag.icon ? null : (
-                        <img
-                            className={'tag-icon pr2'}
-                            src={activeTag.icon}
-                            alt={`${activeTag.name} icon`}
-                        />
-                    )}
-
-                    <span>{activeTag.name}</span>
-                </a>
-            </Link>
-        )
+                        <span>{tagModel.name}</span>
+                    </a>
+                </Link>
+            ),
+        })
     }
 
     public render(): React.ReactNode {

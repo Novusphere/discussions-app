@@ -8,7 +8,7 @@ interface IUPageProps {
 }
 
 class U extends React.Component<IUPageProps> {
-    static async getInitialProps({ ctx: { query } }) {
+    static async getInitialProps({ query }) {
         const userData = await dummy.getUser(query.username)
         return {
             username: query.username,

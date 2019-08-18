@@ -1,10 +1,9 @@
 import * as React from 'react'
 import { observer, inject } from 'mobx-react'
-// import { PostPreview } from '@components'
+import { PostPreview } from '@components'
 import { IStores } from '@stores'
 import { IPost } from '@stores/posts'
 import { Router } from '@router'
-// import { /*discussions,*/ Post } from '@novuspherejs'
 
 interface IIndexPage {
     postsStore: IStores['postsStore']
@@ -25,32 +24,21 @@ class Index extends React.Component<IIndexPage> {
     }
 
     public render(): React.ReactNode {
-        if (typeof window !== 'undefined') {
-            // setTimeout(async function () {
-                //const bk = discussions.bkCreate();
-                //const json = await discussions.bkToStatusJson(bk, 'testp', {});
-                //const bk2 = discussions.bkFromStatusJson(json, 'testp');
-
-                
-                //await discussions.bkRetrieveFromEOS('asphyxiating');
-            // }, 5000);
+        if (!this.props.postsStore.posts || !this.props.postsStore.posts.length) {
+            return <span>No posts found</span>
         }
 
-        return null
-
-        // return this.props.postsStore.posts.map(post => {
-        //     if (post instanceof Post) {
-        //         return (
-        //             <PostPreview
-        //                 post={post.openingPost as Post}
-        //                 key={post.uuid}
-        //                 onClick={this.clickPost}
-        //                 tag={this.props.tagStore.tags.get(post.sub)}
-        //                 voteHandler={this.props.postsStore.vote}
-        //             />
-        //         )
-        //     }
-        // })
+        return this.props.postsStore.posts.map(post => {
+            return (
+                <PostPreview
+                    post={post}
+                    key={post.uuid}
+                    onClick={this.clickPost}
+                    tag={this.props.tagStore.tags.get(post.sub)}
+                    voteHandler={this.props.postsStore.vote}
+                />
+            )
+        })
     }
 }
 

@@ -85,7 +85,6 @@ export default class Auth extends BaseStore {
                         if (statusJson) {
                             const parsedJSON = JSON.parse(statusJson)
                             if (parsedJSON.tip !== this.tipPub) {
-                                console.log('in here')
                                 this.uiStore.showModal(ModalOptions.signIn)
                                 await sleep(200)
                                 this.signInObjectState(4)
@@ -182,7 +181,6 @@ export default class Auth extends BaseStore {
                 onSubmit: async form => {
                     const { password } = form.values()
                     if (password) {
-                        console.log('password set!')
                         this.signInObject.password = password
                         try {
                             await this.setupBKKeysToScatter()

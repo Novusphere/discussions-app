@@ -20,20 +20,18 @@ interface ITagProps {
 @inject('tagStore', 'postsStore')
 @observer
 class Tag extends React.Component<ITagProps> {
-    static async getInitialProps({ ctx: { store, query } }) {
+    static async getInitialProps({ query, store }) {
         const tag = query.name
         const postsStore: IStores['postsStore'] = store.postsStore
-        const tagStore: IStores['tagStore'] = store.tagStore
-
-        const tagModel = tagStore.setActiveTag(tag)
-
         const feed = await postsStore.getPostsByTag([tag])
-
         return {
             tagName: tag,
-            tagModel: tagModel,
             feed: feed,
         }
+    }
+
+    componentWillMount(): void {
+        this.props.tagStore.setActiveTag(this.props.tagName)
     }
 
     public clickPost = (post: IPost) => {
@@ -46,14 +44,20 @@ class Tag extends React.Component<ITagProps> {
     public render() {
         const {
             clickPost,
-            props: { postsStore, tagModel, feed, tagName },
+            props: { postsStore, tagStore, feed, tagName },
         } = this
 
-        if (!feed.length) {
+        if (!feed || !feed.length) {
             return <span>No posts found for specified tag: {tagName}</span>
         }
 
-        return <Feed threads={postsStore.feedThreads} onClick={clickPost} tagModel={tagModel} />
+        return (
+            <Feed
+                threads={postsStore.feedThreads}
+                onClick={clickPost}
+                tagModel={tagStore.activeTag}
+            />
+        )
     }
 }
 

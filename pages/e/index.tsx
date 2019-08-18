@@ -22,7 +22,7 @@ interface IEPageState {}
 @inject('postsStore', 'tagStore')
 @observer
 class E extends React.Component<IEPageProps, IEPageState> {
-    static async getInitialProps({ ctx: { query, store } }) {
+    static async getInitialProps({ query, store }) {
         const postsStore: IStores['postsStore'] = store.postsStore
         const thread = await postsStore.getThreadById(query.id)
 
