@@ -79,16 +79,18 @@ export default class Posts extends BaseStore {
         this.authStore = getAuthStore()
         this.uiStore = getUiStore()
 
-        // reaction(
-        //     () => this.authStore.isLoggedIn,
-        //     async isLoggedIn => {
-        //         if (isLoggedIn) {
-        //             if (this.tagsStore.activeTag) {
-        //                 await this.getPostsByTag([this.tagsStore.activeTag.name])
-        //             }
-        //         }
-        //     }
-        // )
+        // refresh posts on logged in
+        // so we can show upvotes/downvotes by the user
+        reaction(
+            () => this.authStore.isLoggedIn,
+            async isLoggedIn => {
+                if (isLoggedIn) {
+                    if (this.activeThread) {
+                        this.getAndSetThread(this.activeThreadId)
+                    }
+                }
+            }
+        )
     }
 
     public encodeId(post: IPost) {
@@ -113,6 +115,20 @@ export default class Posts extends BaseStore {
             return null
         }
         return this.posts.filter(post => post.title.length).map(post => new FeedModel(post as any))
+    }
+
+    @task
+    @action.bound
+    public async getAndSetThread(id: string) {
+        try {
+            this.activeThreadId = id
+            const thread = await this.getThreadById(id)
+            this.activeThread = thread
+            return thread
+        } catch (error) {
+            console.log('Class: Posts, Function: getAndSetThread, Line 123 error: ', error);
+            throw error
+        }
     }
 
     @task

@@ -79,33 +79,42 @@ export default class Auth extends BaseStore {
             () => !!this.statusJson,
             async () => {
                 if (!this.isLoggedIn) {
-                    if (this.preferredSignInMethod === SignInMethods.scatter) {
-                        const statusJson = await discussions.bkRetrieveStatusEOS(this.accountName)
-
-                        if (statusJson) {
-                            const parsedJSON = JSON.parse(statusJson)
-                            if (parsedJSON.tip !== this.tipPub) {
-                                this.uiStore.showModal(ModalOptions.signIn)
-                                await sleep(200)
-                                this.signInObjectState(4)
-                            } else {
-                                await init()
-                                const wallet = await eos.detectWallet()
-
-                                if (typeof wallet !== 'boolean' && wallet) {
-                                    await this.initializeScatterAndSetBalance()
-                                    this.isLoggedIn = true
-                                }
-                            }
-                        }
-                    } else if (this.preferredSignInMethod === SignInMethods.brainKey) {
-                        if (this.postPriv && this.tipPub) {
-                            this.isLoggedIn = true
-                        }
-                    }
+                    this.checkInitialConditions()
                 }
             }
         )
+    }
+
+    /**
+     * Check the condition of LS to determine if the user should be logged in or not
+     */
+    @task
+    @action.bound
+    async checkInitialConditions() {
+        if (this.preferredSignInMethod === SignInMethods.scatter) {
+            const statusJson = await discussions.bkRetrieveStatusEOS(this.accountName)
+
+            if (statusJson) {
+                const parsedJSON = JSON.parse(statusJson)
+                if (parsedJSON.tip !== this.tipPub) {
+                    this.uiStore.showModal(ModalOptions.signIn)
+                    await sleep(200)
+                    this.signInObjectState(4)
+                } else {
+                    await init()
+                    const wallet = await eos.detectWallet()
+
+                    if (typeof wallet !== 'boolean' && wallet) {
+                        await this.initializeScatterAndSetBalance()
+                        this.isLoggedIn = true
+                    }
+                }
+            }
+        } else if (this.preferredSignInMethod === SignInMethods.brainKey) {
+            if (this.postPriv && this.tipPub && this.accountName) {
+                this.isLoggedIn = true
+            }
+        }
     }
 
     /**
@@ -291,6 +300,11 @@ export default class Auth extends BaseStore {
             console.log('Logging in with password')
             await sleep(1000)
             const bk = await discussions.bkFromStatusJson(this.statusJson, password)
+            const parsed = JSON.parse(this.statusJson)
+
+            // set account name just in case things changed
+            this.accountName = parsed.displayName
+
             await this.storeKeys(bk)
             await this.signUpSuccess()
         } catch (error) {
@@ -438,6 +452,7 @@ export default class Auth extends BaseStore {
 
     @action clearAuth = () => {
         this.isLoggedIn = false
+        this.accountName = ''
     }
 
     @action setAuth = (eosAuthObject: {

@@ -42,6 +42,11 @@
 .post-content {
     @extend .pa3;
     background: white;
+
+    .tag-image {
+        width: 24px !important;
+        padding-right: 5px;
+    }
 }
 
 .reply-content {
@@ -67,7 +72,6 @@
 
 .vote {
     svg {
-        @extend .pr1;
         width: 0.625em;
     }
 }

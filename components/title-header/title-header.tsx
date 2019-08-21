@@ -48,10 +48,10 @@ class TitleHeader extends React.Component<ITitleHeaderProps> {
     }
 
     private renderAuthActions = () => {
-        const { isLoggedIn, accountName, initializeScatterAndSetBalance } = this.props.authStore
+        const { isLoggedIn, accountName, initializeScatterAndSetBalance, checkInitialConditions } = this.props.authStore
         const { showModal } = this.props.uiStore
 
-        if (initializeScatterAndSetBalance['pending']) {
+        if (initializeScatterAndSetBalance['pending'] || checkInitialConditions['pending']) {
             return <FontAwesomeIcon width={13} icon={faSpinner} spin />
         }
 

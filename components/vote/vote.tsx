@@ -15,7 +15,9 @@ interface IVoteProps {
 
 const Vote: React.FC<IVoteProps> = ({ uuid, upVotes, downVotes, myVote, handler, ...props }) => (
     <span
-        className={'black f6 vote flex flex-column items-center ph1 disable-user-select'}
+        className={classNames([
+            'black f6 vote flex flex-column items-center disable-user-select ph1',
+        ])}
         {...props}
     >
         <span onClick={async () => await handler(uuid, 1)}>
@@ -31,7 +33,7 @@ const Vote: React.FC<IVoteProps> = ({ uuid, upVotes, downVotes, myVote, handler,
                 ])}
             />
         </span>
-        <span className={'f6 b pr1  disable-user-select ph1'}>{upVotes + downVotes}</span>
+        <span className={classNames(['f6 b disable-user-select ph1'])}>{upVotes + downVotes}</span>
         <span onClick={async () => await handler(uuid, -1)}>
             <FontAwesomeIcon
                 width={13}

@@ -73,7 +73,8 @@ class Editor extends React.Component<IEditorProps> {
                     }
                 },
                 onSelect: (item, insertItem) => {
-                    item.value = `<a href='${window.location.origin + '/u/' + item.value}'>${item.value}</a>`
+                    item.value = `<a href='${window.location.origin + '/u/' + item.value}'>@${item.value}</a>`
+                    item.denotationChar = ''
                     return insertItem(item)
                 }
             },

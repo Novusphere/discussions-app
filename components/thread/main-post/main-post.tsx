@@ -22,7 +22,6 @@ interface IMainPost {
 }
 
 const MainPost: React.FC<IMainPost> = ({ openingPost, replyHandler, voteHandler }) => {
-    console.log(openingPost.sub)
     return (
         <>
             <div className={'pb2'}>

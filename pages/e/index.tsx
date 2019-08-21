@@ -24,12 +24,19 @@ interface IEPageState {}
 class E extends React.Component<IEPageProps, IEPageState> {
     static async getInitialProps({ query, store }) {
         const postsStore: IStores['postsStore'] = store.postsStore
-        const thread = await postsStore.getThreadById(query.id)
+        const tagStore: IStores['tagStore'] = store.tagStore
+        const thread = await postsStore.getAndSetThread(query.id)
+        tagStore.setActiveTag(query.tag)
 
         return {
             query,
             thread,
         }
+    }
+
+    async componentWillMount(): Promise<void> {
+        this.props.tagStore.setActiveTag(this.props.query.tag)
+        await this.props.postsStore.getAndSetThread(this.props.query.id)
     }
 
     public render(): React.ReactNode {
@@ -42,19 +49,29 @@ class E extends React.Component<IEPageProps, IEPageState> {
             return <span>No posts found for specified thread: {id}</span>
         }
 
-        return (
-            <div className={'thread-container'}>
-                <Thread
-                    opening={thread.openingPost}
-                    openingModel={thread.rbModel(thread.openingPost)}
-                    getModel={thread.rbModel}
-                    getRepliesFromMap={thread.getRepliesFromMap}
-                    vote={thread.vote}
-                    openingPostReplies={thread.openingPostReplies}
-                    totalReplies={thread.totalReplies}
-                />
-            </div>
-        )
+        return this.props.postsStore.getAndSetThread['match']({
+            pending: () => <FontAwesomeIcon width={13} icon={faSpinner} spin />,
+            rejected: () => <span>No posts found for specified thread: {id}</span>,
+            resolved: thread => {
+                if (!thread) {
+                    return <span>No posts found for specified thread: {id}</span>
+                }
+
+                return (
+                    <div className={'thread-container'}>
+                        <Thread
+                            opening={thread.openingPost}
+                            openingModel={thread.rbModel(thread.openingPost)}
+                            getModel={thread.rbModel}
+                            getRepliesFromMap={thread.getRepliesFromMap}
+                            vote={thread.vote}
+                            openingPostReplies={thread.openingPostReplies}
+                            totalReplies={thread.totalReplies}
+                        />
+                    </div>
+                )
+            },
+        })
     }
 }
 

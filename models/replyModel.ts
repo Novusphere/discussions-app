@@ -3,7 +3,7 @@ import { task } from 'mobx-task'
 import { Post } from '@novuspherejs/discussions/post'
 import { Messages } from '@globals'
 import { generateUuid, getAttachmentValue } from '@utils'
-import { getAuthStore, getPostsStore, IStores } from '@stores'
+import { getAuthStore, getPostsStore, getUiStore, IStores } from '@stores'
 import PostModel from '@models/postModel'
 import { discussions } from '@novuspherejs'
 
@@ -15,6 +15,7 @@ export class ReplyModel {
 
     public readonly authStore: IStores['authStore']
     public readonly postStore: IStores['postsStore']
+    public readonly uiStore: IStores['uiStore']
 
     // the post replying to
     @observable post: Post = null
@@ -24,6 +25,7 @@ export class ReplyModel {
         this.map = map
         this.authStore = getAuthStore()
         this.postStore = getPostsStore()
+        this.uiStore = getUiStore()
     }
 
     @action setContent = (content: string) => {
@@ -35,6 +37,11 @@ export class ReplyModel {
     }
 
     @task.resolved onSubmit = async () => {
+        if (!this.authStore.isLoggedIn) {
+            this.uiStore.showToast('You must be logged in to comment', 'error')
+            return
+        }
+
         let post: PostModel
 
         if (!this.post) {
@@ -47,6 +54,8 @@ export class ReplyModel {
 
         const generatedUid = generateUuid()
         const posterName = getAuthStore().posterName
+
+        console.log('Class: ReplyModel, Function: onSubmit, Line 58 : ', posterName);
 
         const reply = {
             poster: posterName,
@@ -64,9 +73,11 @@ export class ReplyModel {
             upvotes: 0,
             downvotes: 0,
         }
-
+        
         try {
             const activeThread = this.postStore.activeThread
+
+            console.log('Class: ReplyModel, Function: onSubmit, Line 73 activeThread: ', activeThread);
 
             if (activeThread) {
                 const model = new PostModel(reply as any)
@@ -79,7 +90,7 @@ export class ReplyModel {
                         ...activeThread.map,
                         [reply.id]: new PostModel({
                             ...confirmedReply,
-                            poster: 'eosforumanon',
+                            poster: posterName,
                             myVote: posterName ? 1 : 0,
                         } as any),
                     },
@@ -87,12 +98,16 @@ export class ReplyModel {
 
                 this.content = ''
                 this.toggleOpen()
+                this.uiStore.showToast('Your reply has been submitted!', 'success')
+            } else {
+                this.uiStore.showToast('Failed to submit your reply', 'error')
             }
 
             // await discussions.post.sign(this.authStore.postPriv)
             // await discussions.post(reply as any)
         } catch (error) {
-            console.log(error)
+            console.log('Class: ReplyModel, Function: onSubmit, Line 100 error: ', error);
+            this.uiStore.showToast(error.message, 'error')
             throw error
         }
     }
