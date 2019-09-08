@@ -13,6 +13,9 @@ export class TagModel extends BaseModel {
     @observable root = false
     @observable url = ''
 
+    @observable memberCount = 5000
+    @observable tagDescription = `Here is some intro text about this community. Lorem ipsum.`
+
     constructor(tag, opts?: TagOptions) {
         super()
         this.id = BaseModel.generateId()

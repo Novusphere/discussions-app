@@ -17,6 +17,8 @@ export { default as Thread } from './thread/thread-container'
 export { default as Feed } from './feed/feed'
 export { default as Collapse } from './collapse/collapse'
 export { default as BrianKey } from './brian-key/brian-key'
+export { default as TagPreview } from './tag-preview/tag-preview'
+export { default as UserNotifications } from './user-notifications/user-notifications'
 
 export { default as ChooseAccountName } from './modal/sign-up/choose-account-name'
 export { default as SectionHeader } from './modal/sign-up/header'

@@ -6,6 +6,15 @@ export default class Ui extends BaseStore {
     @observable activeBanner = '/static/banners/default.png'
     @observable activeModal = ''
 
+    @observable showSidebar = true
+    @observable showBanner = true
+
+    @action.bound
+    toggleSidebarAndBanner() {
+        this.showSidebar = !this.showSidebar
+        this.showBanner = !this.showBanner
+    }
+
     @computed get isModalOpen(): boolean {
         return this.activeModal !== ''
     }

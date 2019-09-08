@@ -1,0 +1,32 @@
+.notification-tooltip {
+	color: #212529;
+	background-color: #fff;
+	background-clip: padding-box;
+	border: 1px solid rgba(0, 0, 0, 0.15);
+	border-radius: 0.25rem;
+
+}
+
+.notification-item {
+	@extend .flex;
+	@extend .flex-column;
+	@extend .pointer;
+
+	overflow: hidden;
+	border-bottom: 1px solid #FAFAFA;
+
+	&:hover {
+		background-color: #FAFAFA;
+	}
+
+	&:last-of-type {
+		border-bottom: none;
+	}
+
+	span {
+		padding: 0;
+		margin: 0;
+	}
+
+	padding: 1em 1em !important;
+}

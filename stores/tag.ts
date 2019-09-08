@@ -406,6 +406,11 @@ export default class Tag extends BaseStore {
         }
     }
 
+    @action.bound
+    public destroyActiveTag() {
+        this.activeTag = null
+    }
+
     @task
     public setActiveTag(tagName: string): TagModel {
         let tagModel

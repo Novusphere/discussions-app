@@ -46,7 +46,7 @@ const ThreadContainer: React.FC<IThreadContainerProps> = ({
                         <span className={'b f6 pb2'}>viewing all {totalReplies} comments</span>
                     </div>
 
-                    <div className={'card pr2 pv1'}>
+                    <div className={'card'}>
                         {openingPostReplies.map(reply => (
                             <Replies
                                 post={reply as any}

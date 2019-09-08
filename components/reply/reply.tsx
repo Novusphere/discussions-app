@@ -3,15 +3,24 @@ import { Editor } from '@components'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { faSpinner } from '@fortawesome/free-solid-svg-icons'
 import { observer } from 'mobx-react'
+import classNames from 'classnames'
 
 interface IReplyProps {
+    className?: string
     uid: string // the uid of the post this component is active for
     onContentChange: (content: string) => void
     onSubmit: (uid: string) => Promise<boolean | void>
 }
 
-const Reply: React.FC<IReplyProps> = ({ uid, onContentChange, onSubmit }) => (
-    <div className={'mt3'}>
+const Reply: React.FC<IReplyProps> = ({ uid, onContentChange, onSubmit, className }) => (
+    <div
+        className={classNames([
+            'mt3',
+            {
+                [className]: !!className,
+            },
+        ])}
+    >
         <Editor placeholder={'Enter your reply'} className={'db f6'} onChange={onContentChange} />
         {onSubmit['match']({
             pending: () => (

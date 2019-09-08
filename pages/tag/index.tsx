@@ -23,7 +23,9 @@ class Tag extends React.Component<ITagProps> {
     static async getInitialProps({ query, store }) {
         const tag = query.name
         const postsStore: IStores['postsStore'] = store.postsStore
+        const tagStore: IStores['tagStore'] = store.tagStore
         const feed = await postsStore.getPostsByTag([tag])
+        tagStore.setActiveTag(tag)
         return {
             tagName: tag,
             feed: feed,
@@ -31,6 +33,7 @@ class Tag extends React.Component<ITagProps> {
     }
 
     componentWillMount(): void {
+        console.log(this.props.tagName)
         this.props.tagStore.setActiveTag(this.props.tagName)
     }
 

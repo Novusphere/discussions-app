@@ -1,11 +1,9 @@
 import * as React from 'react'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import {
-    faExclamationTriangle,
+    faDollarSign,
     faLink,
     faReply,
-    faShare,
-    faUserCircle,
 } from '@fortawesome/free-solid-svg-icons'
 import moment from 'moment'
 import { Link } from '@router'
@@ -14,6 +12,7 @@ import ReactMarkdown from 'react-markdown'
 import { observer, Observer } from 'mobx-react'
 import { ReplyModel } from '@models/replyModel'
 import PostModel from '@models/postModel'
+import classNames from 'classnames'
 
 interface IReplies {
     post: PostModel
@@ -28,63 +27,107 @@ const Replies: React.FC<IReplies> = ({
     voteHandler,
     getModel,
     getRepliesFromMap,
+    className,
     ...props
 }) => {
+    const [isHover, setHover] = React.useState(false)
     const replyModel = getModel(post)
     const replies = getRepliesFromMap(post.uuid)
+
+    const renderHoverElements = () => {
+        if (!isHover) {
+            return null
+        }
+        return (
+            <div className={'hover-elements disable-user-select'}>
+                <span
+                    onClick={replyModel.toggleOpen}
+                    title={'Reply to post'}
+                >
+                    <FontAwesomeIcon icon={faReply} />
+                </span>
+                <FontAwesomeIcon icon={faDollarSign} />
+                <FontAwesomeIcon icon={faLink} />
+            </div>
+        )
+    }
 
     return (
         <Observer>
             {() => (
-                <div className={'post-content post-reply black'} {...props}>
-                    <div className={'header pb2'}>
-                        <Link route={`/u/${post.poster}`}>
-                            <a>
-                                <FontAwesomeIcon width={13} icon={faUserCircle} className={'pr1'} />
-                                <span>{post.poster}</span>
-                            </a>
-                        </Link>
-                        <span className={'pl2 o-50 f6'}>{moment(post.createdAt).fromNow()}</span>
+                <>
+                    <div
+                        className={classNames([
+                            'post-reply black',
+                            {
+                                'post-content-hover': isHover,
+                                [className]: !!className,
+                            },
+                        ])}
+                        {...props}
+                        onMouseLeave={() => setHover(false)}
+                        onMouseEnter={() => setHover(true)}
+                    >
+                        {renderHoverElements()}
+                        <div className={'flex flex-row'}>
+                            <div className={'flex justify-between items-center mr2'}>
+                                <Votes
+                                    upVotes={post.upvotes}
+                                    downVotes={post.downvotes}
+                                    myVote={post.myVote}
+                                    uuid={post.uuid}
+                                    handler={voteHandler}
+                                />
+                            </div>
+                            <div className={'flex flex-column'}>
+                                <div className={'header pb0'}>
+                                    <Link route={`/u/${post.poster}`}>
+                                        <a>
+                                            <span className={'f6'}>{post.poster}</span>
+                                        </a>
+                                    </Link>
+                                    <span className={'pl2 o-50 f6'}>
+                                        {moment(post.createdAt).fromNow()}
+                                    </span>
+                                </div>
+                                <ReactMarkdown
+                                    className={'f6 lh-copy reply-content'}
+                                    source={post.content}
+                                />
+                            </div>
+                        </div>
+                        {/*<div className={'footer flex items-center pt1 ph2'}>*/}
+                        {/*    <span*/}
+                        {/*        className={'reply mr3 pointer dim'}*/}
+                        {/*        onClick={replyModel.toggleOpen}*/}
+                        {/*    >*/}
+                        {/*        reply*/}
+                        {/*    </span>*/}
+
+                        {/*    <FontAwesomeIcon*/}
+                        {/*        width={13}*/}
+                        {/*        icon={faLink}*/}
+                        {/*        className={'pr2 black f6 pointer dim'}*/}
+                        {/*    />*/}
+                        {/*    <FontAwesomeIcon*/}
+                        {/*        width={13}*/}
+                        {/*        icon={faShare}*/}
+                        {/*        className={'pr2 black f6 pointer dim'}*/}
+                        {/*    />*/}
+
+                        {/*    <span className={'f6 black f6 pointer dim'}>*/}
+                        {/*        <FontAwesomeIcon*/}
+                        {/*            width={13}*/}
+                        {/*            icon={faExclamationTriangle}*/}
+                        {/*            className={'pr1'}*/}
+                        {/*        />*/}
+                        {/*        mark as spam*/}
+                        {/*    </span>*/}
+                        {/*</div>*/}
                     </div>
-                    <ReactMarkdown className={'f6 lh-copy reply-content'} source={post.content} />
-                    <div className={'footer flex items-center pt3'}>
-                        <Votes
-                            upVotes={post.upvotes}
-                            downVotes={post.downvotes}
-                            myVote={post.myVote}
-                            uuid={post.uuid}
-                            className={'mr2'}
-                            handler={voteHandler}
-                        />
-
-                        <button className={'reply mr3 pointer dim'} onClick={replyModel.toggleOpen}>
-                            <FontAwesomeIcon width={13} icon={faReply} className={'pr1'} />
-                            reply
-                        </button>
-
-                        <FontAwesomeIcon
-                            width={13}
-                            icon={faLink}
-                            className={'pr2 black f6 pointer dim'}
-                        />
-                        <FontAwesomeIcon
-                            width={13}
-                            icon={faShare}
-                            className={'pr2 black f6 pointer dim'}
-                        />
-
-                        <span className={'f6 black f6 pointer dim'}>
-                            <FontAwesomeIcon
-                                width={13}
-                                icon={faExclamationTriangle}
-                                className={'pr1'}
-                            />
-                            mark as spam
-                        </span>
-                    </div>
-
                     {replyModel.open ? (
                         <Reply
+                            className={'ml4'}
                             uid={post.uuid}
                             onContentChange={replyModel.setContent}
                             onSubmit={replyModel.onSubmit}
@@ -98,12 +141,12 @@ const Replies: React.FC<IReplies> = ({
                                   key={postReply.uuid}
                                   getModel={getModel}
                                   getRepliesFromMap={getRepliesFromMap}
-                                  className={'post-content post-reply black child'}
+                                  className={'post-reply black child ml4'}
                                   voteHandler={voteHandler}
                               />
                           ))
                         : null}
-                </div>
+                </>
             )}
         </Observer>
     )

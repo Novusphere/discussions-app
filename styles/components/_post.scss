@@ -40,7 +40,7 @@
 }
 
 .post-content {
-    @extend .pa3;
+    @extend .pa4;
     background: white;
 
     .tag-image {
@@ -50,6 +50,10 @@
 }
 
 .reply-content {
+    p {
+        @extend .mt2;
+        @extend .mb0;
+    }
     a {
         color: #007bff !important;
     }
@@ -88,9 +92,9 @@ button.reply {
 }
 
 .post-reply {
-    @extend .ba;
-    @extend .ml2;
-    @extend .mv3;
+    //@extend .ba;
+    @extend .pa2;
+    @extend .relative;
 
     border-color: #e3e3e3;
 
@@ -109,9 +113,49 @@ button.reply {
     }
 }
 
+.hover-elements {
+    @extend .flex;
+    @extend .flex-row;
+    @extend .justify-center;
+    @extend .items-center;
+
+    z-index: 10;
+    background: #FFFFFF;
+    border: 1px solid #E9EBEE;
+    box-sizing: border-box;
+    border-radius: 4px;
+    position: absolute;
+    right: 1em;
+    top: -5px;
+
+    svg {
+        @extend .pointer;
+        @extend .ph2;
+        @extend .pv1;
+        border-right: 1px solid #E9EBEE;
+
+       path {
+           fill: #5B6780;
+       }
+
+        &:hover {
+            background-color: #E9EBEE;
+        }
+
+        &:last-of-type {
+            border-right: none;
+        }
+    }
+}
+
+.post-content-hover {
+    background-color: #FAFAFA !important;
+}
+
 .child > .child,
 .child > .child > .child > .child {
-    background: #fff;
+    //background: #fff;
+    border-left: 1px solid #E9EBEE;
 }
 
 /**
@@ -120,5 +164,6 @@ button.reply {
 .child,
 .child > .child > .child,
 .child > .child > .child > .child > .child {
-    background-color: #f7f7f7;
+    border-left: 1px solid #E9EBEE;
+    //background-color: #f7f7f7;
 }

@@ -93,7 +93,6 @@ export default class Auth extends BaseStore {
     async checkInitialConditions() {
         if (this.preferredSignInMethod === SignInMethods.scatter) {
             const statusJson = await discussions.bkRetrieveStatusEOS(this.accountName)
-
             if (statusJson) {
                 const parsedJSON = JSON.parse(statusJson)
                 if (parsedJSON.tip !== this.tipPub) {
@@ -110,7 +109,10 @@ export default class Auth extends BaseStore {
                     }
                 }
             }
-        } else if (this.preferredSignInMethod === SignInMethods.brainKey) {
+        }
+
+
+        if (this.preferredSignInMethod === SignInMethods.brainKey) {
             if (this.postPriv && this.tipPub && this.accountName) {
                 this.isLoggedIn = true
             }

@@ -5,7 +5,6 @@ import Select from 'react-select'
 import { Editor } from '@components'
 import { faSpinner } from '@fortawesome/free-solid-svg-icons'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
-import { isServer } from '@utils'
 
 interface FormProps extends React.HTMLAttributes<HTMLFormElement> {
     form: IForm
@@ -105,10 +104,19 @@ class Form extends React.Component<FormProps> {
                         return (
                             <React.Fragment key={field.name}>
                                 <div className={'field-container pb3 inline-labels'}>
-                                    <label htmlFor={field.accessor.id} className={'w-40'}>
-                                        {field.accessor.label}
-                                    </label>
-                                    <div className={'w-60 flex flex-column'}>
+                                    {!field.hideLabels && (
+                                        <label htmlFor={field.accessor.id} className={'w-40'}>
+                                            {field.accessor.label}
+                                        </label>
+                                    )}
+                                    <div
+                                        className={classNames([
+                                            'w-60 flex flex-column',
+                                            {
+                                                'w-100': field.hideLabels,
+                                            },
+                                        ])}
+                                    >
                                         <Select
                                             className={'db f6 react-select-dropdown'}
                                             classNamePrefix={'rs'}
@@ -126,10 +134,19 @@ class Form extends React.Component<FormProps> {
                         return (
                             <React.Fragment key={field.name}>
                                 <div className={'field-container pb3 inline-labels'}>
-                                    <label htmlFor={field.accessor.id} className={'w-40'}>
-                                        {field.accessor.label}
-                                    </label>
-                                    <div className={'w-60 flex flex-column'}>
+                                    {!field.hideLabels && (
+                                        <label htmlFor={field.accessor.id} className={'w-40'}>
+                                            {field.accessor.label}
+                                        </label>
+                                    )}
+                                    <div
+                                        className={classNames([
+                                            'w-60 flex flex-column',
+                                            {
+                                                'w-100': field.hideLabels,
+                                            },
+                                        ])}
+                                    >
                                         <textarea
                                             rows="4"
                                             cols="50"
@@ -147,10 +164,19 @@ class Form extends React.Component<FormProps> {
                         return (
                             <React.Fragment key={field.name}>
                                 <div className={'field-container pb3 inline-labels'}>
-                                    <label htmlFor={field.accessor.id} className={'w-40'}>
-                                        {field.accessor.label}
-                                    </label>
-                                    <div className={'w-60 h-100 flex flex-column'}>
+                                    {!field.hideLabels && (
+                                        <label htmlFor={field.accessor.id} className={'w-40'}>
+                                            {field.accessor.label}
+                                        </label>
+                                    )}
+                                    <div
+                                        className={classNames([
+                                            'w-60 h-100 flex flex-column',
+                                            {
+                                                'w-100': field.hideLabels,
+                                            },
+                                        ])}
+                                    >
                                         <Editor
                                             placeholder={field.placeholder}
                                             className={'db f6'}
@@ -170,7 +196,16 @@ class Form extends React.Component<FormProps> {
                                 className={'field-container pb3 db flex justify-end items-center'}
                                 key={field.name}
                             >
-                                <div className={'w-80'}>{renderButton(field, type, rest)}</div>
+                                <div
+                                    className={classNames([
+                                        {
+                                            'w-80': !field.hideLabels,
+                                            'w-100': field.hideLabels,
+                                        },
+                                    ])}
+                                >
+                                    {renderButton(field, type, rest)}
+                                </div>
                             </div>
                         )
                     case 'radiogroup':
@@ -206,10 +241,19 @@ class Form extends React.Component<FormProps> {
                         return (
                             <React.Fragment key={field.name}>
                                 <div className={'field-container pb3 inline-labels'}>
-                                    <label htmlFor={field.accessor.id} className={'w-40'}>
-                                        {field.accessor.label}
-                                    </label>
-                                    <div className={'w-60 flex flex-column'}>
+                                    {!field.hideLabels && (
+                                        <label htmlFor={field.accessor.id} className={'w-40'}>
+                                            {field.accessor.label}
+                                        </label>
+                                    )}
+                                    <div
+                                        className={classNames([
+                                            'w-60 flex flex-column',
+                                            {
+                                                'w-100': field.hideLabels,
+                                            },
+                                        ])}
+                                    >
                                         <input {...bind} className={'db f6 form-input'} />
                                         <span className={'error f6 db pv2 tl'}>
                                             {field.accessor.error}

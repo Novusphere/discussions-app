@@ -52,6 +52,7 @@ declare interface FormField {
     readonly?: boolean
     disabled?: boolean
     accessor?: Form$
+    hideLabels?: boolean
 
     input?: (value) => any
     output?: (value) => any

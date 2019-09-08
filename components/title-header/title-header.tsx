@@ -3,10 +3,11 @@ import { inject, observer } from 'mobx-react'
 import { Link } from '@router'
 import { IStores } from '@stores'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
-import { faEnvelope, faPen, faSearch, faSpinner, faUser } from '@fortawesome/free-solid-svg-icons'
+import { faBell, faSearch, faSpinner, faUserCircle } from '@fortawesome/free-solid-svg-icons'
 import { Tooltip } from 'react-tippy'
 import { ModalOptions } from '@globals'
 import { TagModel } from '@models/tagModel'
+import { UserNotifications } from '@components'
 
 interface ITitleHeaderProps {
     tagStore: IStores['tagStore']
@@ -48,7 +49,12 @@ class TitleHeader extends React.Component<ITitleHeaderProps> {
     }
 
     private renderAuthActions = () => {
-        const { isLoggedIn, accountName, initializeScatterAndSetBalance, checkInitialConditions } = this.props.authStore
+        const {
+            isLoggedIn,
+            accountName,
+            initializeScatterAndSetBalance,
+            checkInitialConditions,
+        } = this.props.authStore
         const { showModal } = this.props.uiStore
 
         if (initializeScatterAndSetBalance['pending'] || checkInitialConditions['pending']) {
@@ -58,31 +64,43 @@ class TitleHeader extends React.Component<ITitleHeaderProps> {
         if (isLoggedIn) {
             return (
                 <div className={'f4 flex items-center'}>
+                    <Tooltip
+                        animateFill={false}
+                        interactive
+                        html={<UserNotifications />}
+                        position={'bottom-end'}
+                        trigger={'mouseenter'}
+                    >
+                        <Link route={'/notifications'}>
+                            <a rel={'Open your notifications'}>
+                                <FontAwesomeIcon
+                                    width={13}
+                                    icon={faBell}
+                                    className={'ph2'}
+                                    color={'#7D8894'}
+                                />
+                            </a>
+                        </Link>
+                    </Tooltip>
                     <Link route={`/new`}>
-                        <a rel={'Create a new post'}>
-                            <FontAwesomeIcon width={13} icon={faPen} className={'ph2'} />
-                        </a>
-                    </Link>
-                    <Link route={'/notifications'}>
-                        <a rel={'Open your notifications'}>
-                            <FontAwesomeIcon width={13} icon={faEnvelope} className={'ph2'} />
-                        </a>
+                        <button title={'Create new post'} className={'ml3'}>
+                            <span className={'f6 white'}>New Post</span>
+                        </button>
                     </Link>
                     <Tooltip
+                        animateFill={false}
                         interactive
                         html={this.renderUserSettings()}
                         position={'bottom-end'}
                         trigger={'mouseenter'}
-                        animation={'none'}
-                        duration={0}
                     >
                         <Link route={`/u/${accountName}`}>
                             <a
                                 rel={'Open your profile'}
                                 className={'flex items-center user-container pointer dim'}
                             >
-                                <FontAwesomeIcon width={13} icon={faUser} />
-                                <span className={'b f6 pl3 pr1'}>{accountName}</span>
+                                <span className={'b f6 pl1 pr3 black'}>{accountName}</span>
+                                <FontAwesomeIcon width={13} icon={faUserCircle} color={'#7D8894'} />
                             </a>
                         </Link>
                     </Tooltip>
@@ -104,7 +122,15 @@ class TitleHeader extends React.Component<ITitleHeaderProps> {
     }
 
     private renderActiveTag = () => {
-        const { setActiveTag } = this.props.tagStore
+        const { setActiveTag, activeTag } = this.props.tagStore
+
+        if (!activeTag) {
+            return (
+                <Link route={'/'}>
+                    <a>home</a>
+                </Link>
+            )
+        }
 
         return setActiveTag['match']({
             pending: () => <FontAwesomeIcon width={13} icon={faSpinner} spin />,

@@ -15,12 +15,11 @@ interface IIndexPage {
 class Index extends React.Component<IIndexPage> {
     static async getInitialProps({ store }) {
         const tagStore: IStores['tagStore'] = store.tagStore
-        tagStore.setActiveTag('home')
+        tagStore.destroyActiveTag()
         return {}
     }
 
     async componentWillMount(): Promise<void> {
-        this.props.tagStore.setActiveTag('home')
         await this.props.postsStore.getPostsByTag(['home'])
     }
 

@@ -2,19 +2,24 @@ import * as React from 'react'
 import Head from 'next/head'
 import { inject, observer } from 'mobx-react'
 import { AppModals, Sidebar, TitleHeader } from '@components'
+import classNames from 'classnames'
 
 import { IStores } from '@stores'
 
 interface IMainLayoutProps {
     activeBanner: string
     tagStore: IStores['tagStore']
+    uiStore: IStores['uiStore']
     tags: IStores['tagStore']['tags']
 }
 
-@inject('tagStore')
+@inject('tagStore', 'uiStore')
 @observer
 class MainLayout extends React.Component<IMainLayoutProps> {
     public render() {
+        const { activeTag } = this.props.tagStore
+        const { showBanner, showSidebar } = this.props.uiStore
+
         return (
             <>
                 <Head>
@@ -22,20 +27,34 @@ class MainLayout extends React.Component<IMainLayoutProps> {
                 </Head>
 
                 <TitleHeader />
-                <div className={'w-100 header-image'}>
-                    <img
-                        src={this.props.activeBanner}
-                        title={'Active banner'}
-                        alt={'Active banner image'}
-                    />
-                </div>
+
+                {showBanner && (
+                    <div className={'w-100 header-image'}>
+                        <img
+                            src={this.props.activeBanner}
+                            title={'Active banner'}
+                            alt={'Active banner image'}
+                        />
+                    </div>
+                )}
                 <AppModals />
                 <div className={'content'}>
                     <div className={'container flex pv3'}>
-                        <div className={'w-30 card sidebar mr3'}>
-                            <Sidebar tags={this.props.tags} />
+                        {showSidebar && (
+                            <div className={'w-30 card sidebar mr3'}>
+                                <Sidebar tags={this.props.tags} activeTag={activeTag} />
+                            </div>
+                        )}
+                        <div
+                            className={classNames([
+                                'w-70',
+                                {
+                                    'w-100': !showSidebar,
+                                },
+                            ])}
+                        >
+                            {this.props.children}
                         </div>
-                        <div className={'w-70'}>{this.props.children}</div>
                     </div>
                 </div>
 

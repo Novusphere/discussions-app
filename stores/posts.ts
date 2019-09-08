@@ -56,6 +56,11 @@ export default class Posts extends BaseStore {
 
     @observable activeThreadId = ''
 
+    // when creating a new post
+    @observable newPostData = {
+        sub: '',
+    }
+
     /**
      * Manage getRepliesFromMap within a post (not opening post)
      */
@@ -126,7 +131,7 @@ export default class Posts extends BaseStore {
             this.activeThread = thread
             return thread
         } catch (error) {
-            console.log('Class: Posts, Function: getAndSetThread, Line 123 error: ', error);
+            console.log('Class: Posts, Function: getAndSetThread, Line 123 error: ', error)
             throw error
         }
     }
@@ -159,6 +164,28 @@ export default class Posts extends BaseStore {
         this.preview = null
     }
 
+    get subFields() {
+        return {
+            name: 'sub',
+            label: 'Sub',
+            placeholder: 'Select a sub',
+            rules: 'required',
+            type: 'dropdown',
+            hideLabels: true,
+            extra: {
+                options: [
+                    { value: 'all', label: 'all' },
+                    ...Array.from(this.tagsStore.tags.values())
+                        .filter(tag => !tag.root)
+                        .map(tag => ({
+                            value: tag.name,
+                            label: tag.name,
+                        })),
+                ],
+            },
+        }
+    }
+
     get newPostForm() {
         return new CreateForm({}, [
             {
@@ -166,124 +193,148 @@ export default class Posts extends BaseStore {
                 label: `Title`,
                 placeholder: 'Enter a post title',
                 rules: 'required|string|min:5|max:45',
+                hideLabels: true,
             },
-            {
-                name: 'sub',
-                label: 'Sub',
-                placeholder: 'Select a sub',
-                rules: 'required',
-                type: 'dropdown',
-                extra: {
-                    options: [
-                        { value: 'all', label: 'all' },
-                        ...Array.from(this.tagsStore.tags.values())
-                            .filter(tag => !tag.root)
-                            .map(tag => ({
-                                value: tag.name,
-                                label: tag.name,
-                            })),
-                    ],
-                },
-            },
+            // {
+            //     name: 'sub',
+            //     label: 'Sub',
+            //     placeholder: 'Select a sub',
+            //     rules: 'required',
+            //     type: 'dropdown',
+            //     hideLabels: true,
+            //     extra: {
+            //         options: [
+            //             { value: 'all', label: 'all' },
+            //             ...Array.from(this.tagsStore.tags.values())
+            //                 .filter(tag => !tag.root)
+            //                 .map(tag => ({
+            //                     value: tag.name,
+            //                     label: tag.name,
+            //                 })),
+            //         ],
+            //     },
+            // },
             {
                 name: 'content',
                 label: 'Content',
+                hideLabels: true,
                 placeholder: 'Enter your content',
                 // rules: 'required',
                 type: 'richtext',
             },
-            {
-                name: 'attachmentType',
-                type: 'radiogroup',
-                value: 'No Attachment',
-                extra: {
-                    options: [
-                        {
-                            value: 'No Attachment',
-                            onClick: ({ form }) => {
-                                form.$('urlType').$extra.render = false
-                                form.$('hash').$extra.render = false
-                                form.$('txidType').$extra.render = false
-
-                                // reset values
-                                form.$('urlType').value = ''
-                                form.$('hash').value = ''
-                                form.$('txidType').value = ''
-                            },
-                        },
-                        {
-                            value: 'URL',
-                            onClick: ({ form }) => {
-                                form.$('urlType').$extra.render = true
-                                form.$('hash').$extra.render = true
-                                form.$('txidType').$extra.render = false
-                            },
-                        },
-                        {
-                            value: 'IPFS',
-                            onClick: ({ form }) => {
-                                form.$('urlType').$extra.render = true
-                                form.$('hash').$extra.render = true
-                                form.$('txidType').$extra.render = false
-                            },
-                        },
-                        {
-                            value: 'TXID',
-                            onClick: ({ form }) => {
-                                form.$('urlType').$extra.render = false
-                                form.$('hash').$extra.render = true
-                                form.$('txidType').$extra.render = true
-                            },
-                        },
-                    ],
-                },
-            },
-            {
-                name: 'urlType',
-                type: 'radiogroup',
-                extra: {
-                    render: false,
-                    options: [
-                        {
-                            value: 'link',
-                        },
-                        {
-                            value: 'iframe',
-                        },
-                        {
-                            value: 'mp4',
-                        },
-                        {
-                            value: 'mp3',
-                        },
-                    ],
-                },
-            },
-            {
-                name: 'txidType',
-                type: 'radiogroup',
-                extra: {
-                    render: false,
-                    options: [
-                        {
-                            value: 'referendum',
-                        },
-                    ],
-                },
-            },
-            {
-                name: 'hash',
-                label: 'Hash',
-                placeholder: 'IPFS Hash / URL / TXID',
-                extra: {
-                    render: false,
-                },
-            },
+            // {
+            //     name: 'attachmentType',
+            //     type: 'radiogroup',
+            //     value: 'No Attachment',
+            //     hideLabels: true,
+            //     extra: {
+            //         options: [
+            //             {
+            //                 value: 'No Attachment',
+            //                 onClick: ({ form }) => {
+            //                     form.$('urlType').$extra.render = false
+            //                     form.$('hash').$extra.render = false
+            //                     form.$('txidType').$extra.render = false
+            //
+            //                     // reset values
+            //                     form.$('urlType').value = ''
+            //                     form.$('hash').value = ''
+            //                     form.$('txidType').value = ''
+            //                 },
+            //             },
+            //             {
+            //                 value: 'URL',
+            //                 onClick: ({ form }) => {
+            //                     form.$('urlType').$extra.render = true
+            //                     form.$('hash').$extra.render = true
+            //                     form.$('txidType').$extra.render = false
+            //                 },
+            //             },
+            //             {
+            //                 value: 'IPFS',
+            //                 onClick: ({ form }) => {
+            //                     form.$('urlType').$extra.render = true
+            //                     form.$('hash').$extra.render = true
+            //                     form.$('txidType').$extra.render = false
+            //                 },
+            //             },
+            //             {
+            //                 value: 'TXID',
+            //                 onClick: ({ form }) => {
+            //                     form.$('urlType').$extra.render = false
+            //                     form.$('hash').$extra.render = true
+            //                     form.$('txidType').$extra.render = true
+            //                 },
+            //             },
+            //         ],
+            //     },
+            // },
+            // {
+            //     name: 'urlType',
+            //     type: 'radiogroup',
+            //     extra: {
+            //         render: false,
+            //         options: [
+            //             {
+            //                 value: 'link',
+            //             },
+            //             {
+            //                 value: 'iframe',
+            //             },
+            //             {
+            //                 value: 'mp4',
+            //             },
+            //             {
+            //                 value: 'mp3',
+            //             },
+            //         ],
+            //     },
+            // },
+            // {
+            //     name: 'txidType',
+            //     type: 'radiogroup',
+            //     extra: {
+            //         render: false,
+            //         options: [
+            //             {
+            //                 value: 'referendum',
+            //             },
+            //         ],
+            //     },
+            // },
+            // {
+            //     name: 'hash',
+            //     label: 'Hash',
+            //     placeholder: 'IPFS Hash / URL / TXID',
+            //     extra: {
+            //         render: false,
+            //     },
+            // },
             {
                 name: 'buttons',
                 type: 'button',
+                hideLabels: true,
                 extra: {
                     options: [
+                        // {
+                        //     value: 'Preview',
+                        //     className: 'white bg-gray',
+                        //     title: 'Preview the post before submitting',
+                        //     onClick: form => {
+                        //         if (form.isValid) {
+                        //             console.log(this.newPostData)
+                        //             // this.preview = form.values()
+                        //             // this.preview.sub = {
+                        //             //     value: this.newPostData.sub,
+                        //             //     label: this.newPostData.sub,
+                        //             // }
+                        //         }
+                        //     },
+                        // },
+                        {
+                            value: 'Post ID',
+                            title: 'Post with an anonymous ID',
+                        },
                         {
                             value: 'Post',
                             disabled: !this.authStore.isLoggedIn,
@@ -312,20 +363,6 @@ export default class Posts extends BaseStore {
 
                                 this.clearPreview()
                             }),
-                        },
-                        {
-                            value: 'Post ID',
-                            title: 'Post with an anonymous ID',
-                        },
-                        {
-                            value: 'Preview',
-                            className: 'white bg-gray',
-                            title: 'Preview the post before submitting',
-                            onClick: form => {
-                                if (form.isValid) {
-                                    this.preview = form.values()
-                                }
-                            },
                         },
                     ],
                 },
