@@ -83,10 +83,7 @@ const Sidebar: React.FC<ITagListProps> = ({ tags, activeTag, ...props }) => {
                                 offset={600}
                                 className={'interactive-hover'}
                                 distance={400}
-                                delay={0}
-                                hideDelay={0}
                                 trigger={'mouseenter'}
-                                animation={'none'}
                             >
                                 <Link route={'tag'} params={{ name: tag.name }}>
                                     <a className={'flex items-center pb1 pointer'}>

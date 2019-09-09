@@ -6,11 +6,21 @@ import { IStores } from '@stores'
 
 interface ISettings {
     settingsStore: IStores['settingsStore']
+    postsStore: IStores['postsStore']
+    uiStore: IStores['uiStore']
 }
 
-@inject('settingsStore')
+@inject('settingsStore', 'postsStore', 'uiStore')
 @observer
 class Settings extends React.Component<ISettings> {
+    static async getInitialProps({ store }) {
+        const uiStore: IStores['uiStore'] = store.uiStore
+        const tagStore: IStores['tagStore'] = store.tagStore
+        uiStore.toggleSidebarAndBanner()
+        tagStore.destroyActiveTag()
+        return {}
+    }
+
     private renderSetIdComponent = () => {
         const { setIdForm } = this.props.settingsStore
         return (
@@ -59,6 +69,11 @@ class Settings extends React.Component<ISettings> {
 
     private renderAccountComponent = () => {
         return <span>Test</span>
+    }
+
+    componentWillUnmount(): void {
+        this.props.postsStore.clearPreview()
+        this.props.uiStore.toggleSidebarAndBanner()
     }
 
     public render() {

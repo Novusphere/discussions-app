@@ -4,6 +4,7 @@
 @import '~react-tabs/style/react-tabs.css';
 @import '~react-tippy/dist/tippy.css';
 @import 'components/all';
+@import "pages/all";
 
 @import '~react-toastify/dist/ReactToastify.css';
 @import '~react-quill/dist/quill.snow.css';
@@ -139,6 +140,16 @@ a {
     height: 1em;
     overflow: visible;
     vertical-align: -0.125em;
+}
+
+.small-title {
+    color: #7D8894;
+    font-family: IBM Plex Sans;
+    font-style: normal;
+    font-weight: 500;
+    font-size: 12px;
+    line-height: 16px;
+    text-transform: uppercase;
 }
 
 .dim {

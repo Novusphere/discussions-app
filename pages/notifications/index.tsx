@@ -18,6 +18,15 @@ interface INotificationsProps {
 @inject('authStore', 'tagStore')
 @observer
 class Notifications extends React.Component<INotificationsProps> {
+    static async getInitialProps({ store }) {
+        const uiStore: IStores['uiStore'] = store.uiStore
+        const tagStore: IStores['tagStore'] = store.tagStore
+        uiStore.toggleSidebarAndBanner()
+        tagStore.destroyActiveTag()
+        return {}
+    }
+
+
     @task.resolved
     private fetchNotifications = async () => {
         if (this.props.authStore.isLoggedIn) {
@@ -25,14 +34,6 @@ class Notifications extends React.Component<INotificationsProps> {
         }
 
         return <span>No notifications found</span>
-    }
-
-    componentWillMount(): void {
-        this.props.tagStore.activeTag = new TagModel({
-            name: 'notifications',
-            url: '/notifications',
-            logo: '',
-        })
     }
 
     componentDidMount(): void {

@@ -1,14 +1,21 @@
 import * as React from 'react'
 import { dummy } from '@novuspherejs'
-import moment from 'moment'
+import { IStores } from '@stores'
+import { inject, observer } from 'mobx-react'
+import { Tab, Tabs, TabList, TabPanel } from 'react-tabs'
 
 interface IUPageProps {
+    uiStore: IStores['uiStore']
     username: string
     data: any
 }
 
+@inject('uiStore')
+@observer
 class U extends React.Component<IUPageProps> {
-    static async getInitialProps({ query }) {
+    static async getInitialProps({ query, store }) {
+        const uiStore: IStores['uiStore'] = store.uiStore
+        uiStore.toggleSidebar()
         const userData = await dummy.getUser(query.username)
         return {
             username: query.username,
@@ -16,35 +23,78 @@ class U extends React.Component<IUPageProps> {
         }
     }
 
+    componentWillUnmount(): void {
+        this.props.uiStore.toggleSidebar()
+    }
+
+    private renderSidebarContent = () => {
+        return (
+            <>
+                <div className={'flex flex-row items-center'}>
+                    <img
+                        className={'br-100'}
+                        src={'https://via.placeholder.com/100x100'}
+                        alt={'User profile image'}
+                    />
+                    <div className={'ml3 flex flex-column items-start justify-center'}>
+                        <span className={'b black f5 mb2'}>{this.props.username}</span>
+                        <span className={'b f6 mb2'}>192 Followers</span>
+                        <button className={'button-outline'}>Follow</button>
+                    </div>
+                </div>
+
+                <div className={'mt4 flex flex-column'}>
+                    <span className={'small-title mb2'}>Contacts</span>
+
+                    <ul className={'list'}>
+                        <li className={'pa0 mb2'}>@{this.props.username}</li>
+                        <li className={'pa0 mb2'}>{this.props.username}</li>
+                        <li className={'pa0 mb2'}>{this.props.username}</li>
+                        <li className={'pa0 mb2'}>{this.props.username}.com</li>
+                    </ul>
+                </div>
+
+                <div className={'mt4 flex flex-column'}>
+                    <span className={'small-title mb2'}>Connected Accounts</span>
+
+                    <ul className={'list'}>
+                        <li className={'pa0 mb2'}>EOS</li>
+                    </ul>
+                </div>
+            </>
+        )
+    }
+
     public render(): React.ReactNode {
         const { data } = this.props
 
         return (
-            <div className={'card pa4'}>
-                <div className={'flex items-center justify-between'}>
-                    <span className={'black lh-copy'}>
-                        <h2 className={'pa0 ma0'}>{this.props.username}</h2>
-                        <h4 className={'pa0 ma0 o-50'}>Last active: {moment(data.lastActivity).fromNow()}</h4>
-                    </span>
-                    <span>
-                        <button
-                            onClick={() => console.log('add follow logic')}
-                            className={'f6 link dim ph3 pv2 dib pointer white bg-green mr2'}
-                        >
-                            Follow
-                        </button>
-                        <button
-                            onClick={() => console.log('add block logic')}
-                            className={'f6 link dim ph3 pv2 dib pointer white bg-red'}
-                        >
-                            Block
-                        </button>
-                    </span>
-                </div>
-                <div className={'flex items-center mt3'}>
-                    <span className={'mr3'}>Followers: {data.followers}</span>
-                    <span className={'mr3'}>Comments: {data.comments.length}</span>
-                    <span className={'mr3'}>Threads: {data.threads.length}</span>
+            <div className={'flex flex-row'}>
+                <div className={'card w-30 mr2 pa3'}>{this.renderSidebarContent()}</div>
+                <div className={'w-70 pa3'}>
+                    <Tabs>
+                        <TabList className={'settings-tabs'}>
+                            <Tab className={'settings-tab'}>Blog</Tab>
+                            <Tab className={'settings-tab'}>Posts</Tab>
+                            <Tab className={'settings-tab'}>Latest</Tab>
+                        </TabList>
+
+                        <TabPanel>
+                            <div className={'card settings-card'}>
+                                There are no blog posts from this uer.
+                            </div>
+                        </TabPanel>
+                        <TabPanel>
+                            <div className={'card settings-card'}>
+                                There are no posts from this user.
+                            </div>
+                        </TabPanel>
+                        <TabPanel>
+                            <div className={'card settings-card'}>
+                                There are no posts from this user.
+                            </div>
+                        </TabPanel>
+                    </Tabs>
                 </div>
             </div>
         )

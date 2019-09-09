@@ -15,6 +15,11 @@ export default class Ui extends BaseStore {
         this.showBanner = !this.showBanner
     }
 
+    @action.bound
+    toggleSidebar() {
+        this.showSidebar = !this.showSidebar
+    }
+
     @computed get isModalOpen(): boolean {
         return this.activeModal !== ''
     }
