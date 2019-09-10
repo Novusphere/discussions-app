@@ -70,8 +70,8 @@ class U extends React.Component<IUPageProps> {
 
         return (
             <div className={'flex flex-row'}>
-                <div className={'card w-30 mr2 pa3'}>{this.renderSidebarContent()}</div>
-                <div className={'w-70 pa3'}>
+                <div className={'card w-30 mr5 pa3'}>{this.renderSidebarContent()}</div>
+                <div className={'w-70'}>
                     <Tabs>
                         <TabList className={'settings-tabs'}>
                             <Tab className={'settings-tab'}>Blog</Tab>

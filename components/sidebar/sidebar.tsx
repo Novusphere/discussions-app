@@ -53,6 +53,7 @@ const Sidebar: React.FC<ITagListProps> = ({ tags, activeTag, ...props }) => {
                         <li
                             key={tag.id}
                             className={classNames([
+                                'ph3 pb3',
                                 {
                                     active: props.router.asPath === tag.url,
                                 },
@@ -70,6 +71,7 @@ const Sidebar: React.FC<ITagListProps> = ({ tags, activeTag, ...props }) => {
                         <li
                             key={tag.id}
                             className={classNames([
+                                'ph3 pb3',
                                 {
                                     active: props.router.asPath === tag.url,
                                 },
