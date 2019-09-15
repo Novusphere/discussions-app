@@ -108,6 +108,20 @@ export default class DiscussionsService {
         return keys
     }
 
+    async getPostsForSearch(search: string): Promise<Post[]> {
+        const query = await nsdb.search({
+                query: {
+                    "$text": { "$search": search }
+                },
+                sort: {
+                    createdAt: -1,
+                },
+                account: eos.accountName || '',
+            });
+    
+            return query.payload.map(o => Post.fromDbObject(o))
+    }
+
     async bkRetrieveStatusEOS(account: string): Promise<string | undefined> {
         let result = await eos.api.rpc.get_table_rows({
             code: 'discussionsx',
@@ -237,7 +251,7 @@ export default class DiscussionsService {
                 transaction: { $regex: `^${dId.txid32}` },
             },
         })
-
+        
         if (sq.payload.length == 0) return undefined
 
         let posts: Post[] = []

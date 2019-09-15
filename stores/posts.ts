@@ -58,7 +58,7 @@ export default class Posts extends BaseStore {
 
     // when creating a new post
     @observable newPostData = {
-        sub: '',
+        sub: { value: '', label: '' },
     }
 
     /**
@@ -349,10 +349,10 @@ export default class Posts extends BaseStore {
                                     poster: this.authStore.posterName,
                                     title: post.title,
                                     content: post.content,
-                                    sub: post.sub.value,
+                                    sub: this.newPostData.sub.value,
                                     chain: 'eos',
                                     mentions: [],
-                                    tags: [post.sub.value],
+                                    tags: [this.newPostData.sub.value],
                                     uuid: uuid,
                                     parentUuid: '',
                                     threadUuid: uuid,

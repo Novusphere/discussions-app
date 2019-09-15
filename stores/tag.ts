@@ -5,7 +5,7 @@ import { task } from 'mobx-task'
 
 export default class Tag extends BaseStore {
     // the amount of subs that are base
-    static baseSubLength = 4
+    static baseSubLength = 3
 
     @observable activeTag: TagModel = null
     @observable tags = observable.map<string, TagModel>()
@@ -439,10 +439,6 @@ export default class Tag extends BaseStore {
             {
                 name: 'all',
                 url: '/e/all',
-            },
-            {
-                name: 'referendum',
-                url: '/e/referendum',
             },
         ].map(topLevelTag => {
             this.tags.set(

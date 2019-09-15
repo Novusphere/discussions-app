@@ -12,6 +12,7 @@ export const Routes = routes()
     .add('settings', '/settings')
     .add('notifications', '/notifications')
     .add('new', '/new')
+    .add('search', '/search')
 
 export const Link = Routes.Link
 

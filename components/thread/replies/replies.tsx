@@ -1,10 +1,6 @@
 import * as React from 'react'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
-import {
-    faDollarSign,
-    faLink,
-    faReply,
-} from '@fortawesome/free-solid-svg-icons'
+import { faDollarSign, faLink, faReply } from '@fortawesome/free-solid-svg-icons'
 import moment from 'moment'
 import { Link } from '@router'
 import { Votes, Reply } from '@components'
@@ -13,6 +9,7 @@ import { observer, Observer } from 'mobx-react'
 import { ReplyModel } from '@models/replyModel'
 import PostModel from '@models/postModel'
 import classNames from 'classnames'
+import { openInNewTab } from '@utils'
 
 interface IReplies {
     post: PostModel
@@ -40,14 +37,18 @@ const Replies: React.FC<IReplies> = ({
         }
         return (
             <div className={'hover-elements disable-user-select'}>
-                <span
-                    onClick={replyModel.toggleOpen}
-                    title={'Reply to post'}
-                >
+                <span onClick={replyModel.toggleOpen} title={'Reply to post'}>
                     <FontAwesomeIcon icon={faReply} />
                 </span>
-                <FontAwesomeIcon icon={faDollarSign} />
-                <FontAwesomeIcon icon={faLink} />
+                <span title={'Donate tokens'}>
+                    <FontAwesomeIcon icon={faDollarSign} />
+                </span>
+                <span
+                    title={'View block'}
+                    onClick={() => openInNewTab(`https://eosq.app/tx/${post.transaction}`)}
+                >
+                    <FontAwesomeIcon icon={faLink} />
+                </span>
             </div>
         )
     }

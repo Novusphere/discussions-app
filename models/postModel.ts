@@ -17,6 +17,8 @@ class PostModel {
     @observable content
     @observable replies
 
+    @observable transaction
+
     @observable verifySig
     @observable sig
 

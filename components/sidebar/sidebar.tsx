@@ -64,7 +64,7 @@ const Sidebar: React.FC<ITagListProps> = ({ tags, activeTag, ...props }) => {
                             </Link>
                         </li>
                     ))}
-                <div className={'divider-line'} />
+                <div className={'divider-line mb2'} />
                 {Array.from(tags.values())
                     .filter(tag => !tag.root)
                     .map(tag => (

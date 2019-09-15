@@ -23,3 +23,8 @@ export const getAttachmentValue = (post: any) => {
     }
 }
 
+
+export const openInNewTab = (url: string) => {
+    const win = window.open(url, '_blank')
+    return win.focus()
+}

@@ -1,6 +1,6 @@
 import * as React from 'react'
 import { inject, observer } from 'mobx-react'
-import { Link } from '@router'
+import { Link, Router } from '@router'
 import { IStores } from '@stores'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { faBell, faSearch, faSpinner, faUserCircle } from '@fortawesome/free-solid-svg-icons'
@@ -15,9 +15,17 @@ interface ITitleHeaderProps {
     uiStore: IStores['uiStore']
 }
 
+interface ITitleHeaderState {
+    search: string
+}
+
 @inject('tagStore', 'authStore', 'uiStore')
 @observer
-class TitleHeader extends React.Component<ITitleHeaderProps> {
+class TitleHeader extends React.Component<ITitleHeaderProps, ITitleHeaderState> {
+    state = {
+        search: '',
+    }
+
     private renderUserSettings = () => {
         const { logOut, ATMOSBalance } = this.props.authStore
 
@@ -157,6 +165,16 @@ class TitleHeader extends React.Component<ITitleHeaderProps> {
         })
     }
 
+    private handleKeySearch = e => {
+        const key = e.key
+
+        if (key.match(/NumpadEnter|Enter/)) {
+            const value = e.target.value
+            Router.pushRoute('search', { q: value })
+            e.preventDefault()
+        }
+    }
+
     public render(): React.ReactNode {
         return (
             <div className={'title-header flex items-center z-999'}>
@@ -164,7 +182,11 @@ class TitleHeader extends React.Component<ITitleHeaderProps> {
                     <span className={'f4 black'}>{this.renderActiveTag()}</span>
 
                     <div className={'mh4 flex-auto relative flex items-center'}>
-                        <input className={'w-100 main-search pl4'} placeholder={'Search EOS'} />
+                        <input
+                            className={'w-100 main-search pl4'}
+                            placeholder={'Search on Discussions.app'}
+                            onKeyDown={this.handleKeySearch}
+                        />
                         <FontAwesomeIcon
                             width={13}
                             icon={faSearch}
