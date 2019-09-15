@@ -13,6 +13,7 @@ export const Routes = routes()
     .add('notifications', '/notifications')
     .add('new', '/new')
     .add('search', '/search')
+    .add('all', 'all')
 
 export const Link = Routes.Link
 

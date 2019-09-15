@@ -438,7 +438,7 @@ export default class Tag extends BaseStore {
             },
             {
                 name: 'all',
-                url: '/e/all',
+                url: '/all',
             },
         ].map(topLevelTag => {
             this.tags.set(
