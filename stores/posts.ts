@@ -342,33 +342,35 @@ export default class Posts extends BaseStore {
                                 ? 'You need to be logged in to post'
                                 : 'Post with your logged as ' + this.authStore.accountName,
                             onClick: task.resolved(async form => {
-                                const post = form.values()
-                                const uuid = generateUuid()
+                                if (!form.hasError && this.newPostData.sub.value) {
+                                    const post = form.values()
+                                    const uuid = generateUuid()
 
-                                const submittedPost = await discussions.post({
-                                    poster: this.authStore.posterName,
-                                    title: post.title,
-                                    content: post.content,
-                                    sub: this.newPostData.sub.value,
-                                    chain: 'eos',
-                                    mentions: [],
-                                    tags: [this.newPostData.sub.value],
-                                    uuid: uuid,
-                                    parentUuid: '',
-                                    threadUuid: uuid,
-                                    attachment: getAttachmentValue(post),
-                                    createdAt: Date.now(),
-                                } as any)
+                                    const submittedPost = await discussions.post({
+                                        poster: this.authStore.posterName,
+                                        title: post.title,
+                                        content: post.content,
+                                        sub: this.newPostData.sub.value,
+                                        chain: 'eos',
+                                        mentions: [],
+                                        tags: [this.newPostData.sub.value],
+                                        uuid: uuid,
+                                        parentUuid: '',
+                                        threadUuid: uuid,
+                                        attachment: getAttachmentValue(post),
+                                        createdAt: Date.now(),
+                                    } as any)
 
-                                // TODO: Add check to make sure the thread is actually posted onto the chain
-                                await sleep(5000)
+                                    // TODO: Add check to make sure the thread is actually posted onto the chain
+                                    await sleep(5000)
 
-                                const id = this.encodeId(submittedPost as any)
-                                pushToThread(submittedPost, id)
+                                    const id = this.encodeId(submittedPost as any)
+                                    pushToThread(submittedPost, id)
 
-                                this.uiStore.showToast('Your post has been created!', 'success')
+                                    this.uiStore.showToast('Your post has been created!', 'success')
 
-                                this.clearPreview()
+                                    this.clearPreview()
+                                }
                             }),
                         },
                     ],

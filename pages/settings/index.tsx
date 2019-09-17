@@ -10,6 +10,8 @@ interface ISettings {
     uiStore: IStores['uiStore']
 }
 
+// TODO: Real Data
+
 @inject('settingsStore', 'postsStore', 'uiStore')
 @observer
 class Settings extends React.Component<ISettings> {
