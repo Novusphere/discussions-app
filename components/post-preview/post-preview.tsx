@@ -36,12 +36,11 @@ const PostPreview: React.FC<IPostPreviewProps> = ({
                     />
                 )}
             </div>
-            <div
-                className={'flex flex-column post-content w-100'}
-                onClick={() => onClick(post)}
-            >
+            <div className={'flex flex-column post-content w-100'} onClick={() => onClick(post)}>
                 <div className={'flex f6 lh-copy black items-center'}>
-                    <img src={tag.icon} title={`${tag.name} icon`} className={'tag-image'} />
+                    {tag && (
+                        <img src={tag.icon} title={`${tag.name} icon`} className={'tag-image'} />
+                    )}
                     <span className={'b ttu'}>{post.sub}</span>
                     <span className={'ph1 b'}>&#183;</span>
                     <span className={'o-80'}>by {post.poster}</span>

@@ -4,16 +4,17 @@ import { discussions, Post } from '@novuspherejs'
 import PostPreview from '../../components/post-preview/post-preview'
 import { inject, observer } from 'mobx-react'
 import { IPost } from '@stores/posts'
-import { Router } from '@router'
+import { pushToThread } from '@utils'
 
 interface IAllProps {
     tagStore: IStores['tagStore']
+    postsStore: IStores['postsStore']
     threads: Post[]
 }
 
 interface IAllState {}
 
-@inject('tagStore')
+@inject('tagStore', 'postsStore')
 @observer
 class All extends React.Component<IAllProps, IAllState> {
     static async getInitialProps({ store }) {
@@ -26,9 +27,8 @@ class All extends React.Component<IAllProps, IAllState> {
     }
 
     public clickPost = (post: IPost) => {
-        Router.pushRoute(
-            `/e/${post.sub}/${post.id}/${decodeURIComponent(post.title.replace(/ /g, '_'))}`
-        )
+        const id = this.props.postsStore.encodeId(post) // Post.encodeId(post.transaction, new Date(post.createdAt));
+        pushToThread(post, id)
     }
 
     public render() {

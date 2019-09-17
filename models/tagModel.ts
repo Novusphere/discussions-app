@@ -13,6 +13,8 @@ export class TagModel extends BaseModel {
     @observable root = false
     @observable url = ''
 
+    // TODO: Real-data
+
     @observable memberCount = 5000
     @observable tagDescription = `Here is some intro text about this community. Lorem ipsum.`
 

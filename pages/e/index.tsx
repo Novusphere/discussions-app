@@ -36,7 +36,8 @@ class E extends React.Component<IEPageProps, IEPageState> {
 
     async componentWillMount(): Promise<void> {
         this.props.tagStore.setActiveTag(this.props.query.tag)
-        await this.props.postsStore.getAndSetThread(this.props.query.id)
+        const thread = await this.props.postsStore.getAndSetThread(this.props.query.id)
+        console.log('Class: E, Function: componentWillMount, Line 40 thread: ', thread);
     }
 
     public render(): React.ReactNode {

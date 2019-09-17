@@ -4,17 +4,18 @@ import { IPost } from '@stores/posts'
 import PostPreview from '../../components/post-preview/post-preview'
 import { inject, observer } from 'mobx-react'
 import { IStores } from '@stores'
-import { Router } from '@router'
+import { pushToThread } from '@utils'
 
 interface ISearchPageProps {
     tagStore: IStores['tagStore']
+    postsStore: IStores['postsStore']
     searchValue: string
     searchResult: IPost[]
 }
 
 interface ISearchPageState {}
 
-@inject('tagStore')
+@inject('tagStore', 'postsStore')
 @observer
 class Index extends React.Component<ISearchPageProps, ISearchPageState> {
     static async getInitialProps({ query, store }) {
@@ -32,9 +33,8 @@ class Index extends React.Component<ISearchPageProps, ISearchPageState> {
 
 
     public clickPost = (post: IPost) => {
-        Router.pushRoute(
-            `/e/${post.sub}/${post.id}/${decodeURIComponent(post.title.replace(/ /g, '_'))}`
-        )
+        const id = this.props.postsStore.encodeId(post) // Post.encodeId(post.transaction, new Date(post.createdAt));
+        pushToThread(post, id)
     }
 
     renderPosts = () => {

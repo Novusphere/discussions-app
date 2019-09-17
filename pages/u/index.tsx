@@ -10,6 +10,8 @@ interface IUPageProps {
     data: any
 }
 
+// TO-DO: real data
+
 @inject('uiStore')
 @observer
 class U extends React.Component<IUPageProps> {

@@ -1,3 +1,5 @@
+import { Router } from '@router'
+
 const uuid = require('uuidv4')
 
 export const isServer = typeof window === 'undefined'
@@ -27,4 +29,10 @@ export const getAttachmentValue = (post: any) => {
 export const openInNewTab = (url: string) => {
     const win = window.open(url, '_blank')
     return win.focus()
+}
+
+export const pushToThread = (post, id) => {
+    Router.pushRoute(
+        `/e/${post.sub}/${id}/${decodeURIComponent(post.title.replace(/ /g, '_'))}`
+    )
 }

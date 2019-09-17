@@ -6,6 +6,7 @@ import { Feed } from '@components'
 import { Router } from '@router'
 import { TagModel } from '@models/tagModel'
 import FeedModel from '@models/feedModel'
+import { pushToThread } from '@utils'
 
 interface ITagProps {
     tagStore: IStores['tagStore']
@@ -33,15 +34,12 @@ class Tag extends React.Component<ITagProps> {
     }
 
     componentWillMount(): void {
-        console.log(this.props.tagName)
         this.props.tagStore.setActiveTag(this.props.tagName)
     }
 
     public clickPost = (post: IPost) => {
         const id = this.props.postsStore.encodeId(post) // Post.encodeId(post.transaction, new Date(post.createdAt));
-        Router.pushRoute(
-            `/e/${post.sub}/${id}/${decodeURIComponent(post.title.replace(/ /g, '_'))}`
-        )
+        pushToThread(post, id)
     }
 
     public render() {

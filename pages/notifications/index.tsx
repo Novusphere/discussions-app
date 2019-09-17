@@ -15,6 +15,8 @@ interface INotificationsProps {
     tagStore: IStores['tagStore']
 }
 
+// TODO: Real-data
+
 @inject('authStore', 'tagStore')
 @observer
 class Notifications extends React.Component<INotificationsProps> {

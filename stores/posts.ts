@@ -5,7 +5,7 @@ import { BaseStore, getOrCreateStore } from 'next-mobx-wrapper'
 import { CreateForm } from '@components'
 import { getTagStore } from '@stores/tag'
 import { getAuthStore, getUiStore, IStores } from '@stores'
-import { generateUuid, getAttachmentValue } from '@utils'
+import { generateUuid, getAttachmentValue, pushToThread, sleep } from '@utils'
 import { ThreadModel } from '@models/threadModel'
 import FeedModel from '@models/feedModel'
 
@@ -137,7 +137,7 @@ export default class Posts extends BaseStore {
     }
 
     @task
-    public getThreadById = async (id: any) => {
+    public getThreadById = async (id: string) => {
         try {
             const thread = await discussions.getThread(id)
             if (!thread) {
@@ -345,7 +345,7 @@ export default class Posts extends BaseStore {
                                 const post = form.values()
                                 const uuid = generateUuid()
 
-                                await discussions.post({
+                                const submittedPost = await discussions.post({
                                     poster: this.authStore.posterName,
                                     title: post.title,
                                     content: post.content,
@@ -357,7 +357,14 @@ export default class Posts extends BaseStore {
                                     parentUuid: '',
                                     threadUuid: uuid,
                                     attachment: getAttachmentValue(post),
+                                    createdAt: Date.now(),
                                 } as any)
+
+                                // TODO: Add check to make sure the thread is actually posted onto the chain
+                                await sleep(5000)
+
+                                const id = this.encodeId(submittedPost as any)
+                                pushToThread(submittedPost, id)
 
                                 this.uiStore.showToast('Your post has been created!', 'success')
 
