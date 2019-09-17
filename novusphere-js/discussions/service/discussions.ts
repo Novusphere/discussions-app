@@ -110,16 +110,16 @@ export default class DiscussionsService {
 
     async getPostsForSearch(search: string): Promise<Post[]> {
         const query = await nsdb.search({
-                query: {
-                    "$text": { "$search": search }
-                },
-                sort: {
-                    createdAt: -1,
-                },
-                account: eos.accountName || '',
-            });
-    
-            return query.payload.map(o => Post.fromDbObject(o))
+            query: {
+                $text: { $search: search },
+            },
+            sort: {
+                createdAt: -1,
+            },
+            account: eos.accountName || '',
+        })
+
+        return query.payload.map(o => Post.fromDbObject(o))
     }
 
     async bkRetrieveStatusEOS(account: string): Promise<string | undefined> {
@@ -171,6 +171,8 @@ export default class DiscussionsService {
     }
 
     async post(p: Post): Promise<Post> {
+        console.log('posting as: ', p.poster)
+
         if (p.chain != 'eos') throw new Error('Unknown chain')
 
         const tags = new Set()
@@ -202,18 +204,17 @@ export default class DiscussionsService {
 
         try {
             if (!p.poster) {
-                console.log(
-                    'Class: DiscussionsService, Function: post, Line 189 `${nsdb.api}/discussions/post?data=${JSON.stringify(data)}`: ',
-                    `${nsdb.api}/discussions/post?data=${JSON.stringify(data)}`
-                )
+                console.log('no poster found, posting as anon')
                 const resp = await fetch(
                     `${nsdb.api}/discussions/post?data=${JSON.stringify(data)}`
                 )
+                console.log('Class: DiscussionsService, Function: post, Line 211 resp: ', resp)
                 const res = await resp.json()
+                console.log('Class: DiscussionsService, Function: post, Line 213 res: ', res)
                 if (res.error) throw new Error(res.message)
-
                 p.transaction = res.transaction
             } else {
+                console.log('poster found, opening Scatter to confirm')
                 const transaction = await eos.transact([
                     {
                         account: 'discussionsx',
@@ -230,6 +231,11 @@ export default class DiscussionsService {
                         },
                     },
                 ])
+
+                console.log(
+                    'Class: DiscussionsService, Function: post, Line 234 transaction: ',
+                    transaction
+                )
 
                 p.transaction = transaction
             }
@@ -251,7 +257,7 @@ export default class DiscussionsService {
                 transaction: { $regex: `^${dId.txid32}` },
             },
         })
-        
+
         if (sq.payload.length == 0) return undefined
 
         let posts: Post[] = []
