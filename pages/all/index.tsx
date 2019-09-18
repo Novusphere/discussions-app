@@ -32,15 +32,17 @@ class All extends React.Component<IAllProps, IAllState> {
     }
 
     public render() {
-        return this.props.threads.map(thread => (
-            <PostPreview
-                key={thread.id}
-                post={thread as any}
-                onClick={this.clickPost}
-                tag={this.props.tagStore.tags.get(thread.sub)}
-                disableVoteHandler
-            />
-        ))
+        return this.props.threads
+            .filter(result => result.tags[0].length)
+            .map(thread => (
+                <PostPreview
+                    key={thread.id}
+                    post={thread as any}
+                    onClick={this.clickPost}
+                    tag={this.props.tagStore.tags.get(thread.sub)}
+                    disableVoteHandler
+                />
+            ))
     }
 }
 

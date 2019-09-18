@@ -35,7 +35,6 @@ class Index extends React.Component<ISearchPageProps, ISearchPageState> {
         console.log(this.props.searchResult)
     }
 
-
     public clickPost = (post: IPost) => {
         const id = this.props.postsStore.encodeId(post) // Post.encodeId(post.transaction, new Date(post.createdAt));
         pushToThread(post, id)
@@ -48,15 +47,17 @@ class Index extends React.Component<ISearchPageProps, ISearchPageState> {
             return <span className={'f6'}>No results found</span>
         }
 
-        return searchResult.map(result => (
-            <PostPreview
-                key={result.id}
-                post={result as any}
-                onClick={this.clickPost}
-                tag={this.props.tagStore.tags.get(result.sub)}
-                disableVoteHandler
-            />
-        ))
+        return searchResult
+            .filter(result => result.tags[0].length)
+            .map(result => (
+                <PostPreview
+                    key={result.id}
+                    post={result as any}
+                    onClick={this.clickPost}
+                    tag={this.props.tagStore.tags.get(result.sub)}
+                    disableVoteHandler
+                />
+            ))
     }
 
     public render() {
