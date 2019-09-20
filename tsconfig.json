@@ -70,7 +70,6 @@
   },
   "exclude": [
     "node_modules",
-    "novusphere-js",
     "dist",
     ".next",
     "out",
