@@ -45,11 +45,17 @@ class SignInModal extends React.Component<IWelcomeBackModalProps, IWelcomeBackMo
         }
     }
 
-    // componentDidMount(): void {
-    //     if (this.props.authStore.signInObject.instance) {
-    //         this.props.authStore.signInObjectState(1)
-    //     }
-    // }
+    componentDidMount(): void {
+        const { hasKeysSet, signInObject, preferredSignInMethod } = this.props.authStore
+
+        if (preferredSignInMethod === SignInMethods.brainKey) {
+            if (!hasKeysSet) {
+                signInObject.currentStep = 2
+            } else {
+                signInObject.currentStep = 4
+            }
+        }
+    }
 
     closeModal = () => {
         this.props.uiStore.hideModal()

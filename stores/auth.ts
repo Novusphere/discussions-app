@@ -36,7 +36,7 @@ export default class Auth extends BaseStore {
 
     @observable brianKey = ''
 
-    @persist @observable preferredSignInMethod = ''
+    @persist @observable preferredSignInMethod = SignInMethods.brainKey
     @persist @observable postPriv = ''
     @persist @observable tipPub = ''
 
@@ -61,20 +61,6 @@ export default class Auth extends BaseStore {
     constructor() {
         super()
 
-        const showModalReaction = reaction(
-            () => this.isLoggedIn,
-            status => {
-                if (!status) {
-                    // this.uiStore.showModal(ModalOptions.signUp)
-                }
-            },
-            {
-                fireImmediately: true,
-            }
-        )
-
-        showModalReaction()
-
         when(
             () => !!this.statusJson,
             async () => {
@@ -95,22 +81,26 @@ export default class Auth extends BaseStore {
             const statusJson = await discussions.bkRetrieveStatusEOS(this.accountName)
             if (statusJson) {
                 const parsedJSON = JSON.parse(statusJson)
+
                 if (parsedJSON.tip !== this.tipPub) {
                     this.uiStore.showModal(ModalOptions.signIn)
                     await sleep(200)
                     this.signInObjectState(4)
                 } else {
                     await init()
-                    const wallet = await eos.detectWallet()
+                    if (this.preferredSignInMethod === SignInMethods.scatter) {
+                        const wallet = await eos.detectWallet()
 
-                    if (typeof wallet !== 'boolean' && wallet) {
-                        await this.initializeScatterAndSetBalance()
+                        if (typeof wallet !== 'boolean' && wallet) {
+                            await this.initializeScatterAndSetBalance()
+                            this.isLoggedIn = true
+                        }
+                    } else {
                         this.isLoggedIn = true
                     }
                 }
             }
         }
-
 
         if (this.preferredSignInMethod === SignInMethods.brainKey) {
             if (this.postPriv && this.tipPub && this.accountName) {
@@ -295,6 +285,10 @@ export default class Auth extends BaseStore {
         this.uiStore.hideModal()
         this.isLoggedIn = true
         console.log('Login success! Keys stored in LS!')
+    }
+
+    @computed get hasKeysSet() {
+        return this.postPriv && this.statusJson && this.tipPub
     }
 
     @task.resolved loginWithPassword = async (password: string): Promise<void> => {
@@ -486,8 +480,18 @@ export default class Auth extends BaseStore {
         try {
             let wallet = eos.wallet
 
+            console.log(
+                'Class: Auth, Function: initializeScatterAndSetBalance, Line 489 wallet: ',
+                wallet
+            )
+
             if (typeof wallet !== 'boolean' && wallet) {
                 await eos.login()
+
+                console.log(
+                    'Class: Auth, Function: initializeScatterAndSetBalance, Line 492 eos.auth: ',
+                    eos.auth
+                )
 
                 if (eos.auth) {
                     this.setAuth(eos.auth)
@@ -497,13 +501,19 @@ export default class Auth extends BaseStore {
                     balances.forEach(balance => {
                         this.balances.set(balance.token.name, balance.amount)
                     })
+
+                    return
                 }
+
+                return
             } else {
                 const wallet = await eos.detectWallet()
 
                 if (!wallet) {
                     this.uiStore.showModal(ModalOptions.walletUndetected)
                 }
+
+                return
             }
         } catch (error) {
             return error

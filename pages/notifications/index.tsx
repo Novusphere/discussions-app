@@ -28,7 +28,6 @@ class Notifications extends React.Component<INotificationsProps> {
         return {}
     }
 
-
     @task.resolved
     private fetchNotifications = async () => {
         if (this.props.authStore.isLoggedIn) {
