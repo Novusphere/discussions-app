@@ -4,9 +4,11 @@ import { observer, inject } from 'mobx-react'
 import { IStores } from '@stores'
 import { faSpinner } from '@fortawesome/free-solid-svg-icons'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
+import { ModalOptions } from '@globals'
 
 interface ISignInModalProps {
     authStore: IStores['authStore']
+    uiStore: IStores['uiStore']
 }
 interface ISignInModalState {
     currentStep: number
@@ -14,7 +16,7 @@ interface ISignInModalState {
 
 // TODO: Clean this up and make more modular
 
-@inject('authStore')
+@inject('authStore', 'uiStore')
 @observer
 class SignUpModal extends React.Component<ISignInModalProps, ISignInModalState> {
     state = {
@@ -47,13 +49,19 @@ class SignUpModal extends React.Component<ISignInModalProps, ISignInModalState> 
         const { generateBrianKey, anonymousObject } = this.props.authStore
 
         const bk = generateBrianKey['result']
-        console.log(bk)
+
         if (!anonymousObject.bk) {
             anonymousObject.bk = bk
         }
     }
 
+    private loginWithOtherMethod = () => {
+        this.props.uiStore.showModal(ModalOptions.signIn)
+    }
+
     private renderNextButtons = (setAccountAndPasswordForm: any, verifyBKFormForm: any) => {
+        const { showOtherSignInOption } = this.props.authStore
+
         const renderButton = (text: string, color: string, onClick, disabled?: boolean) => {
             const loading = onClick && onClick['state'] && onClick['pending']
             return (
@@ -70,6 +78,11 @@ class SignUpModal extends React.Component<ISignInModalProps, ISignInModalState> 
             case 1:
                 return (
                     <>
+                        {showOtherSignInOption && (
+                            <span className={'f6 b pointer dim'} onClick={this.loginWithOtherMethod}>
+                                Log in with another method
+                            </span>
+                        )}
                         {renderButton(
                             'Next',
                             'bg-green',

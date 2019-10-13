@@ -11,7 +11,7 @@ import { IStores } from '@stores'
 import { observer, inject } from 'mobx-react'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { faSpinner } from '@fortawesome/free-solid-svg-icons'
-import { SignInMethods } from '@globals'
+import { ModalOptions, SignInMethods } from '@globals'
 import { SignInOptions } from '@constants/sign-in-options'
 import dynamic from 'next/dynamic'
 
@@ -46,11 +46,12 @@ class SignInModal extends React.Component<IWelcomeBackModalProps, IWelcomeBackMo
     }
 
     componentDidMount(): void {
-        const { hasKeysSet, signInObject, preferredSignInMethod } = this.props.authStore
+        const { hasKeysSet, signInObject, preferredSignInMethod, showOtherSignInOption } = this.props.authStore
 
-        if (preferredSignInMethod === SignInMethods.brainKey) {
+        if (!showOtherSignInOption && preferredSignInMethod === SignInMethods.brainKey) {
             if (!hasKeysSet) {
-                signInObject.currentStep = 2
+                this.props.uiStore.showModal(ModalOptions.signUp)
+                this.props.authStore.showOtherSignInOption = true
             } else {
                 signInObject.currentStep = 4
             }

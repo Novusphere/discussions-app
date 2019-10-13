@@ -26,6 +26,10 @@ class TitleHeader extends React.Component<ITitleHeaderProps, ITitleHeaderState> 
         search: '',
     }
 
+    componentDidMount(): void {
+        this.props.authStore.checkInitialConditions()
+    }
+
     private renderUserSettings = () => {
         const { logOut, ATMOSBalance } = this.props.authStore
 
@@ -57,15 +61,10 @@ class TitleHeader extends React.Component<ITitleHeaderProps, ITitleHeaderState> 
     }
 
     private renderAuthActions = () => {
-        const {
-            isLoggedIn,
-            accountName,
-            initializeScatterAndSetBalance,
-            checkInitialConditions,
-        } = this.props.authStore
+        const { isLoggedIn, accountName, checkInitialConditions } = this.props.authStore
         const { showModal } = this.props.uiStore
 
-        if (initializeScatterAndSetBalance['pending'] || checkInitialConditions['pending']) {
+        if (checkInitialConditions['pending']) {
             return <FontAwesomeIcon width={13} icon={faSpinner} spin />
         }
 
@@ -124,7 +123,14 @@ class TitleHeader extends React.Component<ITitleHeaderProps, ITitleHeaderState> 
                 >
                     Login
                 </button>
-                <button onClick={() => showModal(ModalOptions.signUp)}>Sign Up</button>
+                <button
+                    onClick={() => {
+                        showModal(ModalOptions.signUp)
+                        this.props.authStore.showOtherSignInOption = false
+                    }}
+                >
+                    Sign Up
+                </button>
             </>
         )
     }

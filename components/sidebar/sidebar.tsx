@@ -71,7 +71,7 @@ const Sidebar: React.FC<ITagListProps> = ({ tags, activeTag, ...props }) => {
                         <li
                             key={tag.id}
                             className={classNames([
-                                'ph3 pb3',
+                                'ph3 pb1',
                                 {
                                     active: props.router.asPath === tag.url,
                                 },
@@ -82,10 +82,15 @@ const Sidebar: React.FC<ITagListProps> = ({ tags, activeTag, ...props }) => {
                                 interactive
                                 html={<TagPreview tag={tag} />}
                                 position={'left-end'}
-                                offset={600}
+                                unmountHTMLWhenHide={true}
+                                offset={150}
+                                stickyDuration={0}
+                                sticky={true}
+                                duration={275}
+                                animation={'fade'}
                                 className={'interactive-hover'}
                                 distance={400}
-                                trigger={'mouseenter'}
+                                trigger={'mouseenter focus'}
                             >
                                 <Link route={'tag'} params={{ name: tag.name }}>
                                     <a className={'flex items-center pb1 pointer'}>

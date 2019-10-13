@@ -1,4 +1,4 @@
-import { action, computed, observable, reaction, when } from 'mobx'
+import { action, computed, observable } from 'mobx'
 import { task } from 'mobx-task'
 import { discussions, eos, init } from '@novuspherejs'
 import { BaseStore, getOrCreateStore } from 'next-mobx-wrapper'
@@ -36,6 +36,7 @@ export default class Auth extends BaseStore {
 
     @observable brianKey = ''
 
+    @observable showOtherSignInOption = false
     @persist @observable preferredSignInMethod = SignInMethods.brainKey
     @persist @observable postPriv = ''
     @persist @observable tipPub = ''
@@ -60,15 +61,6 @@ export default class Auth extends BaseStore {
 
     constructor() {
         super()
-
-        when(
-            () => !!this.statusJson,
-            async () => {
-                if (!this.isLoggedIn) {
-                    this.checkInitialConditions()
-                }
-            }
-        )
     }
 
     /**
@@ -77,6 +69,11 @@ export default class Auth extends BaseStore {
     @task
     @action.bound
     async checkInitialConditions() {
+        console.log('checking initial conditions')
+        console.log(
+            'Class: Auth, Function: checkInitialConditions, Line 81 this.preferredSignInMethod: ',
+            this.preferredSignInMethod
+        )
         if (this.preferredSignInMethod === SignInMethods.scatter) {
             const statusJson = await discussions.bkRetrieveStatusEOS(this.accountName)
             if (statusJson) {
@@ -94,18 +91,22 @@ export default class Auth extends BaseStore {
                         if (typeof wallet !== 'boolean' && wallet) {
                             await this.initializeScatterAndSetBalance()
                             this.isLoggedIn = true
+                            return
                         }
                     } else {
                         this.isLoggedIn = true
+                        return
                     }
                 }
+            } else {
+                this.isLoggedIn = false
+                return
             }
         }
 
         if (this.preferredSignInMethod === SignInMethods.brainKey) {
-            if (this.postPriv && this.tipPub && this.accountName) {
-                this.isLoggedIn = true
-            }
+            this.isLoggedIn = !!(this.postPriv && this.tipPub && this.accountName)
+            return
         }
     }
 
@@ -297,6 +298,8 @@ export default class Auth extends BaseStore {
             await sleep(1000)
             const bk = await discussions.bkFromStatusJson(this.statusJson, password)
             const parsed = JSON.parse(this.statusJson)
+            
+            console.log('Class: Auth, Function: loginWithPassword, Line 302 parsed: ', parsed);
 
             // set account name just in case things changed
             this.accountName = parsed.displayName
