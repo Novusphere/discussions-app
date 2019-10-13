@@ -257,6 +257,7 @@ export default class DiscussionsService {
                 transaction: { $regex: `^${dId.txid32}` },
             },
         })
+        
 
         if (sq.payload.length == 0) return undefined
 
