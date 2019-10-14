@@ -35,6 +35,7 @@ export { default as ScatterSetBrianKey } from './modal/sign-in/scatter/set-brian
 export { default as ScatterSetPassword } from './modal/sign-in/scatter/set-password'
 
 export { default as BrainKeySetPassword } from './modal/sign-in/brain-key/set-password'
+export { default as SetNewBK } from './modal/sign-in/brain-key/set-new-bk'
 
 export { default as AskForPassword } from './modal/sign-in/scatter/ask-password'
 export { default as SuccessSetup } from './modal/sign-in/success-setup'

@@ -15,4 +15,4 @@ const SetPassword: React.FC<ISetPasswordProps> = ({ form }) => (
     </div>
 )
 
-export default SetPassword
+export default SetPassword as any

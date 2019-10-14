@@ -234,6 +234,40 @@ export default class Auth extends BaseStore {
         )
     }
 
+    get setNewBKAndPasswordForm() {
+        return new CreateForm(
+            {
+                onSubmit: form => {
+                    const { bk, displayName, password } = form.values()
+                    console.log(form.values())
+                },
+            },
+            [
+                {
+                    name: 'bk',
+                    label: 'Brain Key',
+                    type: 'textarea',
+                    placeholder: 'Enter your BK',
+                    rules: 'required|string',
+                },
+                {
+                    name: 'displayName',
+                    label: 'Display Name',
+                    type: 'text',
+                    placeholder: 'Enter your preferred display name',
+                    rules: 'required|string',
+                },
+                {
+                    name: 'password',
+                    label: 'Password',
+                    type: 'password',
+                    placeholder: 'Your password',
+                    rules: 'required|string|between:5,25',
+                },
+            ]
+        )
+    }
+
     get DEPRECATED_signInForm() {
         return new CreateForm(
             {
@@ -292,14 +326,30 @@ export default class Auth extends BaseStore {
         return this.postPriv && this.statusJson && this.tipPub
     }
 
+    @task.resolved
+    @action.bound
+    async loginWithBK(bk: string, displayName: string, password: string): Promise<void> {
+        try {
+            console.log('Logging in with BK')
+            await sleep(1000)
+
+            console.log(bk, displayName, password)
+        } catch (error) {
+            console.error('Login failed!', error)
+            this.uiStore.showToast(error.message, 'error')
+
+            return error
+        }
+    }
+
     @task.resolved loginWithPassword = async (password: string): Promise<void> => {
         try {
             console.log('Logging in with password')
             await sleep(1000)
             const bk = await discussions.bkFromStatusJson(this.statusJson, password)
             const parsed = JSON.parse(this.statusJson)
-            
-            console.log('Class: Auth, Function: loginWithPassword, Line 302 parsed: ', parsed);
+
+            console.log('Class: Auth, Function: loginWithPassword, Line 302 parsed: ', parsed)
 
             // set account name just in case things changed
             this.accountName = parsed.displayName

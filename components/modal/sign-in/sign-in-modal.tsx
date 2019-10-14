@@ -6,6 +6,7 @@ import {
     ScatterSetPassword,
     SuccessSetup,
     AskForPassword,
+    SetNewBK,
 } from '@components'
 import { IStores } from '@stores'
 import { observer, inject } from 'mobx-react'
@@ -46,7 +47,12 @@ class SignInModal extends React.Component<IWelcomeBackModalProps, IWelcomeBackMo
     }
 
     componentDidMount(): void {
-        const { hasKeysSet, signInObject, preferredSignInMethod, showOtherSignInOption } = this.props.authStore
+        const {
+            hasKeysSet,
+            signInObject,
+            preferredSignInMethod,
+            showOtherSignInOption,
+        } = this.props.authStore
 
         if (!showOtherSignInOption && preferredSignInMethod === SignInMethods.brainKey) {
             if (!hasKeysSet) {
@@ -62,7 +68,7 @@ class SignInModal extends React.Component<IWelcomeBackModalProps, IWelcomeBackMo
         this.props.uiStore.hideModal()
     }
 
-    renderButtons = (choosePasswordForm: any, setPassword: any) => {
+    renderButtons = (choosePasswordForm: any, setPassword: any, setNewBKAndPasswordForm: any) => {
         if (this.props.authStore.signInObject.instance) {
             switch (this.props.authStore.signInObject.currentStep) {
                 case 1:
@@ -205,7 +211,6 @@ class SignInModal extends React.Component<IWelcomeBackModalProps, IWelcomeBackMo
                 case 5:
                     return <span>Test</span>
                 case 4:
-                case 6:
                     return this.props.authStore.loginWithPassword['match']({
                         rejected: error => (
                             <>
@@ -238,8 +243,56 @@ class SignInModal extends React.Component<IWelcomeBackModalProps, IWelcomeBackMo
                                     Or log in with another sign in method
                                 </span>{' '}
                                 <button
+                                    onClick={() => this.props.authStore.signInObjectState(6)}
+                                    className={'f6 link dim ph3 pv2 dib pointer white bg-primary'}
+                                >
+                                    Use another BK
+                                </button>{' '}
+                                <button
                                     disabled={this.props.authStore.loginWithPassword['pending']}
                                     onClick={setPassword.onSubmit}
+                                    className={'f6 link dim ph3 pv2 dib pointer white bg-red'}
+                                >
+                                    Log In
+                                </button>
+                            </>
+                        ),
+                    })
+                case 6:
+                    return this.props.authStore.loginWithBK['match']({
+                        rejected: error => (
+                            <>
+                                {JSON.stringify(error)}
+                                <button
+                                    disabled={this.props.authStore.loginWithBK['pending']}
+                                    onClick={setNewBKAndPasswordForm.onSubmit}
+                                    className={'f6 link dim ph3 pv2 dib pointer white bg-red'}
+                                >
+                                    Log In
+                                </button>
+                            </>
+                        ),
+                        pending: () => (
+                            <button
+                                disabled={this.props.authStore.loginWithBK['pending']}
+                                onClick={setNewBKAndPasswordForm.onSubmit}
+                                className={'f6 link dim ph3 pv2 dib pointer white bg-red'}
+                            >
+                                <FontAwesomeIcon width={13} icon={faSpinner} spin />
+                            </button>
+                        ),
+                        resolved: () => (
+                            <>
+                                <span
+                                    className={'b pointer dim'}
+                                    title={'Sign in with another sign in boost'}
+                                    onClick={() => this.props.authStore.signInObjectState(1)}
+                                >
+                                    Or log in with another sign in method
+                                </span>{' '}
+                                <button
+                                    disabled={this.props.authStore.loginWithBK['pending']}
+                                    onClick={setNewBKAndPasswordForm.onSubmit}
                                     className={'f6 link dim ph3 pv2 dib pointer white bg-red'}
                                 >
                                     Log In
@@ -285,6 +338,7 @@ class SignInModal extends React.Component<IWelcomeBackModalProps, IWelcomeBackMo
     public render() {
         const choosePasswordForm = this.props.authStore.choosePassword
         const setPassword = this.props.authStore.setPassword
+        const setNewBKAndPasswordForm = this.props.authStore.setNewBKAndPasswordForm
 
         return (
             <Modal>
@@ -308,14 +362,15 @@ class SignInModal extends React.Component<IWelcomeBackModalProps, IWelcomeBackMo
                                 generateBrianKey={this.props.authStore.generateBrianKey}
                             />
                             <ScatterSetPassword setPasswordForm={choosePasswordForm} />
-
                             <AskForPassword askPasswordForm={setPassword} />
                             <SuccessSetup />
+
+                            <SetNewBK form={setNewBKAndPasswordForm} />
                         </StepWizard>
 
                         <div className={'modal-footer'}>
                             {this.renderRememberOption()}
-                            {this.renderButtons(choosePasswordForm, setPassword)}
+                            {this.renderButtons(choosePasswordForm, setPassword, setNewBKAndPasswordForm)}
                         </div>
                     </>
                 )}
