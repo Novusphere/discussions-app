@@ -4,6 +4,7 @@ const withCSS = require('@zeit/next-css')
 
 module.exports =  withCSS(
     withSass({
+        generateEtags: false,
         webpack: config => {
             config.module.rules.push({
                 test: /\.(eot|woff|woff2|ttf|svg|png|jpg|gif)$/,

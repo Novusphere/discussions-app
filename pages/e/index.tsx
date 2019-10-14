@@ -17,7 +17,9 @@ interface IEPageProps {
     }
 }
 
-interface IEPageState {}
+interface IEPageState {
+    thread: any
+}
 
 @inject('postsStore', 'tagStore')
 @observer
@@ -34,25 +36,25 @@ class E extends React.Component<IEPageProps, IEPageState> {
         }
     }
 
+    state = { thread: null }
+
     async componentWillMount(): Promise<void> {
         this.props.tagStore.setActiveTag(this.props.query.tag)
         const thread = await this.props.postsStore.getAndSetThread(this.props.query.id)
+        this.setState({ thread })
     }
 
     public render(): React.ReactNode {
         let {
-            thread,
             query: { id, tag },
         } = this.props
 
-        if (!thread) {
-            return <span>No posts found for specified thread: {id}</span>
-        }
+        const { thread } = this.state
 
         return this.props.postsStore.getAndSetThread['match']({
             pending: () => <FontAwesomeIcon width={13} icon={faSpinner} spin />,
             rejected: () => <span>No posts found for specified thread: {id}</span>,
-            resolved: thread => {
+            resolved: () => {
                 if (!thread) {
                     return <span>No posts found for specified thread: {id}</span>
                 }
