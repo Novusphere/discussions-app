@@ -74,6 +74,9 @@ export default class Auth extends BaseStore {
             'Class: Auth, Function: checkInitialConditions, Line 81 this.preferredSignInMethod: ',
             this.preferredSignInMethod
         )
+
+        await sleep(1000)
+
         if (this.preferredSignInMethod === SignInMethods.scatter) {
             const statusJson = await discussions.bkRetrieveStatusEOS(this.accountName)
             if (statusJson) {
@@ -105,7 +108,7 @@ export default class Auth extends BaseStore {
         }
 
         if (this.preferredSignInMethod === SignInMethods.brainKey) {
-            this.isLoggedIn = !!(this.postPriv && this.tipPub && this.accountName)
+            this.isLoggedIn = !!(this.postPriv.length && this.tipPub.length && this.accountName.length)
             return
         }
     }
@@ -239,7 +242,7 @@ export default class Auth extends BaseStore {
             {
                 onSubmit: form => {
                     const { bk, displayName, password } = form.values()
-                    console.log(form.values())
+                    this.loginWithBK(bk, displayName, password)
                 },
             },
             [
@@ -334,6 +337,14 @@ export default class Auth extends BaseStore {
             await sleep(1000)
 
             console.log(bk, displayName, password)
+            const unparsedJSON = await discussions.bkToStatusJson(bk, displayName, password, null)
+            const statusJSON = JSON.parse(unparsedJSON)
+
+            console.log('Class: Auth, Function: loginWithBK, Line 340 unparsedJSON: ', unparsedJSON);
+            this.accountName = statusJSON.displayName
+
+            await this.storeKeys(bk)
+            await this.signUpSuccess()
         } catch (error) {
             console.error('Login failed!', error)
             this.uiStore.showToast(error.message, 'error')
