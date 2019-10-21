@@ -7,16 +7,14 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { ModalOptions } from '@globals'
 
 interface ISignInModalProps {
-    authStore: IStores['authStore']
+    newAuthStore: IStores['newAuthStore']
     uiStore: IStores['uiStore']
 }
 interface ISignInModalState {
     currentStep: number
 }
 
-// TODO: Clean this up and make more modular
-
-@inject('authStore', 'uiStore')
+@inject('newAuthStore', 'uiStore')
 @observer
 class SignUpModal extends React.Component<ISignInModalProps, ISignInModalState> {
     state = {
@@ -36,7 +34,7 @@ class SignUpModal extends React.Component<ISignInModalProps, ISignInModalState> 
     }
 
     componentDidMount(): void {
-        this.setStep(1)
+        // this.setStep(1)
     }
 
     public setStep = step => {
@@ -45,28 +43,28 @@ class SignUpModal extends React.Component<ISignInModalProps, ISignInModalState> 
         })
     }
 
-    private saveBKToStore = () => {
-        const { generateBrianKey, anonymousObject } = this.props.authStore
+    // private saveBKToStore = () => {
+    //     const { generateBrianKey, anonymousObject } = this.props.authStore
+    //
+    //     const bk = generateBrianKey['result']
+    //
+    //     if (!anonymousObject.bk) {
+    //         anonymousObject.bk = bk
+    //     }
+    // }
+    //
+    // private loginWithOtherMethod = () => {
+    //     this.props.uiStore.showModal(ModalOptions.signIn)
+    // }
+    //
+    private renderNextButtons = ({ signUpForm, verifyBKForm }) => {
+        const { generateBrianKey } = this.props.newAuthStore
 
-        const bk = generateBrianKey['result']
-
-        if (!anonymousObject.bk) {
-            anonymousObject.bk = bk
-        }
-    }
-
-    private loginWithOtherMethod = () => {
-        this.props.uiStore.showModal(ModalOptions.signIn)
-    }
-
-    private renderNextButtons = (setAccountAndPasswordForm: any, verifyBKFormForm: any) => {
-        const { showOtherSignInOption } = this.props.authStore
-
-        const renderButton = (text: string, color: string, onClick, disabled?: boolean) => {
+        const renderButton = (text: string, color: string, onClick, disabled = false) => {
             const loading = onClick && onClick['state'] && onClick['pending']
             return (
                 <button
-                    disabled={onClick['pending'] || loading || disabled || false}
+                    disabled={onClick['pending'] || loading || disabled}
                     className={'f6 link dim ph3 pv2 dib pointer white ' + color}
                     onClick={onClick}
                 >
@@ -78,22 +76,19 @@ class SignUpModal extends React.Component<ISignInModalProps, ISignInModalState> 
             case 1:
                 return (
                     <>
-                        {showOtherSignInOption && (
-                            <span className={'f6 b pointer dim'} onClick={this.loginWithOtherMethod}>
-                                Log in with another method
-                            </span>
-                        )}
+                        {/*{showOtherSignInOption && (*/}
+                        {/*    <span className={'f6 b pointer dim'} onClick={this.loginWithOtherMethod}>*/}
+                        {/*        Log in with another method*/}
+                        {/*    </span>*/}
+                        {/*)}*/}
                         {renderButton(
                             'Next',
                             'bg-green',
                             e => {
-                                setAccountAndPasswordForm.onSubmit(e)
-
-                                if (!setAccountAndPasswordForm.form.hasError) {
-                                    this.goNext()
-                                }
+                                signUpForm.onSubmit(e)
+                                this.goNext()
                             },
-                            setAccountAndPasswordForm.form.hasError
+                            signUpForm.form.hasError
                         )}
                     </>
                 )
@@ -105,10 +100,9 @@ class SignUpModal extends React.Component<ISignInModalProps, ISignInModalState> 
                             'Next',
                             'bg-green',
                             () => {
-                                this.saveBKToStore()
                                 this.goNext()
                             },
-                            !this.props.authStore.generateBrianKey['result']
+                            !generateBrianKey['result']
                         )}
                     </>
                 )
@@ -120,13 +114,9 @@ class SignUpModal extends React.Component<ISignInModalProps, ISignInModalState> 
                             'Finish',
                             'bg-red',
                             e => {
-                                verifyBKFormForm.onSubmit(e)
-
-                                if (!verifyBKFormForm.form.hasError) {
-                                    this.props.authStore.signUpAsAnonymousId()
-                                }
+                                verifyBKForm.onSubmit(e)
                             },
-                            verifyBKFormForm.form.hasError
+                            verifyBKForm.form.hasError
                         )}
                     </>
                 )
@@ -134,10 +124,15 @@ class SignUpModal extends React.Component<ISignInModalProps, ISignInModalState> 
     }
 
     public render() {
-        const { generateBrianKey, setAccountAndPassword, verifyBKForm } = this.props.authStore
+        // const { generateBrianKey, setAccountAndPassword, verifyBKForm } = this.props.authStore
 
-        const setAccountAndPasswordForm = setAccountAndPassword
-        const verifyBKFormForm = verifyBKForm
+        // const setAccountAndPasswordForm = setAccountAndPassword
+        // const verifyBKFormForm = verifyBKForm
+
+        const { signUpForm, verifyBKForm, generateBrianKey } = this.props.newAuthStore
+
+        const _signUpForm = signUpForm
+        const _verifyBKForm = verifyBKForm
 
         return (
             <Modal>
@@ -148,7 +143,7 @@ class SignUpModal extends React.Component<ISignInModalProps, ISignInModalState> 
                         </div>
                         <div className={'modal-body'}>
                             <ChooseAccountName
-                                form={setAccountAndPasswordForm}
+                                form={_signUpForm}
                                 currentStep={this.state.currentStep}
                                 onHeaderClick={() => null}
                             />
@@ -158,13 +153,16 @@ class SignUpModal extends React.Component<ISignInModalProps, ISignInModalState> 
                                 onHeaderClick={() => null}
                             />
                             <VerifyKey
-                                form={verifyBKFormForm}
+                                form={_verifyBKForm}
                                 currentStep={this.state.currentStep}
                                 onHeaderClick={() => null}
                             />
                         </div>
                         <div className={'modal-footer'}>
-                            {this.renderNextButtons(setAccountAndPasswordForm, verifyBKFormForm)}
+                            {this.renderNextButtons({
+                                signUpForm: _signUpForm,
+                                verifyBKForm: _verifyBKForm,
+                            })}
                         </div>
                     </>
                 )}

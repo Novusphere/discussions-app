@@ -46,6 +46,7 @@ class DiscussionApp extends App {
             })
 
             hydrate('auth', this.props.store.authStore)
+            hydrate('newAuth', this.props.store.newAuthStore)
         }
     }
 

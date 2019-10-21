@@ -12,6 +12,7 @@ import { UserNotifications } from '@components'
 interface ITitleHeaderProps {
     tagStore: IStores['tagStore']
     authStore: IStores['authStore']
+    newAuthStore: IStores['newAuthStore']
     uiStore: IStores['uiStore']
 }
 
@@ -19,7 +20,7 @@ interface ITitleHeaderState {
     search: string
 }
 
-@inject('tagStore', 'authStore', 'uiStore')
+@inject('tagStore', 'newAuthStore', 'authStore', 'uiStore')
 @observer
 class TitleHeader extends React.Component<ITitleHeaderProps, ITitleHeaderState> {
     state = {
@@ -61,14 +62,16 @@ class TitleHeader extends React.Component<ITitleHeaderProps, ITitleHeaderState> 
     }
 
     private renderAuthActions = () => {
-        const { isLoggedIn, accountName, checkInitialConditions } = this.props.authStore
+        const { accountName, checkInitialConditions } = this.props.authStore
         const { showModal } = this.props.uiStore
+
+        const { hasAccount, displayName } = this.props.newAuthStore
 
         if (checkInitialConditions['pending']) {
             return <FontAwesomeIcon width={13} icon={faSpinner} spin />
         }
 
-        if (isLoggedIn) {
+        if (hasAccount) {
             return (
                 <div className={'f4 flex items-center'}>
                     <Tooltip
@@ -101,12 +104,12 @@ class TitleHeader extends React.Component<ITitleHeaderProps, ITitleHeaderState> 
                         position={'bottom-end'}
                         trigger={'mouseenter'}
                     >
-                        <Link route={`/u/${accountName}`}>
+                        <Link route={`/u/${displayName}`}>
                             <a
                                 rel={'Open your profile'}
                                 className={'flex items-center user-container pointer dim'}
                             >
-                                <span className={'b f6 pl1 pr3 black'}>{accountName}</span>
+                                <span className={'b f6 pl1 pr3 black'}>{displayName}</span>
                                 <FontAwesomeIcon width={13} icon={faUserCircle} color={'#7D8894'} />
                             </a>
                         </Link>

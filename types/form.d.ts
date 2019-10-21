@@ -68,6 +68,7 @@ declare interface FormField {
     validating?: boolean
     submitting?: boolean
     value?: string | { value: string; className?: string }[]
+    onChange?: (value: string) => void
 
     options?: {
         validateOnChange?: boolean
