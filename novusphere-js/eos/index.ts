@@ -97,6 +97,7 @@ export class EOS {
         this.discoveryData = discoveryData;
 
         console.log('Detected and connected to ' + selectedProvider.meta.name);
+
         if (discoveryData.keyToAccountMap.length > 0) {
             console.log(discoveryData);
         }

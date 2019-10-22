@@ -8,7 +8,6 @@ import localForage from 'localforage'
 import { isServer } from '@utils'
 import { create } from 'mobx-persist'
 import { toast } from 'react-toastify'
-import { configure } from 'mobx'
 
 import '../styles/style.scss'
 
@@ -41,12 +40,11 @@ class DiscussionApp extends App {
     async componentDidMount(): Promise<void> {
         if (!isServer) {
             const hydrate = create({
-                storage: localForage,
-                jsonify: false,
+                storage: localStorage,
+                jsonify: true,
             })
-
-            hydrate('auth', this.props.store.authStore)
-            hydrate('newAuth', this.props.store.newAuthStore)
+            
+            hydrate('auth', this.props.store.newAuthStore)
         }
     }
 

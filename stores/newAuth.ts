@@ -1,18 +1,25 @@
 import { BaseStore, getOrCreateStore } from 'next-mobx-wrapper'
-import { computed, observable, action } from 'mobx'
+import { computed, observable, action, autorun } from 'mobx'
 import { persist } from 'mobx-persist'
 import { SignInMethods } from '@globals'
 import { CreateForm } from '@components'
 import { task } from 'mobx-task'
-import { discussions } from '@novuspherejs'
+import { discussions, eos, init } from '@novuspherejs'
 import { getUiStore, IStores } from '@stores/index'
+import { sleep } from '@utils'
 
 export default class NewAuth extends BaseStore {
-    @persist @observable displayName = ''
+    @persist('object') @observable displayName = {
+        bk: '',
+        scatter: '',
+    }
+
     @persist @observable postPriv = ''
     @persist @observable tipPub = ''
-
     @persist @observable preferredSignInMethod = SignInMethods.brainKey
+
+    @observable statusJson = ''
+    @observable clickedSignInMethod = ''
 
     // signup object
     @observable signUpObject = {
@@ -23,15 +30,52 @@ export default class NewAuth extends BaseStore {
         brianKeyVerify: '',
     }
 
+    // login objects
+    @observable signInObject = {
+        ref: null,
+        step: 1,
+    }
+
+    // status
+    @observable hasAccount = false
+
     private readonly uiStore: IStores['uiStore'] = getUiStore()
 
-    @computed get hasAccount() {
-        return this.displayName && this.postPriv && this.tipPub
+    constructor() {
+        super()
+
+        // autorun(() => {
+        //     if (this.getActiveDisplayName && this.postPriv && this.tipPub) {
+        //         this.hasAccount = true
+        //     }
+        // })
     }
 
     @action.bound
-    setPreferredSignInMethod(method: keyof typeof SignInMethods) {
-        this.preferredSignInMethod = method
+    setClickedSignInMethod(method: string) {
+        this.clickedSignInMethod = method
+    }
+
+    @computed get getActiveDisplayName() {
+        if (this.clickedSignInMethod === SignInMethods.brainKey) {
+            return this.displayName.bk
+        }
+
+        return this.displayName.scatter
+    }
+
+    @action.bound
+    setPreferredSignInMethod(method: string) {
+        if (method !== this.preferredSignInMethod) {
+            this.preferredSignInMethod = method
+        } else {
+            if (method === SignInMethods.brainKey) {
+                this.preferredSignInMethod = SignInMethods.scatter
+            }
+            if (method === SignInMethods.scatter) {
+                this.preferredSignInMethod = SignInMethods.brainKey
+            }
+        }
     }
 
     /**
@@ -112,12 +156,24 @@ export default class NewAuth extends BaseStore {
 
     @task.resolved
     @action.bound
+    async logOut() {
+        try {
+            await eos.logout()
+            this.hasAccount = false
+            this.uiStore.showToast('You have signed out!', 'success')
+        } catch (error) {
+            throw error
+        }
+    }
+
+    @task.resolved
+    @action.bound
     async signUpWithBK() {
         try {
             if (this.signUpObject.brianKey === this.signUpObject.brianKeyVerify) {
                 await this.completeSignUpProcess()
                 this.uiStore.hideModal()
-                this.uiStore.showToast('Great success!', 'success')
+                this.uiStore.showToast('You have successfully signed up!', 'success')
             } else {
                 this.uiStore.showToast(
                     'The key you entered does not match the one we generated. Please try again.',
@@ -131,6 +187,50 @@ export default class NewAuth extends BaseStore {
         }
     }
 
+    /**
+     * Sign in forms
+     */
+    @task.resolved
+    @action.bound
+    async loginWithScatter() {
+        try {
+            await init()
+            const wallet = await eos.detectWallet()
+
+            if (typeof wallet !== 'boolean' && wallet) {
+                // prompt login
+                await eos.login()
+                const accountName = eos.accountName
+
+                if (accountName) {
+                    this.displayName.scatter = accountName
+                    const statusJSON = await discussions.bkRetrieveStatusEOS(accountName)
+                    const parsedStatusJSON = JSON.parse(statusJSON)
+
+                    this.postPriv = parsedStatusJSON['post']
+                    this.tipPub = parsedStatusJSON['tip']
+                    this.uiStore.showToast('You have signed in via Scatter!', 'success')
+                    this.uiStore.hideModal()
+                } else {
+                    throw new Error('Failed to get account name')
+                }
+            } else {
+                throw new Error('Failed to detect wallet')
+            }
+        } catch (error) {
+            this.uiStore.showToast('Failed to detect wallet', 'error')
+            console.log(error)
+            return error
+        }
+    }
+
+    @task.resolved
+    @action.bound
+    async loginWithBrainKey() {
+        await sleep(2000)
+        console.log('loginWithBrainKey clicked')
+    }
+
     @task.resolved
     private async completeSignUpProcess() {
         try {
@@ -142,7 +242,7 @@ export default class NewAuth extends BaseStore {
                 null
             )
 
-            this.displayName = this.signUpObject.username
+            this.displayName.bk = this.signUpObject.username
             const transact = await discussions.bkUpdateStatusEOS(json)
             await this.storeKeys(this.signUpObject.brianKeyVerify)
             console.log('signing up with BK ended')

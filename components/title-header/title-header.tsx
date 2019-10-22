@@ -27,12 +27,14 @@ class TitleHeader extends React.Component<ITitleHeaderProps, ITitleHeaderState> 
         search: '',
     }
 
-    componentDidMount(): void {
-        this.props.authStore.checkInitialConditions()
-    }
+    // componentDidMount(): void {
+    //     this.props.authStore.checkInitialConditions()
+    // }
 
     private renderUserSettings = () => {
-        const { logOut, ATMOSBalance } = this.props.authStore
+        const { ATMOSBalance } = this.props.authStore
+
+        const { logOut } = this.props.newAuthStore
 
         return (
             <div className={'tooltip'} style={{ width: 200 }}>
@@ -62,14 +64,13 @@ class TitleHeader extends React.Component<ITitleHeaderProps, ITitleHeaderState> 
     }
 
     private renderAuthActions = () => {
-        const { accountName, checkInitialConditions } = this.props.authStore
         const { showModal } = this.props.uiStore
 
-        const { hasAccount, displayName } = this.props.newAuthStore
+        const { hasAccount, getActiveDisplayName } = this.props.newAuthStore
 
-        if (checkInitialConditions['pending']) {
-            return <FontAwesomeIcon width={13} icon={faSpinner} spin />
-        }
+        // if (checkInitialConditions['pending']) {
+        //     return <FontAwesomeIcon width={13} icon={faSpinner} spin />
+        // }
 
         if (hasAccount) {
             return (
@@ -104,12 +105,12 @@ class TitleHeader extends React.Component<ITitleHeaderProps, ITitleHeaderState> 
                         position={'bottom-end'}
                         trigger={'mouseenter'}
                     >
-                        <Link route={`/u/${displayName}`}>
+                        <Link route={`/u/${getActiveDisplayName}`}>
                             <a
                                 rel={'Open your profile'}
                                 className={'flex items-center user-container pointer dim'}
                             >
-                                <span className={'b f6 pl1 pr3 black'}>{displayName}</span>
+                                <span className={'b f6 pl1 pr3 black'}>{getActiveDisplayName}</span>
                                 <FontAwesomeIcon width={13} icon={faUserCircle} color={'#7D8894'} />
                             </a>
                         </Link>
