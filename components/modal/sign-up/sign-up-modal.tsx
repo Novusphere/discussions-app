@@ -4,7 +4,6 @@ import { observer, inject } from 'mobx-react'
 import { IStores } from '@stores'
 import { faSpinner } from '@fortawesome/free-solid-svg-icons'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
-import { ModalOptions } from '@globals'
 
 interface ISignInModalProps {
     newAuthStore: IStores['newAuthStore']

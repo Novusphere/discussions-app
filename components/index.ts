@@ -31,8 +31,6 @@ export { default as WalletUndetectedModal } from './modal/wallet-undetected/wall
 export { default as WelcomeBackModal } from './modal/welcome-back/welcome-back-modal'
 export { default as SignInModal } from './modal/sign-in/sign-in-modal'
 export { default as SignInModalOptions } from './modal/sign-in/scatter/select-sign-in-option'
-export { default as SignInModalSetBK } from './modal/sign-in/scatter/set-brian-key'
-export { default as SignInModalSetPassword } from './modal/sign-in/scatter/set-password'
 
 export { default as BrainKeySetPassword } from './modal/sign-in/brain-key/set-password'
 export { default as SetNewBK } from './modal/sign-in/brain-key/set-new-bk'

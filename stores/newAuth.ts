@@ -18,7 +18,7 @@ export default class NewAuth extends BaseStore {
     @persist @observable tipPub = ''
     @persist @observable preferredSignInMethod = SignInMethods.brainKey
 
-    @observable statusJson = ''
+    @persist('object') @observable statusJson = null
     @observable clickedSignInMethod = ''
 
     // signup object
@@ -44,11 +44,19 @@ export default class NewAuth extends BaseStore {
     constructor() {
         super()
 
-        // autorun(() => {
-        //     if (this.getActiveDisplayName && this.postPriv && this.tipPub) {
-        //         this.hasAccount = true
-        //     }
-        // })
+        this.checkInitialConditions()
+    }
+
+    @task
+    @action.bound
+    async checkInitialConditions() {
+        await sleep(500)
+
+        if (this.getActiveDisplayName && this.postPriv && this.tipPub) {
+            this.hasAccount = true
+        } else {
+            this.hasAccount = false
+        }
     }
 
     @action.bound
@@ -56,12 +64,39 @@ export default class NewAuth extends BaseStore {
         this.clickedSignInMethod = method
     }
 
+    /**
+     * Used for posting, returns empty string if the
+     * user is logged in via a non-scatter method
+     */
+    @computed get posterName(): string {
+        if (this.preferredSignInMethod === SignInMethods.brainKey) {
+            return ''
+        }
+
+        return this.getActiveDisplayName
+    }
+
     @computed get getActiveDisplayName() {
         if (this.clickedSignInMethod === SignInMethods.brainKey) {
             return this.displayName.bk
         }
 
-        return this.displayName.scatter
+        if (this.clickedSignInMethod === SignInMethods.scatter) {
+            return this.displayName.scatter
+        }
+
+        if (!this.clickedSignInMethod) {
+            if (this.preferredSignInMethod === SignInMethods.brainKey) {
+                return this.displayName.bk
+            }
+
+            return this.displayName.scatter
+        }
+    }
+
+    @computed get hasBKAccount() {
+        if (!this.displayName.bk) return false
+        return this.displayName.bk
     }
 
     @action.bound
@@ -190,6 +225,126 @@ export default class NewAuth extends BaseStore {
     /**
      * Sign in forms
      */
+    get setNewBKAndPasswordForm() {
+        return new CreateForm(
+            {
+                onSubmit: form => {
+                    const { bk, displayName, password } = form.values()
+
+                    if (!form.hasError) {
+                        this.loginWithBK(bk, displayName, password)
+                    }
+                },
+            },
+            [
+                {
+                    name: 'bk',
+                    label: 'Brain Key',
+                    type: 'textarea',
+                    placeholder: 'Enter your BK',
+                    rules: 'required|string',
+                },
+                {
+                    name: 'displayName',
+                    label: 'Display Name',
+                    type: 'text',
+                    placeholder: 'Enter your preferred display name',
+                    rules: 'required|string',
+                },
+                {
+                    name: 'password',
+                    label: 'Password',
+                    type: 'password',
+                    placeholder: 'Your password',
+                    rules: 'required|string|between:5,25',
+                },
+            ]
+        )
+    }
+
+    get setPassword() {
+        return new CreateForm(
+            {
+                onSubmit: form => {
+                    const { password } = form.values()
+                    if (!form.hasError) {
+                        this.loginWithPassword(password)
+                    }
+                },
+            },
+            [
+                {
+                    name: 'password',
+                    label: 'Password',
+                    type: 'password',
+                    placeholder: 'Your password',
+                    rules: 'required|string|between:5,25',
+                },
+            ]
+        )
+    }
+
+    get choosePassword() {
+        return new CreateForm(
+            {
+                onSubmit: async form => {
+                    const { password } = form.values()
+                    console.log('Class: NewAuth, Function: onSubmit, Line 264 password: ', password)
+                },
+            },
+            [
+                {
+                    name: 'password',
+                    label: 'Password',
+                    type: 'password',
+                    placeholder: 'Your password',
+                    rules: 'required|string|between:5,25',
+                },
+                {
+                    name: 'passwordConfirm',
+                    label: 'Password Confirmation',
+                    type: 'password',
+                    placeholder: 'Confirm Password',
+                    rules: 'required|string|same:password',
+                },
+            ]
+        )
+    }
+
+    @task.resolved
+    @action.bound
+    async loginWithBK(bk: string, displayName: string, password: string) {
+        try {
+            const unparsedJSON = await this.bkToStatusJson(bk, displayName, password, null)
+
+            if (unparsedJSON) {
+                const statusJSON = JSON.parse(unparsedJSON)
+                this.statusJson = statusJSON
+                this.displayName.bk = statusJSON['displayName']
+                await this.storeKeys(bk)
+
+                this.completeSignInProcess()
+            } else {
+                console.log('failed')
+            }
+        } catch (error) {
+            this.uiStore.showToast('Something went wrong!', 'error')
+            return error
+        }
+    }
+
+    @task.resolved
+    @action.bound
+    async loginWithPassword(password: string) {
+        try {
+            const bk = await discussions.bkFromStatusJson(JSON.stringify(this.statusJson), password)
+            await this.loginWithBK(bk, this.statusJson['displayName'], password)
+        } catch (error) {
+            this.uiStore.showToast(error.message, 'error')
+            return error
+        }
+    }
+
     @task.resolved
     @action.bound
     async loginWithScatter() {
@@ -206,11 +361,10 @@ export default class NewAuth extends BaseStore {
                     this.displayName.scatter = accountName
                     const statusJSON = await discussions.bkRetrieveStatusEOS(accountName)
                     const parsedStatusJSON = JSON.parse(statusJSON)
-
                     this.postPriv = parsedStatusJSON['post']
                     this.tipPub = parsedStatusJSON['tip']
-                    this.uiStore.showToast('You have signed in via Scatter!', 'success')
-                    this.uiStore.hideModal()
+
+                    this.completeSignInProcess()
                 } else {
                     throw new Error('Failed to get account name')
                 }
@@ -226,9 +380,24 @@ export default class NewAuth extends BaseStore {
 
     @task.resolved
     @action.bound
-    async loginWithBrainKey() {
-        await sleep(2000)
-        console.log('loginWithBrainKey clicked')
+    async handleStepSwitchForBK() {
+        if (this.hasBKAccount) {
+            // push them to password
+            this.signInObject.ref.goToStep(3)
+            console.log('handleStepSwitchForBK clicked, has bk account')
+        } else {
+            // let them setup a new bk
+            this.signInObject.ref.goToStep(2)
+            console.log('handleStepSwitchForBK clicked, does not have BK account')
+        }
+    }
+
+    @action.bound
+    private completeSignInProcess() {
+        this.uiStore.showToast('You have successfully signed in!', 'success')
+        this.hasAccount = true
+        this.signInObject.ref.goToStep(1)
+        this.uiStore.hideModal()
     }
 
     @task.resolved
@@ -242,6 +411,7 @@ export default class NewAuth extends BaseStore {
                 null
             )
 
+            this.statusJson = json
             this.displayName.bk = this.signUpObject.username
             const transact = await discussions.bkUpdateStatusEOS(json)
             await this.storeKeys(this.signUpObject.brianKeyVerify)

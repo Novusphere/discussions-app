@@ -6,16 +6,16 @@ import { IPost } from '@stores/posts'
 
 interface IPostPreviewProps {
     postsStore: IStores['postsStore']
-    authStore: IStores['authStore']
+    newAuthStore: IStores['newAuthStore']
     tagStore: IStores['tagStore']
 }
 
-@inject('postsStore', 'authStore', 'tagStore')
+@inject('postsStore', 'newAuthStore', 'tagStore')
 @observer
 class NewPostPreview extends React.Component<IPostPreviewProps> {
     public render(): React.ReactNode {
         const { preview } = this.props.postsStore
-        const { accountName } = this.props.authStore
+        const { getActiveDisplayName } = this.props.newAuthStore
 
         if (!preview) {
             return null
@@ -30,7 +30,7 @@ class NewPostPreview extends React.Component<IPostPreviewProps> {
             threadUuid: '',
             uuid: '',
             title: preview.title,
-            poster: accountName,
+            poster: getActiveDisplayName,
             content: preview.content,
             createdAt: Date.now() as any,
             sub: preview.sub.value,

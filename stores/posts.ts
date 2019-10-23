@@ -4,7 +4,7 @@ import { task } from 'mobx-task'
 import { BaseStore, getOrCreateStore } from 'next-mobx-wrapper'
 import { CreateForm } from '@components'
 import { getTagStore } from '@stores/tag'
-import { getAuthStore, getUiStore, IStores } from '@stores'
+import { getAuthStore, getNewAuthStore, getUiStore, IStores } from '@stores'
 import { generateUuid, getAttachmentValue, pushToThread, sleep } from '@utils'
 import { ThreadModel } from '@models/threadModel'
 import FeedModel from '@models/feedModel'
@@ -75,21 +75,21 @@ export default class Posts extends BaseStore {
     @observable.deep activeThread: ThreadModel | undefined
 
     private tagsStore: IStores['tagStore']
-    private authStore: IStores['authStore']
     private uiStore: IStores['uiStore']
+    private newAuthStore: IStores['newAuthStore']
 
     constructor(props) {
         super(props)
         this.tagsStore = getTagStore()
-        this.authStore = getAuthStore()
         this.uiStore = getUiStore()
+        this.newAuthStore = getNewAuthStore()
 
         // refresh posts on logged in
         // so we can show upvotes/downvotes by the user
         reaction(
-            () => this.authStore.isLoggedIn,
-            async isLoggedIn => {
-                if (isLoggedIn) {
+            () => this.newAuthStore.hasAccount,
+            async hasAccount => {
+                if (hasAccount) {
                     if (this.activeThread) {
                         this.getAndSetThread(this.activeThreadId)
                     }
@@ -152,7 +152,7 @@ export default class Posts extends BaseStore {
     @action
     public vote = async (uuid: string, value: number) => {
         try {
-            if (this.authStore.isLoggedIn) {
+            if (this.newAuthStore.hasAccount) {
                 await this.activeThread.vote(uuid, value)
             }
         } catch (error) {
@@ -337,17 +337,19 @@ export default class Posts extends BaseStore {
                         },
                         {
                             value: 'Post',
-                            disabled: !this.authStore.isLoggedIn,
-                            title: !this.authStore.isLoggedIn
+                            disabled: !this.newAuthStore.hasAccount,
+                            title: !this.newAuthStore.hasAccount
                                 ? 'You need to be logged in to post'
-                                : 'Post with your logged as ' + this.authStore.accountName,
+                                : 'Post with your logged as ' +
+                                  this.newAuthStore.getActiveDisplayName,
+
                             onClick: task.resolved(async form => {
                                 if (!form.hasError && this.newPostData.sub.value) {
                                     const post = form.values()
                                     const uuid = generateUuid()
 
                                     const submittedPost = await discussions.post({
-                                        poster: this.authStore.posterName,
+                                        poster: this.newAuthStore.posterName,
                                         title: post.title,
                                         content: post.content,
                                         sub: this.newPostData.sub.value,

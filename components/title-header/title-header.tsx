@@ -66,11 +66,11 @@ class TitleHeader extends React.Component<ITitleHeaderProps, ITitleHeaderState> 
     private renderAuthActions = () => {
         const { showModal } = this.props.uiStore
 
-        const { hasAccount, getActiveDisplayName } = this.props.newAuthStore
+        const { hasAccount, getActiveDisplayName, checkInitialConditions } = this.props.newAuthStore
 
-        // if (checkInitialConditions['pending']) {
-        //     return <FontAwesomeIcon width={13} icon={faSpinner} spin />
-        // }
+        if (checkInitialConditions['pending']) {
+            return <FontAwesomeIcon width={13} icon={faSpinner} spin />
+        }
 
         if (hasAccount) {
             return (
