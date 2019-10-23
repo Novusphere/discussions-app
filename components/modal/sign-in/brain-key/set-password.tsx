@@ -1,5 +1,6 @@
 import * as React from 'react'
 import { Form, CreateForm } from '@components'
+import { observer } from 'mobx-react'
 
 interface ISetPasswordProps {
     form: CreateForm
@@ -15,4 +16,4 @@ const SetPassword: React.FC<ISetPasswordProps> = ({ form }) => (
     </div>
 )
 
-export default SetPassword as any
+export default observer(SetPassword)

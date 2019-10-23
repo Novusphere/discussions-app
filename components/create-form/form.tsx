@@ -18,7 +18,13 @@ class Form extends React.Component<FormProps> {
 
         if (key.match(/NumpadEnter|Enter/)) {
             e.preventDefault()
-            this.props.form.onSubmit(e)
+
+            if (
+                typeof this.props.form !== 'undefined' &&
+                typeof this.props.form.onSubmit !== 'undefined'
+            ) {
+                this.props.form.onSubmit(e)
+            }
         }
     }
 
@@ -32,6 +38,9 @@ class Form extends React.Component<FormProps> {
 
     render() {
         const { form, children, hideSubmitButton, ...props } = this.props
+
+        if (typeof form === 'undefined' || typeof form.fields === 'undefined') return null
+
         const renderButton = (field, type, rest) => {
             if (Array.isArray(field.accessor.$extra.options)) {
                 return field.accessor.$extra.options.map(

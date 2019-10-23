@@ -3,8 +3,9 @@ import {
     Modal,
     SignInModalOptions,
     SuccessSetup,
-    AskForPassword,
     SetNewBK,
+    ScatterAskForPassword,
+    BrainKeySetPassword,
 } from '@components'
 import { IStores } from '@stores'
 import { observer, inject } from 'mobx-react'
@@ -46,10 +47,10 @@ class SignInModal extends React.Component<IWelcomeBackModalProps, IWelcomeBackMo
         this.props.newAuthStore.setClickedSignInMethod(name)
     }
 
-    renderButtons = (choosePasswordForm: any, setPassword: any, setNewBKAndPasswordForm: any) => {
+    renderButtons = (choosePasswordForm: any, setPassword: any, setNewBKAndPasswordForm: any, setPasswordScatter: any) => {
         const {
             signInObject,
-            loginWithScatter,
+            initializeScatterLogin,
             loginWithBK,
             handleStepSwitchForBK,
             hasBKAccount,
@@ -71,11 +72,11 @@ class SignInModal extends React.Component<IWelcomeBackModalProps, IWelcomeBackMo
 
                     switch (this.state.clickedSignInOption) {
                         case SignInMethods.scatter:
-                            if (loginWithScatter['pending']) {
+                            if (initializeScatterLogin['pending']) {
                                 return (
                                     <button
                                         className={'f6 link dim ph3 pv2 dib pointer white bg-green'}
-                                        disabled={loginWithScatter['pending']}
+                                        disabled={initializeScatterLogin['pending']}
                                     >
                                         <FontAwesomeIcon width={13} icon={faSpinner} spin />
                                     </button>
@@ -83,7 +84,7 @@ class SignInModal extends React.Component<IWelcomeBackModalProps, IWelcomeBackMo
                             }
                             return (
                                 <button
-                                    onClick={loginWithScatter}
+                                    onClick={initializeScatterLogin}
                                     className={'f6 link dim ph3 pv2 dib pointer white bg-green'}
                                     disabled={!this.state.clickedSignInOption}
                                 >
@@ -216,6 +217,49 @@ class SignInModal extends React.Component<IWelcomeBackModalProps, IWelcomeBackMo
                     })
                 case 4:
                     break
+                case 5:
+                    return this.props.newAuthStore.initializeScatterLogin['match']({
+                        rejected: () => (
+                            <>
+                                <button
+                                    disabled={this.props.newAuthStore.initializeScatterLogin['pending']}
+                                    onClick={setPasswordScatter.onSubmit}
+                                    className={'f6 link dim ph3 pv2 dib pointer white bg-red'}
+                                >
+                                    Log In
+                                </button>
+                            </>
+                        ),
+                        pending: () => (
+                            <button
+                                disabled={this.props.newAuthStore.initializeScatterLogin['pending']}
+                                onClick={setPasswordScatter.onSubmit}
+                                className={'f6 link dim ph3 pv2 dib pointer white bg-red'}
+                            >
+                                <FontAwesomeIcon width={13} icon={faSpinner} spin />
+                            </button>
+                        ),
+                        resolved: () => (
+                            <>
+                                <span
+                                    className={'b pointer dim'}
+                                    title={'Sign in with another sign in boost'}
+                                    onClick={() =>
+                                        this.props.newAuthStore.signInObject.ref.goToStep(1)
+                                    }
+                                >
+                                    Or log in with another sign in method
+                                </span>{' '}
+                                <button
+                                    disabled={this.props.newAuthStore.initializeScatterLogin['pending']}
+                                    onClick={setPasswordScatter.onSubmit}
+                                    className={'f6 link dim ph3 pv2 dib pointer white bg-red'}
+                                >
+                                    Log In with Scatter
+                                </button>
+                            </>
+                        ),
+                    })
             }
         }
     }
@@ -257,8 +301,11 @@ class SignInModal extends React.Component<IWelcomeBackModalProps, IWelcomeBackMo
     public render() {
         const { signInObject } = this.props.newAuthStore
         const choosePasswordForm = this.props.newAuthStore.choosePassword
-        const setPassword = this.props.newAuthStore.setPassword
+        const setPasswordBK = this.props.newAuthStore.setPasswordBK
+        const setPasswordScatter = this.props.newAuthStore.setPasswordScatter
         const setNewBKAndPasswordForm = this.props.newAuthStore.setNewBKAndPasswordForm
+
+        console.log(setPasswordBK)
 
         return (
             <Modal>
@@ -279,16 +326,19 @@ class SignInModal extends React.Component<IWelcomeBackModalProps, IWelcomeBackMo
                                 clickedSignInOption={this.state.clickedSignInOption}
                             />
                             <SetNewBK form={setNewBKAndPasswordForm} />
-                            <AskForPassword askPasswordForm={setPassword} />
+                            <BrainKeySetPassword form={setPasswordBK} />
                             <SuccessSetup />
+
+                            <ScatterAskForPassword form={setPasswordScatter} />
                         </StepWizard>
 
                         <div className={'modal-footer'}>
                             {this.renderRememberOption()}
                             {this.renderButtons(
                                 choosePasswordForm,
-                                setPassword,
-                                setNewBKAndPasswordForm
+                                setPasswordBK,
+                                setNewBKAndPasswordForm,
+                                setPasswordScatter
                             )}
                         </div>
                     </>

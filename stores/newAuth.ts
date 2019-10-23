@@ -1,7 +1,7 @@
 import { BaseStore, getOrCreateStore } from 'next-mobx-wrapper'
-import { computed, observable, action, autorun } from 'mobx'
+import { action, computed, observable } from 'mobx'
 import { persist } from 'mobx-persist'
-import { SignInMethods } from '@globals'
+import { ModalOptions, SignInMethods } from '@globals'
 import { CreateForm } from '@components'
 import { task } from 'mobx-task'
 import { discussions, eos, init } from '@novuspherejs'
@@ -18,7 +18,10 @@ export default class NewAuth extends BaseStore {
     @persist @observable tipPub = ''
     @persist @observable preferredSignInMethod = SignInMethods.brainKey
 
-    @persist('object') @observable statusJson = null
+    @persist('object') @observable statusJson = {
+        bk: null,
+        scatter: null,
+    }
     @observable clickedSignInMethod = ''
 
     // signup object
@@ -53,14 +56,18 @@ export default class NewAuth extends BaseStore {
         await sleep(500)
 
         if (this.getActiveDisplayName && this.postPriv && this.tipPub) {
-            this.hasAccount = true
-
             if (this.preferredSignInMethod === SignInMethods.scatter) {
                 try {
-                    return await this.loginWithScatter()
+                    return await this.initializeScatterLogin()
                 } catch (error) {
                     this.hasAccount = false
                     return error
+                }
+            }
+
+            if (this.preferredSignInMethod === SignInMethods.brainKey) {
+                if (this.statusJson.bk && this.postPriv && this.tipPub && this.displayName.bk) {
+                    this.hasAccount = true
                 }
             }
         } else {
@@ -78,10 +85,6 @@ export default class NewAuth extends BaseStore {
      * user is logged in via a non-scatter method
      */
     @computed get posterName(): string {
-        if (this.preferredSignInMethod === SignInMethods.brainKey) {
-            return ''
-        }
-
         return this.getActiveDisplayName
     }
 
@@ -271,13 +274,36 @@ export default class NewAuth extends BaseStore {
         )
     }
 
-    get setPassword() {
+    @computed get setPasswordBK() {
         return new CreateForm(
             {
                 onSubmit: form => {
                     const { password } = form.values()
                     if (!form.hasError) {
                         this.loginWithPassword(password)
+                    }
+                },
+            },
+            [
+                {
+                    name: 'password',
+                    label: 'Password',
+                    type: 'password',
+                    placeholder: 'Your password',
+                    rules: 'required|string|between:5,25',
+                },
+            ]
+        )
+    }
+
+    get setPasswordScatter() {
+        return new CreateForm(
+            {
+                onSubmit: form => {
+                    const { password } = form.values()
+
+                    if (!form.hasError) {
+                        return this.loginWithScatter(password)
                     }
                 },
             },
@@ -324,11 +350,19 @@ export default class NewAuth extends BaseStore {
     @action.bound
     async loginWithBK(bk: string, displayName: string, password: string) {
         try {
+            // check if valid bk
+            const bkIsValid = discussions.bkIsValid(bk)
+
+            if (!bkIsValid) {
+                this.uiStore.showToast('You have entered an invalid brain key.', 'error')
+                return
+            }
+
             const unparsedJSON = await this.bkToStatusJson(bk, displayName, password, null)
 
             if (unparsedJSON) {
                 const statusJSON = JSON.parse(unparsedJSON)
-                this.statusJson = statusJSON
+                this.statusJson.bk = statusJSON
                 this.displayName.bk = statusJSON['displayName']
                 await this.storeKeys(bk)
 
@@ -356,7 +390,7 @@ export default class NewAuth extends BaseStore {
 
     @task.resolved
     @action.bound
-    async loginWithScatter() {
+    async initializeScatterLogin() {
         try {
             await init()
             const wallet = await eos.detectWallet()
@@ -364,18 +398,13 @@ export default class NewAuth extends BaseStore {
             if (typeof wallet !== 'boolean' && wallet) {
                 // prompt login
                 await eos.login()
-                const accountName = eos.accountName
 
-                if (accountName) {
-                    this.displayName.scatter = accountName
-                    const statusJSON = await discussions.bkRetrieveStatusEOS(accountName)
-                    const parsedStatusJSON = JSON.parse(statusJSON)
-                    this.postPriv = parsedStatusJSON['post']
-                    this.tipPub = parsedStatusJSON['tip']
+                console.log('time to ask for your password')
 
-                    this.completeSignInProcess()
-                } else {
-                    throw new Error('Failed to get account name')
+                if (this.uiStore.activeModal !== ModalOptions.signIn) {
+                    this.uiStore.showModal(ModalOptions.signIn)
+                    await sleep(50)
+                    this.signInObject.ref.goToStep(5)
                 }
             } else {
                 throw new Error('Failed to detect wallet')
@@ -383,6 +412,34 @@ export default class NewAuth extends BaseStore {
         } catch (error) {
             this.uiStore.showToast('Failed to detect wallet', 'error')
             console.log(error)
+            return error
+        }
+    }
+
+    @task.resolved
+    @action.bound
+    async loginWithScatter(password: string) {
+        try {
+            const accountName = eos.accountName
+            const json = await discussions.bkRetrieveStatusEOS(accountName)
+
+            const bk = await discussions.bkFromStatusJson(json, password)
+
+            if (!bk) {
+                return
+            }
+
+            this.statusJson.scatter = JSON.parse(json)
+            
+            if (accountName) {
+                this.postPriv = this.statusJson.scatter['post']
+                this.tipPub = this.statusJson.scatter['tip']
+                this.completeSignInProcess()
+            } else {
+                throw new Error('Failed to get account name')
+            }
+        } catch (error) {
+            this.uiStore.showToast(error.message, 'error')
             return error
         }
     }
@@ -426,7 +483,7 @@ export default class NewAuth extends BaseStore {
                 null
             )
 
-            this.statusJson = json
+            this.statusJson.bk = json
             this.displayName.bk = this.signUpObject.username
             const transact = await discussions.bkUpdateStatusEOS(json)
             await this.storeKeys(this.signUpObject.brianKeyVerify)
