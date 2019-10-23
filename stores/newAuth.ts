@@ -360,10 +360,13 @@ export default class NewAuth extends BaseStore {
 
             const unparsedJSON = await this.bkToStatusJson(bk, displayName, password, null)
 
+            console.log('Class: NewAuth, Function: loginWithBK, Line 363 unparsedJSON: ', unparsedJSON);
+
             if (unparsedJSON) {
                 const statusJSON = JSON.parse(unparsedJSON)
                 this.statusJson.bk = statusJSON
                 this.displayName.bk = statusJSON['displayName']
+
                 await this.storeKeys(bk)
 
                 this.completeSignInProcess()
@@ -380,8 +383,8 @@ export default class NewAuth extends BaseStore {
     @action.bound
     async loginWithPassword(password: string) {
         try {
-            const bk = await discussions.bkFromStatusJson(JSON.stringify(this.statusJson), password)
-            await this.loginWithBK(bk, this.statusJson['displayName'], password)
+            const bk = await discussions.bkFromStatusJson(JSON.stringify(this.statusJson.bk), password)
+            await this.loginWithBK(bk, this.statusJson.bk['displayName'], password)
         } catch (error) {
             this.uiStore.showToast(error.message, 'error')
             return error
@@ -483,7 +486,7 @@ export default class NewAuth extends BaseStore {
                 null
             )
 
-            this.statusJson.bk = json
+            this.statusJson.bk = JSON.parse(json)
             this.displayName.bk = this.signUpObject.username
             const transact = await discussions.bkUpdateStatusEOS(json)
             await this.storeKeys(this.signUpObject.brianKeyVerify)

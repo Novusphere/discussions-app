@@ -1,8 +1,11 @@
 import { CreateForm } from '@components'
-import {BaseStore, getOrCreateStore} from 'next-mobx-wrapper';
-
+import { BaseStore, getOrCreateStore } from 'next-mobx-wrapper'
+import { observable } from 'mobx'
+import { persist } from 'mobx-persist'
 
 export default class Settings extends BaseStore {
+    @persist @observable localStorageVersion = '2.0.0'
+
     get setIdForm() {
         return new CreateForm(
             {

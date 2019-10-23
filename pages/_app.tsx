@@ -4,16 +4,17 @@ import * as Stores from '@stores'
 import { Provider, useStaticRendering } from 'mobx-react'
 import { MainLayout } from '@components'
 import { withMobx } from 'next-mobx-wrapper'
-import localForage from 'localforage'
-import { isServer } from '@utils'
+import { getVersion, isServer } from '@utils'
 import { create } from 'mobx-persist'
 import { toast } from 'react-toastify'
 
 import '../styles/style.scss'
+import { getNewAuthStore, getSettingsStore } from '@stores'
 
 // configure({ enforceActions: 'observed' })
 useStaticRendering(isServer) // NOT `true` value
 toast.configure()
+
 
 class DiscussionApp extends App {
     public props: any
@@ -39,12 +40,29 @@ class DiscussionApp extends App {
      */
     async componentDidMount(): Promise<void> {
         if (!isServer) {
+            const { newAuthStore, settingsStore } = this.props.store
+
+            const stores = {
+                auth: newAuthStore,
+                settings: settingsStore,
+            }
+
             const hydrate = create({
                 storage: localStorage,
                 jsonify: true,
             })
-            
-            hydrate('auth', this.props.store.newAuthStore)
+
+            Object.keys(stores).forEach(store => {
+                const result = hydrate(store, stores[store])
+
+                if (getVersion() !== this.props.store.settingsStore.localStorageVersion) {
+                    console.error('local storage version mismatch')
+
+                    result.rehydrate().then(() => {
+                        console.log('store rehydrated')
+                    })
+                }
+            })
         }
     }
 

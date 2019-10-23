@@ -1,6 +1,6 @@
 {
     "name": "discussions-app",
-    "version": "2.0.0",
+    "version": "2.0.1",
     "dependencies": {
         "@babel/runtime": "7.4.5",
         "@fortawesome/fontawesome-svg-core": "^1.2.19",

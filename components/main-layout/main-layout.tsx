@@ -5,15 +5,17 @@ import { AppModals, Sidebar, TitleHeader } from '@components'
 import classNames from 'classnames'
 
 import { IStores } from '@stores'
+import { getVersion } from '@utils'
 
 interface IMainLayoutProps {
     activeBanner: string
     tagStore: IStores['tagStore']
     uiStore: IStores['uiStore']
+    settingsStore: IStores['settingsStore']
     tags: IStores['tagStore']['tags']
 }
 
-@inject('tagStore', 'uiStore')
+@inject('tagStore', 'uiStore', 'settingsStore')
 @observer
 class MainLayout extends React.Component<IMainLayoutProps> {
     public render() {
@@ -59,21 +61,27 @@ class MainLayout extends React.Component<IMainLayoutProps> {
                 </div>
 
                 <footer>
-                    <p className="tc lh-copy">
-                        This site is hosted entirely from{' '}
-                        <a href="https://github.com/Novusphere/novusphere-eos/tree/gh-pages">
-                            GitHub Pages
-                        </a>{' '}
-                        and is fully{' '}
-                        <a href="https://github.com/Novusphere/novusphere-eos">open source</a>.
-                        <br />
-                        The developers of this software take no responsibility for the content
-                        displayed.
-                        <br />
-                        No images, files or media are hosted by the forum,
-                        <br />
-                        please contact the respective site owners hosting content in breach of DMCA.
-                    </p>
+                    <div className="tc lh-copy">
+                        <p className={'b'}>
+                            Version: {getVersion()} ({this.props.settingsStore.localStorageVersion})
+                        </p>
+                        <p>
+                            This site is hosted entirely from{' '}
+                            <a href="https://github.com/Novusphere/novusphere-eos/tree/gh-pages">
+                                GitHub Pages
+                            </a>{' '}
+                            and is fully{' '}
+                            <a href="https://github.com/Novusphere/novusphere-eos">open source</a>.
+                            <br />
+                            The developers of this software take no responsibility for the content
+                            displayed.
+                            <br />
+                            No images, files or media are hosted by the forum,
+                            <br />
+                            please contact the respective site owners hosting content in breach of
+                            DMCA.
+                        </p>
+                    </div>
                 </footer>
             </>
         )

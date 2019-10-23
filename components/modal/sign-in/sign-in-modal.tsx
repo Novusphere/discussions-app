@@ -305,8 +305,6 @@ class SignInModal extends React.Component<IWelcomeBackModalProps, IWelcomeBackMo
         const setPasswordScatter = this.props.newAuthStore.setPasswordScatter
         const setNewBKAndPasswordForm = this.props.newAuthStore.setNewBKAndPasswordForm
 
-        console.log(setPasswordBK)
-
         return (
             <Modal>
                 {({ CloseIcon }) => (
