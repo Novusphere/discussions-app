@@ -54,6 +54,15 @@ export default class NewAuth extends BaseStore {
 
         if (this.getActiveDisplayName && this.postPriv && this.tipPub) {
             this.hasAccount = true
+
+            if (this.preferredSignInMethod === SignInMethods.scatter) {
+                try {
+                    return await this.loginWithScatter()
+                } catch (error) {
+                    this.hasAccount = false
+                    return error
+                }
+            }
         } else {
             this.hasAccount = false
         }
@@ -396,8 +405,14 @@ export default class NewAuth extends BaseStore {
     private completeSignInProcess() {
         this.uiStore.showToast('You have successfully signed in!', 'success')
         this.hasAccount = true
-        this.signInObject.ref.goToStep(1)
-        this.uiStore.hideModal()
+
+        if (this.signInObject.ref) {
+            this.signInObject.ref.goToStep(1)
+        }
+
+        if (this.uiStore.activeModal) {
+            this.uiStore.hideModal()
+        }
     }
 
     @task.resolved
