@@ -3,7 +3,7 @@ import { task } from 'mobx-task'
 import { Post } from '@novuspherejs/discussions/post'
 import { Messages } from '@globals'
 import { generateUuid, getAttachmentValue } from '@utils'
-import { getAuthStore, getPostsStore, getUiStore, IStores } from '@stores'
+import { getAuthStore, getNewAuthStore, getPostsStore, getUiStore, IStores } from '@stores'
 import PostModel from '@models/postModel'
 import { discussions } from '@novuspherejs'
 
@@ -13,7 +13,7 @@ export class ReplyModel {
     @observable open = false
     @observable map: { [p: string]: PostModel }
 
-    public readonly authStore: IStores['authStore']
+    public readonly newAuthStore: IStores['newAuthStore']
     public readonly postStore: IStores['postsStore']
     public readonly uiStore: IStores['uiStore']
 
@@ -23,7 +23,7 @@ export class ReplyModel {
     constructor(post: PostModel, map: { [p: string]: PostModel }) {
         this.uid = post.uuid
         this.map = map
-        this.authStore = getAuthStore()
+        this.newAuthStore = getNewAuthStore()
         this.postStore = getPostsStore()
         this.uiStore = getUiStore()
     }
@@ -37,7 +37,7 @@ export class ReplyModel {
     }
 
     @task.resolved onSubmit = async () => {
-        if (!this.authStore.isLoggedIn) {
+        if (!this.newAuthStore.hasAccount) {
             this.uiStore.showToast('You must be logged in to comment', 'error')
             return
         }
@@ -82,7 +82,7 @@ export class ReplyModel {
             if (activeThread) {
                 const model = new PostModel(reply as any)
 
-                const signedReply = model.sign(this.authStore.postPriv)
+                const signedReply = model.sign(this.newAuthStore.postPriv)
                 const confirmedReply = await discussions.post(signedReply as any)
 
                 set(activeThread, {
