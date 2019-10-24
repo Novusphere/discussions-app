@@ -12,6 +12,7 @@ class FeedModel {
     @observable map: any
     @observable sub: any
     @observable poster: any
+    @observable displayName: any
     @observable content: any
     @observable createdAt: any
     @observable totalReplies: any

@@ -43,7 +43,7 @@ const PostPreview: React.FC<IPostPreviewProps> = ({
                     )}
                     <span className={'b ttu'}>{post.sub}</span>
                     <span className={'ph1 b'}>&#183;</span>
-                    <span className={'o-80'}>by {post.poster}</span>
+                    <span className={'o-80'}>by {post.displayName || post.poster}</span>
                     <span className={'o-50 pl2'}>{moment(post.createdAt).fromNow()}</span>
                 </div>
                 <div className={'flex justify-between items-center pt1'}>
