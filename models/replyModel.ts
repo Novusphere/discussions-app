@@ -82,7 +82,7 @@ export class ReplyModel {
 
         if (posterName === this.newAuthStore.displayName.scatter) {
             reply.poster = posterName
-            reply.displayName = undefined
+            reply.displayName = posterName
         }
 
         try {

@@ -372,7 +372,7 @@ export default class Posts extends BaseStore {
 
                                     if (posterName === this.newAuthStore.displayName.scatter) {
                                         newPost.poster = posterName
-                                        newPost.displayName = undefined
+                                        newPost.displayName = posterName
                                     }
 
 
