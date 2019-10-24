@@ -3,7 +3,7 @@ import { task } from 'mobx-task'
 import { Post } from '@novuspherejs/discussions/post'
 import { Messages } from '@globals'
 import { generateUuid, getAttachmentValue } from '@utils'
-import { getAuthStore, getNewAuthStore, getPostsStore, getUiStore, IStores } from '@stores'
+import { getNewAuthStore, getPostsStore, getUiStore, IStores } from '@stores'
 import PostModel from '@models/postModel'
 import { discussions } from '@novuspherejs'
 
@@ -53,12 +53,13 @@ export class ReplyModel {
         }
 
         const generatedUid = generateUuid()
-        const posterName = getAuthStore().posterName
+        const posterName = this.newAuthStore.posterName
 
         console.log('Class: ReplyModel, Function: onSubmit, Line 58 : ', posterName);
 
         const reply = {
-            poster: posterName,
+            poster: null,
+            displayName: null,
             title: '',
             content: this.content,
             sub: post.sub,
@@ -73,23 +74,31 @@ export class ReplyModel {
             upvotes: 0,
             downvotes: 0,
         }
+
+        if (posterName === this.newAuthStore.displayName.bk) {
+            reply.poster = null
+            reply.displayName = posterName
+        } else if (posterName === this.newAuthStore.displayName.scatter) {
+            reply.poster = posterName
+            reply.displayName = posterName
+        }
         
         try {
             const activeThread = this.postStore.activeThread
-
-            console.log('Class: ReplyModel, Function: onSubmit, Line 73 activeThread: ', activeThread);
-
+            
             if (activeThread) {
                 const model = new PostModel(reply as any)
-
                 const signedReply = model.sign(this.newAuthStore.postPriv)
-                const confirmedReply = await discussions.post(signedReply as any)
+                // const confirmedReply = await discussions.post(signedReply as any)
+                
+                console.log('Class: ReplyModel, Function: onSubmit, Line 94 post: ', post);
+                console.log('Class: ReplyModel, Function: onSubmit, Line 94 reply: ', reply);
 
                 set(activeThread, {
                     map: {
                         ...activeThread.map,
                         [reply.id]: new PostModel({
-                            ...confirmedReply,
+                            ...reply,
                             poster: posterName,
                             myVote: posterName ? 1 : 0,
                         } as any),

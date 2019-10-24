@@ -27,12 +27,12 @@ class E extends React.Component<IEPageProps, IEPageState> {
     static async getInitialProps({ query, store }) {
         const postsStore: IStores['postsStore'] = store.postsStore
         const tagStore: IStores['tagStore'] = store.tagStore
-        const thread = await postsStore.getAndSetThread(query.id)
+        // const thread = await postsStore.getAndSetThread(query.id)
         tagStore.setActiveTag(query.tag)
 
         return {
             query,
-            thread,
+            // thread,
         }
     }
 

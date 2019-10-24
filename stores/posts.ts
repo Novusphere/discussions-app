@@ -86,16 +86,16 @@ export default class Posts extends BaseStore {
 
         // refresh posts on logged in
         // so we can show upvotes/downvotes by the user
-        reaction(
-            () => this.newAuthStore.hasAccount,
-            async hasAccount => {
-                if (hasAccount) {
-                    if (this.activeThread) {
-                        this.getAndSetThread(this.activeThreadId)
-                    }
-                }
-            }
-        )
+        // reaction(
+        //     () => this.newAuthStore.hasAccount,
+        //     async hasAccount => {
+        //         if (hasAccount) {
+        //             if (this.activeThread) {
+        //                 this.getAndSetThread(this.activeThreadId)
+        //             }
+        //         }
+        //     }
+        // )
     }
 
     public encodeId(post: IPost) {
@@ -129,7 +129,7 @@ export default class Posts extends BaseStore {
             this.activeThreadId = id
             const thread = await this.getThreadById(id)
             this.activeThread = thread
-            return thread
+            return this.activeThread
         } catch (error) {
             console.log('Class: Posts, Function: getAndSetThread, Line 123 error: ', error)
             throw error
@@ -341,7 +341,7 @@ export default class Posts extends BaseStore {
                             title: !this.newAuthStore.hasAccount
                                 ? 'You need to be logged in to post'
                                 : 'Post with your logged as ' +
-                                  this.newAuthStore.getActiveDisplayName,
+                                  this.newAuthStore.posterName,
 
                             onClick: task.resolved(async form => {
                                 if (!form.hasError && this.newPostData.sub.value) {
@@ -350,6 +350,7 @@ export default class Posts extends BaseStore {
 
                                     const submittedPost = await discussions.post({
                                         poster: this.newAuthStore.posterName,
+                                        displayName: this.newAuthStore.posterName,
                                         title: post.title,
                                         content: post.content,
                                         sub: this.newPostData.sub.value,

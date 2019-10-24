@@ -171,7 +171,8 @@ export default class DiscussionsService {
     }
 
     async post(p: Post): Promise<Post> {
-        console.log('posting as: ', p.poster)
+        console.log('poster name: ', p.poster)
+        console.log('display name: ', p.displayName)
 
         if (p.chain != 'eos') throw new Error('Unknown chain')
 
@@ -208,9 +209,7 @@ export default class DiscussionsService {
                 const resp = await fetch(
                     `${nsdb.api}/discussions/post?data=${JSON.stringify(data)}`
                 )
-                console.log('Class: DiscussionsService, Function: post, Line 211 resp: ', resp)
                 const res = await resp.json()
-                console.log('Class: DiscussionsService, Function: post, Line 213 res: ', res)
                 if (res.error) throw new Error(res.message)
                 p.transaction = res.transaction
             } else {
@@ -231,11 +230,6 @@ export default class DiscussionsService {
                         },
                     },
                 ])
-
-                console.log(
-                    'Class: DiscussionsService, Function: post, Line 234 transaction: ',
-                    transaction
-                )
 
                 p.transaction = transaction
             }

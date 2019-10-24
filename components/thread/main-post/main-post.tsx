@@ -43,10 +43,10 @@ const MainPost: React.FC<IMainPost> = ({ openingPost, replyHandler, voteHandler 
                             </a>
                         </Link>
                         <span className={'ph1 b'}>&#183;</span>
-                        <Link route={`/u/${openingPost.poster}`}>
+                        <Link route={`/u/${openingPost.displayName || openingPost.poster}`}>
                             <a>
                                 <FontAwesomeIcon width={13} icon={faUserCircle} className={'pr1'} />
-                                <span>{openingPost.poster}</span>
+                                <span>{openingPost.displayName || openingPost.poster}</span>
                             </a>
                         </Link>
                         <span className={'ph1 b'}>&#183;</span>

@@ -1,4 +1,4 @@
-import { observable, set } from 'mobx'
+import { computed, observable, set } from 'mobx'
 import { Post } from '@novuspherejs'
 
 class PostModel {
@@ -9,6 +9,7 @@ class PostModel {
     @observable uuid
     @observable title
     @observable poster
+    @observable displayName
     @observable createdAt
     @observable myVote
     @observable upvotes
@@ -24,6 +25,13 @@ class PostModel {
 
     constructor(post: Post) {
         set(this, post)
+    }
+
+    @computed get posterName() {
+        if (this.displayName) {
+            return this.displayName
+        }
+        return this.poster
     }
 
     sign = (privateKey: string) => {

@@ -82,9 +82,11 @@ const Replies: React.FC<IReplies> = ({
                             </div>
                             <div className={'flex flex-column'}>
                                 <div className={'header pb0'}>
-                                    <Link route={`/u/${post.poster}`}>
+                                    <Link route={`/u/${post.displayName || post.poster}`}>
                                         <a>
-                                            <span className={'f6'}>{post.poster}</span>
+                                            <span className={'f6'}>
+                                                {post.displayName || post.poster}
+                                            </span>
                                         </a>
                                     </Link>
                                     <span className={'pl2 o-50 f6'}>
@@ -125,28 +127,29 @@ const Replies: React.FC<IReplies> = ({
                         {/*        mark as spam*/}
                         {/*    </span>*/}
                         {/*</div>*/}
-                    </div>
-                    {replyModel.open ? (
-                        <Reply
-                            className={'ml4'}
-                            uid={post.uuid}
-                            onContentChange={replyModel.setContent}
-                            onSubmit={replyModel.onSubmit}
-                        />
-                    ) : null}
 
-                    {replies && replies.length
-                        ? getRepliesFromMap(post.uuid).map(postReply => (
-                              <Replies
-                                  post={postReply}
-                                  key={postReply.uuid}
-                                  getModel={getModel}
-                                  getRepliesFromMap={getRepliesFromMap}
-                                  className={'post-reply black child ml4'}
-                                  voteHandler={voteHandler}
-                              />
-                          ))
-                        : null}
+                        {replyModel.open ? (
+                            <Reply
+                                className={'ml4'}
+                                uid={post.uuid}
+                                onContentChange={replyModel.setContent}
+                                onSubmit={replyModel.onSubmit}
+                            />
+                        ) : null}
+
+                        {replies && replies.length
+                            ? replies.map(postReply => (
+                                  <Replies
+                                      post={postReply}
+                                      key={postReply.uuid}
+                                      getModel={getModel}
+                                      getRepliesFromMap={getRepliesFromMap}
+                                      className={'ml4'}
+                                      voteHandler={voteHandler}
+                                  />
+                              ))
+                            : null}
+                    </div>
                 </>
             )}
         </Observer>
