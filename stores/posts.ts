@@ -347,10 +347,11 @@ export default class Posts extends BaseStore {
                                 if (!form.hasError && this.newPostData.sub.value) {
                                     const post = form.values()
                                     const uuid = generateUuid()
+                                    const posterName = this.newAuthStore.posterName
 
-                                    const submittedPost = await discussions.post({
-                                        poster: this.newAuthStore.posterName,
-                                        displayName: this.newAuthStore.posterName,
+                                    const newPost = {
+                                        poster: null,
+                                        displayName: null,
                                         title: post.title,
                                         content: post.content,
                                         sub: this.newPostData.sub.value,
@@ -362,7 +363,20 @@ export default class Posts extends BaseStore {
                                         threadUuid: uuid,
                                         attachment: getAttachmentValue(post),
                                         createdAt: Date.now(),
-                                    } as any)
+                                    }
+
+                                    if (posterName === this.newAuthStore.displayName.bk) {
+                                        newPost.poster = undefined
+                                        newPost.displayName = posterName
+                                    }
+
+                                    if (posterName === this.newAuthStore.displayName.scatter) {
+                                        newPost.poster = posterName
+                                        newPost.displayName = undefined
+                                    }
+
+
+                                    const submittedPost = await discussions.post(newPost as any)
 
                                     // TODO: Add check to make sure the thread is actually posted onto the chain
                                     await sleep(5000)

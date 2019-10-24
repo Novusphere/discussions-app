@@ -76,11 +76,13 @@ export class ReplyModel {
         }
 
         if (posterName === this.newAuthStore.displayName.bk) {
-            reply.poster = null
+            reply.poster = undefined
             reply.displayName = posterName
-        } else if (posterName === this.newAuthStore.displayName.scatter) {
+        }
+
+        if (posterName === this.newAuthStore.displayName.scatter) {
             reply.poster = posterName
-            reply.displayName = posterName
+            reply.displayName = undefined
         }
 
         try {
