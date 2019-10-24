@@ -35,7 +35,6 @@ class PostModel {
     }
 
     sign = (privateKey: string) => {
-        console.log('Class: PostModel, Function: sign, Line 25 privateKey: ', privateKey);
         const _post = new Post(this as any)
         _post.sign(privateKey)
         this.verifySig = _post['verifySig']

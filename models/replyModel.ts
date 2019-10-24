@@ -55,7 +55,7 @@ export class ReplyModel {
         const generatedUid = generateUuid()
         const posterName = this.newAuthStore.posterName
 
-        console.log('Class: ReplyModel, Function: onSubmit, Line 58 : ', posterName);
+        console.log('Class: ReplyModel, Function: onSubmit, Line 58 : ', posterName)
 
         const reply = {
             poster: null,
@@ -82,25 +82,22 @@ export class ReplyModel {
             reply.poster = posterName
             reply.displayName = posterName
         }
-        
+
         try {
             const activeThread = this.postStore.activeThread
-            
+
             if (activeThread) {
                 const model = new PostModel(reply as any)
                 const signedReply = model.sign(this.newAuthStore.postPriv)
-                // const confirmedReply = await discussions.post(signedReply as any)
-                
-                console.log('Class: ReplyModel, Function: onSubmit, Line 94 post: ', post);
-                console.log('Class: ReplyModel, Function: onSubmit, Line 94 reply: ', reply);
+                const confirmedReply = await discussions.post(signedReply as any)
 
                 set(activeThread, {
                     map: {
                         ...activeThread.map,
                         [reply.id]: new PostModel({
-                            ...reply,
-                            poster: posterName,
-                            myVote: posterName ? 1 : 0,
+                            ...confirmedReply,
+                            upvotes: reply.displayName && reply.poster ? 1 : 0,
+                            myVote: reply.displayName && reply.poster ? 1 : 0,
                         } as any),
                     },
                 })
@@ -115,7 +112,7 @@ export class ReplyModel {
             // await discussions.post.sign(this.authStore.postPriv)
             // await discussions.post(reply as any)
         } catch (error) {
-            console.log('Class: ReplyModel, Function: onSubmit, Line 100 error: ', error);
+            console.log('Class: ReplyModel, Function: onSubmit, Line 100 error: ', error)
             this.uiStore.showToast(error.message, 'error')
             throw error
         }

@@ -18,6 +18,9 @@ export default class NewAuth extends BaseStore {
     @persist @observable tipPub = ''
     @persist @observable preferredSignInMethod = SignInMethods.brainKey
 
+    // private stuff
+    @observable privateKey = ''
+    
     @persist('object') @observable statusJson = {
         bk: null,
         scatter: null,
@@ -360,7 +363,10 @@ export default class NewAuth extends BaseStore {
 
             const unparsedJSON = await this.bkToStatusJson(bk, displayName, password, null)
 
-            console.log('Class: NewAuth, Function: loginWithBK, Line 363 unparsedJSON: ', unparsedJSON);
+            console.log(
+                'Class: NewAuth, Function: loginWithBK, Line 363 unparsedJSON: ',
+                unparsedJSON
+            )
 
             if (unparsedJSON) {
                 const statusJSON = JSON.parse(unparsedJSON)
@@ -383,7 +389,11 @@ export default class NewAuth extends BaseStore {
     @action.bound
     async loginWithPassword(password: string) {
         try {
-            const bk = await discussions.bkFromStatusJson(JSON.stringify(this.statusJson.bk), password)
+            const bk = await discussions.bkFromStatusJson(
+                JSON.stringify(this.statusJson.bk),
+                password
+            )
+            
             await this.loginWithBK(bk, this.statusJson.bk['displayName'], password)
         } catch (error) {
             this.uiStore.showToast(error.message, 'error')
@@ -409,6 +419,10 @@ export default class NewAuth extends BaseStore {
                     await sleep(50)
                     this.signInObject.ref.goToStep(5)
                 }
+
+                if (this.uiStore.activeModal === ModalOptions.signIn) {
+                    this.signInObject.ref.goToStep(5)
+                }
             } else {
                 throw new Error('Failed to detect wallet')
             }
@@ -425,18 +439,18 @@ export default class NewAuth extends BaseStore {
         try {
             const accountName = eos.accountName
             const json = await discussions.bkRetrieveStatusEOS(accountName)
-
             const bk = await discussions.bkFromStatusJson(json, password)
+
+            await this.storeKeys(bk)
 
             if (!bk) {
                 return
             }
 
             this.statusJson.scatter = JSON.parse(json)
-            
+            this.displayName.scatter = accountName
+
             if (accountName) {
-                this.postPriv = this.statusJson.scatter['post']
-                this.tipPub = this.statusJson.scatter['tip']
                 this.completeSignInProcess()
             } else {
                 throw new Error('Failed to get account name')
@@ -500,8 +514,10 @@ export default class NewAuth extends BaseStore {
     private async storeKeys(bk: string) {
         try {
             const keys = await discussions.bkToKeys(bk)
+            
             this.postPriv = keys.post.priv
             this.tipPub = keys.tip.pub
+            
             return keys
         } catch (error) {
             console.log(error)

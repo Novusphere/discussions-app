@@ -97,11 +97,17 @@ export default class DiscussionsService {
         }
     }
 
-    async bkToKeys(bk: string): Promise<any> {
+    async bkToKeys(
+        bk: string
+    ): Promise<{ post: { priv: string; pub: string }; tip: { priv: string; pub: string } }> {
         const seed = await bip39.mnemonicToSeed(bk)
         const node = await bip32.fromSeed(seed)
 
-        const keys = {}
+        const keys = {
+            post: null,
+            tip: null,
+        }
+
         //keys['BTC'] = this.bkGetBitcoin(node);
         keys['post'] = this.bkGetEOS(node, 0)
         keys['tip'] = this.bkGetEOS(node, 1)
@@ -251,7 +257,6 @@ export default class DiscussionsService {
                 transaction: { $regex: `^${dId.txid32}` },
             },
         })
-        
 
         if (sq.payload.length == 0) return undefined
 
