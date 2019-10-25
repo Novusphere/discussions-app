@@ -55,8 +55,6 @@ export class ReplyModel {
         const generatedUid = generateUuid()
         const posterName = this.newAuthStore.posterName
 
-        console.log('Class: ReplyModel, Function: onSubmit, Line 58 : ', posterName)
-
         const reply = {
             poster: null,
             displayName: null,

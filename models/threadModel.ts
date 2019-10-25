@@ -60,7 +60,7 @@ export class ThreadModel {
      */
     getRepliesFromMap: (...args: any[]) => PostModel[] = computedFn((uid: string): PostModel[] => {
         if (this.map[uid]) {
-            return _.filter(this.map, post => post.parentUuid === uid)
+            return _.filter(this.map, (post, index) => post.parentUuid === uid)
         }
 
         return []

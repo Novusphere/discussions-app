@@ -1,4 +1,4 @@
-import { observable, set } from 'mobx'
+import { computed, observable, set } from 'mobx'
 import { Post } from '@novuspherejs'
 
 class FeedModel {
@@ -13,14 +13,13 @@ class FeedModel {
     @observable sub: any
     @observable poster: any
     @observable displayName: any
+    @observable totalReplies: any
     @observable content: any
     @observable createdAt: any
-    @observable totalReplies: any
 
     constructor(post: Post) {
         set(this, post)
     }
-
 
     vote = async (_uuid: string, myNewVote: number) => {
         const type = myNewVote === 1 ? 'upvotes' : 'downvotes'

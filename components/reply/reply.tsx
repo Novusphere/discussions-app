@@ -15,8 +15,8 @@ interface IReplyProps {
 const Reply: React.FC<IReplyProps> = ({ uid, onContentChange, onSubmit, className }) => (
     <div
         className={classNames([
-            'mt3',
             {
+                'mt3': typeof className === 'undefined',
                 [className]: !!className,
             },
         ])}

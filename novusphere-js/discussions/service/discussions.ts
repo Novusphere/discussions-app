@@ -177,8 +177,6 @@ export default class DiscussionsService {
     }
 
     async post(p: Post): Promise<Post> {
-        console.log('poster name: ', p.poster)
-        console.log('display name: ', p.displayName)
 
         if (p.chain != 'eos') throw new Error('Unknown chain')
 
@@ -191,6 +189,7 @@ export default class DiscussionsService {
         const metadata: PostMetaData = {}
         if (p.title) metadata.title = p.title
         if (p.attachment.value) metadata.attachment = p.attachment
+        
         if (p.pub && p.sig) {
             metadata.pub = p.pub
             metadata.sig = p.sig

@@ -22,6 +22,7 @@ class PostModel {
 
     @observable verifySig
     @observable sig
+    @observable pub
 
     constructor(post: Post) {
         set(this, post)
@@ -39,6 +40,7 @@ class PostModel {
         _post.sign(privateKey)
         this.verifySig = _post['verifySig']
         this.sig = _post['sig']
+        this.pub = _post['pub']
         return this
     }
 }

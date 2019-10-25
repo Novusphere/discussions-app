@@ -31,6 +31,22 @@ const Replies: React.FC<IReplies> = ({
     const replyModel = getModel(post)
     const replies = getRepliesFromMap(post.uuid)
 
+    // const renderBottomButtons = () => (
+    //     <div className={'footer flex items-center pt1 ph2'}>
+    //         <span className={'reply mr3 pointer dim'} onClick={replyModel.toggleOpen}>
+    //             reply
+    //         </span>
+    //
+    //         <FontAwesomeIcon width={13} icon={faLink} className={'pr2 black f6 pointer dim'} />
+    //         <FontAwesomeIcon width={13} icon={faShare} className={'pr2 black f6 pointer dim'} />
+    //
+    //         <span className={'f6 black f6 pointer dim'}>
+    //             <FontAwesomeIcon width={13} icon={faExclamationTriangle} className={'pr1'} />
+    //             mark as spam
+    //         </span>
+    //     </div>
+    // )
+
     const renderHoverElements = () => {
         if (!isHover) {
             return null
@@ -61,7 +77,6 @@ const Replies: React.FC<IReplies> = ({
                         className={classNames([
                             'post-reply black',
                             {
-                                'post-content-hover': isHover,
                                 [className]: !!className,
                             },
                         ])}
@@ -70,7 +85,14 @@ const Replies: React.FC<IReplies> = ({
                         onMouseEnter={() => setHover(true)}
                     >
                         {renderHoverElements()}
-                        <div className={'flex flex-row'}>
+                        <div
+                            className={classNames([
+                                'flex flex-row pa2',
+                                {
+                                    'post-content-hover': isHover,
+                                },
+                            ])}
+                        >
                             <div className={'flex justify-between items-center mr2'}>
                                 <Votes
                                     upVotes={post.upvotes}
@@ -99,38 +121,16 @@ const Replies: React.FC<IReplies> = ({
                                 />
                             </div>
                         </div>
-                        {/*<div className={'footer flex items-center pt1 ph2'}>*/}
-                        {/*    <span*/}
-                        {/*        className={'reply mr3 pointer dim'}*/}
-                        {/*        onClick={replyModel.toggleOpen}*/}
-                        {/*    >*/}
-                        {/*        reply*/}
-                        {/*    </span>*/}
 
-                        {/*    <FontAwesomeIcon*/}
-                        {/*        width={13}*/}
-                        {/*        icon={faLink}*/}
-                        {/*        className={'pr2 black f6 pointer dim'}*/}
-                        {/*    />*/}
-                        {/*    <FontAwesomeIcon*/}
-                        {/*        width={13}*/}
-                        {/*        icon={faShare}*/}
-                        {/*        className={'pr2 black f6 pointer dim'}*/}
-                        {/*    />*/}
-
-                        {/*    <span className={'f6 black f6 pointer dim'}>*/}
-                        {/*        <FontAwesomeIcon*/}
-                        {/*            width={13}*/}
-                        {/*            icon={faExclamationTriangle}*/}
-                        {/*            className={'pr1'}*/}
-                        {/*        />*/}
-                        {/*        mark as spam*/}
-                        {/*    </span>*/}
-                        {/*</div>*/}
+                        {/*{renderBottomButtons()}*/}
 
                         {replyModel.open ? (
                             <Reply
-                                className={'ml4'}
+                                className={classNames([
+                                    'ph4 pb4', {
+                                        'post-content-hover': isHover,
+                                    }
+                                ])}
                                 uid={post.uuid}
                                 onContentChange={replyModel.setContent}
                                 onSubmit={replyModel.onSubmit}
@@ -138,15 +138,20 @@ const Replies: React.FC<IReplies> = ({
                         ) : null}
 
                         {replies && replies.length
-                            ? replies.map(postReply => (
-                                  <Replies
-                                      post={postReply}
+                            ? replies.map((postReply, index) => (
+                                  <div
+                                      onMouseLeave={() => setHover(true)}
+                                      onMouseEnter={() => setHover(false)}
                                       key={postReply.uuid}
-                                      getModel={getModel}
-                                      getRepliesFromMap={getRepliesFromMap}
-                                      className={'ml4'}
-                                      voteHandler={voteHandler}
-                                  />
+                                  >
+                                      <Replies
+                                          post={postReply}
+                                          getModel={getModel}
+                                          className={'ml3'}
+                                          getRepliesFromMap={getRepliesFromMap}
+                                          voteHandler={voteHandler}
+                                      />
+                                  </div>
                               ))
                             : null}
                     </div>
