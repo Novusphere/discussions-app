@@ -1,4 +1,4 @@
-import { action, observable, set } from 'mobx'
+import { action, computed, observable, set } from 'mobx'
 import { task } from 'mobx-task'
 import { Post } from '@novuspherejs/discussions/post'
 import { Messages } from '@globals'
@@ -34,6 +34,10 @@ export class ReplyModel {
 
     @action clearContent = () => {
         this.content = ''
+    }
+
+    @computed get inlineTags() {
+        return this.content.match(/#([^\s.,;:!?]+)/gi)
     }
 
     @task.resolved onSubmit = async () => {
@@ -81,6 +85,13 @@ export class ReplyModel {
         if (posterName === this.newAuthStore.displayName.scatter) {
             reply.poster = posterName
             reply.displayName = posterName
+        }
+
+        let tags = this.inlineTags
+
+        if (tags && tags.length) {
+            tags = tags.map(tag => tag.replace('#', ''))
+            reply.tags = [...reply.tags, ...tags]
         }
 
         try {

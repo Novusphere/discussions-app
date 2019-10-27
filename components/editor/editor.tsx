@@ -79,14 +79,13 @@ class Editor extends React.Component<IEditorProps> {
                 onSelect: (item, insertItem) => {
                     item.value = `<a href='${window.location.origin + '/u/' + item.value}'>@${
                         item.value
-                        }</a>`
+                    }</a>`
                     item.denotationChar = ''
                     return insertItem(item)
                 },
             },
             autoformat: true,
         }
-
 
         /**
          * Set loaded to true at the end

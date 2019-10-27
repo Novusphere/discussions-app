@@ -211,6 +211,7 @@ export default class DiscussionsService {
         try {
             if (!p.poster) {
                 console.log('no poster found, posting as anon')
+                console.log('Class: DiscussionsService, Function: post, Line 214 data: ', data);
                 const resp = await fetch(
                     `${nsdb.api}/discussions/post?data=${JSON.stringify(data)}`
                 )

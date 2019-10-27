@@ -58,7 +58,7 @@ class E extends React.Component<IEPageProps, IEPageState> {
                 if (!thread) {
                     return <span>No posts found for specified thread: {id}</span>
                 }
-
+                
                 return (
                     <div className={'thread-container'}>
                         <Thread
