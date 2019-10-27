@@ -35,6 +35,7 @@
                     "@constants": "./constants",
                     "@novuspherejs": "./novusphere-js",
                     "@stores": "./stores",
+                    "@modules": "./modules",
                     "@styles": "./styles",
                     "@utils": "./utils",
                     "@router": "./routes.ts",

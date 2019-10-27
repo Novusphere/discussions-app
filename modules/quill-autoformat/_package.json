@@ -1,0 +1,68 @@
+{
+  "name": "quill-autoformat",
+  "version": "0.1.2",
+  "description": "Quill Extension for transforming text and format as you type",
+  "main": "dist/quill-autoformat.js",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/weavy/quill-autoformat.git"
+  },
+  "keywords": [
+    "text",
+    "format",
+    "quill",
+    "editor"
+  ],
+  "author": "weavy",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/weavy/quill-autoformat/issues"
+  },
+  "homepage": "https://github.com/weavy/quill-autoformat#readme",
+  "dependencies": {
+    "quill": "2.0.0-dev.3"
+  },
+  "devDependencies": {
+    "@babel/core": "^7.4.0",
+    "@babel/preset-env": "^7.4.2",
+    "babel-loader": "^8.0.5",
+    "webpack": "^4.29.6",
+    "webpack-cli": "^3.3.0"
+  },
+  "engines": {
+    "node": ">=10.15.3",
+    "yarn": ">=1.15.2"
+  },
+  "scripts": {
+    "build": "webpack --mode=production",
+    "debug": "webpack --mode=development"
+  },
+  "eslintConfig": {
+    "extends": "eslint:recommended",
+    "parserOptions": {
+      "ecmaVersion": 6,
+      "sourceType": "module",
+      "ecmaFeatures": {
+        "impliedStrict": true
+      }
+    },
+    "rules": {
+      "eqeqeq": [
+        2,
+        "allow-null"
+      ],
+      "no-unused-vars": [
+        1,
+        {
+          "vars": "local",
+          "args": "none"
+        }
+      ],
+      "no-console": 0
+    },
+    "env": {
+      "browser": false,
+      "node": true
+    }
+  }
+}

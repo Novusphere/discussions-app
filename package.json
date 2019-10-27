@@ -38,6 +38,7 @@
         "next-routes": "1.4.2",
         "node-fetch": "^2.6.0",
         "node-sass": "4.12.0",
+        "quill-autoformat": "^0.1.2",
         "quill-mention": "^2.1.1",
         "react": "16.10.2",
         "react-collapse": "^4.0.3",
@@ -63,7 +64,8 @@
         "build": "cross-env NODE_ENV=production next build && tsc --project tsconfig.server.json",
         "start": "cross-env NODE_ENV=production node dist/server.js",
         "start2": "cross-env NODE_ENV=production next start",
-        "plop": "plop --plopfile ./generator/index.js"
+        "plop": "plop --plopfile ./generator/index.js",
+        "build-editor": "webpack --mode=development --config=./modules/quill-autoformat/webpack.config.js"
     },
     "devDependencies": {
         "@babel/plugin-transform-runtime": "7.4.4",
@@ -88,6 +90,7 @@
         "plop": "^2.4.0",
         "prettier": "^1.18.2",
         "ts-node": "^8.3.0",
-        "tslint": "5.17.0"
+        "tslint": "5.17.0",
+        "webpack-cli": "^3.3.9"
     }
 }

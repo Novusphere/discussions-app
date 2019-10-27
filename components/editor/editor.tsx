@@ -38,12 +38,18 @@ class Editor extends React.Component<IEditorProps> {
         const mention = await import('quill-mention')
         const Mention = mention.default
 
+        const autoformat = await import('@modules/quill-autoformat/dist/quill-autoformat.js')
+        const Autoformat = autoformat.default
+        const Hashtag = autoformat.Hashtag
+
         const turndownImport = await import('turndown')
         const Turndown = turndownImport.default
 
         this.turndownService = new Turndown()
 
         this.quillBase.Quill.register('modules/mention', Mention)
+        this.quillBase.Quill.register('modules/autoformat', Autoformat)
+        this.quillBase.Quill.register('formats/hashtag', Hashtag)
 
         this.modules = {
             mention: {
@@ -55,8 +61,6 @@ class Editor extends React.Component<IEditorProps> {
                     let values
 
                     if (mentionChar === '@') {
-                        values = accounts
-                    } else {
                         values = accounts
                     }
 
@@ -73,12 +77,16 @@ class Editor extends React.Component<IEditorProps> {
                     }
                 },
                 onSelect: (item, insertItem) => {
-                    item.value = `<a href='${window.location.origin + '/u/' + item.value}'>@${item.value}</a>`
+                    item.value = `<a href='${window.location.origin + '/u/' + item.value}'>@${
+                        item.value
+                        }</a>`
                     item.denotationChar = ''
                     return insertItem(item)
-                }
+                },
             },
+            autoformat: true,
         }
+
 
         /**
          * Set loaded to true at the end
@@ -103,32 +111,32 @@ class Editor extends React.Component<IEditorProps> {
         const { Editor } = this.quillBase
 
         return (
-            <>
-                <Editor
-                    key={'editor'}
-                    onChange={this.onChange}
-                    formats={[
-                        'header',
-                        'font',
-                        'size',
-                        'bold',
-                        'italic',
-                        'underline',
-                        'strike',
-                        'blockquote',
-                        'list',
-                        'bullet',
-                        'indent',
-                        'link',
-                        'image',
-                        'video',
-                        'mention',
-                    ]}
-                    modules={{
-                        mention: this.modules.mention,
-                    }}
-                />
-            </>
+            <Editor
+                key={'editor'}
+                onChange={this.onChange}
+                formats={[
+                    'header',
+                    'font',
+                    'size',
+                    'bold',
+                    'italic',
+                    'underline',
+                    'strike',
+                    'blockquote',
+                    'list',
+                    'bullet',
+                    'indent',
+                    'link',
+                    'image',
+                    'video',
+                    'mention',
+                    'hashtag',
+                ]}
+                modules={{
+                    autoformat: this.modules.autoformat,
+                    mention: this.modules.mention,
+                }}
+            />
         )
     }
 }
