@@ -30,3 +30,13 @@
     border-bottom-right-radius: 0.25rem;
     overflow: visible !important;
 }
+
+.mention-list-item {
+    @extend .flex;
+    @extend .items-center;
+}
+
+.mention-list-icon {
+    border-radius: 100px;
+    margin-right: 10px;
+}

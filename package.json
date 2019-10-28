@@ -23,6 +23,7 @@
         "eosjs": "^20.0.0",
         "eosjs-ecc": "4.0.4",
         "express": "4.17.1",
+        "identicon.js": "^2.3.3",
         "immutable": "^4.0.0-rc.12",
         "localforage": "^1.7.3",
         "lodash": "^4.17.14",

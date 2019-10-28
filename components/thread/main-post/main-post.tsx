@@ -14,6 +14,7 @@ import {
 import moment from 'moment'
 import ReactMarkdown from 'react-markdown'
 import PostModel from '@models/postModel'
+import { getIdenticon } from '@utils'
 
 interface IMainPost {
     openingPost: PostModel
@@ -22,6 +23,48 @@ interface IMainPost {
 }
 
 const MainPost: React.FC<IMainPost> = ({ openingPost, replyHandler, voteHandler }) => {
+    const renderUserIcon = () => {
+        let imageData = getIdenticon()
+
+        if (openingPost.pub) {
+            imageData = getIdenticon(openingPost.pub)
+        }
+
+        const image = (
+            <img
+                width={30}
+                height={30}
+                src={`data:image/png;base64,${imageData}`}
+                className={'post-icon mr2'}
+            />
+        )
+        const user = <span>{openingPost.displayName || openingPost.poster}</span>
+
+        if (!openingPost.pub) {
+            return (
+                <span
+                    className={'flex items-center'}
+                    title={
+                        'Since no pub key was found for this post, you cannot use user actions on this user'
+                    }
+                >
+                    {image}
+                    <span>{user}</span>
+                </span>
+            )
+        }
+
+        return (
+            <Link route={`/u/${openingPost.displayName || openingPost.poster}`}>
+                <a>
+                    {image}
+                    {/*<FontAwesomeIcon width={13} icon={faUserCircle} className={'pr1'} />*/}
+                    {user}
+                </a>
+            </Link>
+        )
+    }
+
     return (
         <>
             <div className={'pb2'}>
@@ -36,19 +79,14 @@ const MainPost: React.FC<IMainPost> = ({ openingPost, replyHandler, voteHandler 
             </div>
             <div className={'opening-post card'}>
                 <div className={'post-content'}>
-                    <div className={'meta pb2'}>
+                    <div className={'flex items-center pb2'}>
                         <Link route={`/e/${openingPost.sub}`}>
                             <a>
                                 <span className={'b'}>{openingPost.sub}</span>
                             </a>
                         </Link>
                         <span className={'ph1 b'}>&#183;</span>
-                        <Link route={`/u/${openingPost.displayName || openingPost.poster}`}>
-                            <a>
-                                <FontAwesomeIcon width={13} icon={faUserCircle} className={'pr1'} />
-                                <span>{openingPost.displayName || openingPost.poster}</span>
-                            </a>
-                        </Link>
+                        {renderUserIcon()}
                         <span className={'ph1 b'}>&#183;</span>
                         <span> {moment(openingPost.createdAt).fromNow()}</span>
                     </div>

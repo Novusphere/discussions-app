@@ -1,13 +1,14 @@
-import { action, computed, observable, reaction } from 'mobx'
-import { discussions, Post, Thread } from '@novuspherejs'
+import { action, computed, observable } from 'mobx'
+import { discussions, Post } from '@novuspherejs'
 import { task } from 'mobx-task'
 import { BaseStore, getOrCreateStore } from 'next-mobx-wrapper'
 import { CreateForm } from '@components'
 import { getTagStore } from '@stores/tag'
-import { getAuthStore, getNewAuthStore, getUiStore, IStores } from '@stores'
-import { generateUuid, getAttachmentValue, pushToThread, sleep } from '@utils'
+import { getNewAuthStore, getUiStore, IStores } from '@stores'
+import { generateUuid, getAttachmentValue, getIdenticon, pushToThread, sleep } from '@utils'
 import { ThreadModel } from '@models/threadModel'
 import FeedModel from '@models/feedModel'
+import _ from 'lodash'
 
 export interface IAttachment {
     value: string
@@ -134,6 +135,38 @@ export default class Posts extends BaseStore {
             console.log('Class: Posts, Function: getAndSetThread, Line 123 error: ', error)
             throw error
         }
+    }
+
+    /**
+     * Get the list of users in the current thread for tagging.
+     * TODO: Add users the current active user follows as well
+     * @returns {id: string, value: string}[]
+     */
+    @computed get getPossibleUsersToTag() {
+        if (!this.activeThread) return []
+
+        return _.uniqBy(
+            _.map(this.activeThread.map, posts => {
+                let poster = posts.poster
+
+                if (poster === 'eosforumanon') {
+                    poster = posts.displayName
+                }
+
+                let imageData = getIdenticon()
+
+                if (posts.pub && posts.pub.length) {
+                    imageData = getIdenticon(posts.pub)
+                }
+
+                return {
+                    id: poster,
+                    value: poster,
+                    icon: imageData,
+                }
+            }),
+            option => option.id
+        )
     }
 
     @task
@@ -340,8 +373,7 @@ export default class Posts extends BaseStore {
                             disabled: !this.newAuthStore.hasAccount,
                             title: !this.newAuthStore.hasAccount
                                 ? 'You need to be logged in to post'
-                                : 'Post with your logged as ' +
-                                  this.newAuthStore.posterName,
+                                : 'Post with your logged as ' + this.newAuthStore.posterName,
 
                             onClick: task.resolved(async form => {
                                 if (!form.hasError && this.newPostData.sub.value) {
@@ -374,7 +406,6 @@ export default class Posts extends BaseStore {
                                         newPost.poster = posterName
                                         newPost.displayName = posterName
                                     }
-
 
                                     const submittedPost = await discussions.post(newPost as any)
 

@@ -9,7 +9,7 @@ import { observer, Observer } from 'mobx-react'
 import { ReplyModel } from '@models/replyModel'
 import PostModel from '@models/postModel'
 import classNames from 'classnames'
-import { openInNewTab } from '@utils'
+import { getIdenticon, openInNewTab } from '@utils'
 
 interface IReplies {
     post: PostModel
@@ -46,6 +46,48 @@ const Replies: React.FC<IReplies> = ({
     //         </span>
     //     </div>
     // )
+
+    const renderUserIcon = () => {
+        let imageData = getIdenticon()
+
+        if (post.pub) {
+            imageData = getIdenticon(post.pub)
+        }
+
+        const image = (
+            <img
+                width={15}
+                height={15}
+                src={`data:image/png;base64,${imageData}`}
+                className={'post-icon mr2'}
+            />
+        )
+        const user = <span>{post.displayName || post.poster}</span>
+
+        if (!post.pub) {
+            return (
+                <span
+                    className={'flex items-center'}
+                    title={
+                        'Since no pub key was found for this post, you cannot use user actions on this user'
+                    }
+                >
+                    {image}
+                    <span>{user}</span>
+                </span>
+            )
+        }
+
+        return (
+            <Link route={`/u/${post.displayName || post.poster}`}>
+                <a>
+                    {image}
+                    {/*<FontAwesomeIcon width={13} icon={faUserCircle} className={'pr1'} />*/}
+                    {user}
+                </a>
+            </Link>
+        )
+    }
 
     const renderHoverElements = () => {
         if (!isHover) {
@@ -104,13 +146,7 @@ const Replies: React.FC<IReplies> = ({
                             </div>
                             <div className={'flex flex-column'}>
                                 <div className={'header pb0'}>
-                                    <Link route={`/u/${post.displayName || post.poster}`}>
-                                        <a>
-                                            <span className={'f6'}>
-                                                {post.displayName || post.poster}
-                                            </span>
-                                        </a>
-                                    </Link>
+                                    {renderUserIcon()}
                                     <span className={'pl2 o-50 f6'}>
                                         {moment(post.createdAt).fromNow()}
                                     </span>
@@ -127,9 +163,10 @@ const Replies: React.FC<IReplies> = ({
                         {replyModel.open ? (
                             <Reply
                                 className={classNames([
-                                    'ph4 pb4', {
+                                    'ph4 pb4',
+                                    {
                                         'post-content-hover': isHover,
-                                    }
+                                    },
                                 ])}
                                 uid={post.uuid}
                                 onContentChange={replyModel.setContent}

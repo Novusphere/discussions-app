@@ -5,14 +5,14 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { faSpinner } from '@fortawesome/free-solid-svg-icons'
 
 interface IEditorProps {
-    authStore?: IStores['authStore']
+    postsStore?: IStores['postsStore']
     onChange: (html: any) => void // passed in via spread (bind) in form.tsx
     placeholder: string
     className?: string
     value?: any
 }
 
-@inject('authStore')
+@inject('postsStore')
 @observer
 class Editor extends React.Component<IEditorProps> {
     state = {
@@ -56,7 +56,7 @@ class Editor extends React.Component<IEditorProps> {
                 fixMentionsToQuill: true,
                 mentionDenotationChars: ['@'],
                 source: async (searchTerm, renderList, mentionChar) => {
-                    const accounts = await this.props.authStore.fetchSuggestedAccounts(searchTerm)
+                    const accounts = this.props.postsStore.getPossibleUsersToTag
 
                     let values
 
@@ -75,6 +75,10 @@ class Editor extends React.Component<IEditorProps> {
                         }
                         renderList(matches, searchTerm)
                     }
+                },
+                renderItem: (item, searchTerm) => {
+                    const image = `<img width=20 height=20 src="data:image/png;base64,${item.icon}" class="mention-list-icon" />`
+                    return `<span class="mention-list-item">${image} <span>${item.value}</span></span>`
                 },
                 onSelect: (item, insertItem) => {
                     item.value = `<a href='${window.location.origin + '/u/' + item.value}'>@${
