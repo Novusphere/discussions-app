@@ -49,7 +49,7 @@ const MainPost: React.FC<IMainPost> = ({ openingPost, replyHandler, voteHandler 
                     }
                 >
                     {image}
-                    <span>{user}</span>
+                    <span className={'black b'}>{user}</span>
                 </span>
             )
         }

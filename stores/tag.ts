@@ -22,7 +22,7 @@ export default class Tag extends BaseStore {
                 {
                     name: 'uxfyre',
                     url: '/tag/uxfyre',
-                    logo: 'https://uxfyre.io/public/img/fyreicon.png',
+                    logo: 'https://miro.medium.com/fit/c/256/256/1*dvVPDFC1GvXfYvnL0RJjeQ.png',
                 },
                 {
                     name: 'airdropsdac',
@@ -113,7 +113,7 @@ export default class Tag extends BaseStore {
                     name: 'enumivo',
                     url: '/tag/enumivo',
                     logo:
-                        'https://enumivo.org/wp-content/themes/enumivo/assets/img/enumivo-logo-only.png',
+                        'https://assets.coingecko.com/coins/images/5043/large/enumivo-logo.jpg?1547040458',
                 },
                 {
                     name: 'eos',
