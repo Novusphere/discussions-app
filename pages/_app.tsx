@@ -9,7 +9,6 @@ import { create } from 'mobx-persist'
 import { toast } from 'react-toastify'
 
 import '../styles/style.scss'
-import { getNewAuthStore, getSettingsStore } from '@stores'
 
 // configure({ enforceActions: 'observed' })
 useStaticRendering(isServer) // NOT `true` value
@@ -40,11 +39,12 @@ class DiscussionApp extends App {
      */
     async componentDidMount(): Promise<void> {
         if (!isServer) {
-            const { newAuthStore, settingsStore } = this.props.store
+            const { newAuthStore, settingsStore, userStore } = this.props.store
 
             const stores = {
                 auth: newAuthStore,
                 settings: settingsStore,
+                user: userStore,
             }
 
             const hydrate = create({
@@ -53,15 +53,15 @@ class DiscussionApp extends App {
             })
 
             Object.keys(stores).forEach(store => {
-                const result = hydrate(store, stores[store])
+               hydrate(store, stores[store])
 
-                if (getVersion() !== this.props.store.settingsStore.localStorageVersion) {
-                    console.error('local storage version mismatch')
-
-                    result.rehydrate().then(() => {
-                        console.log('store rehydrated')
-                    })
-                }
+                // if (getVersion() !== this.props.store.settingsStore.localStorageVersion) {
+                //     console.error('local storage version mismatch')
+                //
+                //     result.rehydrate().then(() => {
+                //         console.log('store rehydrated')
+                //     })
+                // }
             })
         }
     }

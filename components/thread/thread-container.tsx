@@ -47,15 +47,18 @@ const ThreadContainer: React.FC<IThreadContainerProps> = ({
                     </div>
 
                     <div className={'card'}>
-                        {openingPostReplies.map(reply => (
-                            <Replies
-                                post={reply as any}
-                                key={reply.uuid}
-                                getModel={getModel}
-                                voteHandler={vote}
-                                getRepliesFromMap={getRepliesFromMap}
-                            />
-                        ))}
+                        {openingPostReplies.map(reply => {
+                            const post = new PostModel(reply)
+                            return (
+                                <Replies
+                                    post={post}
+                                    key={reply.uuid}
+                                    getModel={getModel}
+                                    voteHandler={vote}
+                                    getRepliesFromMap={getRepliesFromMap}
+                                />
+                            )
+                        })}
                     </div>
                 </>
             ) : null}

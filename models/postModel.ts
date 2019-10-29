@@ -1,5 +1,6 @@
 import { computed, observable, set } from 'mobx'
 import { Post } from '@novuspherejs'
+import ecc from 'eosjs-ecc'
 
 class PostModel {
     @observable public map: { [p: string]: PostModel } | undefined
@@ -15,8 +16,8 @@ class PostModel {
     @observable upvotes
     @observable downvotes
     @observable attachment
-    @observable content
     @observable replies
+    @observable content
 
     @observable transaction
 
@@ -35,12 +36,12 @@ class PostModel {
         return this.poster
     }
 
-    sign = (privateKey: string) => {
-        const _post = new Post(this as any)
-        _post.sign(privateKey)
-        this.verifySig = _post['verifySig']
-        this.sig = _post['sig']
-        this.pub = _post['pub']
+    sign = (privKey: string) => {
+        this.pub = ecc.privateToPublic(privKey);
+        const hash0 = ecc.sha256(this.content);
+        const hash1 = ecc.sha256(this.uuid+hash0);
+        this.sig = ecc.sign(hash1, privKey);
+        this.verifySig = this.pub;
         return this
     }
 }

@@ -146,7 +146,7 @@ export default class Posts extends BaseStore {
         if (!this.activeThread) return []
 
         return _.uniqBy(
-            _.map(this.activeThread.map, posts => {
+            _.map(_.filter(this.activeThread.map, posts => posts.pub.length), posts => {
                 let poster = posts.poster
 
                 if (poster === 'eosforumanon') {

@@ -6,6 +6,7 @@ const aesjs = require('aes-js')
 const bip39 = require('bip39')
 import * as bip32 from 'bip32'
 import ecc from 'eosjs-ecc'
+import axios from 'axios'
 
 export interface IBrainKeyPair {
     priv: string
@@ -177,7 +178,6 @@ export default class DiscussionsService {
     }
 
     async post(p: Post): Promise<Post> {
-
         if (p.chain != 'eos') throw new Error('Unknown chain')
 
         const tags = new Set()
@@ -196,7 +196,7 @@ export default class DiscussionsService {
         }
         metadata.displayName = p.displayName || p.poster
 
-        const data = {
+        const post = {
             poster: p.poster,
             content: p.content,
             uuid: p.uuid,
@@ -211,20 +211,20 @@ export default class DiscussionsService {
         try {
             if (!p.poster) {
                 console.log('no poster found, posting as anon')
-                console.log('Class: DiscussionsService, Function: post, Line 214 data: ', data);
-                const resp = await fetch(
-                    `${nsdb.api}/discussions/post?data=${JSON.stringify(data)}`
-                )
-                const res = await resp.json()
-                if (res.error) throw new Error(res.message)
-                p.transaction = res.transaction
+                const { data } = await axios.get(`${nsdb.api}/discussions/post`, {
+                    params: {
+                        data: JSON.stringify(post)
+                    }
+                })
+                console.log('Class: DiscussionsService, Function: post, Line 219 data: ', data);
+                p.transaction = data.transaction
             } else {
                 console.log('poster found, opening Scatter to confirm')
                 const transaction = await eos.transact([
                     {
                         account: 'discussionsx',
                         name: 'post',
-                        data: data,
+                        data: post,
                     },
                     {
                         account: 'discussionsx', // self up vote

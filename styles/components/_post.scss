@@ -144,6 +144,12 @@ button.reply {
             border-right: none;
         }
     }
+    
+    svg.red {
+        path {
+            fill: #ad464f !important;
+        }
+    }
 }
 
 .post-content-hover {

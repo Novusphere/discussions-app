@@ -93,10 +93,10 @@ export class ReplyModel {
             tags = tags.map(tag => tag.replace('#', ''))
             reply.tags = [...reply.tags, ...tags]
         }
-
+        
         try {
             const activeThread = this.postStore.activeThread
-
+            
             if (activeThread) {
                 const model = new PostModel(reply as any)
                 const signedReply = model.sign(this.newAuthStore.postPriv)
@@ -123,7 +123,6 @@ export class ReplyModel {
             // await discussions.post.sign(this.authStore.postPriv)
             // await discussions.post(reply as any)
         } catch (error) {
-            console.log('Class: ReplyModel, Function: onSubmit, Line 100 error: ', error)
             this.uiStore.showToast(error.message, 'error')
             throw error
         }

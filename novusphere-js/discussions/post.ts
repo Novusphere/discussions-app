@@ -161,7 +161,17 @@ export class Post {
 
     sign(privKey: string) {
         this.pub = ecc.privateToPublic(privKey);
-        this.sig = ecc.sign(ecc.sha256(this.uuid+ecc.sha256(this.content)), privKey);
+        // const hash = ecc.sha256(this.uuid+ecc.sha256(this.content))
+        const hash0 = ecc.sha256(this.content);
+        const hash1 = ecc.sha256(this.uuid+hash0);
+        
+        console.log('Class: Post, Function: sign, Line 168 this.content: ', this.content);
+        console.log('Class: Post, Function: sign, Line 169 this.uuid: ', this.uuid);
+
+        console.log('Class: Post, Function: sign, Line 168 hash0: ', hash0);
+        console.log('Class: Post, Function: sign, Line 169 hash1: ', hash1);
+
+        this.sig = ecc.sign(hash1, privKey);
         this.verifySig = this.pub;
     }
 
