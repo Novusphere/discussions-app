@@ -40,6 +40,17 @@ export class ReplyModel {
         return this.content.match(/#([^\s.,;:!?]+)/gi)
     }
 
+    @computed get inlineMentions() {
+        return this.content.match(/\[@(.*?)]\(.*?\)/gi)
+    }
+
+    @computed get inlineMentionHashes() {
+        const regex = new RegExp(/\(?EOS.*\)?\w/, 'gi')
+        return this.inlineMentions.map(items => {
+            return items.match(regex)[0]
+        })
+    }
+
     @task.resolved onSubmit = async () => {
         if (!this.newAuthStore.hasAccount) {
             this.uiStore.showToast('You must be logged in to comment', 'error')
@@ -66,7 +77,7 @@ export class ReplyModel {
             content: this.content,
             sub: post.sub,
             chain: 'eos',
-            mentions: [],
+            mentions: this.inlineMentionHashes,
             tags: [post.sub],
             id: generatedUid,
             uuid: generatedUid,
@@ -93,10 +104,10 @@ export class ReplyModel {
             tags = tags.map(tag => tag.replace('#', ''))
             reply.tags = [...reply.tags, ...tags]
         }
-        
+
         try {
             const activeThread = this.postStore.activeThread
-            
+
             if (activeThread) {
                 const model = new PostModel(reply as any)
                 const signedReply = model.sign(this.newAuthStore.postPriv)
@@ -119,9 +130,6 @@ export class ReplyModel {
             } else {
                 this.uiStore.showToast('Failed to submit your reply', 'error')
             }
-
-            // await discussions.post.sign(this.authStore.postPriv)
-            // await discussions.post(reply as any)
         } catch (error) {
             this.uiStore.showToast(error.message, 'error')
             throw error

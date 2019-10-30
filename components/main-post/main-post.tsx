@@ -1,6 +1,6 @@
 import * as React from 'react'
 import { observer } from 'mobx-react'
-import { Attachments, Votes } from '@components'
+import { Attachments, UserNameWithIcon, Votes } from '@components'
 import { Link } from '@router'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import {
@@ -23,48 +23,6 @@ interface IMainPost {
 }
 
 const MainPost: React.FC<IMainPost> = ({ openingPost, replyHandler, voteHandler }) => {
-    const renderUserIcon = () => {
-        let imageData = getIdenticon()
-
-        if (openingPost.pub) {
-            imageData = getIdenticon(openingPost.pub)
-        }
-
-        const image = (
-            <img
-                width={30}
-                height={30}
-                src={`data:image/png;base64,${imageData}`}
-                className={'post-icon mr2'}
-            />
-        )
-        const user = <span>{openingPost.displayName || openingPost.poster}</span>
-
-        if (!openingPost.pub) {
-            return (
-                <span
-                    className={'flex items-center'}
-                    title={
-                        'Since no pub key was found for this post, you cannot use user actions on this user'
-                    }
-                >
-                    {image}
-                    <span className={'black b'}>{user}</span>
-                </span>
-            )
-        }
-
-        return (
-            <Link route={`/u/${openingPost.displayName || openingPost.poster}`}>
-                <a>
-                    {image}
-                    {/*<FontAwesomeIcon width={13} icon={faUserCircle} className={'pr1'} />*/}
-                    {user}
-                </a>
-            </Link>
-        )
-    }
-
     return (
         <>
             <div className={'pb2'}>
@@ -86,7 +44,7 @@ const MainPost: React.FC<IMainPost> = ({ openingPost, replyHandler, voteHandler 
                             </a>
                         </Link>
                         <span className={'ph1 b'}>&#183;</span>
-                        {renderUserIcon()}
+                        <UserNameWithIcon imageData={openingPost.imageData} name={openingPost.posterName} imageSize={20} />
                         <span className={'ph1 b'}>&#183;</span>
                         <span> {moment(openingPost.createdAt).fromNow()}</span>
                     </div>

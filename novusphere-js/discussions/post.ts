@@ -8,6 +8,7 @@ export interface PostMetaData {
     pub?: string;
     sig?: string;
     displayName?: string;
+    mentions?: string[];
     attachment?: Attachment;
 }
 

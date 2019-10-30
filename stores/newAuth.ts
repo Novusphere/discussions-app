@@ -78,6 +78,20 @@ export default class NewAuth extends BaseStore {
         }
     }
 
+    @computed get isBKAccount() {
+        return this.getActiveDisplayName === this.displayName.bk
+    }
+
+    @computed get activePublicKey() {
+        if (!this.statusJson) return null
+
+        if (this.isBKAccount) {
+            return this.statusJson.bk.post
+        }
+
+        return this.statusJson.scatter.post
+    }
+
     @action.bound
     setClickedSignInMethod(method: string) {
         this.clickedSignInMethod = method

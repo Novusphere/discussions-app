@@ -1,5 +1,5 @@
 import * as React from 'react'
-import { MainPost, Replies, Reply } from '@components'
+import { MainPost, Reply, ReplyBox } from '@components'
 import { observer } from 'mobx-react'
 import { Post } from '@novuspherejs'
 import { ReplyModel } from '@models/replyModel'
@@ -33,7 +33,7 @@ const ThreadContainer: React.FC<IThreadContainerProps> = ({
             />
             {openingModel.open ? (
                 <div className={'mb3'}>
-                    <Reply
+                    <ReplyBox
                         uid={opening.uuid}
                         onContentChange={openingModel.setContent}
                         onSubmit={openingModel.onSubmit}
@@ -50,7 +50,7 @@ const ThreadContainer: React.FC<IThreadContainerProps> = ({
                         {openingPostReplies.map(reply => {
                             const post = new PostModel(reply)
                             return (
-                                <Replies
+                                <Reply
                                     post={post}
                                     key={reply.uuid}
                                     getModel={getModel}

@@ -1,68 +1,184 @@
 import * as React from 'react'
-import { Editor } from '@components'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
-import { faSpinner } from '@fortawesome/free-solid-svg-icons'
-import { observer } from 'mobx-react'
+import {
+    faDollarSign,
+    faLink,
+    faReply,
+    faUserMinus,
+    faUserPlus,
+} from '@fortawesome/free-solid-svg-icons'
+import moment from 'moment'
+import { Link } from '@router'
+import { Votes, ReplyBox, UserNameWithIcon } from '@components'
+import ReactMarkdown from 'react-markdown'
+import { inject, observer } from 'mobx-react'
+import { ReplyModel } from '@models/replyModel'
+import PostModel from '@models/postModel'
 import classNames from 'classnames'
+import { getIdenticon, openInNewTab } from '@utils'
+import { IStores } from '@stores'
 
-interface IReplyProps {
+interface IReplies {
+    post: PostModel
     className?: string
-    uid: string // the uid of the post this component is active for
-    onContentChange: (content: string) => void
-    onSubmit: (uid: string) => Promise<boolean | void>
+    getModel: (post: PostModel) => ReplyModel
+    voteHandler: (uuid: string, value: number) => void
+    getRepliesFromMap: (uid: string) => PostModel[]
+
+    userStore?: IStores['userStore']
+    newAuthStore?: IStores['newAuthStore']
 }
 
-const Reply: React.FC<IReplyProps> = ({ uid, onContentChange, onSubmit, className }) => (
-    <div
-        className={classNames([
-            {
-                'mt3': typeof className === 'undefined',
-                [className]: !!className,
-            },
-        ])}
-    >
-        <Editor placeholder={'Enter your reply'} className={'db f6'} onChange={onContentChange} />
-        {onSubmit['match']({
-            pending: () => (
-                <button
-                    disabled
-                    className={'mt3 f6 link dim ph3 pv2 dib mr2 pointer white bg-green'}
-                >
-                    <FontAwesomeIcon width={13} icon={faSpinner} spin />
-                </button>
-            ),
-            rejected: error => (
-                <div className={'flex flex-column items-start'}>
-                    <span className={'red f6 pt3'}>{error.message}</span>
-                    <button
-                        onClick={() =>
-                            onSubmit(uid).catch(err => {
-                                console.error(err)
-                            })
-                        }
-                        className={'mt3 f6 link dim ph3 pv2 dib mr2 pointer white bg-green'}
-                    >
-                        Post reply
-                    </button>
-                </div>
-            ),
-            resolved: status => (
-                <div className={'flex flex-column items-start'}>
-                    {status ? <span className={'green f6 pt3'}>Post submitted!</span> : null}
-                    <button
-                        onClick={() =>
-                            onSubmit(uid).catch(err => {
-                                console.error(err)
-                            })
-                        }
-                        className={'mt3 f6 link dim ph3 pv2 dib mr2 pointer white bg-green'}
-                    >
-                        Post reply
-                    </button>
-                </div>
-            ),
-        })}
-    </div>
-)
+@inject('userStore', 'newAuthStore')
+@observer
+class Reply extends React.Component<IReplies, any> {
+    state = {
+        isHover: false,
+    }
 
-export default observer(Reply)
+    private setHover = (state: boolean) => {
+        this.setState({
+            isHover: state,
+        })
+    }
+
+    private toggleFollowStatus = () => {
+        const { post } = this.props
+        this.props.userStore.toggleUserFollowing(post.pub, post.posterName)
+    }
+
+    private renderHoverElements = () => {
+        if (!this.state.isHover) {
+            return null
+        }
+
+        const { post, getModel, userStore, newAuthStore } = this.props
+        const { isFollowingUser } = userStore
+        const { activePublicKey } = newAuthStore
+        const replyModel = getModel(post)
+
+        return (
+            <div className={'hover-elements disable-user-select'}>
+                <span onClick={replyModel.toggleOpen} title={'Reply to post'}>
+                    <FontAwesomeIcon icon={faReply} />
+                </span>
+                <span title={'Donate tokens'}>
+                    <FontAwesomeIcon icon={faDollarSign} />
+                </span>
+                <span
+                    title={'View block'}
+                    onClick={() => openInNewTab(`https://eosq.app/tx/${post.transaction}`)}
+                >
+                    <FontAwesomeIcon icon={faLink} />
+                </span>
+                {post.pub && activePublicKey !== post.pub ? (
+                    isFollowingUser(post.pub) ? (
+                        <span title={'Unfollow user'} onClick={this.toggleFollowStatus}>
+                            <FontAwesomeIcon icon={faUserMinus} className={'red'} />
+                        </span>
+                    ) : (
+                        <span title={'Follow user'} onClick={this.toggleFollowStatus}>
+                            <FontAwesomeIcon icon={faUserPlus} />
+                        </span>
+                    )
+                ) : null}
+            </div>
+        )
+    }
+
+    render() {
+        const {
+            post,
+            voteHandler,
+            getModel,
+            getRepliesFromMap,
+            className,
+            userStore,
+            newAuthStore,
+        } = this.props
+
+        const replyModel = getModel(post)
+        const replies = getRepliesFromMap(post.uuid)
+
+        return (
+            <div
+                className={classNames([
+                    'post-reply black',
+                    {
+                        [className]: !!className,
+                    },
+                ])}
+                onMouseEnter={() => this.setHover(true)}
+                onMouseLeave={() => this.setHover(false)}
+            >
+                {this.renderHoverElements()}
+                <div
+                    className={classNames([
+                        'flex flex-row pa2',
+                        {
+                            'post-content-hover': this.state.isHover,
+                        },
+                    ])}
+                >
+                    <div className={'flex justify-between items-center mr2'}>
+                        <Votes
+                            upVotes={post.upvotes}
+                            downVotes={post.downvotes}
+                            myVote={post.myVote}
+                            uuid={post.uuid}
+                            handler={voteHandler}
+                        />
+                    </div>
+                    <div className={'flex flex-column'}>
+                        <div className={'header pb0'}>
+                            <UserNameWithIcon imageData={post.imageData} name={post.posterName} />
+                            <span className={'pl2 o-50 f6'}>
+                                {moment(post.createdAt).fromNow()}
+                            </span>
+                        </div>
+                        <ReactMarkdown
+                            className={'f6 lh-copy reply-content'}
+                            source={post.content}
+                        />
+                    </div>
+                </div>
+
+                {replyModel.open ? (
+                    <ReplyBox
+                        className={classNames([
+                            'ph4 pb4',
+                            {
+                                'post-content-hover': this.state.isHover,
+                            },
+                        ])}
+                        uid={post.uuid}
+                        onContentChange={replyModel.setContent}
+                        onSubmit={replyModel.onSubmit}
+                    />
+                ) : null}
+
+                {replies && replies.length
+                    ? replies.map(postReply => (
+                          <div
+                              onMouseLeave={() => this.setHover(true)}
+                              onMouseEnter={() => this.setHover(false)}
+                              key={postReply.uuid}
+                          >
+                              <Reply
+                                  post={postReply}
+                                  getModel={getModel}
+                                  className={'ml3'}
+                                  getRepliesFromMap={getRepliesFromMap}
+                                  voteHandler={voteHandler}
+                                  userStore={userStore}
+                                  newAuthStore={newAuthStore}
+                              />
+                          </div>
+                      ))
+                    : null}
+            </div>
+        )
+    }
+}
+
+export default Reply

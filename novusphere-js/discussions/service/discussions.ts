@@ -177,13 +177,13 @@ export default class DiscussionsService {
         }
     }
 
-    async post(p: Post): Promise<Post> {
+    async post(p: Post): Promise<any> {
         if (p.chain != 'eos') throw new Error('Unknown chain')
 
         const tags = new Set()
         ;[p.sub, ...p.tags].forEach(t => tags.add(t.toLowerCase()))
 
-        const mentions = new Set()
+        const mentions = new Set<string>()
         p.mentions.forEach(u => mentions.add(u))
 
         const metadata: PostMetaData = {}
@@ -194,7 +194,9 @@ export default class DiscussionsService {
             metadata.pub = p.pub
             metadata.sig = p.sig
         }
+
         metadata.displayName = p.displayName || p.poster
+        metadata.mentions = Array.from(mentions)
 
         const post = {
             poster: p.poster,
@@ -203,11 +205,11 @@ export default class DiscussionsService {
             threadUuid: p.threadUuid,
             parentUuid: p.parentUuid,
             tags: Array.from(tags),
-            mentions: Array.from(mentions),
+            mentions: [],
             metadata: JSON.stringify(metadata),
             transaction: '',
         }
-
+        
         try {
             if (!p.poster) {
                 console.log('no poster found, posting as anon')

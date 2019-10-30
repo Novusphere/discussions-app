@@ -76,14 +76,12 @@ class Editor extends React.Component<IEditorProps> {
                         renderList(matches, searchTerm)
                     }
                 },
-                renderItem: (item, searchTerm) => {
+                renderItem: (item) => {
                     const image = `<img width=20 height=20 src="data:image/png;base64,${item.icon}" class="mention-list-icon" />`
-                    return `<span class="mention-list-item">${image} <span>${item.value}</span></span>`
+                    return `<span class="mention-list-item" title={${item.id}}>${image} <span>${item.value}</span></span>`
                 },
                 onSelect: (item, insertItem) => {
-                    item.value = `<a href='${window.location.origin + '/u/' + item.value}'>@${
-                        item.value
-                    }</a>`
+                    item.value = `<a href=${window.location.origin}/u/${item.value}-${item.id}>@${item.value}</a>`
                     item.denotationChar = ''
                     return insertItem(item)
                 },

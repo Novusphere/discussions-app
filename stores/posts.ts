@@ -160,7 +160,7 @@ export default class Posts extends BaseStore {
                 }
 
                 return {
-                    id: poster,
+                    id: posts.pub,
                     value: poster,
                     icon: imageData,
                 }

@@ -67,7 +67,7 @@ export class ThreadModel {
     })
 
     /**
-     * Reply box open status for a particular post id
+     * ReplyBox box open status for a particular post id
      */
     constructor(thread: Thread) {
         if (!(thread instanceof Post) || thread instanceof Thread) {

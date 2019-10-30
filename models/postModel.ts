@@ -1,6 +1,7 @@
 import { computed, observable, set } from 'mobx'
 import { Post } from '@novuspherejs'
 import ecc from 'eosjs-ecc'
+import { getIdenticon } from '@utils'
 
 class PostModel {
     @observable public map: { [p: string]: PostModel } | undefined
@@ -25,8 +26,18 @@ class PostModel {
     @observable sig
     @observable pub
 
+    @observable imageData
+
     constructor(post: Post) {
         set(this, post)
+
+        let imageData = getIdenticon()
+
+        if (this.pub) {
+            imageData = getIdenticon(this.pub)
+        }
+
+        this.imageData = imageData
     }
 
     @computed get posterName() {
