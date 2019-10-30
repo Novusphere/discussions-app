@@ -83,7 +83,7 @@ export default class NewAuth extends BaseStore {
     }
 
     @computed get activePublicKey() {
-        if (!this.statusJson) return null
+        if (!this.statusJson.bk || !this.statusJson.scatter) return null
 
         if (this.isBKAccount) {
             return this.statusJson.bk.post

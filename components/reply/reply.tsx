@@ -54,7 +54,7 @@ class Reply extends React.Component<IReplies, any> {
 
         const { post, getModel, userStore, newAuthStore } = this.props
         const { isFollowingUser } = userStore
-        const { activePublicKey } = newAuthStore
+        const { activePublicKey, hasAccount } = newAuthStore
         const replyModel = getModel(post)
 
         return (
@@ -71,7 +71,7 @@ class Reply extends React.Component<IReplies, any> {
                 >
                     <FontAwesomeIcon icon={faLink} />
                 </span>
-                {post.pub && activePublicKey !== post.pub ? (
+                {post.pub && hasAccount && activePublicKey !== post.pub ? (
                     isFollowingUser(post.pub) ? (
                         <span title={'Unfollow user'} onClick={this.toggleFollowStatus}>
                             <FontAwesomeIcon icon={faUserMinus} className={'red'} />
