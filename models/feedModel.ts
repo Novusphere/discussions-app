@@ -6,6 +6,7 @@ class FeedModel {
     @observable upvotes: number
     @observable downvotes: number
     @observable myVote: number
+    @observable parentUuid: string
 
     @observable verifySig: any
     @observable uuid: any

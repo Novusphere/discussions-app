@@ -32,8 +32,8 @@ export class NSDB {
             `q=${sq.query ? JSON.stringify(sq.query) : ''}&` +
             `s=${sq.sort ? JSON.stringify(sq.sort) : ''}&` +
             `u=${sq.account ? sq.account : ''}&` +
-            `lim=${sq.limit ? sq.limit : 20}&` +
-            `p=${sq.count ? sq.count : 0}`;
+            `lim=${typeof sq.limit !== 'undefined' ? sq.limit : 20}&` +
+            `p=${typeof sq.count !== 'undefined' ? sq.count : 0}`;
 
         const request = await fetch(`${this.api}/discussions/search?${qs}`, {
             method: 'GET',

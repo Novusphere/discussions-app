@@ -1,9 +1,8 @@
 import * as React from 'react'
 import { inject, observer } from 'mobx-react'
 import { IStores } from '@stores'
-import { IPost } from '@stores/posts'
+import posts, { IPost } from '@stores/posts'
 import { Feed } from '@components'
-import { Router } from '@router'
 import { TagModel } from '@models/tagModel'
 import FeedModel from '@models/feedModel'
 import { pushToThread } from '@utils'
@@ -25,8 +24,14 @@ class Tag extends React.Component<ITagProps> {
         const tag = query.name
         const postsStore: IStores['postsStore'] = store.postsStore
         const tagStore: IStores['tagStore'] = store.tagStore
+
+        if (tagStore.activeTag && tagStore.activeTag.name !== tag) {
+            postsStore.resetPositionAndPosts()
+            tagStore.setActiveTag(tag)
+        }
+
         const feed = await postsStore.getPostsByTag([tag])
-        tagStore.setActiveTag(tag)
+
         return {
             tagName: tag,
             feed: feed,

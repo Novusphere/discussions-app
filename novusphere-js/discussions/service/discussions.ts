@@ -189,7 +189,7 @@ export default class DiscussionsService {
         const metadata: PostMetaData = {}
         if (p.title) metadata.title = p.title
         if (p.attachment.value) metadata.attachment = p.attachment
-        
+
         if (p.pub && p.sig) {
             metadata.pub = p.pub
             metadata.sig = p.sig
@@ -209,16 +209,16 @@ export default class DiscussionsService {
             metadata: JSON.stringify(metadata),
             transaction: '',
         }
-        
+
         try {
             if (!p.poster) {
                 console.log('no poster found, posting as anon')
                 const { data } = await axios.get(`${nsdb.api}/discussions/post`, {
                     params: {
-                        data: JSON.stringify(post)
-                    }
+                        data: JSON.stringify(post),
+                    },
                 })
-                console.log('Class: DiscussionsService, Function: post, Line 219 data: ', data);
+                console.log('Class: DiscussionsService, Function: post, Line 219 data: ', data)
                 p.transaction = data.transaction
             } else {
                 console.log('poster found, opening Scatter to confirm')
@@ -304,8 +304,17 @@ export default class DiscussionsService {
         return query.payload.map(o => Post.fromDbObject(o))
     }
 
-    async getPostsForTags(tags: string[]): Promise<Post[]> {
-        const query = await nsdb.search({
+    async getPostsForTags(
+        tags: string[],
+        cursorId = undefined,
+        count = 0,
+        limit = 20,
+        threadOnly = true
+    ): Promise<{
+        posts: Post[]
+        cursorId: number
+    }> {
+        const searchQuery = {
             query: {
                 tags: { $in: tags.map(tag => tag.toLowerCase()) },
             },
@@ -313,9 +322,21 @@ export default class DiscussionsService {
                 createdAt: -1,
             },
             account: eos.accountName || '',
-        })
+            cursorId,
+            count,
+            limit,
+        }
 
+        if (threadOnly) {
+            searchQuery.query['parentUuid'] = ''
+        }
+
+        const query = await nsdb.search(searchQuery)
         let posts = query.payload.map(o => Post.fromDbObject(o))
-        return posts
+
+        return {
+            posts,
+            cursorId: query.cursorId,
+        }
     }
 };

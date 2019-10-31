@@ -1,4 +1,4 @@
-import { action, computed, observable } from 'mobx'
+import { action, computed, observable, reaction } from 'mobx'
 import { discussions, Post } from '@novuspherejs'
 import { task } from 'mobx-task'
 import { BaseStore, getOrCreateStore } from 'next-mobx-wrapper'
@@ -9,6 +9,7 @@ import { generateUuid, getAttachmentValue, getIdenticon, pushToThread, sleep } f
 import { ThreadModel } from '@models/threadModel'
 import FeedModel from '@models/feedModel'
 import _ from 'lodash'
+import react from 'next-routes/typings/tests/react'
 
 export interface IAttachment {
     value: string
@@ -52,7 +53,13 @@ export interface IPreviewPost {
 
 export default class Posts extends BaseStore {
     // all posts by filter
-    @observable posts: FeedModel[]
+    @observable posts: Post[] = []
+
+    @observable postsPosition = {
+        items: 0,
+        cursorId: undefined,
+    }
+
     @observable preview: IPreviewPost | null = null
 
     @observable activeThreadId = ''
@@ -99,18 +106,30 @@ export default class Posts extends BaseStore {
         // )
     }
 
+    public resetPositionAndPosts = () => {
+        this.posts = []
+        this.postsPosition = {
+            items: 0,
+            cursorId: undefined,
+        }
+    }
+
     public encodeId(post: IPost) {
         return Post.encodeId(post.transaction, new Date(post.createdAt))
     }
 
     @task getPostsByTag = async (tags: string[]) => {
-        const posts = await discussions.getPostsForTags(tags)
-        const postsAsModels = posts.map(post => {
-            return new FeedModel(post)
-        })
-
-        this.posts = postsAsModels
-        return postsAsModels
+        const { posts, cursorId } = await discussions.getPostsForTags(
+            tags,
+            this.postsPosition.cursorId,
+            this.postsPosition.items
+        )
+        this.posts = [...this.posts, ...posts]
+        this.postsPosition = {
+            items: this.posts.length,
+            cursorId: cursorId,
+        }
+        return this.posts
     }
 
     /**
@@ -120,7 +139,10 @@ export default class Posts extends BaseStore {
         if (!this.posts || !this.posts.length) {
             return null
         }
-        return this.posts.filter(post => post.title.length).map(post => new FeedModel(post as any))
+
+        return this.posts
+            .filter(post => post.parentUuid === '')
+            .map(post => new FeedModel(post as any))
     }
 
     @task
@@ -128,8 +150,7 @@ export default class Posts extends BaseStore {
     public async getAndSetThread(id: string) {
         try {
             this.activeThreadId = id
-            const thread = await this.getThreadById(id)
-            this.activeThread = thread
+            this.activeThread = await this.getThreadById(id)
             return this.activeThread
         } catch (error) {
             console.log('Class: Posts, Function: getAndSetThread, Line 123 error: ', error)
