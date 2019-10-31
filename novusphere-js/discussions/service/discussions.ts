@@ -339,4 +339,24 @@ export default class DiscussionsService {
             cursorId: query.cursorId,
         }
     }
+
+    /**
+     * Returns all the posts in which the user was
+     * tagged in (mentions).
+     */
+    async getPostsForNotifications(
+        postPublicKey: string,
+        lastCheckedNotifications: number
+    ): Promise<NSDBNotificationsResponse.RootObject> {
+        try {
+            return await nsdb.search({
+                query: {
+                    createdAt: { $gte: lastCheckedNotifications },
+                    mentions: { $in: [postPublicKey] },
+                },
+            })
+        } catch (error) {
+            throw error
+        }
+    }
 };

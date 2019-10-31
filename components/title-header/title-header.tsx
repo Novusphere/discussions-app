@@ -11,7 +11,6 @@ import { UserNotifications } from '@components'
 
 interface ITitleHeaderProps {
     tagStore: IStores['tagStore']
-    authStore: IStores['authStore']
     newAuthStore: IStores['newAuthStore']
     uiStore: IStores['uiStore']
 }
@@ -20,20 +19,14 @@ interface ITitleHeaderState {
     search: string
 }
 
-@inject('tagStore', 'newAuthStore', 'authStore', 'uiStore')
+@inject('tagStore', 'newAuthStore', 'uiStore', 'notificationsStore')
 @observer
 class TitleHeader extends React.Component<ITitleHeaderProps, ITitleHeaderState> {
     state = {
         search: '',
     }
 
-    // componentDidMount(): void {
-    //     this.props.authStore.checkInitialConditions()
-    // }
-
     private renderUserSettings = () => {
-        const { ATMOSBalance } = this.props.authStore
-
         const { logOut } = this.props.newAuthStore
 
         return (
@@ -44,7 +37,7 @@ class TitleHeader extends React.Component<ITitleHeaderProps, ITitleHeaderState> 
                     </a>
                 </Link>
                 <a title={'ATMOS Balance'} className={'db mb2'}>
-                    {ATMOSBalance} ATMOS
+                    0 ATMOS
                 </a>
                 <a
                     rel={'Open settings'}
@@ -130,7 +123,6 @@ class TitleHeader extends React.Component<ITitleHeaderProps, ITitleHeaderState> 
                 <button
                     onClick={() => {
                         showModal(ModalOptions.signUp)
-                        this.props.authStore.showOtherSignInOption = false
                     }}
                 >
                     Sign Up

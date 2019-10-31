@@ -14,7 +14,6 @@ import '../styles/style.scss'
 useStaticRendering(isServer) // NOT `true` value
 toast.configure()
 
-
 class DiscussionApp extends App {
     public props: any
 
@@ -39,12 +38,13 @@ class DiscussionApp extends App {
      */
     async componentDidMount(): Promise<void> {
         if (!isServer) {
-            const { newAuthStore, settingsStore, userStore } = this.props.store
+            const { newAuthStore, settingsStore, userStore, notificationsStore } = this.props.store
 
             const stores = {
                 auth: newAuthStore,
                 settings: settingsStore,
                 user: userStore,
+                // notifications: notificationsStore,
             }
 
             const hydrate = create({
@@ -53,7 +53,7 @@ class DiscussionApp extends App {
             })
 
             Object.keys(stores).forEach(store => {
-               hydrate(store, stores[store])
+                hydrate(store, stores[store])
 
                 // if (getVersion() !== this.props.store.settingsStore.localStorageVersion) {
                 //     console.error('local storage version mismatch')
@@ -71,10 +71,7 @@ class DiscussionApp extends App {
         return (
             <Container>
                 <Provider {...store}>
-                    <MainLayout
-                        activeBanner={store.uiStore.activeBanner}
-                        tags={store.tagStore.tags}
-                    >
+                    <MainLayout>
                         <Component {...pageProps} />
                     </MainLayout>
                 </Provider>

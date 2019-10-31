@@ -1,10 +1,21 @@
 import * as React from 'react'
+import { inject, observer } from 'mobx-react'
+import { IStores } from '@stores'
 
-interface IUserNotificationsProps {}
+interface IUserNotificationsOuterProps {}
+
+interface IUserNotificationsInnerProps {
+    notificationsStore: IStores['notificationsStore']
+}
 
 interface IUserNotificationsState {}
 
-class UserNotifications extends React.Component<IUserNotificationsProps, IUserNotificationsState> {
+@inject('notificationsStore')
+@observer
+class UserNotifications extends React.Component<
+    IUserNotificationsOuterProps & IUserNotificationsInnerProps,
+    IUserNotificationsState
+> {
     public render() {
         return (
             <div className={'notification-tooltip'} style={{ width: 300 }}>
@@ -34,4 +45,4 @@ class UserNotifications extends React.Component<IUserNotificationsProps, IUserNo
     }
 }
 
-export default UserNotifications
+export default UserNotifications as React.ComponentClass<IUserNotificationsOuterProps>

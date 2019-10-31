@@ -25,9 +25,9 @@ export class NSDB {
         const result = await request.text();
         return result;
     }
-    async search(sq : INSDBSearchQuery) : Promise<INSDBSearchQuery> {
 
-        const qs = 
+    async search(sq : INSDBSearchQuery) : Promise<NSDBNotificationsResponse.RootObject> {
+        const qs =
             `c=${sq.cursorId ? sq.cursorId : ''}&` +
             `q=${sq.query ? JSON.stringify(sq.query) : ''}&` +
             `s=${sq.sort ? JSON.stringify(sq.sort) : ''}&` +
@@ -54,6 +54,6 @@ export class NSDB {
         sq.limit = result.limit;
         sq.payload = result.payload;
 
-        return sq;
+        return sq as any;
     }
 };

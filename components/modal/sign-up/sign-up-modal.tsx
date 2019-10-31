@@ -42,20 +42,6 @@ class SignUpModal extends React.Component<ISignInModalProps, ISignInModalState> 
         })
     }
 
-    // private saveBKToStore = () => {
-    //     const { generateBrianKey, anonymousObject } = this.props.authStore
-    //
-    //     const bk = generateBrianKey['result']
-    //
-    //     if (!anonymousObject.bk) {
-    //         anonymousObject.bk = bk
-    //     }
-    // }
-    //
-    // private loginWithOtherMethod = () => {
-    //     this.props.uiStore.showModal(ModalOptions.signIn)
-    // }
-    //
     private renderNextButtons = ({ signUpForm, verifyBKForm }) => {
         const { generateBrianKey } = this.props.newAuthStore
 

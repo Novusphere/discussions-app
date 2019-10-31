@@ -37,7 +37,7 @@ class Index extends React.Component<IIndexPage> {
         return this.props.postsStore.posts.map(post => {
             return (
                 <PostPreview
-                    post={post}
+                    post={post as any}
                     key={post.uuid}
                     onClick={this.clickPost}
                     tag={this.props.tagStore.tags.get(post.sub)}

@@ -8,19 +8,17 @@ import { IStores } from '@stores'
 import { getVersion } from '@utils'
 
 interface IMainLayoutProps {
-    activeBanner: string
     tagStore: IStores['tagStore']
     uiStore: IStores['uiStore']
     settingsStore: IStores['settingsStore']
-    tags: IStores['tagStore']['tags']
 }
 
 @inject('tagStore', 'uiStore', 'settingsStore')
 @observer
 class MainLayout extends React.Component<IMainLayoutProps> {
     public render() {
-        const { activeTag } = this.props.tagStore
-        const { showBanner, showSidebar } = this.props.uiStore
+        const { activeTag, tags } = this.props.tagStore
+        const { showBanner, showSidebar, activeBanner } = this.props.uiStore
 
         return (
             <>
@@ -33,7 +31,7 @@ class MainLayout extends React.Component<IMainLayoutProps> {
                 {showBanner && (
                     <div className={'w-100 header-image'}>
                         <img
-                            src={this.props.activeBanner}
+                            src={activeBanner}
                             title={'Active banner'}
                             alt={'Active banner image'}
                         />
@@ -44,7 +42,7 @@ class MainLayout extends React.Component<IMainLayoutProps> {
                     <div className={'container flex pv3'}>
                         {showSidebar && (
                             <div className={'w-30 card sidebar mr3'}>
-                                <Sidebar tags={this.props.tags} activeTag={activeTag} />
+                                <Sidebar tags={tags} activeTag={activeTag} />
                             </div>
                         )}
                         <div
