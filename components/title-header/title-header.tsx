@@ -8,10 +8,12 @@ import { Tooltip } from 'react-tippy'
 import { ModalOptions } from '@globals'
 import { TagModel } from '@models/tagModel'
 import { UserNotifications } from '@components'
+import ReactMarkdown from 'react-markdown'
 
 interface ITitleHeaderProps {
     tagStore: IStores['tagStore']
     newAuthStore: IStores['newAuthStore']
+    notificationsStore: IStores['notificationsStore']
     uiStore: IStores['uiStore']
 }
 
@@ -57,8 +59,8 @@ class TitleHeader extends React.Component<ITitleHeaderProps, ITitleHeaderState> 
     }
 
     private renderAuthActions = () => {
+        const { notificationsStore } = this.props
         const { showModal } = this.props.uiStore
-
         const { hasAccount, getActiveDisplayName, checkInitialConditions } = this.props.newAuthStore
 
         if (checkInitialConditions['pending']) {
@@ -66,12 +68,16 @@ class TitleHeader extends React.Component<ITitleHeaderProps, ITitleHeaderState> 
         }
 
         if (hasAccount) {
+            const { hasNotifications, notificationCount } = notificationsStore
+
             return (
                 <div className={'f4 flex items-center'}>
                     <Tooltip
                         animateFill={false}
                         interactive
-                        html={<UserNotifications />}
+                        interactiveBorder={20}
+                        unmountHTMLWhenHide={true}
+                        html={<UserNotifications notificationsStore={notificationsStore} />}
                         position={'bottom-end'}
                         trigger={'mouseenter'}
                     >
@@ -81,8 +87,13 @@ class TitleHeader extends React.Component<ITitleHeaderProps, ITitleHeaderState> 
                                     width={13}
                                     icon={faBell}
                                     className={'ph2'}
-                                    color={'#7D8894'}
+                                    color={hasNotifications ? '#ad3b2b' : '#7D8894'}
                                 />
+                                {hasNotifications && (
+                                    <span className={'f5 b notification-count'}>
+                                        {notificationCount}
+                                    </span>
+                                )}
                             </a>
                         </Link>
                     </Tooltip>

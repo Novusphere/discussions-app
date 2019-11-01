@@ -5,7 +5,6 @@ import { Link } from '@router'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import {
     faReply,
-    faUserCircle,
     faLink,
     faShare,
     faExclamationTriangle,
@@ -14,7 +13,6 @@ import {
 import moment from 'moment'
 import ReactMarkdown from 'react-markdown'
 import PostModel from '@models/postModel'
-import { getIdenticon } from '@utils'
 
 interface IMainPost {
     openingPost: PostModel

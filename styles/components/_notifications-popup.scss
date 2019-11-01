@@ -4,7 +4,12 @@
 	background-clip: padding-box;
 	border: 1px solid rgba(0, 0, 0, 0.15);
 	border-radius: 0.25rem;
+	display: flex;
+	flex-direction: column;
+	justify-content: space-between;
+	align-items: flex-start;
 
+	min-height: 150px;
 }
 
 .notification-item {
@@ -23,10 +28,19 @@
 		border-bottom: none;
 	}
 
-	span {
+	padding: 1em 1em !important;
+}
+
+.notifications-content {
+	max-height: 50px;
+	overflow: hidden;
+
+	> p {
 		padding: 0;
 		margin: 0;
 	}
+}
 
-	padding: 1em 1em !important;
+.notification-count {
+	color: #ad3b2b;
 }

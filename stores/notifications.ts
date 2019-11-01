@@ -7,33 +7,70 @@ import { persist } from 'mobx-persist'
 import { IPost } from '@stores/posts'
 
 export default class Notifications extends BaseStore {
+    static notificationMaximumCount = 5
+
     // the time last checked
     // @persist
     @observable lastCheckedNotifications = 0
+
     @observable cursorId = 0
-
-    // all the notifications
     @observable notifications = observable.map<string, IPost>()
+    @observable unreadCount = 0
 
-    private readonly authStore: IStores['newAuthStore']  = getNewAuthStore()
+    private readonly authStore: IStores['newAuthStore'] = getNewAuthStore()
 
     constructor() {
         super()
 
         reaction(
             () => this.authStore.hasAccount,
-            (hasAccount) => {
+            hasAccount => {
                 if (hasAccount) {
                     this.fetchNotifications()
                 }
-            }, {
+            },
+            {
                 fireImmediately: true,
             }
         )
     }
 
+    @computed get notificationsAsArray() {
+        return Array.from(this.notifications.values())
+    }
+
+    @computed get firstSetOfNotifications() {
+        return this.notificationsAsArray.slice(0, Notifications.notificationMaximumCount - 1)
+    }
+
     @computed get hasMoreThanQueriedNotifications() {
         return this.cursorId !== 0
+    }
+
+    @computed get hasNotifications() {
+        return this.unreadCount > 0
+    }
+
+    @computed get notificationCount() {
+        const count = this.unreadCount
+
+        if (count > Notifications.notificationMaximumCount) {
+            return `${Notifications.notificationMaximumCount}+`
+        }
+
+        return count
+    }
+
+    @action.bound
+    resetUnreadCount() {
+        this.unreadCount = 0
+    }
+
+    @action.bound
+    clearNotifications() {
+        this.resetUnreadCount()
+        this.notifications.clear()
+        this.cursorId = 0
     }
 
     @task
@@ -48,9 +85,10 @@ export default class Notifications extends BaseStore {
             payload.forEach(notification => {
                 this.notifications.set(notification.uuid, notification as any)
             })
-            
+
             this.lastCheckedNotifications = Date.now()
             this.cursorId = cursorId
+            this.unreadCount = this.notifications.size
         } catch (error) {
             throw error
         }
