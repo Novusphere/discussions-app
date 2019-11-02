@@ -10,14 +10,13 @@ export default class Ui extends BaseStore {
     @observable showBanner = true
 
     @action.bound
-    toggleSidebarAndBanner() {
-        this.showSidebar = !this.showSidebar
-        this.showBanner = !this.showBanner
+    toggleSidebarStatus(status: boolean) {
+        this.showSidebar = status
     }
 
     @action.bound
-    toggleSidebar() {
-        this.showSidebar = !this.showSidebar
+    toggleBannerStatus(status: boolean) {
+        this.showBanner = status
     }
 
     @computed get isModalOpen(): boolean {

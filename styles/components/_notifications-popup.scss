@@ -7,7 +7,6 @@
 	display: flex;
 	flex-direction: column;
 	justify-content: space-between;
-	align-items: flex-start;
 
 	min-height: 150px;
 }
@@ -17,7 +16,7 @@
 	@extend .flex-column;
 	@extend .pointer;
 
-	overflow: hidden;
+	//overflow: hidden;
 	border-bottom: 1px solid #FAFAFA;
 
 	&:hover {
@@ -32,12 +31,27 @@
 }
 
 .notifications-content {
+	position: relative;
 	max-height: 50px;
 	overflow: hidden;
 
 	> p {
+		@extend .f6;
 		padding: 0;
 		margin: 0;
+	}
+}
+
+.notification-content-fade {
+	&:after {
+		content: '';
+		width: 100%;
+		height: 100%;
+		position: absolute;
+		z-index: 1;
+		left: 0;
+		bottom: 0;
+		background: linear-gradient(hsla(0, 0%, 100%, 0) 75%, #fff 85%);
 	}
 }
 

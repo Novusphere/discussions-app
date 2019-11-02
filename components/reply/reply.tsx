@@ -44,7 +44,7 @@ class Reply extends React.Component<IReplies, any> {
 
     private toggleFollowStatus = () => {
         const { post } = this.props
-        this.props.userStore.toggleUserFollowing(post.pub, post.posterName)
+        this.props.userStore.toggleUserFollowing(post.posterName, post.pub)
     }
 
     private renderHoverElements = () => {
@@ -72,7 +72,7 @@ class Reply extends React.Component<IReplies, any> {
                     <FontAwesomeIcon icon={faLink} />
                 </span>
                 {post.pub && hasAccount && activePublicKey !== post.pub ? (
-                    isFollowingUser(post.pub) ? (
+                    isFollowingUser(post.posterName) ? (
                         <span title={'Unfollow user'} onClick={this.toggleFollowStatus}>
                             <FontAwesomeIcon icon={faUserMinus} className={'red'} />
                         </span>

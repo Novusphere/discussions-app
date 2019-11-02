@@ -346,7 +346,8 @@ export default class DiscussionsService {
      */
     async getPostsForNotifications(
         postPublicKey: string,
-        lastCheckedNotifications: number
+        lastCheckedNotifications: number,
+        cursorId = undefined,
     ): Promise<NSDBNotificationsResponse.RootObject> {
         try {
             return await nsdb.search({
@@ -354,6 +355,7 @@ export default class DiscussionsService {
                     createdAt: { $gte: lastCheckedNotifications },
                     mentions: { $in: [postPublicKey] },
                 },
+                cursorId,
             })
         } catch (error) {
             throw error

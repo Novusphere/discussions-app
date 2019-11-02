@@ -3,21 +3,24 @@ import { dummy } from '@novuspherejs'
 import { IStores } from '@stores'
 import { inject, observer } from 'mobx-react'
 import { Tab, Tabs, TabList, TabPanel } from 'react-tabs'
+import { faMinusCircle, faSpinner } from '@fortawesome/free-solid-svg-icons'
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 
 interface IUPageProps {
     uiStore: IStores['uiStore']
+    userStore: IStores['userStore']
     username: string
     data: any
 }
 
 // TO-DO: real data
 
-@inject('uiStore')
+@inject('uiStore', 'userStore')
 @observer
 class U extends React.Component<IUPageProps> {
     static async getInitialProps({ query, store }) {
         const uiStore: IStores['uiStore'] = store.uiStore
-        uiStore.toggleSidebar()
+        uiStore.toggleSidebarStatus(false)
         const userData = await dummy.getUser(query.username)
         return {
             username: query.username,
@@ -25,8 +28,32 @@ class U extends React.Component<IUPageProps> {
         }
     }
 
-    componentWillUnmount(): void {
-        this.props.uiStore.toggleSidebar()
+    private renderFollowingList = () => {
+        if (!this.props.userStore.following.size) {
+            return <li className={'f6'}>You are not following any users.</li>
+        }
+
+        const pubs = Array.from(this.props.userStore.following.values())
+        const following = Array.from(this.props.userStore.following.keys())
+
+        return following.map((follow, index) => (
+            <li className={'pa0 mb2'}>
+                <span title={pubs[index]} className={'link pr2 pointer dim'}>
+                    {follow}
+                </span>
+                <span
+                    onClick={() => this.props.userStore.toggleUserFollowing(follow, pubs[index])}
+                    title={'Click to unfollow'}
+                >
+                    <FontAwesomeIcon
+                        width={13}
+                        icon={faMinusCircle}
+                        className={'pointer dim'}
+                        color={'red'}
+                    />
+                </span>
+            </li>
+        ))
     }
 
     private renderSidebarContent = () => {
@@ -62,6 +89,12 @@ class U extends React.Component<IUPageProps> {
                     <ul className={'list'}>
                         <li className={'pa0 mb2'}>EOS</li>
                     </ul>
+                </div>
+
+                <div className={'mt4 flex flex-column'}>
+                    <span className={'small-title mb2'}>Following (only visible to you)</span>
+
+                    <ul className={'list'}>{this.renderFollowingList()}</ul>
                 </div>
             </>
         )

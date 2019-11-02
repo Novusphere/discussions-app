@@ -5,13 +5,16 @@ import { getNewAuthStore, IStores } from '@stores/index'
 import { discussions } from '@novuspherejs'
 import { persist } from 'mobx-persist'
 import { IPost } from '@stores/posts'
+import FeedModel from '@models/feedModel'
+import { sleep } from '@utils'
 
 export default class Notifications extends BaseStore {
     static notificationMaximumCount = 5
 
     // the time last checked
-    // @persist
-    @observable lastCheckedNotifications = 0
+    @persist
+    @observable
+    lastCheckedNotifications = -1 // set default
 
     @observable cursorId = 0
     @observable notifications = observable.map<string, IPost>()
@@ -62,6 +65,11 @@ export default class Notifications extends BaseStore {
     }
 
     @action.bound
+    setTimeStamp() {
+        this.lastCheckedNotifications = Date.now()
+    }
+
+    @action.bound
     resetUnreadCount() {
         this.unreadCount = 0
     }
@@ -75,20 +83,47 @@ export default class Notifications extends BaseStore {
 
     @task
     @action.bound
-    async fetchNotifications() {
+    async fetchNotifications(time = this.lastCheckedNotifications) {
+        let defaultCursorId = this.cursorId
+
+        if (defaultCursorId === 0) {
+            defaultCursorId = undefined
+        }
+
         try {
             const { payload, cursorId } = await discussions.getPostsForNotifications(
                 this.authStore.activePublicKey,
-                this.lastCheckedNotifications
+                time,
+                defaultCursorId
             )
 
-            payload.forEach(notification => {
-                this.notifications.set(notification.uuid, notification as any)
-            })
+            if (time === 0) {
+                this.lastCheckedNotifications = Date.now()
+                this.cursorId = cursorId
+                return payload
+            } else {
+                payload.forEach(notification => {
+                    this.notifications.set(notification.uuid, notification as any)
+                })
 
-            this.lastCheckedNotifications = Date.now()
-            this.cursorId = cursorId
-            this.unreadCount = this.notifications.size
+                this.lastCheckedNotifications = Date.now()
+                this.cursorId = cursorId
+                this.unreadCount = this.notifications.size
+            }
+
+            return payload
+        } catch (error) {
+            throw error
+        }
+    }
+
+    @task
+    @action.bound
+    async fetchNotificationsAsFeed(): Promise<FeedModel[]> {
+        try {
+            await sleep(500)
+            const payload = await this.fetchNotifications(0)
+            return payload.map(post => new FeedModel(post as any))
         } catch (error) {
             throw error
         }

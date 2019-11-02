@@ -14,7 +14,10 @@ interface IIndexPage {
 @observer
 class Index extends React.Component<IIndexPage> {
     static async getInitialProps({ store }) {
+        const uiStore: IStores['uiStore'] = store.uiStore
         const tagStore: IStores['tagStore'] = store.tagStore
+        uiStore.toggleSidebarStatus(true)
+        uiStore.toggleBannerStatus(true)
         tagStore.destroyActiveTag()
         return {}
     }

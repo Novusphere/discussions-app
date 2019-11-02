@@ -44,7 +44,7 @@ class DiscussionApp extends App {
                 auth: newAuthStore,
                 settings: settingsStore,
                 user: userStore,
-                // notifications: notificationsStore,
+                notifications: notificationsStore,
             }
 
             const hydrate = create({

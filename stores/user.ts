@@ -5,11 +5,11 @@ import { computedFn } from 'mobx-utils'
 
 export default class User extends BaseStore {
     /**
-     * List of following users
+     * Observable map of users the current account is following
+     * TODO: Sync with an API
      * {
-     *     name: displayName or poster
-     *     pub: pub key
-     * }[]
+     *     pub: username
+     * }
      */
     @persist('map') @observable following = observable.map<string, string>()
 
@@ -22,8 +22,8 @@ export default class User extends BaseStore {
         }
     }
 
-    isFollowingUser = computedFn((pub: string) => {
-        return this.following.has(pub)
+    isFollowingUser = computedFn((user: string) => {
+        return this.following.has(user)
     })
 }
 

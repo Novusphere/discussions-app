@@ -43,8 +43,7 @@ class Tag extends React.Component<ITagProps> {
     }
 
     public clickPost = (post: IPost) => {
-        const id = this.props.postsStore.encodeId(post) // Post.encodeId(post.transaction, new Date(post.createdAt));
-        pushToThread(post, id)
+        pushToThread(post)
     }
 
     public render() {

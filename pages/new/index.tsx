@@ -16,14 +16,14 @@ class NewPage extends React.Component<INewPageProps> {
     static async getInitialProps({ store }) {
         const uiStore: IStores['uiStore'] = store.uiStore
         const tagStore: IStores['tagStore'] = store.tagStore
-        uiStore.toggleSidebarAndBanner()
+        uiStore.toggleBannerStatus(true)
+        uiStore.toggleSidebarStatus(false)
         tagStore.destroyActiveTag()
         return {}
     }
 
     componentWillUnmount(): void {
         this.props.postsStore.clearPreview()
-        this.props.uiStore.toggleSidebarAndBanner()
     }
 
     public render(): React.ReactNode {

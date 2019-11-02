@@ -114,10 +114,6 @@ export default class Posts extends BaseStore {
         }
     }
 
-    public encodeId(post: IPost) {
-        return Post.encodeId(post.transaction, new Date(post.createdAt))
-    }
-
     @task getPostsByTag = async (tags: string[]) => {
         const { posts, cursorId } = await discussions.getPostsForTags(
             tags,
@@ -433,8 +429,7 @@ export default class Posts extends BaseStore {
                                     // TODO: Add check to make sure the thread is actually posted onto the chain
                                     await sleep(5000)
 
-                                    const id = this.encodeId(submittedPost as any)
-                                    pushToThread(submittedPost, id)
+                                    pushToThread(submittedPost)
 
                                     this.uiStore.showToast('Your post has been created!', 'success')
 

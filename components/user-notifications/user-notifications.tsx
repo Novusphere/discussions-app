@@ -3,8 +3,8 @@ import { observer } from 'mobx-react'
 import { IStores } from '@stores'
 import moment from 'moment'
 import ReactMarkdown from 'react-markdown'
-import _ from 'lodash'
-import { sleep } from '@utils'
+import { pushToThread } from '@utils'
+import { Router } from '@router'
 
 interface IUserNotificationsOuterProps {
     notificationsStore: IStores['notificationsStore']
@@ -28,7 +28,7 @@ class UserNotifications extends React.Component<
     private container = React.createRef<HTMLDivElement>()
 
     async componentDidMount(): Promise<void> {
-        await sleep(1000)
+        this.props.notificationsStore.setTimeStamp()
         this.props.notificationsStore.resetUnreadCount()
     }
 
@@ -56,7 +56,12 @@ class UserNotifications extends React.Component<
 
     private renderNotification = (notification: any) => {
         return (
-            <span className={'notification-item'} key={notification.uuid}>
+            <span
+                className={'notification-item'}
+                key={notification.uuid}
+                title={'Click to go to post'}
+                onClick={() => pushToThread(notification)}
+            >
                 <span className={'f5 tl'}>
                     <span className={'f6 b flex mb2'}>
                         You have been mentioned by {this.getPoster(notification)}
@@ -66,7 +71,12 @@ class UserNotifications extends React.Component<
                         source={notification.content}
                     />
                 </span>
-                <span className={'f6 tl flex mt3'}>{moment(notification.createdAt).fromNow()}</span>
+                <span
+                    className={'f6 tl flex mt3'}
+                    title={moment(notification.createdAt).toLocaleString()}
+                >
+                    {moment(notification.createdAt).fromNow()}
+                </span>
             </span>
         )
     }
@@ -79,6 +89,10 @@ class UserNotifications extends React.Component<
         return this.props.notificationsStore.firstSetOfNotifications.map(notification => {
             return this.renderNotification(notification)
         })
+    }
+
+    private goToNotifications = () => {
+        Router.pushRoute('notifications')
     }
 
     public render() {
@@ -108,6 +122,7 @@ class UserNotifications extends React.Component<
                                     mark as read
                                 </span>
                                 <span
+                                    onClick={this.goToNotifications}
                                     className={'dim pointer'}
                                     title={'View all notifications, including ones that are read'}
                                 >

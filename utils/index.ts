@@ -1,5 +1,7 @@
 import { Router } from '@router'
 import Identicon from 'identicon.js'
+import { Post } from '@novuspherejs'
+import { IPost } from '@stores/posts'
 
 const pjson = require('../package.json')
 const uuid = require('uuidv4')
@@ -32,7 +34,12 @@ export const openInNewTab = (url: string) => {
     return win.focus()
 }
 
-export const pushToThread = (post, id) => {
+export const encodeId = (post: IPost) => {
+    return Post.encodeId(post.transaction, new Date(post.createdAt))
+}
+
+export const pushToThread = (post) => {
+    const id = encodeId(post)
     Router.pushRoute(`/e/${post.sub}/${id}/${decodeURIComponent(post.title.replace(/ /g, '_'))}`)
 }
 

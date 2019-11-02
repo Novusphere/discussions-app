@@ -27,8 +27,7 @@ class All extends React.Component<IAllProps, IAllState> {
     }
 
     public clickPost = (post: IPost) => {
-        const id = this.props.postsStore.encodeId(post) // Post.encodeId(post.transaction, new Date(post.createdAt));
-        pushToThread(post, id)
+        pushToThread(post)
     }
 
     public render() {
