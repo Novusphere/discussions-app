@@ -164,7 +164,7 @@ class TitleHeader extends React.Component<ITitleHeaderProps, ITitleHeaderState> 
                 </Link>
             ),
             resolved: (tagModel: TagModel) => (
-                <Link href={tagModel.url}>
+                <Link href={'/tag/[name]'} as={tagModel.url}>
                     <a className={'flex items-center'}>
                         {!tagModel.icon ? null : (
                             <img

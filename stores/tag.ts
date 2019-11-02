@@ -434,7 +434,7 @@ export default class Tag extends BaseStore {
             },
             {
                 name: 'feed',
-                url: '/feed',
+                url: '/all',
             },
             {
                 name: 'all',

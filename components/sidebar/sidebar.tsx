@@ -59,7 +59,7 @@ const Sidebar: React.FC<ITagListProps> = ({ tags, activeTag, ...props }) => {
                                 },
                             ])}
                         >
-                            <Link href={tag.url}>
+                            <Link href={'/tag/[name]'} as={tag.url}>
                                 <a className={'db black pointer pb1 no-underline'}>{tag.name}</a>
                             </Link>
                         </li>
@@ -92,7 +92,7 @@ const Sidebar: React.FC<ITagListProps> = ({ tags, activeTag, ...props }) => {
                                 distance={400}
                                 trigger={'mouseenter focus'}
                             >
-                                <Link href={{ pathname: '/tag', query: { name: tag.name } }} as={`/tag/${tag.name}`}>
+                                <Link href={`/tag/[name]`} as={`/tag/${tag.name}`}>
                                     <a className={'flex items-center pb1 pointer'}>
                                         <img
                                             className={'tag-icon pr2'}

@@ -24,7 +24,7 @@ const MainPost: React.FC<IMainPost> = ({ openingPost, replyHandler, voteHandler 
     return (
         <>
             <div className={'pb2'}>
-                <Link href={`/tag/${openingPost.sub}`}>
+                <Link href={`/tag/[name]`} as={`/tag/${openingPost.sub}`}>
                     <a>
                         <button className={'tl'}>
                             <FontAwesomeIcon width={13} icon={faArrowLeft} className={'pr1'} />
@@ -36,7 +36,7 @@ const MainPost: React.FC<IMainPost> = ({ openingPost, replyHandler, voteHandler 
             <div className={'opening-post card'}>
                 <div className={'post-content'}>
                     <div className={'flex items-center pb2'}>
-                        <Link href={`/tag/${openingPost.sub}`}>
+                        <Link href={`/tag/[name]`} as={`/tag/${openingPost.sub}`}>
                             <a>
                                 <span className={'b'}>{openingPost.sub}</span>
                             </a>
