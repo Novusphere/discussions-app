@@ -8,6 +8,7 @@ import { ThreadModel } from '@models/threadModel'
 import Head from 'next/head'
 import Router from 'next/router'
 import url from 'url'
+import { decodeId } from '@utils'
 
 interface IEPageProps {
     postsStore: IStores['postsStore']
@@ -39,7 +40,9 @@ class E extends React.Component<IEPageProps, IEPageState> {
         const postsStore: IStores['postsStore'] = store.postsStore
         tagStore.setActiveTag(query.tag)
 
-        let thread = await postsStore.getAndSetThread(query.id)
+        const id = decodeId(query.id).txid32
+
+        let thread = await postsStore.getAndSetThread(id)
 
         query.title = thread.title
         query.tag = thread.sub
