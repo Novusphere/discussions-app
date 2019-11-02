@@ -8,7 +8,6 @@ import Head from 'next/head'
 interface IEPageProps {
     postsStore: IStores['postsStore']
     tagStore: IStores['tagStore']
-    thread: ThreadModel
     query: {
         name: string
         id: string
@@ -41,12 +40,12 @@ class E extends React.Component<IEPageProps, IEPageState> {
 
         return {
             query,
-            thread,
         }
     }
 
     async componentWillMount(): Promise<void> {
         this.props.tagStore.setActiveTag(this.props.query.name)
+        await this.props.postsStore.getAndSetThread(this.props.query.id)
     }
 
     public render(): React.ReactNode {
@@ -54,13 +53,11 @@ class E extends React.Component<IEPageProps, IEPageState> {
             query: { id, name, title },
         } = this.props
 
-        const { activeThread, refreshActiveThreadAsModel } = this.props.postsStore
+        const { activeThread } = this.props.postsStore
 
         if (!activeThread) {
             return <span>No posts found for specified thread: {id} {name} {title}</span>
         }
-
-        const thread = refreshActiveThreadAsModel()
 
         return (
             <div className={'thread-container'}>
@@ -70,13 +67,13 @@ class E extends React.Component<IEPageProps, IEPageState> {
                     </title>
                 </Head>
                 <Thread
-                    opening={thread.openingPost}
-                    openingModel={thread.rbModel(thread.openingPost)}
-                    getModel={thread.rbModel}
-                    getRepliesFromMap={thread.getRepliesFromMap}
-                    vote={thread.vote}
-                    openingPostReplies={thread.openingPostReplies}
-                    totalReplies={thread.totalReplies}
+                    opening={activeThread.openingPost}
+                    openingModel={activeThread.rbModel(activeThread.openingPost)}
+                    getModel={activeThread.rbModel}
+                    getRepliesFromMap={activeThread.getRepliesFromMap}
+                    vote={activeThread.vote}
+                    openingPostReplies={activeThread.openingPostReplies}
+                    totalReplies={activeThread.totalReplies}
                 />
             </div>
         )
