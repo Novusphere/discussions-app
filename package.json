@@ -63,12 +63,12 @@
         "validatorjs": "3.15.1"
     },
     "scripts": {
-        "_dev": "next",
-        "_build": "cross-env NODE_ENV=production next build",
-        "_start": "cross-env NODE_ENV=production next start",
-        "dev": "nodemon",
-        "build": "next build",
-        "start": "cross-env NODE_ENV=production node dist/index.js",
+        "dev": "next",
+        "build": "cross-env NODE_ENV=production next build",
+        "start": "cross-env NODE_ENV=production next start",
+        "_dev": "nodemon",
+        "_build": "next build",
+        "_start": "cross-env NODE_ENV=production node dist/index.js",
         "plop": "plop --plopfile ./generator/index.js",
         "build-editor": "webpack --mode=development --config=./modules/quill-autoformat/webpack.config.js"
     },
