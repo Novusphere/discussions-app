@@ -45,6 +45,8 @@ export class ReplyModel {
     }
 
     @computed get inlineMentionHashes() {
+        if (!this.inlineMentions) return []
+
         const regex = new RegExp(/\(?EOS.*\)?\w/, 'gi')
         return this.inlineMentions.map(items => {
             return items.match(regex)[0]

@@ -4,6 +4,8 @@ import { IStores } from '@stores'
 import { Thread } from '@components'
 import { ThreadModel } from '@models/threadModel'
 import Head from 'next/head'
+import { faSpinner } from '@fortawesome/free-solid-svg-icons'
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 
 interface IEPageProps {
     postsStore: IStores['postsStore']
@@ -53,30 +55,38 @@ class E extends React.Component<IEPageProps, IEPageState> {
             query: { id, name, title },
         } = this.props
 
-        const { activeThread } = this.props.postsStore
+        return this.props.postsStore.getAndSetThread['match']({
+            pending: () => <FontAwesomeIcon width={13} icon={faSpinner} spin />,
+            rejected: () => <span>No posts found</span>,
+            resolved: (activeThread: ThreadModel) => {
+                if (!activeThread) {
+                    return (
+                        <span>
+                            No posts found for specified thread: {id} {name} {title}
+                        </span>
+                    )
+                }
 
-        if (!activeThread) {
-            return <span>No posts found for specified thread: {id} {name} {title}</span>
-        }
-
-        return (
-            <div className={'thread-container'}>
-                <Head>
-                    <title>
-                        {title} - {name}
-                    </title>
-                </Head>
-                <Thread
-                    opening={activeThread.openingPost}
-                    openingModel={activeThread.rbModel(activeThread.openingPost)}
-                    getModel={activeThread.rbModel}
-                    getRepliesFromMap={activeThread.getRepliesFromMap}
-                    vote={activeThread.vote}
-                    openingPostReplies={activeThread.openingPostReplies}
-                    totalReplies={activeThread.totalReplies}
-                />
-            </div>
-        )
+                return (
+                    <div className={'thread-container'}>
+                        <Head>
+                            <title>
+                                {title} - {name}
+                            </title>
+                        </Head>
+                        <Thread
+                            opening={activeThread.openingPost}
+                            openingModel={activeThread.rbModel(activeThread.openingPost)}
+                            getModel={activeThread.rbModel}
+                            getRepliesFromMap={activeThread.getRepliesFromMap}
+                            vote={activeThread.vote}
+                            openingPostReplies={activeThread.openingPostReplies}
+                            totalReplies={activeThread.totalReplies}
+                        />
+                    </div>
+                )
+            },
+        })
     }
 }
 
