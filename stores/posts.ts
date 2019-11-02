@@ -1,4 +1,4 @@
-import { action, computed, observable, reaction } from 'mobx'
+import { action, computed, observable } from 'mobx'
 import { discussions, Post } from '@novuspherejs'
 import { task } from 'mobx-task'
 import { BaseStore, getOrCreateStore } from 'next-mobx-wrapper'
@@ -144,15 +144,19 @@ export default class Posts extends BaseStore {
     @action.bound
     public async getAndSetThread(id: string) {
         try {
-            const thread = await this.getThreadById(id)
-            if (!thread) { return null }
-            this.activeThread = thread
+            this.activeThread = await this.getThreadById(id)
             this.activeThreadId = id
             return this.activeThread
         } catch (error) {
             console.log('Class: Posts, Function: getAndSetThread, Line 123 error: ', error)
             throw error
         }
+    }
+
+    @action.bound
+    refreshActiveThreadAsModel() {
+        this.activeThread = new ThreadModel(this.activeThread as any)
+        return this.activeThread
     }
 
     /**
@@ -188,7 +192,7 @@ export default class Posts extends BaseStore {
     }
 
     @task
-    public getThreadById = async (id: string) => {
+    public getThreadById = async (id: string): Promise<ThreadModel | null> => {
         try {
             const thread = await discussions.getThread(id)
             if (!thread) {

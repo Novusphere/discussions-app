@@ -66,6 +66,7 @@
         "dev": "next",
         "build": "cross-env NODE_ENV=production next build",
         "start": "cross-env NODE_ENV=production next start",
+        "dev-prod": "cross-env NODE_ENV=production next",
         "_dev": "nodemon",
         "_build": "next build",
         "_start": "cross-env NODE_ENV=production node dist/index.js",

@@ -52,14 +52,15 @@ class E extends React.Component<IEPageProps, IEPageState> {
     public render(): React.ReactNode {
         let {
             query: { id, name, title },
-            thread,
         } = this.props
 
-        if (!thread) {
+        const { activeThread, refreshActiveThreadAsModel } = this.props.postsStore
+
+        if (!activeThread) {
             return <span>No posts found for specified thread: {id}</span>
         }
 
-        thread = new ThreadModel(thread as any)
+        const thread = refreshActiveThreadAsModel()
 
         return (
             <div className={'thread-container'}>
