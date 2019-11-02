@@ -1,0 +1,1 @@
+{"ast":null,"code":"class BaseModel {\n  constructor() {\n    this.id = void 0;\n  }\n\n  static generateId() {\n    return this.nextId++;\n  }\n\n}\n\nBaseModel.nextId = 1;\nexport default BaseModel;","map":null,"metadata":{},"sourceType":"module"}

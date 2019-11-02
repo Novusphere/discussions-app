@@ -1,0 +1,1 @@
+{"ast":null,"code":"import { SignInMethods } from \"./globals\";\nexport const SignInOptions = [{\n  name: SignInMethods.scatter,\n  icon: '/static/wallets/scatter_badge_transparent.svg'\n}, {\n  name: SignInMethods.brainKey,\n  icon: '/static/wallets/scatter_badge_transparent.svg'\n}];","map":null,"metadata":{},"sourceType":"module"}

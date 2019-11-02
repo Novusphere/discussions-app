@@ -2,7 +2,12 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="2d14133e-344f-4fbf-9bb7-c9e5e96ae697" name="Default Changelist" comment="">
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/next.config.js" beforeDir="false" afterPath="$PROJECT_DIR$/next.config.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/package.json" beforeDir="false" afterPath="$PROJECT_DIR$/package.json" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/pages/_app.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/pages/_app.tsx" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/pages/e/index.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/pages/e/index.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/server/index.ts" beforeDir="false" afterPath="$PROJECT_DIR$/server/index.ts" afterDir="false" />
     </list>
     <ignored path="$PROJECT_DIR$/.tmp/" />
     <ignored path="$PROJECT_DIR$/temp/" />
@@ -15,60 +20,46 @@
   </component>
   <component name="FileEditorManager">
     <leaf>
-      <file pinned="false" current-in-tab="true">
-        <entry file="file://$PROJECT_DIR$/pages/e/index.tsx">
+      <file pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/pages/_app.tsx">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="223">
-              <caret line="36" column="83" lean-forward="true" selection-start-line="36" selection-start-column="83" selection-end-line="36" selection-end-column="83" />
+            <state relative-caret-position="-177">
+              <caret line="29" column="25" selection-start-line="29" selection-start-column="25" selection-end-line="29" selection-end-column="25" />
               <folding>
-                <element signature="e#0#30#0" expanded="true" />
+                <element signature="e#0#41#0" expanded="true" />
               </folding>
             </state>
           </provider>
         </entry>
       </file>
       <file pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/models/threadModel.ts">
-          <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="400">
-              <caret line="92" selection-start-line="92" selection-end-line="92" />
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/utils/index.ts">
+        <entry file="file://$PROJECT_DIR$/next.config.js">
           <provider selected="true" editor-type-id="text-editor">
             <state relative-caret-position="432">
-              <caret line="42" column="21" selection-start-line="42" selection-start-column="13" selection-end-line="42" selection-end-column="21" />
-              <folding>
-                <element signature="e#0#32#0" expanded="true" />
-              </folding>
+              <caret line="27" selection-start-line="27" selection-end-line="27" />
             </state>
           </provider>
         </entry>
       </file>
       <file pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/stores/posts.ts">
+        <entry file="file://$PROJECT_DIR$/pages/_document.tsx">
+          <provider selected="true" editor-type-id="text-editor" />
+        </entry>
+      </file>
+      <file pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/package.json">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="293">
-              <caret line="146" column="46" lean-forward="true" selection-start-line="146" selection-start-column="46" selection-end-line="146" selection-end-column="46" />
-              <folding>
-                <element signature="e#0#61#0" expanded="true" />
-              </folding>
+            <state relative-caret-position="368">
+              <caret line="69" column="30" selection-start-line="69" selection-start-column="30" selection-end-line="69" selection-end-column="30" />
             </state>
           </provider>
         </entry>
       </file>
-      <file pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/novusphere-js/discussions/service/discussions.ts">
+      <file pinned="false" current-in-tab="true">
+        <entry file="file://$PROJECT_DIR$/server/index.ts">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="268">
-              <caret line="254" column="10" selection-start-line="254" selection-start-column="10" selection-end-line="254" selection-end-column="10" />
-              <folding>
-                <element signature="e#0#44#0" expanded="true" />
-                <element signature="e#217#247#0" expanded="true" />
-              </folding>
+            <state relative-caret-position="96">
+              <caret line="6" column="38" selection-start-line="6" selection-start-column="38" selection-end-line="6" selection-end-column="38" />
             </state>
           </provider>
         </entry>
@@ -142,7 +133,6 @@
   <component name="IdeDocumentHistory">
     <option name="CHANGED_PATHS">
       <list>
-        <option value="$PROJECT_DIR$/components/editor/editor.tsx" />
         <option value="$PROJECT_DIR$/novusphere-js/discussions/post.ts" />
         <option value="$PROJECT_DIR$/models/replyModel.ts" />
         <option value="$PROJECT_DIR$/components/thread/replies/replies.tsx" />
@@ -166,7 +156,6 @@
         <option value="$PROJECT_DIR$/pages/new/index.tsx" />
         <option value="$PROJECT_DIR$/pages/settings/index.tsx" />
         <option value="$PROJECT_DIR$/pages/search/index.tsx" />
-        <option value="$PROJECT_DIR$/pages/_app.tsx" />
         <option value="$PROJECT_DIR$/stores/notifications.ts" />
         <option value="$PROJECT_DIR$/pages/notifications/index.tsx" />
         <option value="$PROJECT_DIR$/stores/user.ts" />
@@ -179,7 +168,6 @@
         <option value="$PROJECT_DIR$/components/user-name-with-icon/user-name-with-icon.tsx" />
         <option value="$PROJECT_DIR$/server.ts" />
         <option value="$PROJECT_DIR$/components/title-header/title-header.tsx" />
-        <option value="$PROJECT_DIR$/package.json" />
         <option value="$PROJECT_DIR$/tsconfig.json" />
         <option value="$PROJECT_DIR$/pages/tag/index.tsx" />
         <option value="$PROJECT_DIR$/nodemon.json" />
@@ -187,12 +175,15 @@
         <option value="$PROJECT_DIR$/novusphere-js/nsdb.ts" />
         <option value="$PROJECT_DIR$/novusphere-js/discussions/service/discussions.ts" />
         <option value="$PROJECT_DIR$/tsconfig.server.json" />
-        <option value="$PROJECT_DIR$/server/index.ts" />
         <option value="$PROJECT_DIR$/pages/u/index.tsx" />
         <option value="$PROJECT_DIR$/stores/posts.ts" />
         <option value="$PROJECT_DIR$/utils/index.ts" />
         <option value="$PROJECT_DIR$/models/threadModel.ts" />
         <option value="$PROJECT_DIR$/pages/e/index.tsx" />
+        <option value="$PROJECT_DIR$/pages/_app.tsx" />
+        <option value="$PROJECT_DIR$/next.config.js" />
+        <option value="$PROJECT_DIR$/package.json" />
+        <option value="$PROJECT_DIR$/server/index.ts" />
       </list>
     </option>
   </component>
@@ -419,12 +410,12 @@
       <workItem from="1572387544940" duration="10562000" />
       <workItem from="1572483506980" duration="5208000" />
       <workItem from="1572559424268" duration="9815000" />
-      <workItem from="1572705113560" duration="16702000" />
+      <workItem from="1572705113560" duration="17656000" />
     </task>
     <servers />
   </component>
   <component name="TimeTrackingManager">
-    <option name="totallyTimeSpent" value="503628000" />
+    <option name="totallyTimeSpent" value="504582000" />
   </component>
   <component name="ToolWindowManager">
     <frame x="-8" y="-8" width="2576" height="1416" extended-state="6" />
@@ -476,23 +467,6 @@
     <option name="version" value="1" />
   </component>
   <component name="editorHistoryManager">
-    <entry file="file://$PROJECT_DIR$/components/modal/modal-switcher.tsx">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="320">
-          <caret line="20" column="48" lean-forward="true" selection-start-line="20" selection-start-column="48" selection-end-line="20" selection-end-column="48" />
-          <folding>
-            <element signature="e#0#30#0" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/components/index.ts">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="16">
-          <caret line="1" column="29" selection-start-line="1" selection-start-column="29" selection-end-line="1" selection-end-column="29" />
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/components/main-layout/main-layout.tsx">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="336">
@@ -576,16 +550,6 @@
           <caret line="12" column="25" lean-forward="true" selection-start-line="12" selection-start-column="25" selection-end-line="12" selection-end-column="25" />
           <folding>
             <element signature="e#0#49#0" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/pages/_app.tsx">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="242">
-          <caret line="47" column="13" lean-forward="true" selection-start-line="47" selection-start-column="13" selection-end-line="47" selection-end-column="13" />
-          <folding>
-            <element signature="e#0#41#0" expanded="true" />
           </folding>
         </state>
       </provider>
@@ -782,24 +746,10 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/package.json">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="-16">
-          <caret line="47" column="52" lean-forward="true" selection-start-line="47" selection-start-column="52" selection-end-line="47" selection-end-column="52" />
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/novusphere-js/nsdb.ts">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="191">
           <caret line="30" column="75" selection-start-line="30" selection-start-column="75" selection-end-line="30" selection-end-column="75" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/nodemon.json">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="32">
-          <caret line="2" column="40" selection-start-line="2" selection-start-column="40" selection-end-line="2" selection-end-column="46" />
         </state>
       </provider>
     </entry>
@@ -838,26 +788,6 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/pages/u/index.tsx">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="159">
-          <caret line="14" column="13" lean-forward="true" selection-start-line="14" selection-start-column="13" selection-end-line="14" selection-end-column="13" />
-          <folding>
-            <element signature="e#0#30#0" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/utils/index.ts">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="432">
-          <caret line="42" column="21" selection-start-line="42" selection-start-column="13" selection-end-line="42" selection-end-column="21" />
-          <folding>
-            <element signature="e#0#32#0" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/stores/posts.ts">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="293">
@@ -865,20 +795,6 @@
           <folding>
             <element signature="e#0#61#0" expanded="true" />
           </folding>
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/models/threadModel.ts">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="400">
-          <caret line="92" selection-start-line="92" selection-end-line="92" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/server/index.ts">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="352">
-          <caret line="22" column="32" lean-forward="true" selection-start-line="22" selection-start-column="32" selection-end-line="22" selection-end-column="32" />
         </state>
       </provider>
     </entry>
@@ -893,13 +809,81 @@
         </state>
       </provider>
     </entry>
+    <entry file="file://$PROJECT_DIR$/utils/index.ts">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="432">
+          <caret line="42" column="21" selection-start-line="42" selection-start-column="13" selection-end-line="42" selection-end-column="21" />
+          <folding>
+            <element signature="e#0#32#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/models/threadModel.ts">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="400">
+          <caret line="92" selection-start-line="92" selection-end-line="92" />
+        </state>
+      </provider>
+    </entry>
     <entry file="file://$PROJECT_DIR$/pages/e/index.tsx">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="223">
-          <caret line="36" column="83" lean-forward="true" selection-start-line="36" selection-start-column="83" selection-end-line="36" selection-end-column="83" />
+        <state relative-caret-position="319">
+          <caret line="42" selection-start-line="42" selection-end-line="42" />
           <folding>
             <element signature="e#0#30#0" expanded="true" />
           </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/nodemon.json">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="32">
+          <caret line="2" column="40" selection-start-line="2" selection-start-column="40" selection-end-line="2" selection-end-column="46" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/pages/u/index.tsx">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="112">
+          <caret line="14" column="13" lean-forward="true" selection-start-line="14" selection-start-column="13" selection-end-line="14" selection-end-column="13" />
+          <folding>
+            <element signature="e#0#30#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/pages/_app.tsx">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="-177">
+          <caret line="29" column="25" selection-start-line="29" selection-start-column="25" selection-end-line="29" selection-end-column="25" />
+          <folding>
+            <element signature="e#0#41#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/next.config.js">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="432">
+          <caret line="27" selection-start-line="27" selection-end-line="27" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/pages/_document.tsx">
+      <provider selected="true" editor-type-id="text-editor" />
+    </entry>
+    <entry file="file://$PROJECT_DIR$/package.json">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="368">
+          <caret line="69" column="30" selection-start-line="69" selection-start-column="30" selection-end-line="69" selection-end-column="30" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/server/index.ts">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="96">
+          <caret line="6" column="38" selection-start-line="6" selection-start-column="38" selection-end-line="6" selection-end-column="38" />
         </state>
       </provider>
     </entry>

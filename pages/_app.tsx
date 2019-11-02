@@ -17,19 +17,19 @@ toast.configure()
 class DiscussionApp extends App {
     public props: any
 
-    static async getInitialProps({ ctx, Component }) {
-        const isServer = !!ctx.req
-        let pageProps = {}
-        //
-        if (Component.getInitialProps) {
-            pageProps = await Component.getInitialProps(ctx)
-        }
-
-        return {
-            isServer,
-            pageProps,
-        }
-    }
+    // static async getInitialProps({ ctx, Component }) {
+    //     const isServer = !!ctx.req
+    //     let pageProps = {}
+    //     //
+    //     if (Component.getInitialProps) {
+    //         pageProps = await Component.getInitialProps(ctx)
+    //     }
+    //
+    //     return {
+    //         isServer,
+    //         pageProps,
+    //     }
+    // }
 
     /**
      * Hydrate the store for LS here

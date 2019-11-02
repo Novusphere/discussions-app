@@ -67,7 +67,7 @@
         "_build": "cross-env NODE_ENV=production next build",
         "_start": "cross-env NODE_ENV=production next start",
         "dev": "nodemon",
-        "build": "next build && tsc --project tsconfig.server.json",
+        "build": "next build",
         "start": "cross-env NODE_ENV=production node dist/index.js",
         "plop": "plop --plopfile ./generator/index.js",
         "build-editor": "webpack --mode=development --config=./modules/quill-autoformat/webpack.config.js"

@@ -2,8 +2,12 @@
 const withSass = require('@zeit/next-sass')
 const withCSS = require('@zeit/next-css')
 
-module.exports =  withCSS(
+module.exports = withCSS(
     withSass({
+        distDir: '_next',
+        generateBuildId: async () => {
+            return String(Date.now())
+        },
         generateEtags: false,
         webpack: config => {
             config.module.rules.push({

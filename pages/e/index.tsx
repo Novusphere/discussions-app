@@ -34,12 +34,12 @@ class E extends React.Component<IEPageProps, IEPageState> {
         const postsStore: IStores['postsStore'] = store.postsStore
         tagStore.setActiveTag(query.tag)
 
-        console.log('Class: E, Function: getInitialProps, Line 43 query: ', query);
-
         let thread = await postsStore.getAndSetThread(query.id)
-        
-        query.title = thread.title
-        query.tag = thread.sub
+
+        if (thread) {
+            query.title = thread.title
+            query.tag = thread.sub
+        }
 
         uiStore.toggleSidebarStatus(true)
         uiStore.toggleBannerStatus(true)
