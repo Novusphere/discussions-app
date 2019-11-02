@@ -41,7 +41,7 @@ const UserNameWithIcon: React.FC<IUserNameWithIconProps> = ({ imageSize, imageDa
     }
 
     return (
-        <Link href={`/u/${name}`} as={`/u/${name}`}>
+        <Link href={`/u/[username]`} as={`/u/${name}`}>
             <a>
                 <span className={'flex items-center'}>
                     {image}

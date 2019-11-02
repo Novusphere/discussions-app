@@ -110,7 +110,7 @@ class TitleHeader extends React.Component<ITitleHeaderProps, ITitleHeaderState> 
                         trigger={'mouseenter'}
                     >
                         <Link
-                            href={{ pathname: '/u', query: { username: getActiveDisplayName } }}
+                            href={`/u/[username]`}
                             as={`/u/${getActiveDisplayName}`}
                         >
                             <a
