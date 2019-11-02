@@ -25,25 +25,19 @@ interface IEPageState {
     thread: any
 }
 
-/**
- * export const pushToThread = (post) => {
-    const id = encodeId(post)
-    Router.push(`/e/${post.sub}/${id}/${decodeURIComponent(post.title.replace(/ /g, '_'))}`)
-}
- */
 @inject('postsStore', 'tagStore')
 @observer
 class E extends React.Component<IEPageProps, IEPageState> {
-    static async getInitialProps({ query, store, res }) {
+    static async getInitialProps({ query, store }) {
         const uiStore: IStores['uiStore'] = store.uiStore
         const tagStore: IStores['tagStore'] = store.tagStore
         const postsStore: IStores['postsStore'] = store.postsStore
         tagStore.setActiveTag(query.tag)
 
-        const id = decodeId(query.id).txid32
+        console.log('Class: E, Function: getInitialProps, Line 43 query: ', query);
 
-        let thread = await postsStore.getAndSetThread(id)
-
+        let thread = await postsStore.getAndSetThread(query.id)
+        
         query.title = thread.title
         query.tag = thread.sub
 
