@@ -7,6 +7,7 @@ const bip39 = require('bip39')
 import * as bip32 from 'bip32'
 import ecc from 'eosjs-ecc'
 import axios from 'axios'
+import { NSDBNotificationsResponse } from 'interfaces/NSDBNotifications'
 
 export interface IBrainKeyPair {
     priv: string
@@ -348,7 +349,7 @@ export default class DiscussionsService {
         postPublicKey: string,
         lastCheckedNotifications: number,
         cursorId = undefined,
-    ): Promise<NSDBNotificationsResponse.RootObject> {
+    ): Promise<NSDBNotificationsResponse> {
         try {
             return await nsdb.search({
                 query: {

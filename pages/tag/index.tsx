@@ -1,11 +1,12 @@
 import * as React from 'react'
 import { inject, observer } from 'mobx-react'
 import { IStores } from '@stores'
-import posts, { IPost } from '@stores/posts'
+import { IPost } from '@stores/posts'
 import { Feed } from '@components'
 import { TagModel } from '@models/tagModel'
 import FeedModel from '@models/feedModel'
 import { pushToThread } from '@utils'
+import Head from 'next/head'
 
 interface ITagProps {
     tagStore: IStores['tagStore']
@@ -57,11 +58,18 @@ class Tag extends React.Component<ITagProps> {
         }
 
         return (
-            <Feed
-                threads={postsStore.feedThreads}
-                onClick={clickPost}
-                tagModel={tagStore.activeTag}
-            />
+            <>
+                <Head>
+                    <title>
+                        {tagName}
+                    </title>
+                </Head>
+                <Feed
+                    threads={postsStore.feedThreads}
+                    onClick={clickPost}
+                    tagModel={tagStore.activeTag}
+                />
+            </>
         )
     }
 }

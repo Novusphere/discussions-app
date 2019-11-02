@@ -1,3 +1,5 @@
+import { NSDBNotificationsResponse } from 'interfaces/NSDBNotifications'
+
 const fetch = require('node-fetch');
 
 export const DEFAULT_NSDB_ENDPOINT = 'https://atmosdb.novusphere.io';
@@ -26,7 +28,7 @@ export class NSDB {
         return result;
     }
 
-    async search(sq : INSDBSearchQuery) : Promise<NSDBNotificationsResponse.RootObject> {
+    async search(sq : INSDBSearchQuery) : Promise<NSDBNotificationsResponse> {
         const qs =
             `c=${sq.cursorId ? sq.cursorId : ''}&` +
             `q=${sq.query ? JSON.stringify(sq.query) : ''}&` +

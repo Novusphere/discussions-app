@@ -1,6 +1,7 @@
 import * as React from 'react'
 import { inject, observer } from 'mobx-react'
-import { Link, Router } from '@router'
+import Router from 'next/router'
+import Link from 'next/link'
 import { IStores } from '@stores'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { faBell, faSearch, faSpinner, faUserCircle } from '@fortawesome/free-solid-svg-icons'
@@ -8,7 +9,6 @@ import { Tooltip } from 'react-tippy'
 import { ModalOptions } from '@globals'
 import { TagModel } from '@models/tagModel'
 import { UserNotifications } from '@components'
-import ReactMarkdown from 'react-markdown'
 
 interface ITitleHeaderProps {
     tagStore: IStores['tagStore']
@@ -33,7 +33,7 @@ class TitleHeader extends React.Component<ITitleHeaderProps, ITitleHeaderState> 
 
         return (
             <div className={'tooltip'} style={{ width: 200 }}>
-                <Link route={'/settings'}>
+                <Link href={'/settings'}>
                     <a rel={'Open settings'} className={'db mb2'}>
                         settings
                     </a>
@@ -81,7 +81,7 @@ class TitleHeader extends React.Component<ITitleHeaderProps, ITitleHeaderState> 
                         position={'bottom-end'}
                         trigger={'mouseenter'}
                     >
-                        <Link route={'/notifications'}>
+                        <Link href={'/notifications'}>
                             <a rel={'Open your notifications'}>
                                 <FontAwesomeIcon
                                     width={13}
@@ -97,7 +97,7 @@ class TitleHeader extends React.Component<ITitleHeaderProps, ITitleHeaderState> 
                             </a>
                         </Link>
                     </Tooltip>
-                    <Link route={`/new`}>
+                    <Link href={`/new`}>
                         <button title={'Create new post'} className={'ml3'}>
                             <span className={'f6 white'}>New Post</span>
                         </button>
@@ -109,7 +109,10 @@ class TitleHeader extends React.Component<ITitleHeaderProps, ITitleHeaderState> 
                         position={'bottom-end'}
                         trigger={'mouseenter'}
                     >
-                        <Link route={`/u/${getActiveDisplayName}`}>
+                        <Link
+                            href={{ pathname: '/u', query: { username: getActiveDisplayName } }}
+                            as={`/u/${getActiveDisplayName}`}
+                        >
                             <a
                                 rel={'Open your profile'}
                                 className={'flex items-center user-container pointer dim'}
@@ -147,7 +150,7 @@ class TitleHeader extends React.Component<ITitleHeaderProps, ITitleHeaderState> 
 
         if (!activeTag) {
             return (
-                <Link route={'/'}>
+                <Link href={'/'}>
                     <a>home</a>
                 </Link>
             )
@@ -156,12 +159,12 @@ class TitleHeader extends React.Component<ITitleHeaderProps, ITitleHeaderState> 
         return setActiveTag['match']({
             pending: () => <FontAwesomeIcon width={13} icon={faSpinner} spin />,
             rejected: () => (
-                <Link route={'/'}>
+                <Link href={'/'}>
                     <a>home</a>
                 </Link>
             ),
             resolved: (tagModel: TagModel) => (
-                <Link route={tagModel.url}>
+                <Link href={tagModel.url}>
                     <a className={'flex items-center'}>
                         {!tagModel.icon ? null : (
                             <img
@@ -183,7 +186,7 @@ class TitleHeader extends React.Component<ITitleHeaderProps, ITitleHeaderState> 
 
         if (key.match(/NumpadEnter|Enter/)) {
             const value = e.target.value
-            Router.pushRoute('search', { q: value })
+            Router.push({ pathname: '/search', query: { q: value } })
             e.preventDefault()
         }
     }

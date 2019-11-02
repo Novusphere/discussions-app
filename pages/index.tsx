@@ -3,7 +3,7 @@ import { observer, inject } from 'mobx-react'
 import { PostPreview } from '@components'
 import { IStores } from '@stores'
 import { IPost } from '@stores/posts'
-import { Router } from '@router'
+import { pushToThread } from '@utils'
 
 interface IIndexPage {
     postsStore: IStores['postsStore']
@@ -27,9 +27,7 @@ class Index extends React.Component<IIndexPage> {
     }
 
     public clickPost = (post: IPost) => {
-        Router.pushRoute(
-            `/e/${post.sub}/${post.id}/${decodeURIComponent(post.title.replace(/ /g, '_'))}`
-        )
+        return pushToThread(post)
     }
 
     public render(): React.ReactNode {

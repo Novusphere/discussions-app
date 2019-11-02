@@ -5,6 +5,9 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { faSpinner } from '@fortawesome/free-solid-svg-icons'
 import { Thread } from '@components'
 import { ThreadModel } from '@models/threadModel'
+import Head from 'next/head'
+import Router from 'next/router'
+import url from 'url'
 
 interface IEPageProps {
     postsStore: IStores['postsStore']
@@ -21,60 +24,69 @@ interface IEPageState {
     thread: any
 }
 
+/**
+ * export const pushToThread = (post) => {
+    const id = encodeId(post)
+    Router.push(`/e/${post.sub}/${id}/${decodeURIComponent(post.title.replace(/ /g, '_'))}`)
+}
+ */
 @inject('postsStore', 'tagStore')
 @observer
 class E extends React.Component<IEPageProps, IEPageState> {
-    static async getInitialProps({ query, store }) {
+    static async getInitialProps({ query, store, res }) {
         const uiStore: IStores['uiStore'] = store.uiStore
         const tagStore: IStores['tagStore'] = store.tagStore
+        const postsStore: IStores['postsStore'] = store.postsStore
         tagStore.setActiveTag(query.tag)
+
+        let thread = await postsStore.getAndSetThread(query.id)
+
+        query.title = thread.title
+        query.tag = thread.sub
 
         uiStore.toggleSidebarStatus(true)
         uiStore.toggleBannerStatus(true)
 
         return {
             query,
+            thread,
         }
     }
 
-    state = { thread: null }
-
     async componentWillMount(): Promise<void> {
         this.props.tagStore.setActiveTag(this.props.query.tag)
-        const thread = await this.props.postsStore.getAndSetThread(this.props.query.id)
-        this.setState({ thread })
     }
 
     public render(): React.ReactNode {
         let {
-            query: { id, tag },
+            query: { id, tag, title },
+            thread,
         } = this.props
 
-        const { thread } = this.state
+        if (!thread) {
+            return <span>No posts found for specified thread: {id}</span>
+        }
 
-        return this.props.postsStore.getAndSetThread['match']({
-            pending: () => <FontAwesomeIcon width={13} icon={faSpinner} spin />,
-            rejected: () => <span>No posts found for specified thread: {id}</span>,
-            resolved: () => {
-                if (!thread) {
-                    return <span>No posts found for specified thread: {id}</span>
-                }
-                
-                return (
-                    <div className={'thread-container'}>
-                        <Thread
-                            opening={thread.openingPost}
-                            openingModel={thread.rbModel(thread.openingPost)}
-                            getModel={thread.rbModel}
-                            getRepliesFromMap={thread.getRepliesFromMap}
-                            vote={thread.vote}
-                            openingPostReplies={thread.openingPostReplies}
-                            totalReplies={thread.totalReplies}
-                        />
-                    </div>
-                )
-            },
-        })
+        thread = new ThreadModel(thread as any)
+
+        return (
+            <div className={'thread-container'}>
+                <Head>
+                    <title>
+                        {title} - {tag}
+                    </title>
+                </Head>
+                <Thread
+                    opening={thread.openingPost}
+                    openingModel={thread.rbModel(thread.openingPost)}
+                    getModel={thread.rbModel}
+                    getRepliesFromMap={thread.getRepliesFromMap}
+                    vote={thread.vote}
+                    openingPostReplies={thread.openingPostReplies}
+                    totalReplies={thread.totalReplies}
+                />
+            </div>
+        )
     }
 }
 

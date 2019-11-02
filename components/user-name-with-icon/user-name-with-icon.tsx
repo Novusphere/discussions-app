@@ -1,5 +1,5 @@
 import * as React from 'react'
-import { Link } from '@router'
+import Link from 'next/link'
 import { getDefaultIdenticon } from '@utils'
 
 interface IUserNameWithIconProps {
@@ -41,7 +41,7 @@ const UserNameWithIcon: React.FC<IUserNameWithIconProps> = ({ imageSize, imageDa
     }
 
     return (
-        <Link route={`/u/${name}`}>
+        <Link href={`/u/${name}`}>
             <a>
                 <span className={'flex items-center'}>
                     {image}

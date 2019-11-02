@@ -8,14 +8,13 @@ import {
     faUserPlus,
 } from '@fortawesome/free-solid-svg-icons'
 import moment from 'moment'
-import { Link } from '@router'
 import { Votes, ReplyBox, UserNameWithIcon } from '@components'
 import ReactMarkdown from 'react-markdown'
 import { inject, observer } from 'mobx-react'
 import { ReplyModel } from '@models/replyModel'
 import PostModel from '@models/postModel'
 import classNames from 'classnames'
-import { getIdenticon, openInNewTab } from '@utils'
+import { openInNewTab } from '@utils'
 import { IStores } from '@stores'
 
 interface IReplies {

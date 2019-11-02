@@ -14,6 +14,7 @@ export class ThreadModel {
     @observable.deep public openingPost: PostModel
     @observable public uuid: string
     @observable public title: string
+    @observable public sub: string
 
     @observable public replies: PostModel[]
 
@@ -82,6 +83,7 @@ export class ThreadModel {
 
             this.map = map
             this.title = thread.openingPost.title
+            this.sub = thread.openingPost.sub
         } else {
             this.openingPost = thread
             this.uuid = thread!.uuid

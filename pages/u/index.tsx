@@ -30,14 +30,14 @@ class U extends React.Component<IUPageProps> {
 
     private renderFollowingList = () => {
         if (!this.props.userStore.following.size) {
-            return <li className={'f6'}>You are not following any users.</li>
+            return <li className={'f6'} key={'none'}>You are not following any users.</li>
         }
 
         const pubs = Array.from(this.props.userStore.following.values())
         const following = Array.from(this.props.userStore.following.keys())
 
         return following.map((follow, index) => (
-            <li className={'pa0 mb2'}>
+            <li className={'pa0 mb2'} key={follow}>
                 <span title={pubs[index]} className={'link pr2 pointer dim'}>
                     {follow}
                 </span>

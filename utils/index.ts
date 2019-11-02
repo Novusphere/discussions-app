@@ -1,4 +1,4 @@
-import { Router } from '@router'
+import Router from 'next/router'
 import Identicon from 'identicon.js'
 import { Post } from '@novuspherejs'
 import { IPost } from '@stores/posts'
@@ -40,7 +40,7 @@ export const encodeId = (post: IPost) => {
 
 export const pushToThread = (post) => {
     const id = encodeId(post)
-    Router.pushRoute(`/e/${post.sub}/${id}/${decodeURIComponent(post.title.replace(/ /g, '_'))}`)
+    Router.push(`/e/${post.sub}/${id}/${decodeURIComponent(post.title.replace(/ /g, '_'))}`)
 }
 
 export const getVersion = () => {

@@ -1,7 +1,7 @@
 import * as React from 'react'
 import { observer } from 'mobx-react'
 import TagStore from '../../stores/tag'
-import { Link } from '@router'
+import Link from 'next/link'
 import { withRouter } from 'next/router'
 import classNames from 'classnames'
 import { TagModel } from '@models/tagModel'
@@ -59,7 +59,7 @@ const Sidebar: React.FC<ITagListProps> = ({ tags, activeTag, ...props }) => {
                                 },
                             ])}
                         >
-                            <Link route={tag.url}>
+                            <Link href={tag.url}>
                                 <a className={'db black pointer pb1 no-underline'}>{tag.name}</a>
                             </Link>
                         </li>
@@ -92,7 +92,7 @@ const Sidebar: React.FC<ITagListProps> = ({ tags, activeTag, ...props }) => {
                                 distance={400}
                                 trigger={'mouseenter focus'}
                             >
-                                <Link route={'tag'} params={{ name: tag.name }}>
+                                <Link href={{ pathname: '/tag', query: { name: tag.name } }} as={`/tag/${tag.name}`}>
                                     <a className={'flex items-center pb1 pointer'}>
                                         <img
                                             className={'tag-icon pr2'}

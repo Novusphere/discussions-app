@@ -4,7 +4,7 @@ import { IStores } from '@stores'
 import moment from 'moment'
 import ReactMarkdown from 'react-markdown'
 import { pushToThread } from '@utils'
-import { Router } from '@router'
+import Router from 'next/router'
 
 interface IUserNotificationsOuterProps {
     notificationsStore: IStores['notificationsStore']
@@ -92,7 +92,7 @@ class UserNotifications extends React.Component<
     }
 
     private goToNotifications = () => {
-        Router.pushRoute('notifications')
+        Router.push({ pathname: '/notifications' })
     }
 
     public render() {

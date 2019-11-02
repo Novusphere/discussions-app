@@ -145,8 +145,10 @@ export default class Posts extends BaseStore {
     @action.bound
     public async getAndSetThread(id: string) {
         try {
+            const thread = await this.getThreadById(id)
+            if (!thread) { return null }
+            this.activeThread = thread
             this.activeThreadId = id
-            this.activeThread = await this.getThreadById(id)
             return this.activeThread
         } catch (error) {
             console.log('Class: Posts, Function: getAndSetThread, Line 123 error: ', error)
