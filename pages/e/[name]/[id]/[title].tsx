@@ -57,7 +57,7 @@ class E extends React.Component<IEPageProps, IEPageState> {
         const { activeThread, refreshActiveThreadAsModel } = this.props.postsStore
 
         if (!activeThread) {
-            return <span>No posts found for specified thread: {id}</span>
+            return <span>No posts found for specified thread: {id} {name} {title}</span>
         }
 
         const thread = refreshActiveThreadAsModel()
