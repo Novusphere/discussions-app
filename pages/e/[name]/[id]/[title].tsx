@@ -1,21 +1,16 @@
 import * as React from 'react'
 import { inject, observer } from 'mobx-react'
 import { IStores } from '@stores'
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
-import { faSpinner } from '@fortawesome/free-solid-svg-icons'
 import { Thread } from '@components'
 import { ThreadModel } from '@models/threadModel'
 import Head from 'next/head'
-import Router from 'next/router'
-import url from 'url'
-import { decodeId } from '@utils'
 
 interface IEPageProps {
     postsStore: IStores['postsStore']
     tagStore: IStores['tagStore']
     thread: ThreadModel
     query: {
-        tag: string
+        name: string
         id: string
         title: string
     }
@@ -32,13 +27,13 @@ class E extends React.Component<IEPageProps, IEPageState> {
         const uiStore: IStores['uiStore'] = store.uiStore
         const tagStore: IStores['tagStore'] = store.tagStore
         const postsStore: IStores['postsStore'] = store.postsStore
-        tagStore.setActiveTag(query.tag)
+        tagStore.setActiveTag(query.name)
 
         let thread = await postsStore.getAndSetThread(query.id)
 
         if (thread) {
             query.title = thread.title
-            query.tag = thread.sub
+            query.name = thread.sub
         }
 
         uiStore.toggleSidebarStatus(true)
@@ -51,12 +46,12 @@ class E extends React.Component<IEPageProps, IEPageState> {
     }
 
     async componentWillMount(): Promise<void> {
-        this.props.tagStore.setActiveTag(this.props.query.tag)
+        this.props.tagStore.setActiveTag(this.props.query.name)
     }
 
     public render(): React.ReactNode {
         let {
-            query: { id, tag, title },
+            query: { id, name, title },
             thread,
         } = this.props
 
@@ -70,7 +65,7 @@ class E extends React.Component<IEPageProps, IEPageState> {
             <div className={'thread-container'}>
                 <Head>
                     <title>
-                        {title} - {tag}
+                        {title} - {name}
                     </title>
                 </Head>
                 <Thread

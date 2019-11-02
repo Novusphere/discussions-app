@@ -97,6 +97,7 @@
         "prettier": "1.18.2",
         "ts-node": "8.3.0",
         "tslint": "5.17.0",
+        "webpack": "^4.41.2",
         "webpack-cli": "3.3.9"
     }
 }

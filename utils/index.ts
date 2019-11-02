@@ -58,7 +58,7 @@ export const decodeId = (id: string) => {
 export const pushToThread = post => {
     const id = encodeId(post)
     Router.push(
-        '/e/[sub][id][title]',
+        '/e/[name]/[id]/[title]',
         `/e/${post.sub}/${id}/${decodeURIComponent(post.title.replace(/ /g, '_'))}`
     )
 }
