@@ -5,17 +5,19 @@ import { inject, observer } from 'mobx-react'
 import { Tab, Tabs, TabList, TabPanel } from 'react-tabs'
 import { faMinusCircle, faSpinner } from '@fortawesome/free-solid-svg-icons'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
+import { computed } from 'mobx'
 
 interface IUPageProps {
     uiStore: IStores['uiStore']
     userStore: IStores['userStore']
+    newAuthStore: IStores['newAuthStore']
     username: string
     data: any
 }
 
 // TO-DO: real data
 
-@inject('uiStore', 'userStore')
+@inject('uiStore', 'userStore', 'newAuthStore')
 @observer
 class U extends React.Component<IUPageProps> {
     static async getInitialProps({ query, store }) {
@@ -28,9 +30,17 @@ class U extends React.Component<IUPageProps> {
         }
     }
 
+    @computed get isSameUser() {
+        return this.props.username === this.props.newAuthStore.getActiveDisplayName
+    }
+
     private renderFollowingList = () => {
         if (!this.props.userStore.following.size) {
-            return <li className={'f6'} key={'none'}>You are not following any users.</li>
+            return (
+                <li className={'f6'} key={'none'}>
+                    You are not following any users.
+                </li>
+            )
         }
 
         const pubs = Array.from(this.props.userStore.following.values())
@@ -91,11 +101,13 @@ class U extends React.Component<IUPageProps> {
                     </ul>
                 </div>
 
-                <div className={'mt4 flex flex-column'}>
-                    <span className={'small-title mb2'}>Following (only visible to you)</span>
+                {this.isSameUser && (
+                    <div className={'mt4 flex flex-column'}>
+                        <span className={'small-title mb2'}>Following (only visible to you)</span>
 
-                    <ul className={'list'}>{this.renderFollowingList()}</ul>
-                </div>
+                        <ul className={'list'}>{this.renderFollowingList()}</ul>
+                    </div>
+                )}
             </>
         )
     }

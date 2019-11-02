@@ -9,7 +9,6 @@ import { generateUuid, getAttachmentValue, getIdenticon, pushToThread, sleep } f
 import { ThreadModel } from '@models/threadModel'
 import FeedModel from '@models/feedModel'
 import _ from 'lodash'
-import react from 'next-routes/typings/tests/react'
 
 export interface IAttachment {
     value: string
