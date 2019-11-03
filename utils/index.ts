@@ -1,6 +1,6 @@
 import Router from 'next/router'
 import Identicon from 'identicon.js'
-import { Post } from '@novuspherejs'
+import { Post, discussions } from '@novuspherejs'
 import { IPost } from '@stores/posts'
 
 const pjson = require('../package.json')
@@ -11,6 +11,14 @@ const BigInt = require('big-integer')
 export const isServer = typeof window === 'undefined'
 export const sleep = milliseconds => {
     return new Promise(resolve => setTimeout(resolve, milliseconds))
+}
+
+export const getBaseUrl = () => {
+    return window.location.origin
+}
+
+export const getPermaLink = (path: string, uuid: string) => {
+    return `${path}#${uuid}`
 }
 
 export const generateUuid = () => {
@@ -55,12 +63,20 @@ export const decodeId = (id: string) => {
     }
 }
 
-export const pushToThread = post => {
+export const pushToThread = async (post, permalinkUuid?: string) => {
     const id = encodeId(post)
-    Router.push(
-        '/e/[name]/[id]/[title]',
-        `/e/${post.sub}/${id}/${decodeURIComponent(post.title.replace(/ /g, '_'))}`
-    )
+    let url = `/e/${post.sub}/${id}/${decodeURIComponent(post.title.replace(/ /g, '_'))}`
+
+    if (post.title === '') {
+        const thread = await discussions.getThread(id)
+        url += `${thread.title}`
+    }
+
+    if (permalinkUuid) {
+        url += `${post.title}#${permalinkUuid}`
+    }
+
+    Router.push('/e/[name]/[id]/[title]', url)
 }
 
 export const getVersion = () => {

@@ -2,22 +2,28 @@ import * as React from 'react'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import {
     faDollarSign,
+    faEye,
     faLink,
     faReply,
     faUserMinus,
     faUserPlus,
 } from '@fortawesome/free-solid-svg-icons'
 import moment from 'moment'
-import { Votes, ReplyBox, UserNameWithIcon } from '@components'
+import { ReplyBox, UserNameWithIcon, Votes } from '@components'
 import ReactMarkdown from 'react-markdown'
 import { inject, observer } from 'mobx-react'
 import { ReplyModel } from '@models/replyModel'
 import PostModel from '@models/postModel'
 import classNames from 'classnames'
-import { openInNewTab } from '@utils'
+import { getPermaLink, openInNewTab } from '@utils'
 import { IStores } from '@stores'
+import copy from 'clipboard-copy'
+import Router from 'next/router'
+
+import './style.scss'
 
 interface IReplies {
+    currentPath: string
     post: PostModel
     className?: string
     getModel: (post: PostModel) => ReplyModel
@@ -26,14 +32,31 @@ interface IReplies {
 
     userStore?: IStores['userStore']
     newAuthStore?: IStores['newAuthStore']
+    postsStore?: IStores['postsStore']
 }
 
-@inject('userStore', 'newAuthStore')
+@inject('userStore', 'newAuthStore', 'postsStore')
 @observer
 class Reply extends React.Component<IReplies, any> {
     state = {
         isHover: false,
     }
+
+    componentDidMount(): void {
+        if (this.props.currentPath.indexOf('#') !== -1) {
+            const [, uuid] = this.props.currentPath.split('#')
+            this.addAndScrollToUuid(uuid)
+        }
+    }
+
+    private addAndScrollToUuid = (uuid: string) => {
+        if (this.replyRef.current.dataset.postUuid === uuid) {
+            this.props.postsStore.highlightPostUuid(uuid)
+            window.scrollTo(0, this.replyRef.current.offsetTop)
+        }
+    }
+
+    private replyRef = React.createRef<HTMLDivElement>()
 
     private setHover = (state: boolean) => {
         this.setState({
@@ -44,6 +67,19 @@ class Reply extends React.Component<IReplies, any> {
     private toggleFollowStatus = () => {
         const { post } = this.props
         this.props.userStore.toggleUserFollowing(post.posterName, post.pub)
+    }
+
+    private getPermaLinkUrl = async () => {
+        const { dataset } = this.replyRef.current
+        const { postUuid, permalink } = dataset
+        const url = `${window.location.origin}${permalink}`
+
+        this.addAndScrollToUuid(postUuid)
+
+        await copy(url)
+        await Router.push('/e/[name]/[id]/[title]', permalink, {
+            shallow: true,
+        })
     }
 
     private renderHoverElements = () => {
@@ -61,6 +97,9 @@ class Reply extends React.Component<IReplies, any> {
                 <span onClick={replyModel.toggleOpen} title={'Reply to post'}>
                     <FontAwesomeIcon icon={faReply} />
                 </span>
+                <span title={'Permalink'} onClick={this.getPermaLinkUrl}>
+                    <FontAwesomeIcon icon={faLink} />
+                </span>
                 <span title={'Donate tokens'}>
                     <FontAwesomeIcon icon={faDollarSign} />
                 </span>
@@ -68,7 +107,7 @@ class Reply extends React.Component<IReplies, any> {
                     title={'View block'}
                     onClick={() => openInNewTab(`https://eosq.app/tx/${post.transaction}`)}
                 >
-                    <FontAwesomeIcon icon={faLink} />
+                    <FontAwesomeIcon icon={faEye} />
                 </span>
                 {post.pub && hasAccount && activePublicKey !== post.pub ? (
                     isFollowingUser(post.posterName) ? (
@@ -94,17 +133,25 @@ class Reply extends React.Component<IReplies, any> {
             className,
             userStore,
             newAuthStore,
+            currentPath,
+            postsStore,
         } = this.props
 
         const replyModel = getModel(post)
         const replies = getRepliesFromMap(post.uuid)
 
+        const [currentPathTrimmed] = currentPath.split('#')
+
         return (
             <div
+                ref={this.replyRef}
+                data-post-uuid={post.uuid}
+                data-permalink={getPermaLink(currentPathTrimmed, post.uuid)}
                 className={classNames([
                     'post-reply black',
                     {
                         [className]: !!className,
+                        'permalink-highlight': postsStore.currentHighlightedPostUuid === post.uuid,
                     },
                 ])}
                 onMouseEnter={() => this.setHover(true)}
@@ -113,7 +160,7 @@ class Reply extends React.Component<IReplies, any> {
                 {this.renderHoverElements()}
                 <div
                     className={classNames([
-                        'flex flex-row pa2',
+                        'parent flex flex-row pa2',
                         {
                             'post-content-hover': this.state.isHover,
                         },
@@ -171,6 +218,8 @@ class Reply extends React.Component<IReplies, any> {
                                   voteHandler={voteHandler}
                                   userStore={userStore}
                                   newAuthStore={newAuthStore}
+                                  postsStore={postsStore}
+                                  currentPath={currentPath}
                               />
                           </div>
                       ))

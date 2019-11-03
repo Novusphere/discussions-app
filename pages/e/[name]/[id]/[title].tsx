@@ -1,15 +1,12 @@
 import * as React from 'react'
 import { inject, observer } from 'mobx-react'
 import { IStores } from '@stores'
-import { Thread } from '@components'
-import { ThreadModel } from '@models/threadModel'
-import Head from 'next/head'
-import { faSpinner } from '@fortawesome/free-solid-svg-icons'
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
+import { ShowFullThread } from '@components'
 
 interface IEPageProps {
     postsStore: IStores['postsStore']
     tagStore: IStores['tagStore']
+    thread: any
     query: {
         name: string
         id: string
@@ -42,6 +39,7 @@ class E extends React.Component<IEPageProps, IEPageState> {
 
         return {
             query,
+            thread,
         }
     }
 
@@ -52,41 +50,11 @@ class E extends React.Component<IEPageProps, IEPageState> {
 
     public render(): React.ReactNode {
         let {
+            thread,
             query: { id, name, title },
         } = this.props
 
-        return this.props.postsStore.getAndSetThread['match']({
-            pending: () => <FontAwesomeIcon width={13} icon={faSpinner} spin />,
-            rejected: () => <span>No posts found</span>,
-            resolved: (activeThread: ThreadModel) => {
-                if (!activeThread) {
-                    return (
-                        <span>
-                            No posts found for specified thread: {id} {name} {title}
-                        </span>
-                    )
-                }
-
-                return (
-                    <div className={'thread-container'}>
-                        <Head>
-                            <title>
-                                {title} - {name}
-                            </title>
-                        </Head>
-                        <Thread
-                            opening={activeThread.openingPost}
-                            openingModel={activeThread.rbModel(activeThread.openingPost)}
-                            getModel={activeThread.rbModel}
-                            getRepliesFromMap={activeThread.getRepliesFromMap}
-                            vote={activeThread.vote}
-                            openingPostReplies={activeThread.openingPostReplies}
-                            totalReplies={activeThread.totalReplies}
-                        />
-                    </div>
-                )
-            },
-        })
+        return <ShowFullThread thread={thread} />
     }
 }
 

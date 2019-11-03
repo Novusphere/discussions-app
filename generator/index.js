@@ -28,6 +28,11 @@ module.exports = function(plop) {
                     path: '../{{path}}/{{name}}.tsx',
                     templateFile: 'templates/react-class.hbs',
                 })
+                actions.push({
+                    type: 'add',
+                    path: '../{{path}}/style.scss',
+                    templateFile: 'templates/style.scss',
+                })
             }
 
             if (data['typeOfReactComponent'] === 'React FC') {
@@ -35,6 +40,11 @@ module.exports = function(plop) {
                     type: 'add',
                     path: '../{{path}}/{{name}}.tsx',
                     templateFile: 'templates/react-fc.hbs',
+                })
+                actions.push({
+                    type: 'add',
+                    path: '../{{path}}/style.scss',
+                    templateFile: 'templates/style.scss',
                 })
             }
 

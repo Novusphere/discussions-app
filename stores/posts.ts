@@ -81,6 +81,8 @@ export default class Posts extends BaseStore {
 
     @observable.deep activeThread: ThreadModel | undefined
 
+    @observable currentHighlightedPostUuid = ''
+
     private tagsStore: IStores['tagStore']
     private uiStore: IStores['uiStore']
     private newAuthStore: IStores['newAuthStore']
@@ -103,6 +105,11 @@ export default class Posts extends BaseStore {
         //         }
         //     }
         // )
+    }
+
+    @action.bound
+    highlightPostUuid(uuid: string) {
+        this.currentHighlightedPostUuid = uuid
     }
 
     public resetPositionAndPosts = () => {

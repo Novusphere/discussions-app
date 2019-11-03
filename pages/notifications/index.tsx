@@ -41,7 +41,7 @@ class Notifications extends React.Component<INotificationsProps> {
                             disableVoteHandler
                             key={notification.uuid}
                             post={notification}
-                            onClick={() => pushToThread(notification)}
+                            onClick={() => pushToThread(notification, notification.uuid)}
                             tag={this.props.tagStore.tags.get(notification.sub)}
                         />
                     )
