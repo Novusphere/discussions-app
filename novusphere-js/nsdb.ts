@@ -40,7 +40,15 @@ export class NSDB {
             `p=${typeof sq.count !== 'undefined' ? sq.count : 0}`;
 
             try {
-                const { data } = await axios.get(`${this.api}/discussions/search?${qs}`, {
+                const { data } = await axios.get(`${this.api}/discussions/search`, {
+                    params: {
+                      c: sq.cursorId || '',
+                      q: JSON.stringify(sq.query) || '',
+                      sort: sq.sort || '',
+                      account: sq.account || '',
+                      limit: sq.limit || 20,
+                      count: sq.count || 0,
+                    },
                     headers: {
                         'Accept': 'application/json',
                         'Content-Type': 'text/plain'
