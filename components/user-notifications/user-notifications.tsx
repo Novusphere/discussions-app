@@ -60,7 +60,7 @@ class UserNotifications extends React.Component<
                 className={'notification-item'}
                 key={notification.uuid}
                 title={'Click to go to post'}
-                onClick={() => pushToThread(notification)}
+                onClick={() => pushToThread(notification, notification.uuid)}
             >
                 <span className={'f5 tl'}>
                     <span className={'f6 b flex mb2'}>
