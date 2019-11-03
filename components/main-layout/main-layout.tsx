@@ -7,6 +7,8 @@ import classNames from 'classnames'
 import { IStores } from '@stores'
 import { getVersion } from '@utils'
 
+import '../../styles/style.scss'
+
 interface IMainLayoutProps {
     tagStore: IStores['tagStore']
     uiStore: IStores['uiStore']
