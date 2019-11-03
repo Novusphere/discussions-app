@@ -1,4 +1,4 @@
-import App, { Container } from 'next/app'
+import App  from 'next/app'
 import React from 'react'
 import * as Stores from '@stores'
 import { Provider, useStaticRendering } from 'mobx-react'
@@ -69,13 +69,11 @@ class DiscussionApp extends App {
     public render() {
         const { Component, pageProps, store } = (this as any).props
         return (
-            <Container>
-                <Provider {...store}>
-                    <MainLayout>
-                        <Component {...pageProps} />
-                    </MainLayout>
-                </Provider>
-            </Container>
+            <Provider {...store}>
+                <MainLayout>
+                    <Component {...pageProps} />
+                </MainLayout>
+            </Provider>
         )
     }
 }

@@ -40,11 +40,11 @@ class MainLayout extends React.Component<IMainLayoutProps> {
                 <AppModals />
                 <div className={'content'}>
                     <div className={'container flex pv3'}>
-                        {showSidebar && (
+                        {showSidebar ? (
                             <div className={'w-30 card sidebar mr3'}>
                                 <Sidebar tags={tags} activeTag={activeTag} />
                             </div>
-                        )}
+                        ) : null}
                         <div
                             className={classNames([
                                 {
@@ -53,6 +53,7 @@ class MainLayout extends React.Component<IMainLayoutProps> {
                                 },
                             ])}
                         >
+                            {showSidebar ? 'show sidebar' : 'hide sidebar' }
                             {this.props.children}
                         </div>
                     </div>
