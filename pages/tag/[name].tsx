@@ -26,6 +26,10 @@ class Tag extends React.Component<ITagProps> {
         const postsStore: IStores['postsStore'] = store.postsStore
         const tagStore: IStores['tagStore'] = store.tagStore
 
+        const uiStore: IStores['uiStore'] = store.uiStore
+        uiStore.toggleBannerStatus(true)
+        uiStore.toggleSidebarStatus(true)
+
         if (tagStore.activeTag && tagStore.activeTag.name !== tag) {
             postsStore.resetPositionAndPosts()
             tagStore.setActiveTag(tag)

@@ -21,6 +21,11 @@ class Index extends React.Component<ISearchPageProps, ISearchPageState> {
     static async getInitialProps({ query, store }) {
         const searchValue = query.q
         const postsStore: IStores['postsStore'] = store.postsStore
+
+        const uiStore: IStores['uiStore'] = store.uiStore
+        uiStore.toggleBannerStatus(true)
+        uiStore.toggleSidebarStatus(true)
+
         postsStore.resetPositionAndPosts()
         const searchResult = await discussions.getPostsForSearch(searchValue)
         return {

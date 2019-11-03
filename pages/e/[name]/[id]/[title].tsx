@@ -25,9 +25,12 @@ interface IEPageState {
 @observer
 class E extends React.Component<IEPageProps, IEPageState> {
     static async getInitialProps({ query, store }) {
-        const uiStore: IStores['uiStore'] = store.uiStore
         const tagStore: IStores['tagStore'] = store.tagStore
         const postsStore: IStores['postsStore'] = store.postsStore
+        const uiStore: IStores['uiStore'] = store.uiStore
+        uiStore.toggleBannerStatus(true)
+        uiStore.toggleSidebarStatus(true)
+
         tagStore.setActiveTag(query.name)
 
         let thread = await postsStore.getAndSetThread(query.id)
