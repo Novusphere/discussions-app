@@ -4,7 +4,7 @@ import * as Stores from '@stores'
 import { Provider, useStaticRendering } from 'mobx-react'
 import { MainLayout } from '@components'
 import { withMobx } from 'next-mobx-wrapper'
-import { getVersion, isServer } from '@utils'
+import { isServer } from '@utils'
 import { create } from 'mobx-persist'
 import { toast } from 'react-toastify'
 

@@ -7,8 +7,6 @@ import classNames from 'classnames'
 import { IStores } from '@stores'
 import { getVersion } from '@utils'
 
-import '../../styles/style.scss'
-
 interface IMainLayoutProps {
     tagStore: IStores['tagStore']
     uiStore: IStores['uiStore']
@@ -49,8 +47,8 @@ class MainLayout extends React.Component<IMainLayoutProps> {
                         )}
                         <div
                             className={classNames([
-                                'w-70',
                                 {
+                                    'w-70': showSidebar,
                                     'w-100': !showSidebar,
                                 },
                             ])}
