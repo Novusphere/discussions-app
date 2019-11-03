@@ -3,12 +3,11 @@ import { dummy } from '@novuspherejs'
 import { IStores } from '@stores'
 import { inject, observer } from 'mobx-react'
 import { Tab, Tabs, TabList, TabPanel } from 'react-tabs'
-import { faMinusCircle, faSpinner } from '@fortawesome/free-solid-svg-icons'
+import { faMinusCircle } from '@fortawesome/free-solid-svg-icons'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { computed } from 'mobx'
 
 interface IUPageProps {
-    uiStore: IStores['uiStore']
     userStore: IStores['userStore']
     newAuthStore: IStores['newAuthStore']
     username: string
@@ -17,13 +16,15 @@ interface IUPageProps {
 
 // TO-DO: real data
 
-@inject('uiStore', 'userStore', 'newAuthStore')
+@inject('userStore', 'newAuthStore')
 @observer
 class U extends React.Component<IUPageProps> {
     static async getInitialProps({ query, store }) {
         const uiStore: IStores['uiStore'] = store.uiStore
-        uiStore.toggleSidebarStatus(false)
         const userData = await dummy.getUser(query.username)
+
+        uiStore.toggleSidebarStatus(false)
+
         return {
             username: query.username,
             data: userData,

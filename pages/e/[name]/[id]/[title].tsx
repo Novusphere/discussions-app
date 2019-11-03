@@ -40,9 +40,6 @@ class E extends React.Component<IEPageProps, IEPageState> {
             query.name = thread.sub
         }
 
-        uiStore.toggleSidebarStatus(true)
-        uiStore.toggleBannerStatus(true)
-
         return {
             query,
         }
