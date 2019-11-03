@@ -59,7 +59,6 @@ class MainLayout extends React.Component<IMainLayoutProps> {
                                 },
                             ])}
                         >
-                            {showSidebar ? 'show sidebar' : 'hide sidebar'}
                             {this.props.children}
                         </div>
                     </div>
