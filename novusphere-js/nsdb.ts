@@ -4,6 +4,9 @@ import { NSDBNotificationsResponse } from 'interfaces/NSDBNotifications'
 
 import axios from 'axios'
 
+const querystring = require('querystring');
+
+
 export const DEFAULT_NSDB_ENDPOINT = 'https://atmosdb.novusphere.io';
 
 export interface INSDBSearchQuery {

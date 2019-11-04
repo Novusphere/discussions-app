@@ -79,7 +79,7 @@ export default class Posts extends BaseStore {
      */
     @observable openingPostReplyContent = ''
 
-    @observable.deep activeThread: ThreadModel | undefined
+    @observable activeThread: ThreadModel | null = null
 
     @observable currentHighlightedPostUuid = ''
 
@@ -121,17 +121,21 @@ export default class Posts extends BaseStore {
     }
 
     @task getPostsByTag = async (tags: string[]) => {
-        const { posts, cursorId } = await discussions.getPostsForTags(
-            tags,
-            this.postsPosition.cursorId,
-            this.postsPosition.items
-        )
-        this.posts = [...this.posts, ...posts]
-        this.postsPosition = {
-            items: this.posts.length,
-            cursorId: cursorId,
+        try {
+            const { posts, cursorId } = await discussions.getPostsForTags(
+                tags,
+                this.postsPosition.cursorId,
+                this.postsPosition.items
+            )
+            this.posts = [...this.posts, ...posts]
+            this.postsPosition = {
+                items: this.posts.length,
+                cursorId: cursorId,
+            }
+            return this.posts
+        } catch (error) {
+            return error
         }
-        return this.posts
     }
 
     /**
@@ -151,7 +155,9 @@ export default class Posts extends BaseStore {
     @action.bound
     public async getAndSetThread(id: string) {
         try {
-            this.activeThread = await this.getThreadById(id)
+            const thread = await this.getThreadById(id)
+            if (!thread) return null
+            this.activeThread = thread
             this.activeThreadId = id
             return this.activeThread
         } catch (error) {
@@ -202,9 +208,7 @@ export default class Posts extends BaseStore {
     public getThreadById = async (id: string): Promise<ThreadModel | null> => {
         try {
             const thread = await discussions.getThread(id)
-            if (!thread) {
-                return null
-            }
+            if (!thread) return null
             return new ThreadModel(thread)
         } catch (error) {
             throw error

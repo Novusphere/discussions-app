@@ -260,8 +260,9 @@ export default class DiscussionsService {
                 transaction: { $regex: `^${dId.txid32}` },
             },
         })
-        
-        if (sq.payload.length == 0) return undefined
+
+
+        if (sq.payload.length == 0) return null
 
         let posts: Post[] = []
         let op = Post.fromDbObject(sq.payload[0])
@@ -274,15 +275,19 @@ export default class DiscussionsService {
             account: eos.accountName || '',
         }
 
-        do {
-            sq = await nsdb.search(sq)
-            posts = [...posts, ...sq.payload.map(o => Post.fromDbObject(o))]
-        } while (sq.cursorId)
+       try {
+           do {
+               sq = await nsdb.search(sq)
+               posts = [...posts, ...sq.payload.map(o => Post.fromDbObject(o))]
+           } while (sq.cursorId)
 
-        let thread = new Thread()
-        thread.init(posts)
-        thread.normalize()
-        return thread
+           let thread = new Thread()
+           thread.init(posts)
+           thread.normalize()
+           return thread
+       } catch (error) {
+            throw error
+       }
     }
 
     async getPostsForSubs(subs: string[]): Promise<Post[]> {
@@ -332,12 +337,16 @@ export default class DiscussionsService {
             searchQuery.query['parentUuid'] = ''
         }
 
-        const query = await nsdb.search(searchQuery)
-        let posts = query.payload.map(o => Post.fromDbObject(o))
+        try {
+            const query = await nsdb.search(searchQuery)
+            let posts = query.payload.map(o => Post.fromDbObject(o))
 
-        return {
-            posts,
-            cursorId: query.cursorId,
+            return {
+                posts,
+                cursorId: query.cursorId,
+            }
+        } catch (error) {
+            return error
         }
     }
 

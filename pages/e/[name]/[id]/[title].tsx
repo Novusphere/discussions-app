@@ -2,6 +2,7 @@ import * as React from 'react'
 import { inject, observer } from 'mobx-react'
 import { IStores } from '@stores'
 import { ShowFullThread } from '@components'
+import { sleep } from '@utils'
 
 interface IEPageProps {
     postsStore: IStores['postsStore']
@@ -30,8 +31,8 @@ class E extends React.Component<IEPageProps, IEPageState> {
 
         tagStore.setActiveTag(query.name)
 
-        let thread = await postsStore.getAndSetThread(query.id)
-
+        const thread = await postsStore.getAndSetThread(query.id)
+        
         if (thread) {
             query.title = thread.title
             query.name = thread.sub
