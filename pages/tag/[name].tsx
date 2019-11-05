@@ -1,12 +1,14 @@
 import * as React from 'react'
 import { inject, observer } from 'mobx-react'
 import { IStores } from '@stores'
-import { IPost } from '@stores/posts'
+import posts, { IPost } from '@stores/posts'
 import { Feed } from '@components'
 import { TagModel } from '@models/tagModel'
 import FeedModel from '@models/feedModel'
 import { pushToThread } from '@utils'
 import Head from 'next/head'
+import { faSpinner } from '@fortawesome/free-solid-svg-icons'
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 
 interface ITagProps {
     tagStore: IStores['tagStore']
@@ -30,12 +32,22 @@ class Tag extends React.Component<ITagProps> {
         uiStore.toggleBannerStatus(true)
         uiStore.toggleSidebarStatus(true)
 
+        let feed: any[] = []
+
+        if (!tagStore.activeTag || tagStore.activeTag.name !== tag) {
+            feed = await postsStore.getPostsByTag([tag])
+        }
+
+        if (tagStore.activeTag && tagStore.activeTag.name === tag) {
+            feed = postsStore.posts
+        }
+
         if (tagStore.activeTag && tagStore.activeTag.name !== tag) {
             postsStore.resetPositionAndPosts()
             tagStore.setActiveTag(tag)
-        }
 
-        const feed = await postsStore.getPostsByTag([tag])
+            feed = await postsStore.getPostsByTag([tag])
+        }
 
         return {
             tagName: tag,
@@ -57,7 +69,11 @@ class Tag extends React.Component<ITagProps> {
             props: { postsStore, tagStore, feed, tagName },
         } = this
 
-        if (!feed || !feed.length) {
+        if (postsStore.getPostsByTag['pending']) {
+            return <FontAwesomeIcon width={13} icon={faSpinner} spin />
+        }
+
+        if (!feed || !feed.length && postsStore.getPostsByTag['resolved']) {
             return <span>No posts found for specified tag: {tagName}</span>
         }
 

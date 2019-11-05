@@ -120,7 +120,8 @@ export default class Posts extends BaseStore {
         }
     }
 
-    @task getPostsByTag = async (tags: string[]) => {
+    @task.resolved
+    getPostsByTag = async (tags: string[]) => {
         try {
             const { posts, cursorId } = await discussions.getPostsForTags(
                 tags,

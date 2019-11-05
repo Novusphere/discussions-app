@@ -15,15 +15,24 @@ interface IIndexPage {
 class Index extends React.Component<IIndexPage> {
     static async getInitialProps({ store }) {
         const uiStore: IStores['uiStore'] = store.uiStore
+        const postsStore: IStores['postsStore'] = store.postsStore
         const tagStore: IStores['tagStore'] = store.tagStore
+
+        postsStore.resetPositionAndPosts()
+
         uiStore.toggleSidebarStatus(true)
         uiStore.toggleBannerStatus(true)
         tagStore.destroyActiveTag()
-        return {}
+
+        const feed = await postsStore.getPostsByTag(['home'])
+
+        return {
+            feed
+        }
     }
 
     async componentWillMount(): Promise<void> {
-        await this.props.postsStore.getPostsByTag(['home'])
+        // await this.props.postsStore.getPostsByTag(['home'])
     }
 
     public clickPost = (post: IPost) => {
@@ -31,7 +40,10 @@ class Index extends React.Component<IIndexPage> {
     }
 
     public render(): React.ReactNode {
-        if (!this.props.postsStore.posts || !this.props.postsStore.posts.length) {
+        if (
+            (!this.props.postsStore.posts || !this.props.postsStore.posts.length) &&
+            this.props.postsStore.getPostsByTag['resolved']
+        ) {
             return <span>No posts found</span>
         }
 

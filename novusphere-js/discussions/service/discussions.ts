@@ -335,7 +335,7 @@ export default class DiscussionsService {
         if (threadOnly) {
             searchQuery.query['parentUuid'] = ''
         }
-
+        
         try {
             const query = await nsdb.search(searchQuery)
             let posts = query.payload.map(o => Post.fromDbObject(o))
