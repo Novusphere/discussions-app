@@ -43,6 +43,38 @@ const Sidebar: React.FC<ITagListProps> = ({ tags, activeTag, ...props }) => {
         return null
     }
 
+    const renderTopLevelTags = tag => {
+        if (tag.name === 'all') {
+            return (
+                <Link href={'/all'} as={tag.url}>
+                    <a className={'db black pointer pb1 no-underline'}>{tag.name}</a>
+                </Link>
+            )
+        }
+
+        if (tag.name === 'feed') {
+            return (
+                <Link href={'/all'} as={tag.url}>
+                    <a className={'db black pointer pb1 no-underline'}>{tag.name}</a>
+                </Link>
+            )
+        }
+
+        if (tag.name === 'home') {
+            return (
+                <Link href={'/'} as={tag.url}>
+                    <a className={'db black pointer pb1 no-underline'}>{tag.name}</a>
+                </Link>
+            )
+        }
+
+        return (
+            <Link href={'/tag/[name]'} as={tag.url}>
+                <a className={'db black pointer pb1 no-underline'}>{tag.name}</a>
+            </Link>
+        )
+    }
+
     return (
         <>
             {renderActiveTag()}
@@ -59,9 +91,7 @@ const Sidebar: React.FC<ITagListProps> = ({ tags, activeTag, ...props }) => {
                                 },
                             ])}
                         >
-                            <Link href={'/tag/[name]'} as={tag.url}>
-                                <a className={'db black pointer pb1 no-underline'}>{tag.name}</a>
-                            </Link>
+                            {renderTopLevelTags(tag)}
                         </li>
                     ))}
                 <div className={'divider-line mb2'} />
