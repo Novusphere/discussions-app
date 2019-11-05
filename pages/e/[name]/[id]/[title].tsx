@@ -2,12 +2,13 @@ import * as React from 'react'
 import { inject, observer } from 'mobx-react'
 import { IStores } from '@stores'
 import { ShowFullThread } from '@components'
-import { sleep } from '@utils'
+import { faSpinner } from '@fortawesome/free-solid-svg-icons'
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 
 interface IEPageProps {
     postsStore: IStores['postsStore']
     tagStore: IStores['tagStore']
-    thread: any
+    // thread: any
     query: {
         name: string
         id: string
@@ -31,16 +32,16 @@ class E extends React.Component<IEPageProps, IEPageState> {
 
         tagStore.setActiveTag(query.name)
 
-        const thread = await postsStore.getAndSetThread(query.id)
+        // const thread = await postsStore.getAndSetThread(query.id)
         
-        if (thread) {
-            query.title = thread.title
-            query.name = thread.sub
-        }
+        // if (thread) {
+        //     query.title = thread.title
+        //     query.name = thread.sub
+        // }
 
         return {
             query,
-            thread,
+            // thread,
         }
     }
 
@@ -51,11 +52,18 @@ class E extends React.Component<IEPageProps, IEPageState> {
 
     public render(): React.ReactNode {
         let {
-            thread,
+            // thread,
             query: { id, name, title },
+            postsStore: { activeThread }
         } = this.props
 
-        return <ShowFullThread thread={thread} />
+        return this.props.postsStore.getAndSetThread['match']({
+            pending: () => <FontAwesomeIcon width={13} icon={faSpinner} spin />,
+            rejected: () => 'Error!',
+            resolved: () => <ShowFullThread thread={activeThread} />,
+        })
+
+        // return <ShowFullThread thread={thread} />
     }
 }
 

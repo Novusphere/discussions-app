@@ -261,7 +261,6 @@ export default class DiscussionsService {
             },
         })
 
-
         if (sq.payload.length == 0) return null
 
         let posts: Post[] = []
@@ -275,19 +274,19 @@ export default class DiscussionsService {
             account: eos.accountName || '',
         }
 
-       try {
-           do {
-               sq = await nsdb.search(sq)
-               posts = [...posts, ...sq.payload.map(o => Post.fromDbObject(o))]
-           } while (sq.cursorId)
+        try {
+            do {
+                sq = await nsdb.search(sq)
+                posts = [...posts, ...sq.payload.map(o => Post.fromDbObject(o))]
+            } while (sq.cursorId)
 
-           let thread = new Thread()
-           thread.init(posts)
-           thread.normalize()
-           return thread
-       } catch (error) {
+            let thread = new Thread()
+            thread.init(posts)
+            thread.normalize()
+            return thread
+        } catch (error) {
             throw error
-       }
+        }
     }
 
     async getPostsForSubs(subs: string[]): Promise<Post[]> {
@@ -357,7 +356,7 @@ export default class DiscussionsService {
     async getPostsForNotifications(
         postPublicKey: string,
         lastCheckedNotifications: number,
-        cursorId = undefined,
+        cursorId = undefined
     ): Promise<NSDBNotificationsResponse> {
         try {
             return await nsdb.search({
