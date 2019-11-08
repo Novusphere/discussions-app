@@ -2,6 +2,7 @@ import Router from 'next/router'
 import Identicon from 'identicon.js'
 import { Post, discussions } from '@novuspherejs'
 import { IPost } from '@stores/posts'
+import _ from 'lodash'
 
 const pjson = require('../package.json')
 const uuid = require('uuidv4')
@@ -65,7 +66,7 @@ export const decodeId = (id: string) => {
 
 export const pushToThread = async (post, permalinkUuid?: string) => {
     const id = encodeId(post)
-    let url = `/e/${post.sub}/${id}/${decodeURIComponent(post.title.replace(/ /g, '_'))}`
+    let url = `/e/${post.sub}/${id}/${decodeURIComponent(_.snakeCase(post.title))}`
 
     if (post.title === '') {
         const thread = await discussions.getThread(id)
