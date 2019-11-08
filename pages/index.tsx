@@ -4,6 +4,7 @@ import { PostPreview } from '@components'
 import { IStores } from '@stores'
 import { IPost } from '@stores/posts'
 import { pushToThread } from '@utils'
+import Router from 'next/router'
 
 interface IIndexPage {
     postsStore: IStores['postsStore']
@@ -13,22 +14,33 @@ interface IIndexPage {
 @inject('postsStore', 'tagStore')
 @observer
 class Index extends React.Component<IIndexPage> {
-    static async getInitialProps({ store }) {
-        const uiStore: IStores['uiStore'] = store.uiStore
-        const postsStore: IStores['postsStore'] = store.postsStore
-        const tagStore: IStores['tagStore'] = store.tagStore
+    static async getInitialProps({ store, res }) {
+        // const uiStore: IStores['uiStore'] = store.uiStore
+        // const postsStore: IStores['postsStore'] = store.postsStore
+        // const tagStore: IStores['tagStore'] = store.tagStore
+        //
+        // postsStore.resetPositionAndPosts()
+        //
+        // uiStore.toggleSidebarStatus(true)
+        // uiStore.toggleBannerStatus(true)
+        // tagStore.destroyActiveTag()
+        //
+        // const feed = await postsStore.getPostsByTag(['home'])
+        //
+        // return {
+        //     feed
+        // }
 
-        postsStore.resetPositionAndPosts()
-
-        uiStore.toggleSidebarStatus(true)
-        uiStore.toggleBannerStatus(true)
-        tagStore.destroyActiveTag()
-
-        const feed = await postsStore.getPostsByTag(['home'])
-
-        return {
-            feed
+        if (res) {
+            res.writeHead(302, {
+                Location: '/all',
+            })
+            res.end()
+        } else {
+            Router.push('/all')
         }
+
+        return {}
     }
 
     async componentWillMount(): Promise<void> {

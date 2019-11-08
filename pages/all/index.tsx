@@ -18,7 +18,16 @@ interface IAllState {}
 @observer
 class All extends React.Component<IAllProps, IAllState> {
     static async getInitialProps({ store }) {
+        const uiStore: IStores['uiStore'] = store.uiStore
+        const postsStore: IStores['postsStore'] = store.postsStore
         const tagStore: IStores['tagStore'] = store.tagStore
+
+        postsStore.resetPositionAndPosts()
+
+        uiStore.toggleSidebarStatus(true)
+        uiStore.toggleBannerStatus(true)
+        tagStore.destroyActiveTag()
+
         tagStore.destroyActiveTag()
         const threads = await discussions.getPostsForSubs(['all'])
         return {

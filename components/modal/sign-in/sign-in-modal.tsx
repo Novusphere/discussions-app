@@ -11,7 +11,7 @@ import { IStores } from '@stores'
 import { observer, inject } from 'mobx-react'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { faSpinner } from '@fortawesome/free-solid-svg-icons'
-import { SignInMethods } from '@globals'
+import { ModalOptions, SignInMethods } from '@globals'
 import { SignInOptions } from '@constants/sign-in-options'
 import dynamic from 'next/dynamic'
 
@@ -298,6 +298,10 @@ class SignInModal extends React.Component<IWelcomeBackModalProps, IWelcomeBackMo
         this.props.newAuthStore.signInObject.ref = instance
     }
 
+    createAccountOnClick = () => {
+        this.props.uiStore.showModal(ModalOptions.signUp)
+    }
+
     public render() {
         const { signInObject } = this.props.newAuthStore
         const choosePasswordForm = this.props.newAuthStore.choosePassword
@@ -322,12 +326,13 @@ class SignInModal extends React.Component<IWelcomeBackModalProps, IWelcomeBackMo
                                 signInOptions={SignInOptions}
                                 optionOnClick={this.clickSignIn}
                                 clickedSignInOption={this.state.clickedSignInOption}
+                                createAccountOnClick={this.createAccountOnClick}
                             />
                             <SetNewBK form={setNewBKAndPasswordForm} />
                             <BrainKeySetPassword form={setPasswordBK} />
                             <SuccessSetup />
 
-                            <ScatterAskForPassword form={setPasswordScatter} />
+                            {/*<ScatterAskForPassword form={setPasswordScatter} />*/}
                         </StepWizard>
 
                         <div className={'modal-footer'}>

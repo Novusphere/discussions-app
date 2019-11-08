@@ -8,12 +8,14 @@ interface ISelectSignInOptionProps extends StepProps {
     signInOptions: typeof SignInOptions
     clickedSignInOption: string
     optionOnClick: (name: string) => void
+    createAccountOnClick: () => void
 }
 
 const SelectSignInOption: React.FC<ISelectSignInOptionProps> = ({
     signInOptions,
     optionOnClick,
     clickedSignInOption,
+    createAccountOnClick,
 }) => (
     <>
         <div className={'tc ph2 mv3'}>
@@ -41,7 +43,7 @@ const SelectSignInOption: React.FC<ISelectSignInOptionProps> = ({
                 ))}
             </div>
 
-            <span className={'f5 b mt3'}>
+            <span className={'f5 b mt3'} onClick={createAccountOnClick}>
                 Don't have one? <a>Create an account for free.</a>
             </span>
         </div>
