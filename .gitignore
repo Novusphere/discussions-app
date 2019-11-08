@@ -58,6 +58,9 @@ typings/
 # dotenv environment variables file
 .env
 
+#testing
+novusphere-js/**/*.js
+
 # next.js build output
 .next
 dist/
