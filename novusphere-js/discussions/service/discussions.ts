@@ -323,7 +323,7 @@ export default class DiscussionsService {
         tags: string[],
         cursorId = undefined,
         count = 0,
-        limit = 20,
+        limit = 2,
         threadOnly = true
     ): Promise<{
         posts: Post[]

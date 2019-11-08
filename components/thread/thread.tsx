@@ -57,9 +57,9 @@ class Thread extends React.Component<IThreadOuterProps & IThreadInnerProps, IThr
                 <div className={'pb2'}>
                     <Link href={`/tag/[name]`} as={`/tag/${openingPost.sub}`}>
                         <a>
-                            <button className={'tl'}>
+                            <button className={'tl'} title={`Show all posts in ${openingPost.sub}`}>
                                 <FontAwesomeIcon width={13} icon={faArrowLeft} className={'pr1'} />
-                                {`tag/${openingPost.sub}`}
+                                {`#${openingPost.sub}`}
                             </button>
                         </a>
                     </Link>

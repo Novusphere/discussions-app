@@ -16,7 +16,7 @@ const TagPreview: React.FC<ITagPreviewProps> = ({ tag }) => {
                         title={`${tag.name} icon`}
                         className={'tag-image w-10 mr2'}
                     />
-                    <span className={'b black f5'}>e/{tag.name}</span>
+                    <span className={'b black f5'}>#{tag.name}</span>
                 </span>
 
                 <span className={'flex row black mt2 f6 tl'}>{tag.tagDescription}</span>

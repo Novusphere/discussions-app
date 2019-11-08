@@ -34,20 +34,25 @@ class Tag extends React.Component<ITagProps> {
 
         let feed: any[] = []
 
-        if (!tagStore.activeTag || tagStore.activeTag.name !== tag) {
-            feed = await postsStore.getPostsByTag([tag])
-        }
+        // if (!tagStore.activeTag || tagStore.activeTag.name !== tag) {
+        //     feed = await postsStore.getPostsByTag([tag])
+        // }
+        //
+        // if (tagStore.activeTag && tagStore.activeTag.name === tag) {
+        //     feed = postsStore.posts
+        // }
+        //
+        // if (tagStore.activeTag && tagStore.activeTag.name !== tag) {
+        //     postsStore.resetPositionAndPosts()
+        //     tagStore.setActiveTag(tag)
+        //
+        //     feed = await postsStore.getPostsByTag([tag])
+        // }
 
-        if (tagStore.activeTag && tagStore.activeTag.name === tag) {
-            feed = postsStore.posts
-        }
+        postsStore.resetPositionAndPosts()
+        tagStore.setActiveTag(tag)
 
-        if (tagStore.activeTag && tagStore.activeTag.name !== tag) {
-            postsStore.resetPositionAndPosts()
-            tagStore.setActiveTag(tag)
-
-            feed = await postsStore.getPostsByTag([tag])
-        }
+        feed = await postsStore.getPostsByTag([tag])
 
         return {
             tagName: tag,
@@ -68,14 +73,15 @@ class Tag extends React.Component<ITagProps> {
             clickPost,
             props: { postsStore, tagStore, feed, tagName },
         } = this
+        
 
         if (postsStore.getPostsByTag['pending']) {
             return <FontAwesomeIcon width={13} icon={faSpinner} spin />
         }
 
-        if (!feed || !feed.length && postsStore.getPostsByTag['resolved']) {
-            return <span>No posts found for specified tag: {tagName}</span>
-        }
+        // if (!feed.length && postsStore.getPostsByTag['resolved']) {
+        //     return <span>No posts found for specified tag: {tagName}</span>
+        // }
 
         return (
             <>
