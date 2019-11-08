@@ -1,13 +1,13 @@
 import { Post, PostMetaData } from '../post'
 import Thread from '../thread'
-import { eos, nsdb } from '@novuspherejs'
+import { eos, nsdb } from '../../index'
 const aesjs = require('aes-js')
 //const crypto = require('crypto');
 const bip39 = require('bip39')
 import * as bip32 from 'bip32'
 import ecc from 'eosjs-ecc'
 import axios from 'axios'
-import { NSDBNotificationsResponse } from 'interfaces/NSDBNotifications'
+import { INSDBSearchQuery } from '@novuspherejs/nsdb'
 
 export interface IBrainKeyPair {
     priv: string
@@ -118,15 +118,19 @@ export default class DiscussionsService {
 
     async getPostsForSearch(search: string): Promise<Post[]> {
         const query = await nsdb.search({
-            query: {
-                $text: { $search: search },
-            },
-            sort: {
-                createdAt: -1,
-            },
-            account: eos.accountName || '',
+            pipeline: [
+                {
+                    $match: {
+                        $text: { $search: search },
+                    },
+                },
+                {
+                    $sort: {
+                        createdAt: -1,
+                    },
+                },
+            ],
         })
-
         return query.payload.map(o => Post.fromDbObject(o))
     }
 
@@ -255,10 +259,14 @@ export default class DiscussionsService {
     async getThread(_id: string): Promise<Thread | undefined> {
         let dId = Post.decodeId(_id)
         let sq = await nsdb.search({
-            query: {
-                createdAt: { $gte: dId.timeGte, $lte: dId.timeLte },
-                transaction: { $regex: `^${dId.txid32}` },
-            },
+            pipeline: [
+                {
+                    $match: {
+                        createdAt: { $gte: dId.timeGte, $lte: dId.timeLte },
+                        transaction: { $regex: `^${dId.txid32}` },
+                    },
+                },
+            ],
         })
 
         if (sq.payload.length == 0) return null
@@ -266,27 +274,24 @@ export default class DiscussionsService {
         let posts: Post[] = []
         let op = Post.fromDbObject(sq.payload[0])
 
-        sq = {
-            query: {
-                threadUuid: op.threadUuid,
-                sub: op.sub,
-            },
-            account: eos.accountName || '',
-        }
+        do {
+            sq = await nsdb.search({
+                pipeline: [
+                    {
+                        $match: {
+                            threadUuid: op.threadUuid,
+                            sub: op.sub,
+                        },
+                    },
+                ],
+            })
+            posts = [...posts, ...sq.payload.map(o => Post.fromDbObject(o))]
+        } while (sq.cursorId)
 
-        try {
-            do {
-                sq = await nsdb.search(sq)
-                posts = [...posts, ...sq.payload.map(o => Post.fromDbObject(o))]
-            } while (sq.cursorId)
-
-            let thread = new Thread()
-            thread.init(posts)
-            thread.normalize()
-            return thread
-        } catch (error) {
-            throw error
-        }
+        let thread = new Thread()
+        thread.init(posts)
+        thread.normalize()
+        return thread
     }
 
     async getPostsForSubs(subs: string[]): Promise<Post[]> {
@@ -296,14 +301,19 @@ export default class DiscussionsService {
         }
 
         const query = await nsdb.search({
-            query: {
-                sub: q,
-                parentUuid: '', // top-level only
-            },
-            sort: {
-                createdAt: -1,
-            },
-            account: eos.accountName || '',
+            pipeline: [
+                {
+                    $match: {
+                        sub: q,
+                        parentUuid: '', // top-level only
+                    },
+                },
+                {
+                    $sort: {
+                        createdAt: -1,
+                    },
+                },
+            ],
         })
 
         return query.payload.map(o => Post.fromDbObject(o))
@@ -319,25 +329,17 @@ export default class DiscussionsService {
         posts: Post[]
         cursorId: number
     }> {
-        const searchQuery = {
-            query: {
-                tags: { $in: tags.map(tag => tag.toLowerCase()) },
-            },
-            sort: {
-                createdAt: -1,
-            },
-            account: eos.accountName || '',
-            cursorId,
-            count,
-            limit,
-        }
+        let searchQuery = { tags: { $in: tags.map(tag => tag.toLowerCase()) } }
 
         if (threadOnly) {
-            searchQuery.query['parentUuid'] = ''
+            searchQuery['parentUuid'] = ''
         }
-        
+
         try {
-            const query = await nsdb.search(searchQuery)
+            const query = await nsdb.search({
+                cursorId,
+                pipeline: [{ $match: searchQuery }, { $sort: { createdAt: -1 } }],
+            })
             let posts = query.payload.map(o => Post.fromDbObject(o))
 
             return {
@@ -345,7 +347,7 @@ export default class DiscussionsService {
                 cursorId: query.cursorId,
             }
         } catch (error) {
-            return error
+            throw error
         }
     }
 
@@ -357,13 +359,17 @@ export default class DiscussionsService {
         postPublicKey: string,
         lastCheckedNotifications: number,
         cursorId = undefined
-    ): Promise<NSDBNotificationsResponse> {
+    ): Promise<INSDBSearchQuery> {
         try {
             return await nsdb.search({
-                query: {
-                    createdAt: { $gte: lastCheckedNotifications },
-                    mentions: { $in: [postPublicKey] },
-                },
+                pipeline: [
+                    {
+                        $match: {
+                            createdAt: { $gte: lastCheckedNotifications },
+                            mentions: { $in: [postPublicKey] },
+                        },
+                    },
+                ],
                 cursorId,
             })
         } catch (error) {

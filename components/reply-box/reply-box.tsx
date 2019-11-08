@@ -1,9 +1,15 @@
 import * as React from 'react'
-import { Editor } from '@components'
+// import { Editor } from '@components'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { faSpinner } from '@fortawesome/free-solid-svg-icons'
 import { observer } from 'mobx-react'
 import classNames from 'classnames'
+
+import dynamic from 'next/dynamic'
+
+const Editor = dynamic(() => import('../editor/editor'), {
+    ssr: false,
+})
 
 interface IReplyProps {
     className?: string
@@ -16,7 +22,7 @@ const ReplyBox: React.FC<IReplyProps> = ({ uid, onContentChange, onSubmit, class
     <div
         className={classNames([
             {
-                'mt3': typeof className === 'undefined',
+                mt3: typeof className === 'undefined',
                 [className]: !!className,
             },
         ])}

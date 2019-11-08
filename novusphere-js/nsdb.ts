@@ -1,21 +1,12 @@
-import { NSDBNotificationsResponse } from 'interfaces/NSDBNotifications'
+import axios from 'axios';
 
-// const fetch = require('node-fetch');
-
-import axios from 'axios'
-
-const querystring = require('querystring')
-
-export const DEFAULT_NSDB_ENDPOINT = 'https://atmosdb.novusphere.io'
+export const DEFAULT_NSDB_ENDPOINT = 'https://atmosdb.novusphere.io';
 
 export interface INSDBSearchQuery {
-    cursorId?: number
-    query: any
-    sort?: any
-    account?: string
-    payload?: any
-    count?: number
-    limit?: number
+    cursorId?: number;
+    pipeline: any[];
+    payload?: any;
+    count?: number;
 }
 
 export class NSDB {
@@ -23,46 +14,31 @@ export class NSDB {
     constructor() {
         this.api = DEFAULT_NSDB_ENDPOINT
     }
+    
     async init(apiEndpoint: string) {
         this.api = apiEndpoint
     }
+
     async cors(url: string) {
-        const request = await fetch(`https://db.novusphere.io/service/cors/?${url}`)
-        const result = await request.text()
-        return result
+        const request = await axios.get(`https://db.novusphere.io/service/cors/?${url}`);
+        const result = request.data;
+        return result;
     }
 
-    async search(sq: INSDBSearchQuery): Promise<NSDBNotificationsResponse> {
-        try {
-            const { data } = await axios.get(`${this.api}/discussions/search`, {
-                params: {
-                    c: sq.cursorId || '',
-                    q: sq.query ? JSON.stringify(sq.query) : '',
-                    sort: sq.sort ? JSON.stringify(sq.sort) : '',
-                    account: sq.account || '',
-                    limit: sq.limit || 20,
-                    count: sq.count || 0,
-                },
-                headers: {
-                    Accept: 'application/json',
-                    'Content-Type': 'text/plain',
-                },
-            })
+    async search(sq : INSDBSearchQuery) : Promise<INSDBSearchQuery> {
+        const qs = `data=${JSON.stringify(sq)}`;
 
-            const result = data
-
-            if (typeof result.error !== 'undefined' && result.error) {
-                throw new Error(result.error)
-            }
-
-            sq.cursorId = result.cursorId
-            sq.count = result.count
-            sq.limit = result.limit
-            sq.payload = result.payload
-
-            return sq as any
-        } catch (error) {
-            throw error
+        const request = await axios.get(`${this.api}/discussions/search?${qs}`);
+        const result = request.data;
+        if (result.error) {
+            console.log(result);
+            throw new Error(result.error);
         }
+
+        sq.cursorId = result.cursorId;
+        sq.count = result.count;
+        sq.payload = result.payload;
+
+        return sq;
     }
 };
