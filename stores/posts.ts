@@ -9,6 +9,7 @@ import { generateUuid, getAttachmentValue, getIdenticon, pushToThread, sleep } f
 import { ThreadModel } from '@models/threadModel'
 import FeedModel from '@models/feedModel'
 import _ from 'lodash'
+import PostModel from '@models/postModel'
 
 export interface IAttachment {
     value: string
@@ -399,10 +400,10 @@ export default class Posts extends BaseStore {
                         //         }
                         //     },
                         // },
-                        {
-                            value: 'Post ID',
-                            title: 'Post with an anonymous ID',
-                        },
+                        // {
+                        //     value: 'Post ID',
+                        //     title: 'Post with an anonymous ID',
+                        // },
                         {
                             value: 'Post',
                             disabled: !this.newAuthStore.hasAccount,
@@ -442,7 +443,10 @@ export default class Posts extends BaseStore {
                                         newPost.displayName = posterName
                                     }
 
-                                    const submittedPost = await discussions.post(newPost as any)
+
+                                    const model = new PostModel(newPost as any)
+                                    const signedReply = model.sign(this.newAuthStore.postPriv)
+                                    const submittedPost = await discussions.post(signedReply as any)
 
                                     // TODO: Add check to make sure the thread is actually posted onto the chain
                                     await sleep(5000)

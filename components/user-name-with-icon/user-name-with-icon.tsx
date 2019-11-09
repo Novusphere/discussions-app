@@ -21,6 +21,7 @@ const UserNameWithIcon: React.FC<IUserNameWithIconProps> = ({ imageSize, imageDa
             height={size}
             src={`data:image/png;base64,${imageData}`}
             className={'post-icon mr2'}
+            alt={'Icon'}
         />
     )
 
