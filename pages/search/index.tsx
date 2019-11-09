@@ -4,7 +4,6 @@ import { IPost } from '@stores/posts'
 import PostPreview from '../../components/post-preview/post-preview'
 import { inject, observer } from 'mobx-react'
 import { IStores } from '@stores'
-import { pushToThread } from '@utils'
 
 interface ISearchPageProps {
     tagStore: IStores['tagStore']
@@ -38,10 +37,6 @@ class Index extends React.Component<ISearchPageProps, ISearchPageState> {
         this.props.tagStore.destroyActiveTag()
     }
 
-    public clickPost = (post: IPost) => {
-        pushToThread(post)
-    }
-
     renderPosts = () => {
         const { searchResult } = this.props
 
@@ -55,7 +50,6 @@ class Index extends React.Component<ISearchPageProps, ISearchPageState> {
                 <PostPreview
                     key={result.id}
                     post={result as any}
-                    onClick={this.clickPost}
                     tag={this.props.tagStore.tags.get(result.sub)}
                     disableVoteHandler
                 />

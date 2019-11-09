@@ -1,11 +1,9 @@
 import * as React from 'react'
 import { inject, observer } from 'mobx-react'
 import { IStores } from '@stores'
-import { IPost } from '@stores/posts'
 import { InfiniteScrollFeed } from '@components'
 import { TagModel } from '@models/tagModel'
 import FeedModel from '@models/feedModel'
-import { pushToThread } from '@utils'
 import Head from 'next/head'
 
 interface ITagProps {
@@ -19,7 +17,6 @@ interface ITagProps {
 // TODO: Merge logic between e/page and tag/page. Right now it's separated.
 
 interface ITagPageState {
-    feed: any[]
 }
 
 @inject('tagStore', 'postsStore')
@@ -60,37 +57,14 @@ class Tag extends React.Component<ITagProps, ITagPageState> {
         }
     }
 
-    constructor(props) {
-        super(props)
-
-        this.state = {
-            feed: props.feed,
-        }
-    }
-
-    private getMorePosts = async () => {
-        const feed = await this.props.postsStore.getPostsByTag([this.props.tagName])
-
-        this.setState({
-            feed,
-        })
-    }
-
     componentWillMount(): void {
         this.props.tagStore.setActiveTag(this.props.tagName)
     }
 
-    public clickPost = (post: IPost) => {
-        pushToThread(post)
-    }
-
     public render() {
-        const { feed } = this.state
-
         const {
-            clickPost,
             props: {
-                postsStore: { postsPosition },
+                postsStore: { posts, postsPosition, getPostsByTag },
                 tagStore,
                 tagName,
             },
@@ -104,9 +78,8 @@ class Tag extends React.Component<ITagProps, ITagPageState> {
                 <InfiniteScrollFeed
                     dataLength={postsPosition.items}
                     hasMore={postsPosition.cursorId !== 0}
-                    next={this.getMorePosts}
-                    posts={feed}
-                    postOnClick={clickPost}
+                    next={() => getPostsByTag([tagName])}
+                    posts={posts}
                     tagModel={tagStore.activeTag}
                 />
             </>

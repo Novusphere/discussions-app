@@ -2,11 +2,7 @@ import * as React from 'react'
 import { IStores } from '@stores'
 import { Post } from '@novuspherejs'
 import { inject, observer } from 'mobx-react'
-import { IPost } from '@stores/posts'
-import { pushToThread, sleep } from '@utils'
 import { InfiniteScrollFeed } from '@components'
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
-import { faSpinner } from '@fortawesome/free-solid-svg-icons'
 
 interface IAllProps {
     tagStore: IStores['tagStore']
@@ -33,15 +29,6 @@ class All extends React.Component<IAllProps, IAllState> {
         return {}
     }
 
-    async componentDidMount(): Promise<void> {
-        await sleep(500)
-        await this.props.tagStore.getPostsBySubscribed()
-    }
-
-    public clickPost = (post: IPost) => {
-        pushToThread(post)
-    }
-
     public render() {
         const { getPostsBySubscribed, postsPosition, allPosts } = this.props.tagStore
         const { cursorId, count } = postsPosition
@@ -52,7 +39,6 @@ class All extends React.Component<IAllProps, IAllState> {
                 hasMore={cursorId !== 0}
                 next={getPostsBySubscribed}
                 posts={allPosts}
-                postOnClick={this.clickPost}
             />
         )
     }

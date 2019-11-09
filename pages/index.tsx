@@ -2,8 +2,6 @@ import * as React from 'react'
 import { observer, inject } from 'mobx-react'
 import { PostPreview } from '@components'
 import { IStores } from '@stores'
-import { IPost } from '@stores/posts'
-import { pushToThread } from '@utils'
 import Router from 'next/router'
 
 interface IIndexPage {
@@ -47,10 +45,6 @@ class Index extends React.Component<IIndexPage> {
         // await this.props.postsStore.getPostsByTag(['home'])
     }
 
-    public clickPost = (post: IPost) => {
-        return pushToThread(post)
-    }
-
     public render(): React.ReactNode {
         if (
             (!this.props.postsStore.posts || !this.props.postsStore.posts.length) &&
@@ -64,7 +58,6 @@ class Index extends React.Component<IIndexPage> {
                 <PostPreview
                     post={post as any}
                     key={post.uuid}
-                    onClick={this.clickPost}
                     tag={this.props.tagStore.tags.get(post.sub)}
                     voteHandler={this.props.postsStore.vote}
                 />

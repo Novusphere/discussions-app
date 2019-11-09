@@ -46,8 +46,6 @@ class DiscussionApp extends App {
                 tagStore,
             } = this.props.store
 
-            tagStore.initializeDefaultSubs()
-
             const stores = {
                 auth: newAuthStore,
                 settings: settingsStore,

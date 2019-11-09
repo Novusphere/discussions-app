@@ -1,9 +1,9 @@
-import { action, computed, observable } from 'mobx'
+import { action, computed, intercept, observable, observe, reaction } from 'mobx'
 import { TagModel } from '@models/tagModel'
 import { BaseStore, getOrCreateStore } from 'next-mobx-wrapper'
 import { task } from 'mobx-task'
 import { persist } from 'mobx-persist'
-import { defaultSubs } from '@utils'
+import { defaultSubs, sleep } from '@utils'
 import { discussions } from '@novuspherejs'
 
 export default class Tag extends BaseStore {
@@ -27,6 +27,20 @@ export default class Tag extends BaseStore {
 
         // set top level tags
         this.setTopLevelTags()
+
+        // hard code tags
+        this.initializeDefaultSubs()
+
+        // subscribe everyone to default
+        this.subscribeToDefaultSubs().then(() => {
+            this.getPostsBySubscribed()
+        })
+        // .then(() => {
+        //     observe(this.subSubscriptionStatus, async change => {
+        //         await sleep(500)
+        //         await this.getPostsBySubscribed()
+        //     })
+        // })
     }
 
     @task
@@ -39,11 +53,11 @@ export default class Tag extends BaseStore {
                 this.postsPosition.count
             )
 
-
             this.allPosts = [...this.allPosts, ...posts]
+
             this.postsPosition = {
-                cursorId,
                 count: this.allPosts.length,
+                cursorId,
             }
 
             return this.allPosts
@@ -54,20 +68,27 @@ export default class Tag extends BaseStore {
 
     @action.bound
     initializeDefaultSubs() {
-        // hard code tags
         if (this.tags.size === Tag.baseSubLength) {
             defaultSubs.map(tag => {
                 this.tags.set(tag.name, new TagModel(tag))
-                this.subSubscriptionStatus.set(tag.name, true)
             })
         }
+    }
+
+    @action.bound
+    async subscribeToDefaultSubs() {
+        this.tags.forEach((tagStatus, tagName) => {
+            this.subSubscriptionStatus.set(tagName, true)
+        })
+
+        return Promise.resolve(true)
     }
 
     @computed get subscribedSubs() {
         const subs = []
 
         this.subSubscriptionStatus.forEach((subStatus, subName) => {
-            if (this.subSubscriptionStatus.get(subName)) {
+            if (subStatus) {
                 subs.push(subName)
             }
         })

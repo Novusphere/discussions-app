@@ -5,7 +5,6 @@ import { faSpinner } from '@fortawesome/free-solid-svg-icons'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { PostPreview } from '@components'
 import FeedModel from '@models/feedModel'
-import { pushToThread } from '@utils'
 
 interface INotificationsProps {
     notificationsStore: IStores['notificationsStore']
@@ -43,7 +42,6 @@ class Notifications extends React.Component<INotificationsProps> {
                             disableVoteHandler
                             key={notification.uuid}
                             post={notification}
-                            onClick={() => pushToThread(notification, notification.uuid)}
                             tag={this.props.tagStore.tags.get(notification.sub)}
                         />
                     )

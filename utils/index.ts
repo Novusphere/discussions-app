@@ -64,7 +64,7 @@ export const decodeId = (id: string) => {
     }
 }
 
-export const pushToThread = async (post, permalinkUuid?: string) => {
+export const getThreadUrl = async (post, permalinkUuid?: string) => {
     const id = encodeId(post)
     let url = `/e/${post.sub}/${id}/${decodeURIComponent(_.snakeCase(post.title))}`
 
@@ -77,6 +77,11 @@ export const pushToThread = async (post, permalinkUuid?: string) => {
         url += `${post.title}#${permalinkUuid}`
     }
 
+    return url
+}
+
+export const pushToThread = async (post, permalinkUuid?: string) => {
+    const url = await getThreadUrl(post ,permalinkUuid)
     Router.push('/e/[name]/[id]/[title]', url)
 }
 

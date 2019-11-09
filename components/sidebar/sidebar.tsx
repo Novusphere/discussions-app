@@ -20,9 +20,10 @@ interface ITagListInnerProps {
 @observer
 class Sidebar extends React.Component<ITagListOuterProps & ITagListInnerProps> {
     private renderActiveTag = () => {
-        const { activeTag } = this.props.tagStore
+        const { activeTag, toggleTagSubscribe, subSubscriptionStatus } = this.props.tagStore
 
         if (activeTag) {
+            const isSubbed = subSubscriptionStatus.get(activeTag.name)
             return (
                 <div className={'pa4 bg-white shadow'}>
                     <span className={'flex flex-row items-center'}>
@@ -39,7 +40,9 @@ class Sidebar extends React.Component<ITagListOuterProps & ITagListInnerProps> {
                     <span className={'flex row black mt2 f6'}>{activeTag.tagDescription}</span>
 
                     <div className={'flex flex-column items-center justify-center mt3'}>
-                        <button className={'w-100 mb2'}>Join Community</button>
+                        <button className={'w-100 mb2'} onClick={() => toggleTagSubscribe(activeTag.name)}>
+                            {isSubbed ? 'Unsubscribe' : 'Subscribe'}
+                        </button>
                         <button className={'w-100 button-outline'}>Create Post</button>
                     </div>
                 </div>
