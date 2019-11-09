@@ -148,6 +148,9 @@ export default class NewAuth extends BaseStore {
     get signUpForm() {
         return new CreateForm(
             {
+                onBlur: form => {
+                    console.log(form.values())
+                },
                 onSubmit: form => {
                     const { displayName, password } = form.values()
 

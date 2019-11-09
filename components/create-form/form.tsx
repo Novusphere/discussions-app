@@ -263,7 +263,11 @@ class Form extends React.Component<FormProps> {
                                             },
                                         ])}
                                     >
-                                        <input {...bind} className={'db f6 form-input'} />
+                                        <input
+                                            {...bind}
+                                            className={'db f6 form-input'}
+                                            {...field.bind}
+                                        />
                                         <span className={'error f6 db pv2 tl'}>
                                             {field.accessor.error}
                                         </span>

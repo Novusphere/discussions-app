@@ -260,7 +260,7 @@ export default class Posts extends BaseStore {
                 name: 'title',
                 label: `Title`,
                 placeholder: 'Enter a post title',
-                rules: 'required|string|min:5|max:45',
+                rules: 'required|string|min:5|max:300',
                 hideLabels: true,
             },
             // {
