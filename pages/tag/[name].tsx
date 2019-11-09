@@ -3,7 +3,6 @@ import { inject, observer } from 'mobx-react'
 import { IStores } from '@stores'
 import { InfiniteScrollFeed } from '@components'
 import { TagModel } from '@models/tagModel'
-import FeedModel from '@models/feedModel'
 import Head from 'next/head'
 
 interface ITagProps {
@@ -11,7 +10,6 @@ interface ITagProps {
     postsStore: IStores['postsStore']
     tagName: undefined | string
     tagModel: TagModel
-    feed: FeedModel[]
 }
 
 // TODO: Merge logic between e/page and tag/page. Right now it's separated.
@@ -31,29 +29,16 @@ class Tag extends React.Component<ITagProps, ITagPageState> {
         uiStore.toggleBannerStatus(true)
         uiStore.toggleSidebarStatus(true)
 
-        let feed: any[] = []
-
-        if (!tagStore.activeTag) {
-            console.log('here 1')
-            feed = await postsStore.getPostsByTag([tag])
-        }
-
-        if (tagStore.activeTag && tagStore.activeTag.name === tag) {
-            console.log('here 2')
-            feed = postsStore.posts
-        }
-
         if (tagStore.activeTag && tagStore.activeTag.name !== tag) {
             console.log('here 3')
             postsStore.resetPositionAndPosts()
             tagStore.setActiveTag(tag)
-
-            feed = await postsStore.getPostsByTag([tag])
         }
+
+        await postsStore.getPostsByTag([tag])
 
         return {
             tagName: tag,
-            feed: feed,
         }
     }
 
