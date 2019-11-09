@@ -35,11 +35,17 @@ interface IReplies {
     postsStore?: IStores['postsStore']
 }
 
+interface IRepliesState {
+    isHover: boolean
+    isCollapsed: boolean
+}
+
 @inject('userStore', 'newAuthStore', 'postsStore')
 @observer
-class Reply extends React.Component<IReplies, any> {
+class Reply extends React.Component<IReplies, IRepliesState> {
     state = {
         isHover: false,
+        isCollapsed: false,
     }
 
     componentDidMount(): void {
@@ -137,6 +143,8 @@ class Reply extends React.Component<IReplies, any> {
             postsStore,
         } = this.props
 
+        const { isCollapsed, isHover } = this.state
+
         const replyModel = getModel(post)
         const replies = getRepliesFromMap(post.uuid)
 
@@ -160,14 +168,22 @@ class Reply extends React.Component<IReplies, any> {
             >
                 {this.renderHoverElements()}
                 <div
+                    style={{
+                        height: !isCollapsed ? 'auto' : '30px',
+                    }}
                     className={classNames([
                         'parent flex flex-row pa2',
                         {
-                            'post-content-hover': this.state.isHover,
+                            'post-content-hover': isHover,
                         },
                     ])}
                 >
-                    <div className={'flex justify-between items-center mr2'}>
+                    <div
+                        style={{
+                            visibility: isCollapsed ? 'hidden' : 'visible',
+                        }}
+                        className={'flex justify-between items-center mr2'}
+                    >
                         <Votes
                             upVotes={post.upvotes}
                             downVotes={post.downvotes}
@@ -176,17 +192,31 @@ class Reply extends React.Component<IReplies, any> {
                             handler={voteHandler}
                         />
                     </div>
-                    <div className={'flex flex-column'}>
+                    <div
+                        className={'flex flex-column'}
+                        // onDoubleClick={() =>
+                        //     this.setState({ isCollapsed: !this.state.isCollapsed })
+                        // }
+                    >
                         <div className={'header pb0'}>
+                            <div className={'pr2'}>{this.renderCollapseElements()}</div>
                             <UserNameWithIcon imageData={post.imageData} name={post.posterName} />
-                            <span className={'pl2 o-50 f6'}>
+                            <span
+                                className={'pl2 o-50 f6'}
+                                title={moment(post.createdAt).format('YYYY-MM-DD HH:mm:ss')}
+                            >
                                 {moment(post.createdAt).fromNow()}
                             </span>
+                            {isCollapsed && (
+                                <span className={'o-50 i f6 pl2'}>({replies.length} children)</span>
+                            )}
                         </div>
-                        <ReactMarkdown
-                            className={'f6 lh-copy reply-content'}
-                            source={post.content}
-                        />
+                        {!isCollapsed && (
+                            <ReactMarkdown
+                                className={'f6 lh-copy reply-content'}
+                                source={post.content}
+                            />
+                        )}
                     </div>
                 </div>
 
@@ -195,7 +225,7 @@ class Reply extends React.Component<IReplies, any> {
                         className={classNames([
                             'ph4 pb4',
                             {
-                                'post-content-hover': this.state.isHover,
+                                'post-content-hover': isHover,
                             },
                         ])}
                         uid={post.uuid}
@@ -226,6 +256,29 @@ class Reply extends React.Component<IReplies, any> {
                       ))
                     : null}
             </div>
+        )
+    }
+
+    private renderCollapseElements = () => {
+        if (this.state.isCollapsed) {
+            return (
+                <span
+                    className={'f6 pointer dim gray'}
+                    onClick={() => this.setState({ isCollapsed: false })}
+                    title={'Uncollapse comment'}
+                >
+                    [+]
+                </span>
+            )
+        }
+        return (
+            <span
+                className={'f6 pointer dim gray'}
+                onClick={() => this.setState({ isCollapsed: true })}
+                title={'Collapse comment'}
+            >
+                [-]
+            </span>
         )
     }
 }

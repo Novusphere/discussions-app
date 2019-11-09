@@ -79,7 +79,10 @@ class Thread extends React.Component<IThreadOuterProps & IThreadInnerProps, IThr
                                 imageSize={20}
                             />
                             <span className={'ph1 b'}>&#183;</span>
-                            <span> {moment(openingPost.createdAt).fromNow()}</span>
+                            <span title={moment(openingPost.createdAt).format('YYYY-MM-DD HH:mm:ss')}>
+                                {' '}
+                                {moment(openingPost.createdAt).fromNow()}
+                            </span>
                         </div>
 
                         <div className={'flex justify-between items-center pb1'}>
