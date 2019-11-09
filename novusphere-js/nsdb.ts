@@ -6,6 +6,7 @@ export interface INSDBSearchQuery {
     pipeline: any[];
     payload?: any;
     count?: number;
+    limit?: number;
 }
 
 export class NSDB {
@@ -36,6 +37,7 @@ export class NSDB {
 
         sq.cursorId = result.cursorId;
         sq.count = result.count;
+        sq.limit = result.limit;
         sq.payload = result.payload;
 
         return sq;
