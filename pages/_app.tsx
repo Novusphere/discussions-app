@@ -1,4 +1,4 @@
-import App  from 'next/app'
+import App from 'next/app'
 import React from 'react'
 import * as Stores from '@stores'
 import { Provider, useStaticRendering } from 'mobx-react'
@@ -38,13 +38,22 @@ class DiscussionApp extends App {
      */
     async componentDidMount(): Promise<void> {
         if (!isServer) {
-            const { newAuthStore, settingsStore, userStore, notificationsStore } = this.props.store
+            const {
+                newAuthStore,
+                settingsStore,
+                userStore,
+                notificationsStore,
+                tagStore,
+            } = this.props.store
+
+            tagStore.initializeDefaultSubs()
 
             const stores = {
                 auth: newAuthStore,
                 settings: settingsStore,
                 user: userStore,
                 notifications: notificationsStore,
+                tags: tagStore,
             }
 
             const hydrate = create({

@@ -1,12 +1,16 @@
 import * as React from 'react'
 import { TagModel } from '@models/tagModel'
+import { observer } from 'mobx-react'
 
 interface ITagPreviewProps {
     tag: TagModel
+
+    isSubscribed: boolean
+    toggleSubscribe: (name: string) => void
 }
 
 // mouse over tag html
-const TagPreview: React.FC<ITagPreviewProps> = ({ tag }) => {
+const TagPreview: React.FC<ITagPreviewProps> = ({ tag, isSubscribed, toggleSubscribe }) => {
     const renderActiveTag = () => {
         return (
             <div className={'pa4 bg-white shadow'}>
@@ -24,7 +28,9 @@ const TagPreview: React.FC<ITagPreviewProps> = ({ tag }) => {
                 <span className={'flex row fa5 mt2 f5'}>{tag.memberCount} Members</span>
                 <span className={'flex row fa5 mt2 f5'}>0 members online</span>
                 <div className={'flex flex-column items-center justify-center mt3'}>
-                    <button className={'w-100 mb2'}>Join Community</button>
+                    <button className={'w-100 mb2'} onClick={() => toggleSubscribe(tag.name)}>
+                        {isSubscribed ? 'Unsubscribe' : 'Subscribe'}
+                    </button>
                 </div>
             </div>
         )
@@ -33,4 +39,4 @@ const TagPreview: React.FC<ITagPreviewProps> = ({ tag }) => {
     return <div className={'interactive-hover'}>{renderActiveTag()}</div>
 }
 
-export default TagPreview
+export default observer(TagPreview)

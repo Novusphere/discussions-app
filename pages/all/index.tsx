@@ -1,21 +1,22 @@
 import * as React from 'react'
 import { IStores } from '@stores'
-import { discussions, Post } from '@novuspherejs'
-import { observer } from 'mobx-react'
+import { Post } from '@novuspherejs'
+import { inject, observer } from 'mobx-react'
 import { IPost } from '@stores/posts'
-import { pushToThread } from '@utils'
+import { pushToThread, sleep } from '@utils'
 import { InfiniteScrollFeed } from '@components'
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
+import { faSpinner } from '@fortawesome/free-solid-svg-icons'
 
 interface IAllProps {
+    tagStore: IStores['tagStore']
     posts: Post[]
     cursorId: number
 }
 
-interface IAllState {
-    posts: Post[]
-    cursorId: number
-}
+interface IAllState {}
 
+@inject('tagStore')
 @observer
 class All extends React.Component<IAllProps, IAllState> {
     static async getInitialProps({ store }) {
@@ -29,53 +30,28 @@ class All extends React.Component<IAllProps, IAllState> {
         uiStore.toggleBannerStatus(true)
         tagStore.destroyActiveTag()
 
-        const { posts, cursorId } = await discussions.getPostsForSubs(['all'])
-
-        return {
-            posts: posts.filter(result => result.tags[0].length),
-            cursorId,
-        }
+        return {}
     }
 
-    constructor(props) {
-        super(props)
-
-        this.state = {
-            posts: props.posts,
-            cursorId: props.cursorId,
-        }
+    async componentDidMount(): Promise<void> {
+        await sleep(500)
+        await this.props.tagStore.getPostsBySubscribed()
     }
 
     public clickPost = (post: IPost) => {
         pushToThread(post)
     }
 
-    private getMorePosts = async () => {
-        try {
-            const { posts, cursorId } = await discussions.getPostsForSubs(
-                ['all'],
-                this.state.cursorId,
-                this.state.posts.length
-            )
-
-            this.setState(prevState => ({
-                posts: [...prevState.posts, ...posts],
-                cursorId,
-            }))
-        } catch (error) {
-            return error
-        }
-    }
-
     public render() {
-        const { cursorId, posts } = this.state
+        const { getPostsBySubscribed, postsPosition, allPosts } = this.props.tagStore
+        const { cursorId, count } = postsPosition
 
         return (
             <InfiniteScrollFeed
-                dataLength={posts.length}
+                dataLength={count}
                 hasMore={cursorId !== 0}
-                next={this.getMorePosts}
-                posts={posts}
+                next={getPostsBySubscribed}
+                posts={allPosts}
                 postOnClick={this.clickPost}
             />
         )

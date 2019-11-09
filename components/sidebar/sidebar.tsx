@@ -1,21 +1,27 @@
 import * as React from 'react'
-import { observer } from 'mobx-react'
-import TagStore from '../../stores/tag'
+import { inject, observer } from 'mobx-react'
 import Link from 'next/link'
 import { withRouter } from 'next/router'
 import classNames from 'classnames'
-import { TagModel } from '@models/tagModel'
 import { Tooltip } from 'react-tippy'
 import { TagPreview } from '@components'
+import { IStores } from '@stores'
 
-interface ITagListProps {
-    activeTag: TagModel
-    tags: TagStore['tags']
+import './style.scss'
+
+interface ITagListOuterProps {}
+
+interface ITagListInnerProps {
     router: any
+    tagStore: IStores['tagStore']
 }
 
-const Sidebar: React.FC<ITagListProps> = ({ tags, activeTag, ...props }) => {
-    const renderActiveTag = () => {
+@inject('tagStore')
+@observer
+class Sidebar extends React.Component<ITagListOuterProps & ITagListInnerProps> {
+    private renderActiveTag = () => {
+        const { activeTag } = this.props.tagStore
+
         if (activeTag) {
             return (
                 <div className={'pa4 bg-white shadow'}>
@@ -43,7 +49,7 @@ const Sidebar: React.FC<ITagListProps> = ({ tags, activeTag, ...props }) => {
         return null
     }
 
-    const renderTopLevelTags = tag => {
+    private renderTopLevelTags = tag => {
         if (tag.name === 'all') {
             return (
                 <Link href={'/all'} as={tag.url}>
@@ -75,72 +81,85 @@ const Sidebar: React.FC<ITagListProps> = ({ tags, activeTag, ...props }) => {
         )
     }
 
-    return (
-        <>
-            {renderActiveTag()}
-            <ul className={'w-100'}>
-                {Array.from(tags.values())
-                    .filter(tag => tag.root)
-                    .map(tag => (
-                        <li
-                            key={tag.id}
-                            className={classNames([
-                                'ph3 pb3',
-                                {
-                                    active: props.router.asPath === tag.url,
-                                },
-                            ])}
-                        >
-                            {renderTopLevelTags(tag)}
-                        </li>
-                    ))}
-                <div className={'divider-line mb2'} />
-                {Array.from(tags.values())
-                    .filter(tag => !tag.root)
-                    .map(tag => (
-                        <li
-                            key={tag.id}
-                            className={classNames([
-                                'ph3 pb1',
-                                {
-                                    active: props.router.asPath === tag.url,
-                                },
-                            ])}
-                        >
-                            <Tooltip
-                                animateFill={false}
-                                interactive
-                                html={<TagPreview tag={tag} />}
-                                position={'left-end'}
-                                unmountHTMLWhenHide={true}
-                                offset={150}
-                                stickyDuration={0}
-                                sticky={true}
-                                duration={275}
-                                animation={'fade'}
-                                className={'interactive-hover'}
-                                distance={400}
-                                trigger={'mouseenter focus'}
+    render() {
+        const {
+            router,
+            tagStore: { tags, subSubscriptionStatus, toggleTagSubscribe },
+        } = this.props
+
+        return (
+            <>
+                {this.renderActiveTag()}
+                <ul className={'w-100'}>
+                    {Array.from(tags.values())
+                        .filter(tag => tag.root)
+                        .map(tag => (
+                            <li
+                                key={tag.id}
+                                className={classNames([
+                                    'ph3 mb3',
+                                    {
+                                        'sidebar-link-active': router.asPath === tag.url,
+                                    },
+                                ])}
                             >
-                                <Link href={`/tag/[name]`} as={`/tag/${tag.name}`}>
-                                    <a className={'flex items-center pb1 pointer'}>
-                                        <img
-                                            className={'tag-icon pr2'}
-                                            src={tag.icon}
-                                            alt={`${tag.name} icon`}
+                                {this.renderTopLevelTags(tag)}
+                            </li>
+                        ))}
+                    <div className={'divider-line mb2'} />
+                    {Array.from(tags.values())
+                        .filter(tag => !tag.root)
+                        .map(tag => (
+                            <li
+                                key={tag.id}
+                                className={classNames([
+                                    'ph3',
+                                    {
+                                        'sidebar-link-active': router.query.name === tag.name,
+                                    },
+                                ])}
+                            >
+                                <Tooltip
+                                    animateFill={false}
+                                    interactive
+                                    html={
+                                        <TagPreview
+                                            tag={tag}
+                                            isSubscribed={subSubscriptionStatus.get(tag.name)}
+                                            toggleSubscribe={toggleTagSubscribe}
                                         />
-                                        <span className={'db black no-underline'}>
-                                            {'#'}
-                                            {tag.name}
-                                        </span>
-                                    </a>
-                                </Link>
-                            </Tooltip>
-                        </li>
-                    ))}
-            </ul>
-        </>
-    )
+                                    }
+                                    position={'left-end'}
+                                    unmountHTMLWhenHide={true}
+                                    offset={150}
+                                    stickyDuration={0}
+                                    sticky={true}
+                                    duration={275}
+                                    animation={'fade'}
+                                    className={'interactive-hover'}
+                                    distance={400}
+                                    trigger={'mouseenter focus'}
+                                >
+                                    <Link href={`/tag/[name]`} as={`/tag/${tag.name}`}>
+                                        <a className={'flex items-center pb1 pointer'}>
+                                            <img
+                                                className={'tag-icon pr2'}
+                                                src={tag.icon}
+                                                alt={`${tag.name} icon`}
+                                            />
+                                            <span className={'db black no-underline'}>
+                                                {'#'}
+                                                {tag.name}
+                                            </span>
+                                        </a>
+                                    </Link>
+                                </Tooltip>
+                            </li>
+                        ))}
+                </ul>
+            </>
+        )
+    }
 }
 
-export default withRouter(observer(Sidebar))
+export default withRouter(observer(Sidebar)) as React.ComponentClass<ITagListOuterProps>

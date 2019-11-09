@@ -49,7 +49,7 @@ class MainLayout extends React.Component<IMainLayoutProps> {
                                 },
                             ])}
                         >
-                            <Sidebar tags={tags} activeTag={activeTag} />
+                            <Sidebar />
                         </div>
                         <div
                             className={classNames([

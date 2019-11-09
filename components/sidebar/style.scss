@@ -1,0 +1,13 @@
+.sidebar-link-active {
+	text-decoration: none;
+	background-color: #ececec;
+
+	&:hover {
+		text-decoration: none;
+		background-color: #079E99;
+
+		span {
+			color: #fff !important;
+		}
+	}
+}
