@@ -1,14 +1,12 @@
 import * as React from 'react'
 import { inject, observer } from 'mobx-react'
 import { IStores } from '@stores'
-import posts, { IPost } from '@stores/posts'
-import { Feed } from '@components'
+import { IPost } from '@stores/posts'
+import { InfiniteScrollFeed } from '@components'
 import { TagModel } from '@models/tagModel'
 import FeedModel from '@models/feedModel'
 import { pushToThread } from '@utils'
 import Head from 'next/head'
-import { faSpinner } from '@fortawesome/free-solid-svg-icons'
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 
 interface ITagProps {
     tagStore: IStores['tagStore']
@@ -20,9 +18,13 @@ interface ITagProps {
 
 // TODO: Merge logic between e/page and tag/page. Right now it's separated.
 
+interface ITagPageState {
+    feed: any[]
+}
+
 @inject('tagStore', 'postsStore')
 @observer
-class Tag extends React.Component<ITagProps> {
+class Tag extends React.Component<ITagProps, ITagPageState> {
     static async getInitialProps({ query, store }) {
         const tag = query.name
         const postsStore: IStores['postsStore'] = store.postsStore
@@ -58,6 +60,22 @@ class Tag extends React.Component<ITagProps> {
         }
     }
 
+    constructor(props) {
+        super(props)
+
+        this.state = {
+            feed: props.feed,
+        }
+    }
+
+    private getMorePosts = async () => {
+        const feed = await this.props.postsStore.getPostsByTag([this.props.tagName])
+
+        this.setState({
+            feed,
+        })
+    }
+
     componentWillMount(): void {
         this.props.tagStore.setActiveTag(this.props.tagName)
     }
@@ -67,21 +85,28 @@ class Tag extends React.Component<ITagProps> {
     }
 
     public render() {
+        const { feed } = this.state
+
         const {
             clickPost,
-            props: { postsStore, tagStore, feed, tagName },
+            props: {
+                postsStore: { postsPosition },
+                tagStore,
+                tagName,
+            },
         } = this
-        
+
         return (
             <>
                 <Head>
-                    <title>
-                        {tagName}
-                    </title>
+                    <title>{tagName}</title>
                 </Head>
-                <Feed
-                    threads={feed}
-                    onClick={clickPost}
+                <InfiniteScrollFeed
+                    dataLength={postsPosition.items}
+                    hasMore={postsPosition.cursorId !== 0}
+                    next={this.getMorePosts}
+                    posts={feed}
+                    postOnClick={clickPost}
                     tagModel={tagStore.activeTag}
                 />
             </>
