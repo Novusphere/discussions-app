@@ -52,7 +52,7 @@ const PostPreview: React.FC<IPostPreviewProps> = ({
                         />
                     )}
                 </div>
-                <Link href={url}>
+                <Link href={'/e/[name]/[id]/[title]'} as={url}>
                     <a className={'no-style w-100'}>
                         <div className={'flex flex-column post-content w-100'}>
                             <div className={'flex f6 lh-copy black items-center'}>
@@ -72,8 +72,8 @@ const PostPreview: React.FC<IPostPreviewProps> = ({
                                         .toDate()
                                         .toLocaleString()}
                                 >
-                                {moment(post.createdAt).fromNow()}
-                            </span>
+                                    {moment(post.createdAt).fromNow()}
+                                </span>
                             </div>
                             <div className={'flex justify-between items-center pt1'}>
                                 <span className={'black f3 b lh-title'}>{post.title}</span>
@@ -89,10 +89,14 @@ const PostPreview: React.FC<IPostPreviewProps> = ({
                             </object>
 
                             <div className={'flex z-2 footer b'}>
-                            <span className={'o-80 f6 ml2 dim pointer'}>
-                                <FontAwesomeIcon width={13} icon={faComment} className={'pr2'} />
-                                {post.totalReplies} comments
-                            </span>
+                                <span className={'o-80 f6 ml2 dim pointer'}>
+                                    <FontAwesomeIcon
+                                        width={13}
+                                        icon={faComment}
+                                        className={'pr2'}
+                                    />
+                                    {post.totalReplies} comments
+                                </span>
                                 <span className={'o-80 f6 ml2 dim pointer'}>share</span>
                                 <span className={'o-80 f6 ml2 dim pointer'}>reply</span>
                                 <span className={'o-80 f6 ml2 dim pointer'}>mark as spam</span>
