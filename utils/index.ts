@@ -86,6 +86,7 @@ export const getVersion = () => {
 
 // TODO: Hash has to be A hexadecimal string of 15+ characters that will be used to generate the image.
 export const getIdenticon = (hexaString = 'd3b07384d113edec49eaa6238ad5ff00') => {
+    if (!hexaString || hexaString === '') return getDefaultIdenticon
     return new Identicon(hexaString, 420).toString()
 }
 

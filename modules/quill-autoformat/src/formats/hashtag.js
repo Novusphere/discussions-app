@@ -5,7 +5,7 @@ const Embed = Quill.import('blots/embed');
 class Hashtag extends Embed {
   static create(value) {
     let node = super.create(value);
-    node.setAttribute('href', `${window.location.origin}/tags/${value}`);
+    node.setAttribute('href', `${window.location.origin}/tag/${value}`);
     node.setAttribute('spellcheck', false);
     node.textContent = "#" + value;
     return node;

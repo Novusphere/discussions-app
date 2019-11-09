@@ -191,16 +191,10 @@ export default class Posts extends BaseStore {
                     poster = posts.displayName
                 }
 
-                let imageData = getIdenticon()
-
-                if (posts.pub && posts.pub.length) {
-                    imageData = getIdenticon(posts.pub)
-                }
-
                 return {
                     id: posts.pub,
                     value: poster,
-                    icon: imageData,
+                    icon: posts.imageData,
                 }
             }),
             option => option.id

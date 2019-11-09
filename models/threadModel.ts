@@ -6,6 +6,7 @@ import { ReplyModel } from '@models/replyModel'
 import _ from 'lodash'
 import PostModel from '@models/postModel'
 import { discussions } from '@novuspherejs'
+import { getIdenticon } from '@utils'
 
 // import { discussions } from '@novuspherejs'
 
@@ -19,6 +20,37 @@ export class ThreadModel {
     @observable public replies: PostModel[]
 
     public replyBoxStatuses = observable.map<string, ReplyModel>()
+
+    /**
+     * ReplyBox box open status for a particular post id
+     */
+    constructor(thread: Thread) {
+        if (!(thread instanceof Post) || thread instanceof Thread) {
+            this.openingPost = new PostModel(thread.openingPost)
+            this.uuid = thread.openingPost.uuid
+
+            const map = {}
+
+            Object.keys(thread.map).map(id => {
+                map[id] = new PostModel(thread.map[id])
+            })
+
+            this.map = map
+            this.title = thread.openingPost.title
+            this.sub = thread.openingPost.sub
+        } else {
+            this.openingPost = thread
+            this.uuid = thread!.uuid
+            this.title = thread!.title
+        }
+
+        /**
+         * Set reply box open for the opening post by default
+         */
+        const openingPostReplyModel = new ReplyModel(this.openingPost, this.map)
+        openingPostReplyModel.toggleOpen()
+        this.replyBoxStatuses.set(this.uuid, openingPostReplyModel)
+    }
 
     @computed get totalReplies() {
         const map = Object.keys(this.map)
@@ -66,37 +98,6 @@ export class ThreadModel {
 
         return []
     })
-
-    /**
-     * ReplyBox box open status for a particular post id
-     */
-    constructor(thread: Thread) {
-        if (!(thread instanceof Post) || thread instanceof Thread) {
-            this.openingPost = new PostModel(thread.openingPost)
-            this.uuid = thread.openingPost.uuid
-
-            const map = {}
-
-            Object.keys(thread.map).map(id => {
-                map[id] = new PostModel(thread.map[id])
-            })
-
-            this.map = map
-            this.title = thread.openingPost.title
-            this.sub = thread.openingPost.sub
-        } else {
-            this.openingPost = thread
-            this.uuid = thread!.uuid
-            this.title = thread!.title
-        }
-
-        /**
-         * Set reply box open for the opening post by default
-         */
-        const openingPostReplyModel = new ReplyModel(this.openingPost, this.map)
-        openingPostReplyModel.toggleOpen()
-        this.replyBoxStatuses.set(this.uuid, openingPostReplyModel)
-    }
 
     @computed get openingPostReplies(): any[] {
         const openingPostReplies = this.getRepliesFromMap(this.uuid)
