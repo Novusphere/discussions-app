@@ -298,7 +298,8 @@ export default class DiscussionsService {
         subs: string[],
         cursorId = undefined,
         count = 0,
-        limit = 20): Promise<{
+        limit = 20
+    ): Promise<{
         posts: Post[]
         cursorId: number
     }> {
@@ -355,10 +356,7 @@ export default class DiscussionsService {
                 cursorId,
                 count,
                 limit,
-                pipeline: [
-                    { $match: searchQuery },
-                    { $sort: { createdAt: -1 } },
-                ],
+                pipeline: [{ $match: searchQuery }, { $sort: { createdAt: -1 } }],
             })
             let posts = query.payload.map(o => Post.fromDbObject(o))
 

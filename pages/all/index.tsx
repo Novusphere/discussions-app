@@ -1,20 +1,21 @@
 import * as React from 'react'
 import { IStores } from '@stores'
 import { discussions, Post } from '@novuspherejs'
-import PostPreview from '../../components/post-preview/post-preview'
-import { inject, observer } from 'mobx-react'
+import { observer } from 'mobx-react'
 import { IPost } from '@stores/posts'
 import { pushToThread } from '@utils'
+import { InfiniteScrollFeed } from '@components'
 
 interface IAllProps {
-    tagStore: IStores['tagStore']
-    postsStore: IStores['postsStore']
-    threads: Post[]
+    posts: Post[]
+    cursorId: number
 }
 
-interface IAllState {}
+interface IAllState {
+    posts: Post[]
+    cursorId: number
+}
 
-@inject('tagStore', 'postsStore')
 @observer
 class All extends React.Component<IAllProps, IAllState> {
     static async getInitialProps({ store }) {
@@ -28,10 +29,20 @@ class All extends React.Component<IAllProps, IAllState> {
         uiStore.toggleBannerStatus(true)
         tagStore.destroyActiveTag()
 
-        tagStore.destroyActiveTag()
-        const threads = await discussions.getPostsForSubs(['all'])
+        const { posts, cursorId } = await discussions.getPostsForSubs(['all'])
+
         return {
-            threads,
+            posts: posts.filter(result => result.tags[0].length),
+            cursorId,
+        }
+    }
+
+    constructor(props) {
+        super(props)
+
+        this.state = {
+            posts: props.posts,
+            cursorId: props.cursorId,
         }
     }
 
@@ -39,18 +50,35 @@ class All extends React.Component<IAllProps, IAllState> {
         pushToThread(post)
     }
 
+    private getMorePosts = async () => {
+        try {
+            const { posts, cursorId } = await discussions.getPostsForSubs(
+                ['all'],
+                this.state.cursorId,
+                this.state.posts.length
+            )
+
+            this.setState(prevState => ({
+                posts: [...prevState.posts, ...posts],
+                cursorId,
+            }))
+        } catch (error) {
+            return error
+        }
+    }
+
     public render() {
-        return this.props.threads
-            .filter(result => result.tags[0].length)
-            .map(thread => (
-                <PostPreview
-                    key={thread.id}
-                    post={thread as any}
-                    onClick={this.clickPost}
-                    tag={this.props.tagStore.tags.get(thread.sub)}
-                    disableVoteHandler
-                />
-            ))
+        const { cursorId, posts } = this.state
+
+        return (
+            <InfiniteScrollFeed
+                dataLength={posts.length}
+                hasMore={cursorId !== 0}
+                next={this.getMorePosts}
+                posts={posts}
+                postOnClick={this.clickPost}
+            />
+        )
     }
 }
 
