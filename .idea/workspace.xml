@@ -2,19 +2,10 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="2d14133e-344f-4fbf-9bb7-c9e5e96ae697" name="Default Changelist" comment="">
-      <change beforePath="$PROJECT_DIR$/components/infinite-scroll-feed/infinite-scroll-feed.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/components/infinite-scroll-feed/infinite-scroll-feed.tsx" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/components/post-preview/post-preview.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/components/post-preview/post-preview.tsx" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/components/sidebar/sidebar.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/components/sidebar/sidebar.tsx" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/pages/_app.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/pages/_app.tsx" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/pages/all/index.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/pages/all/index.tsx" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/pages/index.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/pages/index.tsx" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/pages/new/new-post-preview/new-post-preview.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/pages/new/new-post-preview/new-post-preview.tsx" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/pages/notifications/index.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/pages/notifications/index.tsx" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/pages/search/index.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/pages/search/index.tsx" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/pages/tag/[name].tsx" beforeDir="false" afterPath="$PROJECT_DIR$/pages/tag/[name].tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/stores/posts.ts" beforeDir="false" afterPath="$PROJECT_DIR$/stores/posts.ts" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/stores/tag.ts" beforeDir="false" afterPath="$PROJECT_DIR$/stores/tag.ts" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/styles/components/_post.scss" beforeDir="false" afterPath="$PROJECT_DIR$/styles/components/_post.scss" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/utils/index.ts" beforeDir="false" afterPath="$PROJECT_DIR$/utils/index.ts" afterDir="false" />
     </list>
     <ignored path="$PROJECT_DIR$/.tmp/" />
     <ignored path="$PROJECT_DIR$/temp/" />
@@ -26,14 +17,14 @@
     <option name="LAST_RESOLUTION" value="IGNORE" />
   </component>
   <component name="FileEditorManager">
-    <splitter split-orientation="horizontal" split-proportion="0.5">
+    <splitter split-orientation="horizontal" split-proportion="0.39212176">
       <split-first>
         <leaf>
           <file pinned="false" current-in-tab="true">
-            <entry file="file://$PROJECT_DIR$/components/post-preview/post-preview.tsx">
+            <entry file="file://$PROJECT_DIR$/pages/index.tsx">
               <provider selected="true" editor-type-id="text-editor">
-                <state relative-caret-position="387">
-                  <caret line="69" column="41" lean-forward="true" selection-start-line="69" selection-start-column="41" selection-end-line="69" selection-end-column="41" />
+                <state relative-caret-position="384">
+                  <caret line="24" column="17" lean-forward="true" selection-start-line="24" selection-start-column="17" selection-end-line="24" selection-end-column="17" />
                   <folding>
                     <element signature="e#0#30#0" expanded="true" />
                   </folding>
@@ -42,25 +33,10 @@
             </entry>
           </file>
           <file pinned="false" current-in-tab="false">
-            <entry file="file://$PROJECT_DIR$/components/infinite-scroll-feed/infinite-scroll-feed.tsx">
+            <entry file="file://$PROJECT_DIR$/stores/tag.ts">
               <provider selected="true" editor-type-id="text-editor">
-                <state relative-caret-position="499">
-                  <caret line="68" column="30" lean-forward="true" selection-start-line="68" selection-start-column="30" selection-end-line="68" selection-end-column="30" />
-                  <folding>
-                    <element signature="e#0#30#0" expanded="true" />
-                  </folding>
-                </state>
-              </provider>
-            </entry>
-          </file>
-          <file pinned="false" current-in-tab="false">
-            <entry file="file://$PROJECT_DIR$/pages/tag/[name].tsx">
-              <provider selected="true" editor-type-id="text-editor">
-                <state relative-caret-position="275">
-                  <caret line="62" lean-forward="true" selection-start-line="62" selection-end-line="62" />
-                  <folding>
-                    <element signature="e#0#30#0" expanded="true" />
-                  </folding>
+                <state relative-caret-position="80">
+                  <caret line="11" lean-forward="true" selection-start-line="11" selection-end-line="11" />
                 </state>
               </provider>
             </entry>
@@ -69,23 +45,14 @@
       </split-first>
       <split-second>
         <leaf>
-          <file pinned="false" current-in-tab="false">
-            <entry file="file://$PROJECT_DIR$/utils/index.ts">
-              <provider selected="true" editor-type-id="text-editor">
-                <state relative-caret-position="248">
-                  <caret line="64" column="1" lean-forward="true" selection-start-line="64" selection-start-column="1" selection-end-line="64" selection-end-column="1" />
-                  <folding>
-                    <element signature="e#0#32#0" expanded="true" />
-                  </folding>
-                </state>
-              </provider>
-            </entry>
-          </file>
           <file pinned="false" current-in-tab="true">
-            <entry file="file://$PROJECT_DIR$/styles/components/_post.scss">
+            <entry file="file://$PROJECT_DIR$/pages/all/index.tsx">
               <provider selected="true" editor-type-id="text-editor">
-                <state relative-caret-position="496">
-                  <caret line="58" column="19" selection-start-line="58" selection-start-column="19" selection-end-line="58" selection-end-column="19" />
+                <state relative-caret-position="576">
+                  <caret line="36" column="79" lean-forward="true" selection-start-line="36" selection-start-column="79" selection-end-line="36" selection-end-column="79" />
+                  <folding>
+                    <element signature="e#0#30#0" expanded="true" />
+                  </folding>
                 </state>
               </provider>
             </entry>
@@ -93,8 +60,8 @@
           <file pinned="false" current-in-tab="false">
             <entry file="file://$PROJECT_DIR$/stores/posts.ts">
               <provider selected="true" editor-type-id="text-editor">
-                <state relative-caret-position="273">
-                  <caret line="124" column="17" selection-start-line="124" selection-start-column="4" selection-end-line="124" selection-end-column="17" />
+                <state relative-caret-position="411">
+                  <caret line="125" column="10" selection-start-line="125" selection-start-column="10" selection-end-line="125" selection-end-column="10" />
                   <folding>
                     <element signature="e#0#51#0" expanded="true" />
                   </folding>
@@ -108,8 +75,6 @@
   </component>
   <component name="FindInProjectRecents">
     <findStrings>
-      <find>getPostsForTags</find>
-      <find>postsPosition.</find>
       <find>Since no pub</find>
       <find>&lt;UserNameWithIcon</find>
       <find>this.imageData</find>
@@ -138,6 +103,8 @@
       <find>&lt;InfiniteSc</find>
       <find>&lt;PostPreview</find>
       <find>.post-preview</find>
+      <find>getPosts</find>
+      <find>getPostsBySubscribed</find>
     </findStrings>
     <replaceStrings>
       <replace>.child</replace>
@@ -202,7 +169,6 @@
         <option value="$PROJECT_DIR$/components/index.ts" />
         <option value="$PROJECT_DIR$/novusphere-js/discussions/service/discussions.ts" />
         <option value="$PROJECT_DIR$/modules/quill-autoformat/src/formats/hashtag.js" />
-        <option value="$PROJECT_DIR$/stores/posts.ts" />
         <option value="$PROJECT_DIR$/models/threadModel.ts" />
         <option value="$PROJECT_DIR$/stores/newAuth.ts" />
         <option value="$PROJECT_DIR$/stores/notifications.ts" />
@@ -212,18 +178,19 @@
         <option value="$PROJECT_DIR$/components/tag-preview/tag-preview.tsx" />
         <option value="$PROJECT_DIR$/components/sidebar/sidebar.tsx" />
         <option value="$PROJECT_DIR$/pages/_app.tsx" />
-        <option value="$PROJECT_DIR$/stores/tag.ts" />
         <option value="$PROJECT_DIR$/utils/index.ts" />
         <option value="$PROJECT_DIR$/pages/new/new-post-preview/new-post-preview.tsx" />
         <option value="$PROJECT_DIR$/pages/notifications/index.tsx" />
-        <option value="$PROJECT_DIR$/pages/index.tsx" />
         <option value="$PROJECT_DIR$/pages/search/index.tsx" />
         <option value="$PROJECT_DIR$/components/infinite-scroll-feed/infinite-scroll-feed.tsx" />
-        <option value="$PROJECT_DIR$/pages/all/index.tsx" />
         <option value="$PROJECT_DIR$/models/feedModel.ts" />
         <option value="$PROJECT_DIR$/pages/tag/[name].tsx" />
         <option value="$PROJECT_DIR$/components/post-preview/post-preview.tsx" />
         <option value="$PROJECT_DIR$/styles/components/_post.scss" />
+        <option value="$PROJECT_DIR$/stores/posts.ts" />
+        <option value="$PROJECT_DIR$/stores/tag.ts" />
+        <option value="$PROJECT_DIR$/pages/index.tsx" />
+        <option value="$PROJECT_DIR$/pages/all/index.tsx" />
       </list>
     </option>
   </component>
@@ -492,12 +459,12 @@
       <workItem from="1572884342401" duration="610000" />
       <workItem from="1572909854078" duration="4444000" />
       <workItem from="1573256311248" duration="11802000" />
-      <workItem from="1573311991118" duration="7452000" />
+      <workItem from="1573311991118" duration="7966000" />
     </task>
     <servers />
   </component>
   <component name="TimeTrackingManager">
-    <option name="totallyTimeSpent" value="553658000" />
+    <option name="totallyTimeSpent" value="554172000" />
   </component>
   <component name="ToolWindowManager">
     <frame x="-8" y="-8" width="2576" height="1416" extended-state="6" />
@@ -517,7 +484,7 @@
       <window_info anchor="bottom" id="Version Control" order="7" />
       <window_info anchor="bottom" id="Docker" order="8" show_stripe_button="false" />
       <window_info anchor="bottom" id="TypeScript" order="9" />
-      <window_info anchor="bottom" id="Terminal" order="10" sideWeight="0.49960598" visible="true" weight="0.32424006" />
+      <window_info anchor="bottom" id="Terminal" order="10" sideWeight="0.49960598" weight="0.32424006" />
       <window_info anchor="bottom" id="Event Log" order="11" sideWeight="0.500394" side_tool="true" weight="0.17614965" />
       <window_info anchor="right" id="Commander" internal_type="SLIDING" order="0" type="SLIDING" weight="0.4" />
       <window_info anchor="right" id="Ant Build" order="1" weight="0.25" />
@@ -655,16 +622,6 @@
           <folding>
             <element signature="e#0#30#0" expanded="true" />
             <element signature="e#344#365#0" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/pages/index.tsx">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="250">
-          <caret line="19" column="63" lean-forward="true" selection-start-line="17" selection-start-column="6" selection-end-line="19" selection-end-column="63" />
-          <folding>
-            <element signature="e#0#30#0" expanded="true" />
           </folding>
         </state>
       </provider>
@@ -892,26 +849,6 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/stores/tag.ts">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="273">
-          <caret line="49" selection-start-line="49" selection-end-line="49" />
-          <folding>
-            <element signature="e#0#51#0" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/pages/all/index.tsx">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="371">
-          <caret line="34" selection-start-line="34" selection-end-line="34" />
-          <folding>
-            <element signature="e#0#30#0" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/node_modules/@types/react/index.d.ts">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="472">
@@ -932,16 +869,6 @@
           <caret line="64" column="1" lean-forward="true" selection-start-line="64" selection-start-column="1" selection-end-line="64" selection-end-column="1" />
           <folding>
             <element signature="e#0#32#0" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/stores/posts.ts">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="273">
-          <caret line="124" column="17" selection-start-line="124" selection-start-column="4" selection-end-line="124" selection-end-column="17" />
-          <folding>
-            <element signature="e#0#51#0" expanded="true" />
           </folding>
         </state>
       </provider>
@@ -968,8 +895,8 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/components/post-preview/post-preview.tsx">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="387">
-          <caret line="69" column="41" lean-forward="true" selection-start-line="69" selection-start-column="41" selection-end-line="69" selection-end-column="41" />
+        <state relative-caret-position="211">
+          <caret line="58" column="41" lean-forward="true" selection-start-line="58" selection-start-column="41" selection-end-line="58" selection-end-column="41" />
           <folding>
             <element signature="e#0#30#0" expanded="true" />
           </folding>
@@ -980,6 +907,43 @@
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="496">
           <caret line="58" column="19" selection-start-line="58" selection-start-column="19" selection-end-line="58" selection-end-column="19" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/stores/tag.ts">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="80">
+          <caret line="11" lean-forward="true" selection-start-line="11" selection-end-line="11" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/stores/posts.ts">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="411">
+          <caret line="125" column="10" selection-start-line="125" selection-start-column="10" selection-end-line="125" selection-end-column="10" />
+          <folding>
+            <element signature="e#0#51#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/pages/all/index.tsx">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="576">
+          <caret line="36" column="79" lean-forward="true" selection-start-line="36" selection-start-column="79" selection-end-line="36" selection-end-column="79" />
+          <folding>
+            <element signature="e#0#30#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/pages/index.tsx">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="384">
+          <caret line="24" column="17" lean-forward="true" selection-start-line="24" selection-start-column="17" selection-end-line="24" selection-end-column="17" />
+          <folding>
+            <element signature="e#0#30#0" expanded="true" />
+          </folding>
         </state>
       </provider>
     </entry>

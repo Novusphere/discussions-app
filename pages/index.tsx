@@ -1,8 +1,7 @@
 import * as React from 'react'
 import { observer, inject } from 'mobx-react'
-import { PostPreview } from '@components'
+import { InfiniteScrollFeed } from '@components'
 import { IStores } from '@stores'
-import Router from 'next/router'
 
 interface IIndexPage {
     postsStore: IStores['postsStore']
@@ -12,57 +11,36 @@ interface IIndexPage {
 @inject('postsStore', 'tagStore')
 @observer
 class Index extends React.Component<IIndexPage> {
-    static async getInitialProps({ store, res }) {
-        // const uiStore: IStores['uiStore'] = store.uiStore
-        // const postsStore: IStores['postsStore'] = store.postsStore
-        // const tagStore: IStores['tagStore'] = store.tagStore
-        //
-        // postsStore.resetPositionAndPosts()
-        //
-        // uiStore.toggleSidebarStatus(true)
-        // uiStore.toggleBannerStatus(true)
-        // tagStore.destroyActiveTag()
-        //
-        // const feed = await postsStore.getPostsByTag(['home'])
-        //
-        // return {
-        //     feed
-        // }
+    static async getInitialProps({ store }) {
+        const uiStore: IStores['uiStore'] = store.uiStore
+        const postsStore: IStores['postsStore'] = store.postsStore
+        const tagStore: IStores['tagStore'] = store.tagStore
 
-        if (res) {
-            res.writeHead(302, {
-                Location: '/all',
-            })
-            res.end()
-        } else {
-            Router.push('/all')
-        }
+        postsStore.resetPositionAndPosts()
+
+        uiStore.toggleSidebarStatus(true)
+        uiStore.toggleBannerStatus(true)
+        tagStore.destroyActiveTag()
 
         return {}
     }
 
-    async componentWillMount(): Promise<void> {
-        // await this.props.postsStore.getPostsByTag(['home'])
+    componentDidMount(): void {
+        this.props.postsStore.getPostsForSubs()
     }
 
-    public render(): React.ReactNode {
-        if (
-            (!this.props.postsStore.posts || !this.props.postsStore.posts.length) &&
-            this.props.postsStore.getPostsByTag['resolved']
-        ) {
-            return <span>No posts found</span>
-        }
+    public render() {
+        const { getPostsForSubs, postsPosition, posts } = this.props.postsStore
+        const { cursorId, items } = postsPosition
 
-        return this.props.postsStore.posts.map(post => {
-            return (
-                <PostPreview
-                    post={post as any}
-                    key={post.uuid}
-                    tag={this.props.tagStore.tags.get(post.sub)}
-                    voteHandler={this.props.postsStore.vote}
-                />
-            )
-        })
+        return (
+            <InfiniteScrollFeed
+                dataLength={items}
+                hasMore={cursorId !== 0}
+                next={getPostsForSubs}
+                posts={posts}
+            />
+        )
     }
 }
 

@@ -5,17 +5,17 @@ import { inject, observer } from 'mobx-react'
 import { InfiniteScrollFeed } from '@components'
 
 interface IAllProps {
-    tagStore: IStores['tagStore']
+    postsStore: IStores['postsStore']
     posts: Post[]
     cursorId: number
 }
 
 interface IAllState {}
 
-@inject('tagStore')
+@inject('postsStore')
 @observer
 class All extends React.Component<IAllProps, IAllState> {
-    static async getInitialProps({ store }) {
+    static async getInitialProps({ store, res }) {
         const uiStore: IStores['uiStore'] = store.uiStore
         const postsStore: IStores['postsStore'] = store.postsStore
         const tagStore: IStores['tagStore'] = store.tagStore
@@ -29,16 +29,20 @@ class All extends React.Component<IAllProps, IAllState> {
         return {}
     }
 
+    componentDidMount(): void {
+        this.props.postsStore.getPostsForSubs(['all'])
+    }
+
     public render() {
-        const { getPostsBySubscribed, postsPosition, allPosts } = this.props.tagStore
-        const { cursorId, count } = postsPosition
+        const { getPostsForSubs, postsPosition, posts } = this.props.postsStore
+        const { cursorId, items } = postsPosition
 
         return (
             <InfiniteScrollFeed
-                dataLength={count}
+                dataLength={items}
                 hasMore={cursorId !== 0}
-                next={getPostsBySubscribed}
-                posts={allPosts}
+                next={getPostsForSubs}
+                posts={posts}
             />
         )
     }

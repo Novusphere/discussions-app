@@ -121,6 +121,29 @@ export default class Posts extends BaseStore {
         }
     }
 
+    @task
+    @action.bound
+    async getPostsForSubs(subs = this.tagsStore.subscribedSubs) {
+        try {
+            const { posts, cursorId } = await discussions.getPostsForSubs(
+                subs,
+                this.postsPosition.cursorId,
+                this.postsPosition.items
+            )
+
+            this.posts = [...this.posts, ...posts]
+
+            this.postsPosition = {
+                items: this.posts.length,
+                cursorId,
+            }
+
+            return this.posts
+        } catch (error) {
+            return error
+        }
+    }
+
     @task.resolved
     getPostsByTag = async (tags: string[]) => {
         try {

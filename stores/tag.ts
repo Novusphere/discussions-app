@@ -10,13 +10,6 @@ export default class Tag extends BaseStore {
     // the amount of subs that are base
     static baseSubLength = 3
 
-    @observable postsPosition = {
-        count: 0,
-        cursorId: undefined,
-    }
-
-    @observable allPosts: any[] = []
-
     @observable activeTag: TagModel = null
     @observable tags = observable.map<string, TagModel>()
 
@@ -32,39 +25,9 @@ export default class Tag extends BaseStore {
         this.initializeDefaultSubs()
 
         // subscribe everyone to default
-        this.subscribeToDefaultSubs().then(() => {
-            this.getPostsBySubscribed()
-        })
-        // .then(() => {
-        //     observe(this.subSubscriptionStatus, async change => {
-        //         await sleep(500)
-        //         await this.getPostsBySubscribed()
-        //     })
-        // })
+        this.subscribeToDefaultSubs()
     }
 
-    @task
-    @action.bound
-    async getPostsBySubscribed() {
-        try {
-            const { posts, cursorId } = await discussions.getPostsForSubs(
-                this.subscribedSubs,
-                this.postsPosition.cursorId,
-                this.postsPosition.count
-            )
-
-            this.allPosts = [...this.allPosts, ...posts]
-
-            this.postsPosition = {
-                count: this.allPosts.length,
-                cursorId,
-            }
-
-            return this.allPosts
-        } catch (error) {
-            return error
-        }
-    }
 
     @action.bound
     initializeDefaultSubs() {
