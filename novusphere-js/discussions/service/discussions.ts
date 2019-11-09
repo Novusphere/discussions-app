@@ -274,17 +274,19 @@ export default class DiscussionsService {
         let posts: Post[] = []
         let op = Post.fromDbObject(sq.payload[0])
 
-        do {
-            sq = await nsdb.search({
-                pipeline: [
-                    {
-                        $match: {
-                            threadUuid: op.threadUuid,
-                            sub: op.sub,
-                        },
+        sq = {
+            pipeline: [
+                {
+                    $match: {
+                        threadUuid: op.threadUuid,
+                        sub: op.sub,
                     },
-                ],
-            })
+                },
+            ],
+        }
+
+        do {
+            sq = await nsdb.search(sq)
             posts = [...posts, ...sq.payload.map(o => Post.fromDbObject(o))]
         } while (sq.cursorId)
 

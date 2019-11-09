@@ -1,7 +1,7 @@
 import * as React from 'react'
 import { inject, observer } from 'mobx-react'
 import Link from 'next/link'
-import { withRouter } from 'next/router'
+import { NextRouter, withRouter } from 'next/router'
 import classNames from 'classnames'
 import { Tooltip } from 'react-tippy'
 import { TagPreview } from '@components'
@@ -12,13 +12,29 @@ import './style.scss'
 interface ITagListOuterProps {}
 
 interface ITagListInnerProps {
-    router: any
+    router: NextRouter
     tagStore: IStores['tagStore']
+    postsStore: IStores['postsStore']
 }
 
-@inject('tagStore')
+@inject('tagStore', 'postsStore')
 @observer
 class Sidebar extends React.Component<ITagListOuterProps & ITagListInnerProps> {
+    private createPost = () => {
+        const {
+            tagStore: { activeTag },
+            postsStore: { newPostData },
+            router,
+        } = this.props
+
+        newPostData.sub = {
+            value: activeTag.name,
+            label: activeTag.name,
+        }
+
+        return router.push('/new')
+    }
+
     private renderActiveTag = () => {
         const { activeTag, toggleTagSubscribe, subSubscriptionStatus } = this.props.tagStore
 
@@ -40,10 +56,15 @@ class Sidebar extends React.Component<ITagListOuterProps & ITagListInnerProps> {
                     <span className={'flex row black mt2 f6'}>{activeTag.tagDescription}</span>
 
                     <div className={'flex flex-column items-center justify-center mt3'}>
-                        <button className={'w-100 mb2'} onClick={() => toggleTagSubscribe(activeTag.name)}>
+                        <button
+                            className={'w-100 mb2'}
+                            onClick={() => toggleTagSubscribe(activeTag.name)}
+                        >
                             {isSubbed ? 'Unsubscribe' : 'Subscribe'}
                         </button>
-                        <button className={'w-100 button-outline'}>Create Post</button>
+                        <button className={'w-100 button-outline'} onClick={this.createPost}>
+                            Create Post
+                        </button>
                     </div>
                 </div>
             )
@@ -63,7 +84,7 @@ class Sidebar extends React.Component<ITagListOuterProps & ITagListInnerProps> {
 
         if (tag.name === 'feed') {
             return (
-                <Link href={'/all'} as={tag.url}>
+                <Link href={'/feed'} as={tag.url}>
                     <a className={'db black pointer pb1 no-underline'}>{tag.name}</a>
                 </Link>
             )
@@ -102,6 +123,7 @@ class Sidebar extends React.Component<ITagListOuterProps & ITagListInnerProps> {
                                 className={classNames([
                                     'ph3 mb3',
                                     {
+                                        dim: router.asPath !== tag.url,
                                         'sidebar-link-active': router.asPath === tag.url,
                                     },
                                 ])}
@@ -118,6 +140,7 @@ class Sidebar extends React.Component<ITagListOuterProps & ITagListInnerProps> {
                                 className={classNames([
                                     'ph3',
                                     {
+                                        dim: router.query.name !== tag.name,
                                         'sidebar-link-active': router.query.name === tag.name,
                                     },
                                 ])}

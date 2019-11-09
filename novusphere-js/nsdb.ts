@@ -27,9 +27,12 @@ export class NSDB {
     }
 
     async search(sq : INSDBSearchQuery) : Promise<INSDBSearchQuery> {
-        const qs = `data=${JSON.stringify(sq)}`;
+        sq.payload = undefined;
 
-        const request = await axios.get(`${this.api}/discussions/search?${qs}`);
+        const qs = `data=${JSON.stringify(sq)}`;
+        const rurl = `${this.api}/discussions/search?${qs}`;
+
+        const request = await axios.get(rurl);
         const result = request.data;
 
         if (result.error) {

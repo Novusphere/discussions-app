@@ -66,7 +66,7 @@ export default class Posts extends BaseStore {
 
     // when creating a new post
     @observable newPostData = {
-        sub: { value: '', label: '' },
+        sub: null, // { value: '', label: '' }
     }
 
     /**
@@ -152,7 +152,7 @@ export default class Posts extends BaseStore {
                 this.postsPosition.cursorId,
                 this.postsPosition.items
             )
-            
+
             this.posts = [...this.posts, ...posts]
             this.postsPosition = {
                 items: this.posts.length,
@@ -181,21 +181,15 @@ export default class Posts extends BaseStore {
     @action.bound
     public async getAndSetThread(id: string) {
         try {
-            const thread = await this.getThreadById(id)
+            const thread = await discussions.getThread(id)
             if (!thread) return null
-            this.activeThread = thread
+            this.activeThread = new ThreadModel(thread)
             this.activeThreadId = id
-            return thread
+            return this.activeThread
         } catch (error) {
             console.log('Class: Posts, Function: getAndSetThread, Line 123 error: ', error)
             throw error
         }
-    }
-
-    @action.bound
-    refreshActiveThreadAsModel() {
-        this.activeThread = new ThreadModel(this.activeThread as any)
-        return this.activeThread
     }
 
     /**
@@ -224,17 +218,6 @@ export default class Posts extends BaseStore {
         )
     }
 
-    @task
-    public getThreadById = async (id: string): Promise<ThreadModel | null> => {
-        try {
-            const thread = await discussions.getThread(id)
-            if (!thread) return null
-            return new ThreadModel(thread)
-        } catch (error) {
-            throw error
-        }
-    }
-
     @action
     public vote = async (uuid: string, value: number) => {
         try {
@@ -260,7 +243,6 @@ export default class Posts extends BaseStore {
             hideLabels: true,
             extra: {
                 options: [
-                    { value: 'all', label: 'all' },
                     ...Array.from(this.tagsStore.tags.values())
                         .filter(tag => !tag.root)
                         .map(tag => ({
@@ -459,7 +441,6 @@ export default class Posts extends BaseStore {
                                         newPost.poster = posterName
                                         newPost.displayName = posterName
                                     }
-
 
                                     const model = new PostModel(newPost as any)
                                     const signedReply = model.sign(this.newAuthStore.postPriv)

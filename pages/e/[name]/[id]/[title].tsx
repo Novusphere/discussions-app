@@ -31,7 +31,6 @@ class E extends React.Component<IEPageProps, IEPageState> {
         const uiStore: IStores['uiStore'] = store.uiStore
         uiStore.toggleBannerStatus(true)
         uiStore.toggleSidebarStatus(true)
-
         tagStore.setActiveTag(query.name)
 
         return {
@@ -39,15 +38,13 @@ class E extends React.Component<IEPageProps, IEPageState> {
         }
     }
 
-    async componentWillMount(): Promise<void> {
+    async componentDidMount(): Promise<void> {
         this.props.tagStore.setActiveTag(this.props.query.name)
         await this.props.postsStore.getAndSetThread(this.props.query.id)
     }
 
     public render(): React.ReactNode {
         let {
-            // thread,
-            query: { id, name, title },
             postsStore: { activeThread },
         } = this.props
 
@@ -56,8 +53,6 @@ class E extends React.Component<IEPageProps, IEPageState> {
             rejected: () => 'Error!',
             resolved: () => <ShowFullThread thread={activeThread} />,
         })
-
-        // return <ShowFullThread thread={thread} />
     }
 }
 
