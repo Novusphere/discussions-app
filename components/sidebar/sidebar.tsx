@@ -114,7 +114,7 @@ class Sidebar extends React.Component<ITagListOuterProps & ITagListInnerProps> {
         return (
             <>
                 {this.renderActiveTag()}
-                <ul className={'w-100'}>
+                <ul className={'w-100 list sidebar-ul'}>
                     {Array.from(tags.values())
                         .filter(tag => tag.root)
                         .map(tag => (
