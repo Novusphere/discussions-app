@@ -7,6 +7,7 @@ export interface INSDBSearchQuery {
     pipeline: any[];
     payload?: any;
     count?: number;
+    limit?: number;
 }
 
 export class NSDB {
@@ -30,13 +31,15 @@ export class NSDB {
 
         const request = await axios.get(`${this.api}/discussions/search?${qs}`);
         const result = request.data;
+
         if (result.error) {
             console.log(result);
             throw new Error(result.error);
         }
-
+        
         sq.cursorId = result.cursorId;
         sq.count = result.count;
+        sq.limit = result.limit;
         sq.payload = result.payload;
 
         return sq;

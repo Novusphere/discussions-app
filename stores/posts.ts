@@ -128,6 +128,7 @@ export default class Posts extends BaseStore {
                 this.postsPosition.cursorId,
                 this.postsPosition.items
             )
+            
             this.posts = [...this.posts, ...posts]
             this.postsPosition = {
                 items: this.posts.length,

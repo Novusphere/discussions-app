@@ -34,25 +34,23 @@ class Tag extends React.Component<ITagProps> {
 
         let feed: any[] = []
 
-        // if (!tagStore.activeTag || tagStore.activeTag.name !== tag) {
-        //     feed = await postsStore.getPostsByTag([tag])
-        // }
-        //
-        // if (tagStore.activeTag && tagStore.activeTag.name === tag) {
-        //     feed = postsStore.posts
-        // }
-        //
-        // if (tagStore.activeTag && tagStore.activeTag.name !== tag) {
-        //     postsStore.resetPositionAndPosts()
-        //     tagStore.setActiveTag(tag)
-        //
-        //     feed = await postsStore.getPostsByTag([tag])
-        // }
+        if (!tagStore.activeTag) {
+            console.log('here 1')
+            feed = await postsStore.getPostsByTag([tag])
+        }
 
-        postsStore.resetPositionAndPosts()
-        tagStore.setActiveTag(tag)
+        if (tagStore.activeTag && tagStore.activeTag.name === tag) {
+            console.log('here 2')
+            feed = postsStore.posts
+        }
 
-        feed = await postsStore.getPostsByTag([tag])
+        if (tagStore.activeTag && tagStore.activeTag.name !== tag) {
+            console.log('here 3')
+            postsStore.resetPositionAndPosts()
+            tagStore.setActiveTag(tag)
+
+            feed = await postsStore.getPostsByTag([tag])
+        }
 
         return {
             tagName: tag,
@@ -74,15 +72,6 @@ class Tag extends React.Component<ITagProps> {
             props: { postsStore, tagStore, feed, tagName },
         } = this
         
-
-        if (postsStore.getPostsByTag['pending']) {
-            return <FontAwesomeIcon width={13} icon={faSpinner} spin />
-        }
-
-        // if (!feed.length && postsStore.getPostsByTag['resolved']) {
-        //     return <span>No posts found for specified tag: {tagName}</span>
-        // }
-
         return (
             <>
                 <Head>
@@ -91,7 +80,7 @@ class Tag extends React.Component<ITagProps> {
                     </title>
                 </Head>
                 <Feed
-                    threads={postsStore.feedThreads}
+                    threads={feed}
                     onClick={clickPost}
                     tagModel={tagStore.activeTag}
                 />

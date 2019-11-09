@@ -294,13 +294,23 @@ export default class DiscussionsService {
         return thread
     }
 
-    async getPostsForSubs(subs: string[]): Promise<Post[]> {
+    async getPostsForSubs(
+        subs: string[],
+        cursorId = undefined,
+        count = 0,
+        limit = 20): Promise<{
+        posts: Post[]
+        cursorId: number
+    }> {
         let q: any = { $in: subs.map(sub => sub.toLowerCase()) }
         if (subs.length == 1 && subs[0] == 'all') {
             q = { $nin: [] } // filtered subs from all sub
         }
 
         const query = await nsdb.search({
+            cursorId,
+            count,
+            limit,
             pipeline: [
                 {
                     $match: {
@@ -316,14 +326,19 @@ export default class DiscussionsService {
             ],
         })
 
-        return query.payload.map(o => Post.fromDbObject(o))
+        let posts = query.payload.map(o => Post.fromDbObject(o))
+
+        return {
+            posts,
+            cursorId: query.cursorId,
+        }
     }
 
     async getPostsForTags(
         tags: string[],
         cursorId = undefined,
         count = 0,
-        limit = 2,
+        limit = 10,
         threadOnly = true
     ): Promise<{
         posts: Post[]
@@ -338,7 +353,12 @@ export default class DiscussionsService {
         try {
             const query = await nsdb.search({
                 cursorId,
-                pipeline: [{ $match: searchQuery }, { $sort: { createdAt: -1 } }],
+                count,
+                limit,
+                pipeline: [
+                    { $match: searchQuery },
+                    { $sort: { createdAt: -1 } },
+                ],
             })
             let posts = query.payload.map(o => Post.fromDbObject(o))
 
