@@ -2,10 +2,8 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="2d14133e-344f-4fbf-9bb7-c9e5e96ae697" name="Default Changelist" comment="">
-      <change beforePath="$PROJECT_DIR$/models/threadModel.ts" beforeDir="false" afterPath="$PROJECT_DIR$/models/threadModel.ts" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/modules/quill-autoformat/src/formats/hashtag.js" beforeDir="false" afterPath="$PROJECT_DIR$/modules/quill-autoformat/src/formats/hashtag.js" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/stores/posts.ts" beforeDir="false" afterPath="$PROJECT_DIR$/stores/posts.ts" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/utils/index.ts" beforeDir="false" afterPath="$PROJECT_DIR$/utils/index.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/stores/newAuth.ts" beforeDir="false" afterPath="$PROJECT_DIR$/stores/newAuth.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/stores/notifications.ts" beforeDir="false" afterPath="$PROJECT_DIR$/stores/notifications.ts" afterDir="false" />
     </list>
     <ignored path="$PROJECT_DIR$/.tmp/" />
     <ignored path="$PROJECT_DIR$/temp/" />
@@ -17,49 +15,32 @@
     <option name="LAST_RESOLUTION" value="IGNORE" />
   </component>
   <component name="FileEditorManager">
-    <splitter split-orientation="horizontal" split-proportion="0.5">
-      <split-first>
-        <leaf>
-          <file pinned="false" current-in-tab="true">
-            <entry file="file://$PROJECT_DIR$/stores/posts.ts">
-              <provider selected="true" editor-type-id="text-editor">
-                <state relative-caret-position="321">
-                  <caret line="190" column="46" lean-forward="true" selection-start-line="190" selection-start-column="46" selection-end-line="190" selection-end-column="46" />
-                  <folding>
-                    <element signature="e#0#51#0" expanded="true" />
-                  </folding>
-                </state>
-              </provider>
-            </entry>
-          </file>
-        </leaf>
-      </split-first>
-      <split-second>
-        <leaf>
-          <file pinned="false" current-in-tab="true">
-            <entry file="file://$PROJECT_DIR$/models/threadModel.ts">
-              <provider selected="true" editor-type-id="text-editor">
-                <state relative-caret-position="432">
-                  <caret line="40" column="16" lean-forward="true" selection-start-line="40" selection-start-column="16" selection-end-line="40" selection-end-column="16" />
-                  <folding>
-                    <element signature="e#0#53#0" expanded="true" />
-                  </folding>
-                </state>
-              </provider>
-            </entry>
-          </file>
-          <file pinned="false" current-in-tab="false">
-            <entry file="file://$PROJECT_DIR$/models/postModel.ts">
-              <provider selected="true" editor-type-id="text-editor">
-                <state relative-caret-position="280">
-                  <caret line="30" column="4" selection-start-line="30" selection-start-column="4" selection-end-line="30" selection-end-column="4" />
-                </state>
-              </provider>
-            </entry>
-          </file>
-        </leaf>
-      </split-second>
-    </splitter>
+    <leaf>
+      <file pinned="false" current-in-tab="true">
+        <entry file="file://$PROJECT_DIR$/stores/notifications.ts">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="225">
+              <caret line="103" column="91" selection-start-line="103" selection-start-column="91" selection-end-line="103" selection-end-column="91" />
+              <folding>
+                <element signature="e#0#63#0" expanded="true" />
+              </folding>
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/stores/newAuth.ts">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="451">
+              <caret line="85" column="72" lean-forward="true" selection-start-line="85" selection-start-column="72" selection-end-line="85" selection-end-column="72" />
+              <folding>
+                <element signature="e#0#63#0" expanded="true" />
+              </folding>
+            </state>
+          </provider>
+        </entry>
+      </file>
+    </leaf>
   </component>
   <component name="FindInProjectRecents">
     <findStrings>
@@ -128,7 +109,6 @@
   <component name="IdeDocumentHistory">
     <option name="CHANGED_PATHS">
       <list>
-        <option value="$PROJECT_DIR$/components/title-header/title-header.tsx" />
         <option value="$PROJECT_DIR$/server/index.ts" />
         <option value="$PROJECT_DIR$/models/replyModel.ts" />
         <option value="$PROJECT_DIR$/pages/_document.tsx" />
@@ -170,7 +150,6 @@
         <option value="$PROJECT_DIR$/models/postModel.ts" />
         <option value="$PROJECT_DIR$/components/user-notifications/user-notifications.tsx" />
         <option value="$PROJECT_DIR$/pages/notifications/index.tsx" />
-        <option value="$PROJECT_DIR$/stores/notifications.ts" />
         <option value="$PROJECT_DIR$/components/feed/feed.tsx" />
         <option value="$PROJECT_DIR$/components/index.ts" />
         <option value="$PROJECT_DIR$/novusphere-js/discussions/service/discussions.ts" />
@@ -179,6 +158,8 @@
         <option value="$PROJECT_DIR$/utils/index.ts" />
         <option value="$PROJECT_DIR$/stores/posts.ts" />
         <option value="$PROJECT_DIR$/models/threadModel.ts" />
+        <option value="$PROJECT_DIR$/stores/newAuth.ts" />
+        <option value="$PROJECT_DIR$/stores/notifications.ts" />
       </list>
     </option>
   </component>
@@ -417,18 +398,18 @@
       <workItem from="1572830992500" duration="1317000" />
       <workItem from="1572884342401" duration="610000" />
       <workItem from="1572909854078" duration="4444000" />
-      <workItem from="1573256311248" duration="10741000" />
+      <workItem from="1573256311248" duration="11185000" />
     </task>
     <servers />
   </component>
   <component name="TimeTrackingManager">
-    <option name="totallyTimeSpent" value="545145000" />
+    <option name="totallyTimeSpent" value="545589000" />
   </component>
   <component name="ToolWindowManager">
     <frame x="-8" y="-8" width="2576" height="1416" extended-state="6" />
     <editor active="true" />
     <layout>
-      <window_info content_ui="combo" id="Project" order="0" sideWeight="0.49896482" visible="true" weight="0.119779356" />
+      <window_info active="true" content_ui="combo" id="Project" order="0" sideWeight="0.49896482" visible="true" weight="0.119779356" />
       <window_info id="Structure" order="1" side_tool="true" weight="0.25" />
       <window_info id="Favorites" order="2" side_tool="true" />
       <window_info id="npm" order="3" sideWeight="0.5010352" side_tool="true" weight="0.12647754" />
@@ -442,7 +423,7 @@
       <window_info anchor="bottom" id="Version Control" order="7" />
       <window_info anchor="bottom" id="Docker" order="8" show_stripe_button="false" />
       <window_info anchor="bottom" id="TypeScript" order="9" />
-      <window_info active="true" anchor="bottom" id="Terminal" order="10" sideWeight="0.49960598" visible="true" weight="0.32424006" />
+      <window_info anchor="bottom" id="Terminal" order="10" sideWeight="0.49960598" visible="true" weight="0.32424006" />
       <window_info anchor="bottom" id="Event Log" order="11" sideWeight="0.500394" side_tool="true" weight="0.17614965" />
       <window_info anchor="right" id="Commander" internal_type="SLIDING" order="0" type="SLIDING" weight="0.4" />
       <window_info anchor="right" id="Ant Build" order="1" weight="0.25" />
@@ -782,16 +763,6 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/stores/newAuth.ts">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="-64">
-          <caret line="32" column="21" lean-forward="true" selection-start-line="32" selection-start-column="21" selection-end-line="32" selection-end-column="21" />
-          <folding>
-            <element signature="e#0#63#0" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/components/title-header/title-header.tsx">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="225">
@@ -808,16 +779,6 @@
           <caret line="30" column="52" selection-start-line="30" selection-start-column="52" selection-end-line="30" selection-end-column="52" />
           <folding>
             <element signature="e#0#30#0" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/stores/notifications.ts">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="305">
-          <caret line="99" column="42" selection-start-line="99" selection-start-column="42" selection-end-line="99" selection-end-column="42" />
-          <folding>
-            <element signature="e#0#63#0" expanded="true" />
           </folding>
         </state>
       </provider>
@@ -896,8 +857,8 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/stores/posts.ts">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="321">
-          <caret line="190" column="46" lean-forward="true" selection-start-line="190" selection-start-column="46" selection-end-line="190" selection-end-column="46" />
+        <state relative-caret-position="337">
+          <caret line="191" column="17" lean-forward="true" selection-start-line="191" selection-start-column="17" selection-end-line="191" selection-end-column="17" />
           <folding>
             <element signature="e#0#51#0" expanded="true" />
           </folding>
@@ -910,6 +871,26 @@
           <caret line="40" column="16" lean-forward="true" selection-start-line="40" selection-start-column="16" selection-end-line="40" selection-end-column="16" />
           <folding>
             <element signature="e#0#53#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/stores/newAuth.ts">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="451">
+          <caret line="85" column="72" lean-forward="true" selection-start-line="85" selection-start-column="72" selection-end-line="85" selection-end-column="72" />
+          <folding>
+            <element signature="e#0#63#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/stores/notifications.ts">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="225">
+          <caret line="103" column="91" selection-start-line="103" selection-start-column="91" selection-end-line="103" selection-end-column="91" />
+          <folding>
+            <element signature="e#0#63#0" expanded="true" />
           </folding>
         </state>
       </provider>
