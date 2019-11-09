@@ -371,16 +371,23 @@ export default class DiscussionsService {
         postPublicKey: string,
         lastCheckedNotifications: number,
         cursorId = undefined,
+        count = 0,
+        limit = 20,
     ): Promise<INSDBSearchQuery> {
         try {
             return await nsdb.search({
-                pipeline: [{
-                    $match: {
-                        createdAt: { $gte: lastCheckedNotifications },
-                        mentions: { $in: [postPublicKey] },
-                    }
-                }],
+                pipeline: [
+                    {
+                        $match: {
+                            createdAt: { $gte: lastCheckedNotifications },
+                            mentions: { $in: [postPublicKey] },
+                        }
+                    },
+                    { $sort: { createdAt: -1 } }
+                ],
                 cursorId,
+                count,
+                limit
             })
         } catch (error) {
             throw error
