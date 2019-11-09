@@ -20,6 +20,8 @@ export default class Notifications extends BaseStore {
     @observable notifications = observable.map<string, IPost>()
     @observable unreadCount = 0
 
+    @observable private notificationIntervalHandler: any = null
+
     private readonly authStore: IStores['newAuthStore'] = getNewAuthStore()
 
     constructor() {
@@ -30,6 +32,14 @@ export default class Notifications extends BaseStore {
             hasAccount => {
                 if (hasAccount) {
                     this.fetchNotifications()
+                    this.notificationIntervalHandler = setInterval(() => {
+                        this.fetchNotifications()
+                    }, 5000)
+                } else {
+                    if (this.notificationIntervalHandler) {
+                        clearInterval(this.notificationIntervalHandler)
+                        this.notificationIntervalHandler = null
+                    }
                 }
             },
             {
@@ -43,7 +53,9 @@ export default class Notifications extends BaseStore {
     }
 
     @computed get firstSetOfNotifications() {
-        return this.notificationsAsArray.slice(0, Notifications.notificationMaximumCount - 1)
+        return this.notificationsAsArray
+            .slice(0, Notifications.notificationMaximumCount - 1)
+            .reverse()
     }
 
     @computed get hasMoreThanQueriedNotifications() {
@@ -83,11 +95,19 @@ export default class Notifications extends BaseStore {
 
     @task
     @action.bound
-    async fetchNotifications(time = this.lastCheckedNotifications) {
+    async fetchNotifications(time = this.lastCheckedNotifications, clearTray = false) {
+        console.log('Fetching notifications: ', time)
+        console.warn('If notification time was 0, that means you are on the feed page')
+
         let defaultCursorId = this.cursorId
 
         if (defaultCursorId === 0) {
             defaultCursorId = undefined
+        }
+
+        if (clearTray) {
+            this.resetUnreadCount()
+            this.notifications.clear()
         }
 
         try {
@@ -97,18 +117,16 @@ export default class Notifications extends BaseStore {
                 defaultCursorId
             )
 
-            if (time === 0) {
-                this.lastCheckedNotifications = Date.now()
-                this.cursorId = cursorId
-                return payload
-            } else {
+            if (time !== 0) {
+                this.unreadCount = payload.length
+            }
+
+            this.cursorId = cursorId
+
+            if (!clearTray) {
                 payload.forEach(notification => {
                     this.notifications.set(notification.uuid, notification as any)
                 })
-
-                this.lastCheckedNotifications = Date.now()
-                this.cursorId = cursorId
-                this.unreadCount = this.notifications.size
             }
 
             return payload
@@ -122,7 +140,7 @@ export default class Notifications extends BaseStore {
     async fetchNotificationsAsFeed(): Promise<FeedModel[]> {
         try {
             await sleep(500)
-            const payload = await this.fetchNotifications(0)
+            const payload = await this.fetchNotifications(0, true)
             return payload.map(post => new FeedModel(post as any))
         } catch (error) {
             throw error

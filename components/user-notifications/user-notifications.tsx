@@ -82,11 +82,13 @@ class UserNotifications extends React.Component<
     }
 
     private renderNotifications = () => {
-        if (!this.props.notificationsStore.firstSetOfNotifications.length) {
+        const { firstSetOfNotifications } = this.props.notificationsStore
+
+        if (!firstSetOfNotifications.length) {
             return <span className={'tc f6 pt4 self-center'}>You have no new notifications</span>
         }
 
-        return this.props.notificationsStore.firstSetOfNotifications.map(notification => {
+        return firstSetOfNotifications.map(notification => {
             return this.renderNotification(notification)
         })
     }

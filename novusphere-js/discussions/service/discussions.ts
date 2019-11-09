@@ -376,7 +376,9 @@ export default class DiscussionsService {
     async getPostsForNotifications(
         postPublicKey: string,
         lastCheckedNotifications: number,
-        cursorId = undefined
+        cursorId = undefined,
+        count = 0,
+        limit = 20
     ): Promise<INSDBSearchQuery> {
         try {
             return await nsdb.search({
@@ -387,8 +389,11 @@ export default class DiscussionsService {
                             mentions: { $in: [postPublicKey] },
                         },
                     },
+                    { $sort: { createdAt: -1 } },
                 ],
                 cursorId,
+                count,
+                limit,
             })
         } catch (error) {
             throw error

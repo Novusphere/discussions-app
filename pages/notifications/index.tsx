@@ -27,6 +27,8 @@ class Notifications extends React.Component<INotificationsProps> {
     }
 
     componentDidMount(): void {
+        this.props.notificationsStore.resetUnreadCount()
+        this.props.notificationsStore.setTimeStamp()
         this.props.notificationsStore.fetchNotificationsAsFeed()
     }
 

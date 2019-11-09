@@ -37,8 +37,6 @@ class PostModel {
             imageData = getIdenticon(this.pub)
         }
 
-        console.log(this.pub)
-
         this.imageData = imageData
     }
 
