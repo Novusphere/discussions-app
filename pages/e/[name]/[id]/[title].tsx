@@ -4,6 +4,7 @@ import { IStores } from '@stores'
 import { ShowFullThread } from '@components'
 import { faSpinner } from '@fortawesome/free-solid-svg-icons'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
+import { NextRouter } from 'next/router'
 
 interface IEPageProps {
     postsStore: IStores['postsStore']
@@ -14,6 +15,8 @@ interface IEPageProps {
         id: string
         title: string
     }
+
+    router: NextRouter
 }
 
 interface IEPageState {
@@ -25,23 +28,14 @@ interface IEPageState {
 class E extends React.Component<IEPageProps, IEPageState> {
     static async getInitialProps({ query, store }) {
         const tagStore: IStores['tagStore'] = store.tagStore
-        const postsStore: IStores['postsStore'] = store.postsStore
         const uiStore: IStores['uiStore'] = store.uiStore
         uiStore.toggleBannerStatus(true)
         uiStore.toggleSidebarStatus(true)
 
         tagStore.setActiveTag(query.name)
 
-        // const thread = await postsStore.getAndSetThread(query.id)
-        
-        // if (thread) {
-        //     query.title = thread.title
-        //     query.name = thread.sub
-        // }
-
         return {
             query,
-            // thread,
         }
     }
 
@@ -54,7 +48,7 @@ class E extends React.Component<IEPageProps, IEPageState> {
         let {
             // thread,
             query: { id, name, title },
-            postsStore: { activeThread }
+            postsStore: { activeThread },
         } = this.props
 
         return this.props.postsStore.getAndSetThread['match']({

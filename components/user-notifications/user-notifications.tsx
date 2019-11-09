@@ -98,6 +98,8 @@ class UserNotifications extends React.Component<
     }
 
     public render() {
+        const { fetchNotifications, firstSetOfNotifications } = this.props.notificationsStore
+
         return (
             <div
                 ref={this.container}
@@ -105,35 +107,33 @@ class UserNotifications extends React.Component<
                     minHeight: this.state.height ? this.state.height : undefined,
                 }}
             >
-                {this.props.notificationsStore.fetchNotifications['match']({
-                    pending: () => <span>Loading...</span>,
-                    rejected: () => <span>Failed to fetch your notifications</span>,
-                    resolved: () => (
-                        <div className={'notification-tooltip'} style={{ width: 300 }}>
-                            {this.renderNotifications()}
-                            <div
-                                className={
-                                    'f6 gray bg-near-white w-100 self-end pv3 ph3 flex flex-row justify-between'
-                                }
+                {fetchNotifications['pending'] && !firstSetOfNotifications ? (
+                    <span>Loading...</span>
+                ) : (
+                    <div className={'notification-tooltip'} style={{ width: 300 }}>
+                        {this.renderNotifications()}
+                        <div
+                            className={
+                                'f6 gray bg-near-white w-100 self-end pv3 ph3 flex flex-row justify-between'
+                            }
+                        >
+                            <span
+                                onClick={this.clearNotifications}
+                                className={'b dim pointer'}
+                                title={'Mark all new notifications as read'}
                             >
-                                <span
-                                    onClick={this.clearNotifications}
-                                    className={'b dim pointer'}
-                                    title={'Mark all new notifications as read'}
-                                >
-                                    mark as read
-                                </span>
-                                <span
-                                    onClick={this.goToNotifications}
-                                    className={'dim pointer'}
-                                    title={'View all notifications, including ones that are read'}
-                                >
-                                    view all
-                                </span>
-                            </div>
+                                mark as read
+                            </span>
+                            <span
+                                onClick={this.goToNotifications}
+                                className={'dim pointer'}
+                                title={'View all notifications, including ones that are read'}
+                            >
+                                view all
+                            </span>
                         </div>
-                    ),
-                })}
+                    </div>
+                )}
             </div>
         )
     }

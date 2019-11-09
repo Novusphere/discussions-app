@@ -52,7 +52,7 @@ class Reply extends React.Component<IReplies, any> {
     private addAndScrollToUuid = (uuid: string) => {
         if (this.replyRef.current.dataset.postUuid === uuid) {
             this.props.postsStore.highlightPostUuid(uuid)
-            window.scrollTo(0, this.replyRef.current.offsetTop)
+            window.scrollTo(0, this.replyRef.current.scrollHeight * 2)
         }
     }
 
@@ -144,6 +144,7 @@ class Reply extends React.Component<IReplies, any> {
 
         return (
             <div
+                id={post.uuid}
                 ref={this.replyRef}
                 data-post-uuid={post.uuid}
                 data-permalink={getPermaLink(currentPathTrimmed, post.uuid)}

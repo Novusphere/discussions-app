@@ -41,6 +41,7 @@ class Notifications extends React.Component<INotificationsProps> {
                         <PostPreview
                             disableVoteHandler
                             key={notification.uuid}
+                            notificationUuid={notification.uuid}
                             post={notification}
                             tag={this.props.tagStore.tags.get(notification.sub)}
                         />

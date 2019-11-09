@@ -14,6 +14,7 @@ import { getThreadUrl } from '@utils'
 interface IPostPreviewProps {
     post: FeedModel
     tag: TagModel
+    notificationUuid?: string
     voteHandler?: (uuid: string, value: number) => Promise<void>
     disableVoteHandler?: boolean // in case voting needs to be disabled
 }
@@ -22,13 +23,14 @@ const PostPreview: React.FC<IPostPreviewProps> = ({
     disableVoteHandler,
     post,
     tag,
+    notificationUuid,
     voteHandler,
 }) => {
     const [url, setUrl] = useState('')
 
     useEffect(() => {
         async function getUrl() {
-            setUrl(await getThreadUrl(post))
+            setUrl(await getThreadUrl(post, notificationUuid))
         }
 
         getUrl()
