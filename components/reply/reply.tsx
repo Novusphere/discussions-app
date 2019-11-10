@@ -33,6 +33,8 @@ interface IReplies {
     userStore?: IStores['userStore']
     newAuthStore?: IStores['newAuthStore']
     postsStore?: IStores['postsStore']
+
+    isCollapsed?: boolean
 }
 
 interface IRepliesState {
@@ -131,6 +133,9 @@ class Reply extends React.Component<IReplies, IRepliesState> {
     }
 
     render() {
+
+        if (this.props.isCollapsed) return null
+
         const {
             post,
             voteHandler,
@@ -251,6 +256,7 @@ class Reply extends React.Component<IReplies, IRepliesState> {
                                   newAuthStore={newAuthStore}
                                   postsStore={postsStore}
                                   currentPath={currentPath}
+                                  isCollapsed={isCollapsed}
                               />
                           </div>
                       ))
