@@ -48,7 +48,7 @@ class Sidebar extends React.Component<ITagListOuterProps & ITagListInnerProps> {
                             title={`${activeTag.name} icon`}
                             className={'activeTag-image w-10 mr2'}
                         />
-                        <span className={'b black f6'}>e/{activeTag.name}</span>
+                        <span className={'b black f6'}>#{activeTag.name}</span>
                     </span>
 
                     <span className={'flex row fa5 mt2 f5'}>{activeTag.memberCount} Members</span>
