@@ -105,6 +105,8 @@ class TitleHeader extends React.Component<ITitleHeaderProps, ITitleHeaderState> 
                     <Tooltip
                         animateFill={false}
                         interactive
+                        interactiveBorder={20}
+                        unmountHTMLWhenHide={true}
                         html={this.renderUserSettings()}
                         position={'bottom-end'}
                         trigger={'mouseenter'}

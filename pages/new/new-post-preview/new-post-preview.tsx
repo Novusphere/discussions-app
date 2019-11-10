@@ -1,8 +1,9 @@
 import * as React from 'react'
 import { inject, observer } from 'mobx-react'
 import { IStores } from '@stores'
-import { PostPreview } from '@components'
 import { IPost } from '@stores/posts'
+import { OpeningPost } from '@components'
+import PostModel from '@models/postModel'
 
 interface IPostPreviewProps {
     postsStore: IStores['postsStore']
@@ -20,6 +21,8 @@ class NewPostPreview extends React.Component<IPostPreviewProps> {
         if (!preview) {
             return null
         }
+
+        console.log(preview)
 
         const post: IPost = {
             id: 0,
@@ -55,10 +58,12 @@ class NewPostPreview extends React.Component<IPostPreviewProps> {
                     This is what your post will look like before you post.
                 </span>
                 <div className={'mt3'}>
-                    <PostPreview
-                        post={post as any}
-                        tag={this.props.tagStore.tags.get(post.sub)}
-                        disableVoteHandler
+                    <OpeningPost
+                        isPreview
+                        activeThread={null}
+                        openingPost={new PostModel(post as any)}
+                        asPath={null}
+                        getThreadLoading={null}
                     />
                 </div>
             </>

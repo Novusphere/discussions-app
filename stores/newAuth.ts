@@ -56,17 +56,17 @@ export default class NewAuth extends BaseStore {
     @task
     @action.bound
     async checkInitialConditions() {
-        await sleep(500)
+        await sleep(100)
 
         if (this.getActiveDisplayName && this.postPriv && this.tipPub) {
-            if (this.preferredSignInMethod === SignInMethods.scatter) {
-                try {
-                    return await this.initializeScatterLogin()
-                } catch (error) {
-                    this.hasAccount = false
-                    return error
-                }
-            }
+            // if (this.preferredSignInMethod === SignInMethods.scatter) {
+            //     try {
+            //         return await this.initializeScatterLogin()
+            //     } catch (error) {
+            //         this.hasAccount = false
+            //         return error
+            //     }
+            // }
 
             if (this.preferredSignInMethod === SignInMethods.brainKey) {
                 if (this.statusJson.bk && this.postPriv && this.tipPub && this.displayName.bk) {
@@ -121,6 +121,8 @@ export default class NewAuth extends BaseStore {
 
             return this.displayName.scatter
         }
+
+        return null
     }
 
     @computed get hasBKAccount() {

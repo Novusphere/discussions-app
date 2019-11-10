@@ -384,21 +384,17 @@ export default class Posts extends BaseStore {
                 hideLabels: true,
                 extra: {
                     options: [
-                        // {
-                        //     value: 'Preview',
-                        //     className: 'white bg-gray',
-                        //     title: 'Preview the post before submitting',
-                        //     onClick: form => {
-                        //         if (form.isValid) {
-                        //             console.log(this.newPostData)
-                        //             // this.preview = form.values()
-                        //             // this.preview.sub = {
-                        //             //     value: this.newPostData.sub,
-                        //             //     label: this.newPostData.sub,
-                        //             // }
-                        //         }
-                        //     },
-                        // },
+                        {
+                            value: 'Preview',
+                            className: 'white bg-gray',
+                            title: 'Preview the post before submitting',
+                            onClick: form => {
+                                if (!form.hasError) {
+                                    this.preview = form.values()
+                                    this.preview.sub = this.newPostData.sub
+                                }
+                            },
+                        },
                         // {
                         //     value: 'Post ID',
                         //     title: 'Post with an anonymous ID',
