@@ -6,23 +6,17 @@ import { IStores } from '@stores'
 interface IIndexPage {
     postsStore: IStores['postsStore']
     tagStore: IStores['tagStore']
+    uiStore: IStores['uiStore']
 }
 
-@inject('postsStore', 'tagStore')
+@inject('postsStore', 'tagStore', 'uiStore')
 @observer
 class Index extends React.Component<IIndexPage> {
-    static async getInitialProps({ store }) {
-        const uiStore: IStores['uiStore'] = store.uiStore
-        const postsStore: IStores['postsStore'] = store.postsStore
-        const tagStore: IStores['tagStore'] = store.tagStore
-
-        postsStore.resetPositionAndPosts()
-
-        uiStore.toggleSidebarStatus(true)
-        uiStore.toggleBannerStatus(true)
-        tagStore.destroyActiveTag()
-
-        return {}
+    componentWillMount(): void {
+        this.props.postsStore.resetPositionAndPosts()
+        this.props.tagStore.destroyActiveTag()
+        this.props.uiStore.toggleSidebarStatus(true)
+        this.props.uiStore.toggleBannerStatus(true)
     }
 
     componentDidMount(): void {

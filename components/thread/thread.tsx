@@ -2,24 +2,14 @@ import * as React from 'react'
 import { observer, inject } from 'mobx-react'
 
 import './style.scss'
-import Link from 'next/link'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
-import {
-    faArrowLeft,
-    faExclamationTriangle,
-    faLink,
-    faReply,
-    faShare,
-    faSpinner,
-} from '@fortawesome/free-solid-svg-icons'
-import { Attachments, OpeningPost, Reply, ReplyBox, UserNameWithIcon, Votes } from '@components'
-import moment from 'moment'
-import ReactMarkdown from 'react-markdown'
+import { faSpinner } from '@fortawesome/free-solid-svg-icons'
+import { OpeningPost, Reply, ReplyBox } from '@components'
 import { ThreadModel } from '@models/threadModel'
 import { IStores } from '@stores'
 import { NextRouter, withRouter } from 'next/router'
-import { getBaseUrl, getPermaLink } from '@utils'
 import PostModel from '@models/postModel'
+import Head from 'next/head'
 
 interface IThreadOuterProps {
     thread: ThreadModel
@@ -136,6 +126,9 @@ class Thread extends React.Component<IThreadOuterProps & IThreadInnerProps, IThr
     public render() {
         return (
             <>
+                <Head>
+                    <title>{this.props.thread.title} | {this.props.thread.sub}</title>
+                </Head>
                 {this.renderOpeningPost()}
                 {this.renderOpeningPostReplyBox()}
                 {this.renderReplyContent()}

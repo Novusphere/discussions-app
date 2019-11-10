@@ -152,7 +152,7 @@ class TitleHeader extends React.Component<ITitleHeaderProps, ITitleHeaderState> 
 
         if (!activeTag) {
             return (
-                <Link href={'/'}>
+                <Link href={'/'} prefetch={false}>
                     <a>home</a>
                 </Link>
             )
