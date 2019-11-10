@@ -84,7 +84,7 @@ const PostPreview: React.FC<IPostPreviewProps> = ({
                             <object>
                                 <ReactMarkdown
                                     className={
-                                        'black lh-copy measure-wide pt2 post-preview-content content-fade'
+                                        'black lh-copy measure-wide pt2 post-preview-content content-fade overflow-break-word'
                                     }
                                     source={post.content}
                                 />

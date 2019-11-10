@@ -8,6 +8,7 @@ import { NextRouter } from 'next/router'
 
 interface IEPageProps {
     postsStore: IStores['postsStore']
+    uiStore: IStores['uiStore']
     tagStore: IStores['tagStore']
     // thread: any
     query: {
@@ -23,14 +24,12 @@ interface IEPageState {
     thread: any
 }
 
-@inject('postsStore', 'tagStore')
+@inject('postsStore', 'tagStore', 'uiStore')
 @observer
 class E extends React.Component<IEPageProps, IEPageState> {
     static async getInitialProps({ query, store }) {
         const tagStore: IStores['tagStore'] = store.tagStore
         const uiStore: IStores['uiStore'] = store.uiStore
-        uiStore.toggleBannerStatus(true)
-        uiStore.toggleSidebarStatus(true)
         tagStore.setActiveTag(query.name)
 
         return {
@@ -40,6 +39,8 @@ class E extends React.Component<IEPageProps, IEPageState> {
 
     async componentDidMount(): Promise<void> {
         this.props.tagStore.setActiveTag(this.props.query.name)
+        this.props.uiStore.toggleBannerStatus(true)
+        this.props.uiStore.toggleSidebarStatus(true)
         await this.props.postsStore.getAndSetThread(this.props.query.id)
     }
 

@@ -84,7 +84,7 @@ const OpeningPost: React.FC<IOpeningPostProps> = ({
                     )}
                 </div>
 
-                <ReactMarkdown className={'black f6 lh-copy'} source={openingPost.content} />
+                <ReactMarkdown className={'black f6 lh-copy overflow-break-word'} source={openingPost.content} />
 
                 {openingPost.attachment && <Attachments attachment={openingPost.attachment} />}
 

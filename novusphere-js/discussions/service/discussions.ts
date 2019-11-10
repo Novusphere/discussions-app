@@ -217,12 +217,32 @@ export default class DiscussionsService {
 
         try {
             if (!p.poster) {
-                console.log('no poster found, posting as anon')
-                const { data } = await axios.get(`${nsdb.api}/discussions/post`, {
-                    params: {
-                        data: JSON.stringify(post),
-                    },
-                })
+                console.log('no poster found, posting as anon!')
+                // const { data } = await axios.post(
+                //     `${nsdb.api}/discussions/post`,
+                //     {
+                //         data: JSON.stringify(post),
+                //     },
+                //     {
+                //         headers: {
+                //             'Content-Type': 'application/x-www-form-urlencoded',
+                //             'Access-Control-Allow-Origin': '*',
+                //         },
+                //     }
+                // )
+                const { data } = await axios.post(
+                    `${nsdb.api}/discussions/post`,
+                    `data=${JSON.stringify(post)}`,
+                    {
+                        headers: {
+                            'Content-Type': 'application/x-www-form-urlencoded',
+                        },
+                    }
+                )
+
+                if (data.error) {
+                    throw new Error('Failed to post')
+                }
                 console.log('Class: DiscussionsService, Function: post, Line 219 data: ', data)
                 p.transaction = data.transaction
             } else {
