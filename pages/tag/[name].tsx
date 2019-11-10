@@ -14,8 +14,7 @@ interface ITagProps {
 
 // TODO: Merge logic between e/page and tag/page. Right now it's separated.
 
-interface ITagPageState {
-}
+interface ITagPageState {}
 
 @inject('tagStore', 'postsStore')
 @observer
@@ -24,17 +23,18 @@ class Tag extends React.Component<ITagProps, ITagPageState> {
         const tag = query.name
         const postsStore: IStores['postsStore'] = store.postsStore
         const tagStore: IStores['tagStore'] = store.tagStore
-
         const uiStore: IStores['uiStore'] = store.uiStore
+
         uiStore.toggleBannerStatus(true)
         uiStore.toggleSidebarStatus(true)
 
+        console.log('viewing tag', tag)
+
         if (tagStore.activeTag && tagStore.activeTag.name !== tag) {
-            console.log('here 3')
-            postsStore.resetPositionAndPosts()
             tagStore.setActiveTag(tag)
         }
 
+        postsStore.resetPositionAndPosts()
         await postsStore.getPostsByTag([tag])
 
         return {

@@ -27,11 +27,7 @@ interface IEPageState {
 @inject('postsStore', 'tagStore', 'uiStore')
 @observer
 class E extends React.Component<IEPageProps, IEPageState> {
-    static async getInitialProps({ query, store }) {
-        const tagStore: IStores['tagStore'] = store.tagStore
-        const uiStore: IStores['uiStore'] = store.uiStore
-        tagStore.setActiveTag(query.name)
-
+    static async getInitialProps({ query }) {
         return {
             query,
         }
