@@ -1,10 +1,9 @@
-import { action, computed, intercept, observable, observe, reaction } from 'mobx'
+import { action, computed, observable } from 'mobx'
 import { TagModel } from '@models/tagModel'
 import { BaseStore, getOrCreateStore } from 'next-mobx-wrapper'
 import { task } from 'mobx-task'
 import { persist } from 'mobx-persist'
-import { defaultSubs, sleep } from '@utils'
-import { discussions } from '@novuspherejs'
+import { defaultSubs } from '@utils'
 
 export default class Tag extends BaseStore {
     // the amount of subs that are base
@@ -27,7 +26,6 @@ export default class Tag extends BaseStore {
         // subscribe everyone to default
         this.subscribeToDefaultSubs()
     }
-
 
     @action.bound
     initializeDefaultSubs() {
@@ -73,17 +71,22 @@ export default class Tag extends BaseStore {
 
     @task
     public setActiveTag(tagName: string): TagModel {
-        let tagModel
+        console.log('Class: Tag, Function: setActiveTag, Line 75 tagName: ', tagName);
+        if (defaultSubs.some(defaultSub => defaultSub.name === tagName)) {
+            let tagModel
 
-        if (!this.tags.get(tagName)) {
-            tagModel = new TagModel(tagName)
-            this.tags.set(tagName, tagModel)
-        } else {
-            tagModel = this.tags.get(tagName)
+            if (!this.tags.get(tagName)) {
+                tagModel = new TagModel(tagName)
+                this.tags.set(tagName, tagModel)
+            } else {
+                tagModel = this.tags.get(tagName)
+            }
+
+            this.activeTag = tagModel
+            return tagModel
         }
 
-        this.activeTag = tagModel
-        return tagModel
+        return null
     }
 
     private setTopLevelTags = () => {

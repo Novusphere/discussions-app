@@ -3,7 +3,7 @@ import { discussions, Post } from '@novuspherejs'
 import { task } from 'mobx-task'
 import { BaseStore, getOrCreateStore } from 'next-mobx-wrapper'
 import { CreateForm } from '@components'
-import { getTagStore } from '@stores/tag'
+import tag, { getTagStore } from '@stores/tag'
 import { getNewAuthStore, getUiStore, IStores } from '@stores'
 import { generateUuid, getAttachmentValue, getIdenticon, pushToThread, sleep } from '@utils'
 import { ThreadModel } from '@models/threadModel'
@@ -152,7 +152,7 @@ export default class Posts extends BaseStore {
                 this.postsPosition.cursorId,
                 this.postsPosition.items
             )
-
+            
             this.posts = [...this.posts, ...posts]
             this.postsPosition = {
                 items: this.posts.length,

@@ -27,12 +27,9 @@ class Tag extends React.Component<ITagProps, ITagPageState> {
 
         uiStore.toggleBannerStatus(true)
         uiStore.toggleSidebarStatus(true)
-
-        if (tagStore.activeTag && tagStore.activeTag.name !== tag) {
-            tagStore.setActiveTag(tag)
-        }
-
+        tagStore.setActiveTag(tag)
         postsStore.resetPositionAndPosts()
+
         await postsStore.getPostsByTag([tag])
 
         return {
@@ -43,6 +40,11 @@ class Tag extends React.Component<ITagProps, ITagPageState> {
     componentWillMount(): void {
         this.props.tagStore.setActiveTag(this.props.tagName)
     }
+
+    componentWillUnmount(): void {
+        this.props.postsStore.resetPositionAndPosts()
+    }
+
 
     public render() {
         const {
