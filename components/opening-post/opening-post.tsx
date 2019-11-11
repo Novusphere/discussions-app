@@ -112,7 +112,7 @@ const OpeningPost: React.FC<IOpeningPostProps> = ({
                             </button>
                         )}
 
-                        <span title={'Permalink'} onClick={() => copy(window.location.href)}>
+                        <span title={'Permalink'} onClick={() => copy(window.location.href.split('#')[0])}>
                             <FontAwesomeIcon
                                 width={13}
                                 icon={faLink}
