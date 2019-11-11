@@ -38,6 +38,10 @@ class Tag extends React.Component<ITagProps, ITagPageState> {
         this.props.uiStore.toggleSidebarStatus(true)
     }
 
+    componentDidMount(): void {
+        window.scrollTo(0, 0)
+    }
+
     componentWillUnmount(): void {
         this.props.postsStore.resetPositionAndPosts()
     }
