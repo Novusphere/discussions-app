@@ -107,11 +107,13 @@ class Reply extends React.Component<IReplies, IRepliesState> {
                 <span onClick={replyModel.toggleOpen} title={'Reply to post'}>
                     <FontAwesomeIcon icon={faReply} />
                 </span>
+                {replyModel.canEditPost && (
+                    <span title={'Edit post'} onClick={() => replyModel.toggleEditing()}>
+                        <FontAwesomeIcon icon={faEdit} />
+                    </span>
+                )}
                 <span title={'Permalink'} onClick={this.getPermaLinkUrl}>
                     <FontAwesomeIcon icon={faLink} />
-                </span>
-                <span title={'Edit post'} onClick={() => replyModel.toggleEditing()}>
-                    <FontAwesomeIcon icon={faEdit} />
                 </span>
                 <span title={'Donate tokens'}>
                     <FontAwesomeIcon icon={faDollarSign} />

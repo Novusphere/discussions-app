@@ -103,7 +103,7 @@ class Editor extends React.Component<IEditorProps> {
             loaded: true,
         })
 
-        if (this.ref && this.props.value) {
+        if (this.ref && this.ref.current && this.props.value) {
             this.ref.current.getEditor().setContents(markdownToDelta(this.props.value))
         }
     }
