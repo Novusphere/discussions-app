@@ -22,10 +22,12 @@ interface ITagPageState {}
 class Tag extends React.Component<ITagProps, ITagPageState> {
     static async getInitialProps({ query, store }) {
         const postsStore: IStores['postsStore'] = store.postsStore
-        postsStore.resetPositionAndPosts()
-
+        const tagStore: IStores['tagStore'] = store.tagStore
         const tag = query.name
-        await postsStore.getPostsByTag([tag])
+
+        postsStore.resetPositionAndPosts()
+        tagStore.setActiveTag(tag)
+        postsStore.getPostsByTag([tag])
 
         return {
             tagName: tag,
@@ -40,6 +42,7 @@ class Tag extends React.Component<ITagProps, ITagPageState> {
 
     componentDidMount(): void {
         window.scrollTo(0, 0)
+        this.props.postsStore.getPostsByTag([this.props.tagName])
     }
 
     componentWillUnmount(): void {
