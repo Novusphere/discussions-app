@@ -1,6 +1,6 @@
 import * as React from 'react'
 import moment from 'moment'
-import { Votes } from '@components'
+import { UserNameWithIcon, Votes } from '@components'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { faComment } from '@fortawesome/free-solid-svg-icons'
 import { TagModel } from '@models/tagModel'
@@ -10,9 +10,10 @@ import FeedModel from '@models/feedModel'
 import Link from 'next/link'
 import { useEffect, useState } from 'react'
 import { getThreadUrl } from '@utils'
+import { Post } from '@novuspherejs'
 
 interface IPostPreviewProps {
-    post: FeedModel
+    post: Post
     tag: TagModel
     notificationUuid?: string
     voteHandler?: (uuid: string, value: number) => Promise<void>
@@ -27,14 +28,22 @@ const PostPreview: React.FC<IPostPreviewProps> = ({
     voteHandler,
 }) => {
     const [url, setUrl] = useState('')
+    const [postModel, setPostModel] = useState(null)
 
     useEffect(() => {
         async function getUrl() {
             setUrl(await getThreadUrl(post, notificationUuid))
         }
 
+        async function makePostIntoFeedModel() {
+            setPostModel(new FeedModel(post))
+        }
+
+        makePostIntoFeedModel()
         getUrl()
     }, [])
+
+    if (!postModel) return null
 
     return (
         <div className={'post-preview'} data-url={url}>
@@ -46,11 +55,11 @@ const PostPreview: React.FC<IPostPreviewProps> = ({
                 >
                     {disableVoteHandler ? null : (
                         <Votes
-                            upVotes={post.upvotes}
-                            downVotes={post.downvotes}
-                            myVote={post.myVote}
-                            handler={voteHandler}
-                            uuid={post.uuid}
+                            upVotes={postModel.upvotes}
+                            downVotes={postModel.downvotes}
+                            myVote={postModel.myVote}
+                            handler={postModel.vote}
+                            uuid={postModel.uuid}
                         />
                     )}
                 </div>
@@ -67,7 +76,14 @@ const PostPreview: React.FC<IPostPreviewProps> = ({
                                 )}
                                 <span className={'b ttu'}>{post.sub}</span>
                                 <span className={'ph1 b'}>&#183;</span>
-                                <span className={'o-80'}>by {post.displayName || post.poster}</span>
+                                <object>
+                                    <UserNameWithIcon
+                                        imageData={postModel.imageData}
+                                        name={postModel.posterName}
+                                        imageSize={20}
+                                    />
+                                </object>
+                                <span className={'ph1 b'}>&#183;</span>
                                 <span
                                     className={'o-50 pl2'}
                                     title={moment(post.createdAt)
