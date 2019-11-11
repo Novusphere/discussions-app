@@ -66,6 +66,9 @@ export const decodeId = (id: string) => {
 
 export const getThreadAsync = async (_id: string) => {
     let dId = Post.decodeId(_id)
+
+    console.log('\n\n\n dId: ', dId, '\n\n\n')
+
     const searchQuery = {
         pipeline: [
             {
@@ -77,7 +80,11 @@ export const getThreadAsync = async (_id: string) => {
         ],
     }
 
+    console.log('\n\n\n searchQuery: ', searchQuery, '\n\n\n')
+
     let sq = await nsdb.search(searchQuery)
+
+    console.log('\n\n\n sq: ', sq, '\n\n\n')
 
     if (sq.payload.length == 0) return null
 
