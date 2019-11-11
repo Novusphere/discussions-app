@@ -6,9 +6,10 @@ import { ReplyModel } from '@models/replyModel'
 import _ from 'lodash'
 import PostModel from '@models/postModel'
 import { discussions } from '@novuspherejs'
-import { getIdenticon } from '@utils'
-
-// import { discussions } from '@novuspherejs'
+import { getNewAuthStore, IStores } from '@stores'
+import CreateForm from '../components/create-form/create-form'
+import { task } from 'mobx-task'
+import { sleep } from '@utils'
 
 export class ThreadModel {
     @observable public map: { [p: string]: PostModel } | undefined
@@ -19,7 +20,11 @@ export class ThreadModel {
 
     @observable public replies: PostModel[]
 
+    @observable editing = true
+
     public replyBoxStatuses = observable.map<string, ReplyModel>()
+
+    private readonly authStore: IStores['newAuthStore'] = getNewAuthStore()
 
     /**
      * ReplyBox box open status for a particular post id
@@ -52,6 +57,10 @@ export class ThreadModel {
         this.replyBoxStatuses.set(this.uuid, openingPostReplyModel)
     }
 
+    @computed get canEditPost() {
+        return this.openingPost.pub === this.authStore.activePublicKey
+    }
+
     @computed get totalReplies() {
         const map = Object.keys(this.map)
 
@@ -60,6 +69,67 @@ export class ThreadModel {
         }
 
         return 0
+    }
+
+    @action.bound
+    toggleEditing(overwriteValue?: boolean) {
+        if (overwriteValue) {
+            this.editing = overwriteValue
+            return
+        }
+
+        this.editing = !this.editing
+    }
+
+    @task.resolved
+    @action.bound
+    async saveEdits(form) {
+        if (!form.hasError) {
+            const { title, content } = form.values()
+            await sleep(5000)
+        }
+        // const signedReply = this.sign(this.newAuthStore.postPriv)
+        // const confirmedReply = await discussions.post(signedReply as any)
+    }
+
+    get editForm() {
+        return new CreateForm({}, [
+            {
+                name: 'title',
+                label: 'title',
+                hideLabels: true,
+                value: this.openingPost.title,
+            },
+            {
+                name: 'content',
+                label: 'Content',
+                value: this.openingPost.content,
+                hideLabels: true,
+                type: 'richtext',
+            },
+            {
+                name: 'buttons',
+                type: 'button',
+                hideLabels: true,
+                extra: {
+                    options: [
+                        {
+                            value: 'Cancel',
+                            className: 'white bg-red',
+                            title: 'Cancel changes to your post',
+                            onClick: () => {
+                                this.editing = false
+                            },
+                        },
+                        {
+                            value: 'Save',
+                            title: 'Save changes to your post',
+                            onClick: this.saveEdits,
+                        },
+                    ],
+                },
+            },
+        ])
     }
 
     /**

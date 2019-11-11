@@ -13,7 +13,7 @@ import {
     faShare,
     faSpinner,
 } from '@fortawesome/free-solid-svg-icons'
-import { Attachments, UserNameWithIcon, Votes } from '@components'
+import { Attachments, UserNameWithIcon, Votes, Form } from '@components'
 import moment from 'moment'
 import ReactMarkdown from 'react-markdown'
 import PostModel from '@models/postModel'
@@ -23,6 +23,7 @@ import copy from 'clipboard-copy'
 
 interface IOpeningPostProps {
     isPreview?: boolean
+    canEditPost?: boolean
     openingPost: PostModel
     asPath: string
     getThreadLoading: boolean
@@ -30,8 +31,9 @@ interface IOpeningPostProps {
 }
 
 const OpeningPost: React.FC<IOpeningPostProps> = ({
-    openingPost,
     isPreview,
+    canEditPost,
+    openingPost,
     getThreadLoading,
     activeThread,
     asPath,
@@ -74,8 +76,10 @@ const OpeningPost: React.FC<IOpeningPostProps> = ({
                 </div>
 
                 <div className={'flex justify-between items-center pb1'}>
-                    <span className={'black f4 b'}>{openingPost.title}</span>
-                    {activeThread && (
+                    {!activeThread.editing && (
+                        <span className={'black f4 b'}>{openingPost.title}</span>
+                    )}
+                    {activeThread && !activeThread.editing && (
                         <Votes
                             uuid={activeThread.openingPost.uuid}
                             myVote={activeThread.openingPost.myVote}
@@ -86,10 +90,14 @@ const OpeningPost: React.FC<IOpeningPostProps> = ({
                     )}
                 </div>
 
-                <ReactMarkdown
-                    className={'black f6 lh-copy overflow-break-word'}
-                    source={openingPost.content}
-                />
+                {activeThread.editing ? (
+                    <Form form={activeThread.editForm} hideSubmitButton />
+                ) : (
+                    <ReactMarkdown
+                        className={'black f6 lh-copy overflow-break-word'}
+                        source={openingPost.content}
+                    />
+                )}
 
                 {openingPost.attachment && <Attachments attachment={openingPost.attachment} />}
 
@@ -112,27 +120,37 @@ const OpeningPost: React.FC<IOpeningPostProps> = ({
                             </button>
                         )}
 
-                        <span title={'Permalink'} onClick={() => copy(window.location.href.split('#')[0])}>
-                            <FontAwesomeIcon
-                                width={13}
-                                icon={faLink}
-                                className={'pr2 black f6 pointer dim'}
-                            />
+                        {canEditPost && (
+                            <span
+                                className={'pr3 black f6 pointer dim'}
+                                title={'Edit post'}
+                                onClick={() => activeThread.toggleEditing()}
+                            >
+                                edit post
+                            </span>
+                        )}
 
+                        <span
+                            className={'pr3 black f6 pointer dim'}
+                            title={'Permalink'}
+                            onClick={() => copy(window.location.href.split('#')[0])}
+                        >
+                            <FontAwesomeIcon width={13} icon={faLink} />
                         </span>
+
                         <span
                             title={'View block'}
                             onClick={() =>
                                 openInNewTab(`https://eosq.app/tx/${openingPost.transaction}`)
                             }
                         >
-                            <FontAwesomeIcon icon={faEye} className={'pr2 black f6 pointer dim'} />
+                            <FontAwesomeIcon icon={faEye} className={'pr3 black f6 pointer dim'} />
                         </span>
 
                         <FontAwesomeIcon
                             width={13}
                             icon={faShare}
-                            className={'pr2 black f6 pointer dim'}
+                            className={'pr3 black f6 pointer dim'}
                         />
 
                         <span className={'f6 black f6'}>

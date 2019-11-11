@@ -27,6 +27,8 @@ interface IThreadState {}
 @observer
 class Thread extends React.Component<IThreadOuterProps & IThreadInnerProps, IThreadState> {
     componentWillUnmount(): void {
+        this.props.postsStore.activeThread.toggleEditing(false)
+
         if (this.props.postsStore.currentHighlightedPostUuid) {
             this.props.postsStore.highlightPostUuid('')
         }
@@ -45,6 +47,7 @@ class Thread extends React.Component<IThreadOuterProps & IThreadInnerProps, IThr
                 asPath={router.asPath}
                 getThreadLoading={getAndSetThread['pending']}
                 activeThread={activeThread}
+                canEditPost={activeThread.canEditPost}
             />
         )
     }

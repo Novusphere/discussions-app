@@ -188,6 +188,7 @@ class Form extends React.Component<FormProps> {
                                     >
                                         <Editor
                                             placeholder={field.placeholder}
+                                            value={field.value}
                                             className={'db f6'}
                                             {...bind}
                                         />

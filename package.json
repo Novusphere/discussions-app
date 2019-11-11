@@ -29,6 +29,7 @@
         "immutable": "4.0.0-rc.12",
         "localforage": "1.7.3",
         "lodash": "4.17.14",
+        "markdown-to-quill-delta": "^0.6.0",
         "mobx": "5.14.2",
         "mobx-persist": "0.4.1",
         "mobx-react": "6.1.4",

@@ -71,7 +71,6 @@ export default class Tag extends BaseStore {
 
     @task
     public setActiveTag(tagName: string): TagModel {
-        console.log('Class: Tag, Function: setActiveTag, Line 75 tagName: ', tagName);
         if (defaultSubs.some(defaultSub => defaultSub.name === tagName)) {
             let tagModel
 
