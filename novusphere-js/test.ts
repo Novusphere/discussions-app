@@ -1,13 +1,12 @@
 import { discussions } from './index';
 
 (async function() {
-    
-    // 1573264557216
-    // 1573265590000
-    let lastCheck = 1573264557216;
 
-    let thread = await discussions.getThread('l3qc3wjcmeoc');
+    let { posts, cursorId } = await discussions.getPostsForKeys([
+        'EOS7frg1UPi5A18ydkVS2WxN8RSh7CTTHQJV52EasEsipash18JFh',
+        'EOS8YDTmZcDMHZP8DgBSeFXRvLiQP6XxWP78ThaciDF4eVXZxw1Sk'
+    ])
 
-    console.log(thread);
+    console.log(posts.map(p => p.displayName));
     
 })();

@@ -292,19 +292,14 @@ export default class DiscussionsService {
         return thread
     }
 
-    async getPostsForSubs(
-        subs: string[],
+    async getPostsForKeys(
+        keys: string[],
         cursorId = undefined,
         count = 0,
         limit = 20): Promise<{
             posts: Post[]
             cursorId: number
         }> {
-
-        let q: any = { $in: subs.map(sub => sub.toLowerCase()) }
-        if (subs.length == 1 && subs[0] == 'all') {
-            q = { $nin: [] } // filtered subs from all sub
-        }
 
         const query = await nsdb.search({
             cursorId,
@@ -313,8 +308,7 @@ export default class DiscussionsService {
             pipeline: [
                 {
                     $match: {
-                        sub: q,
-                        parentUuid: '', // top-level only
+                        pub: { $in: keys },
                     }
                 },
                 {
@@ -331,7 +325,7 @@ export default class DiscussionsService {
             cursorId: query.cursorId,
         }
     }
-
+    
     async getPostsForTags(
         tags: string[],
         cursorId = undefined,
