@@ -1,6 +1,5 @@
 import { action, computed, observable, set } from 'mobx'
 import { task } from 'mobx-task'
-import { Post } from '@novuspherejs/discussions/post'
 import { Messages } from '@globals'
 import { generateUuid, getAttachmentValue, sleep } from '@utils'
 import { getNewAuthStore, getPostsStore, getUiStore, IStores } from '@stores'
@@ -150,7 +149,8 @@ export class ReplyModel {
         }
 
         if (!this.content) {
-            throw Error(Messages.ERROR.POST_EMPTY)
+            this.uiStore.showToast(Messages.ERROR.POST_EMPTY, 'error')
+            return
         }
 
         const generatedUid = generateUuid()

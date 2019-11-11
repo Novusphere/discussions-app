@@ -53,46 +53,20 @@ export class ThreadModel {
         /**
          * Set reply box open for the opening post by default
          */
-        // const openingPostReplyModel = new ReplyModel(this.openingPost, this.map)
-        // openingPostReplyModel.toggleOpen()
-        // this.replyBoxStatuses.set(this.uuid, openingPostReplyModel)
-
-
-    //     /**
-    //      * Get posts based on a parent uuid
-    //      * @param {string} uid - The post uid that you want getRepliesFromMap for
-    //      * @return {PostModel[]}
-    //      */
-    //     getRepliesFromMap: (...args: any[]) => PostModel[] = computedFn((uid: string): PostModel[] => {
-    //         if (this.map[uid]) {
-    //             return _.filter(this.map, (post) => post.parentUuid === uid)
-    //         }
-    //
-    //         return []
-    //     })
-    //
-    // @computed get openingPostReplies(): any[] {
-    //         const openingPostReplies = this.getRepliesFromMap(this.uuid)
-    //
-    //         return openingPostReplies.map(reply => {
-    //             return {
-    //                 ...reply,
-    //                 replies: this.getRepliesFromMap(reply.uuid),
-    //             }
-    //         })
-    //     }
+        const openingPostReplyModel = new ReplyModel(this.openingPost, this.map)
+        openingPostReplyModel.toggleOpen()
+        this.replyBoxStatuses.set(this.uuid, openingPostReplyModel)
 
         this.openingPostReplies = _.filter(this.map, post => post.parentUuid === this.uuid)
-
     }
 
-        getRepliesFromMap: (...args: any[]) => PostModel[] = computedFn((uid: string): PostModel[] => {
-            if (this.map[uid]) {
-                return _.filter(this.map, (post) => post.parentUuid === uid)
-            }
+    getRepliesFromMap: (...args: any[]) => PostModel[] = computedFn((uid: string): PostModel[] => {
+        if (this.map[uid]) {
+            return _.filter(this.map, post => post.parentUuid === uid)
+        }
 
-            return []
-        })
+        return []
+    })
 
     @computed get canEditPost() {
         return this.openingPost.pub === this.authStore.activePublicKey
