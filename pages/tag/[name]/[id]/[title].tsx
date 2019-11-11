@@ -5,6 +5,8 @@ import { ShowFullThread } from '@components'
 import { NextRouter } from 'next/router'
 import { Thread } from '@novuspherejs'
 import { NextSeo } from 'next-seo'
+import { getThreadUrl } from '@utils'
+import Head from 'next/head'
 
 interface IEPageProps {
     postsStore: IStores['postsStore']
@@ -49,13 +51,17 @@ class E extends React.Component<IEPageProps, IEPageState> {
         const { thread } = this.props
         const poster = thread.openingPost.displayName || thread.openingPost.poster
 
+        console.log(thread.openingPost.title)
+
         return (
             <>
+                <Head>
+                    <title>{thread.openingPost.title} | {thread.openingPost.sub}</title>
+                </Head>
                 <NextSeo
                     title={thread.openingPost.title}
                     description={`Posted in #${thread.openingPost.sub} by ${poster}`}
                     openGraph={{
-                        url: window.location.origin,
                         title: thread.openingPost.title,
                         description: `Posted in #${thread.openingPost.sub} by ${poster}`,
                         site_name: 'Discussions App',
