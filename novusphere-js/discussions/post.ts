@@ -10,6 +10,7 @@ export interface PostMetaData {
     displayName?: string;
     mentions?: string[];
     attachment?: Attachment;
+    edit?: boolean
 }
 
 export class Post {
@@ -22,6 +23,7 @@ export class Post {
     // Post Data
     parentUuid: string;
     threadUuid: string;
+    editUuid: string;
     uuid: string;
     title: string;
     poster: string;
@@ -68,7 +70,8 @@ export class Post {
                 this.verifySig = 'INVALID_PUB_KEY';
                 return false;
             }
-            this.verifySig = ecc.recover(this.sig, this.content);
+            const uuid = this.editUuid || this.uuid;
+            this.verifySig = ecc.recover(this.sig, this.getSignHash(uuid));
         }
 
         return (this.verifySig == this.pub);
@@ -79,6 +82,7 @@ export class Post {
         this.transaction = '';
         this.blockApprox = 0;
         this.chain = chain;
+        this.editUuid = '';
         this.parentUuid = '';
         this.threadUuid = '';
         this.uuid = '';
@@ -120,7 +124,10 @@ export class Post {
         p.sub = o.sub;
         p.tags = o.tags;
         p.mentions = o.mentions;
-        p.edit = o.edit;
+        if (o.edit) {
+            p.edit = true;
+            p.editUuid = o.edit;
+        }
         p.pub = o.pub;
         p.sig = o.sig;
         if (o.attachment) {
@@ -160,19 +167,15 @@ export class Post {
         return Post.encodeId(this.transaction, this.createdAt);
     }
 
+    getSignHash(uuid: string) : string {
+        const hash0 = ecc.sha256(this.content);
+        const hash1 = ecc.sha256(uuid+hash0);
+        return hash1;
+    }
+
     sign(privKey: string) {
         this.pub = ecc.privateToPublic(privKey);
-        // const hash = ecc.sha256(this.uuid+ecc.sha256(this.content))
-        const hash0 = ecc.sha256(this.content);
-        const hash1 = ecc.sha256(this.uuid+hash0);
-        
-        console.log('Class: Post, Function: sign, Line 168 this.content: ', this.content);
-        console.log('Class: Post, Function: sign, Line 169 this.uuid: ', this.uuid);
-
-        console.log('Class: Post, Function: sign, Line 168 hash0: ', hash0);
-        console.log('Class: Post, Function: sign, Line 169 hash1: ', hash1);
-
-        this.sig = ecc.sign(hash1, privKey);
+        this.sig = ecc.sign(this.getSignHash(this.uuid), privKey);
         this.verifySig = this.pub;
     }
 
@@ -200,7 +203,7 @@ export class Post {
 
     private autoImage() {
         if (!this.content) return;
-        
+
         const IMAGE_URL = /(.|)http[s]?:\/\/(\w|[:\/\.%-])+\.(png|jpg|jpeg|gif)(\?(\w|[:\/\.%-])+)?(.|)/gi;
         this.content = this.content.replace(IMAGE_URL, (link) => {
             let trimmedLink = link.trim();

@@ -2,10 +2,11 @@ import { action, computed, observable, set } from 'mobx'
 import { task } from 'mobx-task'
 import { Post } from '@novuspherejs/discussions/post'
 import { Messages } from '@globals'
-import { generateUuid, getAttachmentValue } from '@utils'
+import { generateUuid, getAttachmentValue, sleep } from '@utils'
 import { getNewAuthStore, getPostsStore, getUiStore, IStores } from '@stores'
 import PostModel from '@models/postModel'
 import { discussions } from '@novuspherejs'
+import CreateForm from '../components/create-form/create-form'
 
 export class ReplyModel {
     @observable uid = ''
@@ -18,9 +19,14 @@ export class ReplyModel {
     public readonly uiStore: IStores['uiStore']
 
     // the post replying to
-    @observable post: Post = null
+    @observable post: PostModel = null
+
+    @observable editing = false
+
+    private readonly authStore: IStores['newAuthStore'] = getNewAuthStore()
 
     constructor(post: PostModel, map: { [p: string]: PostModel }) {
+        this.post = post
         this.uid = post.uuid
         this.map = map
         this.newAuthStore = getNewAuthStore()
@@ -53,16 +59,92 @@ export class ReplyModel {
         })
     }
 
+    @action.bound
+    toggleEditing(overwriteValue?: boolean) {
+        if (overwriteValue) {
+            this.editing = overwriteValue
+            return
+        }
+
+        this.editing = !this.editing
+
+        if (this.editing) {
+            this.content = this.post.content
+        }
+    }
+
+    @computed get canEditPost() {
+        return this.post.pub === this.authStore.activePublicKey
+    }
+
+    @task.resolved
+    @action.bound
+    async saveEdits(form) {
+        const cached = this
+
+        if (!form.hasError) {
+            const { content } = form.values()
+
+            try {
+                let signedEdit = await this.post.sign(this.authStore.postPriv)
+
+                await discussions.post({
+                    ...signedEdit,
+                    parentUuid: this.post.uuid,
+                    edit: true,
+                    poster: undefined,
+                } as any)
+
+                this.post.content = content
+                this.post.edit = true
+
+                this.uiStore.showToast('Your post has been edited!', 'success')
+                this.toggleEditing()
+            } catch (error) {
+                this.post.content = cached.content
+                this.uiStore.showToast('There was an error editing your post', 'error')
+            }
+        }
+    }
+
+    get editForm() {
+        return new CreateForm({}, [
+            {
+                name: 'content',
+                label: 'Content',
+                value: this.content,
+                hideLabels: true,
+                type: 'richtext',
+            },
+            {
+                name: 'buttons',
+                type: 'button',
+                hideLabels: true,
+                extra: {
+                    options: [
+                        {
+                            value: 'Cancel',
+                            className: 'white bg-red',
+                            title: 'Cancel changes to your post',
+                            onClick: () => {
+                                this.editing = false
+                            },
+                        },
+                        {
+                            value: 'Save',
+                            title: 'Save changes to your post',
+                            onClick: this.saveEdits,
+                        },
+                    ],
+                },
+            },
+        ])
+    }
+
     @task.resolved onSubmit = async () => {
         if (!this.newAuthStore.hasAccount) {
             this.uiStore.showToast('You must be logged in to comment', 'error')
             return
-        }
-
-        let post: PostModel
-
-        if (!this.post) {
-            post = this.map[this.uid]
         }
 
         if (!this.content) {
@@ -77,14 +159,14 @@ export class ReplyModel {
             displayName: null,
             title: '',
             content: this.content,
-            sub: post.sub,
+            sub: this.post.sub,
             chain: 'eos',
             mentions: this.inlineMentionHashes,
-            tags: [post.sub],
+            tags: [this.post.sub],
             id: generatedUid,
             uuid: generatedUid,
-            parentUuid: post.uuid,
-            threadUuid: post.threadUuid,
+            parentUuid: this.post.uuid,
+            threadUuid: this.post.threadUuid,
             attachment: getAttachmentValue(this.content),
             upvotes: 0,
             downvotes: 0,

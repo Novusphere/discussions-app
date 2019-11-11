@@ -73,6 +73,14 @@ const OpeningPost: React.FC<IOpeningPostProps> = ({
                         {' '}
                         {moment(openingPost.createdAt).fromNow()}
                     </span>
+
+                    {openingPost.edit && (
+                        <>
+                            <span className={'ph1 f6 i'} title={'This post was edited'}>
+                                (edited)
+                            </span>
+                        </>
+                    )}
                 </div>
 
                 <div className={'flex justify-between items-center pb1'}>

@@ -218,6 +218,10 @@ export default class DiscussionsService {
         metadata.displayName = p.displayName || p.poster
         metadata.mentions = Array.from(mentions)
 
+        if (p.edit) {
+            metadata.edit = true
+        }
+        
         const post = {
             poster: p.poster,
             content: p.content,
@@ -233,18 +237,6 @@ export default class DiscussionsService {
         try {
             if (!p.poster) {
                 console.log('no poster found, posting as anon!')
-                // const { data } = await axios.post(
-                //     `${nsdb.api}/discussions/post`,
-                //     {
-                //         data: JSON.stringify(post),
-                //     },
-                //     {
-                //         headers: {
-                //             'Content-Type': 'application/x-www-form-urlencoded',
-                //             'Access-Control-Allow-Origin': '*',
-                //         },
-                //     }
-                // )
                 const { data } = await axios.post(
                     `${nsdb.api}/discussions/post`,
                     `data=${JSON.stringify(post)}`,

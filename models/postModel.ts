@@ -19,6 +19,7 @@ class PostModel {
     @observable attachment
     @observable replies
     @observable content
+    @observable edit
 
     @observable transaction
 

@@ -2,6 +2,7 @@ import * as React from 'react'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import {
     faDollarSign,
+    faEdit,
     faEye,
     faLink,
     faReply,
@@ -21,6 +22,7 @@ import copy from 'clipboard-copy'
 import Router from 'next/router'
 
 import './style.scss'
+import Form from '../create-form/form'
 
 interface IReplies {
     currentPath: string
@@ -108,6 +110,9 @@ class Reply extends React.Component<IReplies, IRepliesState> {
                 <span title={'Permalink'} onClick={this.getPermaLinkUrl}>
                     <FontAwesomeIcon icon={faLink} />
                 </span>
+                <span title={'Edit post'} onClick={() => replyModel.toggleEditing()}>
+                    <FontAwesomeIcon icon={faEdit} />
+                </span>
                 <span title={'Donate tokens'}>
                     <FontAwesomeIcon icon={faDollarSign} />
                 </span>
@@ -133,7 +138,6 @@ class Reply extends React.Component<IReplies, IRepliesState> {
     }
 
     render() {
-
         if (this.props.isCollapsed) return null
 
         const {
@@ -212,11 +216,24 @@ class Reply extends React.Component<IReplies, IRepliesState> {
                             >
                                 {moment(post.createdAt).fromNow()}
                             </span>
+                            {post.edit && (
+                                <span className={'o-50 ph1 f6 i'} title={'This post was edited'}>
+                                    (edited)
+                                </span>
+                            )}
                             {isCollapsed && (
                                 <span className={'o-50 i f6 pl2'}>({replies.length} children)</span>
                             )}
                         </div>
-                        {!isCollapsed && (
+                        {replyModel.editing && (
+                            <Form
+                                form={replyModel.editForm}
+                                fieldClassName={'pb0'}
+                                hideSubmitButton
+                                className={'w-100 mt3'}
+                            />
+                        )}
+                        {!isCollapsed && !replyModel.editing && (
                             <ReactMarkdown
                                 className={'f6 lh-copy reply-content'}
                                 source={post.content}
