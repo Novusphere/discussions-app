@@ -64,60 +64,6 @@ export const decodeId = (id: string) => {
     }
 }
 
-export const getThreadAsync = async (_id: string) => {
-    let dId = Post.decodeId(_id)
-
-    console.log('\n\n\n dId: ', dId, '\n\n\n')
-
-    const searchQuery = {
-        pipeline: [
-            {
-                $match: {
-                    createdAt: { $gte: dId.timeGte, $lte: dId.timeLte },
-                    transaction: { $regex: `^${dId.txid32}` },
-                },
-            },
-        ],
-    }
-
-    console.log('\n\n\n searchQuery: ', searchQuery, '\n\n\n')
-
-    try {
-        let sq = await nsdb.search(searchQuery)
-
-        console.log('\n\n\n sq: ', sq, '\n\n\n')
-
-        if (sq.payload.length == 0) return null
-
-        let posts: Post[] = []
-        let op = Post.fromDbObject(sq.payload[0])
-
-        sq = {
-            pipeline: [
-                {
-                    $match: {
-                        threadUuid: op.threadUuid,
-                        sub: op.sub,
-                    },
-                },
-            ],
-        }
-
-        do {
-            sq = await nsdb.search(sq)
-            posts = [...posts, ...sq.payload.map(o => Post.fromDbObject(o))]
-        } while (sq.cursorId)
-
-        let thread = new Thread()
-        thread.init(posts)
-        thread.normalize()
-        return thread
-    } catch (error) {
-        console.error('getThreadAsync error', error)
-        throw error
-    }
-}
-
 export const getThreadTitle = post => {
     return decodeURIComponent(_.snakeCase(post.title))
 }

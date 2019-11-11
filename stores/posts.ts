@@ -80,7 +80,7 @@ export default class Posts extends BaseStore {
      */
     @observable openingPostReplyContent = ''
 
-    @observable activeThread: ThreadModel | null = null
+    @observable activeThread: ThreadModel
 
     @observable currentHighlightedPostUuid = ''
 
