@@ -16,7 +16,7 @@ interface IEPageProps {
         title: string
     }
 
-    thread: Thread
+    thread: null | Thread
     router: NextRouter
 }
 
@@ -31,6 +31,8 @@ class E extends React.Component<IEPageProps, IEPageState> {
         const postsStore: IStores['postsStore'] = store.postsStore
 
         const thread = await postsStore.getAndSetThread(query.id)
+
+        console.log('\n\n\n\n', query, thread, '\n\n\n\n')
 
         return {
             query,
