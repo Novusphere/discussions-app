@@ -32,19 +32,24 @@ export class NSDB {
         const qs = `data=${JSON.stringify(sq)}`;
         const rurl = `${this.api}/discussions/search?${qs}`;
 
-        const request = await axios.get(rurl);
-        const result = request.data;
+        try {
+            const request = await axios.get(rurl);
+            const result = request.data;
 
-        if (result.error) {
-            console.log(result);
-            throw new Error(result.error);
+            if (result.error) {
+                console.log(result);
+                throw new Error(result.error);
+            }
+
+            sq.cursorId = result.cursorId;
+            sq.count = result.count;
+            sq.limit = result.limit;
+            sq.payload = result.payload;
+
+            return sq;
+        } catch(error) {
+            console.error('Search error: \n', error)
+            throw error
         }
-        
-        sq.cursorId = result.cursorId;
-        sq.count = result.count;
-        sq.limit = result.limit;
-        sq.payload = result.payload;
-
-        return sq;
     }
 };

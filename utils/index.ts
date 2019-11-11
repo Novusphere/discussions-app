@@ -82,35 +82,40 @@ export const getThreadAsync = async (_id: string) => {
 
     console.log('\n\n\n searchQuery: ', searchQuery, '\n\n\n')
 
-    let sq = await nsdb.search(searchQuery)
+    try {
+        let sq = await nsdb.search(searchQuery)
 
-    console.log('\n\n\n sq: ', sq, '\n\n\n')
+        console.log('\n\n\n sq: ', sq, '\n\n\n')
 
-    if (sq.payload.length == 0) return null
+        if (sq.payload.length == 0) return null
 
-    let posts: Post[] = []
-    let op = Post.fromDbObject(sq.payload[0])
+        let posts: Post[] = []
+        let op = Post.fromDbObject(sq.payload[0])
 
-    sq = {
-        pipeline: [
-            {
-                $match: {
-                    threadUuid: op.threadUuid,
-                    sub: op.sub,
+        sq = {
+            pipeline: [
+                {
+                    $match: {
+                        threadUuid: op.threadUuid,
+                        sub: op.sub,
+                    },
                 },
-            },
-        ],
+            ],
+        }
+
+        do {
+            sq = await nsdb.search(sq)
+            posts = [...posts, ...sq.payload.map(o => Post.fromDbObject(o))]
+        } while (sq.cursorId)
+
+        let thread = new Thread()
+        thread.init(posts)
+        thread.normalize()
+        return thread
+    } catch (error) {
+        console.error('getThreadAsync error', error)
+        throw error
     }
-
-    do {
-        sq = await nsdb.search(sq)
-        posts = [...posts, ...sq.payload.map(o => Post.fromDbObject(o))]
-    } while (sq.cursorId)
-
-    let thread = new Thread()
-    thread.init(posts)
-    thread.normalize()
-    return thread
 }
 
 export const getThreadTitle = post => {
@@ -134,7 +139,7 @@ export const getThreadUrl = async (post, permalinkUuid?: string) => {
 }
 
 export const pushToThread = async (post, permalinkUuid?: string) => {
-    const url = await getThreadUrl(post ,permalinkUuid)
+    const url = await getThreadUrl(post, permalinkUuid)
     Router.push('/tag/[name]/[id]/[title]', url)
 }
 
@@ -180,8 +185,7 @@ export const defaultSubs = [
     {
         name: 'atticlab',
         url: '/tag/atticlab',
-        logo:
-            'https://pbs.twimg.com/profile_images/1083303049957908480/NPv7U6HD_400x400.jpg',
+        logo: 'https://pbs.twimg.com/profile_images/1083303049957908480/NPv7U6HD_400x400.jpg',
     },
     {
         name: 'betking',
@@ -196,8 +200,7 @@ export const defaultSubs = [
     {
         name: 'boscore',
         url: '/tag/boscore',
-        logo:
-            'https://pbs.twimg.com/profile_images/1077236550377836544/5xkN5oxQ_400x400.jpg',
+        logo: 'https://pbs.twimg.com/profile_images/1077236550377836544/5xkN5oxQ_400x400.jpg',
     },
     {
         name: 'bounties',
@@ -222,8 +225,7 @@ export const defaultSubs = [
     {
         name: 'diceone',
         url: '/tag/diceone',
-        logo:
-            'https://pbs.twimg.com/profile_images/1072900881123692544/jcJqAEKd_400x400.jpg',
+        logo: 'https://pbs.twimg.com/profile_images/1072900881123692544/jcJqAEKd_400x400.jpg',
     },
     {
         name: 'dmail',
@@ -239,14 +241,12 @@ export const defaultSubs = [
     {
         name: 'emanate',
         url: '/tag/emanate',
-        logo:
-            'https://s3-ap-southeast-2.amazonaws.com/emanate.live/airdrop/img/favicon.png',
+        logo: 'https://s3-ap-southeast-2.amazonaws.com/emanate.live/airdrop/img/favicon.png',
     },
     {
         name: 'enumivo',
         url: '/tag/enumivo',
-        logo:
-            'https://assets.coingecko.com/coins/images/5043/large/enumivo-logo.jpg?1547040458',
+        logo: 'https://assets.coingecko.com/coins/images/5043/large/enumivo-logo.jpg?1547040458',
     },
     {
         name: 'eos',
@@ -266,8 +266,7 @@ export const defaultSubs = [
     {
         name: 'eosdac',
         url: '/tag/eosdac',
-        logo:
-            'https://raw.githubusercontent.com/eoscafe/eos-airdrops/master/logos/eosdac.jpg',
+        logo: 'https://raw.githubusercontent.com/eoscafe/eos-airdrops/master/logos/eosdac.jpg',
     },
     {
         name: 'eosforce',
@@ -298,8 +297,7 @@ export const defaultSubs = [
     {
         name: 'eosswedenorg',
         url: '/tag/eosswedenorg',
-        logo:
-            'https://eossweden.se/wp-content/uploads/2018/06/Square-Leaf-Banner-Wt-bkg-256.png',
+        logo: 'https://eossweden.se/wp-content/uploads/2018/06/Square-Leaf-Banner-Wt-bkg-256.png',
     },
     {
         name: 'eostribeprod',
@@ -339,8 +337,7 @@ export const defaultSubs = [
     {
         name: 'franceos',
         url: '/tag/franceos',
-        logo:
-            'https://www.franceos.fr/wp-content/uploads/2018/07/franceos-logo-256x256.png',
+        logo: 'https://www.franceos.fr/wp-content/uploads/2018/07/franceos-logo-256x256.png',
     },
     {
         name: 'general',
@@ -431,8 +428,7 @@ export const defaultSubs = [
     {
         name: 'pixeos',
         url: '/tag/pixeos',
-        logo:
-            'https://raw.githubusercontent.com/eoscafe/eos-airdrops/master/logos/pixeos.png',
+        logo: 'https://raw.githubusercontent.com/eoscafe/eos-airdrops/master/logos/pixeos.png',
     },
     {
         name: 'prospectors',
@@ -478,8 +474,7 @@ export const defaultSubs = [
     {
         name: 'steemit',
         url: '/tag/steemit',
-        logo:
-            'https://upload.wikimedia.org/wikipedia/commons/9/9f/Steemit_New_Logo.png',
+        logo: 'https://upload.wikimedia.org/wikipedia/commons/9/9f/Steemit_New_Logo.png',
     },
     {
         name: 'switcheo',
