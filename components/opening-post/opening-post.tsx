@@ -11,7 +11,6 @@ import {
     faLink,
     faReply,
     faShare,
-    faSpinner,
 } from '@fortawesome/free-solid-svg-icons'
 import { Attachments, UserNameWithIcon, Votes, Form } from '@components'
 import moment from 'moment'
@@ -26,7 +25,6 @@ interface IOpeningPostProps {
     canEditPost?: boolean
     openingPost: PostModel
     asPath: string
-    getThreadLoading: boolean
     activeThread: ThreadModel
 }
 
@@ -34,7 +32,6 @@ const OpeningPost: React.FC<IOpeningPostProps> = ({
     isPreview,
     canEditPost,
     openingPost,
-    getThreadLoading,
     activeThread,
     asPath,
 }) => (
@@ -111,22 +108,18 @@ const OpeningPost: React.FC<IOpeningPostProps> = ({
 
                 {activeThread && (
                     <div className={'footer flex items-center pt3'}>
-                        {getThreadLoading ? (
-                            <FontAwesomeIcon width={13} icon={faSpinner} spin />
-                        ) : (
-                            <button
-                                className={'reply mr3 pointer dim'}
-                                onClick={activeThread.rbModel(activeThread.openingPost).toggleOpen}
-                            >
-                                <FontAwesomeIcon
-                                    fixedWidth
-                                    width={13}
-                                    icon={faReply}
-                                    className={'pr1'}
-                                />
-                                reply
-                            </button>
-                        )}
+                        <button
+                            className={'reply mr3 pointer dim'}
+                            onClick={activeThread.rbModel(activeThread.openingPost).toggleOpen}
+                        >
+                            <FontAwesomeIcon
+                                fixedWidth
+                                width={13}
+                                icon={faReply}
+                                className={'pr1'}
+                            />
+                            reply
+                        </button>
 
                         {canEditPost && (
                             <span

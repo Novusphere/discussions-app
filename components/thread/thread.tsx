@@ -1,18 +1,17 @@
 import * as React from 'react'
-import { observer, inject } from 'mobx-react'
+import { inject, observer } from 'mobx-react'
 
 import './style.scss'
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
-import { faSpinner } from '@fortawesome/free-solid-svg-icons'
 import { OpeningPost, Reply, ReplyBox } from '@components'
 import { ThreadModel } from '@models/threadModel'
 import { IStores } from '@stores'
 import { NextRouter, withRouter } from 'next/router'
 import PostModel from '@models/postModel'
 import Head from 'next/head'
+import { Thread as NSThread } from '@novuspherejs'
 
 interface IThreadOuterProps {
-    thread: ThreadModel
+    thread: NSThread
 }
 
 interface IThreadInnerProps {
@@ -20,14 +19,24 @@ interface IThreadInnerProps {
     router: NextRouter
 }
 
-interface IThreadState {}
+interface IThreadState {
+    threadAsModel: ThreadModel
+}
 
 @(withRouter as any)
 @inject('postsStore')
 @observer
 class Thread extends React.Component<IThreadOuterProps & IThreadInnerProps, IThreadState> {
+    constructor(props) {
+        super(props)
+
+        this.state = {
+            threadAsModel: new ThreadModel(props.thread),
+        }
+    }
+
     componentWillUnmount(): void {
-        this.props.postsStore.activeThread.toggleEditing(false)
+        this.state.threadAsModel.toggleEditing(false)
 
         if (this.props.postsStore.currentHighlightedPostUuid) {
             this.props.postsStore.highlightPostUuid('')
@@ -38,38 +47,31 @@ class Thread extends React.Component<IThreadOuterProps & IThreadInnerProps, IThr
         const {
             router,
             thread: { openingPost },
-            postsStore: { activeThread, getAndSetThread },
         } = this.props
+
+        const { threadAsModel } = this.state
 
         return (
             <OpeningPost
-                openingPost={openingPost}
+                openingPost={openingPost as any}
                 asPath={router.asPath}
-                getThreadLoading={getAndSetThread['pending']}
-                activeThread={activeThread}
-                canEditPost={activeThread.canEditPost}
+                activeThread={threadAsModel}
+                canEditPost={threadAsModel.canEditPost}
             />
         )
     }
 
     private renderOpeningPostReplyBox = () => {
-        const {
-            thread: { openingPost },
-            postsStore: { activeThread, getAndSetThread },
-        } = this.props
+        const { openingPost, uuid } = this.props.thread
 
-        if (getAndSetThread['pending']) {
-            return <FontAwesomeIcon width={13} icon={faSpinner} spin />
-        }
-
-        const openingReplyModel = activeThread.rbModel(activeThread.openingPost)
+        const openingReplyModel = this.state.threadAsModel.rbModel(openingPost)
 
         if (!openingReplyModel.open) return null
 
         return (
             <div className={'mb3'}>
                 <ReplyBox
-                    uid={openingPost.uuid}
+                    uid={uuid}
                     onContentChange={openingReplyModel.setContent}
                     onSubmit={openingReplyModel.onSubmit}
                 />
@@ -95,17 +97,11 @@ class Thread extends React.Component<IThreadOuterProps & IThreadInnerProps, IThr
     }
 
     private renderReplies = () => {
-        const {
-            router,
-            postsStore: {
-                getAndSetThread,
-                activeThread: { openingPostReplies, getRepliesFromMap, vote, rbModel },
-            },
-        } = this.props
+        const { thread, router } = this.props
 
-        if (getAndSetThread['pending']) {
-            return <FontAwesomeIcon width={13} icon={faSpinner} spin />
-        }
+        const {
+            threadAsModel: { openingPostReplies, getRepliesFromMap, vote, rbModel },
+        } = this.state
 
         return (
             <div className={'card'}>
@@ -130,7 +126,9 @@ class Thread extends React.Component<IThreadOuterProps & IThreadInnerProps, IThr
         return (
             <>
                 <Head>
-                    <title>{this.props.thread.title} | {this.props.thread.sub}</title>
+                    <title>
+                        {this.props.thread.title} | {this.props.thread.openingPost.sub}
+                    </title>
                 </Head>
                 {this.renderOpeningPost()}
                 {this.renderOpeningPostReplyBox()}

@@ -4,13 +4,16 @@ import { IStores } from '@stores'
 import { InfiniteScrollFeed } from '@components'
 import { TagModel } from '@models/tagModel'
 import Head from 'next/head'
+import { Post } from '@novuspherejs'
 
 interface ITagProps {
     tagStore: IStores['tagStore']
     postsStore: IStores['postsStore']
     uiStore: IStores['uiStore']
-    tagName: undefined | string
     tagModel: TagModel
+
+    tag: undefined | string
+    posts: Post[]
 }
 
 // TODO: Merge logic between e/page and tag/page. Right now it's separated.
@@ -25,49 +28,49 @@ class Tag extends React.Component<ITagProps, ITagPageState> {
         const tagStore: IStores['tagStore'] = store.tagStore
         const tag = query.name
 
-        postsStore.resetPositionAndPosts()
         tagStore.setActiveTag(tag)
-        postsStore.getPostsByTag([tag])
+
+        postsStore.resetPositionAndPosts()
+        const posts = await postsStore.getPostsByTag([tag])
 
         return {
-            tagName: tag,
+            tag,
+            posts,
         }
     }
 
     componentWillMount(): void {
-        this.props.tagStore.setActiveTag(this.props.tagName)
+        this.props.tagStore.setActiveTag(this.props.tag)
         this.props.uiStore.toggleBannerStatus(true)
         this.props.uiStore.toggleSidebarStatus(true)
     }
 
     componentDidMount(): void {
         window.scrollTo(0, 0)
-        this.props.postsStore.getPostsByTag([this.props.tagName])
     }
 
     componentWillUnmount(): void {
-        this.props.postsStore.resetPositionAndPosts()
+        window.scrollTo(0, 0)
     }
-
 
     public render() {
         const {
             props: {
                 postsStore: { posts, postsPosition, getPostsByTag },
                 tagStore,
-                tagName,
+                tag,
             },
         } = this
 
         return (
             <>
                 <Head>
-                    <title>{tagName}</title>
+                    <title>{tag}</title>
                 </Head>
                 <InfiniteScrollFeed
                     dataLength={postsPosition.items}
                     hasMore={postsPosition.cursorId !== 0}
-                    next={() => getPostsByTag([tagName])}
+                    next={() => getPostsByTag([tag])}
                     posts={posts}
                     tagModel={tagStore.activeTag}
                 />

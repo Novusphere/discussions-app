@@ -31,19 +31,17 @@ const PostPreview: React.FC<IPostPreviewProps> = ({
     const [postModel, setPostModel] = useState(null)
 
     useEffect(() => {
-        async function getUrl() {
-            setUrl(await getThreadUrl(post, notificationUuid))
+        function makePostIntoFeedModel() {
+            setPostModel(new FeedModel(post))
         }
 
-        async function makePostIntoFeedModel() {
-            setPostModel(new FeedModel(post))
+        async function getUrl() {
+            setUrl(await getThreadUrl(post, notificationUuid))
         }
 
         makePostIntoFeedModel()
         getUrl()
     }, [])
-
-    if (!postModel) return null
 
     return (
         <div className={'post-preview'} data-url={url}>
@@ -54,7 +52,7 @@ const PostPreview: React.FC<IPostPreviewProps> = ({
                     }
                 >
                     {disableVoteHandler ? null : (
-                        <Votes
+                        postModel && <Votes
                             upVotes={postModel.upvotes}
                             downVotes={postModel.downvotes}
                             myVote={postModel.myVote}
@@ -76,13 +74,13 @@ const PostPreview: React.FC<IPostPreviewProps> = ({
                                 )}
                                 <span className={'b ttu'}>{post.sub}</span>
                                 <span className={'ph1 b'}>&#183;</span>
-                                <object>
+                                {postModel && <object>
                                     <UserNameWithIcon
                                         imageData={postModel.imageData}
                                         name={postModel.posterName}
                                         imageSize={20}
                                     />
-                                </object>
+                                </object>}
                                 <span className={'ph1 b'}>&#183;</span>
                                 <span
                                     className={'o-50 pl2'}

@@ -144,7 +144,7 @@ export default class Posts extends BaseStore {
         }
     }
 
-    @task.resolved
+    @task
     getPostsByTag = async (tags: string[]) => {
         try {
             const { posts, cursorId } = await discussions.getPostsForTags(
@@ -158,6 +158,7 @@ export default class Posts extends BaseStore {
                 items: this.posts.length,
                 cursorId: cursorId,
             }
+
             return this.posts
         } catch (error) {
             return error
