@@ -2,7 +2,8 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="2d14133e-344f-4fbf-9bb7-c9e5e96ae697" name="Default Changelist" comment="">
-      <change beforePath="$PROJECT_DIR$/novusphere-js/discussions/service/discussions.ts" beforeDir="false" afterPath="$PROJECT_DIR$/novusphere-js/discussions/service/discussions.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/pages/tag/[name]/[id]/[title].tsx" beforeDir="false" afterPath="$PROJECT_DIR$/pages/tag/[name]/[id]/[title].tsx" afterDir="false" />
     </list>
     <ignored path="$PROJECT_DIR$/.tmp/" />
     <ignored path="$PROJECT_DIR$/temp/" />
@@ -20,8 +21,8 @@
           <file pinned="false" current-in-tab="true">
             <entry file="file://$PROJECT_DIR$/pages/tag/[name]/[id]/[title].tsx">
               <provider selected="true" editor-type-id="text-editor">
-                <state relative-caret-position="104">
-                  <caret line="32" column="49" lean-forward="true" selection-start-line="32" selection-start-column="49" selection-end-line="32" selection-end-column="49" />
+                <state relative-caret-position="72">
+                  <caret line="30" column="33" selection-start-line="30" selection-start-column="33" selection-end-line="30" selection-end-column="33" />
                   <folding>
                     <element signature="e#0#30#0" expanded="true" />
                   </folding>
@@ -57,11 +58,11 @@
               </provider>
             </entry>
           </file>
-          <file pinned="false" current-in-tab="true">
+          <file pinned="false" current-in-tab="false">
             <entry file="file://$PROJECT_DIR$/stores/posts.ts">
               <provider selected="true" editor-type-id="text-editor">
                 <state relative-caret-position="285">
-                  <caret line="184" column="51" lean-forward="true" selection-start-line="184" selection-start-column="51" selection-end-line="184" selection-end-column="51" />
+                  <caret line="184" column="48" selection-start-line="184" selection-start-column="48" selection-end-line="184" selection-end-column="48" />
                   <folding>
                     <element signature="e#0#51#0" expanded="true" />
                   </folding>
@@ -69,11 +70,11 @@
               </provider>
             </entry>
           </file>
-          <file pinned="false" current-in-tab="false">
+          <file pinned="false" current-in-tab="true">
             <entry file="file://$PROJECT_DIR$/novusphere-js/discussions/service/discussions.ts">
               <provider selected="true" editor-type-id="text-editor">
                 <state relative-caret-position="253">
-                  <caret line="285" column="55" selection-start-line="285" selection-start-column="55" selection-end-line="285" selection-end-column="55" />
+                  <caret line="285" column="10" selection-start-line="285" selection-start-column="10" selection-end-line="285" selection-end-column="10" />
                   <folding>
                     <element signature="e#0#44#0" expanded="true" />
                     <element signature="e#215#245#0" expanded="true" />
@@ -203,8 +204,8 @@
         <option value="$PROJECT_DIR$/components/opening-post/opening-post.tsx" />
         <option value="$PROJECT_DIR$/components/thread/thread.tsx" />
         <option value="$PROJECT_DIR$/stores/posts.ts" />
-        <option value="$PROJECT_DIR$/pages/tag/[name]/[id]/[title].tsx" />
         <option value="$PROJECT_DIR$/novusphere-js/discussions/service/discussions.ts" />
+        <option value="$PROJECT_DIR$/pages/tag/[name]/[id]/[title].tsx" />
       </list>
     </option>
   </component>
@@ -476,12 +477,12 @@
       <workItem from="1573429868703" duration="1423000" />
       <workItem from="1573438354809" duration="9390000" />
       <workItem from="1573488877106" duration="17000" />
-      <workItem from="1573500289221" duration="10415000" />
+      <workItem from="1573500289221" duration="10716000" />
     </task>
     <servers />
   </component>
   <component name="TimeTrackingManager">
-    <option name="totallyTimeSpent" value="590341000" />
+    <option name="totallyTimeSpent" value="590642000" />
   </component>
   <component name="ToolWindowManager">
     <frame x="-8" y="-8" width="2576" height="1416" extended-state="6" />
@@ -955,12 +956,12 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/pages/tag/[name]/[id]/[title].tsx">
+    <entry file="file://$PROJECT_DIR$/stores/posts.ts">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="104">
-          <caret line="32" column="49" lean-forward="true" selection-start-line="32" selection-start-column="49" selection-end-line="32" selection-end-column="49" />
+        <state relative-caret-position="285">
+          <caret line="184" column="48" selection-start-line="184" selection-start-column="48" selection-end-line="184" selection-end-column="48" />
           <folding>
-            <element signature="e#0#30#0" expanded="true" />
+            <element signature="e#0#51#0" expanded="true" />
           </folding>
         </state>
       </provider>
@@ -968,7 +969,7 @@
     <entry file="file://$PROJECT_DIR$/novusphere-js/discussions/service/discussions.ts">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="253">
-          <caret line="285" column="55" selection-start-line="285" selection-start-column="55" selection-end-line="285" selection-end-column="55" />
+          <caret line="285" column="10" selection-start-line="285" selection-start-column="10" selection-end-line="285" selection-end-column="10" />
           <folding>
             <element signature="e#0#44#0" expanded="true" />
             <element signature="e#215#245#0" expanded="true" />
@@ -976,12 +977,12 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/stores/posts.ts">
+    <entry file="file://$PROJECT_DIR$/pages/tag/[name]/[id]/[title].tsx">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="285">
-          <caret line="184" column="51" lean-forward="true" selection-start-line="184" selection-start-column="51" selection-end-line="184" selection-end-column="51" />
+        <state relative-caret-position="72">
+          <caret line="30" column="33" selection-start-line="30" selection-start-column="33" selection-end-line="30" selection-end-column="33" />
           <folding>
-            <element signature="e#0#51#0" expanded="true" />
+            <element signature="e#0#30#0" expanded="true" />
           </folding>
         </state>
       </provider>
