@@ -22,6 +22,7 @@ export class Post {
     // Post Data
     parentUuid: string;
     threadUuid: string;
+    editUuid: string;
     uuid: string;
     title: string;
     poster: string;
@@ -79,6 +80,7 @@ export class Post {
         this.transaction = '';
         this.blockApprox = 0;
         this.chain = chain;
+        this.editUuid = '';
         this.parentUuid = '';
         this.threadUuid = '';
         this.uuid = '';
@@ -120,7 +122,10 @@ export class Post {
         p.sub = o.sub;
         p.tags = o.tags;
         p.mentions = o.mentions;
-        p.edit = o.edit;
+        if (o.edit) {
+            p.edit = true;
+            p.editUuid = o.edit;
+        }
         p.pub = o.pub;
         p.sig = o.sig;
         if (o.attachment) {
