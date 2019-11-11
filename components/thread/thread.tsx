@@ -6,7 +6,6 @@ import { OpeningPost, Reply, ReplyBox } from '@components'
 import { ThreadModel } from '@models/threadModel'
 import { IStores } from '@stores'
 import { NextRouter, withRouter } from 'next/router'
-import Head from 'next/head'
 import { Thread as NSThread } from '@novuspherejs'
 
 interface IThreadOuterProps {
@@ -125,11 +124,6 @@ class Thread extends React.Component<IThreadOuterProps & IThreadInnerProps, IThr
     public render() {
         return (
             <>
-                <Head>
-                    <title>
-                        {this.props.thread.title} | {this.props.thread.openingPost.sub}
-                    </title>
-                </Head>
                 {this.renderOpeningPost()}
                 {this.renderOpeningPostReplyBox()}
                 {this.renderReplyContent()}

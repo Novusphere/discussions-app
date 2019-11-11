@@ -4,6 +4,7 @@ import { IStores } from '@stores'
 import { ShowFullThread } from '@components'
 import { NextRouter } from 'next/router'
 import { Thread } from '@novuspherejs'
+import { NextSeo } from 'next-seo'
 
 interface IEPageProps {
     postsStore: IStores['postsStore']
@@ -46,7 +47,17 @@ class E extends React.Component<IEPageProps, IEPageState> {
 
     public render(): React.ReactNode {
         const { thread } = this.props
-        return <ShowFullThread thread={thread} />
+        const poster = thread.openingPost.displayName || thread.openingPost.poster
+
+        return (
+            <>
+                <NextSeo
+                    title={thread.openingPost.title}
+                    description={`Posted in #${thread.openingPost.sub} by ${poster}`}
+                />
+                <ShowFullThread thread={thread} />
+            </>
+        )
     }
 }
 
