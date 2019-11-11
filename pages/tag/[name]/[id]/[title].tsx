@@ -4,6 +4,7 @@ import { IStores } from '@stores'
 import { ShowFullThread } from '@components'
 import { NextRouter } from 'next/router'
 import { Thread, discussions } from '@novuspherejs'
+import { getThreadAsync } from '@utils'
 
 interface IEPageProps {
     postsStore: IStores['postsStore']
@@ -35,7 +36,7 @@ class E extends React.Component<IEPageProps, IEPageState> {
         if (!req) {
             thread = await postsStore.getAndSetThread(query.id)
         } else {
-            thread = await discussions.getThread(query.id)
+            thread = await getThreadAsync(query.id)
         }
 
         console.log('\n\n\n\n', query, thread, '\n\n\n\n')

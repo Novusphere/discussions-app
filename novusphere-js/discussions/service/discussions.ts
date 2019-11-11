@@ -8,6 +8,7 @@ import * as bip32 from 'bip32'
 import ecc from 'eosjs-ecc'
 import axios from 'axios'
 import { INSDBSearchQuery } from '@novuspherejs/nsdb'
+import { getThreadAsync } from '@utils'
 
 export interface IBrainKeyPair {
     priv: string
@@ -284,47 +285,7 @@ export default class DiscussionsService {
     }
 
     async getThread(_id: string): Promise<Thread | null> {
-        let dId = Post.decodeId(_id)
-        const searchQuery = {
-            pipeline: [
-                {
-                    $match: {
-                        createdAt: { $gte: dId.timeGte, $lte: dId.timeLte },
-                        transaction: { $regex: `^${dId.txid32}` },
-                    },
-                },
-            ],
-        }
-
-        console.log('Class: DiscussionsService, Function: getThread, Line 301 searchQuery: ', searchQuery, '\n\n');
-
-        let sq = await nsdb.search(searchQuery)
-
-        if (sq.payload.length == 0) return null
-
-        let posts: Post[] = []
-        let op = Post.fromDbObject(sq.payload[0])
-
-        sq = {
-            pipeline: [
-                {
-                    $match: {
-                        threadUuid: op.threadUuid,
-                        sub: op.sub,
-                    },
-                },
-            ],
-        }
-
-        do {
-            sq = await nsdb.search(sq)
-            posts = [...posts, ...sq.payload.map(o => Post.fromDbObject(o))]
-        } while (sq.cursorId)
-
-        let thread = new Thread()
-        thread.init(posts)
-        thread.normalize()
-        return thread
+        return await getThreadAsync(_id)
     }
 
     async getPostsForSubs(

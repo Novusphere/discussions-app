@@ -1,6 +1,6 @@
 import Router from 'next/router'
 import Identicon from 'identicon.js'
-import { Post, discussions } from '@novuspherejs'
+import { Post, discussions, nsdb, Thread } from '@novuspherejs'
 import { IPost } from '@stores/posts'
 import _ from 'lodash'
 
@@ -62,6 +62,48 @@ export const decodeId = (id: string) => {
         timeGte: time - 1000 * 60 * 3,
         timeLte: time + 1000 * 60 * 3,
     }
+}
+
+export const getThreadAsync = async (_id: string) => {
+    let dId = Post.decodeId(_id)
+    const searchQuery = {
+        pipeline: [
+            {
+                $match: {
+                    createdAt: { $gte: dId.timeGte, $lte: dId.timeLte },
+                    transaction: { $regex: `^${dId.txid32}` },
+                },
+            },
+        ],
+    }
+
+    let sq = await nsdb.search(searchQuery)
+
+    if (sq.payload.length == 0) return null
+
+    let posts: Post[] = []
+    let op = Post.fromDbObject(sq.payload[0])
+
+    sq = {
+        pipeline: [
+            {
+                $match: {
+                    threadUuid: op.threadUuid,
+                    sub: op.sub,
+                },
+            },
+        ],
+    }
+
+    do {
+        sq = await nsdb.search(sq)
+        posts = [...posts, ...sq.payload.map(o => Post.fromDbObject(o))]
+    } while (sq.cursorId)
+
+    let thread = new Thread()
+    thread.init(posts)
+    thread.normalize()
+    return thread
 }
 
 export const getThreadTitle = post => {
