@@ -283,9 +283,9 @@ export default class DiscussionsService {
         }
     }
 
-    async getThread(_id: string): Promise<Thread | undefined> {
+    async getThread(_id: string): Promise<Thread | null> {
         let dId = Post.decodeId(_id)
-        let sq = await nsdb.search({
+        const searchQuery = {
             pipeline: [
                 {
                     $match: {
@@ -294,7 +294,11 @@ export default class DiscussionsService {
                     },
                 },
             ],
-        })
+        }
+
+        console.log('Class: DiscussionsService, Function: getThread, Line 301 searchQuery: ', searchQuery, '\n\n');
+
+        let sq = await nsdb.search(searchQuery)
 
         if (sq.payload.length == 0) return null
 
