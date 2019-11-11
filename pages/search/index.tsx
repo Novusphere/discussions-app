@@ -1,70 +1,67 @@
 import * as React from 'react'
-import { discussions } from '@novuspherejs'
-import { IPost } from '@stores/posts'
-import PostPreview from '../../components/post-preview/post-preview'
 import { inject, observer } from 'mobx-react'
 import { IStores } from '@stores'
+import { InfiniteScrollFeed } from '@components'
 
 interface ISearchPageProps {
     tagStore: IStores['tagStore']
     postsStore: IStores['postsStore']
+    searchStore: IStores['searchStore']
+
     searchValue: string
-    searchResult: IPost[]
 }
 
 interface ISearchPageState {}
 
-@inject('tagStore', 'postsStore')
+@inject('tagStore', 'postsStore', 'searchStore')
 @observer
 class Index extends React.Component<ISearchPageProps, ISearchPageState> {
     static async getInitialProps({ query, store }) {
         const searchValue = query.q
         const postsStore: IStores['postsStore'] = store.postsStore
-
         const uiStore: IStores['uiStore'] = store.uiStore
+        const tagStore: IStores['tagStore'] = store.tagStore
+        const searchStore: IStores['searchStore'] = store.searchStore
+
+        tagStore.destroyActiveTag()
         uiStore.toggleBannerStatus(true)
         uiStore.toggleSidebarStatus(true)
-
         postsStore.resetPositionAndPosts()
-        const searchResult = await discussions.getPostsForSearch(searchValue)
+
+        await searchStore.resetPositionAndResults()
+        await searchStore.getSearchResults(searchValue)
+
         return {
             searchValue,
-            searchResult,
         }
-    }
-
-    componentWillMount(): void {
-        this.props.tagStore.destroyActiveTag()
     }
 
     renderPosts = () => {
-        const { searchResult } = this.props
+        const { searchValue } = this.props
+        const {
+            searchResults,
+            getSearchResults,
+            searchPosition: { cursorId, items },
+        } = this.props.searchStore
 
-        if (!searchResult.length || !searchResult) {
-            return <span className={'f6'}>No results found</span>
-        }
-
-        return searchResult
-            .filter(result => result.tags[0].length)
-            .map(result => (
-                <PostPreview
-                    key={result.id}
-                    post={result as any}
-                    tag={this.props.tagStore.tags.get(result.sub)}
-                    disableVoteHandler
-                />
-            ))
+        return (
+            <InfiniteScrollFeed
+                dataLength={items}
+                hasMore={cursorId !== 0}
+                next={() => getSearchResults(searchValue)}
+                posts={searchResults}
+            />
+        )
     }
 
     public render() {
-        const { searchValue, searchResult } = this.props
+        const { searchValue } = this.props
         return (
             <>
                 <div className={'card pa4 mb3'}>
                     <span className={'black f5'}>
                         Showing results for: <span className={'b'}>{searchValue}</span>
                     </span>
-                    <span className={'f5 pl2'}>({searchResult.length} results)</span>
                 </div>
 
                 {this.renderPosts()}

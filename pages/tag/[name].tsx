@@ -28,8 +28,6 @@ class Tag extends React.Component<ITagProps, ITagPageState> {
         uiStore.toggleBannerStatus(true)
         uiStore.toggleSidebarStatus(true)
 
-        console.log('viewing tag', tag)
-
         if (tagStore.activeTag && tagStore.activeTag.name !== tag) {
             tagStore.setActiveTag(tag)
         }

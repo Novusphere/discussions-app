@@ -116,8 +116,17 @@ export default class DiscussionsService {
         return keys
     }
 
-    async getPostsForSearch(search: string): Promise<Post[]> {
-        const query = await nsdb.search({
+    async getPostsForSearch(
+        search: string,
+        searchCursorId = undefined,
+        count = 0
+    ): Promise<{
+        results: Post[]
+        cursorId: number
+    }> {
+        const { payload, cursorId } = await nsdb.search({
+            cursorId: searchCursorId,
+            count,
             pipeline: [
                 {
                     $match: {
@@ -131,7 +140,13 @@ export default class DiscussionsService {
                 },
             ],
         })
-        return query.payload.map(o => Post.fromDbObject(o))
+
+        const results = payload.map(o => Post.fromDbObject(o))
+
+        return {
+            results,
+            cursorId,
+        }
     }
 
     async bkRetrieveStatusEOS(account: string): Promise<string | undefined> {

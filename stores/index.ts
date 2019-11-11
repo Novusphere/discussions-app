@@ -5,6 +5,7 @@ import Posts, { getPostsStore } from '@stores/posts'
 import Settings, { getSettingsStore } from '@stores/settings'
 import NewAuth, { getNewAuthStore } from './newAuth'
 import Notifications, { getNotificationsStore } from '@stores/notifications'
+import SearchStore, { getSearchStore } from '@stores/searchStore'
 
 export interface IStores {
     userStore: User
@@ -14,6 +15,7 @@ export interface IStores {
     postsStore: Posts
     settingsStore: Settings
     notificationsStore: Notifications
+    searchStore: SearchStore
 }
 
 export {
@@ -24,4 +26,5 @@ export {
     getUiStore,
     getUserStore,
     getNotificationsStore,
+    getSearchStore,
 }
