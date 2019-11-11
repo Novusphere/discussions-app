@@ -8,6 +8,7 @@ import Head from 'next/head'
 interface ITagProps {
     tagStore: IStores['tagStore']
     postsStore: IStores['postsStore']
+    uiStore: IStores['uiStore']
     tagName: undefined | string
     tagModel: TagModel
 }
@@ -16,20 +17,14 @@ interface ITagProps {
 
 interface ITagPageState {}
 
-@inject('tagStore', 'postsStore')
+@inject('tagStore', 'postsStore', 'uiStore')
 @observer
 class Tag extends React.Component<ITagProps, ITagPageState> {
     static async getInitialProps({ query, store }) {
-        const tag = query.name
         const postsStore: IStores['postsStore'] = store.postsStore
-        const tagStore: IStores['tagStore'] = store.tagStore
-        const uiStore: IStores['uiStore'] = store.uiStore
-
-        uiStore.toggleBannerStatus(true)
-        uiStore.toggleSidebarStatus(true)
-        tagStore.setActiveTag(tag)
         postsStore.resetPositionAndPosts()
 
+        const tag = query.name
         await postsStore.getPostsByTag([tag])
 
         return {
@@ -39,6 +34,8 @@ class Tag extends React.Component<ITagProps, ITagPageState> {
 
     componentWillMount(): void {
         this.props.tagStore.setActiveTag(this.props.tagName)
+        this.props.uiStore.toggleBannerStatus(true)
+        this.props.uiStore.toggleSidebarStatus(true)
     }
 
     componentWillUnmount(): void {
