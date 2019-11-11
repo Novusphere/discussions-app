@@ -64,9 +64,13 @@ export const decodeId = (id: string) => {
     }
 }
 
+export const getThreadTitle = post => {
+    return decodeURIComponent(_.snakeCase(post.title))
+}
+
 export const getThreadUrl = async (post, permalinkUuid?: string) => {
     const id = encodeId(post)
-    let url = `/e/${post.sub}/${id}/${decodeURIComponent(_.snakeCase(post.title))}`
+    let url = `/tag/${post.sub}/${id}/${getThreadTitle(post)}`
 
     if (post.title === '') {
         const thread = await discussions.getThread(id)
@@ -82,7 +86,7 @@ export const getThreadUrl = async (post, permalinkUuid?: string) => {
 
 export const pushToThread = async (post, permalinkUuid?: string) => {
     const url = await getThreadUrl(post ,permalinkUuid)
-    Router.push('/e/[name]/[id]/[title]', url)
+    Router.push('/tag/[name]/[id]/[title]', url)
 }
 
 export const getVersion = () => {

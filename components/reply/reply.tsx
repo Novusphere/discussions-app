@@ -87,7 +87,7 @@ class Reply extends React.Component<IReplies, IRepliesState> {
         this.addAndScrollToUuid(postUuid)
 
         await copy(url)
-        await Router.push('/e/[name]/[id]/[title]', permalink, {
+        await Router.push('/tag/[name]/[id]/[title]', permalink, {
             shallow: true,
         })
     }
