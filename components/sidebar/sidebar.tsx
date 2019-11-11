@@ -9,7 +9,9 @@ import { IStores } from '@stores'
 
 import './style.scss'
 
-interface ITagListOuterProps {}
+interface ITagListOuterProps {
+    className: string
+}
 
 interface ITagListInnerProps {
     router: NextRouter
@@ -17,9 +19,20 @@ interface ITagListInnerProps {
     postsStore: IStores['postsStore']
 }
 
+interface ITagListState {
+    isScrolling: boolean
+}
+
 @inject('tagStore', 'postsStore')
 @observer
-class Sidebar extends React.Component<ITagListOuterProps & ITagListInnerProps> {
+class Sidebar extends React.Component<ITagListOuterProps & ITagListInnerProps, ITagListState> {
+    private sidebarContainer = React.createRef<HTMLUListElement>()
+    private scrollTimeout: any
+
+    state = {
+        isScrolling: false,
+    }
+
     private createPost = () => {
         const {
             tagStore: { activeTag },
@@ -33,6 +46,39 @@ class Sidebar extends React.Component<ITagListOuterProps & ITagListInnerProps> {
         }
 
         return router.push('/new')
+    }
+
+
+    componentDidMount(): void {
+        if (this.sidebarContainer) {
+            this.sidebarContainer.current.addEventListener('scroll', this.handleScroll, true)
+        }
+    }
+
+    componentWillUnmount(): void {
+        if (this.sidebarContainer) {
+            this.sidebarContainer.current.removeEventListener('scroll', this.handleScroll, true)
+        }
+    }
+
+    private handleScroll = () => {
+        if (this.scrollTimeout) {
+            //if there is already a timeout in process cancel it
+            clearTimeout(this.scrollTimeout)
+        }
+
+        this.scrollTimeout = setTimeout(() => {
+            this.scrollTimeout = null
+            this.setState({
+                isScrolling: false,
+            })
+        }, 500)
+
+        if (!this.state.isScrolling) {
+            this.setState({
+                isScrolling: true,
+            })
+        }
     }
 
     private renderActiveTag = () => {
@@ -107,14 +153,15 @@ class Sidebar extends React.Component<ITagListOuterProps & ITagListInnerProps> {
 
     render() {
         const {
+            className,
             router,
             tagStore: { tags, subSubscriptionStatus, toggleTagSubscribe },
         } = this.props
 
         return (
-            <>
+            <div className={className}>
                 {this.renderActiveTag()}
-                <ul className={'w-100 list sidebar-ul'}>
+                <ul className={'list sidebar-ul'} ref={this.sidebarContainer}>
                     {Array.from(tags.values())
                         .filter(tag => tag.root)
                         .map(tag => (
@@ -146,6 +193,7 @@ class Sidebar extends React.Component<ITagListOuterProps & ITagListInnerProps> {
                                 ])}
                             >
                                 <Tooltip
+                                    disabled={this.state.isScrolling}
                                     animateFill={false}
                                     interactive
                                     html={
@@ -156,14 +204,14 @@ class Sidebar extends React.Component<ITagListOuterProps & ITagListInnerProps> {
                                         />
                                     }
                                     position={'left-end'}
-                                    unmountHTMLWhenHide={true}
+                                    unmountHTMLWhenHide={false}
                                     offset={150}
                                     stickyDuration={0}
                                     sticky={true}
-                                    duration={275}
+                                    duration={0}
                                     animation={'fade'}
                                     className={'interactive-hover'}
-                                    distance={400}
+                                    distance={250}
                                     trigger={'mouseenter focus'}
                                 >
                                     <Link href={`/tag/[name]`} as={`/tag/${tag.name}`}>
@@ -183,7 +231,7 @@ class Sidebar extends React.Component<ITagListOuterProps & ITagListInnerProps> {
                             </li>
                         ))}
                 </ul>
-            </>
+            </div>
         )
     }
 }

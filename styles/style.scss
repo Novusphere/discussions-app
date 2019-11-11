@@ -71,9 +71,14 @@ a {
 }
 
 .sidebar {
-    max-height: calc(100vh - 55px - 15px);
-    overflow: auto;
+    height: 100%;
+    overflow: hidden;
     position: sticky;
+
+    ul {
+        overflow: scroll;
+        max-height: calc(100vh - 55px - 15px);
+    }
 }
 
 .card {
