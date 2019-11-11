@@ -221,7 +221,7 @@ export default class DiscussionsService {
         if (p.edit) {
             metadata.edit = true
         }
-        
+
         const post = {
             poster: p.poster,
             content: p.content,
@@ -284,7 +284,7 @@ export default class DiscussionsService {
     }
 
     async getThread(_id: string, isServer = false): Promise<Thread | null> {
-        let dId = Post.decodeId(_id, isServer)
+        let dId = Post.decodeId(_id)
 
         console.log('\n\n\n dId: ', dId, '\n\n\n')
 
@@ -292,7 +292,10 @@ export default class DiscussionsService {
             pipeline: [
                 {
                     $match: {
-                        createdAt: { $gte: dId.timeGte, $lte: dId.timeLte },
+                        createdAt: {
+                            $gte: dId.timeGte + (isServer ? 18000000 : 0),
+                            $lte: dId.timeLte + (isServer ? 18000000 : 0),
+                        },
                         transaction: { $regex: `^${dId.txid32}` },
                     },
                 },
