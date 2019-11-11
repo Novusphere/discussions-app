@@ -84,7 +84,7 @@ const OpeningPost: React.FC<IOpeningPostProps> = ({
                     {!activeThread || !activeThread.editing && (
                         <span className={'black f4 b'}>{openingPost.title}</span>
                     )}
-                    {activeThread && !activeThread.editing && (
+                    {activeThread && activeThread.openingPost && !activeThread.editing && (
                         <Votes
                             uuid={activeThread.openingPost.uuid}
                             myVote={activeThread.openingPost.myVote}
@@ -106,7 +106,7 @@ const OpeningPost: React.FC<IOpeningPostProps> = ({
 
                 {openingPost.attachment && <Attachments attachment={openingPost.attachment} />}
 
-                {activeThread && (
+                {activeThread && activeThread.openingPost && (
                     <div className={'footer flex items-center pt3'}>
                         <button
                             className={'reply mr3 pointer dim'}
