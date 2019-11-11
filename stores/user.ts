@@ -1,4 +1,4 @@
-import { observable, action, when, reaction } from 'mobx'
+import { observable, action, when, reaction, computed } from 'mobx'
 import { BaseStore, getOrCreateStore } from 'next-mobx-wrapper'
 import { persist } from 'mobx-persist'
 import { computedFn } from 'mobx-utils'
@@ -10,7 +10,7 @@ export default class User extends BaseStore {
      * Observable map of users the current account is following
      * TODO: Sync with an API
      * {
-     *     pub: username
+     *     username: pub
      * }
      */
     @persist('map') @observable following = observable.map<string, string>()
@@ -32,6 +32,9 @@ export default class User extends BaseStore {
         )
     }
 
+    @computed get followingKeys() {
+        return Array.from(this.following.values())
+    }
 
     @action.bound
     toggleUserFollowing(user: string, pub: string) {

@@ -4,7 +4,7 @@ import { task } from 'mobx-task'
 import { BaseStore, getOrCreateStore } from 'next-mobx-wrapper'
 import { CreateForm } from '@components'
 import tag, { getTagStore } from '@stores/tag'
-import { getNewAuthStore, getUiStore, IStores } from '@stores'
+import { getNewAuthStore, getUiStore, getUserStore, IStores } from '@stores'
 import { generateUuid, getAttachmentValue, getIdenticon, pushToThread, sleep } from '@utils'
 import { ThreadModel } from '@models/threadModel'
 import FeedModel from '@models/feedModel'
@@ -84,29 +84,10 @@ export default class Posts extends BaseStore {
 
     @observable currentHighlightedPostUuid = ''
 
-    private tagsStore: IStores['tagStore']
-    private uiStore: IStores['uiStore']
-    private newAuthStore: IStores['newAuthStore']
-
-    constructor(props) {
-        super(props)
-        this.tagsStore = getTagStore()
-        this.uiStore = getUiStore()
-        this.newAuthStore = getNewAuthStore()
-
-        // refresh posts on logged in
-        // so we can show upvotes/downvotes by the user
-        // reaction(
-        //     () => this.newAuthStore.hasAccount,
-        //     async hasAccount => {
-        //         if (hasAccount) {
-        //             if (this.activeThread) {
-        //                 this.getAndSetThread(this.activeThreadId)
-        //             }
-        //         }
-        //     }
-        // )
-    }
+    private readonly tagsStore: IStores['tagStore'] = getTagStore()
+    private readonly uiStore: IStores['uiStore']= getUiStore()
+    private readonly newAuthStore: IStores['newAuthStore'] = getNewAuthStore()
+    private readonly userStore: IStores['userStore'] = getUserStore()
 
     @action.bound
     highlightPostUuid(uuid: string) {
@@ -127,6 +108,29 @@ export default class Posts extends BaseStore {
         try {
             const { posts, cursorId } = await discussions.getPostsForSubs(
                 subs,
+                this.postsPosition.cursorId,
+                this.postsPosition.items
+            )
+
+            this.posts = [...this.posts, ...posts]
+
+            this.postsPosition = {
+                items: this.posts.length,
+                cursorId,
+            }
+
+            return this.posts
+        } catch (error) {
+            return error
+        }
+    }
+
+    @task
+    @action.bound
+    async getPostsForKeys() {
+        try {
+            const { posts, cursorId } = await discussions.getPostsForKeys(
+                this.userStore.followingKeys,
                 this.postsPosition.cursorId,
                 this.postsPosition.items
             )

@@ -376,6 +376,41 @@ export default class DiscussionsService {
         }
     }
 
+    async getPostsForKeys(
+        keys: string[],
+        cursorId = undefined,
+        count = 0,
+        limit = 20
+    ): Promise<{
+        posts: Post[]
+        cursorId: number
+    }> {
+        const query = await nsdb.search({
+            cursorId,
+            count,
+            limit,
+            pipeline: [
+                {
+                    $match: {
+                        pub: { $in: keys },
+                    },
+                },
+                {
+                    $sort: {
+                        createdAt: -1,
+                    },
+                },
+            ],
+        })
+
+        let posts = query.payload.map(o => Post.fromDbObject(o))
+
+        return {
+            posts,
+            cursorId: query.cursorId,
+        }
+    }
+
     async getPostsForTags(
         tags: string[],
         cursorId = undefined,
