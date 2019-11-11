@@ -180,9 +180,9 @@ export default class Posts extends BaseStore {
 
     @task
     @action.bound
-    public async getAndSetThread(id: string): Promise<null | ThreadModel> {
+    public async getAndSetThread(id: string, isServer = false): Promise<null | ThreadModel> {
         try {
-            const thread = await discussions.getThread(id)
+            const thread = await discussions.getThread(id, isServer)
             if (!thread) return null
             this.activeThread = new ThreadModel(thread)
             this.activeThreadId = id

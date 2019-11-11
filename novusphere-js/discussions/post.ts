@@ -144,15 +144,15 @@ export class Post {
         return p;
     }
 
-    static decodeId(id: string) {
+    static decodeId(id: string, isServer: boolean) {
         let n = new BigInt(id, 36);
         let txid32 = n.shiftRight(32).toString(16).padStart(8, '0');
         let timeOffset = n.and(new BigInt('ffffffff', 16));
         let time = (timeOffset.valueOf() * 1000) + new Date('2017/1/1').getTime();
         return {
             txid32: txid32,
-            timeGte: time - 1000*60*3,
-            timeLte: time + 1000*60*3
+            timeGte: time - (isServer ? 0 : 1000*60*3),
+            timeLte: time + (isServer ? 0 : 1000*60*3)
         }
     }
 
