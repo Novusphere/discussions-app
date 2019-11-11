@@ -84,7 +84,7 @@ const OpeningPost: React.FC<IOpeningPostProps> = ({
                 </div>
 
                 <div className={'flex justify-between items-center pb1'}>
-                    {!activeThread.editing && (
+                    {!activeThread || !activeThread.editing && (
                         <span className={'black f4 b'}>{openingPost.title}</span>
                     )}
                     {activeThread && !activeThread.editing && (
@@ -98,7 +98,7 @@ const OpeningPost: React.FC<IOpeningPostProps> = ({
                     )}
                 </div>
 
-                {activeThread.editing ? (
+                {activeThread && activeThread.editing ? (
                     <Form form={activeThread.editForm} hideSubmitButton />
                 ) : (
                     <ReactMarkdown
