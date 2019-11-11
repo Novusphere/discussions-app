@@ -3,7 +3,7 @@ import { inject, observer } from 'mobx-react'
 import { IStores } from '@stores'
 import { ShowFullThread } from '@components'
 import { NextRouter } from 'next/router'
-import { Thread } from '@novuspherejs'
+import { Thread, discussions } from '@novuspherejs'
 
 interface IEPageProps {
     postsStore: IStores['postsStore']
@@ -30,7 +30,8 @@ class E extends React.Component<IEPageProps, IEPageState> {
     static async getInitialProps({ query, store }) {
         const postsStore: IStores['postsStore'] = store.postsStore
 
-        const thread = await postsStore.getAndSetThread(query.id)
+        await postsStore.getAndSetThread(query.id)
+        const thread = await discussions.getThread(query.id)
 
         console.log('\n\n\n\n', query, thread, '\n\n\n\n')
 
