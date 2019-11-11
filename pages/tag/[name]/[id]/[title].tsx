@@ -54,6 +54,12 @@ class E extends React.Component<IEPageProps, IEPageState> {
                 <NextSeo
                     title={thread.openingPost.title}
                     description={`Posted in #${thread.openingPost.sub} by ${poster}`}
+                    openGraph={{
+                        url: window.location.origin,
+                        title: thread.openingPost.title,
+                        description: `Posted in #${thread.openingPost.sub} by ${poster}`,
+                        site_name: 'Discussions App',
+                    }}
                 />
                 <ShowFullThread thread={thread} />
             </>
