@@ -152,7 +152,7 @@ export default class Posts extends BaseStore {
                 this.postsPosition.cursorId,
                 this.postsPosition.items
             )
-            
+
             this.posts = [...this.posts, ...posts]
             this.postsPosition = {
                 items: this.posts.length,
@@ -412,6 +412,14 @@ export default class Posts extends BaseStore {
                                     const uuid = generateUuid()
                                     const posterName = this.newAuthStore.posterName
 
+                                    let inlineTags = post.content.match(/#([^\s.,;:!?]+)/gi)
+                                    let tags = [this.newPostData.sub.value]
+
+                                    if (inlineTags && inlineTags.length) {
+                                        inlineTags = inlineTags.map(tag => tag.replace('#', ''))
+                                        tags = [...tags, ...inlineTags]
+                                    }
+
                                     const newPost = {
                                         poster: null,
                                         displayName: null,
@@ -420,7 +428,7 @@ export default class Posts extends BaseStore {
                                         sub: this.newPostData.sub.value,
                                         chain: 'eos',
                                         mentions: [],
-                                        tags: [this.newPostData.sub.value],
+                                        tags: tags,
                                         uuid: uuid,
                                         parentUuid: '',
                                         threadUuid: uuid,
@@ -444,11 +452,8 @@ export default class Posts extends BaseStore {
 
                                     // TODO: Add check to make sure the thread is actually posted onto the chain
                                     await sleep(5000)
-
-                                    pushToThread(submittedPost)
-
+                                    await pushToThread(submittedPost)
                                     this.uiStore.showToast('Your post has been created!', 'success')
-
                                     this.clearPreview()
                                 }
                             }),
