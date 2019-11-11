@@ -96,12 +96,9 @@ export default class Notifications extends BaseStore {
     @task
     @action.bound
     async fetchNotifications(time = this.lastCheckedNotifications, clearTray = false) {
-        console.log('Fetching notifications: ', time)
-
         let defaultCursorId = this.cursorId
 
         if (defaultCursorId === 0) {
-            console.warn('If notification time was 0, that means you are on the feed page')
             defaultCursorId = undefined
         }
 

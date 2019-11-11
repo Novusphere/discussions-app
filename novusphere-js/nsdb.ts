@@ -32,13 +32,8 @@ export class NSDB {
         const qs = `data=${JSON.stringify(sq)}`;
         const rurl = `${this.api}/discussions/search?${qs}`;
         
-        console.log('Class: NSDB, Function: search, Line 35 rurl: ', rurl);
-
         try {
             const request = await axios.get(rurl);
-            
-            console.log('Class: NSDB, Function: search, Line 40 request: ', request);
-            
             const result = request.data;
 
             if (result.error) {

@@ -188,7 +188,6 @@ export default class Posts extends BaseStore {
             this.activeThreadId = id
             return this.activeThread
         } catch (error) {
-            console.log('Class: Posts, Function: getAndSetThread, Line 123 error: ', error)
             throw error
         }
     }
