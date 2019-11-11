@@ -42,7 +42,7 @@ class Notifications extends React.Component<INotificationsProps> {
                             disableVoteHandler
                             key={notification.uuid}
                             notificationUuid={notification.uuid}
-                            post={notification}
+                            post={notification as any}
                             tag={this.props.tagStore.tags.get(notification.sub)}
                         />
                     )
