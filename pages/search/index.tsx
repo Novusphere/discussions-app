@@ -46,6 +46,7 @@ class Index extends React.Component<ISearchPageProps, ISearchPageState> {
 
         return (
             <InfiniteScrollFeed
+                withAnchorUid
                 dataLength={items}
                 hasMore={cursorId !== 0}
                 next={() => getSearchResults(searchValue)}

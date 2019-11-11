@@ -15,6 +15,7 @@ interface IInfiniteScrollFeedOuterProps {
     next: () => void
     posts: any[]
 
+    withAnchorUid?: boolean
     tagModel?: TagModel
 }
 
@@ -53,6 +54,7 @@ class InfiniteScrollFeed extends React.Component<
             next,
             posts,
             tagModel,
+            withAnchorUid,
             tagStore: { tags },
         } = this.props
 
@@ -71,6 +73,7 @@ class InfiniteScrollFeed extends React.Component<
                             key={post.uuid}
                             tag={typeof tagModel !== 'undefined' ? tagModel : tags.get(post.sub)}
                             voteHandler={post.vote}
+                            {...(withAnchorUid && { notificationUuid: post.uuid })}
                         />
                     )
                 })}

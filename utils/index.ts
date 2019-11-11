@@ -9,6 +9,7 @@ const uuid = require('uuidv4')
 
 const BigInt = require('big-integer')
 
+export const isDev = process.env.NODE_ENV === 'development'
 export const isServer = typeof window === 'undefined'
 export const sleep = milliseconds => {
     return new Promise(resolve => setTimeout(resolve, milliseconds))
@@ -70,15 +71,18 @@ export const getThreadTitle = post => {
 
 export const getThreadUrl = async (post, permalinkUuid?: string) => {
     const id = encodeId(post)
-    let url = `/tag/${post.sub}/${id}/${getThreadTitle(post)}`
+    let url = `/tag/${post.sub}/${id}/`
 
+    // if a post is a comment not a opening post
     if (post.title === '') {
         const thread = await discussions.getThread(id)
-        url += `${thread.title}`
+        url += `${getThreadTitle(thread)}`
+    } else {
+        url += `${getThreadTitle(post)}`
     }
 
     if (permalinkUuid) {
-        url += `${post.title}#${permalinkUuid}`
+        url += `#${permalinkUuid}`
     }
 
     return url

@@ -29,9 +29,8 @@ interface IEPageState {
 class E extends React.Component<IEPageProps, IEPageState> {
     static async getInitialProps({ query, store, req }) {
         const postsStore: IStores['postsStore'] = store.postsStore
-        const thread = await postsStore.getAndSetThread(query.id, !!req)
 
-        console.log('\n\n\n\n', query, thread, '\n\n\n\n')
+        const thread = await postsStore.getAndSetThread(query.id, !!req)
 
         return {
             query,
