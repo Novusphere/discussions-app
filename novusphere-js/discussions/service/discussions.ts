@@ -283,7 +283,7 @@ export default class DiscussionsService {
         }
     }
 
-    async getThread(_id: string, isServer): Promise<Thread | null> {
+    async getThread(_id: string, isServer = false): Promise<Thread | null> {
         let dId = Post.decodeId(_id, isServer)
 
         console.log('\n\n\n dId: ', dId, '\n\n\n')
