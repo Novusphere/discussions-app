@@ -28,6 +28,7 @@ class PostModel {
     @observable pub
 
     @observable imageData
+    @observable posterName
 
     constructor(post: Post) {
         set(this, post)
@@ -39,21 +40,20 @@ class PostModel {
         }
 
         this.imageData = imageData
-    }
 
-    @computed get posterName() {
         if (this.displayName) {
-            return this.displayName
+            this.posterName = this.displayName
+        } else {
+            this.posterName = this.poster
         }
-        return this.poster
     }
 
     sign = (privKey: string) => {
-        this.pub = ecc.privateToPublic(privKey);
-        const hash0 = ecc.sha256(this.content);
-        const hash1 = ecc.sha256(this.uuid+hash0);
-        this.sig = ecc.sign(hash1, privKey);
-        this.verifySig = this.pub;
+        this.pub = ecc.privateToPublic(privKey)
+        const hash0 = ecc.sha256(this.content)
+        const hash1 = ecc.sha256(this.uuid + hash0)
+        this.sig = ecc.sign(hash1, privKey)
+        this.verifySig = this.pub
         return this
     }
 }

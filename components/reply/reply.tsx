@@ -23,6 +23,8 @@ import Router from 'next/router'
 
 import './style.scss'
 import Form from '../create-form/form'
+import { ThreadModel } from '@models/threadModel'
+import { task } from 'mobx-task'
 
 interface IReplies {
     currentPath: string
@@ -37,6 +39,7 @@ interface IReplies {
     postsStore?: IStores['postsStore']
 
     isCollapsed?: boolean
+    threadReference?: ThreadModel
 }
 
 interface IRepliesState {
@@ -51,6 +54,15 @@ class Reply extends React.Component<IReplies, IRepliesState> {
         isHover: false,
         isCollapsed: false,
     }
+
+    constructor(props) {
+        super(props)
+
+        this.onSubmit = this.onSubmit.bind(this)
+    }
+
+    @task.resolved
+    private onSubmit(replyModel) { return replyModel.onSubmit(this.props.threadReference) }
 
     componentDidMount(): void {
         if (this.props.currentPath.indexOf('#') !== -1) {
@@ -152,6 +164,7 @@ class Reply extends React.Component<IReplies, IRepliesState> {
             newAuthStore,
             currentPath,
             postsStore,
+            threadReference,
         } = this.props
 
         const { isCollapsed, isHover } = this.state
@@ -205,9 +218,6 @@ class Reply extends React.Component<IReplies, IRepliesState> {
                     </div>
                     <div
                         className={'flex flex-column'}
-                        // onDoubleClick={() =>
-                        //     this.setState({ isCollapsed: !this.state.isCollapsed })
-                        // }
                     >
                         <div className={'header pb0'}>
                             <div className={'pr2'}>{this.renderCollapseElements()}</div>
@@ -254,7 +264,8 @@ class Reply extends React.Component<IReplies, IRepliesState> {
                         ])}
                         uid={post.uuid}
                         onContentChange={replyModel.setContent}
-                        onSubmit={replyModel.onSubmit}
+                        loading={replyModel.onSubmit['pending']}
+                        onSubmit={() => this.onSubmit(replyModel)}
                     />
                 ) : null}
 
@@ -276,6 +287,7 @@ class Reply extends React.Component<IReplies, IRepliesState> {
                                   postsStore={postsStore}
                                   currentPath={currentPath}
                                   isCollapsed={isCollapsed}
+                                  threadReference={threadReference}
                               />
                           </div>
                       ))

@@ -18,6 +18,7 @@ export class ThreadModel {
     @observable public sub: string
 
     @observable public replies: PostModel[]
+    @observable openingPostReplies: PostModel[]
 
     @observable editing = false
 
@@ -52,10 +53,46 @@ export class ThreadModel {
         /**
          * Set reply box open for the opening post by default
          */
-        const openingPostReplyModel = new ReplyModel(this.openingPost, this.map)
-        openingPostReplyModel.toggleOpen()
-        this.replyBoxStatuses.set(this.uuid, openingPostReplyModel)
+        // const openingPostReplyModel = new ReplyModel(this.openingPost, this.map)
+        // openingPostReplyModel.toggleOpen()
+        // this.replyBoxStatuses.set(this.uuid, openingPostReplyModel)
+
+
+    //     /**
+    //      * Get posts based on a parent uuid
+    //      * @param {string} uid - The post uid that you want getRepliesFromMap for
+    //      * @return {PostModel[]}
+    //      */
+    //     getRepliesFromMap: (...args: any[]) => PostModel[] = computedFn((uid: string): PostModel[] => {
+    //         if (this.map[uid]) {
+    //             return _.filter(this.map, (post) => post.parentUuid === uid)
+    //         }
+    //
+    //         return []
+    //     })
+    //
+    // @computed get openingPostReplies(): any[] {
+    //         const openingPostReplies = this.getRepliesFromMap(this.uuid)
+    //
+    //         return openingPostReplies.map(reply => {
+    //             return {
+    //                 ...reply,
+    //                 replies: this.getRepliesFromMap(reply.uuid),
+    //             }
+    //         })
+    //     }
+
+        this.openingPostReplies = _.filter(this.map, post => post.parentUuid === this.uuid)
+
     }
+
+        getRepliesFromMap: (...args: any[]) => PostModel[] = computedFn((uid: string): PostModel[] => {
+            if (this.map[uid]) {
+                return _.filter(this.map, (post) => post.parentUuid === uid)
+            }
+
+            return []
+        })
 
     @computed get canEditPost() {
         return this.openingPost.pub === this.authStore.activePublicKey
@@ -175,48 +212,25 @@ export class ThreadModel {
             return model
         }
     )
-    /**
-     * Get posts based on a parent uuid
-     * @param {string} uid - The post uid that you want getRepliesFromMap for
-     * @return {PostModel[]}
-     */
-    getRepliesFromMap: (...args: any[]) => PostModel[] = computedFn((uid: string): PostModel[] => {
-        if (this.map[uid]) {
-            return _.filter(this.map, (post, index) => post.parentUuid === uid)
-        }
-
-        return []
-    })
-
-    @computed get openingPostReplies(): any[] {
-        const openingPostReplies = this.getRepliesFromMap(this.uuid)
-
-        return openingPostReplies.map(reply => {
-            return {
-                ...reply,
-                replies: this.getRepliesFromMap(reply.uuid),
-            }
-        })
-    }
 
     /**
      * Toggle the status of the reply box
      * @param {string} uid
      * @return {void}
      */
-    toggleReplyBoxStatus = (uid: string) => {
-        let replyModel: ReplyModel
-
-        if (this.replyBoxStatuses.has(uid)) {
-            replyModel = this.replyBoxStatuses.get(uid)
-            replyModel.toggleOpen()
-            this.replyBoxStatuses.set(uid, replyModel)
-        } else {
-            if (this.map[uid]) {
-                this.replyBoxStatuses.set(uid, new ReplyModel(this.map[uid], this.map))
-            }
-        }
-    }
+    // toggleReplyBoxStatus = (uid: string) => {
+    //     let replyModel: ReplyModel
+    //
+    //     if (this.replyBoxStatuses.has(uid)) {
+    //         replyModel = this.replyBoxStatuses.get(uid)
+    //         replyModel.toggleOpen()
+    //         this.replyBoxStatuses.set(uid, replyModel)
+    //     } else {
+    //         if (this.map[uid]) {
+    //             this.replyBoxStatuses.set(uid, new ReplyModel(this.map[uid], this.map))
+    //         }
+    //     }
+    // }
 
     /**
      * Set the vote of a post given it's uuid.

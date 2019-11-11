@@ -141,7 +141,9 @@ export class ReplyModel {
         ])
     }
 
-    @task.resolved onSubmit = async () => {
+    @task.resolved
+    @action.bound
+    async onSubmit(activeThread: any) {
         if (!this.newAuthStore.hasAccount) {
             this.uiStore.showToast('You must be logged in to comment', 'error')
             return
@@ -190,8 +192,6 @@ export class ReplyModel {
         }
 
         try {
-            const activeThread = this.postStore.activeThread
-
             if (activeThread) {
                 const model = new PostModel(reply as any)
                 const signedReply = model.sign(this.newAuthStore.postPriv)

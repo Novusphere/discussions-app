@@ -6,7 +6,6 @@ import { OpeningPost, Reply, ReplyBox } from '@components'
 import { ThreadModel } from '@models/threadModel'
 import { IStores } from '@stores'
 import { NextRouter, withRouter } from 'next/router'
-import PostModel from '@models/postModel'
 import Head from 'next/head'
 import { Thread as NSThread } from '@novuspherejs'
 
@@ -74,6 +73,7 @@ class Thread extends React.Component<IThreadOuterProps & IThreadInnerProps, IThr
                     uid={uuid}
                     onContentChange={openingReplyModel.setContent}
                     onSubmit={openingReplyModel.onSubmit}
+                    loading={openingReplyModel.onSubmit['pending']}
                 />
             </div>
         )
@@ -97,23 +97,23 @@ class Thread extends React.Component<IThreadOuterProps & IThreadInnerProps, IThr
     }
 
     private renderReplies = () => {
-        const { thread, router } = this.props
+        const { router } = this.props
 
         const {
-            threadAsModel: { openingPostReplies, getRepliesFromMap, vote, rbModel },
+            threadAsModel: { openingPostReplies, rbModel, getRepliesFromMap, vote },
         } = this.state
 
         return (
             <div className={'card'}>
                 {openingPostReplies.map(reply => {
-                    const post = new PostModel(reply)
                     return (
                         <Reply
                             currentPath={router.asPath}
-                            post={post}
+                            post={reply}
                             key={reply.uuid}
                             getModel={rbModel}
                             voteHandler={vote}
+                            threadReference={this.state.threadAsModel}
                             getRepliesFromMap={getRepliesFromMap}
                         />
                     )
