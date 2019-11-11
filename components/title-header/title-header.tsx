@@ -14,6 +14,7 @@ interface ITitleHeaderProps {
     tagStore: IStores['tagStore']
     newAuthStore: IStores['newAuthStore']
     notificationsStore: IStores['notificationsStore']
+    userStore: IStores['userStore']
     uiStore: IStores['uiStore']
 }
 
@@ -21,7 +22,7 @@ interface ITitleHeaderState {
     search: string
 }
 
-@inject('tagStore', 'newAuthStore', 'uiStore', 'notificationsStore')
+@inject('tagStore', 'newAuthStore', 'userStore', 'uiStore', 'notificationsStore')
 @observer
 class TitleHeader extends React.Component<ITitleHeaderProps, ITitleHeaderState> {
     state = {
@@ -61,6 +62,7 @@ class TitleHeader extends React.Component<ITitleHeaderProps, ITitleHeaderState> 
     private renderAuthActions = () => {
         const { notificationsStore } = this.props
         const { showModal } = this.props.uiStore
+        const { userIcon } = this.props.userStore
         const { hasAccount, getActiveDisplayName, checkInitialConditions } = this.props.newAuthStore
 
         if (checkInitialConditions['pending']) {
@@ -111,16 +113,19 @@ class TitleHeader extends React.Component<ITitleHeaderProps, ITitleHeaderState> 
                         position={'bottom-end'}
                         trigger={'mouseenter'}
                     >
-                        <Link
-                            href={`/u/[username]`}
-                            as={`/u/${getActiveDisplayName}`}
-                        >
+                        <Link href={`/u/[username]`} as={`/u/${getActiveDisplayName}`}>
                             <a
                                 rel={'Open your profile'}
                                 className={'flex items-center user-container pointer dim'}
                             >
                                 <span className={'b f6 pl1 pr3 black'}>{getActiveDisplayName}</span>
-                                <FontAwesomeIcon width={13} icon={faUserCircle} color={'#7D8894'} />
+                                <img
+                                    width={30}
+                                    height={30}
+                                    src={`data:image/png;base64,${userIcon}`}
+                                    className={'post-icon mr2'}
+                                    alt={'Icon'}
+                                />
                             </a>
                         </Link>
                     </Tooltip>

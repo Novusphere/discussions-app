@@ -15,7 +15,7 @@ export default class User extends BaseStore {
      */
     @persist('map') @observable following = observable.map<string, string>()
 
-    @observable userIcon = ''
+    @persist @observable userIcon = ''
 
     private readonly authStore: IStores['newAuthStore'] = getNewAuthStore()
 
@@ -26,7 +26,7 @@ export default class User extends BaseStore {
             () => this.authStore.postPriv,
             (priv) => {
                 if (priv) {
-                    this.userIcon = getIdenticon(priv)
+                    this.userIcon = getIdenticon(this.authStore.activePublicKey)
                 }
             }
         )
