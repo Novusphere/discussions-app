@@ -1,7 +1,6 @@
 import * as React from 'react'
 import { inject, observer } from 'mobx-react'
 import { IStores } from '@stores'
-import { IPost } from '@stores/posts'
 import { OpeningPost } from '@components'
 import PostModel from '@models/postModel'
 
@@ -16,15 +15,13 @@ interface IPostPreviewProps {
 class NewPostPreview extends React.Component<IPostPreviewProps> {
     public render(): React.ReactNode {
         const { preview } = this.props.postsStore
-        const { getActiveDisplayName } = this.props.newAuthStore
+        const { getActiveDisplayName, activePublicKey } = this.props.newAuthStore
 
         if (!preview) {
             return null
         }
 
-        console.log(preview)
-
-        const post: IPost = {
+        const post = {
             id: 0,
             transaction: '',
             blockApprox: 0,
@@ -38,6 +35,7 @@ class NewPostPreview extends React.Component<IPostPreviewProps> {
             createdAt: Date.now() as any,
             sub: preview.sub.value,
             tags: [],
+            pub: activePublicKey,
             mentions: [],
             edit: false,
             anonymousId: '',

@@ -32,7 +32,6 @@ interface IEPageState {
 class E extends React.Component<IEPageProps, IEPageState> {
     static async getInitialProps({ query, store, req }) {
         const postsStore: IStores['postsStore'] = store.postsStore
-
         const thread = await postsStore.getAndSetThread(query.id, !!req)
 
         return {
@@ -48,7 +47,12 @@ class E extends React.Component<IEPageProps, IEPageState> {
     }
 
     public render(): React.ReactNode {
-        const { thread } = this.props
+        const { thread, query } = this.props
+
+        if (!thread) {
+            return <span>Couldn't find this thread: {query.id}</span>
+        }
+
         const poster = thread.openingPost.displayName || thread.openingPost.poster
 
         return (

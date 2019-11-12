@@ -408,7 +408,7 @@ export default class Posts extends BaseStore {
                             disabled: !this.newAuthStore.hasAccount,
                             title: !this.newAuthStore.hasAccount
                                 ? 'You need to be logged in to post'
-                                : 'Post with your logged as ' + this.newAuthStore.posterName,
+                                : 'Post as ' + this.newAuthStore.posterName,
 
                             onClick: task.resolved(async form => {
                                 if (!form.hasError && this.newPostData.sub.value) {
@@ -454,7 +454,7 @@ export default class Posts extends BaseStore {
                                     const signedReply = model.sign(this.newAuthStore.postPriv)
                                     const submittedPost = await discussions.post(signedReply as any)
 
-                                    // TODO: Add check to make sure the thread is actually posted onto the chain
+                                    // // TODO: Add check to make sure the thread is actually posted onto the chain
                                     await sleep(5000)
                                     await pushToThread(submittedPost)
                                     this.uiStore.showToast('Your post has been created!', 'success')
