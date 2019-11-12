@@ -71,8 +71,8 @@ class U extends React.Component<IUPageProps> {
             )
         }
 
-        const pubs = Array.from(this.props.userStore.following.values())
-        const following = Array.from(this.props.userStore.following.keys())
+        const pubs = Array.from(this.props.userStore.following.keys())
+        const following = Array.from(this.props.userStore.following.values())
 
         return following.map((follow, index) => (
             <li className={'pa0 mb2'} key={follow}>
