@@ -7,7 +7,7 @@ import { faMinusCircle } from '@fortawesome/free-solid-svg-icons'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { computed } from 'mobx'
 import { getIdenticon } from '@utils'
-import { InfiniteScrollFeed } from '@components'
+import { InfiniteScrollFeed, PostPreview } from '@components'
 
 interface IUPageProps {
     userStore: IStores['userStore']
@@ -168,6 +168,7 @@ class U extends React.Component<IUPageProps> {
 
         return (
             <InfiniteScrollFeed
+                withAnchorUid
                 dataLength={items}
                 hasMore={cursorId !== 0}
                 next={() => getPostsForKeys([pub])}

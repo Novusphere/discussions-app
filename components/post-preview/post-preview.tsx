@@ -36,7 +36,13 @@ const PostPreview: React.FC<IPostPreviewProps> = ({
         }
 
         async function getUrl() {
-            setUrl(await getThreadUrl(post, notificationUuid))
+            let uuid = undefined
+
+            if (!post.title && notificationUuid) {
+                uuid = notificationUuid
+            }
+
+            setUrl(await getThreadUrl(post, uuid))
         }
 
         makePostIntoFeedModel()
@@ -51,15 +57,17 @@ const PostPreview: React.FC<IPostPreviewProps> = ({
                         'bg-light-gray flex tc justify-center ph2 pv4 relative z-2 flex-auto'
                     }
                 >
-                    {disableVoteHandler ? null : (
-                        postModel && <Votes
-                            upVotes={postModel.upvotes}
-                            downVotes={postModel.downvotes}
-                            myVote={postModel.myVote}
-                            handler={postModel.vote}
-                            uuid={postModel.uuid}
-                        />
-                    )}
+                    {disableVoteHandler
+                        ? null
+                        : postModel && (
+                              <Votes
+                                  upVotes={postModel.upvotes}
+                                  downVotes={postModel.downvotes}
+                                  myVote={postModel.myVote}
+                                  handler={postModel.vote}
+                                  uuid={postModel.uuid}
+                              />
+                          )}
                 </div>
                 <Link href={'/tag/[name]/[id]/[title]'} as={url}>
                     <a className={'no-style w-100'}>
@@ -74,14 +82,16 @@ const PostPreview: React.FC<IPostPreviewProps> = ({
                                 )}
                                 <span className={'b ttu'}>{post.sub}</span>
                                 <span className={'ph1 b'}>&#183;</span>
-                                {postModel && <object>
-                                    <UserNameWithIcon
-                                        imageData={postModel.imageData}
-                                        pub={postModel.pub}
-                                        name={postModel.posterName}
-                                        imageSize={20}
-                                    />
-                                </object>}
+                                {postModel && (
+                                    <object>
+                                        <UserNameWithIcon
+                                            imageData={postModel.imageData}
+                                            pub={postModel.pub}
+                                            name={postModel.posterName}
+                                            imageSize={20}
+                                        />
+                                    </object>
+                                )}
                                 <span className={'ph1 b'}>&#183;</span>
                                 <span
                                     className={'o-50 pl2'}
