@@ -117,11 +117,11 @@ class U extends React.Component<IUPageProps> {
                         <span className={'b f6 mb2'}>192 Followers</span>
                         {!this.isSameUser && (
                             <button
-                                title={isFollowingUser(username) ? 'Unfollow user' : 'Follow user'}
+                                title={isFollowingUser(pub) ? 'Unfollow user' : 'Follow user'}
                                 className={'button-outline'}
                                 onClick={() => toggleUserFollowing(username, pub)}
                             >
-                                {isFollowingUser(username) ? 'Unfollow' : 'Follow'}
+                                {isFollowingUser(pub) ? 'Unfollow' : 'Follow'}
                             </button>
                         )}
                     </div>

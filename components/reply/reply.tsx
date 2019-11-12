@@ -137,7 +137,7 @@ class Reply extends React.Component<IReplies, IRepliesState> {
                     <FontAwesomeIcon icon={faEye} />
                 </span>
                 {post.pub && hasAccount && activePublicKey !== post.pub ? (
-                    isFollowingUser(post.posterName) ? (
+                    isFollowingUser(post.pub) ? (
                         <span title={'Unfollow user'} onClick={this.toggleFollowStatus}>
                             <FontAwesomeIcon icon={faUserMinus} className={'red'} />
                         </span>

@@ -10,7 +10,7 @@ export default class User extends BaseStore {
      * Observable map of users the current account is following
      * TODO: Sync with an API
      * {
-     *     username: pub
+     *     pub: username
      * }
      */
     @persist('map') @observable following = observable.map<string, string>()
@@ -33,20 +33,20 @@ export default class User extends BaseStore {
     }
 
     @computed get followingKeys() {
-        return Array.from(this.following.values())
+        return Array.from(this.following.keys())
     }
 
     @action.bound
     toggleUserFollowing(user: string, pub: string) {
-        if (this.following.has(user)) {
-            this.following.delete(user)
+        if (this.following.has(pub)) {
+            this.following.delete(pub)
         } else {
-            this.following.set(user, pub)
+            this.following.set(pub, user)
         }
     }
 
-    isFollowingUser = computedFn((user: string) => {
-        return this.following.has(user)
+    isFollowingUser = computedFn((pub: string) => {
+        return this.following.has(pub)
     })
 }
 
