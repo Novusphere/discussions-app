@@ -30,14 +30,14 @@ class Index extends React.Component<IIndexProps, IIndexState> {
     }
 
     public render() {
-        const { getPostsForSubs, postsPosition, posts } = this.props.postsStore
+        const { getPostsForKeys, postsPosition, posts } = this.props.postsStore
         const { cursorId, items } = postsPosition
 
         return (
             <InfiniteScrollFeed
                 dataLength={items}
                 hasMore={cursorId !== 0}
-                next={getPostsForSubs}
+                next={getPostsForKeys}
                 posts={posts}
             />
         )

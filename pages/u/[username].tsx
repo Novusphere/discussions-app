@@ -1,34 +1,61 @@
 import * as React from 'react'
-import { dummy } from '@novuspherejs'
+import { dummy, Post } from '@novuspherejs'
 import { IStores } from '@stores'
 import { inject, observer } from 'mobx-react'
 import { Tab, Tabs, TabList, TabPanel } from 'react-tabs'
 import { faMinusCircle } from '@fortawesome/free-solid-svg-icons'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { computed } from 'mobx'
+import { getIdenticon } from '@utils'
+import { InfiniteScrollFeed } from '@components'
 
 interface IUPageProps {
     userStore: IStores['userStore']
+    postsStore: IStores['postsStore']
     newAuthStore: IStores['newAuthStore']
-    username: string
+    tagStore: IStores['tagStore']
+    uiStore: IStores['uiStore']
+
     data: any
+
+    username: string
+    pub: string
+    icon: string
+    posts: Post[]
 }
 
 // TO-DO: real data
 
-@inject('userStore', 'newAuthStore')
+@inject('userStore', 'newAuthStore', 'postsStore', 'tagStore', 'uiStore')
 @observer
 class U extends React.Component<IUPageProps> {
     static async getInitialProps({ query, store }) {
-        const uiStore: IStores['uiStore'] = store.uiStore
-        const userData = await dummy.getUser(query.username)
+        const postsStore: IStores['postsStore'] = store.postsStore
+        const data = await dummy.getUser(query.username)
+        const [username, pub] = query.username.split('-')
+        const icon = getIdenticon(pub)
 
-        uiStore.toggleSidebarStatus(false)
+        postsStore.resetPositionAndPosts()
+
+        const posts = await postsStore.getPostsForKeys([pub])
 
         return {
-            username: query.username,
-            data: userData,
+            posts,
+            icon,
+            username,
+            pub,
+            data,
         }
+    }
+
+    componentWillMount(): void {
+        this.props.tagStore.destroyActiveTag()
+        this.props.uiStore.toggleSidebarStatus(false)
+        this.props.uiStore.toggleBannerStatus(true)
+    }
+
+    componentDidMount(): void {
+        window.scrollTo(0, 0)
     }
 
     @computed get isSameUser() {
@@ -68,18 +95,35 @@ class U extends React.Component<IUPageProps> {
     }
 
     private renderSidebarContent = () => {
+        const {
+            icon,
+            username,
+            pub,
+            userStore: { toggleUserFollowing, isFollowingUser },
+        } = this.props
+
         return (
             <>
                 <div className={'flex flex-row items-center'}>
                     <img
-                        className={'br-100'}
-                        src={'https://via.placeholder.com/100x100'}
-                        alt={'User profile image'}
+                        width={100}
+                        height={100}
+                        src={`data:image/png;base64,${icon}`}
+                        className={'post-icon mr2'}
+                        alt={'Icon'}
                     />
                     <div className={'ml3 flex flex-column items-start justify-center'}>
                         <span className={'b black f5 mb2'}>{this.props.username}</span>
                         <span className={'b f6 mb2'}>192 Followers</span>
-                        <button className={'button-outline'}>Follow</button>
+                        {!this.isSameUser && (
+                            <button
+                                title={isFollowingUser(username) ? 'Unfollow user' : 'Follow user'}
+                                className={'button-outline'}
+                                onClick={() => toggleUserFollowing(username, pub)}
+                            >
+                                {isFollowingUser(username) ? 'Unfollow' : 'Follow'}
+                            </button>
+                        )}
                     </div>
                 </div>
 
@@ -113,14 +157,31 @@ class U extends React.Component<IUPageProps> {
         )
     }
 
-    public render(): React.ReactNode {
-        const { data } = this.props
+    private renderUsersPosts = () => {
+        const { pub } = this.props
 
+        const {
+            getPostsForKeys,
+            postsPosition: { cursorId, items },
+            posts,
+        } = this.props.postsStore
+
+        return (
+            <InfiniteScrollFeed
+                dataLength={items}
+                hasMore={cursorId !== 0}
+                next={() => getPostsForKeys([pub])}
+                posts={posts}
+            />
+        )
+    }
+
+    public render(): React.ReactNode {
         return (
             <div className={'flex flex-row'}>
                 <div className={'card w-30 mr5 pa3'}>{this.renderSidebarContent()}</div>
                 <div className={'w-70'}>
-                    <Tabs>
+                    <Tabs selectedIndex={1} onSelect={index => console.log(index)}>
                         <TabList className={'settings-tabs'}>
                             <Tab className={'settings-tab'}>Blog</Tab>
                             <Tab className={'settings-tab'}>Posts</Tab>
@@ -132,11 +193,7 @@ class U extends React.Component<IUPageProps> {
                                 There are no blog posts from this uer.
                             </div>
                         </TabPanel>
-                        <TabPanel>
-                            <div className={'card settings-card'}>
-                                There are no posts from this user.
-                            </div>
-                        </TabPanel>
+                        <TabPanel>{this.renderUsersPosts()}</TabPanel>
                         <TabPanel>
                             <div className={'card settings-card'}>
                                 There are no posts from this user.

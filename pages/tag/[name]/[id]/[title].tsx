@@ -51,8 +51,6 @@ class E extends React.Component<IEPageProps, IEPageState> {
         const { thread } = this.props
         const poster = thread.openingPost.displayName || thread.openingPost.poster
 
-        console.log(thread.openingPost.title)
-
         return (
             <>
                 <Head>

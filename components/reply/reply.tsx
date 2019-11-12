@@ -221,7 +221,7 @@ class Reply extends React.Component<IReplies, IRepliesState> {
                     >
                         <div className={'header pb0'}>
                             <div className={'pr2'}>{this.renderCollapseElements()}</div>
-                            <UserNameWithIcon imageData={post.imageData} name={post.posterName} />
+                            <UserNameWithIcon pub={post.pub} imageData={post.imageData} name={post.posterName} />
                             <span
                                 className={'pl2 o-50 f6'}
                                 title={moment(post.createdAt).format('YYYY-MM-DD HH:mm:ss')}

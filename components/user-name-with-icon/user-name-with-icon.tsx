@@ -6,9 +6,10 @@ interface IUserNameWithIconProps {
     imageSize?: number
     imageData: string
     name: string
+    pub: string
 }
 
-const UserNameWithIcon: React.FC<IUserNameWithIconProps> = ({ imageSize, imageData, name }) => {
+const UserNameWithIcon: React.FC<IUserNameWithIconProps> = ({ imageSize, imageData, name, pub }) => {
     let size = imageSize
 
     if (!imageSize || typeof imageSize === 'undefined') {
@@ -42,7 +43,7 @@ const UserNameWithIcon: React.FC<IUserNameWithIconProps> = ({ imageSize, imageDa
     }
 
     return (
-        <Link href={`/u/[username]`} as={`/u/${name}`}>
+        <Link href={`/u/[username]`} as={`/u/${name}-${pub}`}>
             <a>
                 <span className={'flex items-center'}>
                     {image}

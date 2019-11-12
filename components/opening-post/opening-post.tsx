@@ -61,6 +61,7 @@ const OpeningPost: React.FC<IOpeningPostProps> = ({
                     </Link>
                     <span className={'ph1 b'}>&#183;</span>
                     <UserNameWithIcon
+                        pub={openingPost.pub}
                         imageData={openingPost.imageData}
                         name={openingPost.posterName}
                         imageSize={20}

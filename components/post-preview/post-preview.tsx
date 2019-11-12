@@ -77,6 +77,7 @@ const PostPreview: React.FC<IPostPreviewProps> = ({
                                 {postModel && <object>
                                     <UserNameWithIcon
                                         imageData={postModel.imageData}
+                                        pub={postModel.pub}
                                         name={postModel.posterName}
                                         imageSize={20}
                                     />

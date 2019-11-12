@@ -23,6 +23,7 @@ interface ITagListState {
     isScrolling: boolean
 }
 
+@(withRouter as any)
 @inject('tagStore', 'postsStore')
 @observer
 class Sidebar extends React.Component<ITagListOuterProps & ITagListInnerProps, ITagListState> {
@@ -236,4 +237,4 @@ class Sidebar extends React.Component<ITagListOuterProps & ITagListInnerProps, I
     }
 }
 
-export default withRouter(observer(Sidebar)) as React.ComponentClass<ITagListOuterProps>
+export default Sidebar as React.ComponentClass<ITagListOuterProps>

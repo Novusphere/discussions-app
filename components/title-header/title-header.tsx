@@ -63,7 +63,7 @@ class TitleHeader extends React.Component<ITitleHeaderProps, ITitleHeaderState> 
         const { notificationsStore } = this.props
         const { showModal } = this.props.uiStore
         const { userIcon } = this.props.userStore
-        const { hasAccount, getActiveDisplayName, checkInitialConditions } = this.props.newAuthStore
+        const { hasAccount, getActiveDisplayName, checkInitialConditions, activePublicKey } = this.props.newAuthStore
 
         if (checkInitialConditions['pending']) {
             return <FontAwesomeIcon width={13} icon={faSpinner} spin />
@@ -113,7 +113,7 @@ class TitleHeader extends React.Component<ITitleHeaderProps, ITitleHeaderState> 
                         position={'bottom-end'}
                         trigger={'mouseenter'}
                     >
-                        <Link href={`/u/[username]`} as={`/u/${getActiveDisplayName}`}>
+                        <Link href={`/u/[username]`} as={`/u/${getActiveDisplayName}-${activePublicKey}`}>
                             <a
                                 rel={'Open your profile'}
                                 className={'flex items-center user-container pointer dim'}

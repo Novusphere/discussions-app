@@ -127,10 +127,10 @@ export default class Posts extends BaseStore {
 
     @task
     @action.bound
-    async getPostsForKeys() {
+    async getPostsForKeys(keys = this.userStore.followingKeys) {
         try {
             const { posts, cursorId } = await discussions.getPostsForKeys(
-                this.userStore.followingKeys,
+                keys,
                 this.postsPosition.cursorId,
                 this.postsPosition.items
             )
