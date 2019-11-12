@@ -172,6 +172,7 @@ export class ReplyModel {
             attachment: getAttachmentValue(this.content),
             upvotes: 0,
             downvotes: 0,
+            myVote: 0,
         }
 
         if (posterName === this.newAuthStore.displayName.bk) {
@@ -197,19 +198,28 @@ export class ReplyModel {
                 const signedReply = model.sign(this.newAuthStore.postPriv)
                 const confirmedReply = await discussions.post(signedReply as any)
 
+                const confirmedModel = new PostModel({
+                    ...confirmedReply,
+                    upvotes: reply.displayName && reply.poster ? 1 : 0,
+                    myVote: reply.displayName && reply.poster ? 1 : 0
+                })
+
                 set(activeThread, {
                     map: {
                         ...activeThread.map,
-                        [reply.id]: new PostModel({
-                            ...confirmedReply,
-                            upvotes: reply.displayName && reply.poster ? 1 : 0,
-                            myVote: reply.displayName && reply.poster ? 1 : 0,
-                        } as any),
+                        [reply.id]: confirmedModel,
                     },
                 })
 
-                this.content = ''
-                this.toggleOpen()
+                if (confirmedReply.parentUuid === this.post.threadUuid) {
+                    set(activeThread, {
+                        openingPostReplies: [...activeThread.openingPostReplies, confirmedModel],
+                    })
+                } else {
+                    this.toggleOpen()
+                }
+
+                this.clearContent()
                 this.uiStore.showToast('Your reply has been submitted!', 'success')
             } else {
                 this.uiStore.showToast('Failed to submit your reply', 'error')

@@ -7,6 +7,8 @@ import { ThreadModel } from '@models/threadModel'
 import { IStores } from '@stores'
 import { NextRouter, withRouter } from 'next/router'
 import { Thread as NSThread } from '@novuspherejs'
+import { observable } from 'mobx'
+import { ReplyModel } from '@models/replyModel'
 
 interface IThreadOuterProps {
     thread: NSThread
@@ -18,23 +20,23 @@ interface IThreadInnerProps {
 }
 
 interface IThreadState {
-    threadAsModel: ThreadModel
 }
 
 @(withRouter as any)
 @inject('postsStore')
 @observer
 class Thread extends React.Component<IThreadOuterProps & IThreadInnerProps, IThreadState> {
+    @observable threadAsModel: ThreadModel = null
+    @observable openingReplyModel: ReplyModel = null
+
     constructor(props) {
         super(props)
-
-        this.state = {
-            threadAsModel: new ThreadModel(props.thread),
-        }
+        this.threadAsModel = new ThreadModel(props.thread)
+        this.openingReplyModel = this.threadAsModel.rbModel(props.thread.openingPost)
     }
 
     componentWillUnmount(): void {
-        this.state.threadAsModel.toggleEditing(false)
+        this.threadAsModel.toggleEditing(false)
 
         if (this.props.postsStore.currentHighlightedPostUuid) {
             this.props.postsStore.highlightPostUuid('')
@@ -47,7 +49,7 @@ class Thread extends React.Component<IThreadOuterProps & IThreadInnerProps, IThr
             thread: { openingPost },
         } = this.props
 
-        const { threadAsModel } = this.state
+        const { threadAsModel } = this
 
         return (
             <OpeningPost
@@ -60,19 +62,16 @@ class Thread extends React.Component<IThreadOuterProps & IThreadInnerProps, IThr
     }
 
     private renderOpeningPostReplyBox = () => {
-        const { openingPost, uuid } = this.props.thread
-
-        const openingReplyModel = this.state.threadAsModel.rbModel(openingPost)
-
-        if (!openingReplyModel.open) return null
+        if (!this.openingReplyModel.open) return null
 
         return (
             <div className={'mb3'}>
                 <ReplyBox
-                    uid={uuid}
-                    onContentChange={openingReplyModel.setContent}
-                    onSubmit={openingReplyModel.onSubmit}
-                    loading={openingReplyModel.onSubmit['pending']}
+                    uid={this.props.thread.uuid}
+                    onContentChange={this.openingReplyModel.setContent}
+                    onSubmit={() => this.openingReplyModel.onSubmit(this.threadAsModel)}
+                    loading={this.openingReplyModel.onSubmit['pending']}
+                    value={this.openingReplyModel.content}
                 />
             </div>
         )
@@ -100,7 +99,7 @@ class Thread extends React.Component<IThreadOuterProps & IThreadInnerProps, IThr
 
         const {
             threadAsModel: { openingPostReplies, rbModel, getRepliesFromMap, vote },
-        } = this.state
+        } = this
 
         return (
             <div className={'card'}>
@@ -112,7 +111,7 @@ class Thread extends React.Component<IThreadOuterProps & IThreadInnerProps, IThr
                             key={reply.uuid}
                             getModel={rbModel}
                             voteHandler={vote}
-                            threadReference={this.state.threadAsModel}
+                            threadReference={this.threadAsModel}
                             getRepliesFromMap={getRepliesFromMap}
                         />
                     )

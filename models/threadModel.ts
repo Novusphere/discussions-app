@@ -166,26 +166,25 @@ export class ThreadModel {
      * Get the reply box model for a particular post uid
      * @return {ReplyModel}
      */
-    rbModel: (...args: any[]) => ReplyModel = computedFn(
-        (post: PostModel): ReplyModel => {
-            const uid = post.uuid
+    @action.bound
+    rbModel(post: PostModel) {
+        const uid = post.uuid
 
-            if (this.replyBoxStatuses.has(uid)) {
-                return this.replyBoxStatuses.get(uid)
-            }
-
-            let model: ReplyModel
-
-            if (this.map[uid]) {
-                model = new ReplyModel(this.map[uid], this.map)
-            } else {
-                model = new ReplyModel(post, this.map)
-            }
-
-            this.replyBoxStatuses.set(uid, model)
-            return model
+        if (this.replyBoxStatuses.has(uid)) {
+            return this.replyBoxStatuses.get(uid)
         }
-    )
+
+        let model: ReplyModel
+
+        if (this.map[uid]) {
+            model = new ReplyModel(this.map[uid], this.map)
+        } else {
+            model = new ReplyModel(post, this.map)
+        }
+
+        this.replyBoxStatuses.set(uid, model)
+        return model
+    }
 
     /**
      * Toggle the status of the reply box

@@ -264,6 +264,7 @@ class Reply extends React.Component<IReplies, IRepliesState> {
                         ])}
                         uid={post.uuid}
                         onContentChange={replyModel.setContent}
+                        value={replyModel.content}
                         loading={replyModel.onSubmit['pending']}
                         onSubmit={() => this.onSubmit(replyModel)}
                     />

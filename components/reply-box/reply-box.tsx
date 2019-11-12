@@ -14,8 +14,9 @@ interface IReplyProps {
     className?: string
     uid: string // the uid of the post this component is active for
     onContentChange: (content: string) => void
-    onSubmit: (uid: string) => Promise<boolean | void>
+    onSubmit: (uid: string) =>any
 
+    value?: string
     loading: boolean
 }
 
@@ -25,6 +26,7 @@ const ReplyBox: React.FC<IReplyProps> = ({
     onSubmit,
     loading,
     className,
+    value,
 }) => {
     return (
         <div
@@ -38,6 +40,7 @@ const ReplyBox: React.FC<IReplyProps> = ({
             <Editor
                 placeholder={'Enter your reply'}
                 className={'db f6'}
+                value={value}
                 onChange={onContentChange}
             />
 

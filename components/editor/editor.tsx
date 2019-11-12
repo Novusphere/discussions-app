@@ -103,8 +103,18 @@ class Editor extends React.Component<IEditorProps> {
             loaded: true,
         })
 
-        if (this.ref && this.ref.current && this.props.value) {
-            this.ref.current.getEditor().setContents(markdownToDelta(this.props.value))
+        this.updateContentByRef(markdownToDelta(this.props.value))
+    }
+
+    private updateContentByRef = (content) => {
+        if (this.ref && this.ref.current && typeof this.props.value !== 'undefined') {
+            this.ref.current.getEditor().setContents(content)
+        }
+    }
+
+    componentWillReceiveProps(nextProps: Readonly<IEditorProps>, nextContext: any): void {
+        if (nextProps.value === '') {
+            this.updateContentByRef('')
         }
     }
 
@@ -119,11 +129,13 @@ class Editor extends React.Component<IEditorProps> {
         }
 
         const { Editor } = this.quillBase
+        const { placeholder } = this.props
 
         return (
             <Editor
                 ref={this.ref}
                 key={'editor'}
+                placeholder={placeholder}
                 onChange={this.onChange}
                 formats={[
                     'header',
