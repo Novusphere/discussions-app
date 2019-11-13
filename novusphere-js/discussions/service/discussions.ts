@@ -290,7 +290,10 @@ export default class DiscussionsService {
 
             console.log('transaction set: !', p.transaction)
             p.myVote = 1
-            return p
+            return {
+                ...p,
+                metadata,
+            }
         } catch (error) {
             console.error(error)
             throw error
