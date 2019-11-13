@@ -65,7 +65,7 @@ class DiscussionApp extends App {
             })
 
             Object.keys(stores).forEach(store => {
-                hydrate(store, stores[store])
+                hydrate(store, stores[store]).rehydrate()
 
                 // if (getVersion() !== this.props.store.settingsStore.localStorageVersion) {
                 //     console.error('local storage version mismatch')

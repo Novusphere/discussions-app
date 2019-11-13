@@ -9,6 +9,7 @@ import { Tooltip } from 'react-tippy'
 import { ModalOptions } from '@globals'
 import { TagModel } from '@models/tagModel'
 import { UserNotifications } from '@components'
+import { getIdenticon } from '@utils'
 
 interface ITitleHeaderProps {
     tagStore: IStores['tagStore']
@@ -62,7 +63,6 @@ class TitleHeader extends React.Component<ITitleHeaderProps, ITitleHeaderState> 
     private renderAuthActions = () => {
         const { notificationsStore } = this.props
         const { showModal } = this.props.uiStore
-        const { userIcon } = this.props.userStore
         const { hasAccount, getActiveDisplayName, checkInitialConditions, activePublicKey } = this.props.newAuthStore
 
         if (checkInitialConditions['pending']) {
@@ -122,7 +122,7 @@ class TitleHeader extends React.Component<ITitleHeaderProps, ITitleHeaderState> 
                                 <img
                                     width={30}
                                     height={30}
-                                    src={`data:image/png;base64,${userIcon}`}
+                                    src={getIdenticon(activePublicKey)}
                                     className={'post-icon mr2'}
                                     alt={'Icon'}
                                 />

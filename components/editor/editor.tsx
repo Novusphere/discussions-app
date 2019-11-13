@@ -82,7 +82,7 @@ class Editor extends React.Component<IEditorProps> {
                     }
                 },
                 renderItem: item => {
-                    const image = `<img width=20 height=20 src="data:image/png;base64,${item.icon}" class="mention-list-icon" />`
+                    const image = `<img width=20 height=20 src={${item.icon} class="mention-list-icon" />`
                     return `<span class="mention-list-item" title={${item.id}}>${image} <span>${item.value}</span></span>`
                 },
                 onSelect: (item, insertItem) => {
