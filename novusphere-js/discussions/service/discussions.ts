@@ -37,6 +37,19 @@ export default class DiscussionsService {
         return;
     }*/
 
+     public checkIfPostIsValid(i: any) {
+        const hash0 = ecc.sha256(i.content);
+        const hash1 = ecc.sha256(i.uuid + hash0);
+        
+        console.log('Class: DiscussionsService, Function: checkIfPostIsValid, Line 44 hash0: ', hash0);
+        console.log('Class: DiscussionsService, Function: checkIfPostIsValid, Line 45 hash1: ', hash1);
+        const rpk = ecc.recover(i.metadata.sig, hash1);
+        console.log('Class: DiscussionsService, Function: checkIfPostIsValid, Line 47 rpk: ', rpk);
+        const check = (rpk == i.metadata.pub);
+        console.log('Class: DiscussionsService, Function: checkIfPostIsValid, Line 49 check: ', check);
+        return check
+    }
+
     private aesEncrypt(data: string, password: string): string {
         var key = aesjs.utils.hex.toBytes(ecc.sha256(password))
         var textBytes = aesjs.utils.utf8.toBytes(data)
@@ -277,7 +290,10 @@ export default class DiscussionsService {
 
             console.log('transaction set: !', p.transaction)
             p.myVote = 1
-            return p
+            return {
+                ...post,
+                metadata,
+            }
         } catch (error) {
             console.error(error)
             throw error

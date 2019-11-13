@@ -3,12 +3,8 @@
   <component name="ChangeListManager">
     <list default="true" id="2d14133e-344f-4fbf-9bb7-c9e5e96ae697" name="Default Changelist" comment="">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/components/editor/editor.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/components/editor/editor.tsx" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/components/reply-box/reply-box.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/components/reply-box/reply-box.tsx" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/components/reply/reply.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/components/reply/reply.tsx" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/components/thread/thread.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/components/thread/thread.tsx" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/models/replyModel.ts" beforeDir="false" afterPath="$PROJECT_DIR$/models/replyModel.ts" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/models/threadModel.ts" beforeDir="false" afterPath="$PROJECT_DIR$/models/threadModel.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/novusphere-js/discussions/service/discussions.ts" beforeDir="false" afterPath="$PROJECT_DIR$/novusphere-js/discussions/service/discussions.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/stores/posts.ts" beforeDir="false" afterPath="$PROJECT_DIR$/stores/posts.ts" afterDir="false" />
     </list>
     <ignored path="$PROJECT_DIR$/.tmp/" />
     <ignored path="$PROJECT_DIR$/temp/" />
@@ -20,112 +16,45 @@
     <option name="LAST_RESOLUTION" value="IGNORE" />
   </component>
   <component name="FileEditorManager">
-    <splitter split-orientation="horizontal" split-proportion="0.5">
-      <split-first>
-        <leaf SIDE_TABS_SIZE_LIMIT_KEY="300">
-          <file pinned="false" current-in-tab="false">
-            <entry file="file://$PROJECT_DIR$/models/replyModel.ts">
-              <provider selected="true" editor-type-id="text-editor">
-                <state relative-caret-position="536">
-                  <caret line="210" column="22" lean-forward="true" selection-start-line="210" selection-start-column="22" selection-end-line="210" selection-end-column="22" />
-                  <folding>
-                    <element signature="e#0#56#0" expanded="true" />
-                    <element signature="n#!!block;n#inlineTags#0;n#ReplyModel#0" />
-                    <element signature="n#!!block;n#inlineMentions#0;n#ReplyModel#0" />
-                    <element signature="n#!!block;n#inlineMentionHashes#0;n#ReplyModel#0" />
-                    <element signature="n#!!block;n#toggleEditing#0;n#ReplyModel#0" />
-                    <element signature="n#!!block;n#canEditPost#0;n#ReplyModel#0" />
-                    <element signature="n#!!block;n#saveEdits#0;n#ReplyModel#0" />
-                    <element signature="n#!!block;n#editForm#0;n#ReplyModel#0" />
-                  </folding>
-                </state>
-              </provider>
-            </entry>
-          </file>
-          <file pinned="false" current-in-tab="false">
-            <entry file="file://$PROJECT_DIR$/pages/tag/[name]/[id]/[title].tsx">
-              <provider selected="true" editor-type-id="text-editor">
-                <state relative-caret-position="552">
-                  <caret line="71" column="26" lean-forward="true" selection-start-line="71" selection-start-column="26" selection-end-line="71" selection-end-column="26" />
-                  <folding>
-                    <element signature="e#0#30#0" expanded="true" />
-                  </folding>
-                </state>
-              </provider>
-            </entry>
-          </file>
-          <file pinned="false" current-in-tab="true">
-            <entry file="file://$PROJECT_DIR$/components/thread/thread.tsx">
-              <provider selected="true" editor-type-id="text-editor">
-                <state relative-caret-position="221">
-                  <caret line="68" column="25" lean-forward="true" selection-start-line="68" selection-start-column="25" selection-end-line="68" selection-end-column="25" />
-                  <folding>
-                    <element signature="e#0#30#0" expanded="true" />
-                  </folding>
-                </state>
-              </provider>
-            </entry>
-          </file>
-          <file pinned="false" current-in-tab="false">
-            <entry file="file://$PROJECT_DIR$/models/threadModel.ts">
-              <provider selected="true" editor-type-id="text-editor">
-                <state relative-caret-position="1037">
-                  <caret line="187" selection-start-line="187" selection-end-line="187" />
-                  <folding>
-                    <element signature="e#0#53#0" expanded="true" />
-                  </folding>
-                </state>
-              </provider>
-            </entry>
-          </file>
-        </leaf>
-      </split-first>
-      <split-second>
-        <leaf>
-          <file pinned="false" current-in-tab="true">
-            <entry file="file://$PROJECT_DIR$/components/reply/reply.tsx">
-              <provider selected="true" editor-type-id="text-editor">
-                <state relative-caret-position="333">
-                  <caret line="266" column="49" selection-start-line="266" selection-start-column="49" selection-end-line="266" selection-end-column="49" />
-                  <folding>
-                    <element signature="e#0#30#0" expanded="true" />
-                  </folding>
-                </state>
-              </provider>
-            </entry>
-          </file>
-          <file pinned="false" current-in-tab="false">
-            <entry file="file://$PROJECT_DIR$/components/reply-box/reply-box.tsx">
-              <provider selected="true" editor-type-id="text-editor">
-                <state relative-caret-position="208">
-                  <caret line="28" column="10" selection-start-line="28" selection-start-column="10" selection-end-line="28" selection-end-column="10" />
-                  <folding>
-                    <element signature="e#0#30#0" expanded="true" />
-                  </folding>
-                </state>
-              </provider>
-            </entry>
-          </file>
-          <file pinned="false" current-in-tab="false">
-            <entry file="file://$PROJECT_DIR$/components/editor/editor.tsx">
-              <provider selected="true" editor-type-id="text-editor">
-                <state relative-caret-position="185">
-                  <caret line="115" column="37" lean-forward="true" selection-start-line="115" selection-start-column="37" selection-end-line="115" selection-end-column="37" />
-                  <folding>
-                    <element signature="e#0#30#0" expanded="true" />
-                    <element signature="n#src#0;n#img#0;n#!!top" expanded="true" />
-                  </folding>
-                </state>
-              </provider>
-            </entry>
-          </file>
-        </leaf>
-      </split-second>
-    </splitter>
+    <leaf SIDE_TABS_SIZE_LIMIT_KEY="300">
+      <file pinned="false" current-in-tab="true">
+        <entry file="file://$PROJECT_DIR$/novusphere-js/discussions/service/discussions.ts">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="118">
+              <caret line="31" column="54" lean-forward="true" selection-start-line="31" selection-start-column="54" selection-end-line="31" selection-end-column="54" />
+              <folding>
+                <element signature="e#0#44#0" expanded="true" />
+                <element signature="e#215#245#0" expanded="true" />
+              </folding>
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/stores/posts.ts">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="383">
+              <caret line="458" column="79" lean-forward="true" selection-start-line="458" selection-start-column="79" selection-end-line="458" selection-end-column="79" />
+              <folding>
+                <element signature="e#0#51#0" expanded="true" />
+              </folding>
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/models/postModel.ts">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="495">
+              <caret line="50" column="4" selection-start-line="50" selection-start-column="4" selection-end-line="50" selection-end-column="4" />
+            </state>
+          </provider>
+        </entry>
+      </file>
+    </leaf>
   </component>
   <component name="FindInProjectRecents">
     <findStrings>
-      <find>openingPost</find>
       <find>openingPost:</find>
       <find>decodeId</find>
       <find>getThreadAsync</find>
@@ -155,6 +84,7 @@
       <find>.uuid</find>
       <find>computedFn</find>
       <find>rbModel</find>
+      <find>encodeId(</find>
     </findStrings>
     <replaceStrings>
       <replace>.child</replace>
@@ -220,7 +150,6 @@
         <option value="$PROJECT_DIR$/stores/notifications.ts" />
         <option value="$PROJECT_DIR$/pages/search/index.tsx" />
         <option value="$PROJECT_DIR$/utils/index.ts" />
-        <option value="$PROJECT_DIR$/novusphere-js/discussions/service/discussions.ts" />
         <option value="$PROJECT_DIR$/components/title-header/title-header.tsx" />
         <option value="$PROJECT_DIR$/components/opening-post/opening-post.tsx" />
         <option value="$PROJECT_DIR$/components/user-name-with-icon/user-name-with-icon.tsx" />
@@ -234,23 +163,24 @@
         <option value="$PROJECT_DIR$/components/reply/style.scss" />
         <option value="$PROJECT_DIR$/styles/components/_post.scss" />
         <option value="$PROJECT_DIR$/pages/new/new-post-preview/new-post-preview.tsx" />
-        <option value="$PROJECT_DIR$/stores/posts.ts" />
         <option value="$PROJECT_DIR$/components/reply-box/reply-box.tsx" />
         <option value="$PROJECT_DIR$/pages/tag/[name]/[id]/[title].tsx" />
         <option value="$PROJECT_DIR$/components/editor/editor.tsx" />
         <option value="$PROJECT_DIR$/models/threadModel.ts" />
-        <option value="$PROJECT_DIR$/components/reply/reply.tsx" />
         <option value="$PROJECT_DIR$/models/replyModel.ts" />
         <option value="$PROJECT_DIR$/components/thread/thread.tsx" />
+        <option value="$PROJECT_DIR$/components/reply/reply.tsx" />
+        <option value="$PROJECT_DIR$/stores/posts.ts" />
+        <option value="$PROJECT_DIR$/novusphere-js/discussions/service/discussions.ts" />
       </list>
     </option>
   </component>
   <component name="PackageJsonUpdateNotifier">
     <dismissed value="$PROJECT_DIR$/package.json" />
   </component>
-  <component name="ProjectFrameBounds" extendedState="6">
-    <option name="x" value="116" />
-    <option name="y" value="35" />
+  <component name="ProjectFrameBounds">
+    <option name="x" value="36" />
+    <option name="y" value="31" />
     <option name="width" value="2335" />
     <option name="height" value="1395" />
   </component>
@@ -262,6 +192,7 @@
       <foldersAlwaysOnTop value="true" />
     </navigator>
     <panes>
+      <pane id="Scope" />
       <pane id="ProjectPane">
         <subPane>
           <expand>
@@ -289,58 +220,13 @@
             <path>
               <item name="discussions-app" type="b2602c69:ProjectViewProjectNode" />
               <item name="discussions-app" type="462c0819:PsiDirectoryNode" />
+              <item name="components" type="462c0819:PsiDirectoryNode" />
+              <item name="thread" type="462c0819:PsiDirectoryNode" />
+            </path>
+            <path>
+              <item name="discussions-app" type="b2602c69:ProjectViewProjectNode" />
+              <item name="discussions-app" type="462c0819:PsiDirectoryNode" />
               <item name="models" type="462c0819:PsiDirectoryNode" />
-            </path>
-            <path>
-              <item name="discussions-app" type="b2602c69:ProjectViewProjectNode" />
-              <item name="discussions-app" type="462c0819:PsiDirectoryNode" />
-              <item name="pages" type="462c0819:PsiDirectoryNode" />
-            </path>
-            <path>
-              <item name="discussions-app" type="b2602c69:ProjectViewProjectNode" />
-              <item name="discussions-app" type="462c0819:PsiDirectoryNode" />
-              <item name="pages" type="462c0819:PsiDirectoryNode" />
-              <item name="feed" type="462c0819:PsiDirectoryNode" />
-            </path>
-            <path>
-              <item name="discussions-app" type="b2602c69:ProjectViewProjectNode" />
-              <item name="discussions-app" type="462c0819:PsiDirectoryNode" />
-              <item name="pages" type="462c0819:PsiDirectoryNode" />
-              <item name="new" type="462c0819:PsiDirectoryNode" />
-            </path>
-            <path>
-              <item name="discussions-app" type="b2602c69:ProjectViewProjectNode" />
-              <item name="discussions-app" type="462c0819:PsiDirectoryNode" />
-              <item name="pages" type="462c0819:PsiDirectoryNode" />
-              <item name="new" type="462c0819:PsiDirectoryNode" />
-              <item name="new-post-preview" type="462c0819:PsiDirectoryNode" />
-            </path>
-            <path>
-              <item name="discussions-app" type="b2602c69:ProjectViewProjectNode" />
-              <item name="discussions-app" type="462c0819:PsiDirectoryNode" />
-              <item name="pages" type="462c0819:PsiDirectoryNode" />
-              <item name="tag" type="462c0819:PsiDirectoryNode" />
-            </path>
-            <path>
-              <item name="discussions-app" type="b2602c69:ProjectViewProjectNode" />
-              <item name="discussions-app" type="462c0819:PsiDirectoryNode" />
-              <item name="pages" type="462c0819:PsiDirectoryNode" />
-              <item name="tag" type="462c0819:PsiDirectoryNode" />
-              <item name="[name]" type="462c0819:PsiDirectoryNode" />
-            </path>
-            <path>
-              <item name="discussions-app" type="b2602c69:ProjectViewProjectNode" />
-              <item name="discussions-app" type="462c0819:PsiDirectoryNode" />
-              <item name="pages" type="462c0819:PsiDirectoryNode" />
-              <item name="tag" type="462c0819:PsiDirectoryNode" />
-              <item name="[name]" type="462c0819:PsiDirectoryNode" />
-              <item name="[id]" type="462c0819:PsiDirectoryNode" />
-            </path>
-            <path>
-              <item name="discussions-app" type="b2602c69:ProjectViewProjectNode" />
-              <item name="discussions-app" type="462c0819:PsiDirectoryNode" />
-              <item name="pages" type="462c0819:PsiDirectoryNode" />
-              <item name="u" type="462c0819:PsiDirectoryNode" />
             </path>
             <path>
               <item name="discussions-app" type="b2602c69:ProjectViewProjectNode" />
@@ -356,7 +242,6 @@
           <select />
         </subPane>
       </pane>
-      <pane id="Scope" />
     </panes>
   </component>
   <component name="PropertiesComponent">
@@ -533,17 +418,18 @@
       <workItem from="1573488877106" duration="17000" />
       <workItem from="1573500289221" duration="22727000" />
       <workItem from="1573570366197" duration="3725000" />
+      <workItem from="1573611254739" duration="1190000" />
     </task>
     <servers />
   </component>
   <component name="TimeTrackingManager">
-    <option name="totallyTimeSpent" value="606378000" />
+    <option name="totallyTimeSpent" value="608413000" />
   </component>
   <component name="ToolWindowManager">
-    <frame x="-8" y="-8" width="2576" height="1416" extended-state="6" />
+    <frame x="36" y="31" width="2335" height="1395" extended-state="0" />
     <editor active="true" />
     <layout>
-      <window_info content_ui="combo" id="Project" order="0" sideWeight="0.4982538" visible="true" weight="0.119779356" />
+      <window_info active="true" content_ui="combo" id="Project" order="0" sideWeight="0.4982538" visible="true" weight="0.13234654" />
       <window_info id="Structure" order="1" sideWeight="0.50174624" side_tool="true" weight="0.119779356" />
       <window_info id="Favorites" order="2" side_tool="true" />
       <window_info id="npm" order="3" sideWeight="0.5010352" side_tool="true" weight="0.12647754" />
@@ -557,24 +443,38 @@
       <window_info anchor="bottom" id="Version Control" order="7" />
       <window_info anchor="bottom" id="Docker" order="8" show_stripe_button="false" />
       <window_info anchor="bottom" id="TypeScript" order="9" />
-      <window_info active="true" anchor="bottom" id="Terminal" order="10" sideWeight="0.49960598" visible="true" weight="0.37022603" />
+      <window_info anchor="bottom" id="Terminal" order="10" sideWeight="0.49960598" visible="true" weight="0.3763867" />
       <window_info anchor="bottom" id="Event Log" order="11" sideWeight="0.500394" side_tool="true" weight="0.17614965" />
       <window_info anchor="right" id="Commander" internal_type="SLIDING" order="0" type="SLIDING" weight="0.4" />
       <window_info anchor="right" id="Ant Build" order="1" weight="0.25" />
       <window_info anchor="right" content_ui="combo" id="Hierarchy" order="2" weight="0.25" />
     </layout>
+    <layout-to-restore>
+      <window_info content_ui="combo" id="Project" order="0" sideWeight="0.49896482" visible="true" weight="0.11899133" />
+      <window_info id="Structure" order="1" side_tool="true" weight="0.25" />
+      <window_info id="Favorites" order="2" side_tool="true" />
+      <window_info id="npm" order="3" sideWeight="0.5010352" side_tool="true" weight="0.12647754" />
+      <window_info anchor="bottom" id="Message" order="0" />
+      <window_info anchor="bottom" id="Find" order="1" weight="0.3289166" />
+      <window_info anchor="bottom" id="Run" order="2" weight="0.32969603" />
+      <window_info anchor="bottom" id="Debug" order="3" weight="0.4" />
+      <window_info anchor="bottom" id="Cvs" order="4" weight="0.25" />
+      <window_info anchor="bottom" id="Inspection" order="5" weight="0.4" />
+      <window_info anchor="bottom" id="TODO" order="6" />
+      <window_info anchor="bottom" id="Version Control" order="7" />
+      <window_info anchor="bottom" id="Docker" order="8" show_stripe_button="false" />
+      <window_info anchor="bottom" id="TypeScript" order="9" />
+      <window_info active="true" anchor="bottom" id="Terminal" order="10" sideWeight="0.49960598" visible="true" weight="0.3522993" />
+      <window_info anchor="bottom" id="Event Log" order="11" sideWeight="0.500394" side_tool="true" weight="0.17614965" />
+      <window_info anchor="right" id="Commander" internal_type="SLIDING" order="0" type="SLIDING" weight="0.4" />
+      <window_info anchor="right" id="Ant Build" order="1" weight="0.25" />
+      <window_info anchor="right" content_ui="combo" id="Hierarchy" order="2" weight="0.25" />
+    </layout-to-restore>
   </component>
   <component name="TypeScriptGeneratedFilesManager">
     <option name="version" value="1" />
   </component>
   <component name="editorHistoryManager">
-    <entry file="file://$PROJECT_DIR$/styles/components/_notifications-popup.scss">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="428">
-          <caret line="35" selection-start-line="35" selection-end-line="35" />
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/stores/notifications.ts">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="709">
@@ -613,13 +513,6 @@
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="320">
           <caret line="20" column="9" lean-forward="true" selection-start-line="20" selection-start-column="9" selection-end-line="20" selection-end-column="9" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/package.json">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="336">
-          <caret line="75" column="24" lean-forward="true" selection-start-line="75" selection-start-column="24" selection-end-line="75" selection-end-column="24" />
         </state>
       </provider>
     </entry>
@@ -742,13 +635,6 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/models/postModel.ts">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="440">
-          <caret line="43" column="31" lean-forward="true" selection-start-line="43" selection-start-column="31" selection-end-line="43" selection-end-column="31" />
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/components/opening-post/opening-post.tsx">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="280">
@@ -756,13 +642,6 @@
           <folding>
             <element signature="e#0#30#0" expanded="true" />
           </folding>
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/novusphere-js/nsdb.ts">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="397">
-          <caret line="28" column="61" lean-forward="true" selection-start-line="28" selection-start-column="61" selection-end-line="28" selection-end-column="61" />
         </state>
       </provider>
     </entry>
@@ -864,17 +743,6 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/novusphere-js/discussions/service/discussions.ts">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="69">
-          <caret line="413" column="10" selection-start-line="413" selection-start-column="10" selection-end-line="413" selection-end-column="10" />
-          <folding>
-            <element signature="e#0#44#0" expanded="true" />
-            <element signature="e#215#245#0" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/components/infinite-scroll-feed/infinite-scroll-feed.tsx">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="447">
@@ -923,16 +791,6 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/stores/posts.ts">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="7184">
-          <caret line="460" column="55" selection-start-line="457" selection-start-column="35" selection-end-line="460" selection-end-column="55" />
-          <folding>
-            <element signature="e#0#51#0" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/utils/index.ts">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="1376">
@@ -974,16 +832,6 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/components/reply/reply.tsx">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="333">
-          <caret line="266" column="49" selection-start-line="266" selection-start-column="49" selection-end-line="266" selection-end-column="49" />
-          <folding>
-            <element signature="e#0#30#0" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/pages/tag/[name]/[id]/[title].tsx">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="552">
@@ -1011,12 +859,71 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/components/thread/thread.tsx">
+    <entry file="file://$PROJECT_DIR$/package.json">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="221">
-          <caret line="68" column="25" lean-forward="true" selection-start-line="68" selection-start-column="25" selection-end-line="68" selection-end-column="25" />
+        <state relative-caret-position="480">
+          <caret line="30" column="28" selection-start-line="30" selection-start-column="28" selection-end-line="30" selection-end-column="28" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/novusphere-js/nsdb.ts">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="624">
+          <caret line="39" column="35" selection-start-line="39" selection-start-column="35" selection-end-line="39" selection-end-column="35" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/novusphere-js/index.ts">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="96">
+          <caret line="10" column="13" selection-start-line="10" selection-start-column="13" selection-end-line="10" selection-end-column="13" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/components/reply/reply.tsx">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="149">
+          <caret line="179" column="35" lean-forward="true" selection-start-line="179" selection-start-column="35" selection-end-line="179" selection-end-column="35" />
           <folding>
             <element signature="e#0#30#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/components/thread/thread.tsx">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="600">
+          <caret line="115" column="26" lean-forward="true" selection-start-line="115" selection-start-column="26" selection-end-line="115" selection-end-column="26" />
+          <folding>
+            <element signature="e#0#30#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/models/postModel.ts">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="495">
+          <caret line="50" column="4" selection-start-line="50" selection-start-column="4" selection-end-line="50" selection-end-column="4" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/stores/posts.ts">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="383">
+          <caret line="458" column="79" lean-forward="true" selection-start-line="458" selection-start-column="79" selection-end-line="458" selection-end-column="79" />
+          <folding>
+            <element signature="e#0#51#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/novusphere-js/discussions/service/discussions.ts">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="118">
+          <caret line="31" column="54" lean-forward="true" selection-start-line="31" selection-start-column="54" selection-end-line="31" selection-end-column="54" />
+          <folding>
+            <element signature="e#0#44#0" expanded="true" />
+            <element signature="e#215#245#0" expanded="true" />
           </folding>
         </state>
       </provider>

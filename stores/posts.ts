@@ -454,11 +454,21 @@ export default class Posts extends BaseStore {
                                     const signedReply = model.sign(this.newAuthStore.postPriv)
                                     const submittedPost = await discussions.post(signedReply as any)
 
-                                    // // TODO: Add check to make sure the thread is actually posted onto the chain
-                                    await sleep(5000)
-                                    await pushToThread(submittedPost)
-                                    this.uiStore.showToast('Your post has been created!', 'success')
-                                    this.clearPreview()
+                                    console.log('submittedPost', submittedPost)
+
+                                    const isPostValid = discussions.checkIfPostIsValid(submittedPost)
+
+                                    console.log('isPostvalid', isPostValid)
+
+                                    if (isPostValid) {
+                                        // // TODO: Add check to make sure the thread is actually posted onto the chain
+                                        await sleep(5000)
+                                        await pushToThread(submittedPost)
+                                        this.uiStore.showToast('Your post has been created!', 'success')
+                                        this.clearPreview()
+                                    }  else {
+                                        this.uiStore.showToast('Unable to verify post was created.!', 'error')
+                                    }
                                 }
                             }),
                         },
