@@ -49,10 +49,6 @@ class Tag extends React.Component<ITagProps, ITagPageState> {
         window.scrollTo(0, 0)
     }
 
-    componentWillUnmount(): void {
-        window.scrollTo(0, 0)
-    }
-
     public render() {
         const {
             props: {

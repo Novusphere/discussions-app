@@ -9,10 +9,15 @@ import { create } from 'mobx-persist'
 import { toast } from 'react-toastify'
 
 import '../styles/style.scss'
+import { Router } from 'next/router'
 
 // configure({ enforceActions: 'observed' })
 useStaticRendering(isServer) // NOT `true` value
 toast.configure()
+
+Router.events.on('routeChangeComplete', () => {
+    window.scrollTo(0, 0)
+})
 
 class DiscussionApp extends App {
     public props: any

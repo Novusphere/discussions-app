@@ -69,7 +69,7 @@ const PostPreview: React.FC<IPostPreviewProps> = ({
                               />
                           )}
                 </div>
-                <Link href={'/tag/[name]/[id]/[title]'} as={url}>
+                <Link href={'/tag/[name]/[id]/[title]'} as={url} scroll={false}>
                     <a className={'no-style w-100'}>
                         <div className={'flex flex-column post-content w-100'}>
                             <div className={'flex f6 lh-copy black items-center'}>

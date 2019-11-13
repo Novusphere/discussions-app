@@ -37,7 +37,7 @@ const OpeningPost: React.FC<IOpeningPostProps> = ({
 }) => (
     <div
         data-post-uuid={openingPost.uuid}
-        {...(asPath && { 'data-permalink': getPermaLink(asPath, openingPost.uuid) })}
+        //{...(asPath && { 'data-permalink': getPermaLink(asPath, openingPost.uuid) })}
     >
         {typeof isPreview === 'undefined' && (
             <div className={'pb2'}>

@@ -16,7 +16,7 @@ import { inject, observer } from 'mobx-react'
 import { ReplyModel } from '@models/replyModel'
 import PostModel from '@models/postModel'
 import classNames from 'classnames'
-import { getPermaLink, openInNewTab } from '@utils'
+import { getPermaLink, openInNewTab, sleep } from '@utils'
 import { IStores } from '@stores'
 import copy from 'clipboard-copy'
 import Router from 'next/router'
@@ -62,19 +62,14 @@ class Reply extends React.Component<IReplies, IRepliesState> {
     }
 
     @task.resolved
-    private onSubmit(replyModel) { return replyModel.onSubmit(this.props.threadReference) }
-
-    componentDidMount(): void {
-        if (this.props.currentPath.indexOf('#') !== -1) {
-            const [, uuid] = this.props.currentPath.split('#')
-            this.addAndScrollToUuid(uuid)
-        }
+    private onSubmit(replyModel) {
+        return replyModel.onSubmit(this.props.threadReference)
     }
 
     private addAndScrollToUuid = (uuid: string) => {
         if (this.replyRef.current.dataset.postUuid === uuid) {
             this.props.postsStore.highlightPostUuid(uuid)
-            window.scrollTo(0, this.replyRef.current.scrollHeight * 2)
+            window.scrollTo(0, this.replyRef.current.offsetTop)
         }
     }
 
@@ -175,125 +170,136 @@ class Reply extends React.Component<IReplies, IRepliesState> {
         const [currentPathTrimmed] = currentPath.split('#')
 
         return (
-            <div
-                id={post.uuid}
-                ref={this.replyRef}
-                data-post-uuid={post.uuid}
-                data-permalink={getPermaLink(currentPathTrimmed, post.uuid)}
-                className={classNames([
-                    'post-reply black',
-                    {
-                        [className]: !!className,
-                        'permalink-highlight': postsStore.currentHighlightedPostUuid === post.uuid,
-                    },
-                ])}
-                onMouseEnter={() => this.setHover(true)}
-                onMouseLeave={() => this.setHover(false)}
-            >
-                {this.renderHoverElements()}
-                <div
-                    style={{
-                        height: !isCollapsed ? 'auto' : '30px',
-                    }}
-                    className={classNames([
-                        'parent flex flex-row pa2',
-                        {
-                            'post-content-hover': isHover,
-                        },
-                    ])}
-                >
+            <a id={post.uuid}>
+                <object>
                     <div
-                        style={{
-                            visibility: isCollapsed ? 'hidden' : 'visible',
-                        }}
-                        className={'flex justify-between items-center mr2'}
-                    >
-                        <Votes
-                            upVotes={post.upvotes}
-                            downVotes={post.downvotes}
-                            myVote={post.myVote}
-                            uuid={post.uuid}
-                            handler={voteHandler}
-                        />
-                    </div>
-                    <div
-                        className={'flex flex-column'}
-                    >
-                        <div className={'header pb0'}>
-                            <div className={'pr2'}>{this.renderCollapseElements()}</div>
-                            <UserNameWithIcon pub={post.pub} imageData={post.imageData} name={post.posterName} />
-                            <span
-                                className={'pl2 o-50 f6'}
-                                title={moment(post.createdAt).format('YYYY-MM-DD HH:mm:ss')}
-                            >
-                                {moment(post.createdAt).fromNow()}
-                            </span>
-                            {post.edit && (
-                                <span className={'o-50 ph1 f6 i'} title={'This post was edited'}>
-                                    (edited)
-                                </span>
-                            )}
-                            {isCollapsed && (
-                                <span className={'o-50 i f6 pl2'}>({replies.length} children)</span>
-                            )}
-                        </div>
-                        {replyModel.editing && (
-                            <Form
-                                form={replyModel.editForm}
-                                fieldClassName={'pb0'}
-                                hideSubmitButton
-                                className={'w-100 mt3'}
-                            />
-                        )}
-                        {!isCollapsed && !replyModel.editing && (
-                            <ReactMarkdown
-                                className={'f6 lh-copy reply-content'}
-                                source={post.content}
-                            />
-                        )}
-                    </div>
-                </div>
-
-                {replyModel.open ? (
-                    <ReplyBox
+                        ref={this.replyRef}
+                        data-post-uuid={post.uuid}
+                        data-permalink={getPermaLink(currentPathTrimmed, post.uuid)}
                         className={classNames([
-                            'ph4 pb4',
+                            'post-reply black',
                             {
-                                'post-content-hover': isHover,
+                                [className]: !!className,
+                                'permalink-highlight':
+                                    postsStore.currentHighlightedPostUuid === post.uuid,
                             },
                         ])}
-                        uid={post.uuid}
-                        onContentChange={replyModel.setContent}
-                        value={replyModel.content}
-                        loading={replyModel.onSubmit['pending']}
-                        onSubmit={() => this.onSubmit(replyModel)}
-                    />
-                ) : null}
+                        onMouseEnter={() => this.setHover(true)}
+                        onMouseLeave={() => this.setHover(false)}
+                    >
+                        {this.renderHoverElements()}
+                        <div
+                            style={{
+                                height: !isCollapsed ? 'auto' : '30px',
+                            }}
+                            className={classNames([
+                                'parent flex flex-row pa2',
+                                {
+                                    'post-content-hover': isHover,
+                                },
+                            ])}
+                        >
+                            <div
+                                style={{
+                                    visibility: isCollapsed ? 'hidden' : 'visible',
+                                }}
+                                className={'flex justify-between items-center mr2'}
+                            >
+                                <Votes
+                                    upVotes={post.upvotes}
+                                    downVotes={post.downvotes}
+                                    myVote={post.myVote}
+                                    uuid={post.uuid}
+                                    handler={voteHandler}
+                                />
+                            </div>
+                            <div className={'flex flex-column'}>
+                                <div className={'header pb0'}>
+                                    <div className={'pr2'}>{this.renderCollapseElements()}</div>
+                                    <UserNameWithIcon
+                                        pub={post.pub}
+                                        imageData={post.imageData}
+                                        name={post.posterName}
+                                    />
+                                    <span
+                                        className={'pl2 o-50 f6'}
+                                        title={moment(post.createdAt).format('YYYY-MM-DD HH:mm:ss')}
+                                    >
+                                        {moment(post.createdAt).fromNow()}
+                                    </span>
+                                    {post.edit && (
+                                        <span
+                                            className={'o-50 ph1 f6 i'}
+                                            title={'This post was edited'}
+                                        >
+                                            (edited)
+                                        </span>
+                                    )}
+                                    {isCollapsed && (
+                                        <span className={'o-50 i f6 pl2'}>
+                                            ({replies.length} children)
+                                        </span>
+                                    )}
+                                </div>
+                                {replyModel.editing && (
+                                    <Form
+                                        form={replyModel.editForm}
+                                        fieldClassName={'pb0'}
+                                        hideSubmitButton
+                                        className={'w-100 mt3'}
+                                    />
+                                )}
+                                {!isCollapsed && !replyModel.editing && (
+                                    <ReactMarkdown
+                                        className={'f6 lh-copy reply-content'}
+                                        source={post.content}
+                                    />
+                                )}
+                            </div>
+                        </div>
 
-                {replies && replies.length
-                    ? replies.map(postReply => (
-                          <div
-                              onMouseLeave={() => this.setHover(true)}
-                              onMouseEnter={() => this.setHover(false)}
-                              key={postReply.uuid}
-                          >
-                              <Reply
-                                  post={postReply}
-                                  getModel={getModel}
-                                  className={'ml3'}
-                                  getRepliesFromMap={getRepliesFromMap}
-                                  voteHandler={voteHandler}
-                                  userStore={userStore}
-                                  newAuthStore={newAuthStore}
-                                  postsStore={postsStore}
-                                  currentPath={currentPath}
-                                  isCollapsed={isCollapsed}
-                                  threadReference={threadReference}
-                              />
-                          </div>
-                      ))
-                    : null}
-            </div>
+                        {replyModel.open ? (
+                            <ReplyBox
+                                className={classNames([
+                                    'ph4 pb4',
+                                    {
+                                        'post-content-hover': isHover,
+                                    },
+                                ])}
+                                uid={post.uuid}
+                                onContentChange={replyModel.setContent}
+                                value={replyModel.content}
+                                loading={replyModel.onSubmit['pending']}
+                                onSubmit={() => this.onSubmit(replyModel)}
+                            />
+                        ) : null}
+
+                        {replies && replies.length
+                            ? replies.map(postReply => (
+                                  <div
+                                      onMouseLeave={() => this.setHover(true)}
+                                      onMouseEnter={() => this.setHover(false)}
+                                      key={postReply.uuid}
+                                  >
+                                      <Reply
+                                          post={postReply}
+                                          getModel={getModel}
+                                          className={'ml3'}
+                                          getRepliesFromMap={getRepliesFromMap}
+                                          voteHandler={voteHandler}
+                                          userStore={userStore}
+                                          newAuthStore={newAuthStore}
+                                          postsStore={postsStore}
+                                          currentPath={currentPath}
+                                          isCollapsed={isCollapsed}
+                                          threadReference={threadReference}
+                                      />
+                                  </div>
+                              ))
+                            : null}
+                    </div>
+                </object>
+            </a>
         )
     }
 

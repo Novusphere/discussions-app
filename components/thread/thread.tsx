@@ -9,6 +9,7 @@ import { NextRouter, withRouter } from 'next/router'
 import { Thread as NSThread } from '@novuspherejs'
 import { observable } from 'mobx'
 import { ReplyModel } from '@models/replyModel'
+import { sleep } from '@utils'
 
 interface IThreadOuterProps {
     thread: NSThread
@@ -19,8 +20,7 @@ interface IThreadInnerProps {
     router: NextRouter
 }
 
-interface IThreadState {
-}
+interface IThreadState {}
 
 @(withRouter as any)
 @inject('postsStore')
@@ -41,6 +41,21 @@ class Thread extends React.Component<IThreadOuterProps & IThreadInnerProps, IThr
         if (this.props.postsStore.currentHighlightedPostUuid) {
             this.props.postsStore.highlightPostUuid('')
         }
+    }
+
+    async componentDidMount(): Promise<void> {
+        // const [, uuid] = this.props.router.asPath.split('#')
+        // console.log('Class: Reply, Function: addAndScrollToUuid, Line 82 uuid: ', uuid)
+        // const { offsetTop } = document.getElementById(uuid)
+        // console.log(
+        //     'Class: Reply, Function: addAndScrollToUuid, Line 84 document.getElementById(uuid): ',
+        //     document.getElementById(uuid)
+        // )
+        //
+        // if (offsetTop) {
+        //     this.props.postsStore.highlightPostUuid(uuid)
+        //     window.scrollTo(0, offsetTop)
+        // }
     }
 
     private renderOpeningPost = () => {

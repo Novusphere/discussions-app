@@ -78,6 +78,7 @@
 .opening-post,
 .post-reply,
 .post-preview {
+    word-break: break-all;
     a {
         @extend .dim;
         text-decoration: none;
