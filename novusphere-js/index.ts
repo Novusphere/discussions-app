@@ -3,11 +3,10 @@ export * from './eos';
 
 import { RedditService, DiscussionService } from './discussions/index';
 import { EOS } from "./eos";
-import { NSDB, INSDBSearchQuery } from './nsdb';
+import { NSDB } from './nsdb';
 import { Settings } from "./settings";
 import DummyService from './discussions/service/dummy';
 
-export { INSDBSearchQuery };
 export const reddit = new RedditService();
 export const discussions = new DiscussionService();
 export const dummy = new DummyService()

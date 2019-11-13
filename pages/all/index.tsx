@@ -1,47 +1,50 @@
 import * as React from 'react'
 import { IStores } from '@stores'
-import { discussions, Post } from '@novuspherejs'
-import PostPreview from '../../components/post-preview/post-preview'
+import { Post } from '@novuspherejs'
 import { inject, observer } from 'mobx-react'
-import { IPost } from '@stores/posts'
-import { pushToThread } from '@utils'
+import { InfiniteScrollFeed } from '@components'
 
 interface IAllProps {
-    tagStore: IStores['tagStore']
     postsStore: IStores['postsStore']
-    threads: Post[]
+    posts: Post[]
+    cursorId: number
 }
 
 interface IAllState {}
 
-@inject('tagStore', 'postsStore')
+@inject('postsStore')
 @observer
 class All extends React.Component<IAllProps, IAllState> {
-    static async getInitialProps({ store }) {
+    static async getInitialProps({ store, res }) {
+        const uiStore: IStores['uiStore'] = store.uiStore
+        const postsStore: IStores['postsStore'] = store.postsStore
         const tagStore: IStores['tagStore'] = store.tagStore
+
+        postsStore.resetPositionAndPosts()
+
+        uiStore.toggleSidebarStatus(true)
+        uiStore.toggleBannerStatus(true)
         tagStore.destroyActiveTag()
-        const threads = await discussions.getPostsForSubs(['all'])
-        return {
-            threads,
-        }
+
+        return {}
     }
 
-    public clickPost = (post: IPost) => {
-        pushToThread(post)
+    componentDidMount(): void {
+        this.props.postsStore.getPostsForSubs(['all'])
     }
 
     public render() {
-        return this.props.threads
-            .filter(result => result.tags[0].length)
-            .map(thread => (
-                <PostPreview
-                    key={thread.id}
-                    post={thread as any}
-                    onClick={this.clickPost}
-                    tag={this.props.tagStore.tags.get(thread.sub)}
-                    disableVoteHandler
-                />
-            ))
+        const { getPostsForSubs, postsPosition, posts } = this.props.postsStore
+        const { cursorId, items } = postsPosition
+
+        return (
+            <InfiniteScrollFeed
+                dataLength={items}
+                hasMore={cursorId !== 0}
+                next={getPostsForSubs}
+                posts={posts}
+            />
+        )
     }
 }
 

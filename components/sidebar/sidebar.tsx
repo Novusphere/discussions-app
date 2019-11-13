@@ -1,22 +1,92 @@
 import * as React from 'react'
-import { observer } from 'mobx-react'
-import TagStore from '../../stores/tag'
+import { inject, observer } from 'mobx-react'
 import Link from 'next/link'
-import { withRouter } from 'next/router'
+import { NextRouter, withRouter } from 'next/router'
 import classNames from 'classnames'
-import { TagModel } from '@models/tagModel'
 import { Tooltip } from 'react-tippy'
 import { TagPreview } from '@components'
+import { IStores } from '@stores'
 
-interface ITagListProps {
-    activeTag: TagModel
-    tags: TagStore['tags']
-    router: any
+import './style.scss'
+
+interface ITagListOuterProps {
+    className: string
 }
 
-const Sidebar: React.FC<ITagListProps> = ({ tags, activeTag, ...props }) => {
-    const renderActiveTag = () => {
+interface ITagListInnerProps {
+    router: NextRouter
+    tagStore: IStores['tagStore']
+    postsStore: IStores['postsStore']
+}
+
+interface ITagListState {
+    isScrolling: boolean
+}
+
+@(withRouter as any)
+@inject('tagStore', 'postsStore')
+@observer
+class Sidebar extends React.Component<ITagListOuterProps & ITagListInnerProps, ITagListState> {
+    private sidebarContainer = React.createRef<HTMLUListElement>()
+    private scrollTimeout: any
+
+    state = {
+        isScrolling: false,
+    }
+
+    private createPost = () => {
+        const {
+            tagStore: { activeTag },
+            postsStore: { newPostData },
+            router,
+        } = this.props
+
+        newPostData.sub = {
+            value: activeTag.name,
+            label: activeTag.name,
+        }
+
+        return router.push('/new')
+    }
+
+
+    componentDidMount(): void {
+        if (this.sidebarContainer) {
+            this.sidebarContainer.current.addEventListener('scroll', this.handleScroll, true)
+        }
+    }
+
+    componentWillUnmount(): void {
+        if (this.sidebarContainer) {
+            this.sidebarContainer.current.removeEventListener('scroll', this.handleScroll, true)
+        }
+    }
+
+    private handleScroll = () => {
+        if (this.scrollTimeout) {
+            //if there is already a timeout in process cancel it
+            clearTimeout(this.scrollTimeout)
+        }
+
+        this.scrollTimeout = setTimeout(() => {
+            this.scrollTimeout = null
+            this.setState({
+                isScrolling: false,
+            })
+        }, 500)
+
+        if (!this.state.isScrolling) {
+            this.setState({
+                isScrolling: true,
+            })
+        }
+    }
+
+    private renderActiveTag = () => {
+        const { activeTag, toggleTagSubscribe, subSubscriptionStatus } = this.props.tagStore
+
         if (activeTag) {
+            const isSubbed = subSubscriptionStatus.get(activeTag.name)
             return (
                 <div className={'pa4 bg-white shadow'}>
                     <span className={'flex flex-row items-center'}>
@@ -25,7 +95,7 @@ const Sidebar: React.FC<ITagListProps> = ({ tags, activeTag, ...props }) => {
                             title={`${activeTag.name} icon`}
                             className={'activeTag-image w-10 mr2'}
                         />
-                        <span className={'b black f6'}>e/{activeTag.name}</span>
+                        <span className={'b black f6'}>#{activeTag.name}</span>
                     </span>
 
                     <span className={'flex row fa5 mt2 f5'}>{activeTag.memberCount} Members</span>
@@ -33,8 +103,15 @@ const Sidebar: React.FC<ITagListProps> = ({ tags, activeTag, ...props }) => {
                     <span className={'flex row black mt2 f6'}>{activeTag.tagDescription}</span>
 
                     <div className={'flex flex-column items-center justify-center mt3'}>
-                        <button className={'w-100 mb2'}>Join Community</button>
-                        <button className={'w-100 button-outline'}>Create Post</button>
+                        <button
+                            className={'w-100 mb2'}
+                            onClick={() => toggleTagSubscribe(activeTag.name)}
+                        >
+                            {isSubbed ? 'Unsubscribe' : 'Subscribe'}
+                        </button>
+                        <button className={'w-100 button-outline'} onClick={this.createPost}>
+                            Create Post
+                        </button>
                     </div>
                 </div>
             )
@@ -43,74 +120,121 @@ const Sidebar: React.FC<ITagListProps> = ({ tags, activeTag, ...props }) => {
         return null
     }
 
-    return (
-        <>
-            {renderActiveTag()}
-            <ul className={'w-100'}>
-                {Array.from(tags.values())
-                    .filter(tag => tag.root)
-                    .map(tag => (
-                        <li
-                            key={tag.id}
-                            className={classNames([
-                                'ph3 pb3',
-                                {
-                                    active: props.router.asPath === tag.url,
-                                },
-                            ])}
-                        >
-                            <Link href={tag.url}>
-                                <a className={'db black pointer pb1 no-underline'}>{tag.name}</a>
-                            </Link>
-                        </li>
-                    ))}
-                <div className={'divider-line mb2'} />
-                {Array.from(tags.values())
-                    .filter(tag => !tag.root)
-                    .map(tag => (
-                        <li
-                            key={tag.id}
-                            className={classNames([
-                                'ph3 pb1',
-                                {
-                                    active: props.router.asPath === tag.url,
-                                },
-                            ])}
-                        >
-                            <Tooltip
-                                animateFill={false}
-                                interactive
-                                html={<TagPreview tag={tag} />}
-                                position={'left-end'}
-                                unmountHTMLWhenHide={true}
-                                offset={150}
-                                stickyDuration={0}
-                                sticky={true}
-                                duration={275}
-                                animation={'fade'}
-                                className={'interactive-hover'}
-                                distance={400}
-                                trigger={'mouseenter focus'}
+    private renderTopLevelTags = tag => {
+        if (tag.name === 'all') {
+            return (
+                <Link href={'/all'} as={tag.url}>
+                    <a className={'db black pointer pb1 no-underline'}>{tag.name}</a>
+                </Link>
+            )
+        }
+
+        if (tag.name === 'feed') {
+            return (
+                <Link href={'/feed'} as={tag.url}>
+                    <a className={'db black pointer pb1 no-underline'}>{tag.name}</a>
+                </Link>
+            )
+        }
+
+        if (tag.name === 'home') {
+            return (
+                <Link href={'/'} as={tag.url}>
+                    <a className={'db black pointer pb1 no-underline'}>{tag.name}</a>
+                </Link>
+            )
+        }
+
+        return (
+            <Link href={'/tag/[name]'} as={tag.url}>
+                <a className={'db black pointer pb1 no-underline'}>{tag.name}</a>
+            </Link>
+        )
+    }
+
+    render() {
+        const {
+            className,
+            router,
+            tagStore: { tags, subSubscriptionStatus, toggleTagSubscribe },
+        } = this.props
+
+        return (
+            <div className={className}>
+                {this.renderActiveTag()}
+                <ul className={'list sidebar-ul'} ref={this.sidebarContainer}>
+                    {Array.from(tags.values())
+                        .filter(tag => tag.root)
+                        .map(tag => (
+                            <li
+                                key={tag.id}
+                                className={classNames([
+                                    'ph3 mb3',
+                                    {
+                                        dim: router.asPath !== tag.url,
+                                        'sidebar-link-active': router.asPath === tag.url,
+                                    },
+                                ])}
                             >
-                                <Link href={{ pathname: '/tag', query: { name: tag.name } }} as={`/tag/${tag.name}`}>
-                                    <a className={'flex items-center pb1 pointer'}>
-                                        <img
-                                            className={'tag-icon pr2'}
-                                            src={tag.icon}
-                                            alt={`${tag.name} icon`}
+                                {this.renderTopLevelTags(tag)}
+                            </li>
+                        ))}
+                    <div className={'divider-line mb2'} />
+                    {Array.from(tags.values())
+                        .filter(tag => !tag.root)
+                        .map(tag => (
+                            <li
+                                key={tag.id}
+                                className={classNames([
+                                    'ph3',
+                                    {
+                                        dim: router.query.name !== tag.name,
+                                        'sidebar-link-active': router.query.name === tag.name,
+                                    },
+                                ])}
+                            >
+                                <Tooltip
+                                    disabled={this.state.isScrolling}
+                                    animateFill={false}
+                                    interactive
+                                    html={
+                                        <TagPreview
+                                            tag={tag}
+                                            isSubscribed={subSubscriptionStatus.get(tag.name)}
+                                            toggleSubscribe={toggleTagSubscribe}
                                         />
-                                        <span className={'db black no-underline'}>
-                                            {'#'}
-                                            {tag.name}
-                                        </span>
-                                    </a>
-                                </Link>
-                            </Tooltip>
-                        </li>
-                    ))}
-            </ul>
-        </>
-    )
+                                    }
+                                    position={'left-end'}
+                                    unmountHTMLWhenHide={false}
+                                    offset={150}
+                                    stickyDuration={0}
+                                    sticky={true}
+                                    duration={0}
+                                    animation={'fade'}
+                                    className={'interactive-hover'}
+                                    distance={250}
+                                    trigger={'mouseenter focus'}
+                                >
+                                    <Link href={`/tag/[name]`} as={`/tag/${tag.name}`}>
+                                        <a className={'flex items-center pb1 pointer'}>
+                                            <img
+                                                className={'tag-icon pr2'}
+                                                src={tag.icon}
+                                                alt={`${tag.name} icon`}
+                                            />
+                                            <span className={'db black no-underline'}>
+                                                {'#'}
+                                                {tag.name}
+                                            </span>
+                                        </a>
+                                    </Link>
+                                </Tooltip>
+                            </li>
+                        ))}
+                </ul>
+            </div>
+        )
+    }
 }
 
-export default withRouter(observer(Sidebar))
+export default Sidebar as React.ComponentClass<ITagListOuterProps>

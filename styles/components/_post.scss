@@ -49,6 +49,17 @@
     }
 }
 
+.no-style {
+    margin: 0;
+    padding: 0;
+    font-size: inherit;
+    color: inherit;
+
+    &:hover {
+        opacity: 1;
+    }
+}
+
 .reply-content {
     p {
         @extend .mt2;
@@ -153,7 +164,7 @@ button.reply {
 }
 
 .post-content-hover {
-    background-color: #FAFAFA !important;
+    background-color: #FAFAFA;
 }
 
 .child > .child,

@@ -10,6 +10,9 @@ interface ISettings {
     uiStore: IStores['uiStore']
 }
 
+import './style.scss'
+import ComingSoonMessage from '../../components/coming-soon-message/coming-soon-message'
+
 // TODO: Real Data
 
 @inject('settingsStore', 'postsStore', 'uiStore')
@@ -91,7 +94,8 @@ class Settings extends React.Component<ISettings> {
 
     public render() {
         return (
-            <div className={'flex flex-row'}>
+            <div className={'flex flex-row relative'}>
+                <ComingSoonMessage />
                 <div className={'card w-30 mr5 pa3'}>{this.renderSidebarContent()}</div>
                 <div className={'card w-70 pa4'}>
                     <span className={'b black f4'}>Connections</span>
@@ -119,11 +123,7 @@ class Settings extends React.Component<ISettings> {
                             </span>
                         </div>
 
-                        <div
-                            className={
-                                'flex flex-row justify-between items-center pv3'
-                            }
-                        >
+                        <div className={'flex flex-row justify-between items-center pv3'}>
                             <span className={'flex flex-column tl mr4'}>
                                 <span className={'b black f5 pb2'}>
                                     You are connected to Twitter

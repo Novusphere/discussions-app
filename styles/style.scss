@@ -54,7 +54,6 @@ button {
 
 a {
     @extend .green;
-    @extend .dim;
     @extend .no-underline;
     @extend .pointer;
 }
@@ -72,9 +71,14 @@ a {
 }
 
 .sidebar {
-    max-height: calc(100vh - 55px - 15px);
-    overflow: auto;
+    height: 100%;
+    overflow: hidden;
     position: sticky;
+
+    ul {
+        overflow: scroll;
+        max-height: calc(100vh - 55px - 15px);
+    }
 }
 
 .card {
@@ -83,9 +87,9 @@ a {
     box-shadow: 0 1px 2px #c9cccd;
     margin-bottom: 20px;
 
-    ul {
-        padding: 0;
-    }
+    //ul {
+    //    padding: 0;
+    //}
     //
     //li {
     //    @extend .ph3;
@@ -160,4 +164,8 @@ a {
             opacity: 0.5 !important;
         }
     }
+}
+
+.overflow-break-word {
+    overflow-wrap: break-word;
 }

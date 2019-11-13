@@ -40,15 +40,19 @@ class MainLayout extends React.Component<IMainLayoutProps> {
                 <AppModals />
                 <div className={'content'}>
                     <div className={'container flex pv3'}>
-                        {showSidebar && (
-                            <div className={'w-30 card sidebar mr3'}>
-                                <Sidebar tags={tags} activeTag={activeTag} />
-                            </div>
-                        )}
+                        <Sidebar
+                            className={classNames([
+                                'w-30 card sidebar mr3',
+                                {
+                                    dn: !showSidebar,
+                                    'flex flex-column': showSidebar,
+                                },
+                            ])}
+                        />
                         <div
                             className={classNames([
-                                'w-70',
                                 {
+                                    'w-70': showSidebar,
                                     'w-100': !showSidebar,
                                 },
                             ])}

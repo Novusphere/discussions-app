@@ -1,14 +1,15 @@
-import { action, computed, observable, reaction } from 'mobx'
+import { action, computed, observable } from 'mobx'
 import { discussions, Post } from '@novuspherejs'
 import { task } from 'mobx-task'
 import { BaseStore, getOrCreateStore } from 'next-mobx-wrapper'
 import { CreateForm } from '@components'
-import { getTagStore } from '@stores/tag'
-import { getNewAuthStore, getUiStore, IStores } from '@stores'
+import tag, { getTagStore } from '@stores/tag'
+import { getNewAuthStore, getUiStore, getUserStore, IStores } from '@stores'
 import { generateUuid, getAttachmentValue, getIdenticon, pushToThread, sleep } from '@utils'
 import { ThreadModel } from '@models/threadModel'
 import FeedModel from '@models/feedModel'
 import _ from 'lodash'
+import PostModel from '@models/postModel'
 
 export interface IAttachment {
     value: string
@@ -65,7 +66,7 @@ export default class Posts extends BaseStore {
 
     // when creating a new post
     @observable newPostData = {
-        sub: { value: '', label: '' },
+        sub: null, // { value: '', label: '' }
     }
 
     /**
@@ -79,30 +80,18 @@ export default class Posts extends BaseStore {
      */
     @observable openingPostReplyContent = ''
 
-    @observable.deep activeThread: ThreadModel | undefined
+    @observable activeThread: ThreadModel
 
-    private tagsStore: IStores['tagStore']
-    private uiStore: IStores['uiStore']
-    private newAuthStore: IStores['newAuthStore']
+    @observable currentHighlightedPostUuid = ''
 
-    constructor(props) {
-        super(props)
-        this.tagsStore = getTagStore()
-        this.uiStore = getUiStore()
-        this.newAuthStore = getNewAuthStore()
+    private readonly tagsStore: IStores['tagStore'] = getTagStore()
+    private readonly uiStore: IStores['uiStore']= getUiStore()
+    private readonly newAuthStore: IStores['newAuthStore'] = getNewAuthStore()
+    private readonly userStore: IStores['userStore'] = getUserStore()
 
-        // refresh posts on logged in
-        // so we can show upvotes/downvotes by the user
-        // reaction(
-        //     () => this.newAuthStore.hasAccount,
-        //     async hasAccount => {
-        //         if (hasAccount) {
-        //             if (this.activeThread) {
-        //                 this.getAndSetThread(this.activeThreadId)
-        //             }
-        //         }
-        //     }
-        // )
+    @action.bound
+    highlightPostUuid(uuid: string) {
+        this.currentHighlightedPostUuid = uuid
     }
 
     public resetPositionAndPosts = () => {
@@ -113,18 +102,71 @@ export default class Posts extends BaseStore {
         }
     }
 
-    @task getPostsByTag = async (tags: string[]) => {
-        const { posts, cursorId } = await discussions.getPostsForTags(
-            tags,
-            this.postsPosition.cursorId,
-            this.postsPosition.items
-        )
-        this.posts = [...this.posts, ...posts]
-        this.postsPosition = {
-            items: this.posts.length,
-            cursorId: cursorId,
+    @task
+    @action.bound
+    async getPostsForSubs(subs = this.tagsStore.subscribedSubs) {
+        try {
+            const { posts, cursorId } = await discussions.getPostsForSubs(
+                subs,
+                this.postsPosition.cursorId,
+                this.postsPosition.items
+            )
+
+            this.posts = [...this.posts, ...posts]
+
+            this.postsPosition = {
+                items: this.posts.length,
+                cursorId,
+            }
+
+            return this.posts
+        } catch (error) {
+            return error
         }
-        return this.posts
+    }
+
+    @task
+    @action.bound
+    async getPostsForKeys(keys = this.userStore.followingKeys) {
+        try {
+            const { posts, cursorId } = await discussions.getPostsForKeys(
+                keys,
+                this.postsPosition.cursorId,
+                this.postsPosition.items
+            )
+
+            this.posts = [...this.posts, ...posts]
+
+            this.postsPosition = {
+                items: this.posts.length,
+                cursorId,
+            }
+
+            return this.posts
+        } catch (error) {
+            return error
+        }
+    }
+
+    @task
+    getPostsByTag = async (tags: string[]) => {
+        try {
+            const { posts, cursorId } = await discussions.getPostsForTags(
+                tags,
+                this.postsPosition.cursorId,
+                this.postsPosition.items
+            )
+
+            this.posts = [...this.posts, ...posts]
+            this.postsPosition = {
+                items: this.posts.length,
+                cursorId: cursorId,
+            }
+
+            return this.posts
+        } catch (error) {
+            return error
+        }
     }
 
     /**
@@ -142,15 +184,14 @@ export default class Posts extends BaseStore {
 
     @task
     @action.bound
-    public async getAndSetThread(id: string) {
+    public async getAndSetThread(id: string, isServer = false): Promise<null | ThreadModel> {
         try {
-            const thread = await this.getThreadById(id)
-            if (!thread) { return null }
-            this.activeThread = thread
+            const thread = await discussions.getThread(id, isServer)
+            if (!thread) return null
+            this.activeThread = new ThreadModel(thread)
             this.activeThreadId = id
             return this.activeThread
         } catch (error) {
-            console.log('Class: Posts, Function: getAndSetThread, Line 123 error: ', error)
             throw error
         }
     }
@@ -171,33 +212,14 @@ export default class Posts extends BaseStore {
                     poster = posts.displayName
                 }
 
-                let imageData = getIdenticon()
-
-                if (posts.pub && posts.pub.length) {
-                    imageData = getIdenticon(posts.pub)
-                }
-
                 return {
                     id: posts.pub,
                     value: poster,
-                    icon: imageData,
+                    icon: posts.imageData,
                 }
             }),
             option => option.id
         )
-    }
-
-    @task
-    public getThreadById = async (id: string) => {
-        try {
-            const thread = await discussions.getThread(id)
-            if (!thread) {
-                return null
-            }
-            return new ThreadModel(thread)
-        } catch (error) {
-            throw error
-        }
     }
 
     @action
@@ -225,7 +247,6 @@ export default class Posts extends BaseStore {
             hideLabels: true,
             extra: {
                 options: [
-                    { value: 'all', label: 'all' },
                     ...Array.from(this.tagsStore.tags.values())
                         .filter(tag => !tag.root)
                         .map(tag => ({
@@ -243,7 +264,7 @@ export default class Posts extends BaseStore {
                 name: 'title',
                 label: `Title`,
                 placeholder: 'Enter a post title',
-                rules: 'required|string|min:5|max:45',
+                rules: 'required|string|min:5|max:300',
                 hideLabels: true,
             },
             // {
@@ -367,37 +388,41 @@ export default class Posts extends BaseStore {
                 hideLabels: true,
                 extra: {
                     options: [
-                        // {
-                        //     value: 'Preview',
-                        //     className: 'white bg-gray',
-                        //     title: 'Preview the post before submitting',
-                        //     onClick: form => {
-                        //         if (form.isValid) {
-                        //             console.log(this.newPostData)
-                        //             // this.preview = form.values()
-                        //             // this.preview.sub = {
-                        //             //     value: this.newPostData.sub,
-                        //             //     label: this.newPostData.sub,
-                        //             // }
-                        //         }
-                        //     },
-                        // },
                         {
-                            value: 'Post ID',
-                            title: 'Post with an anonymous ID',
+                            value: 'Preview',
+                            className: 'white bg-gray',
+                            title: 'Preview the post before submitting',
+                            onClick: form => {
+                                if (!form.hasError) {
+                                    this.preview = form.values()
+                                    this.preview.sub = this.newPostData.sub
+                                }
+                            },
                         },
+                        // {
+                        //     value: 'Post ID',
+                        //     title: 'Post with an anonymous ID',
+                        // },
                         {
                             value: 'Post',
                             disabled: !this.newAuthStore.hasAccount,
                             title: !this.newAuthStore.hasAccount
                                 ? 'You need to be logged in to post'
-                                : 'Post with your logged as ' + this.newAuthStore.posterName,
+                                : 'Post as ' + this.newAuthStore.posterName,
 
                             onClick: task.resolved(async form => {
                                 if (!form.hasError && this.newPostData.sub.value) {
                                     const post = form.values()
                                     const uuid = generateUuid()
                                     const posterName = this.newAuthStore.posterName
+
+                                    let inlineTags = post.content.match(/#([^\s.,;:!?]+)/gi)
+                                    let tags = [this.newPostData.sub.value]
+
+                                    if (inlineTags && inlineTags.length) {
+                                        inlineTags = inlineTags.map(tag => tag.replace('#', ''))
+                                        tags = [...tags, ...inlineTags]
+                                    }
 
                                     const newPost = {
                                         poster: null,
@@ -407,7 +432,7 @@ export default class Posts extends BaseStore {
                                         sub: this.newPostData.sub.value,
                                         chain: 'eos',
                                         mentions: [],
-                                        tags: [this.newPostData.sub.value],
+                                        tags: tags,
                                         uuid: uuid,
                                         parentUuid: '',
                                         threadUuid: uuid,
@@ -425,15 +450,14 @@ export default class Posts extends BaseStore {
                                         newPost.displayName = posterName
                                     }
 
-                                    const submittedPost = await discussions.post(newPost as any)
+                                    const model = new PostModel(newPost as any)
+                                    const signedReply = model.sign(this.newAuthStore.postPriv)
+                                    const submittedPost = await discussions.post(signedReply as any)
 
-                                    // TODO: Add check to make sure the thread is actually posted onto the chain
+                                    // // TODO: Add check to make sure the thread is actually posted onto the chain
                                     await sleep(5000)
-
-                                    pushToThread(submittedPost)
-
+                                    await pushToThread(submittedPost)
                                     this.uiStore.showToast('Your post has been created!', 'success')
-
                                     this.clearPreview()
                                 }
                             }),

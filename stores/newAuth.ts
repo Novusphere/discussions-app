@@ -56,17 +56,17 @@ export default class NewAuth extends BaseStore {
     @task
     @action.bound
     async checkInitialConditions() {
-        await sleep(500)
+        await sleep(100)
 
         if (this.getActiveDisplayName && this.postPriv && this.tipPub) {
-            if (this.preferredSignInMethod === SignInMethods.scatter) {
-                try {
-                    return await this.initializeScatterLogin()
-                } catch (error) {
-                    this.hasAccount = false
-                    return error
-                }
-            }
+            // if (this.preferredSignInMethod === SignInMethods.scatter) {
+            //     try {
+            //         return await this.initializeScatterLogin()
+            //     } catch (error) {
+            //         this.hasAccount = false
+            //         return error
+            //     }
+            // }
 
             if (this.preferredSignInMethod === SignInMethods.brainKey) {
                 if (this.statusJson.bk && this.postPriv && this.tipPub && this.displayName.bk) {
@@ -83,7 +83,7 @@ export default class NewAuth extends BaseStore {
     }
 
     @computed get activePublicKey() {
-        if (!this.statusJson.bk || !this.statusJson.scatter) return null
+        if (!this.statusJson.bk && !this.statusJson.scatter) return null
 
         if (this.isBKAccount) {
             return this.statusJson.bk.post
@@ -121,6 +121,8 @@ export default class NewAuth extends BaseStore {
 
             return this.displayName.scatter
         }
+
+        return null
     }
 
     @computed get hasBKAccount() {
@@ -148,6 +150,9 @@ export default class NewAuth extends BaseStore {
     get signUpForm() {
         return new CreateForm(
             {
+                onBlur: form => {
+                    console.log(form.values())
+                },
                 onSubmit: form => {
                     const { displayName, password } = form.values()
 

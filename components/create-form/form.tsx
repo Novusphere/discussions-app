@@ -9,6 +9,7 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 interface FormProps extends React.HTMLAttributes<HTMLFormElement> {
     form: IForm
     className?: string
+    fieldClassName?: string
     hideSubmitButton?: boolean
 }
 
@@ -37,7 +38,7 @@ class Form extends React.Component<FormProps> {
     }
 
     render() {
-        const { form, children, hideSubmitButton, ...props } = this.props
+        const { form, children, hideSubmitButton, fieldClassName, ...props } = this.props
 
         if (typeof form === 'undefined' || typeof form.fields === 'undefined') return null
 
@@ -172,7 +173,15 @@ class Form extends React.Component<FormProps> {
                     case 'richtext':
                         return (
                             <React.Fragment key={field.name}>
-                                <div className={'field-container pb3 inline-labels'}>
+                                <div
+                                    className={classNames([
+                                        'field-container inline-labels',
+                                        {
+                                            [fieldClassName]: !!fieldClassName,
+                                            pb3: !fieldClassName,
+                                        },
+                                    ])}
+                                >
                                     {!field.hideLabels && (
                                         <label htmlFor={field.accessor.id} className={'w-40'}>
                                             {field.accessor.label}
@@ -188,6 +197,7 @@ class Form extends React.Component<FormProps> {
                                     >
                                         <Editor
                                             placeholder={field.placeholder}
+                                            value={field.value}
                                             className={'db f6'}
                                             {...bind}
                                         />
@@ -263,7 +273,11 @@ class Form extends React.Component<FormProps> {
                                             },
                                         ])}
                                     >
-                                        <input {...bind} className={'db f6 form-input'} />
+                                        <input
+                                            {...bind}
+                                            className={'db f6 form-input'}
+                                            {...field.bind}
+                                        />
                                         <span className={'error f6 db pv2 tl'}>
                                             {field.accessor.error}
                                         </span>

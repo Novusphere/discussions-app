@@ -37,6 +37,7 @@ class NewPage extends React.Component<INewPageProps> {
                         onChange={option => (newPostData.sub = option)}
                         className={'w-80 db f6 react-select-dropdown'}
                         classNamePrefix={'rs'}
+                        value={newPostData.sub}
                         options={subFields.extra.options}
                     />
                 </div>

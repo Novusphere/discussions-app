@@ -31,6 +31,9 @@
 }
 
 .notifications-content {
+	@extend .flex;
+	@extend .flex-column;
+
 	position: relative;
 	max-height: 50px;
 	overflow: hidden;

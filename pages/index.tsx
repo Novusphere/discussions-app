@@ -1,51 +1,40 @@
 import * as React from 'react'
 import { observer, inject } from 'mobx-react'
-import { PostPreview } from '@components'
+import { InfiniteScrollFeed } from '@components'
 import { IStores } from '@stores'
-import { IPost } from '@stores/posts'
-import { pushToThread } from '@utils'
 
 interface IIndexPage {
     postsStore: IStores['postsStore']
     tagStore: IStores['tagStore']
+    uiStore: IStores['uiStore']
 }
 
-@inject('postsStore', 'tagStore')
+@inject('postsStore', 'tagStore', 'uiStore')
 @observer
 class Index extends React.Component<IIndexPage> {
-    static async getInitialProps({ store }) {
-        const uiStore: IStores['uiStore'] = store.uiStore
-        const tagStore: IStores['tagStore'] = store.tagStore
-        uiStore.toggleSidebarStatus(true)
-        uiStore.toggleBannerStatus(true)
-        tagStore.destroyActiveTag()
-        return {}
+    componentWillMount(): void {
+        this.props.postsStore.resetPositionAndPosts()
+        this.props.tagStore.destroyActiveTag()
+        this.props.uiStore.toggleSidebarStatus(true)
+        this.props.uiStore.toggleBannerStatus(true)
     }
 
-    async componentWillMount(): Promise<void> {
-        await this.props.postsStore.getPostsByTag(['home'])
+    componentDidMount(): void {
+        this.props.postsStore.getPostsForSubs()
     }
 
-    public clickPost = (post: IPost) => {
-        return pushToThread(post)
-    }
+    public render() {
+        const { getPostsForSubs, postsPosition, posts } = this.props.postsStore
+        const { cursorId, items } = postsPosition
 
-    public render(): React.ReactNode {
-        if (!this.props.postsStore.posts || !this.props.postsStore.posts.length) {
-            return <span>No posts found</span>
-        }
-
-        return this.props.postsStore.posts.map(post => {
-            return (
-                <PostPreview
-                    post={post as any}
-                    key={post.uuid}
-                    onClick={this.clickPost}
-                    tag={this.props.tagStore.tags.get(post.sub)}
-                    voteHandler={this.props.postsStore.vote}
-                />
-            )
-        })
+        return (
+            <InfiniteScrollFeed
+                dataLength={items}
+                hasMore={cursorId !== 0}
+                next={getPostsForSubs}
+                posts={posts}
+            />
+        )
     }
 }
 

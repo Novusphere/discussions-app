@@ -4,7 +4,6 @@ const withCSS = require('@zeit/next-css')
 
 module.exports = withCSS(
     withSass({
-        distDir: '_next',
         generateBuildId: async () => {
             return String(Date.now())
         },

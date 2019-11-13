@@ -1,10 +1,10 @@
-import App, { Container } from 'next/app'
+import App from 'next/app'
 import React from 'react'
 import * as Stores from '@stores'
 import { Provider, useStaticRendering } from 'mobx-react'
 import { MainLayout } from '@components'
 import { withMobx } from 'next-mobx-wrapper'
-import { getVersion, isServer } from '@utils'
+import { isServer } from '@utils'
 import { create } from 'mobx-persist'
 import { toast } from 'react-toastify'
 
@@ -38,13 +38,20 @@ class DiscussionApp extends App {
      */
     async componentDidMount(): Promise<void> {
         if (!isServer) {
-            const { newAuthStore, settingsStore, userStore, notificationsStore } = this.props.store
+            const {
+                newAuthStore,
+                settingsStore,
+                userStore,
+                notificationsStore,
+                tagStore,
+            } = this.props.store
 
             const stores = {
                 auth: newAuthStore,
                 settings: settingsStore,
                 user: userStore,
                 notifications: notificationsStore,
+                tags: tagStore,
             }
 
             const hydrate = create({
@@ -69,13 +76,11 @@ class DiscussionApp extends App {
     public render() {
         const { Component, pageProps, store } = (this as any).props
         return (
-            <Container>
-                <Provider {...store}>
-                    <MainLayout>
-                        <Component {...pageProps} />
-                    </MainLayout>
-                </Provider>
-            </Container>
+            <Provider {...store}>
+                <MainLayout>
+                    <Component {...pageProps} />
+                </MainLayout>
+            </Provider>
         )
     }
 }

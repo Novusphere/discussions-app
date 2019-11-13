@@ -1,5 +1,6 @@
 import { computed, observable, set } from 'mobx'
 import { Post } from '@novuspherejs'
+import { getIdenticon } from '@utils'
 
 class FeedModel {
     @observable title: string
@@ -17,9 +18,27 @@ class FeedModel {
     @observable totalReplies: any
     @observable content: any
     @observable createdAt: any
+    @observable pub: any
+
+    @observable imageData = ''
 
     constructor(post: Post) {
         set(this, post)
+
+        let imageData = getIdenticon()
+
+        if (this.pub) {
+            imageData = getIdenticon(this.pub)
+        }
+
+        this.imageData = imageData
+    }
+
+    @computed get posterName() {
+        if (this.displayName) {
+            return this.displayName
+        }
+        return this.poster
     }
 
     vote = async (_uuid: string, myNewVote: number) => {

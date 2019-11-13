@@ -6,8 +6,9 @@ import { ReplyModel } from '@models/replyModel'
 import _ from 'lodash'
 import PostModel from '@models/postModel'
 import { discussions } from '@novuspherejs'
-
-// import { discussions } from '@novuspherejs'
+import { getNewAuthStore, getUiStore, IStores } from '@stores'
+import CreateForm from '../components/create-form/create-form'
+import { task } from 'mobx-task'
 
 export class ThreadModel {
     @observable public map: { [p: string]: PostModel } | undefined
@@ -17,55 +18,14 @@ export class ThreadModel {
     @observable public sub: string
 
     @observable public replies: PostModel[]
+    @observable openingPostReplies: PostModel[]
+
+    @observable editing = false
 
     public replyBoxStatuses = observable.map<string, ReplyModel>()
 
-    @computed get totalReplies() {
-        const map = Object.keys(this.map)
-
-        if (map.length) {
-            return map.length - 1
-        }
-
-        return 0
-    }
-
-    /**
-     * Get the reply box model for a particular post uid
-     * @return {ReplyModel}
-     */
-    rbModel: (...args: any[]) => ReplyModel = computedFn(
-        (post: PostModel): ReplyModel => {
-            const uid = post.uuid
-
-            if (this.replyBoxStatuses.has(uid)) {
-                return this.replyBoxStatuses.get(uid)
-            }
-
-            let model: ReplyModel
-
-            if (this.map[uid]) {
-                model = new ReplyModel(this.map[uid], this.map)
-            } else {
-                model = new ReplyModel(post, this.map)
-            }
-
-            this.replyBoxStatuses.set(uid, model)
-            return model
-        }
-    )
-    /**
-     * Get posts based on a parent uuid
-     * @param {string} uid - The post uid that you want getRepliesFromMap for
-     * @return {PostModel[]}
-     */
-    getRepliesFromMap: (...args: any[]) => PostModel[] = computedFn((uid: string): PostModel[] => {
-        if (this.map[uid]) {
-            return _.filter(this.map, (post, index) => post.parentUuid === uid)
-        }
-
-        return []
-    })
+    private readonly authStore: IStores['newAuthStore'] = getNewAuthStore()
+    private readonly uiStore: IStores['uiStore'] = getUiStore()
 
     /**
      * ReplyBox box open status for a particular post id
@@ -96,17 +56,134 @@ export class ThreadModel {
         const openingPostReplyModel = new ReplyModel(this.openingPost, this.map)
         openingPostReplyModel.toggleOpen()
         this.replyBoxStatuses.set(this.uuid, openingPostReplyModel)
+
+        this.openingPostReplies = _.filter(this.map, post => post.parentUuid === this.uuid)
     }
 
-    @computed get openingPostReplies(): any[] {
-        const openingPostReplies = this.getRepliesFromMap(this.uuid)
+    getRepliesFromMap: (...args: any[]) => PostModel[] = computedFn((uid: string): PostModel[] => {
+        if (this.map[uid]) {
+            return _.filter(this.map, post => post.parentUuid === uid)
+        }
 
-        return openingPostReplies.map(reply => {
-            return {
-                ...reply,
-                replies: this.getRepliesFromMap(reply.uuid),
+        return []
+    })
+
+    @computed get canEditPost() {
+        return this.openingPost.pub === this.authStore.activePublicKey
+    }
+
+    @computed get totalReplies() {
+        const map = Object.keys(this.map)
+
+        if (map.length) {
+            return map.length - 1
+        }
+
+        return 0
+    }
+
+    @action.bound
+    toggleEditing(overwriteValue?: boolean) {
+        if (overwriteValue) {
+            this.editing = overwriteValue
+            return
+        }
+
+        this.editing = !this.editing
+    }
+
+    @task.resolved
+    @action.bound
+    async saveEdits(form) {
+        const cached = this.openingPost
+
+        if (!form.hasError) {
+            const { title, content } = form.values()
+
+            try {
+                this.openingPost.title = title
+                this.openingPost.content = content
+
+                let signedEdit = await this.openingPost.sign(this.authStore.postPriv)
+
+                signedEdit['parentUuid'] = this.openingPost.uuid
+                signedEdit['edit'] = true
+                signedEdit['poster'] = undefined
+
+                this.openingPost = await discussions.post(signedEdit as any)
+                this.uiStore.showToast('Your post has been edited!', 'success')
+
+                this.toggleEditing()
+            } catch (error) {
+                this.openingPost.title = cached.title
+                this.openingPost.content = cached.content
+                this.uiStore.showToast('There was an error editing your post', 'error')
             }
-        })
+        }
+    }
+
+    get editForm() {
+        return new CreateForm({}, [
+            {
+                name: 'title',
+                label: 'title',
+                hideLabels: true,
+                value: this.openingPost.title,
+            },
+            {
+                name: 'content',
+                label: 'Content',
+                value: this.openingPost.content,
+                hideLabels: true,
+                type: 'richtext',
+            },
+            {
+                name: 'buttons',
+                type: 'button',
+                hideLabels: true,
+                extra: {
+                    options: [
+                        {
+                            value: 'Cancel',
+                            className: 'white bg-red',
+                            title: 'Cancel changes to your post',
+                            onClick: () => {
+                                this.editing = false
+                            },
+                        },
+                        {
+                            value: 'Save',
+                            title: 'Save changes to your post',
+                            onClick: this.saveEdits,
+                        },
+                    ],
+                },
+            },
+        ])
+    }
+
+    /**
+     * Get the reply box model for a particular post uid
+     * @return {ReplyModel}
+     */
+    @action.bound
+    rbModel(post: PostModel) {
+        const uid = post.uuid
+
+        if (this.replyBoxStatuses.has(uid)) {
+            return this.replyBoxStatuses.get(uid)
+        }
+
+        let model: ReplyModel
+
+        if (this.map[uid]) {
+            model = new ReplyModel(this.map[uid], this.map)
+        } else {
+            model = new ReplyModel(post, this.map)
+        }
+
+        this.replyBoxStatuses.set(uid, model)
+        return model
     }
 
     /**
@@ -114,19 +191,19 @@ export class ThreadModel {
      * @param {string} uid
      * @return {void}
      */
-    toggleReplyBoxStatus = (uid: string) => {
-        let replyModel: ReplyModel
-
-        if (this.replyBoxStatuses.has(uid)) {
-            replyModel = this.replyBoxStatuses.get(uid)
-            replyModel.toggleOpen()
-            this.replyBoxStatuses.set(uid, replyModel)
-        } else {
-            if (this.map[uid]) {
-                this.replyBoxStatuses.set(uid, new ReplyModel(this.map[uid], this.map))
-            }
-        }
-    }
+    // toggleReplyBoxStatus = (uid: string) => {
+    //     let replyModel: ReplyModel
+    //
+    //     if (this.replyBoxStatuses.has(uid)) {
+    //         replyModel = this.replyBoxStatuses.get(uid)
+    //         replyModel.toggleOpen()
+    //         this.replyBoxStatuses.set(uid, replyModel)
+    //     } else {
+    //         if (this.map[uid]) {
+    //             this.replyBoxStatuses.set(uid, new ReplyModel(this.map[uid], this.map))
+    //         }
+    //     }
+    // }
 
     /**
      * Set the vote of a post given it's uuid.

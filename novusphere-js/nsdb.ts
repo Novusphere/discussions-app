@@ -1,4 +1,5 @@
 import axios from 'axios';
+
 export const DEFAULT_NSDB_ENDPOINT = 'https://atmosdb.novusphere.io';
 
 export interface INSDBSearchQuery {
@@ -10,13 +11,13 @@ export interface INSDBSearchQuery {
 }
 
 export class NSDB {
-    api: string;
+    api: string
     constructor() {
-        this.api = DEFAULT_NSDB_ENDPOINT;
+        this.api = DEFAULT_NSDB_ENDPOINT
     }
     
     async init(apiEndpoint: string) {
-        this.api = apiEndpoint;
+        this.api = apiEndpoint
     }
 
     async cors(url: string) {
@@ -30,20 +31,25 @@ export class NSDB {
 
         const qs = `data=${JSON.stringify(sq)}`;
         const rurl = `${this.api}/discussions/search?${qs}`;
-        //console.log(rurl);
+        
+        try {
+            const request = await axios.get(rurl);
+            const result = request.data;
 
-        const request = await axios.get(rurl);
-        const result = request.data;
-        if (result.error) {
-            console.log(result);
-            throw new Error(result.error);
+            if (result.error) {
+                console.log(result);
+                throw new Error(result.error);
+            }
+
+            sq.cursorId = result.cursorId;
+            sq.count = result.count;
+            sq.limit = result.limit;
+            sq.payload = result.payload;
+
+            return sq;
+        } catch(error) {
+            console.error('Search error: \n', error)
+            throw error
         }
-
-        sq.cursorId = result.cursorId;
-        sq.count = result.count;
-        sq.limit = result.limit;
-        sq.payload = result.payload;
-
-        return sq;
     }
 };

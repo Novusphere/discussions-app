@@ -2,9 +2,12 @@
 	@extend .justify-center;
 	@extend .items-center;
 	@extend .flex;
+
 	height: 278px;
 
 	img {
+		@extend .w-100;
+		object-fit: cover;
 		height: 278px;
 	}
 }

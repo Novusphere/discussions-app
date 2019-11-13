@@ -24,6 +24,8 @@ class Editor extends React.Component<IEditorProps> {
     private quillBase: any
     private modules: any = null
 
+    private ref = React.createRef<any>()
+
     async componentDidMount(): Promise<void> {
         /**
          * This is how we get around SSR problems
@@ -44,6 +46,9 @@ class Editor extends React.Component<IEditorProps> {
 
         const turndownImport = await import('turndown')
         const Turndown = turndownImport.default
+
+        const markdownToDeltaImport = await import('markdown-to-quill-delta')
+        const markdownToDelta = markdownToDeltaImport.default
 
         this.turndownService = new Turndown()
 
@@ -76,12 +81,12 @@ class Editor extends React.Component<IEditorProps> {
                         renderList(matches, searchTerm)
                     }
                 },
-                renderItem: (item) => {
+                renderItem: item => {
                     const image = `<img width=20 height=20 src="data:image/png;base64,${item.icon}" class="mention-list-icon" />`
                     return `<span class="mention-list-item" title={${item.id}}>${image} <span>${item.value}</span></span>`
                 },
                 onSelect: (item, insertItem) => {
-                    item.value = `<a href=${window.location.origin}/u/${item.value}-${item.id}>@${item.value}</a>`
+                    item.value = `<a href=https://beta.discussions.app/u/${item.value}-${item.id}>@${item.value}</a>`
                     item.denotationChar = ''
                     return insertItem(item)
                 },
@@ -97,6 +102,20 @@ class Editor extends React.Component<IEditorProps> {
         this.setState({
             loaded: true,
         })
+
+        this.updateContentByRef(markdownToDelta(this.props.value))
+    }
+
+    private updateContentByRef = (content) => {
+        if (this.ref && this.ref.current && typeof this.props.value !== 'undefined') {
+            this.ref.current.getEditor().setContents(content)
+        }
+    }
+
+    componentWillReceiveProps(nextProps: Readonly<IEditorProps>, nextContext: any): void {
+        if (nextProps.value === '') {
+            this.updateContentByRef('')
+        }
     }
 
     public onChange = (text: string) => {
@@ -110,10 +129,13 @@ class Editor extends React.Component<IEditorProps> {
         }
 
         const { Editor } = this.quillBase
+        const { placeholder } = this.props
 
         return (
             <Editor
+                ref={this.ref}
                 key={'editor'}
+                placeholder={placeholder}
                 onChange={this.onChange}
                 formats={[
                     'header',

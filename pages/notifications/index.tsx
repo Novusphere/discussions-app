@@ -5,7 +5,6 @@ import { faSpinner } from '@fortawesome/free-solid-svg-icons'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { PostPreview } from '@components'
 import FeedModel from '@models/feedModel'
-import { pushToThread } from '@utils'
 
 interface INotificationsProps {
     notificationsStore: IStores['notificationsStore']
@@ -27,6 +26,8 @@ class Notifications extends React.Component<INotificationsProps> {
     }
 
     componentDidMount(): void {
+        this.props.notificationsStore.resetUnreadCount()
+        this.props.notificationsStore.setTimeStamp()
         this.props.notificationsStore.fetchNotificationsAsFeed()
     }
 
@@ -40,8 +41,8 @@ class Notifications extends React.Component<INotificationsProps> {
                         <PostPreview
                             disableVoteHandler
                             key={notification.uuid}
-                            post={notification}
-                            onClick={() => pushToThread(notification)}
+                            notificationUuid={notification.uuid}
+                            post={notification as any}
                             tag={this.props.tagStore.tags.get(notification.sub)}
                         />
                     )
