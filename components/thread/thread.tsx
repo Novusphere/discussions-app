@@ -99,9 +99,11 @@ class Thread extends React.Component<IThreadOuterProps & IThreadInnerProps, IThr
 
         return (
             <>
-                {totalReplies > 1 && <div className={'mb2'}>
-                    <span className={'b f6 pb2'}>viewing all {totalReplies} comments</span>
-                </div>}
+                {totalReplies > 1 && (
+                    <div className={'mb2'} id={'comments'}>
+                        <span className={'b f6 pb2'}>viewing all {totalReplies} comments</span>
+                    </div>
+                )}
                 {this.renderReplies()}
             </>
         )

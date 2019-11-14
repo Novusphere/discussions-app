@@ -116,14 +116,21 @@ const PostPreview: React.FC<IPostPreviewProps> = ({
                             </object>
 
                             <div className={'flex z-2 footer b'}>
-                                <span className={'o-80 f6 ml2 dim pointer'}>
-                                    <FontAwesomeIcon
-                                        width={13}
-                                        icon={faComment}
-                                        className={'pr2'}
-                                    />
-                                    {post.totalReplies} comments
-                                </span>
+                                <object>
+                                    <Link
+                                        href={'/tag/[name]/[id]/[title]'}
+                                        as={`${url}#comments`}
+                                    >
+                                        <a className={'o-80 f6 ml2 dim pointer'}>
+                                            <FontAwesomeIcon
+                                                width={13}
+                                                icon={faComment}
+                                                className={'pr2'}
+                                            />
+                                            {post.totalReplies} comments
+                                        </a>
+                                    </Link>
+                                </object>
                                 <span className={'o-80 f6 ml2 dim pointer'}>share</span>
                                 <span className={'o-80 f6 ml2 dim pointer'}>reply</span>
                                 <span className={'o-80 f6 ml2 dim pointer'}>mark as spam</span>

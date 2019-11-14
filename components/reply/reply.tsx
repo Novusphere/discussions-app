@@ -69,7 +69,7 @@ class Reply extends React.Component<IReplies, IRepliesState> {
     private addAndScrollToUuid = (uuid: string) => {
         if (this.replyRef.current.dataset.postUuid === uuid) {
             this.props.postsStore.highlightPostUuid(uuid)
-            window.scrollTo(0, this.replyRef.current.offsetTop)
+            // window.scrollTo(0, this.replyRef.current.offsetTop)
         }
     }
 
