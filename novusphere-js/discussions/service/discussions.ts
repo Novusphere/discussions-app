@@ -40,22 +40,8 @@ export default class DiscussionsService {
     public checkIfPostIsValid(i: any) {
         const hash0 = ecc.sha256(i.content)
         const hash1 = ecc.sha256(i.uuid + hash0)
-
-        console.log(
-            'Class: DiscussionsService, Function: checkIfPostIsValid, Line 44 hash0: ',
-            hash0
-        )
-        console.log(
-            'Class: DiscussionsService, Function: checkIfPostIsValid, Line 45 hash1: ',
-            hash1
-        )
         const rpk = ecc.recover(i.metadata.sig, hash1)
-        console.log('Class: DiscussionsService, Function: checkIfPostIsValid, Line 47 rpk: ', rpk)
         const check = rpk == i.metadata.pub
-        console.log(
-            'Class: DiscussionsService, Function: checkIfPostIsValid, Line 49 check: ',
-            check
-        )
         return check
     }
 
