@@ -30,10 +30,10 @@ export class NSDB {
         sq.payload = undefined
 
         const qs = `data=${encodeURIComponent(JSON.stringify(sq))}`
-        const rurl = `${this.api}/discussions/search?${qs}`
+        const rurl = `${this.api}/discussions/search`
 
         try {
-            const { data } = await axios.post(rurl)
+            const { data } = await axios.post(rurl, qs)
 
             if (data.error) {
                 console.error('Search failed: ', sq)
