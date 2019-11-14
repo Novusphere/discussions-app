@@ -89,6 +89,7 @@ export class ReplyModel {
 
                 await discussions.post({
                     ...signedEdit,
+                    content: content,
                     parentUuid: this.post.uuid,
                     edit: true,
                     poster: undefined,
