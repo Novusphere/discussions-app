@@ -42,18 +42,29 @@ export class ReplyModel {
     }
 
     @computed get inlineTags() {
-        return this.content.match(/#([^\s.,;:!?]+)/gi)
+        return ReplyModel.matchContentForTags(this.content)
     }
 
     @computed get inlineMentions() {
-        return this.content.match(/\[@(.*?)]\(.*?\)/gi)
+        return ReplyModel.matchContentForMentions(this.content)
     }
 
     @computed get inlineMentionHashes() {
-        if (!this.inlineMentions) return []
+        return ReplyModel.extractMentionHashesForRegEx(this.inlineMentions)
+    }
 
+    private static matchContentForTags(content: string) {
+        return content.match(/#([^\s.,;:!?]+)/gi)
+    }
+
+    private static matchContentForMentions(content: string) {
+        return content.match(/\[@(.*?)]\(.*?\)/gi)
+    }
+
+    private static extractMentionHashesForRegEx(matchedContentForMentions: any) {
+        if (!matchedContentForMentions) return []
         const regex = new RegExp(/\(?EOS.*\)?\w/, 'gi')
-        return this.inlineMentions.map(items => {
+        return matchedContentForMentions.map(items => {
             return items.match(regex)[0]
         })
     }
@@ -85,17 +96,31 @@ export class ReplyModel {
             const { content } = form.values()
 
             try {
-                let signedEdit = await this.post.sign(this.authStore.postPriv)
+                let reply = this.createPostObject(true)
 
-                await discussions.post({
-                    ...signedEdit,
-                    content: content,
-                    parentUuid: this.post.uuid,
+                reply = {
+                    ...reply,
+                    content,
                     edit: true,
-                    poster: undefined,
-                } as any)
+                    mentions: ReplyModel.extractMentionHashesForRegEx(
+                        ReplyModel.matchContentForMentions(content)
+                    ),
+                }
 
-                this.post.content = content
+                let tags = ReplyModel.matchContentForTags(content)
+                
+                console.log('Class: ReplyModel, Function: saveEdits, Line 112 tags: ', tags, '\n\n');
+
+                if (tags && tags.length) {
+                    tags = tags.map(tag => tag.replace('#', ''))
+                    reply.tags = [...reply.tags, ...tags]
+                }
+
+                const model = new PostModel(reply as any)
+                const signedReply = model.sign(this.newAuthStore.postPriv)
+                const confirmedReply = await discussions.post(signedReply as any)
+
+                this.post.content = confirmedReply.content
                 this.post.edit = true
 
                 this.uiStore.showToast('Your post has been edited!', 'success')
@@ -141,23 +166,9 @@ export class ReplyModel {
         ])
     }
 
-    @task.resolved
     @action.bound
-    async onSubmit(activeThread: any) {
-        if (!this.newAuthStore.hasAccount) {
-            this.uiStore.showToast('You must be logged in to comment', 'error')
-            return
-        }
-
-        if (!this.content) {
-            this.uiStore.showToast(Messages.ERROR.POST_EMPTY, 'error')
-            return
-        }
-
-        const generatedUid = generateUuid()
-        const posterName = this.newAuthStore.posterName
-
-        const reply = {
+    private createPostObject(isEdit = false) {
+        let reply = {
             poster: null,
             displayName: null,
             title: '',
@@ -166,15 +177,30 @@ export class ReplyModel {
             chain: 'eos',
             mentions: this.inlineMentionHashes,
             tags: [this.post.sub],
-            id: generatedUid,
-            uuid: generatedUid,
+            id: '',
+            uuid: '',
             parentUuid: this.post.uuid,
             threadUuid: this.post.threadUuid,
             attachment: getAttachmentValue(this.content),
             upvotes: 0,
             downvotes: 0,
             myVote: 0,
+            edit: undefined,
         }
+
+        if (!isEdit) {
+            const generatedUuid = generateUuid()
+            reply.id = generatedUuid
+            reply.uuid = generatedUuid
+
+            reply = {
+                ...reply,
+                upvotes: reply.displayName && reply.poster ? 1 : 0,
+                myVote: reply.displayName && reply.poster ? 1 : 0,
+            }
+        }
+
+        const posterName = this.newAuthStore.posterName
 
         if (posterName === this.newAuthStore.displayName.bk) {
             reply.poster = undefined
@@ -193,6 +219,24 @@ export class ReplyModel {
             reply.tags = [...reply.tags, ...tags]
         }
 
+        return reply
+    }
+
+    @task.resolved
+    @action.bound
+    async onSubmit(activeThread: any) {
+        if (!this.newAuthStore.hasAccount) {
+            this.uiStore.showToast('You must be logged in to comment', 'error')
+            return
+        }
+
+        if (!this.content) {
+            this.uiStore.showToast(Messages.ERROR.POST_EMPTY, 'error')
+            return
+        }
+
+        const reply = this.createPostObject()
+
         try {
             if (activeThread) {
                 const model = new PostModel(reply as any)
@@ -201,8 +245,6 @@ export class ReplyModel {
 
                 const confirmedModel = new PostModel({
                     ...confirmedReply,
-                    upvotes: reply.displayName && reply.poster ? 1 : 0,
-                    myVote: reply.displayName && reply.poster ? 1 : 0
                 })
 
                 set(activeThread, {
