@@ -1,7 +1,6 @@
 import Thread from '@novuspherejs/discussions/thread'
 import { Post } from '@novuspherejs/discussions/post'
 import { action, computed, observable } from 'mobx'
-import { computedFn } from 'mobx-utils'
 import { ReplyModel } from '@models/replyModel'
 import _ from 'lodash'
 import PostModel from '@models/postModel'
@@ -18,7 +17,7 @@ export class ThreadModel {
     @observable public sub: string
 
     @observable public replies: PostModel[]
-    @observable openingPostReplies: PostModel[]
+    @observable openingPostReplies: PostModel[] = []
 
     @observable editing = false
 
@@ -60,13 +59,14 @@ export class ThreadModel {
         this.openingPostReplies = _.filter(this.map, post => post.parentUuid === this.uuid)
     }
 
-    getRepliesFromMap: (...args: any[]) => PostModel[] = computedFn((uid: string): PostModel[] => {
+    @action.bound
+    getRepliesFromMap(uid: string) {
         if (this.map[uid]) {
             return _.filter(this.map, post => post.parentUuid === uid)
         }
 
         return []
-    })
+    }
 
     @computed get canEditPost() {
         return this.openingPost.pub === this.authStore.activePublicKey

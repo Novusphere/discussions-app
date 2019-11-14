@@ -392,6 +392,7 @@ export default class Posts extends BaseStore {
                             value: 'Preview',
                             className: 'white bg-gray',
                             title: 'Preview the post before submitting',
+                            disabled: !this.newPostData.sub,
                             onClick: form => {
                                 if (!form.hasError) {
                                     this.preview = form.values()

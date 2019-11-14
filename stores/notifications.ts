@@ -34,7 +34,7 @@ export default class Notifications extends BaseStore {
                     this.fetchNotifications()
                     this.notificationIntervalHandler = setInterval(() => {
                         this.fetchNotifications()
-                    }, 5000)
+                    }, 10000)
                 } else {
                     if (this.notificationIntervalHandler) {
                         clearInterval(this.notificationIntervalHandler)

@@ -97,13 +97,11 @@ class Thread extends React.Component<IThreadOuterProps & IThreadInnerProps, IThr
 
         const totalReplies = Object.keys(thread.map).length - 1
 
-        if (!totalReplies) return null
-
         return (
             <>
-                <div className={'mb2'}>
+                {totalReplies > 1 && <div className={'mb2'}>
                     <span className={'b f6 pb2'}>viewing all {totalReplies} comments</span>
-                </div>
+                </div>}
                 {this.renderReplies()}
             </>
         )

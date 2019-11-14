@@ -33,7 +33,7 @@ class E extends React.Component<IEPageProps, IEPageState> {
     static async getInitialProps({ query, store, req }) {
         const postsStore: IStores['postsStore'] = store.postsStore
         const thread = await postsStore.getAndSetThread(query.id, !!req)
-
+        
         return {
             query,
             thread,
