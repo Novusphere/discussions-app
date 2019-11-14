@@ -454,12 +454,7 @@ export default class Posts extends BaseStore {
                                     const model = new PostModel(newPost as any)
                                     const signedReply = model.sign(this.newAuthStore.postPriv)
                                     const submittedPost = await discussions.post(signedReply as any)
-
-                                    console.log('submittedPost', submittedPost)
-
                                     const isPostValid = discussions.checkIfPostIsValid(submittedPost)
-
-                                    console.log('isPostvalid', isPostValid)
 
                                     if (isPostValid) {
                                         // // TODO: Add check to make sure the thread is actually posted onto the chain

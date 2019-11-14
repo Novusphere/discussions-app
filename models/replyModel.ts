@@ -108,8 +108,6 @@ export class ReplyModel {
                 }
 
                 let tags = ReplyModel.matchContentForTags(content)
-                
-                console.log('Class: ReplyModel, Function: saveEdits, Line 112 tags: ', tags, '\n\n');
 
                 if (tags && tags.length) {
                     tags = tags.map(tag => tag.replace('#', ''))
