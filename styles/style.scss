@@ -76,7 +76,8 @@ a {
     position: sticky;
 
     ul {
-        overflow: scroll;
+        overflow-y: scroll;
+        overflow-x: hidden;
         max-height: calc(100vh - 55px - 15px);
     }
 }
