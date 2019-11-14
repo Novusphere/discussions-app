@@ -73,6 +73,17 @@ class Reply extends React.Component<IReplies, IRepliesState> {
         }
     }
 
+    componentDidMount(): void {
+        const [, hash] = this.props.currentPath.split('#')
+        if (hash) {
+            const anchor = document.getElementsByName(hash)
+            if (anchor.length > 0) {
+                const offSet = anchor[0].offsetTop - 20
+                window.scrollTo(0, offSet)
+            }
+        }
+    }
+
     private replyRef = React.createRef<HTMLDivElement>()
 
     private setHover = (state: boolean) => {

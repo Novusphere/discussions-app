@@ -9,7 +9,12 @@ interface IUserNameWithIconProps {
     pub: string
 }
 
-const UserNameWithIcon: React.FC<IUserNameWithIconProps> = ({ imageSize, imageData, name, pub }) => {
+const UserNameWithIcon: React.FC<IUserNameWithIconProps> = ({
+    imageSize,
+    imageData,
+    name,
+    pub,
+}) => {
     let size = imageSize
 
     if (!imageSize || typeof imageSize === 'undefined') {
@@ -17,13 +22,7 @@ const UserNameWithIcon: React.FC<IUserNameWithIconProps> = ({ imageSize, imageDa
     }
 
     const image = (
-        <img
-            width={size}
-            height={size}
-            src={imageData}
-            className={'post-icon mr2'}
-            alt={'Icon'}
-        />
+        <img width={size} height={size} src={imageData} className={'post-icon mr2'} alt={'Icon'} />
     )
 
     const user = <span>{name}</span>
@@ -43,14 +42,14 @@ const UserNameWithIcon: React.FC<IUserNameWithIconProps> = ({ imageSize, imageDa
     }
 
     return (
-        <Link href={`/u/[username]`} as={`/u/${name}-${pub}`}>
-            <a>
-                <span className={'flex items-center'}>
+        <object className={'z-2'}>
+            <Link href={`/u/[username]`} as={`/u/${name}-${pub}`}>
+                <a className={'flex items-center dim pointer'}>
                     {image}
                     {user}
-                </span>
-            </a>
-        </Link>
+                </a>
+            </Link>
+        </object>
     )
 }
 

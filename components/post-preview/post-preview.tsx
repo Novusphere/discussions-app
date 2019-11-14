@@ -69,7 +69,7 @@ const PostPreview: React.FC<IPostPreviewProps> = ({
                               />
                           )}
                 </div>
-                <Link href={'/tag/[name]/[id]/[title]'} as={url} scroll={false}>
+                <Link href={'/tag/[name]/[id]/[title]'} as={url}>
                     <a className={'no-style w-100'}>
                         <div className={'flex flex-column post-content w-100'}>
                             <div className={'flex f6 lh-copy black items-center'}>
@@ -83,14 +83,12 @@ const PostPreview: React.FC<IPostPreviewProps> = ({
                                 <span className={'b ttu'}>{post.sub}</span>
                                 <span className={'ph1 b'}>&#183;</span>
                                 {postModel && (
-                                    <object>
-                                        <UserNameWithIcon
-                                            imageData={postModel.imageData}
-                                            pub={postModel.pub}
-                                            name={postModel.posterName}
-                                            imageSize={20}
-                                        />
-                                    </object>
+                                    <UserNameWithIcon
+                                        imageData={postModel.imageData}
+                                        pub={postModel.pub}
+                                        name={postModel.posterName}
+                                        imageSize={20}
+                                    />
                                 )}
                                 <span className={'ph1 b'}>&#183;</span>
                                 <span
@@ -117,10 +115,7 @@ const PostPreview: React.FC<IPostPreviewProps> = ({
 
                             <div className={'flex z-2 footer b'}>
                                 <object>
-                                    <Link
-                                        href={'/tag/[name]/[id]/[title]'}
-                                        as={`${url}#comments`}
-                                    >
+                                    <Link href={'/tag/[name]/[id]/[title]'} as={`${url}#comments`}>
                                         <a className={'o-80 f6 ml2 dim pointer'}>
                                             <FontAwesomeIcon
                                                 width={13}

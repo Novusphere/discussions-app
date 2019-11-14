@@ -108,7 +108,7 @@ class U extends React.Component<IUPageProps> {
                     <img
                         width={100}
                         height={100}
-                        src={`data:image/png;base64,${icon}`}
+                        src={icon}
                         className={'post-icon mr2'}
                         alt={'Icon'}
                     />
