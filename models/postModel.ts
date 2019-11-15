@@ -20,6 +20,8 @@ class PostModel {
     @observable replies
     @observable content
     @observable edit
+    @observable tags
+    @observable mentions
 
     @observable transaction
 

@@ -103,12 +103,27 @@ export class ThreadModel {
             try {
                 this.openingPost.title = title
                 this.openingPost.content = content
+                this.openingPost.createdAt = new Date(Date.now())
+
+                let tags = ReplyModel.matchContentForTags(content)
+
+                if (tags && tags.length) {
+                    tags = tags.map(tag => tag.replace('#', ''))
+                    this.openingPost.tags = [...this.openingPost.tags, ...tags]
+                }
+
+                this.openingPost.mentions = ReplyModel.extractMentionHashesForRegEx(
+                    ReplyModel.matchContentForMentions(content)
+                )
 
                 let signedEdit = await this.openingPost.sign(this.authStore.postPriv)
 
-                signedEdit['parentUuid'] = this.openingPost.uuid
-                signedEdit['edit'] = true
-                signedEdit['poster'] = undefined
+                signedEdit = {
+                    ...signedEdit,
+                    parentUuid: this.openingPost.uuid,
+                    edit: true,
+                    poster: undefined,
+                }
 
                 this.openingPost = await discussions.post(signedEdit as any)
                 this.uiStore.showToast('Your post has been edited!', 'success')

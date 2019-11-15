@@ -82,8 +82,6 @@ class Reply extends React.Component<IReplies, IRepliesState> {
                 window.scrollTo(0, offSet)
             }
         }
-
-        console.log(this.props.post)
     }
 
     private replyRef = React.createRef<HTMLDivElement>()

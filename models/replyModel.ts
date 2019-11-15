@@ -53,15 +53,15 @@ export class ReplyModel {
         return ReplyModel.extractMentionHashesForRegEx(this.inlineMentions)
     }
 
-    private static matchContentForTags(content: string) {
+    public static matchContentForTags(content: string) {
         return content.match(/#([^\s.,;:!?]+)/gi)
     }
 
-    private static matchContentForMentions(content: string) {
+    public static matchContentForMentions(content: string) {
         return content.match(/\[@(.*?)]\(.*?\)/gi)
     }
 
-    private static extractMentionHashesForRegEx(matchedContentForMentions: any) {
+    public static extractMentionHashesForRegEx(matchedContentForMentions: any) {
         if (!matchedContentForMentions) return []
         const regex = new RegExp(/\(?EOS.*\)?\w/, 'gi')
         return matchedContentForMentions.map(items => {
@@ -102,6 +102,7 @@ export class ReplyModel {
                     ...reply,
                     content,
                     edit: true,
+                    createdAt: new Date(Date.now()),
                     mentions: ReplyModel.extractMentionHashesForRegEx(
                         ReplyModel.matchContentForMentions(content)
                     ),
@@ -170,6 +171,7 @@ export class ReplyModel {
             poster: null,
             displayName: null,
             title: '',
+            createdAt: this.post.createdAt,
             content: this.content,
             sub: this.post.sub,
             chain: 'eos',
