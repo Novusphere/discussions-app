@@ -48,18 +48,6 @@ export default class Tag extends BaseStore {
         return Promise.resolve(true)
     }
 
-    @computed get subscribedSubs() {
-        const subs = []
-
-        this.subSubscriptionStatus.forEach((subStatus, subName) => {
-            if (subStatus) {
-                subs.push(subName)
-            }
-        })
-
-        return subs
-    }
-
     @action.bound
     private getGenericTag(subName: string) {
         return new TagModel({
