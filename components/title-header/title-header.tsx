@@ -4,10 +4,9 @@ import Router from 'next/router'
 import Link from 'next/link'
 import { IStores } from '@stores'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
-import { faBell, faSearch, faSpinner, faUserCircle } from '@fortawesome/free-solid-svg-icons'
+import { faBell, faSearch, faSpinner } from '@fortawesome/free-solid-svg-icons'
 import { Tooltip } from 'react-tippy'
 import { ModalOptions } from '@globals'
-import { TagModel } from '@models/tagModel'
 import { UserNotifications } from '@components'
 import { getIdenticon } from '@utils'
 
@@ -153,39 +152,11 @@ class TitleHeader extends React.Component<ITitleHeaderProps, ITitleHeaderState> 
     }
 
     private renderActiveTag = () => {
-        const { setActiveTag, activeTag } = this.props.tagStore
-
-        if (!activeTag) {
-            return (
-                <Link href={'/'} prefetch={false}>
-                    <a>home</a>
-                </Link>
-            )
-        }
-
-        return setActiveTag['match']({
-            pending: () => <FontAwesomeIcon width={13} icon={faSpinner} spin />,
-            rejected: () => (
-                <Link href={'/'}>
-                    <a>home</a>
-                </Link>
-            ),
-            resolved: (tagModel: TagModel) => (
-                <Link href={'/tag/[name]'} as={tagModel.url}>
-                    <a className={'flex items-center'}>
-                        {!tagModel.icon ? null : (
-                            <img
-                                className={'tag-icon pr2'}
-                                src={tagModel.icon}
-                                alt={`${tagModel.name} icon`}
-                            />
-                        )}
-
-                        <span>{tagModel.name}</span>
-                    </a>
-                </Link>
-            ),
-        })
+        return (
+            <Link href={'/'} prefetch={false}>
+                <a>home</a>
+            </Link>
+        )
     }
 
     private handleKeySearch = e => {
