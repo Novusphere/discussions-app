@@ -173,7 +173,10 @@ export class ReplyModel {
             content: this.content,
             sub: this.post.sub,
             chain: 'eos',
-            mentions: this.inlineMentionHashes,
+            mentions: [
+                ...this.inlineMentionHashes,
+                this.post.pub, // the person's pub you are replying to
+            ],
             tags: [this.post.sub],
             id: '',
             uuid: '',
