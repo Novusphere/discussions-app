@@ -98,6 +98,10 @@ class DiscussionApp extends App {
                                 },
                             ],
                         }}
+                        twitter={{
+                            site: '@thenovusphere',
+                            cardType: 'summary',
+                        }}
                     />
                     <Component {...pageProps} />
                 </MainLayout>
