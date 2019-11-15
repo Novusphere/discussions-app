@@ -7,6 +7,7 @@ import { withMobx } from 'next-mobx-wrapper'
 import { isServer } from '@utils'
 import { create } from 'mobx-persist'
 import { toast } from 'react-toastify'
+import { DefaultSeo } from 'next-seo'
 
 import '../styles/style.scss'
 
@@ -78,6 +79,26 @@ class DiscussionApp extends App {
         return (
             <Provider {...store}>
                 <MainLayout>
+                    <DefaultSeo
+                        openGraph={{
+                            type: 'website',
+                            locale: 'en_US',
+                            url: 'https://www.beta.discussions.app/',
+                            site_name: 'Discussions App',
+                            images: [
+                                {
+                                    url: store.tagStore.activeTag
+                                        ? store.tagStore.activeTag.icon
+                                        : 'https://cdn.novusphere.io/static/atmos.svg',
+                                    width: 800,
+                                    height: 600,
+                                    alt: store.tagStore.activeTag
+                                        ? store.tagStore.activeTag.name
+                                        : 'Discussions App',
+                                },
+                            ],
+                        }}
+                    />
                     <Component {...pageProps} />
                 </MainLayout>
             </Provider>

@@ -1,8 +1,8 @@
 import Router from 'next/router'
-import Identicon from 'identicon.js'
-import { Post, discussions, nsdb, Thread } from '@novuspherejs'
+import { Post, discussions } from '@novuspherejs'
 import { IPost } from '@stores/posts'
 import _ from 'lodash'
+const removeMd = require('remove-markdown')
 
 const pjson = require('../package.json')
 const uuid = require('uuidv4')
@@ -13,6 +13,10 @@ export const isDev = process.env.NODE_ENV === 'development'
 export const isServer = typeof window === 'undefined'
 export const sleep = milliseconds => {
     return new Promise(resolve => setTimeout(resolve, milliseconds))
+}
+
+export const removeMD = (md: string) => {
+    return removeMd(md)
 }
 
 export const getBaseUrl = () => {

@@ -5,7 +5,7 @@ import { ShowFullThread } from '@components'
 import { NextRouter } from 'next/router'
 import { Thread } from '@novuspherejs'
 import { NextSeo } from 'next-seo'
-import { getThreadUrl } from '@utils'
+import { getThreadUrl, removeMD } from '@utils'
 import Head from 'next/head'
 
 interface IEPageProps {
@@ -33,7 +33,7 @@ class E extends React.Component<IEPageProps, IEPageState> {
     static async getInitialProps({ query, store, req }) {
         const postsStore: IStores['postsStore'] = store.postsStore
         const thread = await postsStore.getAndSetThread(query.id, !!req)
-        
+
         return {
             query,
             thread,
@@ -47,7 +47,11 @@ class E extends React.Component<IEPageProps, IEPageState> {
     }
 
     public render(): React.ReactNode {
-        const { thread, query } = this.props
+        const {
+            thread,
+            query,
+            tagStore: { activeTag },
+        } = this.props
 
         if (!thread) {
             return <span>Couldn't find this thread: {query.id}</span>
@@ -58,15 +62,27 @@ class E extends React.Component<IEPageProps, IEPageState> {
         return (
             <>
                 <Head>
-                    <title>{thread.openingPost.title} | {thread.openingPost.sub}</title>
+                    <title>
+                        {thread.openingPost.title} | {thread.openingPost.sub}
+                    </title>
                 </Head>
                 <NextSeo
                     title={thread.openingPost.title}
-                    description={`Posted in #${thread.openingPost.sub} by ${poster}`}
+                    description={removeMD(thread.openingPost.content)}
                     openGraph={{
                         title: thread.openingPost.title,
-                        description: `Posted in #${thread.openingPost.sub} by ${poster}`,
+                        description: removeMD(thread.openingPost.content),
                         site_name: 'Discussions App',
+                        images: [
+                            {
+                                url: activeTag
+                                    ? activeTag.icon
+                                    : 'https://cdn.novusphere.io/static/atmos.svg',
+                                width: 800,
+                                height: 600,
+                                alt: activeTag ? activeTag.name : 'Discussions App',
+                            },
+                        ],
                     }}
                 />
                 <ShowFullThread thread={thread} />
