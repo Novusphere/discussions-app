@@ -8,6 +8,9 @@ import { TagPreview } from '@components'
 import { IStores } from '@stores'
 
 import './style.scss'
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
+import { faPlus, faSearch } from '@fortawesome/free-solid-svg-icons'
+import { TagModel } from '@models/tagModel'
 
 interface ITagListOuterProps {
     className: string
@@ -21,6 +24,7 @@ interface ITagListInnerProps {
 
 interface ITagListState {
     isScrolling: boolean
+    tag: string
 }
 
 @(withRouter as any)
@@ -32,6 +36,7 @@ class Sidebar extends React.Component<ITagListOuterProps & ITagListInnerProps, I
 
     state = {
         isScrolling: false,
+        tag: '',
     }
 
     private createPost = () => {
@@ -49,17 +54,33 @@ class Sidebar extends React.Component<ITagListOuterProps & ITagListInnerProps, I
         return router.push('/new')
     }
 
+    private enterKeyEventListener = (e: KeyboardEvent) => {
+        const key = e.code
+
+        if (key.match(/NumpadEnter|Enter/)) {
+            e.preventDefault()
+
+            this.props.tagStore.addTag(this.state.tag)
+            // this.setState({
+            //     tag: '',
+            // })
+        }
+    }
 
     componentDidMount(): void {
         if (this.sidebarContainer) {
             this.sidebarContainer.current.addEventListener('scroll', this.handleScroll, true)
         }
+
+        window.addEventListener('keypress', this.enterKeyEventListener)
     }
 
     componentWillUnmount(): void {
         if (this.sidebarContainer) {
             this.sidebarContainer.current.removeEventListener('scroll', this.handleScroll, true)
         }
+
+        window.removeEventListener('keypress', this.enterKeyEventListener)
     }
 
     private handleScroll = () => {
@@ -86,7 +107,7 @@ class Sidebar extends React.Component<ITagListOuterProps & ITagListInnerProps, I
         const { activeTag, toggleTagSubscribe, subSubscriptionStatus } = this.props.tagStore
 
         if (activeTag) {
-            const isSubbed = subSubscriptionStatus.get(activeTag.name)
+            const isSubbed = subSubscriptionStatus.indexOf(activeTag.name) !== -1
             return (
                 <div className={'pa4 bg-white shadow'}>
                     <span className={'flex flex-row items-center'}>
@@ -152,11 +173,23 @@ class Sidebar extends React.Component<ITagListOuterProps & ITagListInnerProps, I
         )
     }
 
+    private handleAddTagChange = e => {
+        this.setState({
+            tag: e.target.value,
+        })
+    }
+
     render() {
         const {
             className,
             router,
-            tagStore: { tags, subSubscriptionStatus, toggleTagSubscribe },
+            tagStore: {
+                tags,
+                addTag,
+                subscribedSubsAsModels,
+                subSubscriptionStatus,
+                toggleTagSubscribe,
+            },
         } = this.props
 
         return (
@@ -179,10 +212,24 @@ class Sidebar extends React.Component<ITagListOuterProps & ITagListInnerProps, I
                                 {this.renderTopLevelTags(tag)}
                             </li>
                         ))}
-                    <div className={'divider-line mb2'} />
-                    {Array.from(tags.values())
+                    {/*<div className={'divider-line mb2'} />*/}
+                    <div className={'field-container mb2 relative flex-auto flex items-center'}>
+                        <input
+                            value={this.state.tag}
+                            onChange={this.handleAddTagChange}
+                            className={'w-100 tag-search pl4 f6'}
+                            placeholder={'Add a tag to subscribe'}
+                        />
+                        <span
+                            onClick={() => addTag(this.state.tag)}
+                            className={'absolute plus-icon ml2 pl1 dim pointer'}
+                        >
+                            <FontAwesomeIcon width={13} icon={faPlus} title={'Click to add tag'} />
+                        </span>
+                    </div>
+                    {subscribedSubsAsModels
                         .filter(tag => !tag.root)
-                        .map(tag => (
+                        .map((tag, index) => (
                             <li
                                 key={tag.id}
                                 className={classNames([
@@ -200,7 +247,9 @@ class Sidebar extends React.Component<ITagListOuterProps & ITagListInnerProps, I
                                     html={
                                         <TagPreview
                                             tag={tag}
-                                            isSubscribed={subSubscriptionStatus.get(tag.name)}
+                                            isSubscribed={
+                                                subSubscriptionStatus.indexOf(tag.name) !== -1
+                                            }
                                             toggleSubscribe={toggleTagSubscribe}
                                         />
                                     }
@@ -212,20 +261,12 @@ class Sidebar extends React.Component<ITagListOuterProps & ITagListInnerProps, I
                                     duration={0}
                                     animation={'fade'}
                                     className={'interactive-hover'}
-                                    distance={250}
+                                    distance={350}
                                     trigger={'mouseenter focus'}
                                 >
                                     <Link href={`/tag/[name]`} as={`/tag/${tag.name}`}>
                                         <a className={'flex items-center pb1 pointer'}>
-                                            <img
-                                                className={'tag-icon pr2'}
-                                                src={tag.icon}
-                                                alt={`${tag.name} icon`}
-                                            />
-                                            <span className={'db black no-underline'}>
-                                                {'#'}
-                                                {tag.name}
-                                            </span>
+                                            {this.renderTagLi(tag)}
                                         </a>
                                     </Link>
                                 </Tooltip>
@@ -233,6 +274,18 @@ class Sidebar extends React.Component<ITagListOuterProps & ITagListInnerProps, I
                         ))}
                 </ul>
             </div>
+        )
+    }
+
+    private renderTagLi = (tag: any) => {
+        return (
+            <>
+                <img className={'tag-icon pr2'} src={tag.icon} alt={`${tag.name} icon`} />
+                <span className={'db black no-underline'}>
+                    {'#'}
+                    {tag.name}
+                </span>
+            </>
         )
     }
 }

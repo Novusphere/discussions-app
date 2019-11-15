@@ -4,15 +4,18 @@ import { BaseStore, getOrCreateStore } from 'next-mobx-wrapper'
 import { task } from 'mobx-task'
 import { persist } from 'mobx-persist'
 import { defaultSubs } from '@utils'
+import { getUiStore, IStores } from '@stores/index'
 
 export default class Tag extends BaseStore {
     // the amount of subs that are base
     static baseSubLength = 3
 
+    private readonly uiStore: IStores['uiStore'] = getUiStore()
+
     @observable activeTag: TagModel = null
     @observable tags = observable.map<string, TagModel>()
 
-    @persist('map') @observable subSubscriptionStatus = observable.map<string, boolean>()
+    @persist('list') @observable subSubscriptionStatus: string[] = []
 
     constructor() {
         super()
@@ -39,7 +42,7 @@ export default class Tag extends BaseStore {
     @action.bound
     async subscribeToDefaultSubs() {
         this.tags.forEach((tagStatus, tagName) => {
-            this.subSubscriptionStatus.set(tagName, true)
+            this.subSubscriptionStatus.push(tagName)
         })
 
         return Promise.resolve(true)
@@ -58,9 +61,43 @@ export default class Tag extends BaseStore {
     }
 
     @action.bound
+    private getGenericTag(subName: string) {
+        return new TagModel({
+            name: subName,
+            logo: 'https://cdn.novusphere.io/static/atmos.svg',
+            url: `/tag/${subName}`,
+        })
+    }
+
+    @computed get subscribedSubsAsModels() {
+        const subs = []
+
+        this.subSubscriptionStatus.forEach(subName => {
+            if (this.tags.has(subName)) {
+                subs.push(this.tags.get(subName))
+            } else {
+                const model = this.getGenericTag(subName)
+                subs.push(model)
+            }
+        })
+
+        return subs
+    }
+
+    @action.bound
+    addTag(tagName: string) {
+        if (this.subSubscriptionStatus.indexOf(tagName) === -1) {
+            this.subSubscriptionStatus.unshift(tagName)
+            this.uiStore.showToast(`You have subbed to ${tagName}`, 'success')
+        }
+    }
+
+    @action.bound
     public toggleTagSubscribe(tag: string) {
-        if (this.subSubscriptionStatus.has(tag)) {
-            this.subSubscriptionStatus.set(tag, !this.subSubscriptionStatus.get(tag))
+        if (this.subSubscriptionStatus.indexOf(tag) !== -1) {
+            this.subSubscriptionStatus.splice(this.subSubscriptionStatus.indexOf(tag), 1)
+        } else {
+            this.subSubscriptionStatus.unshift(tag)
         }
     }
 
@@ -71,18 +108,22 @@ export default class Tag extends BaseStore {
 
     @task
     public setActiveTag(tagName: string): TagModel {
-        if (defaultSubs.some(defaultSub => defaultSub.name === tagName)) {
-            let tagModel
+        if (!this.tags.has(tagName)) {
+            this.activeTag = this.getGenericTag(tagName)
+        } else {
+            if (defaultSubs.some(defaultSub => defaultSub.name === tagName)) {
+                let tagModel
 
-            if (!this.tags.get(tagName)) {
-                tagModel = new TagModel(tagName)
-                this.tags.set(tagName, tagModel)
-            } else {
-                tagModel = this.tags.get(tagName)
+                if (!this.tags.get(tagName)) {
+                    tagModel = new TagModel(tagName)
+                    this.tags.set(tagName, tagModel)
+                } else {
+                    tagModel = this.tags.get(tagName)
+                }
+
+                this.activeTag = tagModel
+                return tagModel
             }
-
-            this.activeTag = tagModel
-            return tagModel
         }
 
         return null
