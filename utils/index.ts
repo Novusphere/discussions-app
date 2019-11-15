@@ -124,7 +124,7 @@ export const defaultSubs = [
     {
         name: 'anon-pol-econ',
         url: '/tag/anon-pol-econ',
-        logo: 'https://cdn.novusphere.io/static/atmos.svg',
+        logo: 'https://cdn.novusphere.io/static/atmos2.png',
     },
     {
         name: 'anon-r-eos',
@@ -286,7 +286,7 @@ export const defaultSubs = [
     {
         name: 'faq',
         url: '/tag/faq',
-        logo: 'https://cdn.novusphere.io/static/atmos.svg',
+        logo: 'https://cdn.novusphere.io/static/atmos2.png',
     },
     {
         name: 'franceos',
@@ -296,7 +296,7 @@ export const defaultSubs = [
     {
         name: 'general',
         url: '/tag/general',
-        logo: 'https://cdn.novusphere.io/static/atmos.svg',
+        logo: 'https://cdn.novusphere.io/static/atmos2.png',
     },
     {
         name: 'genereos',
@@ -357,7 +357,7 @@ export const defaultSubs = [
     {
         name: 'novusphere',
         url: '/tag/novusphere',
-        logo: 'https://cdn.novusphere.io/static/atmos.svg',
+        logo: 'https://cdn.novusphere.io/static/atmos2.png',
     },
     {
         name: 'onessus',
@@ -372,7 +372,7 @@ export const defaultSubs = [
     {
         name: 'patreos',
         url: '/tag/patreos',
-        logo: 'https://cdn.novusphere.io/static/atmos.svg',
+        logo: 'https://cdn.novusphere.io/static/atmos2.png',
     },
     {
         name: 'peosone',
@@ -453,7 +453,7 @@ export const defaultSubs = [
     {
         name: 'test',
         url: '/tag/test',
-        logo: 'https://cdn.novusphere.io/static/atmos.svg',
+        logo: 'https://cdn.novusphere.io/static/atmos2.png',
     },
     {
         name: 'travel',

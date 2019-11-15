@@ -89,9 +89,9 @@ class DiscussionApp extends App {
                                 {
                                     url: store.tagStore.activeTag
                                         ? store.tagStore.activeTag.icon
-                                        : 'https://cdn.novusphere.io/static/atmos.svg',
-                                    width: 800,
-                                    height: 600,
+                                        : 'https://cdn.novusphere.io/static/atmos2.png',
+                                    width: 250,
+                                    height: 250,
                                     alt: store.tagStore.activeTag
                                         ? store.tagStore.activeTag.name
                                         : 'Discussions App',
