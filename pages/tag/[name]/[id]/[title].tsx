@@ -71,7 +71,9 @@ class E extends React.Component<IEPageProps, IEPageState> {
                     description={removeMD(thread.openingPost.content)}
                     openGraph={{
                         title: thread.openingPost.title,
-                        description: removeMD(thread.openingPost.content),
+                        description: _.truncate(removeMD(thread.openingPost.content), {
+                            length: 200,
+                        }),
                         site_name: 'Discussions App',
                         images: [
                             {
