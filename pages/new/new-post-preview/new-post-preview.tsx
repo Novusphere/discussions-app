@@ -57,6 +57,7 @@ class NewPostPreview extends React.Component<IPostPreviewProps> {
                 </span>
                 <div className={'mt3'}>
                     <OpeningPost
+                        activeTag={null}
                         isPreview
                         activeThread={null}
                         openingPost={new PostModel(post as any)}
