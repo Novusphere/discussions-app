@@ -5,8 +5,9 @@ import { ShowFullThread } from '@components'
 import { NextRouter } from 'next/router'
 import { Thread } from '@novuspherejs'
 import { NextSeo } from 'next-seo'
-import { getThreadUrl, removeMD } from '@utils'
+import { removeMD } from '@utils'
 import Head from 'next/head'
+import _ from 'lodash'
 
 interface IEPageProps {
     postsStore: IStores['postsStore']
