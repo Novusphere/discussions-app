@@ -9,7 +9,6 @@ import { NextRouter, withRouter } from 'next/router'
 import { Thread as NSThread } from '@novuspherejs'
 import { observable } from 'mobx'
 import { ReplyModel } from '@models/replyModel'
-import { sleep } from '@utils'
 
 interface IThreadOuterProps {
     thread: NSThread
@@ -17,13 +16,14 @@ interface IThreadOuterProps {
 
 interface IThreadInnerProps {
     postsStore: IStores['postsStore']
+    tagStore: IStores['tagStore']
     router: NextRouter
 }
 
 interface IThreadState {}
 
 @(withRouter as any)
-@inject('postsStore')
+@inject('postsStore', 'tagStore')
 @observer
 class Thread extends React.Component<IThreadOuterProps & IThreadInnerProps, IThreadState> {
     @observable threadAsModel: ThreadModel = null
@@ -62,6 +62,7 @@ class Thread extends React.Component<IThreadOuterProps & IThreadInnerProps, IThr
         const {
             router,
             thread: { openingPost },
+            tagStore: { activeTag }
         } = this.props
 
         const { threadAsModel } = this
@@ -71,6 +72,7 @@ class Thread extends React.Component<IThreadOuterProps & IThreadInnerProps, IThr
                 openingPost={openingPost as any}
                 asPath={router.asPath}
                 activeThread={threadAsModel}
+                activeTag={activeTag}
                 canEditPost={threadAsModel.canEditPost}
             />
         )

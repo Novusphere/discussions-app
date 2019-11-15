@@ -1,11 +1,11 @@
 import * as React from 'react'
 
 import './style.scss'
-import { getPermaLink, openInNewTab } from '@utils'
+import { openInNewTab } from '@utils'
 import Link from 'next/link'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import {
-    faArrowLeft,
+    faChevronLeft,
     faExclamationTriangle,
     faEye,
     faLink,
@@ -19,12 +19,14 @@ import PostModel from '@models/postModel'
 import { ThreadModel } from '@models/threadModel'
 import { observer } from 'mobx-react'
 import copy from 'clipboard-copy'
+import { TagModel } from '@models/tagModel'
 
 interface IOpeningPostProps {
     isPreview?: boolean
     canEditPost?: boolean
     openingPost: PostModel
     asPath: string
+    activeTag: TagModel
     activeThread: ThreadModel
 }
 
@@ -34,17 +36,24 @@ const OpeningPost: React.FC<IOpeningPostProps> = ({
     openingPost,
     activeThread,
     asPath,
+    activeTag,
 }) => (
-    <div
-        data-post-uuid={openingPost.uuid}
-        //{...(asPath && { 'data-permalink': getPermaLink(asPath, openingPost.uuid) })}
-    >
+    <div data-post-uuid={openingPost.uuid}>
         {typeof isPreview === 'undefined' && (
             <div className={'pb2'}>
                 <Link href={`/tag/[name]`} as={`/tag/${openingPost.sub}`}>
                     <a>
-                        <button className={'tl'} title={`Show all posts in ${openingPost.sub}`}>
-                            <FontAwesomeIcon width={13} icon={faArrowLeft} className={'pr1'} />
+                        <button
+                            className={'tl flex items-center'}
+                            title={`Show all posts in ${openingPost.sub}`}
+                        >
+                            <FontAwesomeIcon width={13} icon={faChevronLeft} className={'pr1'} />
+                            <img
+                                width={20}
+                                height={20}
+                                src={activeTag.icon}
+                                className={'activeTag-image'}
+                            />
                             {`#${openingPost.sub}`}
                         </button>
                     </a>
@@ -82,9 +91,10 @@ const OpeningPost: React.FC<IOpeningPostProps> = ({
                 </div>
 
                 <div className={'flex justify-between items-center pb1'}>
-                    {!activeThread || !activeThread.editing && (
-                        <span className={'black f4 b'}>{openingPost.title}</span>
-                    )}
+                    {!activeThread ||
+                        (!activeThread.editing && (
+                            <span className={'black f4 b'}>{openingPost.title}</span>
+                        ))}
                     {activeThread && activeThread.openingPost && !activeThread.editing && (
                         <Votes
                             uuid={activeThread.openingPost.uuid}
