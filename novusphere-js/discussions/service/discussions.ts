@@ -7,8 +7,8 @@ const bip39 = require('bip39')
 import * as bip32 from 'bip32'
 import ecc from 'eosjs-ecc'
 import axios from 'axios'
-import { INSDBSearchQuery } from '@novuspherejs/nsdb'
-import { isDev } from '@utils'
+import { INSDBSearchQuery } from '../../nsdb';
+//import { isDev } from '@utils'
 
 export interface IBrainKeyPair {
     priv: string
@@ -289,6 +289,32 @@ export default class DiscussionsService {
         }
     }
 
+    async getThreadReplyCount(_id: string): Promise<number> {
+        let dId = Post.decodeId(_id)
+        const isServer = false; // ?
+        const searchQuery = {
+            pipeline: [
+                {
+                    $match: {
+                        createdAt: {
+                            $gte: dId.timeGte,// + (!isDev && isServer ? 18000000 : 0),
+                            $lte: dId.timeLte,// + (!isDev && isServer ? 18000000 : 0),
+                        },
+                        transaction: { $regex: `^${dId.txid32}` },
+                    },
+                },
+            ],
+        }
+
+        let sq = await nsdb.search(searchQuery)
+
+        if (sq.payload.length == 0) return 0
+
+        let op = Post.fromDbObject(sq.payload[0])
+
+        return op.totalReplies;
+    }
+
     async getThread(_id: string, isServer = false): Promise<Thread | null> {
         let dId = Post.decodeId(_id)
 
@@ -297,8 +323,8 @@ export default class DiscussionsService {
                 {
                     $match: {
                         createdAt: {
-                            $gte: dId.timeGte + (!isDev && isServer ? 18000000 : 0),
-                            $lte: dId.timeLte + (!isDev && isServer ? 18000000 : 0),
+                            $gte: dId.timeGte,// + (!isDev && isServer ? 18000000 : 0),
+                            $lte: dId.timeLte,// + (!isDev && isServer ? 18000000 : 0),
                         },
                         transaction: { $regex: `^${dId.txid32}` },
                     },
