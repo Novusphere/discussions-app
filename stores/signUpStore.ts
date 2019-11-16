@@ -9,7 +9,7 @@ export default class SignUpStore extends BaseStore {
     // signup object
     @observable signUpObject = {
         brianKey: '',
-        username: '',
+        displayName: '',
         password: '',
         passwordVerify: '',
 
@@ -46,7 +46,7 @@ export default class SignUpStore extends BaseStore {
                     const { displayName, password } = form.values()
 
                     if (!form.hasError) {
-                        this.signUpObject.username = displayName
+                        this.signUpObject.displayName = displayName
                         this.signUpObject.password = password
                     }
                 },
@@ -56,7 +56,7 @@ export default class SignUpStore extends BaseStore {
                     name: 'displayName',
                     label: 'Display Name',
                     type: 'text',
-                    value: this.signUpObject.username,
+                    value: this.signUpObject.displayName,
                     placeholder: 'Your display name',
                     rules: 'required|string|between:3,25',
                 },
@@ -112,11 +112,13 @@ export default class SignUpStore extends BaseStore {
         if (!form.hasError) {
             this.signUpObject.brianKeyVerify = bkVerify
 
-            const { password, brianKey, username, brianKeyVerify } = this.signUpObject
+            const { password, brianKey, displayName, brianKeyVerify } = this.signUpObject
+            
+            console.log('Class: SignUpStore, Function: onSubmitVerifyBkForm, Line 117 JSON.stringify(this.signUpObject): ', JSON.stringify(this.signUpObject));
 
             if (brianKey === brianKeyVerify) {
-                await this.authStore.signUpWithBK(brianKeyVerify, username, password)
-                await this.authStore.loginWithBK(brianKeyVerify, username, password, {
+                await this.authStore.signUpWithBK(brianKeyVerify, displayName, password)
+                await this.authStore.loginWithBK(brianKeyVerify, displayName, password, {
                     hideSuccessModal: true,
                 })
             } else {

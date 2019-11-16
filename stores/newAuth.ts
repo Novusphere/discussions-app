@@ -152,11 +152,11 @@ export default class NewAuth extends BaseStore {
     @action.bound
     async signUpWithBK(
         brianKeyVerify,
-        username,
+        displayName,
         password
     ): Promise<{ json: string; transaction: string }> {
         try {
-            const auth = await this.parseAndReturnsAuthInfo(brianKeyVerify, username, password)
+            const auth = await this.parseAndReturnsAuthInfo(brianKeyVerify, displayName, password)
             this.uiStore.hideModal()
             this.uiStore.showToast('You have successfully signed up!', 'success')
             this.hasAccount = true
@@ -431,17 +431,9 @@ export default class NewAuth extends BaseStore {
     }
 
     @task.resolved
-    private async parseAndReturnsAuthInfo(brianKeyVerify, username, password) {
+    private async parseAndReturnsAuthInfo(brianKeyVerify, displayName, password) {
         try {
-            console.log('signing up with BK started')
-            const json = await bkToStatusJson(brianKeyVerify, username, password, null)
-            // this.statusJson.bk = JSON.parse(json)
-            // this.displayName.bk = this.signUpStore.signUpObject.username
-            // const transact = await discussions.bkUpdateStatusEOS(json)
-            // await this.storeKeys(this.signUpStore.signUpObject.brianKeyVerify)
-            // console.log('signing up with BK ended')
-            // return transact
-
+            const json = await bkToStatusJson(brianKeyVerify, displayName, password, null)
             const transaction = await discussions.bkUpdateStatusEOS(json)
             await this.storeKeys(brianKeyVerify)
 
