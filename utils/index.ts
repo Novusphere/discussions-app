@@ -483,3 +483,16 @@ export const defaultSubs = [
         logo: 'https://miro.medium.com/max/2400/1*8LqCOymuRAzLp4SFhj-T_Q.png',
     },
 ]
+
+export const bkToStatusJson = async (
+    bk: string,
+    username: string,
+    password: string,
+    status: any
+): Promise<string> => {
+    try {
+        return await discussions.bkToStatusJson(bk, username, password, status)
+    } catch (error) {
+        return error
+    }
+}

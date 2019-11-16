@@ -6,6 +6,7 @@ declare interface Form$ {
     set: (...args: any) => void
     $extra?: any
     value?: any
+    validate?: any
 
     update(value: any): void
 }
@@ -68,7 +69,8 @@ declare interface FormField {
     validating?: boolean
     submitting?: boolean
     value?: string | { value: string; className?: string }[]
-    onChange?: (value: string) => void
+    onComplete?: (form: any) => void
+    onBlur?: (e: any, form: any) => void
 
     options?: {
         validateOnChange?: boolean

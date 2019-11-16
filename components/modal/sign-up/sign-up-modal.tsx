@@ -6,44 +6,16 @@ import { faSpinner } from '@fortawesome/free-solid-svg-icons'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 
 interface ISignInModalProps {
-    newAuthStore: IStores['newAuthStore']
     uiStore: IStores['uiStore']
+    signUpStore: IStores['signUpStore']
 }
-interface ISignInModalState {
-    currentStep: number
-}
+interface ISignInModalState {}
 
-@inject('newAuthStore', 'uiStore')
+@inject('signUpStore', 'uiStore')
 @observer
 class SignUpModal extends React.Component<ISignInModalProps, ISignInModalState> {
-    state = {
-        currentStep: 1,
-    }
-
-    public goNext = () => {
-        this.setState(prevState => ({
-            currentStep: prevState.currentStep + 1,
-        }))
-    }
-
-    public goBack = () => {
-        this.setState(prevState => ({
-            currentStep: prevState.currentStep - 1,
-        }))
-    }
-
-    componentDidMount(): void {
-        // this.setStep(1)
-    }
-
-    public setStep = step => {
-        this.setState({
-            currentStep: step,
-        })
-    }
-
     private renderNextButtons = ({ signUpForm, verifyBKForm }) => {
-        const { generateBrianKey } = this.props.newAuthStore
+        const { generateBrianKey, uiForm, goBack, goNext } = this.props.signUpStore
 
         const renderButton = (text: string, color: string, onClick, disabled = false) => {
             const loading = onClick && onClick['state'] && onClick['pending']
@@ -57,21 +29,16 @@ class SignUpModal extends React.Component<ISignInModalProps, ISignInModalState> 
                 </button>
             )
         }
-        switch (this.state.currentStep) {
+        switch (uiForm.currentStep) {
             case 1:
                 return (
                     <>
-                        {/*{showOtherSignInOption && (*/}
-                        {/*    <span className={'f6 b pointer dim'} onClick={this.loginWithOtherMethod}>*/}
-                        {/*        Log in with another method*/}
-                        {/*    </span>*/}
-                        {/*)}*/}
                         {renderButton(
                             'Next',
                             'bg-green',
                             e => {
                                 signUpForm.onSubmit(e)
-                                this.goNext()
+                                goNext()
                             },
                             signUpForm.form.hasError
                         )}
@@ -80,12 +47,12 @@ class SignUpModal extends React.Component<ISignInModalProps, ISignInModalState> 
             case 2:
                 return (
                     <>
-                        {renderButton('Previous', 'bg-blue', this.goBack)}
+                        {renderButton('Previous', 'bg-blue', goBack)}
                         {renderButton(
                             'Next',
                             'bg-green',
                             () => {
-                                this.goNext()
+                                goNext()
                             },
                             !generateBrianKey['result']
                         )}
@@ -94,7 +61,7 @@ class SignUpModal extends React.Component<ISignInModalProps, ISignInModalState> 
             case 3:
                 return (
                     <>
-                        {renderButton('Previous', 'bg-blue', this.goBack)}
+                        {renderButton('Previous', 'bg-blue', goBack)}
                         {renderButton(
                             'Finish',
                             'bg-red',
@@ -114,7 +81,7 @@ class SignUpModal extends React.Component<ISignInModalProps, ISignInModalState> 
         // const setAccountAndPasswordForm = setAccountAndPassword
         // const verifyBKFormForm = verifyBKForm
 
-        const { signUpForm, verifyBKForm, generateBrianKey } = this.props.newAuthStore
+        const { signUpForm, verifyBKForm, generateBrianKey, uiForm } = this.props.signUpStore
 
         const _signUpForm = signUpForm
         const _verifyBKForm = verifyBKForm
@@ -129,17 +96,17 @@ class SignUpModal extends React.Component<ISignInModalProps, ISignInModalState> 
                         <div className={'modal-body'}>
                             <ChooseAccountName
                                 form={_signUpForm}
-                                currentStep={this.state.currentStep}
+                                currentStep={uiForm.currentStep}
                                 onHeaderClick={() => null}
                             />
                             <GenerateKey
                                 generateBrianKey={generateBrianKey}
-                                currentStep={this.state.currentStep}
+                                currentStep={uiForm.currentStep}
                                 onHeaderClick={() => null}
                             />
                             <VerifyKey
                                 form={_verifyBKForm}
-                                currentStep={this.state.currentStep}
+                                currentStep={uiForm.currentStep}
                                 onHeaderClick={() => null}
                             />
                         </div>

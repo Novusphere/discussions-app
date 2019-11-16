@@ -6,6 +6,8 @@ import Settings, { getSettingsStore } from '@stores/settings'
 import NewAuth, { getNewAuthStore } from './newAuth'
 import Notifications, { getNotificationsStore } from '@stores/notifications'
 import SearchStore, { getSearchStore } from '@stores/searchStore'
+import SignUpStore, { getSignUpStore } from '@stores/signUpStore'
+import SignInStore, { getSignInStore } from '@stores/signInStore'
 
 export interface IStores {
     userStore: User
@@ -16,6 +18,8 @@ export interface IStores {
     settingsStore: Settings
     notificationsStore: Notifications
     searchStore: SearchStore
+    signUpStore: SignUpStore
+    signInStore: SignInStore
 }
 
 export {
@@ -27,4 +31,6 @@ export {
     getUserStore,
     getNotificationsStore,
     getSearchStore,
+    getSignUpStore,
+    getSignInStore,
 }

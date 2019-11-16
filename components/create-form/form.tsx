@@ -5,6 +5,7 @@ import Select from 'react-select'
 import { Editor } from '@components'
 import { faSpinner } from '@fortawesome/free-solid-svg-icons'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
+import _ from 'lodash'
 
 interface FormProps extends React.HTMLAttributes<HTMLFormElement> {
     form: IForm
@@ -162,6 +163,20 @@ class Form extends React.Component<FormProps> {
                                             cols="50"
                                             {...bind}
                                             className={'db f6 form-input'}
+                                            {...(field.onComplete && {
+                                                onBlur: () => {
+                                                    form.form
+                                                        .$(field.name)
+                                                        .validate()
+                                                        .then(() => {
+                                                            field.accessor.onBlur()
+                                                            field.onComplete(form.form)
+                                                        })
+                                                        .catch(error => {
+                                                            console.error(error)
+                                                        })
+                                                },
+                                            })}
                                         />
                                         <span className={'error f6 db pv2 tl'}>
                                             {field.accessor.error}
@@ -277,6 +292,20 @@ class Form extends React.Component<FormProps> {
                                             {...bind}
                                             className={'db f6 form-input'}
                                             {...field.bind}
+                                            {...(field.onComplete && {
+                                                onBlur: () => {
+                                                    form.form
+                                                        .$(field.name)
+                                                        .validate()
+                                                        .then(() => {
+                                                            field.accessor.onBlur()
+                                                            field.onComplete(form.form)
+                                                        })
+                                                        .catch(error => {
+                                                            console.error(error)
+                                                        })
+                                                },
+                                            })}
                                         />
                                         <span className={'error f6 db pv2 tl'}>
                                             {field.accessor.error}

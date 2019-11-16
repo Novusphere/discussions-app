@@ -6,7 +6,7 @@ import { CreateForm } from '@components'
 import { task } from 'mobx-task'
 import { discussions, eos, init } from '@novuspherejs'
 import { getUiStore, IStores } from '@stores/index'
-import { sleep } from '@utils'
+import { bkToStatusJson, sleep } from '@utils'
 
 export default class NewAuth extends BaseStore {
     @persist('object') @observable displayName = {
@@ -20,21 +20,13 @@ export default class NewAuth extends BaseStore {
 
     // private stuff
     @observable privateKey = ''
-    
+
     @persist('object') @observable statusJson = {
         bk: null,
         scatter: null,
     }
+
     @observable clickedSignInMethod = ''
-
-    // signup object
-    @observable signUpObject = {
-        brianKey: '',
-        username: '',
-        password: '',
-
-        brianKeyVerify: '',
-    }
 
     // login objects
     @observable signInObject = {
@@ -144,85 +136,6 @@ export default class NewAuth extends BaseStore {
         }
     }
 
-    /**
-     * Signup forms
-     */
-    get signUpForm() {
-        return new CreateForm(
-            {
-                onBlur: form => {
-                    console.log(form.values())
-                },
-                onSubmit: form => {
-                    const { displayName, password } = form.values()
-
-                    if (!form.hasError) {
-                        this.signUpObject.username = displayName
-                        this.signUpObject.password = password
-                    }
-                },
-            },
-            [
-                {
-                    name: 'displayName',
-                    label: 'Display Name',
-                    type: 'text',
-                    value: this.signUpObject.username,
-                    placeholder: 'Your display name',
-                    rules: 'required|string|between:3,25',
-                },
-                {
-                    name: 'password',
-                    label: 'Password',
-                    type: 'password',
-                    value: this.signUpObject.password,
-                    placeholder: 'Your password',
-                    rules: 'required|string|between:5,25',
-                },
-                {
-                    name: 'passwordConfirm',
-                    label: 'Password Confirmation',
-                    type: 'password',
-                    value: this.signUpObject.password,
-                    placeholder: 'Confirm Password',
-                    rules: 'required|string|same:password',
-                },
-            ]
-        )
-    }
-
-    get verifyBKForm() {
-        return new CreateForm(
-            {
-                onSubmit: form => {
-                    const { bkVerify } = form.values()
-
-                    if (!form.hasError) {
-                        this.signUpObject.brianKeyVerify = bkVerify
-                        this.signUpWithBK()
-                    }
-                },
-            },
-            [
-                {
-                    name: 'bkVerify',
-                    label: 'Verify your brain key',
-                    type: 'textarea',
-                    rules: 'required|string',
-                },
-            ]
-        )
-    }
-
-    @task.resolved
-    @action.bound
-    async generateBrianKey() {
-        const key = discussions.bkCreate()
-        console.log('Class: NewAuth, Function: generateBrianKey, Line 81 key: ', key)
-        this.signUpObject.brianKey = key
-        return key
-    }
-
     @task.resolved
     @action.bound
     async logOut() {
@@ -237,18 +150,17 @@ export default class NewAuth extends BaseStore {
 
     @task.resolved
     @action.bound
-    async signUpWithBK() {
+    async signUpWithBK(
+        brianKeyVerify,
+        username,
+        password
+    ): Promise<{ json: string; transaction: string }> {
         try {
-            if (this.signUpObject.brianKey === this.signUpObject.brianKeyVerify) {
-                await this.completeSignUpProcess()
-                this.uiStore.hideModal()
-                this.uiStore.showToast('You have successfully signed up!', 'success')
-            } else {
-                this.uiStore.showToast(
-                    'The key you entered does not match the one we generated. Please try again.',
-                    'error'
-                )
-            }
+            const auth = await this.parseAndReturnsAuthInfo(brianKeyVerify, username, password)
+            this.uiStore.hideModal()
+            this.uiStore.showToast('You have successfully signed up!', 'success')
+            this.hasAccount = true
+            return auth
         } catch (error) {
             this.uiStore.showToast(error.message, 'error')
             console.error(error)
@@ -370,7 +282,14 @@ export default class NewAuth extends BaseStore {
 
     @task.resolved
     @action.bound
-    async loginWithBK(bk: string, displayName: string, password: string) {
+    async loginWithBK(
+        bk: string,
+        displayName: string,
+        password: string,
+        opts?: {
+            hideSuccessModal: boolean
+        }
+    ) {
         try {
             // check if valid bk
             const bkIsValid = discussions.bkIsValid(bk)
@@ -380,7 +299,7 @@ export default class NewAuth extends BaseStore {
                 return
             }
 
-            const unparsedJSON = await this.bkToStatusJson(bk, displayName, password, null)
+            const unparsedJSON = await bkToStatusJson(bk, displayName, password, null)
 
             console.log(
                 'Class: NewAuth, Function: loginWithBK, Line 363 unparsedJSON: ',
@@ -395,6 +314,10 @@ export default class NewAuth extends BaseStore {
                 await this.storeKeys(bk)
 
                 this.completeSignInProcess()
+
+                if (!opts || !opts.hideSuccessModal) {
+                    this.uiStore.showToast('You have successfully signed in!', 'success')
+                }
             } else {
                 console.log('failed')
             }
@@ -412,7 +335,7 @@ export default class NewAuth extends BaseStore {
                 JSON.stringify(this.statusJson.bk),
                 password
             )
-            
+
             await this.loginWithBK(bk, this.statusJson.bk['displayName'], password)
         } catch (error) {
             this.uiStore.showToast(error.message, 'error')
@@ -496,7 +419,6 @@ export default class NewAuth extends BaseStore {
 
     @action.bound
     private completeSignInProcess() {
-        this.uiStore.showToast('You have successfully signed in!', 'success')
         this.hasAccount = true
 
         if (this.signInObject.ref) {
@@ -509,22 +431,24 @@ export default class NewAuth extends BaseStore {
     }
 
     @task.resolved
-    private async completeSignUpProcess() {
+    private async parseAndReturnsAuthInfo(brianKeyVerify, username, password) {
         try {
             console.log('signing up with BK started')
-            const json = await this.bkToStatusJson(
-                this.signUpObject.brianKeyVerify,
-                this.signUpObject.username,
-                this.signUpObject.password,
-                null
-            )
+            const json = await bkToStatusJson(brianKeyVerify, username, password, null)
+            // this.statusJson.bk = JSON.parse(json)
+            // this.displayName.bk = this.signUpStore.signUpObject.username
+            // const transact = await discussions.bkUpdateStatusEOS(json)
+            // await this.storeKeys(this.signUpStore.signUpObject.brianKeyVerify)
+            // console.log('signing up with BK ended')
+            // return transact
 
-            this.statusJson.bk = JSON.parse(json)
-            this.displayName.bk = this.signUpObject.username
-            const transact = await discussions.bkUpdateStatusEOS(json)
-            await this.storeKeys(this.signUpObject.brianKeyVerify)
-            console.log('signing up with BK ended')
-            return transact
+            const transaction = await discussions.bkUpdateStatusEOS(json)
+            await this.storeKeys(brianKeyVerify)
+
+            return {
+                json,
+                transaction,
+            }
         } catch (error) {}
     }
 
@@ -533,29 +457,14 @@ export default class NewAuth extends BaseStore {
     private async storeKeys(bk: string) {
         try {
             const keys = await discussions.bkToKeys(bk)
-            
+
             this.postPriv = keys.post.priv
             this.tipPub = keys.tip.pub
-            
+
             return keys
         } catch (error) {
             console.log(error)
             throw error
-        }
-    }
-
-    @task.resolved
-    @action.bound
-    private async bkToStatusJson(
-        bk: string,
-        username: string,
-        password: string,
-        status: any
-    ): Promise<string> {
-        try {
-            return await discussions.bkToStatusJson(bk, username, password, status)
-        } catch (error) {
-            return error
         }
     }
 }
