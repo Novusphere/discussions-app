@@ -4,15 +4,14 @@ import { action, observable } from 'mobx'
 import { task } from 'mobx-task'
 import { discussions } from '@novuspherejs'
 import { getNewAuthStore, getUiStore, IStores } from '@stores/index'
-import user from '@stores/user'
 
 export default class SignUpStore extends BaseStore {
     // signup object
     @observable signUpObject = {
         brianKey: '',
-        username: '125123',
-        password: '125123',
-        passwordVerify: '12512',
+        username: '',
+        password: '',
+        passwordVerify: '',
 
         brianKeyVerify: '',
     }
