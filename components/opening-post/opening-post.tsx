@@ -48,12 +48,12 @@ const OpeningPost: React.FC<IOpeningPostProps> = ({
                             title={`Show all posts in ${openingPost.sub}`}
                         >
                             <FontAwesomeIcon width={13} icon={faChevronLeft} className={'pr1'} />
-                            <img
+                            {activeTag && <img
                                 width={20}
                                 height={20}
                                 src={activeTag.icon}
                                 className={'activeTag-image'}
-                            />
+                            />}
                             {`#${openingPost.sub}`}
                         </button>
                     </a>

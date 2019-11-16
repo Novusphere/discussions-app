@@ -60,6 +60,8 @@ export default class Tag extends BaseStore {
     @computed get subscribedSubsAsModels() {
         const subs = []
 
+        if (!this.tags) { return [] }
+
         this.subSubscriptionStatus.forEach(subName => {
             if (this.tags.has(subName)) {
                 subs.push(this.tags.get(subName))
