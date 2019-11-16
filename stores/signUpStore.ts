@@ -42,14 +42,7 @@ export default class SignUpStore extends BaseStore {
     get signUpForm() {
         return new CreateForm(
             {
-                onSubmit: form => {
-                    const { displayName, password } = form.values()
-
-                    if (!form.hasError) {
-                        this.signUpObject.displayName = displayName
-                        this.signUpObject.password = password
-                    }
-                },
+                onSubmit: this.signUpFormOnSubmit,
             },
             [
                 {
@@ -76,6 +69,7 @@ export default class SignUpStore extends BaseStore {
                     placeholder: 'Confirm Password',
                     onComplete: form => {
                         if (!form.hasError) {
+                            this.signUpFormOnSubmit(form)
                             this.goNext()
                         }
                     },
@@ -104,6 +98,15 @@ export default class SignUpStore extends BaseStore {
         )
     }
 
+    private signUpFormOnSubmit = form => {
+        const { displayName, password } = form.values()
+
+        if (!form.hasError) {
+            this.signUpObject.displayName = displayName
+            this.signUpObject.password = password
+        }
+    }
+
     @task.resolved
     @action.bound
     private async onSubmitVerifyBkForm(form) {
@@ -113,8 +116,6 @@ export default class SignUpStore extends BaseStore {
             this.signUpObject.brianKeyVerify = bkVerify
 
             const { password, brianKey, displayName, brianKeyVerify } = this.signUpObject
-            
-            console.log('Class: SignUpStore, Function: onSubmitVerifyBkForm, Line 117 JSON.stringify(this.signUpObject): ', JSON.stringify(this.signUpObject));
 
             if (brianKey === brianKeyVerify) {
                 await this.authStore.signUpWithBK(brianKeyVerify, displayName, password)
