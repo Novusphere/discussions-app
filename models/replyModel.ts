@@ -118,8 +118,11 @@ export class ReplyModel {
                 const model = new PostModel(reply as any)
                 const signedReply = model.sign(this.newAuthStore.postPriv)
                 const confirmedReply = await discussions.post(signedReply as any)
-
+                
                 this.post.content = confirmedReply.content
+                this.post.pub = confirmedReply.pub
+                this.post.createdAt = confirmedReply.createdAt
+                this.post.transaction = confirmedReply.transaction
                 this.post.edit = true
 
                 this.uiStore.showToast('Your post has been edited!', 'success')

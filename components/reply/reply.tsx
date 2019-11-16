@@ -214,7 +214,7 @@ class Reply extends React.Component<IReplies, IRepliesState> {
                                 style={{
                                     visibility: isCollapsed ? 'hidden' : 'visible',
                                 }}
-                                className={'flex justify-between items-center mr2'}
+                                className={'flex flex-column justify-start items-center mr2'}
                             >
                                 <Votes
                                     upVotes={post.upvotes}

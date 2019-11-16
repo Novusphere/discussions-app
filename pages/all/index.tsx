@@ -3,6 +3,7 @@ import { IStores } from '@stores'
 import { Post } from '@novuspherejs'
 import { inject, observer } from 'mobx-react'
 import { InfiniteScrollFeed } from '@components'
+import { sleep } from '@utils'
 
 interface IAllProps {
     postsStore: IStores['postsStore']
@@ -29,8 +30,9 @@ class All extends React.Component<IAllProps, IAllState> {
         return {}
     }
 
-    componentDidMount(): void {
-        this.props.postsStore.getPostsForSubs(['all'])
+    async componentDidMount(): Promise<void> {
+        await sleep(500)
+        await this.props.postsStore.getPostsForSubs(['all'])
     }
 
     public render() {

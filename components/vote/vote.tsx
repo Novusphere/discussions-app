@@ -24,6 +24,7 @@ const Vote: React.FC<IVoteProps> = ({ uuid, upVotes, downVotes, myVote, handler,
             <FontAwesomeIcon
                 width={13}
                 icon={faArrowUp}
+                color={'#b9b9b9'}
                 className={classNames([
                     'pointer disable-user-select',
                     {
@@ -33,10 +34,11 @@ const Vote: React.FC<IVoteProps> = ({ uuid, upVotes, downVotes, myVote, handler,
                 ])}
             />
         </span>
-        <span className={classNames(['f6 b disable-user-select ph1'])}>{upVotes + downVotes}</span>
+        <span className={classNames(['f6 disable-user-select ph1'])} style={{ color: '#b9b9b9', whiteSpace: 'pre' }}>{upVotes + downVotes}</span>
         <span onClick={async () => await handler(uuid, -1)}>
             <FontAwesomeIcon
                 width={13}
+                color={'#b9b9b9'}
                 icon={faArrowDown}
                 className={classNames([
                     'pointer disable-user-select',

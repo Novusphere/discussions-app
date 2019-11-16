@@ -25,8 +25,8 @@ class Index extends React.Component<IIndexProps, IIndexState> {
     }
 
     async componentDidMount(): Promise<void> {
-        await sleep(100)
-        this.props.postsStore.getPostsForKeys()
+        await sleep(500)
+        await this.props.postsStore.getPostsForKeys()
     }
 
     public render() {
