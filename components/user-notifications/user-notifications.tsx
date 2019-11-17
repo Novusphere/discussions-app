@@ -1,11 +1,6 @@
 import * as React from 'react'
 import { observer } from 'mobx-react'
 import { IStores } from '@stores'
-import moment from 'moment'
-import ReactMarkdown from 'react-markdown'
-import { getThreadUrl, pushToThread } from '@utils'
-import Router from 'next/router'
-import NotificationModel from '@models/notificationModel'
 import Link from 'next/link'
 import { NotificationItem } from '@components'
 import { faSpinner } from '@fortawesome/free-solid-svg-icons'
@@ -71,10 +66,6 @@ class UserNotifications extends React.Component<
         })
     }
 
-    private goToNotifications = () => {
-        Router.push({ pathname: '/notifications' })
-    }
-
     public render() {
         return (
             <div
@@ -97,13 +88,14 @@ class UserNotifications extends React.Component<
                         >
                             mark as read
                         </span>
-                        <span
-                            onClick={this.goToNotifications}
-                            className={'dim pointer'}
-                            title={'View all notifications, including ones that are read'}
-                        >
-                            view all
-                        </span>
+                        <Link href={'/notifications'}>
+                            <a
+                                className={'dim pointer'}
+                                title={'View all notifications, including ones that are read'}
+                            >
+                                view all
+                            </a>
+                        </Link>
                     </div>
                 </div>
             </div>

@@ -46,6 +46,15 @@ class NotificationModel {
         }
     }
 
+    get modelCreatedAt() {
+        switch (this.type) {
+            case 'mention':
+                return this.post.createdAt
+            case 'watch':
+                return new Date(Date.now())
+        }
+    }
+
     get posterProfile() {
         return getIdenticon(this.post.pub)
     }

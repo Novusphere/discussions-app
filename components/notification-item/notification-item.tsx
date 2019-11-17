@@ -49,9 +49,9 @@ const NotificationItem: React.FC<INotificationItemProps> = ({ notification }) =>
                 )}
                 <span
                     className={'f7 black tl flex mt3'}
-                    title={moment(notification.createdAt).toLocaleString()}
+                    title={moment(notification.modelCreatedAt).toLocaleString()}
                 >
-                    {moment(notification.createdAt).fromNow()}
+                    {moment(notification.modelCreatedAt).fromNow()}
                 </span>
             </a>
         </Link>

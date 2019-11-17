@@ -3,7 +3,7 @@ import { inject, observer } from 'mobx-react'
 import { IStores } from '@stores'
 import { ShowFullThread } from '@components'
 import Router, { NextRouter } from 'next/router'
-import { Thread } from '@novuspherejs'
+import { Thread, discussions } from '@novuspherejs'
 import { NextSeo } from 'next-seo'
 import { getThreadUrl, removeMD } from '@utils'
 import Head from 'next/head'
@@ -49,8 +49,11 @@ class E extends React.Component<IEPageProps, IEPageState> {
 
     async componentDidMount(): Promise<void> {
         const { thread } = this.props
-        const url = await getThreadUrl(thread.openingPost)
-        await Router.replace('/tag/[name]/[id]/[title]', url, { shallow: true })
+
+        if (thread) {
+            const url = await getThreadUrl(thread.openingPost)
+            await Router.replace('/tag/[name]/[id]/[title]', url, { shallow: true })
+        }
     }
 
     public render(): React.ReactNode {

@@ -71,12 +71,11 @@ export default class Notifications extends BaseStore {
                 const count = change.newValue - this.watchingThreadPostDiff.get(change.name)
 
                 if (count > 0) {
-                    const thread = await discussions.getThread(change.name)
+                    const thread = await discussions.getThread('3qk3dk57g39v1')
                     const notificationModel = new NotificationModel({
                         type: 'watch',
                         post: {
                             ...thread.openingPost,
-                            createdAt: new Date(Date.now()),
                             totalReplies: count,
                         },
                         tag: this.tagStore.tags.get(thread.openingPost.sub),
