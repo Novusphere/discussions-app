@@ -55,6 +55,7 @@ class InfiniteScrollFeed extends React.Component<
             posts,
             tagModel,
             withAnchorUid,
+            children,
             tagStore: { tags },
         } = this.props
 
@@ -66,17 +67,23 @@ class InfiniteScrollFeed extends React.Component<
                 loader={this.renderLoadingMessage()}
                 endMessage={this.renderEndMessage()}
             >
-                {posts.map(post => {
-                    return (
-                        <PostPreview
-                            post={post as any}
-                            key={post.uuid}
-                            tag={typeof tagModel !== 'undefined' ? tagModel : tags.get(post.sub)}
-                            voteHandler={post.vote}
-                            {...(withAnchorUid && { notificationUuid: post.uuid })}
-                        />
-                    )
-                })}
+                {!children
+                    ? posts.map(post => {
+                          return (
+                              <PostPreview
+                                  post={post as any}
+                                  key={post.uuid}
+                                  tag={
+                                      typeof tagModel !== 'undefined'
+                                          ? tagModel
+                                          : tags.get(post.sub)
+                                  }
+                                  voteHandler={post.vote}
+                                  {...(withAnchorUid && { notificationUuid: post.uuid })}
+                              />
+                          )
+                      })
+                    : children}
             </InfiniteScroll>
         )
     }

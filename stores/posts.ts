@@ -87,7 +87,7 @@ export default class Posts extends BaseStore {
     @observable currentHighlightedPostUuid = ''
 
     private readonly tagsStore: IStores['tagStore'] = getTagStore()
-    private readonly uiStore: IStores['uiStore']= getUiStore()
+    private readonly uiStore: IStores['uiStore'] = getUiStore()
     private readonly newAuthStore: IStores['newAuthStore'] = getNewAuthStore()
     private readonly userStore: IStores['userStore'] = getUserStore()
 
@@ -269,25 +269,6 @@ export default class Posts extends BaseStore {
                 rules: 'required|string|min:5|max:300',
                 hideLabels: true,
             },
-            // {
-            //     name: 'sub',
-            //     label: 'Sub',
-            //     placeholder: 'Select a sub',
-            //     rules: 'required',
-            //     type: 'dropdown',
-            //     hideLabels: true,
-            //     extra: {
-            //         options: [
-            //             { value: 'all', label: 'all' },
-            //             ...Array.from(this.tagsStore.tags.values())
-            //                 .filter(tag => !tag.root)
-            //                 .map(tag => ({
-            //                     value: tag.name,
-            //                     label: tag.name,
-            //                 })),
-            //         ],
-            //     },
-            // },
             {
                 name: 'content',
                 label: 'Content',
@@ -296,94 +277,6 @@ export default class Posts extends BaseStore {
                 // rules: 'required',
                 type: 'richtext',
             },
-            // {
-            //     name: 'attachmentType',
-            //     type: 'radiogroup',
-            //     value: 'No Attachment',
-            //     hideLabels: true,
-            //     extra: {
-            //         options: [
-            //             {
-            //                 value: 'No Attachment',
-            //                 onClick: ({ form }) => {
-            //                     form.$('urlType').$extra.render = false
-            //                     form.$('hash').$extra.render = false
-            //                     form.$('txidType').$extra.render = false
-            //
-            //                     // reset values
-            //                     form.$('urlType').value = ''
-            //                     form.$('hash').value = ''
-            //                     form.$('txidType').value = ''
-            //                 },
-            //             },
-            //             {
-            //                 value: 'URL',
-            //                 onClick: ({ form }) => {
-            //                     form.$('urlType').$extra.render = true
-            //                     form.$('hash').$extra.render = true
-            //                     form.$('txidType').$extra.render = false
-            //                 },
-            //             },
-            //             {
-            //                 value: 'IPFS',
-            //                 onClick: ({ form }) => {
-            //                     form.$('urlType').$extra.render = true
-            //                     form.$('hash').$extra.render = true
-            //                     form.$('txidType').$extra.render = false
-            //                 },
-            //             },
-            //             {
-            //                 value: 'TXID',
-            //                 onClick: ({ form }) => {
-            //                     form.$('urlType').$extra.render = false
-            //                     form.$('hash').$extra.render = true
-            //                     form.$('txidType').$extra.render = true
-            //                 },
-            //             },
-            //         ],
-            //     },
-            // },
-            // {
-            //     name: 'urlType',
-            //     type: 'radiogroup',
-            //     extra: {
-            //         render: false,
-            //         options: [
-            //             {
-            //                 value: 'link',
-            //             },
-            //             {
-            //                 value: 'iframe',
-            //             },
-            //             {
-            //                 value: 'mp4',
-            //             },
-            //             {
-            //                 value: 'mp3',
-            //             },
-            //         ],
-            //     },
-            // },
-            // {
-            //     name: 'txidType',
-            //     type: 'radiogroup',
-            //     extra: {
-            //         render: false,
-            //         options: [
-            //             {
-            //                 value: 'referendum',
-            //             },
-            //         ],
-            //     },
-            // },
-            // {
-            //     name: 'hash',
-            //     label: 'Hash',
-            //     placeholder: 'IPFS Hash / URL / TXID',
-            //     extra: {
-            //         render: false,
-            //     },
-            // },
             {
                 name: 'buttons',
                 type: 'button',
@@ -402,10 +295,6 @@ export default class Posts extends BaseStore {
                                 }
                             },
                         },
-                        // {
-                        //     value: 'Post ID',
-                        //     title: 'Post with an anonymous ID',
-                        // },
                         {
                             value: 'Post',
                             disabled: !this.newAuthStore.hasAccount,
@@ -456,16 +345,24 @@ export default class Posts extends BaseStore {
                                     const model = new PostModel(newPost as any)
                                     const signedReply = model.sign(this.newAuthStore.postPriv)
                                     const submittedPost = await discussions.post(signedReply as any)
-                                    const isPostValid = discussions.checkIfPostIsValid(submittedPost)
+                                    const isPostValid = discussions.checkIfPostIsValid(
+                                        submittedPost
+                                    )
 
                                     if (isPostValid) {
                                         // // TODO: Add check to make sure the thread is actually posted onto the chain
                                         await sleep(5000)
                                         await pushToThread(submittedPost)
-                                        this.uiStore.showToast('Your post has been created!', 'success')
+                                        this.uiStore.showToast(
+                                            'Your post has been created!',
+                                            'success'
+                                        )
                                         this.clearPreview()
-                                    }  else {
-                                        this.uiStore.showToast('Unable to verify post was created.!', 'error')
+                                    } else {
+                                        this.uiStore.showToast(
+                                            'Unable to verify post was created.!',
+                                            'error'
+                                        )
                                     }
                                 }
                             }),

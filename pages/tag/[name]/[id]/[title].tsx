@@ -67,8 +67,6 @@ class E extends React.Component<IEPageProps, IEPageState> {
             return <span>Couldn't find this thread: {query.id}</span>
         }
 
-        const poster = thread.openingPost.displayName || thread.openingPost.poster
-
         return (
             <>
                 <Head>

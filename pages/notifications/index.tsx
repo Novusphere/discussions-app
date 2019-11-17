@@ -3,6 +3,9 @@ import { inject, observer } from 'mobx-react'
 import { IStores } from '@stores'
 import { InfiniteScrollFeed } from '@components'
 import { sleep } from '@utils'
+import ReactMarkdown from 'react-markdown'
+import moment from 'moment'
+import Link from 'next/link'
 
 interface INotificationsProps {
     notificationsStore: IStores['notificationsStore']
@@ -49,7 +52,41 @@ class Notifications extends React.Component<INotificationsProps> {
                 next={fetchNotificationsAsFeed}
                 posts={notifications}
                 withAnchorUid
-            />
+            >
+                {notifications.map(notification => (
+                    <Link
+                        href={'/tag/[name]/[id]/[title]'}
+                        as={notification.url}
+                        key={notification.post.uuid}
+                    >
+                        <a className={'db card pa4'} title={'Click to go to post'}>
+                            <span className={'flex flex-row items-center justify-start f5 tl'}>
+                                {notification.image}
+                                <span className={'f6 b flex mb2 black'}>{notification.title}</span>
+                            </span>
+                            {notification.isMentionType && (
+                                <object>
+                                    <ReactMarkdown
+                                        className={'black flex notifications-content'}
+                                        source={notification.post.content}
+                                    />
+                                </object>
+                            )}
+                            {!notification.isMentionType && (
+                                <span className={'black flex notifications-content'}>
+                                    {notification.content}
+                                </span>
+                            )}
+                            <span
+                                className={'f7 black tl flex mt3'}
+                                title={moment(notification.modelCreatedAt).toLocaleString()}
+                            >
+                                {moment(notification.modelCreatedAt).fromNow()}
+                            </span>
+                        </a>
+                    </Link>
+                ))}
+            </InfiniteScrollFeed>
         )
     }
 

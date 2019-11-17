@@ -142,33 +142,25 @@ class Sidebar extends React.Component<ITagListOuterProps & ITagListInnerProps, I
     }
 
     private renderTopLevelTags = tag => {
-        if (tag.name === 'all') {
-            return (
-                <Link href={'/all'} as={tag.url}>
-                    <a className={'db black pointer pb1 no-underline'}>{tag.name}</a>
-                </Link>
-            )
+        const getUrl = url => {
+            switch (url) {
+                case 'all':
+                    return '/all'
+                case 'feed':
+                    return '/feed'
+                case 'home':
+                    return '/'
+            }
         }
 
-        if (tag.name === 'feed') {
-            return (
-                <Link href={'/feed'} as={tag.url}>
-                    <a className={'db black pointer pb1 no-underline'}>{tag.name}</a>
-                </Link>
-            )
-        }
-
-        if (tag.name === 'home') {
-            return (
-                <Link href={'/'} as={tag.url}>
-                    <a className={'db black pointer pb1 no-underline'}>{tag.name}</a>
-                </Link>
-            )
-        }
+        const url = getUrl(tag.name)
 
         return (
-            <Link href={'/tag/[name]'} as={tag.url}>
-                <a className={'db black pointer pb1 no-underline'}>{tag.name}</a>
+            <Link href={url} as={tag.url}>
+                <a className={'db black pointer pb1 no-underline'}>
+                    <FontAwesomeIcon width={13} icon={tag.icon} className={'mr2'} />
+                    {tag.name}
+                </a>
             </Link>
         )
     }
@@ -202,7 +194,7 @@ class Sidebar extends React.Component<ITagListOuterProps & ITagListInnerProps, I
                             <li
                                 key={tag.id}
                                 className={classNames([
-                                    'ph3 mb3',
+                                    'ph3 pv1',
                                     {
                                         dim: router.asPath !== tag.url,
                                         'sidebar-link-active': router.asPath === tag.url,

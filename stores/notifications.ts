@@ -6,6 +6,7 @@ import { discussions } from '@novuspherejs'
 import { persist } from 'mobx-persist'
 import NotificationModel from '@models/notificationModel'
 import { computedFn } from 'mobx-utils'
+import { IPost } from '@stores/posts'
 
 export default class Notifications extends BaseStore {
     static notificationMaximumCount = 5
@@ -161,7 +162,15 @@ export default class Notifications extends BaseStore {
 
     @task
     @action.bound
-    async fetchNotifications(time, preCursorId, count, limit?) {
+    async fetchNotifications(
+        time,
+        preCursorId,
+        count,
+        limit?
+    ): Promise<{
+        payload: IPost[]
+        cursorId: number
+    }> {
         try {
             const { payload, cursorId } = await discussions.getPostsForNotifications(
                 this.authStore.activePublicKey,
@@ -196,7 +205,12 @@ export default class Notifications extends BaseStore {
             }
 
             payload.forEach((item: any) => {
-                this.notifications.push(item)
+                const model = new NotificationModel({
+                    type: 'mention',
+                    post: item,
+                    tag: this.tagStore.tags.get(item.sub),
+                })
+                this.notifications.push(model)
             })
         } catch (error) {
             throw error
@@ -225,7 +239,7 @@ export default class Notifications extends BaseStore {
                 )
             })
 
-            this.firstTimePulling= false
+            this.firstTimePulling = false
         } catch (error) {
             throw error
         }

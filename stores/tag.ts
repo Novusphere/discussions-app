@@ -5,6 +5,7 @@ import { task } from 'mobx-task'
 import { persist } from 'mobx-persist'
 import { defaultSubs } from '@utils'
 import { getUiStore, IStores } from '@stores/index'
+import { faHome, faListAlt, faNewspaper } from '@fortawesome/free-solid-svg-icons'
 
 export default class Tag extends BaseStore {
     // the amount of subs that are base
@@ -124,14 +125,17 @@ export default class Tag extends BaseStore {
             {
                 name: 'home',
                 url: '/',
+                logo: faHome,
             },
             {
                 name: 'feed',
                 url: '/feed',
+                logo: faListAlt,
             },
             {
                 name: 'all',
                 url: '/all',
+                logo: faNewspaper,
             },
         ].map(topLevelTag => {
             this.tags.set(

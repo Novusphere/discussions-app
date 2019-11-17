@@ -1,6 +1,6 @@
 import { computed, observable } from 'mobx'
 import { IPost } from '@stores/posts'
-import { getIdenticon } from '@utils'
+import { getIdenticon, getThreadUrl } from '@utils'
 import React from 'react'
 import { TagModel } from '@models/tagModel'
 
@@ -15,12 +15,27 @@ class NotificationModel {
     @observable post: Partial<IPost> = null
     @observable createdAt: Date | null = null
     @observable tag: TagModel = null
+    @observable url = ''
 
     constructor(opts: ICreateNotification) {
         this.type = opts.type
         this.post = opts.post
         this.tag = opts.tag
         this.createdAt = opts.post.createdAt
+
+        this.getThreadUrl().then((url) => {
+            this.url = url
+        })
+    }
+
+    async getThreadUrl() {
+        let uuid = undefined
+
+        if (!this.post.title && this.post.uuid) {
+            uuid = this.post.uuid
+        }
+
+        return await getThreadUrl(this.post, uuid)
     }
 
     get isMentionType() {
