@@ -160,6 +160,11 @@ export default class Notifications extends BaseStore {
         this.notificationTrayItems.clear()
     }
 
+    @action.bound
+    clearNotification(id) {
+        this.notificationTrayItems.delete(id)
+    }
+
     @task
     @action.bound
     async fetchNotifications(

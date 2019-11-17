@@ -51,6 +51,7 @@ class UserNotifications extends React.Component<
             notificationTrayItemsSorted,
             firstTimePulling,
             fetchNotifications,
+            clearNotification,
         } = this.props.notificationsStore
 
         if (fetchNotifications['pending'] && firstTimePulling) {
@@ -62,7 +63,7 @@ class UserNotifications extends React.Component<
         }
 
         return notificationTrayItemsSorted.map(notification => {
-            return <NotificationItem notification={notification} key={notification.post.uuid} />
+            return <NotificationItem notification={notification} key={notification.post.uuid} onClick={clearNotification} />
         })
     }
 

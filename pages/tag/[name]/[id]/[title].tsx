@@ -2,14 +2,15 @@ import * as React from 'react'
 import { inject, observer } from 'mobx-react'
 import { IStores } from '@stores'
 import { ShowFullThread } from '@components'
-import Router, { NextRouter } from 'next/router'
-import { Thread, discussions } from '@novuspherejs'
+import Router, { NextRouter, withRouter } from 'next/router'
+import { Thread } from '@novuspherejs'
 import { NextSeo } from 'next-seo'
 import { getThreadUrl, removeMD } from '@utils'
 import Head from 'next/head'
 import _ from 'lodash'
 
 interface IEPageProps {
+    router: NextRouter
     postsStore: IStores['postsStore']
     uiStore: IStores['uiStore']
     tagStore: IStores['tagStore']
@@ -21,13 +22,13 @@ interface IEPageProps {
     }
 
     thread: null | Thread
-    router: NextRouter
 }
 
 interface IEPageState {
     thread: any
 }
 
+@(withRouter as any)
 @inject('postsStore', 'tagStore', 'uiStore')
 @observer
 class E extends React.Component<IEPageProps, IEPageState> {
@@ -47,11 +48,26 @@ class E extends React.Component<IEPageProps, IEPageState> {
         this.props.uiStore.toggleSidebarStatus(true)
     }
 
+    private highglightActiveUuid = () => {
+        const [, hash] = this.props.router.asPath.split('#')
+        if (hash) {
+            this.props.postsStore.highlightPostUuid(hash)
+        }
+        return hash
+    }
+
     async componentDidMount(): Promise<void> {
+        const hash = this.highglightActiveUuid()
+
         const { thread } = this.props
 
         if (thread) {
-            const url = await getThreadUrl(thread.openingPost)
+            let url = await getThreadUrl(thread.openingPost)
+
+            if (hash) {
+                url += `#${hash}`
+            }
+
             await Router.replace('/tag/[name]/[id]/[title]', url, { shallow: true })
         }
     }
