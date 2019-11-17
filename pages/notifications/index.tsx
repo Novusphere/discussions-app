@@ -55,8 +55,7 @@ class Notifications extends React.Component<INotificationsProps> {
             >
                 {notifications.map(notification => (
                     <Link
-                        href={'/tag/[name]/[id]/[title]'}
-                        as={notification.url}
+                        href={notification.url}
                         key={notification.post.uuid}
                     >
                         <a className={'db card pa4'} title={'Click to go to post'}>

@@ -81,7 +81,7 @@ export const getThreadUrl = async (post, permalinkUuid?: string) => {
     if (post.title === '') {
         const thread = await discussions.getThread(id)
         const newId = encodeId(thread.openingPost as any)
-        url += `/tag/${thread.openingPost.sub}/${newId}/${getThreadTitle(thread)}`
+        url = `/tag/${thread.openingPost.sub}/${newId}/${getThreadTitle(thread)}`
     } else {
         url += `${getThreadTitle(post)}`
     }
