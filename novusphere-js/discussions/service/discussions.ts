@@ -325,8 +325,8 @@ export default class DiscussionsService {
                 {
                     $match: {
                         createdAt: {
-                            $gte: dId.timeGte  + (!isDev && isServer ? 18000000 : 0),
-                            $lte: dId.timeLte + (!isDev && isServer ? 18000000 : 0),
+                            $gte: dId.timeGte,// + (!isDev && isServer ? 18000000 : 0),
+                            $lte: dId.timeLte,// + (!isDev && isServer ? 18000000 : 0),
                         },
                         transaction: { $regex: `^${dId.txid32}` },
                     },

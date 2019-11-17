@@ -54,21 +54,6 @@ export const encodeId = (post: IPost) => {
     return Post.encodeId(post.transaction, new Date(post.createdAt))
 }
 
-export const decodeId = (id: string) => {
-    let n = new BigInt(id, 36)
-    let txid32 = n
-        .shiftRight(32)
-        .toString(16)
-        .padStart(8, '0')
-    let timeOffset = n.and(new BigInt('ffffffff', 16))
-    let time = timeOffset.valueOf() * 1000 + new Date('2017/1/1').getTime()
-    return {
-        txid32: txid32,
-        timeGte: time - 1000 * 60 * 3,
-        timeLte: time + 1000 * 60 * 3,
-    }
-}
-
 export const getThreadTitle = post => {
     return decodeURIComponent(_.snakeCase(post.title))
 }
