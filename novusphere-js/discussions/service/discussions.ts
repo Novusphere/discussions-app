@@ -8,6 +8,8 @@ import * as bip32 from 'bip32'
 import ecc from 'eosjs-ecc'
 import axios from 'axios'
 import { INSDBSearchQuery } from '../../nsdb';
+import { isDev } from '@utils'
+
 //import { isDev } from '@utils'
 
 export interface IBrainKeyPair {
@@ -323,8 +325,8 @@ export default class DiscussionsService {
                 {
                     $match: {
                         createdAt: {
-                            $gte: dId.timeGte,// + (!isDev && isServer ? 18000000 : 0),
-                            $lte: dId.timeLte,// + (!isDev && isServer ? 18000000 : 0),
+                            $gte: dId.timeGte  + (!isDev && isServer ? 18000000 : 0),
+                            $lte: dId.timeLte + (!isDev && isServer ? 18000000 : 0),
                         },
                         transaction: { $regex: `^${dId.txid32}` },
                     },
