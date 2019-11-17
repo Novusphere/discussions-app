@@ -102,7 +102,6 @@ export class ReplyModel {
                     ...reply,
                     content,
                     edit: true,
-                    createdAt: new Date(Date.now()),
                     mentions: ReplyModel.extractMentionHashesForRegEx(
                         ReplyModel.matchContentForMentions(content)
                     ),
@@ -118,7 +117,7 @@ export class ReplyModel {
                 const model = new PostModel(reply as any)
                 const signedReply = model.sign(this.newAuthStore.postPriv)
                 const confirmedReply = await discussions.post(signedReply as any)
-                
+
                 this.post.content = confirmedReply.content
                 this.post.pub = confirmedReply.pub
                 this.post.createdAt = confirmedReply.createdAt
@@ -174,7 +173,7 @@ export class ReplyModel {
             poster: null,
             displayName: null,
             title: '',
-            createdAt: this.post.createdAt,
+            createdAt: new Date(Date.now()),
             content: this.content,
             sub: this.post.sub,
             chain: 'eos',

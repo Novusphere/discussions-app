@@ -24,10 +24,13 @@ import { TagModel } from '@models/tagModel'
 interface IOpeningPostProps {
     isPreview?: boolean
     canEditPost?: boolean
+    isWatchingPost?: (id: string) => boolean
+    watchPost?: (id: string, count: number) => void
     openingPost: PostModel
     asPath: string
     activeTag: TagModel
     activeThread: ThreadModel
+    id: string
 }
 
 const OpeningPost: React.FC<IOpeningPostProps> = ({
@@ -37,6 +40,9 @@ const OpeningPost: React.FC<IOpeningPostProps> = ({
     activeThread,
     asPath,
     activeTag,
+    watchPost,
+    isWatchingPost,
+    id,
 }) => (
     <div data-post-uuid={openingPost.uuid}>
         {typeof isPreview === 'undefined' && (
@@ -48,12 +54,14 @@ const OpeningPost: React.FC<IOpeningPostProps> = ({
                             title={`Show all posts in ${openingPost.sub}`}
                         >
                             <FontAwesomeIcon width={13} icon={faChevronLeft} className={'pr1'} />
-                            {activeTag && <img
-                                width={20}
-                                height={20}
-                                src={activeTag.icon}
-                                className={'activeTag-image'}
-                            />}
+                            {activeTag && (
+                                <img
+                                    width={20}
+                                    height={20}
+                                    src={activeTag.icon}
+                                    className={'activeTag-image'}
+                                />
+                            )}
                             {`#${openingPost.sub}`}
                         </button>
                     </a>
@@ -139,6 +147,16 @@ const OpeningPost: React.FC<IOpeningPostProps> = ({
                                 onClick={() => activeThread.toggleEditing()}
                             >
                                 edit post
+                            </span>
+                        )}
+
+                        {typeof watchPost !== 'undefined' && (
+                            <span
+                                className={'pr3 black f6 pointer dim'}
+                                title={'Toggle watch status'}
+                                onClick={() => watchPost(id, activeThread.totalReplies)}
+                            >
+                                {!isWatchingPost(id) ? 'watch post' : 'unwatch post'}
                             </span>
                         )}
 

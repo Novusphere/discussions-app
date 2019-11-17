@@ -171,7 +171,7 @@ class TitleHeader extends React.Component<ITitleHeaderProps, ITitleHeaderState> 
 
     public render(): React.ReactNode {
         return (
-            <div className={'title-header flex items-center z-999'}>
+            <div className={'card title-header flex items-center z-999'}>
                 <div className={'container flex items-center justify-between'}>
                     <span className={'f4 black'}>{this.renderActiveTag()}</span>
 

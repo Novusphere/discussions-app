@@ -33,13 +33,15 @@
 .notifications-content {
 	@extend .flex;
 	@extend .flex-column;
+	@extend .items-start;
+	@extend .tl;
+	@extend .f6;
 
 	position: relative;
 	max-height: 50px;
 	overflow: hidden;
 
 	> p {
-		@extend .f6;
 		padding: 0;
 		margin: 0;
 	}

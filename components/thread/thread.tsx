@@ -17,13 +17,14 @@ interface IThreadOuterProps {
 interface IThreadInnerProps {
     postsStore: IStores['postsStore']
     tagStore: IStores['tagStore']
+    notificationsStore: IStores['notificationsStore']
     router: NextRouter
 }
 
 interface IThreadState {}
 
 @(withRouter as any)
-@inject('postsStore', 'tagStore')
+@inject('postsStore', 'tagStore', 'notificationsStore')
 @observer
 class Thread extends React.Component<IThreadOuterProps & IThreadInnerProps, IThreadState> {
     @observable threadAsModel: ThreadModel = null
@@ -62,7 +63,10 @@ class Thread extends React.Component<IThreadOuterProps & IThreadInnerProps, IThr
         const {
             router,
             thread: { openingPost },
-            tagStore: { activeTag }
+            tagStore: { activeTag },
+            notificationsStore: {
+                isWatchingThread, toggleThreadWatch
+            }
         } = this.props
 
         const { threadAsModel } = this
@@ -71,9 +75,12 @@ class Thread extends React.Component<IThreadOuterProps & IThreadInnerProps, IThr
             <OpeningPost
                 openingPost={openingPost as any}
                 asPath={router.asPath}
+                id={router.query.id as string}
                 activeThread={threadAsModel}
                 activeTag={activeTag}
                 canEditPost={threadAsModel.canEditPost}
+                isWatchingPost={isWatchingThread}
+                watchPost={toggleThreadWatch}
             />
         )
     }
@@ -97,13 +104,11 @@ class Thread extends React.Component<IThreadOuterProps & IThreadInnerProps, IThr
     private renderReplyContent = () => {
         const { thread } = this.props
 
-        const totalReplies = Object.keys(thread.map).length - 1
-
         return (
             <>
-                {totalReplies > 1 && (
+                {thread.openingPost.totalReplies > 0 && (
                     <div className={'mb2'} id={'comments'}>
-                        <span className={'b f6 pb2'}>viewing all {totalReplies} comments</span>
+                        <span className={'b f6 pb2'}>viewing all {thread.openingPost.totalReplies} comments</span>
                     </div>
                 )}
                 {this.renderReplies()}

@@ -2,10 +2,10 @@ import * as React from 'react'
 import { inject, observer } from 'mobx-react'
 import { IStores } from '@stores'
 import { ShowFullThread } from '@components'
-import { NextRouter } from 'next/router'
+import Router, { NextRouter } from 'next/router'
 import { Thread } from '@novuspherejs'
 import { NextSeo } from 'next-seo'
-import { removeMD } from '@utils'
+import { getThreadUrl, removeMD } from '@utils'
 import Head from 'next/head'
 import _ from 'lodash'
 
@@ -45,6 +45,12 @@ class E extends React.Component<IEPageProps, IEPageState> {
         this.props.tagStore.setActiveTag(this.props.query.name)
         this.props.uiStore.toggleBannerStatus(true)
         this.props.uiStore.toggleSidebarStatus(true)
+    }
+
+    async componentDidMount(): Promise<void> {
+        const { thread } = this.props
+        const url = await getThreadUrl(thread.openingPost)
+        await Router.replace('/tag/[name]/[id]/[title]', url, { shallow: true })
     }
 
     public render(): React.ReactNode {

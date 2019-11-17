@@ -62,6 +62,7 @@ class NewPostPreview extends React.Component<IPostPreviewProps> {
                         activeThread={null}
                         openingPost={new PostModel(post as any)}
                         asPath={null}
+                        id={null}
                     />
                 </div>
             </>

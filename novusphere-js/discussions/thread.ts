@@ -15,7 +15,7 @@ export default class Thread {
     }
 
     get totalReplies(): number {
-        return this.openingPost ? this.openingPost.totalReplies : 0
+        return this.openingPost.totalReplies
     }
 
     init(posts: Post[]) {

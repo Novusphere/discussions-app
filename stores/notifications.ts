@@ -1,12 +1,11 @@
 import { BaseStore, getOrCreateStore } from 'next-mobx-wrapper'
-import { action, computed, observable, reaction } from 'mobx'
+import { action, computed, observable, observe, reaction } from 'mobx'
 import { task } from 'mobx-task'
-import { getNewAuthStore, IStores } from '@stores/index'
+import { getNewAuthStore, getTagStore, getUiStore, IStores } from '@stores/index'
 import { discussions } from '@novuspherejs'
 import { persist } from 'mobx-persist'
-import { IPost } from '@stores/posts'
-import FeedModel from '@models/feedModel'
-import { sleep } from '@utils'
+import NotificationModel from '@models/notificationModel'
+import { computedFn } from 'mobx-utils'
 
 export default class Notifications extends BaseStore {
     static notificationMaximumCount = 5
@@ -14,15 +13,35 @@ export default class Notifications extends BaseStore {
     // the time last checked
     @persist
     @observable
-    lastCheckedNotifications = -1 // set default
+    lastCheckedNotifications = 0 // set default
 
-    @observable cursorId = 0
-    @observable notifications = observable.map<string, IPost>()
+    @persist('map')
+    @observable
+    watchingThread = observable.map<string, number>() // id: number
+
+    @persist('map')
+    @observable
+    watchingThreadPostDiff = observable.map<string, number>() // how many new posts were there since watch began
+
+    @observable notifications: NotificationModel[] = []
+    @observable notificationTrayItems = observable.map<string, NotificationModel>() // max 5
+
+    @observable postsPosition = {
+        cursorId: undefined,
+        count: 0,
+    }
+
+    // tray unread count
     @observable unreadCount = 0
 
+    @observable firstTimePulling = true
+
     @observable private notificationIntervalHandler: any = null
+    @observable private watchThreadIntervalHandler: any = null
 
     private readonly authStore: IStores['newAuthStore'] = getNewAuthStore()
+    private readonly uiStore: IStores['uiStore'] = getUiStore()
+    private readonly tagStore: IStores['tagStore'] = getTagStore()
 
     constructor() {
         super()
@@ -31,35 +50,79 @@ export default class Notifications extends BaseStore {
             () => this.authStore.hasAccount,
             hasAccount => {
                 if (hasAccount) {
-                    this.fetchNotifications()
-                    this.notificationIntervalHandler = setInterval(() => {
-                        this.fetchNotifications()
-                    }, 10000)
+                    this.fetchNotificationsAsTray()
+                    this.updateWatchThreadCount()
+
+                    this.startNotificationInterval()
                 } else {
-                    if (this.notificationIntervalHandler) {
-                        clearInterval(this.notificationIntervalHandler)
-                        this.notificationIntervalHandler = null
-                    }
+                    this.destroyNotificationInterval()
                 }
-            },
-            {
-                fireImmediately: true,
             }
         )
+
+        observe(this.notificationTrayItems, change => {
+            if (change.type === 'add') {
+                this.unreadCount++
+            }
+        })
+
+        observe(this.watchingThread, async change => {
+            if (change.type === 'update') {
+                const count = change.newValue - this.watchingThreadPostDiff.get(change.name)
+
+                if (count > 0) {
+                    const thread = await discussions.getThread(change.name)
+                    const notificationModel = new NotificationModel({
+                        type: 'watch',
+                        post: {
+                            ...thread.openingPost,
+                            createdAt: new Date(Date.now()),
+                            totalReplies: count,
+                        },
+                        tag: this.tagStore.tags.get(thread.openingPost.sub),
+                    })
+
+                    if (this.notificationTrayItems.size > 4) {
+                        const [, , , , last] = Array.from(this.notificationTrayItems.keys())
+                        this.notificationTrayItems.delete(last)
+                    }
+
+                    this.notificationTrayItems.set(thread.openingPost.uuid, notificationModel)
+                }
+            }
+        })
     }
 
-    @computed get notificationsAsArray() {
-        return Array.from(this.notifications.values())
+    public startNotificationInterval = () => {
+        this.notificationIntervalHandler = setInterval(() => {
+            this.fetchNotificationsAsTray()
+            this.updateWatchThreadCount()
+        }, 5000)
     }
 
-    @computed get firstSetOfNotifications() {
-        return this.notificationsAsArray
-            .slice(0, Notifications.notificationMaximumCount - 1)
-            .reverse()
+    public destroyNotificationInterval = () => {
+        if (this.notificationIntervalHandler) {
+            clearInterval(this.notificationIntervalHandler)
+            this.notificationIntervalHandler = null
+        }
     }
 
-    @computed get hasMoreThanQueriedNotifications() {
-        return this.cursorId !== 0
+    @action.bound
+    async updateWatchThreadCount() {
+        if (!this.watchingThread.size) return
+
+        const threads = Array.from(this.watchingThread.keys())
+
+        await threads.map(async thread => {
+            const number = await discussions.getThreadReplyCount(thread)
+            this.watchingThread.set(thread, number)
+        })
+    }
+
+    @computed get notificationTrayItemsSorted() {
+        return Array.from(this.notificationTrayItems.values()).sort((a, b) =>
+            a.createdAt > b.createdAt ? -1 : 1
+        )
     }
 
     @computed get hasNotifications() {
@@ -87,46 +150,32 @@ export default class Notifications extends BaseStore {
     }
 
     @action.bound
+    syncCountsForUnread() {
+        this.watchingThreadPostDiff.merge(this.watchingThread)
+    }
+
+    @action.bound
     clearNotifications() {
         this.resetUnreadCount()
-        this.notifications.clear()
-        this.cursorId = 0
+        this.notificationTrayItems.clear()
     }
 
     @task
     @action.bound
-    async fetchNotifications(time = this.lastCheckedNotifications, clearTray = false) {
-        let defaultCursorId = this.cursorId
-
-        if (defaultCursorId === 0) {
-            defaultCursorId = undefined
-        }
-
-        if (clearTray) {
-            this.resetUnreadCount()
-            this.notifications.clear()
-        }
-
+    async fetchNotifications(time, preCursorId, count, limit?) {
         try {
             const { payload, cursorId } = await discussions.getPostsForNotifications(
                 this.authStore.activePublicKey,
                 time,
-                defaultCursorId
+                preCursorId,
+                count,
+                limit
             )
 
-            if (time !== 0) {
-                this.unreadCount = payload.length
+            return {
+                payload,
+                cursorId,
             }
-
-            this.cursorId = cursorId
-
-            if (!clearTray) {
-                payload.forEach(notification => {
-                    this.notifications.set(notification.uuid, notification as any)
-                })
-            }
-
-            return payload
         } catch (error) {
             throw error
         }
@@ -134,15 +183,75 @@ export default class Notifications extends BaseStore {
 
     @task
     @action.bound
-    async fetchNotificationsAsFeed(): Promise<FeedModel[]> {
+    async fetchNotificationsAsFeed() {
         try {
-            await sleep(500)
-            const payload = await this.fetchNotifications(0, true)
-            return payload.map(post => new FeedModel(post as any))
+            const { payload, cursorId } = await this.fetchNotifications(
+                0,
+                this.postsPosition.cursorId,
+                this.postsPosition.count
+            )
+
+            this.postsPosition = {
+                cursorId,
+                count: payload.length,
+            }
+
+            payload.forEach((item: any) => {
+                this.notifications.push(item)
+            })
         } catch (error) {
             throw error
         }
     }
+
+    @task
+    @action.bound
+    async fetchNotificationsAsTray() {
+        try {
+            const { payload } = await this.fetchNotifications(
+                this.lastCheckedNotifications,
+                undefined,
+                0,
+                Notifications.notificationMaximumCount
+            )
+
+            payload.forEach(item => {
+                this.notificationTrayItems.set(
+                    item.uuid,
+                    new NotificationModel({
+                        type: 'mention',
+                        post: item,
+                        tag: this.tagStore.tags.get(item.sub),
+                    })
+                )
+            })
+
+            this.firstTimePulling= false
+        } catch (error) {
+            throw error
+        }
+    }
+
+    @action.bound
+    toggleThreadWatch(id: string, count: number) {
+        if (this.watchingThread.has(id)) {
+            this.watchingThread.delete(id)
+            this.watchingThreadPostDiff.delete(id)
+            return
+        }
+
+        if (this.watchingThread.size <= 4) {
+            this.watchingThread.set(id, count)
+            this.watchingThreadPostDiff.set(id, count)
+            this.uiStore.showToast('Success! You are watching this thread', 'success')
+        } else {
+            this.uiStore.showToast('You can only watch a maximum of 5 threads', 'info')
+        }
+    }
+
+    isWatchingThread = computedFn((id: string) => {
+        return this.watchingThread.has(id)
+    })
 }
 
 export const getNotificationsStore = getOrCreateStore('notificationsStore', Notifications)

@@ -3,8 +3,13 @@ import { observer } from 'mobx-react'
 import { IStores } from '@stores'
 import moment from 'moment'
 import ReactMarkdown from 'react-markdown'
-import { pushToThread } from '@utils'
+import { getThreadUrl, pushToThread } from '@utils'
 import Router from 'next/router'
+import NotificationModel from '@models/notificationModel'
+import Link from 'next/link'
+import { NotificationItem } from '@components'
+import { faSpinner } from '@fortawesome/free-solid-svg-icons'
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 
 interface IUserNotificationsOuterProps {
     notificationsStore: IStores['notificationsStore']
@@ -30,6 +35,7 @@ class UserNotifications extends React.Component<
     async componentDidMount(): Promise<void> {
         this.props.notificationsStore.setTimeStamp()
         this.props.notificationsStore.resetUnreadCount()
+        this.props.notificationsStore.syncCountsForUnread()
     }
 
     private clearNotifications = () => {
@@ -44,52 +50,24 @@ class UserNotifications extends React.Component<
         )
     }
 
-    private getPoster = (notification: any) => {
-        let poster = notification.poster
+    private renderNotifications = () => {
+        const {
+            notificationTrayItems,
+            notificationTrayItemsSorted,
+            firstTimePulling,
+            fetchNotifications,
+        } = this.props.notificationsStore
 
-        if (poster === 'eosforumanon') {
-            poster = notification.displayName
+        if (fetchNotifications['pending'] && firstTimePulling) {
+            return <FontAwesomeIcon width={13} icon={faSpinner} spin />
         }
 
-        return poster
-    }
-
-    private renderNotification = (notification: any) => {
-        return (
-            <span
-                className={'notification-item'}
-                key={notification.uuid}
-                title={'Click to go to post'}
-                onClick={() => pushToThread(notification, notification.uuid)}
-            >
-                <span className={'f5 tl'}>
-                    <span className={'f6 b flex mb2'}>
-                        You have been mentioned by {this.getPoster(notification)}
-                    </span>
-                    <ReactMarkdown
-                        className={'black flex notifications-content'}
-                        source={notification.content}
-                    />
-                </span>
-                <span
-                    className={'f6 tl flex mt3'}
-                    title={moment(notification.createdAt).toLocaleString()}
-                >
-                    {moment(notification.createdAt).fromNow()}
-                </span>
-            </span>
-        )
-    }
-
-    private renderNotifications = () => {
-        const { firstSetOfNotifications } = this.props.notificationsStore
-
-        if (!firstSetOfNotifications.length) {
+        if (!notificationTrayItems.size) {
             return <span className={'tc f6 pt4 self-center'}>You have no new notifications</span>
         }
 
-        return firstSetOfNotifications.map(notification => {
-            return this.renderNotification(notification)
+        return notificationTrayItemsSorted.map(notification => {
+            return <NotificationItem notification={notification} key={notification.post.uuid} />
         })
     }
 
@@ -98,8 +76,6 @@ class UserNotifications extends React.Component<
     }
 
     public render() {
-        const { fetchNotifications, firstSetOfNotifications } = this.props.notificationsStore
-
         return (
             <div
                 ref={this.container}
@@ -107,33 +83,29 @@ class UserNotifications extends React.Component<
                     minHeight: this.state.height ? this.state.height : undefined,
                 }}
             >
-                {fetchNotifications['pending'] && !firstSetOfNotifications ? (
-                    <span>Loading...</span>
-                ) : (
-                    <div className={'notification-tooltip'} style={{ width: 300 }}>
-                        {this.renderNotifications()}
-                        <div
-                            className={
-                                'f6 gray bg-near-white w-100 self-end pv3 ph3 flex flex-row justify-between'
-                            }
+                <div className={'notification-tooltip'} style={{ width: 300 }}>
+                    {this.renderNotifications()}
+                    <div
+                        className={
+                            'f6 gray bg-near-white w-100 self-end pv3 ph3 flex flex-row justify-between'
+                        }
+                    >
+                        <span
+                            onClick={this.clearNotifications}
+                            className={'b dim pointer'}
+                            title={'Mark all new notifications as read'}
                         >
-                            <span
-                                onClick={this.clearNotifications}
-                                className={'b dim pointer'}
-                                title={'Mark all new notifications as read'}
-                            >
-                                mark as read
-                            </span>
-                            <span
-                                onClick={this.goToNotifications}
-                                className={'dim pointer'}
-                                title={'View all notifications, including ones that are read'}
-                            >
-                                view all
-                            </span>
-                        </div>
+                            mark as read
+                        </span>
+                        <span
+                            onClick={this.goToNotifications}
+                            className={'dim pointer'}
+                            title={'View all notifications, including ones that are read'}
+                        >
+                            view all
+                        </span>
                     </div>
-                )}
+                </div>
             </div>
         )
     }

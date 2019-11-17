@@ -27,6 +27,8 @@ export interface IPost {
     uuid: string
     title: string
     poster: string
+    displayName: string
+    pub: string
     content: string
     createdAt: Date
     sub: string
