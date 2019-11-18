@@ -9,9 +9,10 @@ import { getUiStore, IStores } from '@stores/index'
 import { bkToStatusJson, sleep } from '@utils'
 
 export default class NewAuth extends BaseStore {
-    @persist('object') @observable displayName = {
-        bk: '',
-        scatter: '',
+    @persist('object')
+    @observable displayName = {
+        bk: null,
+        scatter: null,
     }
 
     @persist @observable postPriv = ''
@@ -21,7 +22,8 @@ export default class NewAuth extends BaseStore {
     // private stuff
     @observable privateKey = ''
 
-    @persist('object') @observable statusJson = {
+    @persist('object')
+    @observable statusJson = {
         bk: null,
         scatter: null,
     }
