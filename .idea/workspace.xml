@@ -3,11 +3,9 @@
   <component name="ChangeListManager">
     <list default="true" id="2d14133e-344f-4fbf-9bb7-c9e5e96ae697" name="Default Changelist" comment="">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/components/notification-item/notification-item.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/components/notification-item/notification-item.tsx" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/components/reply/reply.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/components/reply/reply.tsx" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/components/user-notifications/user-notifications.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/components/user-notifications/user-notifications.tsx" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/pages/tag/[name]/[id]/[title].tsx" beforeDir="false" afterPath="$PROJECT_DIR$/pages/tag/[name]/[id]/[title].tsx" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/stores/notifications.ts" beforeDir="false" afterPath="$PROJECT_DIR$/stores/notifications.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/package-lock.json" beforeDir="false" afterPath="$PROJECT_DIR$/package-lock.json" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/package.json" beforeDir="false" afterPath="$PROJECT_DIR$/package.json" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/pages/_app.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/pages/_app.tsx" afterDir="false" />
     </list>
     <ignored path="$PROJECT_DIR$/.tmp/" />
     <ignored path="$PROJECT_DIR$/temp/" />
@@ -20,28 +18,13 @@
   </component>
   <component name="FileEditorManager">
     <leaf>
-      <file pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/components/reply/reply.tsx">
-          <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="435">
-              <caret line="173" column="24" lean-forward="true" selection-start-line="173" selection-start-column="24" selection-end-line="173" selection-end-column="24" />
-              <folding>
-                <element signature="e#0#30#0" expanded="true" />
-                <element signature="e#2481#2551#0" />
-                <element signature="e#2592#2711#0" />
-                <element signature="e#2755#3093#0" />
-              </folding>
-            </state>
-          </provider>
-        </entry>
-      </file>
       <file pinned="false" current-in-tab="true">
-        <entry file="file://$PROJECT_DIR$/pages/tag/[name]/[id]/[title].tsx">
+        <entry file="file://$PROJECT_DIR$/pages/_app.tsx">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="391">
-              <caret line="65" column="12" lean-forward="true" selection-start-line="65" selection-start-column="12" selection-end-line="65" selection-end-column="12" />
+            <state relative-caret-position="496">
+              <caret line="100" column="30" lean-forward="true" selection-start-line="100" selection-start-column="30" selection-end-line="100" selection-end-column="30" />
               <folding>
-                <element signature="e#0#30#0" expanded="true" />
+                <element signature="e#0#26#0" expanded="true" />
               </folding>
             </state>
           </provider>
@@ -51,10 +34,6 @@
   </component>
   <component name="FindInProjectRecents">
     <findStrings>
-      <find>&lt;img sr</find>
-      <find>notifications-content {</find>
-      <find>edit post</find>
-      <find>&lt;OpeningPost</find>
       <find>&lt;OpeningP</find>
       <find>notificationsAsArray</find>
       <find>new Date(</find>
@@ -81,6 +60,10 @@
       <find>clearNotification.</find>
       <find>notificationTrayItems.set(</find>
       <find>c</find>
+      <find>.post</find>
+      <find>statusJson.bk.post</find>
+      <find>statusJson.</find>
+      <find>bk.post</find>
     </findStrings>
     <replaceStrings>
       <replace>.child</replace>
@@ -118,7 +101,6 @@
   <component name="IdeDocumentHistory">
     <option name="CHANGED_PATHS">
       <list>
-        <option value="$PROJECT_DIR$/models/feedModel.ts" />
         <option value="$PROJECT_DIR$/novusphere-js/discussions/post.ts" />
         <option value="$PROJECT_DIR$/pages/search/index.tsx" />
         <option value="$PROJECT_DIR$/pages/u/[username]-[pub].tsx" />
@@ -135,7 +117,6 @@
         <option value="$PROJECT_DIR$/models/tagModel.ts" />
         <option value="$PROJECT_DIR$/models/threadModel.ts" />
         <option value="$PROJECT_DIR$/models/postModel.ts" />
-        <option value="$PROJECT_DIR$/pages/_app.tsx" />
         <option value="$PROJECT_DIR$/pages/all/index.tsx" />
         <option value="$PROJECT_DIR$/pages/index.tsx" />
         <option value="$PROJECT_DIR$/pages/feed/index.tsx" />
@@ -143,7 +124,6 @@
         <option value="$PROJECT_DIR$/stores/signInStore.ts" />
         <option value="$PROJECT_DIR$/stores/index.ts" />
         <option value="$PROJECT_DIR$/components/modal/sign-up/sign-up-modal.tsx" />
-        <option value="$PROJECT_DIR$/stores/newAuth.ts" />
         <option value="$PROJECT_DIR$/components/create-form/form.tsx" />
         <option value="$PROJECT_DIR$/types/form.d.ts" />
         <option value="$PROJECT_DIR$/stores/signUpStore.ts" />
@@ -169,6 +149,9 @@
         <option value="$PROJECT_DIR$/components/notification-item/notification-item.tsx" />
         <option value="$PROJECT_DIR$/components/reply/reply.tsx" />
         <option value="$PROJECT_DIR$/pages/tag/[name]/[id]/[title].tsx" />
+        <option value="$PROJECT_DIR$/stores/newAuth.ts" />
+        <option value="$PROJECT_DIR$/pages/_document.tsx" />
+        <option value="$PROJECT_DIR$/pages/_app.tsx" />
       </list>
     </option>
   </component>
@@ -292,7 +275,7 @@
     <property name="nodejs_package_manager_path" value="yarn" />
     <property name="prettierjs.PrettierConfiguration.NodeInterpreter" value="project" />
     <property name="prettierjs.PrettierConfiguration.Package" value="$PROJECT_DIR$/node_modules/prettier" />
-    <property name="settings.editor.selected.configurable" value="editing.templates" />
+    <property name="settings.editor.selected.configurable" value="preferences.lookFeel" />
     <property name="ts.external.directory.path" value="$PROJECT_DIR$/node_modules/typescript/lib" />
   </component>
   <component name="RecentsManager">
@@ -460,18 +443,20 @@
       <workItem from="1573921757544" duration="9172000" />
       <workItem from="1573945956736" duration="18268000" />
       <workItem from="1574004781511" duration="2186000" />
-      <workItem from="1574019198122" duration="2171000" />
+      <workItem from="1574019198122" duration="2279000" />
+      <workItem from="1574095548738" duration="10000" />
+      <workItem from="1574119346538" duration="893000" />
     </task>
     <servers />
   </component>
   <component name="TimeTrackingManager">
-    <option name="totallyTimeSpent" value="661198000" />
+    <option name="totallyTimeSpent" value="662209000" />
   </component>
   <component name="ToolWindowManager">
     <frame x="-8" y="-8" width="2576" height="1416" extended-state="6" />
     <editor active="true" />
     <layout>
-      <window_info active="true" content_ui="combo" id="Project" order="0" sideWeight="0.4982538" visible="true" weight="0.119779356" />
+      <window_info content_ui="combo" id="Project" order="0" sideWeight="0.4982538" visible="true" weight="0.119779356" />
       <window_info id="Structure" order="1" sideWeight="0.50174624" side_tool="true" weight="0.119779356" />
       <window_info id="Favorites" order="2" side_tool="true" />
       <window_info id="npm" order="3" sideWeight="0.5010352" side_tool="true" weight="0.12647754" />
@@ -485,7 +470,7 @@
       <window_info anchor="bottom" id="Version Control" order="7" />
       <window_info anchor="bottom" id="Docker" order="8" show_stripe_button="false" />
       <window_info anchor="bottom" id="TypeScript" order="9" />
-      <window_info anchor="bottom" id="Terminal" order="10" sideWeight="0.49960598" visible="true" weight="0.31956354" />
+      <window_info active="true" anchor="bottom" id="Terminal" order="10" sideWeight="0.49960598" visible="true" weight="0.31956354" />
       <window_info anchor="bottom" id="Event Log" order="11" sideWeight="0.500394" side_tool="true" weight="0.17614965" />
       <window_info anchor="right" id="Commander" internal_type="SLIDING" order="0" type="SLIDING" weight="0.4" />
       <window_info anchor="right" id="Ant Build" order="1" weight="0.25" />
@@ -496,13 +481,6 @@
     <option name="version" value="1" />
   </component>
   <component name="editorHistoryManager">
-    <entry file="file://$PROJECT_DIR$/styles/components/_post.scss">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="368">
-          <caret line="23" column="5" lean-forward="true" selection-start-line="23" selection-start-column="5" selection-end-line="23" selection-end-column="5" />
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/components/user-name-with-icon/user-name-with-icon.tsx">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="649">
@@ -586,16 +564,6 @@
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="512">
           <caret line="35" column="23" selection-start-line="35" selection-start-column="23" selection-end-line="35" selection-end-column="23" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/pages/_app.tsx">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="57">
-          <caret line="66" column="59" selection-start-line="66" selection-start-column="59" selection-end-line="66" selection-end-column="59" />
-          <folding>
-            <element signature="e#0#26#0" expanded="true" />
-          </folding>
         </state>
       </provider>
     </entry>
@@ -765,16 +733,6 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/stores/newAuth.ts">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="400">
-          <caret line="39" column="32" selection-start-line="39" selection-end-line="40" />
-          <folding>
-            <element signature="e#0#63#0" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/components/post-preview/post-preview.tsx">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="1961">
@@ -799,15 +757,6 @@
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="601">
           <caret line="84" column="24" lean-forward="true" selection-start-line="84" selection-start-column="24" selection-end-line="84" selection-end-column="24" />
-          <folding>
-            <element signature="e#0#30#0" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/components/tag-preview/tag-preview.tsx">
-      <provider selected="true" editor-type-id="text-editor">
-        <state>
           <folding>
             <element signature="e#0#30#0" expanded="true" />
           </folding>
@@ -931,23 +880,56 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/components/reply/reply.tsx">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="435">
-          <caret line="173" column="24" lean-forward="true" selection-start-line="173" selection-start-column="24" selection-end-line="173" selection-end-column="24" />
+        <state relative-caret-position="2352">
+          <caret line="173" column="24" selection-start-line="173" selection-start-column="24" selection-end-line="173" selection-end-column="24" />
           <folding>
             <element signature="e#0#30#0" expanded="true" />
-            <element signature="e#2481#2551#0" />
-            <element signature="e#2592#2711#0" />
-            <element signature="e#2755#3093#0" />
           </folding>
         </state>
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/pages/tag/[name]/[id]/[title].tsx">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="391">
-          <caret line="65" column="12" lean-forward="true" selection-start-line="65" selection-start-column="12" selection-end-line="65" selection-end-column="12" />
+        <state relative-caret-position="359">
+          <caret line="63" column="21" selection-start-line="63" selection-start-column="21" selection-end-line="63" selection-end-column="21" />
           <folding>
             <element signature="e#0#30#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/components/tag-preview/tag-preview.tsx">
+      <provider selected="true" editor-type-id="text-editor">
+        <state>
+          <folding>
+            <element signature="e#0#30#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/stores/newAuth.ts">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="359">
+          <caret line="69" column="16" lean-forward="true" selection-start-line="69" selection-start-column="16" selection-end-line="69" selection-end-column="16" />
+          <folding>
+            <element signature="e#0#63#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/pages/_document.tsx">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="288">
+          <caret line="18" column="23" lean-forward="true" selection-start-line="18" selection-start-column="23" selection-end-line="18" selection-end-column="23" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/pages/_app.tsx">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="496">
+          <caret line="100" column="30" lean-forward="true" selection-start-line="100" selection-start-column="30" selection-end-line="100" selection-end-column="30" />
+          <folding>
+            <element signature="e#0#26#0" expanded="true" />
           </folding>
         </state>
       </provider>

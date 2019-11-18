@@ -8,6 +8,8 @@ import { isServer } from '@utils'
 import { create } from 'mobx-persist'
 import { toast } from 'react-toastify'
 import { DefaultSeo } from 'next-seo'
+import Router from 'next/router'
+import withGA from 'next-ga'
 
 import '../styles/style.scss'
 
@@ -110,4 +112,4 @@ class DiscussionApp extends App {
     }
 }
 
-export default withMobx(Stores)(DiscussionApp)
+export default (withMobx(Stores))(withGA("UA-152897893-1", Router)(DiscussionApp))
