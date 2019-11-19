@@ -102,6 +102,7 @@ export class ReplyModel {
                     ...reply,
                     content,
                     edit: true,
+                    uuid: generateUuid(),
                     mentions: ReplyModel.extractMentionHashesForRegEx(
                         ReplyModel.matchContentForMentions(content)
                     ),

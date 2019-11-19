@@ -13,6 +13,7 @@ class PostModel {
     @observable poster
     @observable displayName
     @observable createdAt
+    @observable editedAt
     @observable myVote
     @observable upvotes
     @observable downvotes

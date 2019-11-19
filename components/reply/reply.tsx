@@ -5,7 +5,8 @@ import {
     faEdit,
     faEye,
     faLink,
-    faReply, faShare,
+    faReply,
+    faShare,
     faUserMinus,
     faUserPlus,
 } from '@fortawesome/free-solid-svg-icons'
@@ -222,18 +223,15 @@ class Reply extends React.Component<IReplies, IRepliesState> {
                                     />
                                     <span
                                         className={'pl2 o-50 f6'}
-                                        title={moment(post.createdAt).format('YYYY-MM-DD HH:mm:ss')}
+                                        title={moment(
+                                            post.edit ? post.editedAt : post.createdAt
+                                        ).format('YYYY-MM-DD HH:mm:ss')}
                                     >
-                                        {moment(post.createdAt).fromNow()}
+                                        {post.edit && 'edited '}{' '}
+                                        {moment(
+                                            post.edit ? post.editedAt : post.createdAt
+                                        ).fromNow()}
                                     </span>
-                                    {post.edit && (
-                                        <span
-                                            className={'o-50 ph1 f6 i'}
-                                            title={'This post was edited'}
-                                        >
-                                            (edited)
-                                        </span>
-                                    )}
                                     {isCollapsed && (
                                         <span className={'o-50 i f6 pl2'}>
                                             ({replies.length} children)
