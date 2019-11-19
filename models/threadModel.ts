@@ -11,7 +11,7 @@ import { task } from 'mobx-task'
 
 export class ThreadModel {
     @observable public map: { [p: string]: PostModel } | undefined
-    @observable public openingPost: PostModel
+    @observable.deep public openingPost: PostModel
     @observable public uuid: string
     @observable public title: string
     @observable public sub: string
@@ -101,34 +101,38 @@ export class ThreadModel {
             const { title, content } = form.values()
 
             try {
-                this.openingPost.title = title
-                this.openingPost.content = content
-                this.openingPost.createdAt = new Date(Date.now())
-
                 let tags = ReplyModel.matchContentForTags(content)
 
                 if (tags && tags.length) {
                     tags = tags.map(tag => tag.replace('#', ''))
-                    this.openingPost.tags = [...this.openingPost.tags, ...tags]
+                    tags = [...this.openingPost.tags, ...tags]
                 }
 
-                this.openingPost.mentions = ReplyModel.extractMentionHashesForRegEx(
+                const mentions = ReplyModel.extractMentionHashesForRegEx(
                     ReplyModel.matchContentForMentions(content)
                 )
 
-                let signedEdit = await this.openingPost.sign(this.authStore.postPriv)
-
-                signedEdit = {
-                    ...signedEdit,
+                const editedPost = new PostModel({
+                    ...this.openingPost,
+                    content,
+                    title,
+                    tags,
+                    mentions,
                     parentUuid: this.openingPost.uuid,
                     edit: true,
                     poster: undefined,
-                }
+                } as any)
+
+                let signedEdit = await editedPost.sign(this.authStore.postPriv)
+
+                console.log('Class: ThreadModel, Function: saveEdits, Line 128 signedEdit: ', signedEdit, '\n\n');
 
                 const newPost = await discussions.post(signedEdit as any)
 
                 newPost.editedAt = new Date(Date.now())
-                this.openingPost = new PostModel(newPost)
+
+                this.openingPost = editedPost
+
                 this.uiStore.showToast('Your post has been edited!', 'success')
 
                 this.toggleEditing()
@@ -140,7 +144,7 @@ export class ThreadModel {
         }
     }
 
-    get editForm() {
+    @computed get editForm() {
         return new CreateForm({}, [
             {
                 name: 'title',
