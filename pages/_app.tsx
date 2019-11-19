@@ -4,10 +4,11 @@ import * as Stores from '@stores'
 import { Provider, useStaticRendering } from 'mobx-react'
 import { MainLayout } from '@components'
 import { withMobx } from 'next-mobx-wrapper'
-import { isServer } from '@utils'
+import { isServer, pageview } from '@utils'
 import { create } from 'mobx-persist'
 import { toast } from 'react-toastify'
 import { DefaultSeo } from 'next-seo'
+import Router from 'next/router'
 
 import '../styles/style.scss'
 
@@ -15,22 +16,10 @@ import '../styles/style.scss'
 useStaticRendering(isServer) // NOT `true` value
 toast.configure()
 
+Router.events.on('routeChangeComplete', url => pageview(url))
+
 class DiscussionApp extends App {
     public props: any
-
-    // static async getInitialProps({ ctx, Component }) {
-    //     const isServer = !!ctx.req
-    //     let pageProps = {}
-    //     //
-    //     if (Component.getInitialProps) {
-    //         pageProps = await Component.getInitialProps(ctx)
-    //     }
-    //
-    //     return {
-    //         isServer,
-    //         pageProps,
-    //     }
-    // }
 
     /**
      * Hydrate the store for LS here
@@ -61,7 +50,7 @@ class DiscussionApp extends App {
             })
 
             Object.keys(stores).forEach(store => {
-                hydrate(store, stores[store]).rehydrate()
+                hydrate(store, stores[store])
 
                 // if (getVersion() !== this.props.store.settingsStore.localStorageVersion) {
                 //     console.error('local storage version mismatch')

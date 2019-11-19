@@ -8,34 +8,16 @@ import { IStores } from '@stores'
 import { getVersion } from '@utils'
 
 interface IMainLayoutProps {
+    tagStore: IStores['tagStore']
     uiStore: IStores['uiStore']
     settingsStore: IStores['settingsStore']
 }
 
-import ReactGA from "react-ga";
-
-function trackPageView() {
-    if (location.hostname === "localhost" || location.hostname === "127.0.0.1") {
-        return;
-    }
-
-    if (!(window as any).GA_INITIALIZED) {
-        ReactGA.initialize("UA-152897893-1");
-        (window as any).GA_INITIALIZED = true;
-    }
-
-    ReactGA.set({ page: window.location.pathname });
-    ReactGA.pageview(window.location.pathname);
-}
-
-@inject('uiStore', 'settingsStore')
+@inject('tagStore', 'uiStore', 'settingsStore')
 @observer
 class MainLayout extends React.Component<IMainLayoutProps> {
-    componentDidMount(): void {
-        trackPageView()
-    }
-
     public render() {
+        const { activeTag, tags } = this.props.tagStore
         const { showBanner, showSidebar, activeBanner } = this.props.uiStore
 
         return (

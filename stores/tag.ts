@@ -16,7 +16,8 @@ export default class Tag extends BaseStore {
     @observable activeTag: TagModel = null
     @observable tags = observable.map<string, TagModel>()
 
-    @persist('list') @observable subSubscriptionStatus: string[] = []
+    @persist('list')
+    @observable subSubscriptionStatus: string[] = []
 
     constructor() {
         super()
