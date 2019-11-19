@@ -44,21 +44,6 @@ class Thread extends React.Component<IThreadOuterProps & IThreadInnerProps, IThr
         }
     }
 
-    // async componentDidMount(): Promise<void> {
-    //     const [, uuid] = this.props.router.asPath.split('#')
-    //     console.log('Class: Reply, Function: addAndScrollToUuid, Line 82 uuid: ', uuid)
-    //     const { offsetTop } = document.getElementById(uuid)
-    //     console.log(
-    //         'Class: Reply, Function: addAndScrollToUuid, Line 84 document.getElementById(uuid): ',
-    //         document.getElementById(uuid)
-    //     )
-    //
-    //     if (offsetTop) {
-    //         this.props.postsStore.highlightPostUuid(uuid)
-    //         window.scrollTo(0, offsetTop)
-    //     }
-    // }
-
     private renderOpeningPost = () => {
         const {
             router,
@@ -73,7 +58,7 @@ class Thread extends React.Component<IThreadOuterProps & IThreadInnerProps, IThr
 
         return (
             <OpeningPost
-                openingPost={openingPost as any}
+                openingPost={threadAsModel.openingPost}
                 asPath={router.asPath}
                 id={router.query.id as string}
                 activeThread={threadAsModel}

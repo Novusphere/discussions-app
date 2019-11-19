@@ -4,23 +4,13 @@ import './style.scss'
 import { openInNewTab } from '@utils'
 import Link from 'next/link'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
-import {
-    faChevronLeft,
-    faEdit,
-    faExclamationTriangle,
-    faEye,
-    faLink,
-    faPen,
-    faReply,
-    faShare,
-} from '@fortawesome/free-solid-svg-icons'
+import { faChevronLeft, faEye, faLink, faPen, faReply } from '@fortawesome/free-solid-svg-icons'
 import { Attachments, UserNameWithIcon, Votes, Form, SharePost } from '@components'
 import moment from 'moment'
 import ReactMarkdown from 'react-markdown'
 import PostModel from '@models/postModel'
 import { ThreadModel } from '@models/threadModel'
 import { observer } from 'mobx-react'
-import copy from 'clipboard-copy'
 import { TagModel } from '@models/tagModel'
 
 interface IOpeningPostProps {
@@ -40,7 +30,6 @@ const OpeningPost: React.FC<IOpeningPostProps> = ({
     canEditPost,
     openingPost,
     activeThread,
-    asPath,
     activeTag,
     watchPost,
     isWatchingPost,
@@ -86,18 +75,16 @@ const OpeningPost: React.FC<IOpeningPostProps> = ({
                         imageSize={20}
                     />
                     <span className={'ph1 b'}>&#183;</span>
-                    <span title={moment(openingPost.createdAt).format('YYYY-MM-DD HH:mm:ss')}>
-                        {' '}
-                        {moment(openingPost.createdAt).fromNow()}
+                    <span
+                        title={moment(
+                            openingPost.edit ? openingPost.editedAt : openingPost.createdAt
+                        ).format('YYYY-MM-DD HH:mm:ss')}
+                    >
+                        {openingPost.edit && 'edited '}{' '}
+                        {moment(
+                            openingPost.edit ? openingPost.editedAt : openingPost.createdAt
+                        ).fromNow()}
                     </span>
-
-                    {openingPost.edit && (
-                        <>
-                            <span className={'ph1 f6 i'} title={'This post was edited'}>
-                                (edited)
-                            </span>
-                        </>
-                    )}
                 </div>
 
                 <div className={'flex justify-between items-center pb1'}>

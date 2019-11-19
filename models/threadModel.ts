@@ -11,7 +11,7 @@ import { task } from 'mobx-task'
 
 export class ThreadModel {
     @observable public map: { [p: string]: PostModel } | undefined
-    @observable.deep public openingPost: PostModel
+    @observable public openingPost: PostModel
     @observable public uuid: string
     @observable public title: string
     @observable public sub: string
@@ -125,7 +125,10 @@ export class ThreadModel {
                     poster: undefined,
                 }
 
-                this.openingPost = await discussions.post(signedEdit as any)
+                const newPost = await discussions.post(signedEdit as any)
+
+                newPost.editedAt = new Date(Date.now())
+                this.openingPost = new PostModel(newPost)
                 this.uiStore.showToast('Your post has been edited!', 'success')
 
                 this.toggleEditing()

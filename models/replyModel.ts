@@ -121,7 +121,7 @@ export class ReplyModel {
 
                 this.post.content = confirmedReply.content
                 this.post.pub = confirmedReply.pub
-                this.post.createdAt = confirmedReply.createdAt
+                this.post.editedAt = new Date(Date.now())
                 this.post.transaction = confirmedReply.transaction
                 this.post.edit = true
 

@@ -1,9 +1,7 @@
 import * as React from 'react'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import {
-    faDollarSign,
-    faEdit,
-    faEye,
+    faPen,
     faLink,
     faReply,
     faShare,
@@ -116,7 +114,7 @@ class Reply extends React.Component<IReplies, IRepliesState> {
                 </span>
                 {replyModel.canEditPost && (
                     <span title={'Edit post'} onClick={() => replyModel.toggleEditing()}>
-                        <FontAwesomeIcon icon={faEdit} />
+                        <FontAwesomeIcon icon={faPen} />
                     </span>
                 )}
                 <span title={'Permalink'} onClick={this.getPermaLinkUrl}>

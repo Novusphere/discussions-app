@@ -4,8 +4,8 @@ import { task } from 'mobx-task'
 import { BaseStore, getOrCreateStore } from 'next-mobx-wrapper'
 import { CreateForm } from '@components'
 import tag, { getTagStore } from '@stores/tag'
-import { getNewAuthStore, getUiStore, getUserStore, IStores } from '@stores'
-import { generateUuid, getAttachmentValue, getIdenticon, pushToThread, sleep } from '@utils'
+import { getNewAuthStore, getUiStore, IStores } from '@stores'
+import { generateUuid, getAttachmentValue, pushToThread, sleep } from '@utils'
 import { ThreadModel } from '@models/threadModel'
 import FeedModel from '@models/feedModel'
 import _ from 'lodash'
@@ -89,7 +89,6 @@ export default class Posts extends BaseStore {
     private readonly tagsStore: IStores['tagStore'] = getTagStore()
     private readonly uiStore: IStores['uiStore'] = getUiStore()
     private readonly newAuthStore: IStores['newAuthStore'] = getNewAuthStore()
-    private readonly userStore: IStores['userStore'] = getUserStore()
 
     @action.bound
     highlightPostUuid(uuid: string) {

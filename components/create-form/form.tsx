@@ -5,7 +5,6 @@ import Select from 'react-select'
 import { Editor } from '@components'
 import { faSpinner } from '@fortawesome/free-solid-svg-icons'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
-import _ from 'lodash'
 
 interface FormProps extends React.HTMLAttributes<HTMLFormElement> {
     form: IForm
