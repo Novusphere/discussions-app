@@ -2,6 +2,7 @@
 import ecc from 'eosjs-ecc';
 import { Attachment} from './attachment';
 const BigInt = require('big-integer');
+const TIME_ENCODE_GENESIS = 1483246800000; // 2017-1-1
 
 export interface PostMetaData {
     title?: string;
@@ -30,6 +31,7 @@ export class Post {
     displayName: string;
     content: string;
     createdAt: Date;
+    editedAt: Date;
     sub: string;
     tags: string[];
     mentions: string[];
@@ -91,6 +93,7 @@ export class Post {
         this.displayName = '';
         this.content = '';
         this.createdAt = new Date(0);
+        this.editedAt = new Date(0);
         this.sub = '';
         this.tags = [];
         this.mentions = [];
@@ -127,6 +130,7 @@ export class Post {
         if (o.edit) {
             p.edit = true;
             p.editUuid = o.edit;
+            p.editedAt = new Date(o.editedAt);
         }
         p.pub = o.pub;
         p.sig = o.sig;
@@ -146,14 +150,9 @@ export class Post {
 
     static decodeId(id: string) {
         let n = new BigInt(id, 36);
-        
         let txid32 = n.shiftRight(32).toString(16).padStart(8, '0');
-        
         let timeOffset = n.and(new BigInt('ffffffff', 16));
-      
-        let timeGenesis = 1483246800000;
-
-        let time = (timeOffset.valueOf() * 1000) + timeGenesis;
+        let time = (timeOffset.valueOf() * 1000) + TIME_ENCODE_GENESIS;
         
         return {
             txid32: txid32,
@@ -164,7 +163,7 @@ export class Post {
 
     static encodeId(transaction: string, createdAt: Date) : string {
         let txid32 = new BigInt(transaction.substring(0, 8), 16);
-        let timeOffset = new BigInt(Math.floor((createdAt.getTime() - 1483246800000) / 1000), 10);
+        let timeOffset = new BigInt(Math.floor((createdAt.getTime() - TIME_ENCODE_GENESIS) / 1000), 10);
         let id = txid32.shiftLeft(32).or(timeOffset);
         return id.toString(36);
     }
