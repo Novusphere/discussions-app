@@ -9,12 +9,13 @@ import { sleep } from '@utils'
 interface IIndexProps {
     postsStore: IStores['postsStore']
     tagStore: IStores['tagStore']
+    userStore: IStores['userStore']
     uiStore: IStores['uiStore']
 }
 
 interface IIndexState {}
 
-@inject('postsStore', 'tagStore', 'uiStore')
+@inject('postsStore', 'tagStore', 'userStore', 'uiStore')
 @observer
 class Index extends React.Component<IIndexProps, IIndexState> {
     componentWillMount(): void {
@@ -26,7 +27,7 @@ class Index extends React.Component<IIndexProps, IIndexState> {
 
     async componentDidMount(): Promise<void> {
         await sleep(500)
-        await this.props.postsStore.getPostsForKeys()
+        await this.props.postsStore.getPostsForKeys(this.props.userStore.followingKeys)
     }
 
     public render() {
@@ -37,7 +38,7 @@ class Index extends React.Component<IIndexProps, IIndexState> {
             <InfiniteScrollFeed
                 dataLength={items}
                 hasMore={cursorId !== 0}
-                next={getPostsForKeys}
+                next={() => getPostsForKeys(this.props.userStore.followingKeys)}
                 posts={posts}
             />
         )

@@ -31,7 +31,7 @@ export default class User extends BaseStore {
 
     isFollowingUser = computedFn((pub: string) => {
         return this.following.has(pub)
-    })
+    }, true)
 }
 
 export const getUserStore = getOrCreateStore('userStore', User)

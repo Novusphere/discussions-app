@@ -74,11 +74,11 @@ a {
     height: 100%;
     overflow: hidden;
     position: sticky;
+    max-height: calc(100vh - 55px - 15px);
 
     ul {
-        overflow-y: scroll;
+        overflow-y: auto;
         overflow-x: hidden;
-        max-height: calc(100vh - 55px - 15px);
     }
 }
 

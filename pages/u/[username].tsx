@@ -6,7 +6,7 @@ import { Tab, Tabs, TabList, TabPanel } from 'react-tabs'
 import { faMinusCircle } from '@fortawesome/free-solid-svg-icons'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { computed } from 'mobx'
-import { getIdenticon } from '@utils'
+import { getIdenticon, isServer, sleep } from '@utils'
 import { InfiniteScrollFeed, PostPreview } from '@components'
 
 interface IUPageProps {
@@ -35,8 +35,12 @@ class U extends React.Component<IUPageProps> {
         const [username, pub] = query.username.split('-')
         const icon = getIdenticon(pub)
 
-        postsStore.resetPositionAndPosts()
+        if (!isServer) {
+            window.scrollTo(0, 0)
+        }
 
+        postsStore.resetPositionAndPosts()
+        await sleep(500)
         const posts = await postsStore.getPostsForKeys([pub])
 
         return {
@@ -52,10 +56,6 @@ class U extends React.Component<IUPageProps> {
         this.props.tagStore.destroyActiveTag()
         this.props.uiStore.toggleSidebarStatus(false)
         this.props.uiStore.toggleBannerStatus(true)
-    }
-
-    componentDidMount(): void {
-        // window.scrollTo(0, 0)
     }
 
     @computed get isSameUser() {
@@ -180,7 +180,7 @@ class U extends React.Component<IUPageProps> {
     public render(): React.ReactNode {
         return (
             <div className={'flex flex-row'}>
-                <div className={'card w-30 mr5 pa3'}>{this.renderSidebarContent()}</div>
+                <div className={'card sidebar w-30 mr3 pa3'}>{this.renderSidebarContent()}</div>
                 <div className={'w-70'}>
                     <Tabs selectedIndex={1} onSelect={index => console.log(index)}>
                         <TabList className={'settings-tabs'}>
