@@ -1,26 +1,7 @@
 // ./pages/_document.js
 import Document, { Html, Head, Main, NextScript } from 'next/document'
-import ReactGA from "react-ga";
-
-function trackPageView() {
-    if (location.hostname === "localhost" || location.hostname === "127.0.0.1") {
-        return;
-    }
-    
-    if (!(window as any).GA_INITIALIZED) {
-        ReactGA.initialize("UA-152897893-1");
-        (window as any).GA_INITIALIZED = true;
-    }
-    
-    ReactGA.set({ page: window.location.pathname });
-    ReactGA.pageview(window.location.pathname);
-}
 
 export default class MyDocument extends Document {
-    componentDidMount(): void {
-        trackPageView()
-    }
-
     render() {
         return (
             <Html>
