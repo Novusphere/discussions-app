@@ -21,6 +21,7 @@ export { default as ComingSoon } from './coming-soon-message/coming-soon-message
 export { default as InfiniteScrollFeed } from './infinite-scroll-feed/infinite-scroll-feed'
 export { default as OpeningPost } from './opening-post/opening-post'
 export { default as NotificationItem } from './notification-item/notification-item'
+export { default as SharePost } from './share-post/share-post'
 
 export { default as ChooseAccountName } from './modal/sign-up/choose-account-name'
 export { default as SectionHeader } from './modal/sign-up/header'

@@ -5,7 +5,7 @@ import {
     faEdit,
     faEye,
     faLink,
-    faReply,
+    faReply, faShare,
     faUserMinus,
     faUserPlus,
 } from '@fortawesome/free-solid-svg-icons'
@@ -119,16 +119,16 @@ class Reply extends React.Component<IReplies, IRepliesState> {
                     </span>
                 )}
                 <span title={'Permalink'} onClick={this.getPermaLinkUrl}>
-                    <FontAwesomeIcon icon={faLink} />
+                    <FontAwesomeIcon icon={faShare} />
                 </span>
-                <span title={'Donate tokens'}>
-                    <FontAwesomeIcon icon={faDollarSign} />
-                </span>
+                {/*<span title={'Donate tokens'}>*/}
+                {/*    <FontAwesomeIcon icon={faDollarSign} />*/}
+                {/*</span>*/}
                 <span
                     title={'View block'}
                     onClick={() => openInNewTab(`https://eosq.app/tx/${post.transaction}`)}
                 >
-                    <FontAwesomeIcon icon={faEye} />
+                    <FontAwesomeIcon icon={faLink} />
                 </span>
                 {post.pub && hasAccount && activePublicKey !== post.pub ? (
                     following.has(post.pub) ? (

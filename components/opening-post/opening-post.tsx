@@ -6,13 +6,15 @@ import Link from 'next/link'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import {
     faChevronLeft,
+    faEdit,
     faExclamationTriangle,
     faEye,
     faLink,
+    faPen,
     faReply,
     faShare,
 } from '@fortawesome/free-solid-svg-icons'
-import { Attachments, UserNameWithIcon, Votes, Form } from '@components'
+import { Attachments, UserNameWithIcon, Votes, Form, SharePost } from '@components'
 import moment from 'moment'
 import ReactMarkdown from 'react-markdown'
 import PostModel from '@models/postModel'
@@ -127,70 +129,58 @@ const OpeningPost: React.FC<IOpeningPostProps> = ({
 
                 {activeThread && activeThread.openingPost && (
                     <div className={'footer flex items-center pt3'}>
-                        <button
-                            className={'reply mr3 pointer dim'}
-                            onClick={activeThread.rbModel(activeThread.openingPost).toggleOpen}
-                        >
-                            <FontAwesomeIcon
-                                fixedWidth
-                                width={13}
-                                icon={faReply}
-                                className={'pr1'}
-                            />
-                            reply
-                        </button>
+                        <div className={'flex flex-row w-100 items-center justify-between'}>
+                            <div>
+                                <button
+                                    className={'reply mr3 pointer dim'}
+                                    onClick={
+                                        activeThread.rbModel(activeThread.openingPost).toggleOpen
+                                    }
+                                >
+                                    <FontAwesomeIcon
+                                        fixedWidth
+                                        width={13}
+                                        icon={faReply}
+                                        className={'pr1'}
+                                    />
+                                    reply
+                                </button>
 
-                        {canEditPost && (
-                            <span
-                                className={'pr3 black f6 pointer dim'}
-                                title={'Edit post'}
-                                onClick={() => activeThread.toggleEditing()}
-                            >
-                                edit post
-                            </span>
-                        )}
+                                {canEditPost && (
+                                    <span
+                                        className={'mr3 black f6 pointer dim'}
+                                        title={'Edit post'}
+                                        onClick={() => activeThread.toggleEditing()}
+                                    >
+                                        <FontAwesomeIcon icon={faPen} color={'#929292'} />
+                                    </span>
+                                )}
 
-                        {typeof watchPost !== 'undefined' && (
-                            <span
-                                className={'pr3 black f6 pointer dim'}
-                                title={'Toggle watch status'}
-                                onClick={() => watchPost(id, activeThread.totalReplies)}
-                            >
-                                {!isWatchingPost(id) ? 'watch post' : 'unwatch post'}
-                            </span>
-                        )}
+                                {typeof watchPost !== 'undefined' && (
+                                    <span
+                                        className={'mr3 black f6 pointer dim'}
+                                        title={!isWatchingPost(id) ? 'Watch Post' : 'Unwatch Post'}
+                                        onClick={() => watchPost(id, activeThread.totalReplies)}
+                                    >
+                                        <FontAwesomeIcon icon={faEye} color={'#b0b0b0'} />
+                                    </span>
+                                )}
 
-                        <span
-                            className={'pr3 black f6 pointer dim'}
-                            title={'Permalink'}
-                            onClick={() => copy(window.location.href.split('#')[0])}
-                        >
-                            <FontAwesomeIcon width={13} icon={faLink} />
-                        </span>
+                                <span
+                                    className={'mr4 black f6 pointer dim'}
+                                    title={'View block'}
+                                    onClick={() =>
+                                        openInNewTab(
+                                            `https://eosq.app/tx/${openingPost.transaction}`
+                                        )
+                                    }
+                                >
+                                    <FontAwesomeIcon width={13} color={'#b0b0b0'} icon={faLink} />
+                                </span>
+                            </div>
 
-                        <span
-                            title={'View block'}
-                            onClick={() =>
-                                openInNewTab(`https://eosq.app/tx/${openingPost.transaction}`)
-                            }
-                        >
-                            <FontAwesomeIcon icon={faEye} className={'pr3 black f6 pointer dim'} />
-                        </span>
-
-                        <FontAwesomeIcon
-                            width={13}
-                            icon={faShare}
-                            className={'pr3 black f6 pointer dim'}
-                        />
-
-                        <span className={'f6 black f6'}>
-                            <FontAwesomeIcon
-                                width={13}
-                                icon={faExclamationTriangle}
-                                className={'pr1 pointer dim'}
-                            />
-                            mark as spam
-                        </span>
+                            <SharePost />
+                        </div>
                     </div>
                 )}
             </div>
