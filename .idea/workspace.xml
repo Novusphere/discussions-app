@@ -2,8 +2,7 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="2d14133e-344f-4fbf-9bb7-c9e5e96ae697" name="Default Changelist" comment="">
-      <change beforePath="$PROJECT_DIR$/components/thread/thread.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/components/thread/thread.tsx" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/models/replyModel.ts" beforeDir="false" afterPath="$PROJECT_DIR$/models/replyModel.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/components/editor/editor.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/components/editor/editor.tsx" afterDir="false" />
     </list>
     <ignored path="$PROJECT_DIR$/.tmp/" />
     <ignored path="$PROJECT_DIR$/temp/" />
@@ -30,10 +29,10 @@
               </provider>
             </entry>
           </file>
-          <file pinned="false" current-in-tab="true">
+          <file pinned="false" current-in-tab="false">
             <entry file="file://$PROJECT_DIR$/components/thread/thread.tsx">
               <provider selected="true" editor-type-id="text-editor">
-                <state relative-caret-position="576">
+                <state relative-caret-position="-311">
                   <caret line="76" column="35" lean-forward="true" selection-start-line="76" selection-start-column="35" selection-end-line="76" selection-end-column="35" />
                   <folding>
                     <element signature="e#0#30#0" expanded="true" />
@@ -42,11 +41,11 @@
               </provider>
             </entry>
           </file>
-          <file pinned="false" current-in-tab="false">
+          <file pinned="false" current-in-tab="true">
             <entry file="file://$PROJECT_DIR$/components/editor/editor.tsx">
               <provider selected="true" editor-type-id="text-editor">
-                <state relative-caret-position="441">
-                  <caret line="55" lean-forward="true" selection-start-line="55" selection-end-line="55" />
+                <state relative-caret-position="489">
+                  <caret line="178" column="40" lean-forward="true" selection-start-line="178" selection-start-column="40" selection-end-line="178" selection-end-column="40" />
                   <folding>
                     <element signature="e#0#30#0" expanded="true" />
                   </folding>
@@ -191,10 +190,10 @@
         <option value="$PROJECT_DIR$/components/opening-post/opening-post.tsx" />
         <option value="$PROJECT_DIR$/components/reply/reply.tsx" />
         <option value="$PROJECT_DIR$/modules/quill-custom-video/index.js" />
-        <option value="$PROJECT_DIR$/components/editor/editor.tsx" />
         <option value="$PROJECT_DIR$/stores/notifications.ts" />
         <option value="$PROJECT_DIR$/models/replyModel.ts" />
         <option value="$PROJECT_DIR$/components/thread/thread.tsx" />
+        <option value="$PROJECT_DIR$/components/editor/editor.tsx" />
       </list>
     </option>
   </component>
@@ -443,7 +442,7 @@
     <servers />
   </component>
   <component name="TimeTrackingManager">
-    <option name="totallyTimeSpent" value="676762000" />
+    <option name="totallyTimeSpent" value="676991000" />
   </component>
   <component name="ToolWindowManager">
     <frame x="-8" y="-8" width="2576" height="1416" extended-state="6" />
@@ -930,16 +929,6 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/components/editor/editor.tsx">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="441">
-          <caret line="55" lean-forward="true" selection-start-line="55" selection-end-line="55" />
-          <folding>
-            <element signature="e#0#30#0" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/models/replyModel.ts">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="121">
@@ -952,8 +941,18 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/components/thread/thread.tsx">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="576">
+        <state relative-caret-position="-311">
           <caret line="76" column="35" lean-forward="true" selection-start-line="76" selection-start-column="35" selection-end-line="76" selection-end-column="35" />
+          <folding>
+            <element signature="e#0#30#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/components/editor/editor.tsx">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="489">
+          <caret line="178" column="40" lean-forward="true" selection-start-line="178" selection-start-column="40" selection-end-line="178" selection-end-column="40" />
           <folding>
             <element signature="e#0#30#0" expanded="true" />
           </folding>

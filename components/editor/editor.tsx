@@ -174,8 +174,8 @@ class Editor extends React.Component<IEditorProps> {
                         [
                             'bold',
                             'italic',
-                            'underline',
-                            'strike',
+                            // 'underline',
+                            // 'strike',
                             'blockquote',
                             'list',
                             'bullet',
