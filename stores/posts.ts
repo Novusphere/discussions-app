@@ -296,7 +296,7 @@ export default class Posts extends BaseStore {
                         },
                         {
                             value: 'Post',
-                            disabled: !this.newAuthStore.hasAccount,
+                            disabled: !this.newAuthStore.hasAccount || !this.newPostData.sub,
                             title: !this.newAuthStore.hasAccount
                                 ? 'You need to be logged in to post'
                                 : 'Post as ' + this.newAuthStore.posterName,
