@@ -2,7 +2,9 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="2d14133e-344f-4fbf-9bb7-c9e5e96ae697" name="Default Changelist" comment="">
-      <change beforePath="$PROJECT_DIR$/components/opening-post/opening-post.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/components/opening-post/opening-post.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/components/editor/editor.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/components/editor/editor.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/package-lock.json" beforeDir="false" afterPath="$PROJECT_DIR$/package-lock.json" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/package.json" beforeDir="false" afterPath="$PROJECT_DIR$/package.json" afterDir="false" />
     </list>
     <ignored path="$PROJECT_DIR$/.tmp/" />
     <ignored path="$PROJECT_DIR$/temp/" />
@@ -16,10 +18,10 @@
   <component name="FileEditorManager">
     <leaf>
       <file pinned="false" current-in-tab="true">
-        <entry file="file://$PROJECT_DIR$/components/opening-post/opening-post.tsx">
+        <entry file="file://$PROJECT_DIR$/components/editor/editor.tsx">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="297">
-              <caret line="151" column="103" selection-start-line="151" selection-start-column="103" selection-end-line="151" selection-end-column="103" />
+            <state relative-caret-position="617">
+              <caret line="164" column="35" selection-start-line="164" selection-start-column="35" selection-end-line="164" selection-end-column="35" />
               <folding>
                 <element signature="e#0#30#0" expanded="true" />
               </folding>
@@ -101,7 +103,6 @@
       <list>
         <option value="$PROJECT_DIR$/styles/components/_post.scss" />
         <option value="$PROJECT_DIR$/novusphere-js/nsdb.ts" />
-        <option value="$PROJECT_DIR$/components/editor/editor.tsx" />
         <option value="$PROJECT_DIR$/models/tagModel.ts" />
         <option value="$PROJECT_DIR$/pages/all/index.tsx" />
         <option value="$PROJECT_DIR$/pages/index.tsx" />
@@ -150,6 +151,7 @@
         <option value="$PROJECT_DIR$/stores/posts.ts" />
         <option value="$PROJECT_DIR$/styles/components/_header.scss" />
         <option value="$PROJECT_DIR$/components/opening-post/opening-post.tsx" />
+        <option value="$PROJECT_DIR$/components/editor/editor.tsx" />
       </list>
     </option>
   </component>
@@ -181,6 +183,12 @@
               <item name="discussions-app" type="b2602c69:ProjectViewProjectNode" />
               <item name="discussions-app" type="462c0819:PsiDirectoryNode" />
               <item name="components" type="462c0819:PsiDirectoryNode" />
+            </path>
+            <path>
+              <item name="discussions-app" type="b2602c69:ProjectViewProjectNode" />
+              <item name="discussions-app" type="462c0819:PsiDirectoryNode" />
+              <item name="components" type="462c0819:PsiDirectoryNode" />
+              <item name="editor" type="462c0819:PsiDirectoryNode" />
             </path>
             <path>
               <item name="discussions-app" type="b2602c69:ProjectViewProjectNode" />
@@ -419,7 +427,7 @@
     <servers />
   </component>
   <component name="TimeTrackingManager">
-    <option name="totallyTimeSpent" value="672800000" />
+    <option name="totallyTimeSpent" value="672959000" />
   </component>
   <component name="ToolWindowManager">
     <frame x="-8" y="-8" width="2576" height="1416" extended-state="6" />
@@ -471,9 +479,6 @@
     <option name="version" value="1" />
   </component>
   <component name="editorHistoryManager">
-    <entry file="file://$PROJECT_DIR$/models/baseModel.ts">
-      <provider selected="true" editor-type-id="text-editor" />
-    </entry>
     <entry file="file://$PROJECT_DIR$/styles/components/_notifications-popup.scss">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="362">
@@ -906,20 +911,30 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/pages/new/index.tsx">
+    <entry file="file://$PROJECT_DIR$/components/opening-post/opening-post.tsx">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="617">
-          <caret line="48" column="16" selection-start-line="48" selection-start-column="16" selection-end-line="48" selection-end-column="16" />
+        <state relative-caret-position="249">
+          <caret line="148" column="71" lean-forward="true" selection-start-line="148" selection-start-column="71" selection-end-line="148" selection-end-column="71" />
           <folding>
             <element signature="e#0#30#0" expanded="true" />
           </folding>
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/components/opening-post/opening-post.tsx">
+    <entry file="file://$PROJECT_DIR$/pages/new/index.tsx">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="297">
-          <caret line="151" column="103" selection-start-line="151" selection-start-column="103" selection-end-line="151" selection-end-column="103" />
+        <state relative-caret-position="320">
+          <caret line="20" column="35" lean-forward="true" selection-start-line="20" selection-start-column="34" selection-end-line="20" selection-end-column="35" />
+          <folding>
+            <element signature="e#0#30#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/components/editor/editor.tsx">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="617">
+          <caret line="164" column="35" selection-start-line="164" selection-start-column="35" selection-end-line="164" selection-end-column="35" />
           <folding>
             <element signature="e#0#30#0" expanded="true" />
           </folding>

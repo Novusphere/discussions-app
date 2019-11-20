@@ -42,6 +42,7 @@
         "next-seo": "^2.2.1",
         "node-fetch": "2.6.0",
         "node-sass": "4.12.0",
+        "quill-magic-url": "^1.0.3",
         "quill-mention": "2.1.1",
         "react": "16.10.2",
         "react-collapse": "4.0.3",

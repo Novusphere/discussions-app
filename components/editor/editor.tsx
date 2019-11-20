@@ -40,6 +40,9 @@ class Editor extends React.Component<IEditorProps> {
         const mention = await import('quill-mention')
         const Mention = mention.default
 
+        const magicUrl = await import('quill-magic-url')
+        const MagicUrl = magicUrl.default
+
         const autoformat = await import('@modules/quill-autoformat/dist/quill-autoformat.js')
         const Autoformat = autoformat.default
         const Hashtag = autoformat.Hashtag
@@ -55,6 +58,7 @@ class Editor extends React.Component<IEditorProps> {
         this.quillBase.Quill.register('modules/mention', Mention)
         this.quillBase.Quill.register('modules/autoformat', Autoformat)
         this.quillBase.Quill.register('formats/hashtag', Hashtag)
+        this.quillBase.Quill.register('modules/magicUrl', MagicUrl)
 
         this.modules = {
             mention: {
@@ -158,6 +162,7 @@ class Editor extends React.Component<IEditorProps> {
                 modules={{
                     autoformat: this.modules.autoformat,
                     mention: this.modules.mention,
+                    magicUrl: true,
                 }}
             />
         )
