@@ -4,7 +4,7 @@ import './style.scss'
 import { openInNewTab } from '@utils'
 import Link from 'next/link'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
-import { faChevronLeft, faEye, faLink, faPen, faReply } from '@fortawesome/free-solid-svg-icons'
+import { faChevronLeft, faEye, faEyeSlash, faLink, faPen, faReply } from '@fortawesome/free-solid-svg-icons'
 import { Attachments, UserNameWithIcon, Votes, Form, SharePost } from '@components'
 import moment from 'moment'
 import ReactMarkdown from 'react-markdown'
@@ -149,7 +149,7 @@ const OpeningPost: React.FC<IOpeningPostProps> = ({
                                         title={!isWatchingPost(id) ? 'Watch Post' : 'Unwatch Post'}
                                         onClick={() => watchPost(id, activeThread.totalReplies)}
                                     >
-                                        <FontAwesomeIcon icon={faEye} color={'#b0b0b0'} />
+                                        <FontAwesomeIcon icon={!isWatchingPost(id) ? faEye : faEyeSlash} color={'#b0b0b0'} />
                                     </span>
                                 )}
 
