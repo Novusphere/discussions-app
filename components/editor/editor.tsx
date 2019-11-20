@@ -47,6 +47,10 @@ class Editor extends React.Component<IEditorProps> {
         const Autoformat = autoformat.default
         const Hashtag = autoformat.Hashtag
 
+        const blockEmbedVideo = await import('@modules/quill-custom-video')
+        const Video = blockEmbedVideo.default
+        const BlockEmbedVideo = blockEmbedVideo.Video
+
         const turndownImport = await import('turndown')
         const Turndown = turndownImport.default
 
@@ -59,6 +63,7 @@ class Editor extends React.Component<IEditorProps> {
         this.quillBase.Quill.register('modules/autoformat', Autoformat)
         this.quillBase.Quill.register('formats/hashtag', Hashtag)
         this.quillBase.Quill.register('modules/magicUrl', MagicUrl)
+        // this.quillBase.Quill.register('modules/video', BlockEmbedVideo)
 
         this.modules = {
             mention: {
@@ -110,7 +115,7 @@ class Editor extends React.Component<IEditorProps> {
         this.updateContentByRef(markdownToDelta(this.props.value))
     }
 
-    private updateContentByRef = (content) => {
+    private updateContentByRef = content => {
         if (this.ref && this.ref.current && typeof this.props.value !== 'undefined') {
             this.ref.current.getEditor().setContents(content)
         }
@@ -163,6 +168,22 @@ class Editor extends React.Component<IEditorProps> {
                     autoformat: this.modules.autoformat,
                     mention: this.modules.mention,
                     magicUrl: true,
+                    toolbar: [
+                        [{ header: 1 }, { header: 2 }], // custom button values
+                        [{ list: 'ordered' }, { list: 'bullet' }],
+                        [
+                            'bold',
+                            'italic',
+                            'underline',
+                            'strike',
+                            'blockquote',
+                            'list',
+                            'bullet',
+
+                            'image',
+                            'video',
+                        ],
+                    ],
                 }}
             />
         )

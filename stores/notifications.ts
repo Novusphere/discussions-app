@@ -94,10 +94,10 @@ export default class Notifications extends BaseStore {
     }
 
     public startNotificationInterval = () => {
-        // this.notificationIntervalHandler = setInterval(() => {
-        //     this.fetchNotificationsAsTray()
-        //     this.updateWatchThreadCount()
-        // }, 5000)
+        this.notificationIntervalHandler = setInterval(() => {
+            this.fetchNotificationsAsTray()
+            this.updateWatchThreadCount()
+        }, 20000)
     }
 
     public destroyNotificationInterval = () => {
