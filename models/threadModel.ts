@@ -127,9 +127,16 @@ export class ThreadModel {
 
                 let signedEdit = await this.openingPost.sign(this.authStore.postPriv)
 
-                const newPost = await discussions.post(signedEdit as any)
-                newPost.editedAt = new Date(Date.now())
-                this.openingPost = new PostModel(newPost)
+                const transaction = await discussions.post(signedEdit as any)
+
+                if (!transaction) {
+                    this.openingPost.title = cached.title
+                    this.openingPost.content = cached.content
+                    this.uiStore.showToast('There was an error editing your post', 'error')
+                    return
+                }
+
+                this.openingPost.editedAt = new Date(Date.now())
                 this.uiStore.showToast('Your post has been edited!', 'success')
                 this.toggleEditing()
             } catch (error) {
