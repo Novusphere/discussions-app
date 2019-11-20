@@ -2,10 +2,8 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="2d14133e-344f-4fbf-9bb7-c9e5e96ae697" name="Default Changelist" comment="">
-      <change beforePath="$PROJECT_DIR$/components/editor/editor.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/components/editor/editor.tsx" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/components/thread/thread.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/components/thread/thread.tsx" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/models/replyModel.ts" beforeDir="false" afterPath="$PROJECT_DIR$/models/replyModel.ts" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/stores/notifications.ts" beforeDir="false" afterPath="$PROJECT_DIR$/stores/notifications.ts" afterDir="false" />
     </list>
     <ignored path="$PROJECT_DIR$/.tmp/" />
     <ignored path="$PROJECT_DIR$/temp/" />
@@ -23,8 +21,8 @@
           <file pinned="false" current-in-tab="false">
             <entry file="file://$PROJECT_DIR$/models/replyModel.ts">
               <provider selected="true" editor-type-id="text-editor">
-                <state relative-caret-position="510">
-                  <caret line="235" column="37" lean-forward="true" selection-start-line="235" selection-start-column="37" selection-end-line="235" selection-end-column="37" />
+                <state relative-caret-position="121">
+                  <caret line="236" column="9" lean-forward="true" selection-start-line="236" selection-start-column="9" selection-end-line="236" selection-end-column="9" />
                   <folding>
                     <element signature="e#0#56#0" expanded="true" />
                   </folding>
@@ -32,11 +30,11 @@
               </provider>
             </entry>
           </file>
-          <file pinned="false" current-in-tab="false">
+          <file pinned="false" current-in-tab="true">
             <entry file="file://$PROJECT_DIR$/components/thread/thread.tsx">
               <provider selected="true" editor-type-id="text-editor">
-                <state relative-caret-position="592">
-                  <caret line="77" column="48" selection-start-line="77" selection-start-column="48" selection-end-line="77" selection-end-column="48" />
+                <state relative-caret-position="576">
+                  <caret line="76" column="35" lean-forward="true" selection-start-line="76" selection-start-column="35" selection-end-line="76" selection-end-column="35" />
                   <folding>
                     <element signature="e#0#30#0" expanded="true" />
                   </folding>
@@ -44,7 +42,7 @@
               </provider>
             </entry>
           </file>
-          <file pinned="false" current-in-tab="true">
+          <file pinned="false" current-in-tab="false">
             <entry file="file://$PROJECT_DIR$/components/editor/editor.tsx">
               <provider selected="true" editor-type-id="text-editor">
                 <state relative-caret-position="441">
@@ -101,13 +99,13 @@
       <find>&lt;form</find>
       <find>Edit post</find>
       <find>faEdit</find>
-      <find>setInterval</find>
       <find>/tag/[n</find>
       <find>.title-header</find>
       <find>faEye</find>
       <find>markdown</find>
       <find>&lt;Repl</find>
       <find>nsdb</find>
+      <find>setInterval</find>
     </findStrings>
     <replaceStrings>
       <replace>.child</replace>
@@ -191,12 +189,12 @@
         <option value="$PROJECT_DIR$/stores/posts.ts" />
         <option value="$PROJECT_DIR$/styles/components/_header.scss" />
         <option value="$PROJECT_DIR$/components/opening-post/opening-post.tsx" />
-        <option value="$PROJECT_DIR$/models/replyModel.ts" />
         <option value="$PROJECT_DIR$/components/reply/reply.tsx" />
-        <option value="$PROJECT_DIR$/components/thread/thread.tsx" />
         <option value="$PROJECT_DIR$/modules/quill-custom-video/index.js" />
         <option value="$PROJECT_DIR$/components/editor/editor.tsx" />
         <option value="$PROJECT_DIR$/stores/notifications.ts" />
+        <option value="$PROJECT_DIR$/models/replyModel.ts" />
+        <option value="$PROJECT_DIR$/components/thread/thread.tsx" />
       </list>
     </option>
   </component>
@@ -445,10 +443,11 @@
     <servers />
   </component>
   <component name="TimeTrackingManager">
-    <option name="totallyTimeSpent" value="676734000" />
+    <option name="totallyTimeSpent" value="676762000" />
   </component>
   <component name="ToolWindowManager">
     <frame x="-8" y="-8" width="2576" height="1416" extended-state="6" />
+    <editor active="true" />
     <layout>
       <window_info content_ui="combo" id="Project" order="0" sideWeight="0.4982538" visible="true" weight="0.119779356" />
       <window_info id="Structure" order="1" sideWeight="0.50174624" side_tool="true" weight="0.119779356" />
@@ -921,26 +920,6 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/models/replyModel.ts">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="510">
-          <caret line="235" column="37" lean-forward="true" selection-start-line="235" selection-start-column="37" selection-end-line="235" selection-end-column="37" />
-          <folding>
-            <element signature="e#0#56#0" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/components/thread/thread.tsx">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="592">
-          <caret line="77" column="48" selection-start-line="77" selection-start-column="48" selection-end-line="77" selection-end-column="48" />
-          <folding>
-            <element signature="e#0#30#0" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/modules/quill-custom-video/index.js">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="192">
@@ -955,6 +934,26 @@
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="441">
           <caret line="55" lean-forward="true" selection-start-line="55" selection-end-line="55" />
+          <folding>
+            <element signature="e#0#30#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/models/replyModel.ts">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="121">
+          <caret line="236" column="9" lean-forward="true" selection-start-line="236" selection-start-column="9" selection-end-line="236" selection-end-column="9" />
+          <folding>
+            <element signature="e#0#56#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/components/thread/thread.tsx">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="576">
+          <caret line="76" column="35" lean-forward="true" selection-start-line="76" selection-start-column="35" selection-end-line="76" selection-end-column="35" />
           <folding>
             <element signature="e#0#30#0" expanded="true" />
           </folding>

@@ -75,7 +75,6 @@ class Thread extends React.Component<IThreadOuterProps & IThreadInnerProps, IThr
 
         return (
             <div className={'mb3'}>
-                {this.openingReplyModel.content}
                 <ReplyBox
                     uid={this.props.thread.uuid}
                     onContentChange={this.openingReplyModel.setContent}
