@@ -21,6 +21,8 @@ export class ThreadModel {
 
     @observable editing = false
 
+    @observable openingPostReplyModel: ReplyModel = null
+
     public replyBoxStatuses = observable.map<string, ReplyModel>()
 
     private readonly authStore: IStores['newAuthStore'] = getNewAuthStore()
@@ -53,6 +55,7 @@ export class ThreadModel {
          * Set reply box open for the opening post by default
          */
         const openingPostReplyModel = new ReplyModel(this.openingPost, this.map)
+        this.openingPostReplyModel = openingPostReplyModel
         openingPostReplyModel.toggleOpen()
         this.replyBoxStatuses.set(this.uuid, openingPostReplyModel)
 
@@ -102,41 +105,35 @@ export class ThreadModel {
 
             try {
                 let tags = ReplyModel.matchContentForTags(content)
-
+                
                 if (tags && tags.length) {
                     tags = tags.map(tag => tag.replace('#', ''))
                     tags = [...this.openingPost.tags, ...tags]
+                } else {
+                    tags = this.openingPost.tags
                 }
 
                 const mentions = ReplyModel.extractMentionHashesForRegEx(
                     ReplyModel.matchContentForMentions(content)
                 )
 
-                const editedPost = new PostModel({
-                    ...this.openingPost,
-                    content,
-                    title,
-                    tags,
-                    mentions,
-                    parentUuid: this.openingPost.uuid,
-                    edit: true,
-                    poster: undefined,
-                } as any)
+                this.openingPost.content = content
+                this.openingPost.title = title
+                this.openingPost.tags = tags
+                this.openingPost.mentions = mentions
+                this.openingPost.parentUuid = this.openingPost.uuid
+                this.openingPost.edit = true
+                this.openingPost.poster = undefined
 
-                let signedEdit = await editedPost.sign(this.authStore.postPriv)
-
-                console.log('Class: ThreadModel, Function: saveEdits, Line 128 signedEdit: ', signedEdit, '\n\n');
+                let signedEdit = await this.openingPost.sign(this.authStore.postPriv)
 
                 const newPost = await discussions.post(signedEdit as any)
-
                 newPost.editedAt = new Date(Date.now())
-
-                this.openingPost = editedPost
-
+                this.openingPost = new PostModel(newPost)
                 this.uiStore.showToast('Your post has been edited!', 'success')
-
                 this.toggleEditing()
             } catch (error) {
+                console.error(error)
                 this.openingPost.title = cached.title
                 this.openingPost.content = cached.content
                 this.uiStore.showToast('There was an error editing your post', 'error')
@@ -144,7 +141,7 @@ export class ThreadModel {
         }
     }
 
-    @computed get editForm() {
+    get editForm() {
         return new CreateForm({}, [
             {
                 name: 'title',
