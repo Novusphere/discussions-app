@@ -1,5 +1,5 @@
 import axios from 'axios'
-
+const ecc = require('eosjs-ecc')
 export const DEFAULT_NSDB_ENDPOINT = 'https://atmosdb.novusphere.io'
 
 export interface INSDBSearchQuery {
@@ -20,6 +20,40 @@ export class NSDB {
         this.api = apiEndpoint
     }
 
+    async getAccount(privateKey: string) {
+        const time = new Date().getTime();
+        const sig = ecc.sign(ecc.sha256(`discussions-${time}`), privateKey);
+        const pub = ecc.privateToPublic(privateKey);
+
+        const qs = `pub=${pub}&sig=${sig}&time=${time}`;
+        const rurl = `${this.api}/discussions/account/data`;
+
+        const { data } = await axios.post(rurl, qs);
+        if (data.error) {
+            console.error('Get account failed: ', qs);
+            throw new Error(data.error);
+        }
+
+        return data.payload;
+    }
+
+    async saveAccount(privateKey: string, accountData: any) {
+        const jsonData = JSON.stringify(accountData);
+        const sig = ecc.sign(ecc.sha256(jsonData), privateKey);
+        const pub = ecc.privateToPublic(privateKey);
+
+        const qs = `pub=${pub}&sig=${sig}&data=${encodeURIComponent(jsonData)}`;
+        const rurl = `${this.api}/discussions/account/save`;
+
+        const { data } = await axios.post(rurl, qs);
+        if (data.error) {
+            console.error('Save account failed: ', qs);
+            throw new Error(data.error);
+        }
+
+        return data.payload;
+    }
+
     async cors(url: string) {
         const request = await axios.get(`https://db.novusphere.io/service/cors/?${url}`)
         const result = request.data
@@ -37,7 +71,7 @@ export class NSDB {
 
             if (data.error) {
                 console.error('Search failed: ', sq)
-                throw new Error(data.error)
+                throw new Error(data.message)
             }
 
             sq.cursorId = data.cursorId

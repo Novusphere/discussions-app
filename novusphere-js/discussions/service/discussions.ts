@@ -8,8 +8,6 @@ import * as bip32 from 'bip32'
 import ecc from 'eosjs-ecc'
 import axios from 'axios'
 import { INSDBSearchQuery } from '../../nsdb';
-import { isDev } from '@utils'
-
 //import { isDev } from '@utils'
 
 export interface IBrainKeyPair {
