@@ -500,3 +500,16 @@ export const event = ({ action, category, label, value }) => {
         value: value,
     })
 }
+
+
+// ombed stuff
+export const getYouTubeIDFromUrl = url => {
+    const regExp = /.*(?:youtu.be\/|v\/|u\/\w\/|embed\/|watch\?v=)([^#\&\?]*).*/;
+    const match = url.match(regExp);
+
+    if (match) {
+        return match[1]
+    }
+
+    return null
+}

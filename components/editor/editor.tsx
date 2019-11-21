@@ -59,6 +59,10 @@ class Editor extends React.Component<IEditorProps> {
 
         this.turndownService = new Turndown()
 
+        this.turndownService.keep(['video'])
+
+        console.log(this.turndownService)
+
         this.quillBase.Quill.register('modules/mention', Mention)
         this.quillBase.Quill.register('modules/autoformat', Autoformat)
         this.quillBase.Quill.register('formats/hashtag', Hashtag)
@@ -128,7 +132,9 @@ class Editor extends React.Component<IEditorProps> {
     }
 
     public onChange = (text: string) => {
+        console.log('Class: Editor, Function: onChange, Line 131 text: ', text);
         const markdown = this.turndownService.turndown(text)
+        console.log('Class: Editor, Function: onChange, Line 133 markdown: ', markdown);
         this.props.onChange(markdown)
     }
 
@@ -180,6 +186,7 @@ class Editor extends React.Component<IEditorProps> {
                             'list',
                             'bullet',
 
+                            'link',
                             'image',
                             'video',
                         ],
