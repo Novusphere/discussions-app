@@ -19,6 +19,7 @@ import { getPermaLink, openInNewTab, sleep } from '@utils'
 import { IStores } from '@stores'
 import copy from 'clipboard-copy'
 import Router from 'next/router'
+import Markdown from 'markdown-to-jsx'
 
 import './style.scss'
 import Form from '../create-form/form'
@@ -245,10 +246,9 @@ class Reply extends React.Component<IReplies, IRepliesState> {
                                     />
                                 )}
                                 {!isCollapsed && !replyModel.editing && (
-                                    <ReactMarkdown
-                                        className={'f6 lh-copy reply-content'}
-                                        source={post.content}
-                                    />
+                                    <Markdown className={'f6 lh-copy reply-content'}>
+                                        {post.content}
+                                    </Markdown>
                                 )}
                             </div>
                         </div>

@@ -4,7 +4,14 @@ import './style.scss'
 import { openInNewTab } from '@utils'
 import Link from 'next/link'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
-import { faChevronLeft, faEye, faEyeSlash, faLink, faPen, faReply } from '@fortawesome/free-solid-svg-icons'
+import {
+    faChevronLeft,
+    faEye,
+    faEyeSlash,
+    faLink,
+    faPen,
+    faReply,
+} from '@fortawesome/free-solid-svg-icons'
 import { Attachments, UserNameWithIcon, Votes, Form, SharePost } from '@components'
 import moment from 'moment'
 import ReactMarkdown from 'react-markdown'
@@ -12,6 +19,7 @@ import PostModel from '@models/postModel'
 import { ThreadModel } from '@models/threadModel'
 import { observer } from 'mobx-react'
 import { TagModel } from '@models/tagModel'
+import Markdown from 'markdown-to-jsx'
 
 interface IOpeningPostProps {
     isPreview?: boolean
@@ -106,10 +114,9 @@ const OpeningPost: React.FC<IOpeningPostProps> = ({
                 {activeThread && activeThread.editing ? (
                     <Form form={activeThread.editForm} hideSubmitButton />
                 ) : (
-                    <ReactMarkdown
-                        className={'black f6 lh-copy overflow-break-word'}
-                        source={openingPost.content}
-                    />
+                    <Markdown className={'black f6 lh-copy overflow-break-word'}>
+                        {openingPost.content}
+                    </Markdown>
                 )}
 
                 {openingPost.attachment && <Attachments attachment={openingPost.attachment} />}
@@ -149,7 +156,10 @@ const OpeningPost: React.FC<IOpeningPostProps> = ({
                                         title={!isWatchingPost(id) ? 'Watch Post' : 'Unwatch Post'}
                                         onClick={() => watchPost(id, activeThread.totalReplies)}
                                     >
-                                        <FontAwesomeIcon icon={!isWatchingPost(id) ? faEye : faEyeSlash} color={'#b0b0b0'} />
+                                        <FontAwesomeIcon
+                                            icon={!isWatchingPost(id) ? faEye : faEyeSlash}
+                                            color={'#b0b0b0'}
+                                        />
                                     </span>
                                 )}
 

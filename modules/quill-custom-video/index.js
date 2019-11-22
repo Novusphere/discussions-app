@@ -1,45 +1,62 @@
 import { Quill } from 'react-quill'
-import { nsdb } from '../../novusphere-js'
 import { getYouTubeIDFromUrl } from '../../utils'
+import { nsdb } from '../../novusphere-js'
 
 const BlockEmbed = Quill.import('blots/block/embed')
-const Inline = Quill.import('blots/inline')
 
-const VIDEO_ATTRIBUTES = ['height', 'width']
+export const RichEmbedFilters = [
+    {
+        // youtube
+        match: /https:\/\/youtu.be\/[a-zA-Z0-9-_]+/gi,
+    },
+    {
+        // youtube 2
+        match: /https:\/\/www.youtube.com\/watch\?v=[a-zA-Z0-9-_]+/gi,
+    },
+    {
+        match: /https:\/\/twitter.com\/[a-zA-Z0-9-_]+\/status\/[0-9]+/gi,
+    },
+    {
+        match: /https:\/\/t.me\/[\w]+\/[0-9]+/gi,
+    },
+    {
+        match: /https:\/\/medium.com\/@[\w]+\/.+/gi,
+    },
+    {
+        match: /https:\/\/www.instagram.com(\/[a-zA-Z0-9-_]+)?\/p\/[a-zA-Z0-9-_]+(\/?.+)?/gi,
+    },
+    {
+        match: /https:\/\/www.instagr.am(\/[a-zA-Z0-9-_]+)?\/p\/[a-zA-Z0-9-_]+(\/?.+)?/gi,
+    },
+    {
+        match: /https?:\/\/(www\.)?(facebook|fb).(com|me)\/.+/gi,
+    },
+]
 
 // provides a custom div wrapper around the default Video blot
 export class Video extends BlockEmbed {
     static blotName = 'video'
     static className = 'ql-video-wrapper'
-    static tagName = 'Video'
-
-    // static async create(value) {
-    //     let node = super.create()
-    //
-    //     if (value.indexOf('youtube') !== -1) {
-    //         const id = getYouTubeIDFromUrl(value)
-    //         const data = await nsdb.cors(
-    //             `https://www.youtube.com/oembed?format=json&url=https://www.youtube.com/watch?v=${id}`
-    //         )
-    //
-    //         node.innerHTML = data.html
-    //         console.log(node)
-    //         return node
-    //     }
-    //
-    //     return node
-    // }
+    static tagName = 'iframe'
 
     static create(value) {
-        const node = super.create(value);
-        node.setAttribute('src', value);
-        node.setAttribute('width', '100%');
-        node.setAttribute("controls","controls");
-        return node;
+        let node = super.create(value)
+
+        if (value.search(/youtube|youtu.be/) !== -1) {
+            const id = getYouTubeIDFromUrl(value)
+
+            nsdb.cors(
+                `https://www.youtube.com/oembed?format=json&url=https://www.youtube.com/watch?v=${id}`
+            ).then(data => {
+                node.outerHTML = data['html']
+            })
+        }
+
+        return node
     }
 
     static value(node) {
-        return node.getAttribute('src');
+        return node.getAttribute('src')
     }
 }
 
