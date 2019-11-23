@@ -14,7 +14,6 @@ import {
 } from '@fortawesome/free-solid-svg-icons'
 import { Attachments, UserNameWithIcon, Votes, Form, SharePost } from '@components'
 import moment from 'moment'
-import ReactMarkdown from 'react-markdown'
 import PostModel from '@models/postModel'
 import { ThreadModel } from '@models/threadModel'
 import { observer } from 'mobx-react'

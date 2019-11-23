@@ -3,7 +3,7 @@ import { inject, observer } from 'mobx-react'
 import { IStores } from '@stores'
 import { InfiniteScrollFeed } from '@components'
 import { sleep } from '@utils'
-import ReactMarkdown from 'react-markdown'
+import Markdown from 'markdown-to-jsx'
 import moment from 'moment'
 import Link from 'next/link'
 
@@ -54,10 +54,7 @@ class Notifications extends React.Component<INotificationsProps> {
                 withAnchorUid
             >
                 {notifications.map(notification => (
-                    <Link
-                        href={notification.url}
-                        key={notification.post.uuid}
-                    >
+                    <Link href={notification.url} key={notification.post.uuid}>
                         <a className={'db card pa4'} title={'Click to go to post'}>
                             <span className={'flex flex-row items-center justify-start f5 tl'}>
                                 {notification.image}
@@ -65,10 +62,9 @@ class Notifications extends React.Component<INotificationsProps> {
                             </span>
                             {notification.isMentionType && (
                                 <object>
-                                    <ReactMarkdown
-                                        className={'black flex notifications-content'}
-                                        source={notification.post.content}
-                                    />
+                                    <Markdown className={'black flex notifications-content'}>
+                                        {notification.post.content}
+                                    </Markdown>
                                 </object>
                             )}
                             {!notification.isMentionType && (

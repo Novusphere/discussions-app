@@ -10,7 +10,6 @@ import {
 } from '@fortawesome/free-solid-svg-icons'
 import moment from 'moment'
 import { ReplyBox, UserNameWithIcon, Votes } from '@components'
-import ReactMarkdown from 'react-markdown'
 import { inject, observer } from 'mobx-react'
 import { ReplyModel } from '@models/replyModel'
 import PostModel from '@models/postModel'

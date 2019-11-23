@@ -5,7 +5,6 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { faSpinner } from '@fortawesome/free-solid-svg-icons'
 import sanitizeHTML from 'sanitize-html'
 import { allowedHosts } from '@utils'
-const { toDelta } = require('delta-markdown-for-quill')
 
 interface IEditorProps {
     postsStore?: IStores['postsStore']

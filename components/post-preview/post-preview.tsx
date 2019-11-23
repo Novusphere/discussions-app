@@ -1,10 +1,9 @@
 import * as React from 'react'
 import moment from 'moment'
-import { UserNameWithIcon, Votes } from '@components'
+import { RichTextPreview, UserNameWithIcon, Votes } from '@components'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { faComment } from '@fortawesome/free-solid-svg-icons'
 import { TagModel } from '@models/tagModel'
-import ReactMarkdown from 'react-markdown'
 import { observer } from 'mobx-react'
 import FeedModel from '@models/feedModel'
 import Link from 'next/link'
@@ -105,12 +104,7 @@ const PostPreview: React.FC<IPostPreviewProps> = ({
                             </div>
 
                             <object>
-                                <ReactMarkdown
-                                    className={
-                                        'black lh-copy measure-wide pt2 post-preview-content content-fade overflow-break-word'
-                                    }
-                                    source={post.content}
-                                />
+                                <RichTextPreview>{post.content}</RichTextPreview>
                             </object>
 
                             <div className={'flex z-2 footer b'}>

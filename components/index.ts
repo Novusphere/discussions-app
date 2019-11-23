@@ -22,6 +22,7 @@ export { default as InfiniteScrollFeed } from './infinite-scroll-feed/infinite-s
 export { default as OpeningPost } from './opening-post/opening-post'
 export { default as NotificationItem } from './notification-item/notification-item'
 export { default as SharePost } from './share-post/share-post'
+export { default as RichTextPreview } from './rt-preview/rt-preview'
 
 export { default as ChooseAccountName } from './modal/sign-up/choose-account-name'
 export { default as SectionHeader } from './modal/sign-up/header'
