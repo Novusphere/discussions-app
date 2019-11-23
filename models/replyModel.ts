@@ -5,6 +5,7 @@ import { getNewAuthStore, getPostsStore, getUiStore, IStores } from '@stores'
 import PostModel from '@models/postModel'
 import { discussions } from '@novuspherejs'
 import CreateForm from '../components/create-form/create-form'
+import { Messages } from '@globals'
 
 export class ReplyModel {
     @observable uid = ''
