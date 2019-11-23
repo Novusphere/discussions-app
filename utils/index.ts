@@ -487,25 +487,24 @@ export const GA_TRACKING_ID = 'UA-152897893-1'
 
 // https://developers.google.com/analytics/devguides/collection/gtagjs/pages
 export const pageview = url => {
-    (window as any).gtag('config', GA_TRACKING_ID, {
+    ;(window as any).gtag('config', GA_TRACKING_ID, {
         page_path: url,
     })
 }
 
 // https://developers.google.com/analytics/devguides/collection/gtagjs/events
 export const event = ({ action, category, label, value }) => {
-    (window as any).gtag('event', action, {
+    ;(window as any).gtag('event', action, {
         event_category: category,
         event_label: label,
         value: value,
     })
 }
 
-
 // ombed stuff
 export const getYouTubeIDFromUrl = url => {
-    const regExp = /.*(?:youtu.be\/|v\/|u\/\w\/|embed\/|watch\?v=)([^#\&\?]*).*/;
-    const match = url.match(regExp);
+    const regExp = /.*(?:youtu.be\/|v\/|u\/\w\/|embed\/|watch\?v=)([^#\&\?]*).*/
+    const match = url.match(regExp)
 
     if (match) {
         return match[1]
@@ -513,3 +512,24 @@ export const getYouTubeIDFromUrl = url => {
 
     return null
 }
+
+export const allowedHosts = [
+    'youtube.com',
+    'youtu.be',
+    'imgur.com',
+    'twitter.com',
+    't.me',
+    'medium.com',
+    'instagram.com',
+    'instagr.am',
+    'facebook.com',
+    'fb.com',
+    'fb.me',
+    'api.d.tube',
+    'soundcloud.com',
+    'reddit.com',
+    'trybe.one',
+    'steemit.com',
+    'medium.com',
+    'whaleshares.io'
+]

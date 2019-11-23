@@ -2,9 +2,15 @@ import * as React from 'react'
 import { observer } from 'mobx-react'
 import classNames from 'classnames'
 import Select from 'react-select'
-import { Editor } from '@components'
+// import { Editor } from '@components'
 import { faSpinner } from '@fortawesome/free-solid-svg-icons'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
+
+import dynamic from 'next/dynamic'
+
+const Editor  = dynamic(() => import('../editor/editor'), {
+    ssr: false
+})
 
 interface FormProps extends React.HTMLAttributes<HTMLFormElement> {
     form: IForm

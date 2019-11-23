@@ -4,6 +4,7 @@ import { IStores } from '@stores'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { faSpinner } from '@fortawesome/free-solid-svg-icons'
 import sanitizeHTML from 'sanitize-html'
+import { allowedHosts } from '@utils'
 
 interface IEditorProps {
     postsStore?: IStores['postsStore']
@@ -42,9 +43,6 @@ class Editor extends React.Component<IEditorProps> {
         const mention = await import('quill-mention')
         const Mention = mention.default
 
-        const magicUrl = await import('quill-magic-url')
-        const MagicUrl = magicUrl.default
-
         const autoformat = await import('@modules/quill-autoformat/dist/quill-autoformat.js')
         const Autoformat = autoformat.default
         const Hashtag = autoformat.Hashtag
@@ -53,9 +51,11 @@ class Editor extends React.Component<IEditorProps> {
         const Video = blockEmbedVideo.default
         const BlockEmbedVideo = blockEmbedVideo.Video
 
-        const blockEmbedLink = await import('@modules/quill-custom-link')
-        const Link = blockEmbedLink.default
-        const BlockEmbedLink = blockEmbedLink.Link
+        const oembed = await import('@modules/quill-oembed/quill-oembed.ts')
+        const OEmbed = oembed.default
+
+        // const blockEmbedLink = await import('@modules/quill-custom-link')
+        // const MagicUrl = blockEmbedLink.default
 
         const turndownImport = await import('turndown')
         const Turndown = turndownImport.default
@@ -66,12 +66,14 @@ class Editor extends React.Component<IEditorProps> {
         this.turndownService = new Turndown()
         this.showdownService = new showdown.Converter()
 
-        this.turndownService.keep(['iframe'])
+        // to keep HTML tags as is without converting to markdown
+        this.turndownService.keep(['iframe', 'object'])
 
         this.quillBase.Quill.register('modules/mention', Mention)
         this.quillBase.Quill.register('modules/autoformat', Autoformat)
         this.quillBase.Quill.register('formats/hashtag', Hashtag)
-        this.quillBase.Quill.register('modules/magicUrl', MagicUrl)
+        // this.quillBase.Quill.register('modules/magicUrl', MagicUrl)
+        this.quillBase.Quill.register('modules/oembed', OEmbed)
 
         this.modules = {
             mention: {
@@ -120,14 +122,17 @@ class Editor extends React.Component<IEditorProps> {
             loaded: true,
         })
 
-        this.updateContentByRef(this.showdownService.makeHtml(this.props.value))
+        if (this.props.value) {
+            this.updateContentByRef(this.showdownService.makeHtml(this.props.value))
+        }
+        // this.updateContentByRef(this.showdownService.makeHtml(this.props.value))
     }
 
     private updateContentByRef = content => {
         if (this.ref && this.ref.current && typeof this.props.value !== 'undefined') {
             const editor = this.ref.current.getEditor()
-
             editor.clipboard.dangerouslyPasteHTML(content)
+            editor.focus()
         }
     }
 
@@ -138,16 +143,49 @@ class Editor extends React.Component<IEditorProps> {
     }
 
     public onChange = (text: string) => {
-        console.log('Class: Editor, Function: onChange, Line 141 text: ', text);
+        // console.log('Class: Editor, Function: onChange, Line 141 text: ', text)
         const clean = sanitizeHTML(text, {
-            allowedTags: [...sanitizeHTML.defaults.allowedTags],
+            allowedTags: [...sanitizeHTML.defaults.allowedTags, 'object'],
             allowedAttributes: {
                 ...sanitizeHTML.defaults.allowedAttributes,
-                iframe: ['width', 'height', 'src', 'frameborder', 'allow', 'allowfullscreen'],
+                iframe: [
+                    'width',
+                    'height',
+                    'src',
+                    'srcdoc',
+                    'frameborder',
+                    'allow',
+                    'allowfullscreen',
+                ],
+                a: ['href', 'rel', 'target'],
+                blockquote: ['class', 'lang', 'data-id'],
+            },
+            parser: {
+                decodeEntities: false,
             },
             allowedIframeHostnames: ['www.youtube.com', 'www.youtu.be'],
+            transformTags: {
+                iframe: (tagName, attribs) => {
+                    return {
+                        tagName: 'iframe',
+                        attribs: {
+                            ...attribs,
+                            ...(attribs.srcdoc && {
+                                srcdoc: attribs.srcdoc.replace('"', '\''),
+                            }),
+                        },
+                    }
+                },
+                a: (tagName, attribs) =>
+                    allowedHosts.some(host => attribs.href.includes(host))
+                        ? {
+                              tagName: 'a',
+                              attribs: { href: attribs.href },
+                          }
+                        : {},
+            },
         })
-        console.log('Class: Editor, Function: onChange, Line 150 clean: ', clean);
+        // console.log('Class: Editor, Function: onChange, Line 150 clean: ', clean)
         const markdown = this.turndownService.turndown(clean)
         this.props.onChange(markdown)
     }
@@ -183,11 +221,13 @@ class Editor extends React.Component<IEditorProps> {
                     'video',
                     'mention',
                     'hashtag',
+                    'oembed-wrapper',
                 ]}
                 modules={{
                     autoformat: this.modules.autoformat,
                     mention: this.modules.mention,
-                    magicUrl: true,
+                    // magicUrl: true,
+                    oembed: true,
                     toolbar: [
                         [{ header: 1 }, { header: 2 }], // custom button values
                         [{ list: 'ordered' }, { list: 'bullet' }],

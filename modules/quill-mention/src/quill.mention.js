@@ -462,6 +462,6 @@ class Mention {
     }
 }
 
-Quill.register('modules/mention', Mention)
+Quill.register('modules/mention', Mention, true)
 
 export default Mention

@@ -16,7 +16,7 @@ Quill.register({
   'formats/hashtag': Hashtag,
   // 'formats/mention': Mention,
   // 'formats/autoformat-helper': AutoformatHelperAttribute
-});
+}, true);
 
 export {
   Autoformat as default,

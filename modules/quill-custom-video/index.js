@@ -48,7 +48,13 @@ export class Video extends BlockEmbed {
             nsdb.cors(
                 `https://www.youtube.com/oembed?format=json&url=https://www.youtube.com/watch?v=${id}`
             ).then(data => {
-                node.outerHTML = data['html']
+                if (node) {
+                    if (!node.parentNode) {
+                        node = data['html']
+                    } else {
+                        node.outerHTML = data['html']
+                    }
+                }
             })
         }
 

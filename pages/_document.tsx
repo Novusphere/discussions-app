@@ -22,6 +22,7 @@ export default class MyDocument extends Document {
                     async
                     src={`https://www.googletagmanager.com/gtag/js?id=${GA_TRACKING_ID}`}
                 />
+                <script async src={"https://platform.twitter.com/widgets.js"} charSet="utf-8"/>
                 <script
                     dangerouslySetInnerHTML={{
                         __html: `
