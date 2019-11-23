@@ -3,6 +3,7 @@ import Delta from 'quill-delta'
 import { DeltaStatic } from 'quill'
 
 import { nsdb } from '../../novusphere-js'
+import { refreshOEmbed } from '@utils'
 
 const BlockEmbed = Quill.import('blots/block/embed')
 
@@ -97,18 +98,18 @@ export default class QuillOEmbedModule {
             } else {
                 return this.insertInlineLink(node, delta)
             }
+        
+            refreshOEmbed()
 
             nsdb.cors(ombed)
                 .then(result => result)
                 .then(json => this.insertEmbedFromJson(json, index, node.data))
                 // .then(([delta, remove]) => {
-                //     console.log('Class: QuillOEmbedModule, Function: a, Line 67 node.data: ', node.data);
-                //     console.log('Class: QuillOEmbedModule, Function: a, Line 68 index: ', index);
-                //     console.log('Class: QuillOEmbedModule, Function: a, Line 93 delta: ', delta);
-                //     console.log('Class: QuillOEmbedModule, Function: a, Line 94 delta.length(): ', delta.length());
-                //
                 //     if (remove) {
-                //         this.quill.deleteText(index, node.data.length)
+                //         if (node.data.search(/youtube/) !== -1) {
+                //             return
+                //         }
+                //         this.quill.deleteText(index + 2, node.data.length)
                 //     }
                 // })
                 .catch(() => {
@@ -120,9 +121,9 @@ export default class QuillOEmbedModule {
                     _delta = this.insertInlineLink(node, delta)
                 })
 
-            if (_delta) {
-                return _delta
-            }
+            // if (_delta) {
+            //     return _delta
+            // }
         }
 
         return delta
@@ -140,6 +141,7 @@ export default class QuillOEmbedModule {
             case 'video':
             case 'rich': {
                 const data: OEmbedData = QuillOEmbedModule.getOEmbedData(oEmbed)
+                this.quill.insertText(index - 1, '\n')
                 const delta = this.quill.insertEmbed(index, 'oembed-wrapper', data, 'api')
                 return [delta, true]
             }
@@ -167,7 +169,7 @@ class OEmbedWrapper extends BlockEmbed {
 
         node.innerHTML = html
 
-        console.log('Class: OEmbedWrapper, Function: create, Line 164 html: ', node);
+        // console.log('Class: OEmbedWrapper, Function: create, Line 164 html: ', node);
         //
         // node.setAttribute('srcdoc', html)
         // node.setAttribute('width', width)

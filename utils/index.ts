@@ -533,3 +533,12 @@ export const allowedHosts = [
     'medium.com',
     'whaleshares.io'
 ]
+
+export const refreshOEmbed = () => {
+    setTimeout(
+        () => {
+            window['twttr'].widgets.load()
+            window['imgurEmbed'].createIframe()
+        }, 500
+    )
+}

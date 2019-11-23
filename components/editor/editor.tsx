@@ -5,6 +5,7 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { faSpinner } from '@fortawesome/free-solid-svg-icons'
 import sanitizeHTML from 'sanitize-html'
 import { allowedHosts } from '@utils'
+const { toDelta } = require('delta-markdown-for-quill')
 
 interface IEditorProps {
     postsStore?: IStores['postsStore']
@@ -125,14 +126,13 @@ class Editor extends React.Component<IEditorProps> {
         if (this.props.value) {
             this.updateContentByRef(this.showdownService.makeHtml(this.props.value))
         }
-        // this.updateContentByRef(this.showdownService.makeHtml(this.props.value))
     }
 
     private updateContentByRef = content => {
         if (this.ref && this.ref.current && typeof this.props.value !== 'undefined') {
             const editor = this.ref.current.getEditor()
-            editor.clipboard.dangerouslyPasteHTML(content)
-            editor.focus()
+            editor['container']['childNodes'][0].innerHTML = content
+            // editor.clipboard.dangerouslyPasteHTML(content, 'silent')
         }
     }
 
@@ -143,7 +143,6 @@ class Editor extends React.Component<IEditorProps> {
     }
 
     public onChange = (text: string) => {
-        // console.log('Class: Editor, Function: onChange, Line 141 text: ', text)
         const clean = sanitizeHTML(text, {
             allowedTags: [...sanitizeHTML.defaults.allowedTags, 'object'],
             allowedAttributes: {
@@ -157,12 +156,13 @@ class Editor extends React.Component<IEditorProps> {
                     'allow',
                     'allowfullscreen',
                 ],
+                object: ['class'],
                 a: ['href', 'rel', 'target'],
                 blockquote: ['class', 'lang', 'data-id'],
             },
-            parser: {
-                decodeEntities: false,
-            },
+            // parser: {
+            //     decodeEntities: false,
+            // },
             allowedIframeHostnames: ['www.youtube.com', 'www.youtu.be'],
             transformTags: {
                 iframe: (tagName, attribs) => {
@@ -185,7 +185,6 @@ class Editor extends React.Component<IEditorProps> {
                         : {},
             },
         })
-        // console.log('Class: Editor, Function: onChange, Line 150 clean: ', clean)
         const markdown = this.turndownService.turndown(clean)
         this.props.onChange(markdown)
     }

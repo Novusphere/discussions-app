@@ -23,6 +23,8 @@ export default class MyDocument extends Document {
                     src={`https://www.googletagmanager.com/gtag/js?id=${GA_TRACKING_ID}`}
                 />
                 <script async src={"https://platform.twitter.com/widgets.js"} charSet="utf-8"/>
+                <script async src={"https://imgur.com/min/embed.js"} charSet="utf-8"/>
+                <script async src={"https://w.soundcloud.com/player/api.js"} charSet="utf-8"/>
                 <script
                     dangerouslySetInnerHTML={{
                         __html: `

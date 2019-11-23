@@ -183,8 +183,12 @@ class Reply extends React.Component<IReplies, IRepliesState> {
                                     postsStore.currentHighlightedPostUuid === post.uuid,
                             },
                         ])}
-                        onMouseEnter={() => this.setHover(true)}
-                        onMouseLeave={() => this.setHover(false)}
+                        onMouseEnter={() => {
+                            if (!replyModel.editing) this.setHover(true)
+                        }}
+                        onMouseLeave={() => {
+                            if (!replyModel.editing) this.setHover(false)
+                        }}
                     >
                         {this.renderHoverElements()}
                         <div

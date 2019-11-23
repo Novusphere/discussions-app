@@ -9,6 +9,7 @@ import { NextRouter, withRouter } from 'next/router'
 import { Thread as NSThread } from '@novuspherejs'
 import { observable } from 'mobx'
 import { ReplyModel } from '@models/replyModel'
+import { refreshOEmbed } from '@utils'
 
 interface IThreadOuterProps {
     thread: NSThread
@@ -42,6 +43,10 @@ class Thread extends React.Component<IThreadOuterProps & IThreadInnerProps, IThr
         if (this.props.postsStore.currentHighlightedPostUuid) {
             this.props.postsStore.highlightPostUuid('')
         }
+    }
+
+    componentDidMount(): void {
+        refreshOEmbed()
     }
 
     private renderOpeningPost = () => {

@@ -57,7 +57,7 @@ declare interface FormField {
 
     input?: (value) => any
     output?: (value) => any
-    type?: 'password' | 'text' | 'checkbox' | 'button' | 'dropdown' | 'textarea' | 'richtext' | 'radiogroup'
+    type?: string | 'password' | 'text' | 'checkbox' | 'button' | 'dropdown' | 'textarea' | 'richtext' | 'radiogroup'
     render?: boolean
     observers?: any[]
     extra?: any
@@ -69,6 +69,7 @@ declare interface FormField {
     validating?: boolean
     submitting?: boolean
     value?: string | { value: string; className?: string }[]
+    onChange?: any
     onComplete?: (form: any) => void
 
     options?: {
