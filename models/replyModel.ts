@@ -230,53 +230,52 @@ export class ReplyModel {
     @task.resolved
     @action.bound
     async onSubmit(activeThread: any) {
-        console.log(this.content)
-        // if (!this.newAuthStore.hasAccount) {
-        //     this.uiStore.showToast('You must be logged in to comment', 'error')
-        //     return
-        // }
-        //
-        // if (!this.content) {
-        //     this.uiStore.showToast(Messages.ERROR.POST_EMPTY, 'error')
-        //     return
-        // }
-        //
-        // const reply = this.createPostObject()
-        //
-        // try {
-        //     if (activeThread) {
-        //         const model = new PostModel(reply as any)
-        //         const signedReply = model.sign(this.newAuthStore.postPriv)
-        //         const confirmedReply = await discussions.post(signedReply as any)
-        //
-        //         const confirmedModel = new PostModel({
-        //             ...confirmedReply,
-        //         })
-        //
-        //         set(activeThread, {
-        //             map: {
-        //                 ...activeThread.map,
-        //                 [reply.id]: confirmedModel,
-        //             },
-        //         })
-        //
-        //         if (confirmedReply.parentUuid === this.post.threadUuid) {
-        //             set(activeThread, {
-        //                 openingPostReplies: [...activeThread.openingPostReplies, confirmedModel],
-        //             })
-        //         } else {
-        //             this.toggleOpen()
-        //         }
-        //
-        //         this.clearContent()
-        //         this.uiStore.showToast('Your reply has been submitted!', 'success')
-        //     } else {
-        //         this.uiStore.showToast('Failed to submit your reply', 'error')
-        //     }
-        // } catch (error) {
-        //     this.uiStore.showToast(error.message, 'error')
-        //     throw error
-        // }
+        if (!this.newAuthStore.hasAccount) {
+            this.uiStore.showToast('You must be logged in to comment', 'error')
+            return
+        }
+
+        if (!this.content) {
+            this.uiStore.showToast(Messages.ERROR.POST_EMPTY, 'error')
+            return
+        }
+
+        const reply = this.createPostObject()
+
+        try {
+            if (activeThread) {
+                const model = new PostModel(reply as any)
+                const signedReply = model.sign(this.newAuthStore.postPriv)
+                const confirmedReply = await discussions.post(signedReply as any)
+
+                const confirmedModel = new PostModel({
+                    ...confirmedReply,
+                })
+
+                set(activeThread, {
+                    map: {
+                        ...activeThread.map,
+                        [reply.id]: confirmedModel,
+                    },
+                })
+
+                if (confirmedReply.parentUuid === this.post.threadUuid) {
+                    set(activeThread, {
+                        openingPostReplies: [...activeThread.openingPostReplies, confirmedModel],
+                    })
+                } else {
+                    this.toggleOpen()
+                }
+
+                this.clearContent()
+                this.uiStore.showToast('Your reply has been submitted!', 'success')
+            } else {
+                this.uiStore.showToast('Failed to submit your reply', 'error')
+            }
+        } catch (error) {
+            this.uiStore.showToast(error.message, 'error')
+            throw error
+        }
     }
 
     @action toggleOpen = () => {
