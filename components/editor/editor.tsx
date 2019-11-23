@@ -64,7 +64,26 @@ class Editor extends React.Component<IEditorProps> {
         const showdownImport = await import('showdown')
         const showdown = showdownImport.default
 
-        this.turndownService = new Turndown()
+        this.turndownService = new Turndown({
+            blankReplacement(content, node) {
+                const types = ['OBJECT', 'IFRAME']
+                if (types.indexOf(node.nodeName) !== -1) {
+                    return `\n\n${node.outerHTML}\n\n`
+                } else {
+                    const output = []
+                    node.childNodes.forEach(child => {
+                        if (types.indexOf(child.nodeName) !== -1) {
+                            output.push(child.outerHTML)
+                        }
+                    })
+                    if (output.length) {
+                        return '\n\n' + output.join('\n\n') + '\n\n'
+                    } else {
+                        return node.isBlock ? '\n\n' : ''
+                    }
+                }
+            },
+        })
         this.showdownService = new showdown.Converter()
 
         // to keep HTML tags as is without converting to markdown
@@ -171,7 +190,7 @@ class Editor extends React.Component<IEditorProps> {
                         attribs: {
                             ...attribs,
                             ...(attribs.srcdoc && {
-                                srcdoc: attribs.srcdoc.replace('"', '\''),
+                                srcdoc: attribs.srcdoc.replace('"', "'"),
                             }),
                         },
                     }
