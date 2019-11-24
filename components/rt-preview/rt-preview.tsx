@@ -52,8 +52,10 @@ const RtLink = ({ children, href, title }) => {
     return <object dangerouslySetInnerHTML={{ __html: getEmbed }} />
 }
 
-const RtPreview: React.FC<IRtPreviewProps> = ({ children, className }) => (
-    <object>
+const RtPreview: React.FC<IRtPreviewProps> = ({ children, className }) => {
+    if (!children) return null
+
+    return <object>
         <Markdown
             className={classNames([
                 {
@@ -72,6 +74,6 @@ const RtPreview: React.FC<IRtPreviewProps> = ({ children, className }) => (
             {children}
         </Markdown>
     </object>
-)
+}
 
 export default RtPreview
