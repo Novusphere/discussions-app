@@ -47,24 +47,26 @@ const RtLink = ({ children, href }) => {
         }
 
         function refreshIFrames() {
-            if (href.match(/youtube|youtu.be/)) {
-            } else if (href.match(/imgur/)) {
-            } else if (href.match(/twitter.com\/(.*)\/status/)) {
-            } else if (href.match(/d.tube/)) {
-            } else if (href.match(/soundcloud/)) {
-            } else if (href.match(/instagram/)) {
-                ;(window as any).instgrm.Embeds.process()
+            if (href.match(/facebook|fb.me/)) {
+                if ((window as any).FB) {
+                    ;(window as any).FB.XFBML.parse()
+                }
             } else if (href.match(/twitter/)) {
+                if (window['twttr']) {
+                    window['twttr'].widgets.load()
+                }
+            } else if (href.match(/instagram/)) {
+                if ((window as any).instgrm) {
+                    ;(window as any).instgrm.Embeds.process()
+                }
             }
         }
 
         getOEMBED()
 
-        setTimeout(
-            () => {
-                refreshIFrames()
-            }, 500
-        )
+        setTimeout(() => {
+            refreshIFrames()
+        }, 500)
     }, [])
 
     if (!getEmbed) {
