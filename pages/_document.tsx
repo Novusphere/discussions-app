@@ -26,6 +26,7 @@ export default class MyDocument extends Document {
                 <script async src={"https://imgur.com/min/embed.js"} charSet="utf-8"/>
                 <script async src={"https://www.instagram.com/embed.js"} charSet="utf-8"/>
                 <script async src={"https://w.soundcloud.com/player/api.js"} charSet="utf-8"/>
+                <script async src={"https://connect.facebook.net/en_US/sdk.js#xfbml=1&version=v3.2"} charSet="utf-8"/>
                 <script
                     dangerouslySetInnerHTML={{
                         __html: `

@@ -2,11 +2,8 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="2d14133e-344f-4fbf-9bb7-c9e5e96ae697" name="Default Changelist" comment="">
-      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/components/reply/reply.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/components/reply/reply.tsx" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/components/rt-preview/rt-preview.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/components/rt-preview/rt-preview.tsx" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/styles/components/_post.scss" beforeDir="false" afterPath="$PROJECT_DIR$/styles/components/_post.scss" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/utils/index.ts" beforeDir="false" afterPath="$PROJECT_DIR$/utils/index.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/pages/_document.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/pages/_document.tsx" afterDir="false" />
     </list>
     <ignored path="$PROJECT_DIR$/.tmp/" />
     <ignored path="$PROJECT_DIR$/temp/" />
@@ -81,11 +78,23 @@
               </provider>
             </entry>
           </file>
-          <file pinned="false" current-in-tab="true">
+          <file pinned="false" current-in-tab="false">
             <entry file="file://$PROJECT_DIR$/static/telegram.js">
               <provider selected="true" editor-type-id="text-editor">
                 <state relative-caret-position="319">
                   <caret line="166" column="23" selection-start-line="166" selection-start-column="23" selection-end-line="166" selection-end-column="23" />
+                </state>
+              </provider>
+            </entry>
+          </file>
+          <file pinned="false" current-in-tab="true">
+            <entry file="file://$PROJECT_DIR$/pages/_document.tsx">
+              <provider selected="true" editor-type-id="text-editor">
+                <state relative-caret-position="320">
+                  <caret line="20" column="23" lean-forward="true" selection-start-line="20" selection-start-column="23" selection-end-line="20" selection-end-column="23" />
+                  <folding>
+                    <element signature="e#24#94#0" expanded="true" />
+                  </folding>
                 </state>
               </provider>
             </entry>
@@ -97,22 +106,10 @@
           <file pinned="false" current-in-tab="true">
             <entry file="file://$PROJECT_DIR$/components/rt-preview/rt-preview.tsx">
               <provider selected="true" editor-type-id="text-editor">
-                <state relative-caret-position="192">
-                  <caret line="53" column="25" lean-forward="true" selection-start-line="53" selection-start-column="25" selection-end-line="53" selection-end-column="25" />
+                <state relative-caret-position="240">
+                  <caret line="31" column="25" lean-forward="true" selection-start-line="31" selection-start-column="25" selection-end-line="31" selection-end-column="25" />
                   <folding>
                     <element signature="e#0#30#0" expanded="true" />
-                  </folding>
-                </state>
-              </provider>
-            </entry>
-          </file>
-          <file pinned="false" current-in-tab="false">
-            <entry file="file://$PROJECT_DIR$/pages/_document.tsx">
-              <provider selected="true" editor-type-id="text-editor">
-                <state relative-caret-position="448">
-                  <caret line="28" column="23" lean-forward="true" selection-start-line="28" selection-start-column="23" selection-end-line="28" selection-end-column="23" />
-                  <folding>
-                    <element signature="e#24#94#0" expanded="true" />
                   </folding>
                 </state>
               </provider>
@@ -300,9 +297,9 @@
         <option value="$PROJECT_DIR$/components/reply/reply.tsx" />
         <option value="$PROJECT_DIR$/utils/index.ts" />
         <option value="$PROJECT_DIR$/modules/telegram.js" />
+        <option value="$PROJECT_DIR$/static/telegram.js" />
         <option value="$PROJECT_DIR$/pages/_document.tsx" />
         <option value="$PROJECT_DIR$/components/rt-preview/rt-preview.tsx" />
-        <option value="$PROJECT_DIR$/static/telegram.js" />
       </list>
     </option>
   </component>
@@ -550,12 +547,12 @@
       <workItem from="1574567015290" duration="2570000" />
       <workItem from="1574569644073" duration="201000" />
       <workItem from="1574608277277" duration="2434000" />
-      <workItem from="1574619944164" duration="4680000" />
+      <workItem from="1574619944164" duration="5523000" />
     </task>
     <servers />
   </component>
   <component name="TimeTrackingManager">
-    <option name="totallyTimeSpent" value="757085000" />
+    <option name="totallyTimeSpent" value="757928000" />
   </component>
   <component name="ToolWindowManager">
     <frame x="-8" y="-8" width="2576" height="1416" extended-state="6" />
@@ -985,16 +982,6 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/pages/_document.tsx">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="448">
-          <caret line="28" column="23" lean-forward="true" selection-start-line="28" selection-start-column="23" selection-end-line="28" selection-end-column="23" />
-          <folding>
-            <element signature="e#24#94#0" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/utils/index.ts">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="410">
@@ -1005,20 +992,30 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/components/rt-preview/rt-preview.tsx">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="192">
-          <caret line="53" column="25" lean-forward="true" selection-start-line="53" selection-start-column="25" selection-end-line="53" selection-end-column="25" />
-          <folding>
-            <element signature="e#0#30#0" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/static/telegram.js">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="319">
           <caret line="166" column="23" selection-start-line="166" selection-start-column="23" selection-end-line="166" selection-end-column="23" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/pages/_document.tsx">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="320">
+          <caret line="20" column="23" lean-forward="true" selection-start-line="20" selection-start-column="23" selection-end-line="20" selection-end-column="23" />
+          <folding>
+            <element signature="e#24#94#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/components/rt-preview/rt-preview.tsx">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="240">
+          <caret line="31" column="25" lean-forward="true" selection-start-line="31" selection-start-column="25" selection-end-line="31" selection-end-column="25" />
+          <folding>
+            <element signature="e#0#30#0" expanded="true" />
+          </folding>
         </state>
       </provider>
     </entry>
