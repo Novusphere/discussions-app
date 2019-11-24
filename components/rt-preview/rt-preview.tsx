@@ -23,12 +23,8 @@ const RtLink = ({ children, href }) => {
                     embed = `<div class="fb-post" data-href="${href}"></div>`
                     break
                 case /bitchute/.test(href):
-                    const vid = href.match(/video\/[a-zA-Z0-9]+/)
-                    if (vid && vid.length > 0) {
-                        embed = `<iframe width="560px" height="315px" src="https://www.bitchute.com/embed/${vid[0].substring(
-                            6
-                        )}" />`
-                    }
+                    const [, id] = href.split('bitchute.com/video/')
+                    embed = `<iframe width="560px" height="315px" src="https://www.bitchute.com/embed/${id}" frameborder="0" />`
                     break
                 case /https:\/\/www.youtube.com\/watch\?v=[a-zA-Z0-9-_]+/.test(href):
                 case /https:\/\/youtu.be\/[a-zA-Z0-9-_]+/.test(href):
