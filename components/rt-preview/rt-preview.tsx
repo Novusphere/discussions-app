@@ -10,7 +10,7 @@ interface IRtPreviewProps {
     className?: string
 }
 
-const RtLink = ({ children, href, title }) => {
+const RtLink = ({ children, href }) => {
     const [getEmbed, setEmbed] = useState(null)
 
     useEffect(() => {
@@ -21,7 +21,7 @@ const RtLink = ({ children, href, title }) => {
                 embed = await nsdb.cors(`https://www.youtube.com/oembed?format=json&url=${href}`)
             } else if (href.match(/imgur/)) {
                 embed = await nsdb.cors(`https://api.imgur.com/oembed.json?url=${href}`)
-            } else if (href.match(/twitter/)) {
+            } else if (href.match(/twitter.com\/(.*)\/status/)) {
                 embed = await nsdb.cors(`https://publish.twitter.com/oembed?url=${href}`)
             } else if (href.match(/d.tube/)) {
                 embed = await nsdb.cors(`https://api.d.tube/oembed?url=${href}`)
@@ -49,31 +49,41 @@ const RtLink = ({ children, href, title }) => {
         getOEMBED()
     })
 
-    return <object dangerouslySetInnerHTML={{ __html: getEmbed }} />
+    if (!getEmbed) {
+        return (
+            <a href={href} title={`Open ${href}`}>
+                {children}
+            </a>
+        )
+    }
+
+    return <object data-href={href} dangerouslySetInnerHTML={{ __html: getEmbed }} />
 }
 
 const RtPreview: React.FC<IRtPreviewProps> = ({ children, className }) => {
     if (!children) return null
 
-    return <object>
-        <Markdown
-            className={classNames([
-                {
-                    'black lh-copy measure-wide pt0 post-preview-content content-fade overflow-break-word': !className,
-                    [className]: !!className,
-                },
-            ])}
-            options={{
-                overrides: {
-                    a: {
-                        component: RtLink,
+    return (
+        <object>
+            <Markdown
+                className={classNames([
+                    {
+                        'black lh-copy measure-wide pt0 post-preview-content content-fade overflow-break-word': !className,
+                        [className]: !!className,
                     },
-                },
-            }}
-        >
-            {children}
-        </Markdown>
-    </object>
+                ])}
+                options={{
+                    overrides: {
+                        a: {
+                            component: RtLink,
+                        },
+                    },
+                }}
+            >
+                {children}
+            </Markdown>
+        </object>
+    )
 }
 
 export default RtPreview
