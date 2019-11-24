@@ -1,6 +1,6 @@
 import { action, computed, observable, set } from 'mobx'
 import { task } from 'mobx-task'
-import { generateUuid, getAttachmentValue, refreshOEmbed } from '@utils'
+import { generateUuid, getAttachmentValue } from '@utils'
 import { getNewAuthStore, getPostsStore, getUiStore, IStores } from '@stores'
 import PostModel from '@models/postModel'
 import { discussions } from '@novuspherejs'

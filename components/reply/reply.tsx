@@ -188,15 +188,14 @@ class Reply extends React.Component<IReplies, IRepliesState> {
                         className={classNames([
                             'post-reply black',
                             {
-                                [className]: !!className,
                                 'permalink-highlight':
                                     postsStore.currentHighlightedPostUuid === post.uuid,
                             },
                         ])}
-                        onMouseEnter={() => {
+                        onMouseEnter={e => {
                             if (!this.replyModel.editing) this.setHover(true)
                         }}
-                        onMouseLeave={() => {
+                        onMouseLeave={e => {
                             if (!this.replyModel.editing) this.setHover(false)
                         }}
                     >
@@ -285,8 +284,8 @@ class Reply extends React.Component<IReplies, IRepliesState> {
                         {replies && replies.length
                             ? replies.map(postReply => (
                                   <div
-                                      onMouseLeave={() => this.setHover(true)}
-                                      onMouseEnter={() => this.setHover(false)}
+                                      // onMouseLeave={() => this.setHover(true)}
+                                      // onMouseEnter={() => this.setHover(false)}
                                       key={postReply.uuid}
                                   >
                                       <Reply

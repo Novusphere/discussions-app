@@ -46,8 +46,26 @@ const RtLink = ({ children, href }) => {
             }
         }
 
+        function refreshIFrames() {
+            if (href.match(/youtube|youtu.be/)) {
+            } else if (href.match(/imgur/)) {
+            } else if (href.match(/twitter.com\/(.*)\/status/)) {
+            } else if (href.match(/d.tube/)) {
+            } else if (href.match(/soundcloud/)) {
+            } else if (href.match(/instagram/)) {
+                ;(window as any).instgrm.Embeds.process()
+            } else if (href.match(/twitter/)) {
+            }
+        }
+
         getOEMBED()
-    })
+
+        setTimeout(
+            () => {
+                refreshIFrames()
+            }, 500
+        )
+    }, [])
 
     if (!getEmbed) {
         return (
@@ -64,7 +82,7 @@ const RtPreview: React.FC<IRtPreviewProps> = ({ children, className }) => {
     if (!children) return null
 
     return (
-        <object>
+        <object className={'pv3'}>
             <Markdown
                 className={classNames([
                     {
