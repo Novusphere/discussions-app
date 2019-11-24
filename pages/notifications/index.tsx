@@ -1,9 +1,8 @@
 import * as React from 'react'
 import { inject, observer } from 'mobx-react'
 import { IStores } from '@stores'
-import { InfiniteScrollFeed } from '@components'
+import { InfiniteScrollFeed, RichTextPreview } from '@components'
 import { sleep } from '@utils'
-import Markdown from 'markdown-to-jsx'
 import moment from 'moment'
 import Link from 'next/link'
 
@@ -62,9 +61,9 @@ class Notifications extends React.Component<INotificationsProps> {
                             </span>
                             {notification.isMentionType && (
                                 <object>
-                                    <Markdown className={'black flex notifications-content'}>
+                                    <RichTextPreview className={'black flex notifications-content'}>
                                         {notification.post.content}
-                                    </Markdown>
+                                    </RichTextPreview>
                                 </object>
                             )}
                             {!notification.isMentionType && (

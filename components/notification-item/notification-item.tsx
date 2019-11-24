@@ -2,9 +2,9 @@ import * as React from 'react'
 
 import './style.scss'
 import Link from 'next/link'
-import Markdown from 'markdown-to-jsx'
 import moment from 'moment'
 import NotificationModel from '@models/notificationModel'
+import { RichTextPreview } from '@components'
 
 interface INotificationItemProps {
     notification: NotificationModel
@@ -21,9 +21,9 @@ const NotificationItem: React.FC<INotificationItemProps> = ({ notification, onCl
                 </span>
                 {notification.isMentionType && (
                     <object>
-                        <Markdown className={'black flex notifications-content'}>
+                        <RichTextPreview className={'black flex notifications-content'}>
                             {notification.post.content}
-                        </Markdown>
+                        </RichTextPreview>
                     </object>
                 )}
                 {!notification.isMentionType && (

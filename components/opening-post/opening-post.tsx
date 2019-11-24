@@ -12,13 +12,12 @@ import {
     faPen,
     faReply,
 } from '@fortawesome/free-solid-svg-icons'
-import { Attachments, UserNameWithIcon, Votes, Form, SharePost } from '@components'
+import { Attachments, UserNameWithIcon, Votes, Form, SharePost, RichTextPreview } from '@components'
 import moment from 'moment'
 import PostModel from '@models/postModel'
 import { ThreadModel } from '@models/threadModel'
 import { observer } from 'mobx-react'
 import { TagModel } from '@models/tagModel'
-import Markdown from 'markdown-to-jsx'
 
 interface IOpeningPostProps {
     isPreview?: boolean
@@ -113,9 +112,9 @@ const OpeningPost: React.FC<IOpeningPostProps> = ({
                 {activeThread && activeThread.editing ? (
                     <Form form={activeThread.editForm} hideSubmitButton />
                 ) : (
-                    <Markdown className={'black f6 lh-copy overflow-break-word'}>
+                    <RichTextPreview className={'black f6 lh-copy overflow-break-word'}>
                         {openingPost.content}
-                    </Markdown>
+                    </RichTextPreview>
                 )}
 
                 {openingPost.attachment && <Attachments attachment={openingPost.attachment} />}
