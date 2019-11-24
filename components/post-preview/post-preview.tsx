@@ -103,9 +103,7 @@ const PostPreview: React.FC<IPostPreviewProps> = ({
                                 <span className={'black f3 b lh-title'}>{post.title}</span>
                             </div>
 
-                            <object>
-                                <RichTextPreview>{post.content}</RichTextPreview>
-                            </object>
+                            <RichTextPreview>{post.content}</RichTextPreview>
 
                             <div className={'flex z-2 footer b'}>
                                 <object>

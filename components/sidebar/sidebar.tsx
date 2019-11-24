@@ -67,7 +67,8 @@ class Sidebar extends React.Component<ITagListOuterProps & ITagListInnerProps, I
         }
     }
 
-    componentDidMount(): void {
+    private addEnterListener = () => {
+        console.log('entered')
         if (this.sidebarContainer) {
             this.sidebarContainer.current.addEventListener('scroll', this.handleScroll, true)
         }
@@ -75,7 +76,8 @@ class Sidebar extends React.Component<ITagListOuterProps & ITagListInnerProps, I
         window.addEventListener('keypress', this.enterKeyEventListener)
     }
 
-    componentWillUnmount(): void {
+    private removeEnterListener = () => {
+        console.log('exit')
         if (this.sidebarContainer) {
             this.sidebarContainer.current.removeEventListener('scroll', this.handleScroll, true)
         }
@@ -187,7 +189,10 @@ class Sidebar extends React.Component<ITagListOuterProps & ITagListInnerProps, I
         return (
             <div className={className}>
                 {this.renderActiveTag()}
-                <ul className={'list sidebar-ul'} ref={this.sidebarContainer}>
+                <ul
+                    className={'list sidebar-ul'}
+                    ref={this.sidebarContainer}
+                >
                     {Array.from(tags.values())
                         .filter(tag => tag.root)
                         .map(tag => (

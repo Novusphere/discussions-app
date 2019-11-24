@@ -9,16 +9,15 @@ import {
     faUserPlus,
 } from '@fortawesome/free-solid-svg-icons'
 import moment from 'moment'
-import { ReplyBox, UserNameWithIcon, Votes } from '@components'
+import { ReplyBox, UserNameWithIcon, Votes, RichTextPreview } from '@components'
 import { inject, observer } from 'mobx-react'
 import { ReplyModel } from '@models/replyModel'
 import PostModel from '@models/postModel'
 import classNames from 'classnames'
-import { getPermaLink, openInNewTab, sleep } from '@utils'
+import { getPermaLink, openInNewTab } from '@utils'
 import { IStores } from '@stores'
 import copy from 'clipboard-copy'
 import Router from 'next/router'
-import Markdown from 'markdown-to-jsx'
 
 import './style.scss'
 import Form from '../create-form/form'
@@ -120,9 +119,6 @@ class Reply extends React.Component<IReplies, IRepliesState> {
                 <span title={'Permalink'} onClick={this.getPermaLinkUrl}>
                     <FontAwesomeIcon icon={faShare} />
                 </span>
-                {/*<span title={'Donate tokens'}>*/}
-                {/*    <FontAwesomeIcon icon={faDollarSign} />*/}
-                {/*</span>*/}
                 <span
                     title={'View block'}
                     onClick={() => openInNewTab(`https://eosq.app/tx/${post.transaction}`)}
@@ -249,9 +245,9 @@ class Reply extends React.Component<IReplies, IRepliesState> {
                                     />
                                 )}
                                 {!isCollapsed && !replyModel.editing && (
-                                    <Markdown className={'f6 lh-copy reply-content'}>
+                                    <RichTextPreview className={'f6 lh-copy reply-content'}>
                                         {post.content}
-                                    </Markdown>
+                                    </RichTextPreview>
                                 )}
                             </div>
                         </div>

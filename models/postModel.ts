@@ -1,7 +1,8 @@
-import { computed, observable, set } from 'mobx'
+import { observable, set } from 'mobx'
 import { Post } from '@novuspherejs'
 import ecc from 'eosjs-ecc'
 import { getIdenticon } from '@utils'
+
 
 class PostModel {
     @observable public map: { [p: string]: PostModel } | undefined

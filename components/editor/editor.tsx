@@ -4,7 +4,6 @@ import { IStores } from '@stores'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { faSpinner } from '@fortawesome/free-solid-svg-icons'
 import sanitizeHTML from 'sanitize-html'
-import { allowedHosts } from '@utils'
 
 interface IEditorProps {
     postsStore?: IStores['postsStore']
@@ -47,15 +46,8 @@ class Editor extends React.Component<IEditorProps> {
         const Autoformat = autoformat.default
         const Hashtag = autoformat.Hashtag
 
-        const blockEmbedVideo = await import('@modules/quill-custom-video')
-        const Video = blockEmbedVideo.default
-        const BlockEmbedVideo = blockEmbedVideo.Video
-
-        const oembed = await import('@modules/quill-oembed/quill-oembed.ts')
-        const OEmbed = oembed.default
-
-        // const blockEmbedLink = await import('@modules/quill-custom-link')
-        // const MagicUrl = blockEmbedLink.default
+        const blockEmbedLink = await import('quill-magic-url')
+        const MagicUrl = blockEmbedLink.default
 
         const turndownImport = await import('turndown')
         const Turndown = turndownImport.default
@@ -63,36 +55,13 @@ class Editor extends React.Component<IEditorProps> {
         const showdownImport = await import('showdown')
         const showdown = showdownImport.default
 
-        this.turndownService = new Turndown({
-            blankReplacement(content, node) {
-                const types = ['OBJECT', 'IFRAME']
-                if (types.indexOf(node.nodeName) !== -1) {
-                    return `\n\n${node.outerHTML}\n\n`
-                } else {
-                    const output = []
-                    node.childNodes.forEach(child => {
-                        if (types.indexOf(child.nodeName) !== -1) {
-                            output.push(child.outerHTML)
-                        }
-                    })
-                    if (output.length) {
-                        return '\n\n' + output.join('\n\n') + '\n\n'
-                    } else {
-                        return node.isBlock ? '\n\n' : ''
-                    }
-                }
-            },
-        })
+        this.turndownService = new Turndown()
         this.showdownService = new showdown.Converter()
-
-        // to keep HTML tags as is without converting to markdown
-        this.turndownService.keep(['iframe', 'object'])
 
         this.quillBase.Quill.register('modules/mention', Mention)
         this.quillBase.Quill.register('modules/autoformat', Autoformat)
         this.quillBase.Quill.register('formats/hashtag', Hashtag)
-        // this.quillBase.Quill.register('modules/magicUrl', MagicUrl)
-        this.quillBase.Quill.register('modules/oembed', OEmbed)
+        this.quillBase.Quill.register('modules/magicUrl', MagicUrl)
 
         this.modules = {
             mention: {
@@ -150,7 +119,6 @@ class Editor extends React.Component<IEditorProps> {
         if (this.ref && this.ref.current && typeof this.props.value !== 'undefined') {
             const editor = this.ref.current.getEditor()
             editor['container']['childNodes'][0].innerHTML = content
-            // editor.clipboard.dangerouslyPasteHTML(content, 'silent')
         }
     }
 
@@ -158,49 +126,13 @@ class Editor extends React.Component<IEditorProps> {
         if (nextProps.value === '') {
             this.updateContentByRef('')
         }
-    }
+    }m
 
     public onChange = (text: string) => {
         const clean = sanitizeHTML(text, {
-            allowedTags: [...sanitizeHTML.defaults.allowedTags, 'object'],
+            allowedTags: [...sanitizeHTML.defaults.allowedTags],
             allowedAttributes: {
                 ...sanitizeHTML.defaults.allowedAttributes,
-                iframe: [
-                    'width',
-                    'height',
-                    'src',
-                    'srcdoc',
-                    'frameborder',
-                    'allow',
-                    'allowfullscreen',
-                ],
-                object: ['class'],
-                a: ['href', 'rel', 'target'],
-                blockquote: ['class', 'lang', 'data-id'],
-            },
-            // parser: {
-            //     decodeEntities: false,
-            // },
-            allowedIframeHostnames: ['www.youtube.com', 'www.youtu.be'],
-            transformTags: {
-                iframe: (tagName, attribs) => {
-                    return {
-                        tagName: 'iframe',
-                        attribs: {
-                            ...attribs,
-                            ...(attribs.srcdoc && {
-                                srcdoc: attribs.srcdoc.replace('"', "'"),
-                            }),
-                        },
-                    }
-                },
-                a: (tagName, attribs) =>
-                    allowedHosts.some(host => attribs.href.includes(host))
-                        ? {
-                              tagName: 'a',
-                              attribs: { href: attribs.href },
-                          }
-                        : {},
             },
         })
         const markdown = this.turndownService.turndown(clean)
@@ -238,29 +170,15 @@ class Editor extends React.Component<IEditorProps> {
                     'video',
                     'mention',
                     'hashtag',
-                    'oembed-wrapper',
                 ]}
                 modules={{
                     autoformat: this.modules.autoformat,
                     mention: this.modules.mention,
-                    // magicUrl: true,
-                    oembed: true,
+                    magicUrl: true,
                     toolbar: [
                         [{ header: 1 }, { header: 2 }], // custom button values
                         [{ list: 'ordered' }, { list: 'bullet' }],
-                        [
-                            'bold',
-                            'italic',
-                            // 'underline',
-                            // 'strike',
-                            'blockquote',
-                            'list',
-                            'bullet',
-
-                            'link',
-                            'image',
-                            'video',
-                        ],
+                        ['bold', 'italic', 'blockquote', 'list', 'bullet', 'link', 'image'],
                     ],
                 }}
             />
