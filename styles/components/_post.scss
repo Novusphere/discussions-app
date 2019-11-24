@@ -64,9 +64,11 @@
         @extend .mt2;
         @extend .mb0;
     }
+
     a {
-        color: #007bff !important;
+        color: #079E99 !important;
     }
+
 }
 
 .opening-post {
@@ -82,6 +84,12 @@
         @extend .dim;
         text-decoration: none;
         color: black;
+    }
+
+    object {
+        a {
+            color: #079E99 !important;
+        }
     }
 }
 

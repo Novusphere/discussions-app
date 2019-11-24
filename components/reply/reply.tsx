@@ -284,8 +284,8 @@ class Reply extends React.Component<IReplies, IRepliesState> {
                         {replies && replies.length
                             ? replies.map(postReply => (
                                   <div
-                                      // onMouseLeave={() => this.setHover(true)}
-                                      // onMouseEnter={() => this.setHover(false)}
+                                      onMouseLeave={() => this.setHover(true)}
+                                      onMouseEnter={() => this.setHover(false)}
                                       key={postReply.uuid}
                                   >
                                       <Reply

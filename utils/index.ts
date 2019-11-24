@@ -542,3 +542,12 @@ export const refreshOEmbed = () => {
         }, 500
     )
 }
+
+export const getHost = url => {
+    if (url.indexOf("magnet:") == 0) {
+        return "magnet link";
+    }
+    const parser = document.createElement("a");
+    parser.href = url;
+    return parser.host.toLowerCase()
+}

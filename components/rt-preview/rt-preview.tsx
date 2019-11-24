@@ -5,6 +5,7 @@ import './style.scss'
 import { useEffect, useState } from 'react'
 import { nsdb } from '@novuspherejs'
 import classNames from 'classnames'
+import { generateUuid, getHost } from '@utils'
 
 interface IRtPreviewProps {
     className?: string
@@ -17,48 +18,83 @@ const RtLink = ({ children, href }) => {
         async function getOEMBED() {
             let embed
 
-            if (href.match(/youtube|youtu.be/)) {
-                embed = await nsdb.cors(`https://www.youtube.com/oembed?format=json&url=${href}`)
-            } else if (href.match(/imgur/)) {
-                embed = await nsdb.cors(`https://api.imgur.com/oembed.json?url=${href}`)
-            } else if (href.match(/twitter.com\/(.*)\/status/)) {
-                embed = await nsdb.cors(`https://publish.twitter.com/oembed?url=${href}`)
-            } else if (href.match(/d.tube/)) {
-                embed = await nsdb.cors(`https://api.d.tube/oembed?url=${href}`)
-            } else if (href.match(/soundcloud/)) {
-                embed = await nsdb.cors(`https://soundcloud.com/oembed?format=json&url=${href}`)
-            } else if (href.match(/instagram/)) {
-                embed = await nsdb.cors(`https://api.instagram.com/oembed/?url=${href}`)
-            } else if (href.match(/twitter/)) {
-                embed = await nsdb.cors(
-                    `https://db.novusphere.io/service/cors/?https://publish.twitter.com/oembed?url=${href}`
-                )
-            } else {
-                embed = `<a href="${href}" title="Open ${href}">${children}</a>`
+            switch (true) {
+                case /https:\/\/www.youtube.com\/watch\?v=[a-zA-Z0-9-_]+/.test(href):
+                case /https:\/\/youtu.be\/[a-zA-Z0-9-_]+/.test(href):
+                    embed = await nsdb.cors(
+                        `https://www.youtube.com/oembed?format=json&url=${href}`
+                    )
+                    break
+                case /https:\/\/www.imgur.com(\/[a-zA-Z0-9-_]+)?\/p\/[a-zA-Z0-9-_]+(\/?.+)?/.test(
+                    href
+                ):
+                    embed = await nsdb.cors(`https://api.imgur.com/oembed.json?url=${href}`)
+                    break
+                case /https:\/\/twitter.com\/[a-zA-Z0-9-_]+\/status\/[0-9]+/.test(href):
+                    embed = await nsdb.cors(`https://publish.twitter.com/oembed?url=${href}`)
+                    break
+                case /d.tube/.test(href):
+                    embed = await nsdb.cors(`https://api.d.tube/oembed?url=${href}`)
+                    break
+                case /soundcloud/.test(href):
+                    embed = await nsdb.cors(`https://soundcloud.com/oembed?format=json&url=${href}`)
+                    break
+                case /https:\/\/www.instagr.am(\/[a-zA-Z0-9-_]+)?\/p\/[a-zA-Z0-9-_]+(\/?.+)?/.test(
+                    href
+                ):
+                case /https:\/\/www.instagram.com(\/[a-zA-Z0-9-_]+)?\/p\/[a-zA-Z0-9-_]+(\/?.+)?/i.test(
+                    href
+                ):
+                    embed = await nsdb.cors(`https://api.instagram.com/oembed/?url=${href}`)
+                    break
+                case /(.|)http[s]?:\/\/(\w|[:\/.%-])+\.(png|jpg|jpeg|gif)(\?(\w|[:\/.%-])+)?(.|)/.test(
+                    href
+                ):
+                    embed = `<img src="${href}" alt="Viewing image" />`
+                    break
+                case /t.me/.test(href):
+                    const [, ids] = href.split('t.me/')
+                    if (ids) {
+                        embed = `<span data-telegram-rn="${generateUuid()}" data-telegram-post="${ids}" data-width="100%"></span>`
+                    }
+                    break
+                default:
+                    embed = null
+                    break
             }
 
-            if (embed['html']) {
-                setEmbed(embed['html'])
-            } else if (embed['body']) {
-                setEmbed(embed['body'])
-            } else {
-                setEmbed(embed)
+            if (embed) {
+                if (embed['html']) {
+                    setEmbed(embed['html'])
+                } else if (embed['body']) {
+                    setEmbed(embed['body'])
+                } else {
+                    setEmbed(embed)
+                }
             }
         }
 
-        function refreshIFrames() {
+        async function refreshIFrames() {
             if (href.match(/facebook|fb.me/)) {
                 if ((window as any).FB) {
                     ;(window as any).FB.XFBML.parse()
                 }
             } else if (href.match(/twitter/)) {
-                if (window['twttr']) {
-                    window['twttr'].widgets.load()
+                if ((window as any).twttr) {
+                    ;(window as any).twttr.widgets.load()
                 }
             } else if (href.match(/instagram/)) {
                 if ((window as any).instgrm) {
                     ;(window as any).instgrm.Embeds.process()
                 }
+            } else if (href.match(/t.me/)) {
+                // @ts-ignore
+                const tl = await import('/static/telegram.js')
+                tl.default(window)
+                // if ((window as any).Telegram) {
+                //     console.log(window['Telegram'])
+                //     // ;(window as any).Telegram(window)
+                // }
             }
         }
 
