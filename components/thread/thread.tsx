@@ -54,9 +54,7 @@ class Thread extends React.Component<IThreadOuterProps & IThreadInnerProps, IThr
             router,
             thread: { openingPost },
             tagStore: { activeTag },
-            notificationsStore: {
-                isWatchingThread, toggleThreadWatch
-            }
+            notificationsStore: { isWatchingThread, toggleThreadWatch },
         } = this.props
 
         const { threadAsModel } = this
@@ -76,11 +74,10 @@ class Thread extends React.Component<IThreadOuterProps & IThreadInnerProps, IThr
     }
 
     private renderOpeningPostReplyBox = () => {
-        if (!this.openingReplyModel.open) return null
-
         return (
             <div className={'mb3'}>
                 <ReplyBox
+                    open={this.openingReplyModel.open}
                     uid={this.props.thread.uuid}
                     onContentChange={this.openingReplyModel.setContent}
                     onSubmit={() => this.openingReplyModel.onSubmit(this.threadAsModel)}
@@ -98,7 +95,9 @@ class Thread extends React.Component<IThreadOuterProps & IThreadInnerProps, IThr
             <>
                 {thread.openingPost.totalReplies > 0 && (
                     <div className={'mb2'} id={'comments'}>
-                        <span className={'b f6 pb2'}>viewing all {thread.openingPost.totalReplies} comments</span>
+                        <span className={'b f6 pb2'}>
+                            viewing all {thread.openingPost.totalReplies} comments
+                        </span>
                     </div>
                 )}
                 {this.renderReplies()}

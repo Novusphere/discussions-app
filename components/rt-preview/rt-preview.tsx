@@ -34,7 +34,7 @@ const RtLink = ({ children, href, title }) => {
                     `https://db.novusphere.io/service/cors/?https://publish.twitter.com/oembed?url=${href}`
                 )
             } else {
-                embed = `<a href="${href}" title="${title}">${children}</a>`
+                embed = `<a href="${href}" title="Open ${href}">${children}</a>`
             }
 
             if (embed['html']) {

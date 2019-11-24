@@ -53,20 +53,38 @@ class Reply extends React.Component<IReplies, IRepliesState> {
         isCollapsed: false,
     }
 
-    constructor(props) {
-        super(props)
-
-        this.onSubmit = this.onSubmit.bind(this)
+    @task.resolved
+    private onSubmit = replyModel => {
+        return replyModel.onSubmit(this.props.threadReference)
     }
 
-    @task.resolved
-    private onSubmit(replyModel) {
-        return replyModel.onSubmit(this.props.threadReference)
+    @task
+    private setReplyModel = () => {
+        this.replyModel = this.props.getModel(this.props.post)
+        return this.replyModel
     }
 
     private addAndScrollToUuid = (uuid: string) => {
         if (this.replyRef.current.dataset.postUuid === uuid) {
             this.props.postsStore.highlightPostUuid(uuid)
+        }
+    }
+
+    private url: string
+    private replyModel: ReplyModel
+
+    componentDidMount(): void {
+        this.setReplyModel()
+
+        const [og, reply] = window.location.href.split('#')
+
+        this.url = og
+
+        if (reply) {
+            const [replyUuid] = reply.split('-reply')
+            if (replyUuid === this.props.post.uuid) {
+                this.replyModel.toggleOpen()
+            }
         }
     }
 
@@ -101,18 +119,17 @@ class Reply extends React.Component<IReplies, IRepliesState> {
             return null
         }
 
-        const { post, getModel, userStore, newAuthStore } = this.props
+        const { post, userStore, newAuthStore } = this.props
         const { following } = userStore
         const { activePublicKey, hasAccount } = newAuthStore
-        const replyModel = getModel(post)
 
         return (
             <div className={'hover-elements disable-user-select'}>
-                <span onClick={replyModel.toggleOpen} title={'Reply to post'}>
+                <span onClick={this.replyModel.toggleOpen} title={'Reply to post'}>
                     <FontAwesomeIcon icon={faReply} />
                 </span>
-                {replyModel.canEditPost && (
-                    <span title={'Edit post'} onClick={() => replyModel.toggleEditing()}>
+                {this.replyModel.canEditPost && (
+                    <span title={'Edit post'} onClick={() => this.replyModel.toggleEditing()}>
                         <FontAwesomeIcon icon={faPen} />
                     </span>
                 )}
@@ -142,6 +159,7 @@ class Reply extends React.Component<IReplies, IRepliesState> {
 
     render() {
         if (this.props.isCollapsed) return null
+        if (this.setReplyModel['pending']) return null
 
         const {
             post,
@@ -157,10 +175,7 @@ class Reply extends React.Component<IReplies, IRepliesState> {
         } = this.props
 
         const { isCollapsed, isHover } = this.state
-
-        const replyModel = getModel(post)
         const replies = getRepliesFromMap(post.uuid)
-
         const [currentPathTrimmed] = currentPath.split('#')
 
         return (
@@ -179,10 +194,10 @@ class Reply extends React.Component<IReplies, IRepliesState> {
                             },
                         ])}
                         onMouseEnter={() => {
-                            if (!replyModel.editing) this.setHover(true)
+                            if (!this.replyModel.editing) this.setHover(true)
                         }}
                         onMouseLeave={() => {
-                            if (!replyModel.editing) this.setHover(false)
+                            if (!this.replyModel.editing) this.setHover(false)
                         }}
                     >
                         {this.renderHoverElements()}
@@ -236,37 +251,36 @@ class Reply extends React.Component<IReplies, IRepliesState> {
                                         </span>
                                     )}
                                 </div>
-                                {replyModel.editing && (
+                                {this.replyModel.editing && (
                                     <Form
-                                        form={replyModel.editForm}
+                                        form={this.replyModel.editForm}
                                         fieldClassName={'pb0'}
                                         hideSubmitButton
                                         className={'w-100 mt3'}
                                     />
                                 )}
-                                {!isCollapsed && !replyModel.editing && (
+                                {!isCollapsed && !this.replyModel.editing && (
                                     <RichTextPreview className={'f6 lh-copy reply-content'}>
                                         {post.content}
                                     </RichTextPreview>
                                 )}
                             </div>
                         </div>
-
-                        {replyModel.open ? (
-                            <ReplyBox
-                                className={classNames([
-                                    'ph4 pb4',
-                                    {
-                                        'post-content-hover': isHover,
-                                    },
-                                ])}
-                                uid={post.uuid}
-                                onContentChange={replyModel.setContent}
-                                value={replyModel.content}
-                                loading={replyModel.onSubmit['pending']}
-                                onSubmit={() => this.onSubmit(replyModel)}
-                            />
-                        ) : null}
+                        <ReplyBox
+                            id={`${post.uuid}-reply`}
+                            className={classNames([
+                                'ph4 pb4',
+                                {
+                                    'post-content-hover': isHover,
+                                },
+                            ])}
+                            open={this.replyModel.open}
+                            uid={post.uuid}
+                            onContentChange={this.replyModel.setContent}
+                            value={this.replyModel.content}
+                            loading={this.replyModel.onSubmit['pending']}
+                            onSubmit={() => this.onSubmit(this.replyModel)}
+                        />
 
                         {replies && replies.length
                             ? replies.map(postReply => (

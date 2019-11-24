@@ -5,6 +5,8 @@ import { observer } from 'mobx-react'
 import classNames from 'classnames'
 
 import dynamic from 'next/dynamic'
+import { useState } from 'react'
+import RtPreview from '../rt-preview/rt-preview'
 
 const Editor = dynamic(() => import('../editor/editor'), {
     ssr: false,
@@ -14,10 +16,13 @@ interface IReplyProps {
     className?: string
     uid: string // the uid of the post this component is active for
     onContentChange: (content: string) => void
-    onSubmit: (uid: string) =>any
+    onSubmit: (uid: string) => any
 
     value?: string
     loading: boolean
+
+    id?: string
+    open: boolean
 }
 
 const ReplyBox: React.FC<IReplyProps> = ({
@@ -27,24 +32,43 @@ const ReplyBox: React.FC<IReplyProps> = ({
     loading,
     className,
     value,
+    id,
+    open,
 }) => {
+    const [showPreview, setPreviewState] = useState(false)
+    const [content, setContent] = useState(null)
+
     return (
         <div
+            {...(id && { id })}
             className={classNames([
                 {
                     mt3: typeof className === 'undefined',
                     [className]: !!className,
                 },
             ])}
+            style={{
+                display: open ? 'block' : 'none',
+            }}
         >
             <Editor
                 placeholder={'Enter your reply'}
                 className={'db f6'}
                 value={value}
-                onChange={onContentChange}
+                onChange={content => {
+                    onContentChange(content)
+                    setContent(content)
+                }}
             />
 
-            <div className={'flex flex-column items-start'}>
+            <div className={'flex flex-row items-center'}>
+                <button
+                    disabled={loading}
+                    className={'mt3 f6 link dim ph3 pv2 dib mr2 pointer white bg-gray'}
+                    onClick={() => setPreviewState(true)}
+                >
+                    Preview
+                </button>
                 <button
                     disabled={loading}
                     className={'mt3 f6 link dim ph3 pv2 dib mr2 pointer white bg-green'}
@@ -57,6 +81,12 @@ const ReplyBox: React.FC<IReplyProps> = ({
                     {loading ? <FontAwesomeIcon width={13} icon={faSpinner} spin /> : 'Post reply'}
                 </button>
             </div>
+
+            {showPreview && (
+                <div className={'flex flex-row mt3 card pa2'}>
+                    <RtPreview className={'w-100'}>{content}</RtPreview>
+                </div>
+            )}
         </div>
     )
 }
