@@ -1,15 +1,10 @@
 .title-header {
 	height: 55px;
 	background-color: #fff;
-	position: -webkit-sticky;
-	position: sticky;
-	top: -1px;
 	margin-bottom: 0 !important;
 }
 
 .user-container {
 	@extend .pa2;
 	@extend .ml2;
-	//border-radius: 0.25rem;
-	//border: 1px solid rgba(0, 0, 0, 0.15);
 }

@@ -255,6 +255,7 @@ export default class Notifications extends BaseStore {
         if (this.watchingThread.has(id)) {
             this.watchingThread.delete(id)
             this.watchingThreadPostDiff.delete(id)
+            this.uiStore.showToast('You are no longer watching this thread', 'info')
             return
         }
 

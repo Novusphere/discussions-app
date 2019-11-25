@@ -137,7 +137,7 @@ const RtPreview: React.FC<IRtPreviewProps> = ({ children, className }) => {
     if (!children) return null
 
     return (
-        <object className={'pv3'}>
+        <object className={'pt0 pb3'}>
             <Markdown
                 className={classNames([
                     {

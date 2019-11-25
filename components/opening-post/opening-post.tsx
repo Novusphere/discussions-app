@@ -156,7 +156,7 @@ const OpeningPost: React.FC<IOpeningPostProps> = ({
                                     >
                                         <FontAwesomeIcon
                                             icon={!isWatchingPost(id) ? faEye : faEyeSlash}
-                                            color={'#b0b0b0'}
+                                            color={isWatchingPost(id) ? '#079E99' : '#b0b0b0'}
                                         />
                                     </span>
                                 )}

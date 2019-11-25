@@ -32,11 +32,10 @@ export default class Ui extends BaseStore {
     }
 
     showToast = (message: string, type: 'error' | 'info' | 'success' | 'warn') => {
-        return toast[type](message)
-    }
-
-    hideToast = (toastId?: number) => {
-        return toast.dismiss(toastId)
+        return toast[type](message, {
+            hideProgressBar: true,
+            pauseOnHover: false,
+        })
     }
 }
 

@@ -9,8 +9,7 @@ import { IStores } from '@stores'
 
 import './style.scss'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
-import { faPlus, faSearch } from '@fortawesome/free-solid-svg-icons'
-import { TagModel } from '@models/tagModel'
+import { faPlus } from '@fortawesome/free-solid-svg-icons'
 
 interface ITagListOuterProps {
     className: string
@@ -111,7 +110,7 @@ class Sidebar extends React.Component<ITagListOuterProps & ITagListInnerProps, I
         if (activeTag) {
             const isSubbed = subSubscriptionStatus.indexOf(activeTag.name) !== -1
             return (
-                <div className={'pa4 bg-white shadow'}>
+                <div className={'card pa4'}>
                     <span className={'flex flex-row items-center'}>
                         <img
                             src={activeTag.icon}
@@ -190,7 +189,7 @@ class Sidebar extends React.Component<ITagListOuterProps & ITagListInnerProps, I
             <div className={className}>
                 {this.renderActiveTag()}
                 <ul
-                    className={'list sidebar-ul'}
+                    className={'card mt0 pv4 ph2 list'}
                     ref={this.sidebarContainer}
                 >
                     {Array.from(tags.values())

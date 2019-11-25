@@ -9,6 +9,8 @@ const uuid = require('uuidv4')
 
 const BigInt = require('big-integer')
 
+export * from './useScrollPosition'
+
 export const isDev = process.env.NODE_ENV === 'development'
 export const isServer = typeof window === 'undefined'
 export const sleep = milliseconds => {
