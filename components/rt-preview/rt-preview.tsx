@@ -5,7 +5,7 @@ import './style.scss'
 import { useEffect, useState } from 'react'
 import { nsdb } from '@novuspherejs'
 import classNames from 'classnames'
-import { generateUuid, getHost } from '@utils'
+import { generateUuid, waitForObject } from '@utils'
 
 interface IRtPreviewProps {
     className?: string
@@ -81,6 +81,24 @@ const RtLink = ({ children, href }) => {
             }
         }
 
+        // async function refreshIFrames() {
+        //     if (href.match(/facebook|fb.me/)) {
+        //         waitForObject(() => (window as any).twttr, FB => FB.XFBML.parse())
+        //     } else if (href.match(/twitter/)) {
+        //         waitForObject(() => (window as any).twttr, twttr => twttr.widgets.load())
+        //     } else if (href.match(/instagram/)) {
+        //         waitForObject(() => (window as any).twttr, instgrm => instgrm.Embeds.process())
+        //     } else if (href.match(/t.me/)) {
+        //         // @ts-ignore
+        //         const tl = await import('/static/telegram.js')
+        //         tl.default(window)
+        //     }
+        // }
+
+        getOEMBED()
+    }, [])
+
+    useEffect(() => {
         async function refreshIFrames() {
             if (href.match(/facebook|fb.me/)) {
                 if ((window as any).FB) {
@@ -98,19 +116,11 @@ const RtLink = ({ children, href }) => {
                 // @ts-ignore
                 const tl = await import('/static/telegram.js')
                 tl.default(window)
-                // if ((window as any).Telegram) {
-                //     console.log(window['Telegram'])
-                //     // ;(window as any).Telegram(window)
-                // }
             }
         }
 
-        getOEMBED()
-
-        setTimeout(() => {
-            refreshIFrames()
-        }, 500)
-    }, [])
+        refreshIFrames()
+    }, [getEmbed])
 
     if (!getEmbed) {
         return (

@@ -45,6 +45,16 @@ export const getAttachmentValue = (post: any) => {
     }
 }
 
+export function waitForObject(o, withObject, tries=30) {
+    let obj = o();
+    if (obj && withObject) {
+        withObject(obj);
+    }
+    else if (tries > 0) {
+        setTimeout(() => waitForObject(o, withObject, tries-1), 1000);
+    }
+}
+
 export const openInNewTab = (url: string) => {
     const win = window.open(url, '_blank')
     return win.focus()
