@@ -166,11 +166,12 @@ export default (function (window) {
             iframe.id = widgetElId;
             iframe.src = src;
             iframe.width = defWidth;
-            iframe.height = defHeight;
+            iframe.height = "100%";
             iframe.setAttribute('frameborder', '0');
             iframe.setAttribute('scrolling', 'no');
             iframe.style.border = 'none';
             iframe.style.overflow = 'hidden';
+
             for (var prop in styles) {
                 iframe.style[prop] = styles[prop];
             }

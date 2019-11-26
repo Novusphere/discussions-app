@@ -110,7 +110,11 @@ const RtLink: any = ({ children, href, index }) => {
             } else if (href.match(/t.me/)) {
                 // @ts-ignore
                 const tl = await import('/static/telegram.js')
-                tl.default(window)
+                setTimeout(
+                    () => {
+                        tl.default(window)
+                    }, 0
+                )
             }
         }
 
@@ -125,7 +129,13 @@ const RtLink: any = ({ children, href, index }) => {
         )
     }
 
-    return <object data-index={index} dangerouslySetInnerHTML={{ __html: getEmbed }} />
+    return (
+        <object
+            className={'rt-view-container'}
+            data-index={index}
+            dangerouslySetInnerHTML={{ __html: getEmbed }}
+        />
+    )
 }
 
 const RtLinkCount = ({ href, children }) => {
