@@ -14,7 +14,7 @@ export * from './useScrollPosition'
 
 
 export const INDEXER_NAME = '__LINKINDEXER__'
-export const LINK_LIMIT = 3
+export const LINK_LIMIT = 1000
 
 export const isDev = process.env.NODE_ENV === 'development'
 export const isServer = typeof window === 'undefined'
