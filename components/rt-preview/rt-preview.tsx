@@ -129,7 +129,6 @@ const RtLink: any = ({ children, href, index }) => {
 
     return (
         <object
-            className={'rt-view-container'}
             data-index={index}
             dangerouslySetInnerHTML={{ __html: getEmbed }}
         />
