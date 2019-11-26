@@ -3,7 +3,7 @@ import { inject, observer } from 'mobx-react'
 import { IStores } from '@stores'
 import { Form } from '@components'
 import NewPostPreview from './new-post-preview/new-post-preview'
-import Select from 'react-select'
+import Creatable from 'react-select/creatable'
 
 interface INewPageProps {
     postsStore: IStores['postsStore']
@@ -33,7 +33,8 @@ class NewPage extends React.Component<INewPageProps> {
             <>
                 <div className={'flex flex-row items-center mb3'}>
                     <span className={'w-20 black f4 b'}>Create a post in</span>
-                    <Select
+                    <Creatable
+                        formatCreateLabel={inputValue => `Make a new post in #${inputValue}`}
                         onChange={option => (newPostData.sub = option)}
                         className={'w-80 db f6 react-select-dropdown'}
                         classNamePrefix={'rs'}

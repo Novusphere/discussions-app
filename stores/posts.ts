@@ -247,14 +247,12 @@ export default class Posts extends BaseStore {
             type: 'dropdown',
             hideLabels: true,
             extra: {
-                options: [
-                    ...Array.from(this.tagsStore.tags.values())
-                        .filter(tag => !tag.root)
-                        .map(tag => ({
-                            value: tag.name,
-                            label: tag.name,
-                        })),
-                ],
+                options: this.tagsStore.subSubscriptionStatus
+                    .filter(tag => ['home', 'all', 'feed'].indexOf(tag) === -1)
+                    .map(tag => ({
+                        value: tag,
+                        label: `#${tag}`,
+                    })),
             },
         }
     }
