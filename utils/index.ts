@@ -2,6 +2,7 @@ import Router from 'next/router'
 import { Post, discussions } from '@novuspherejs'
 import { IPost } from '@stores/posts'
 import _ from 'lodash'
+
 const removeMd = require('remove-markdown')
 
 const pjson = require('../package.json')
@@ -10,6 +11,10 @@ const uuid = require('uuidv4')
 const BigInt = require('big-integer')
 
 export * from './useScrollPosition'
+
+
+export const INDEXER_NAME = '__LINKINDEXER__'
+export const LINK_LIMIT = 3
 
 export const isDev = process.env.NODE_ENV === 'development'
 export const isServer = typeof window === 'undefined'
@@ -47,13 +52,12 @@ export const getAttachmentValue = (post: any) => {
     }
 }
 
-export function waitForObject(o, withObject, tries=30) {
-    let obj = o();
+export function waitForObject(o, withObject, tries = 30) {
+    let obj = o()
     if (obj && withObject) {
-        withObject(obj);
-    }
-    else if (tries > 0) {
-        setTimeout(() => waitForObject(o, withObject, tries-1), 1000);
+        withObject(obj)
+    } else if (tries > 0) {
+        setTimeout(() => waitForObject(o, withObject, tries - 1), 1000)
     }
 }
 
@@ -543,23 +547,21 @@ export const allowedHosts = [
     'trybe.one',
     'steemit.com',
     'medium.com',
-    'whaleshares.io'
+    'whaleshares.io',
 ]
 
 export const refreshOEmbed = () => {
-    setTimeout(
-        () => {
-            window['twttr'].widgets.load()
-            window['imgurEmbed'].createIframe()
-        }, 500
-    )
+    setTimeout(() => {
+        window['twttr'].widgets.load()
+        window['imgurEmbed'].createIframe()
+    }, 500)
 }
 
 export const getHost = url => {
-    if (url.indexOf("magnet:") == 0) {
-        return "magnet link";
+    if (url.indexOf('magnet:') == 0) {
+        return 'magnet link'
     }
-    const parser = document.createElement("a");
-    parser.href = url;
+    const parser = document.createElement('a')
+    parser.href = url
     return parser.host.toLowerCase()
 }

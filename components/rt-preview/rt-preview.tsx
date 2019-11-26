@@ -5,14 +5,23 @@ import './style.scss'
 import { useEffect, useState } from 'react'
 import { nsdb } from '@novuspherejs'
 import classNames from 'classnames'
-import { generateUuid, waitForObject } from '@utils'
+import { generateUuid, INDEXER_NAME, LINK_LIMIT } from '@utils'
+import { useRef } from 'react'
+import { useCallback } from 'react'
 
 interface IRtPreviewProps {
     className?: string
 }
 
-const RtLink = ({ children, href }) => {
+const RtLink: any = ({ children, href, index }) => {
     const [getEmbed, setEmbed] = useState(null)
+
+    let _href = href
+
+    if (href.indexOf(INDEXER_NAME) !== -1) {
+        const [_splt_href] = href.split(INDEXER_NAME)
+        _href = _splt_href
+    }
 
     useEffect(() => {
         async function getOEMBED() {
@@ -81,20 +90,6 @@ const RtLink = ({ children, href }) => {
             }
         }
 
-        // async function refreshIFrames() {
-        //     if (href.match(/facebook|fb.me/)) {
-        //         waitForObject(() => (window as any).twttr, FB => FB.XFBML.parse())
-        //     } else if (href.match(/twitter/)) {
-        //         waitForObject(() => (window as any).twttr, twttr => twttr.widgets.load())
-        //     } else if (href.match(/instagram/)) {
-        //         waitForObject(() => (window as any).twttr, instgrm => instgrm.Embeds.process())
-        //     } else if (href.match(/t.me/)) {
-        //         // @ts-ignore
-        //         const tl = await import('/static/telegram.js')
-        //         tl.default(window)
-        //     }
-        // }
-
         getOEMBED()
     }, [])
 
@@ -122,22 +117,93 @@ const RtLink = ({ children, href }) => {
         refreshIFrames()
     }, [getEmbed])
 
-    if (!getEmbed) {
+    if (!getEmbed || index > LINK_LIMIT) {
         return (
-            <a href={href} title={`Open ${href}`}>
+            <a data-indexer-set="true" data-index={index} href={_href} title={`Open ${href}`}>
                 {children}
             </a>
         )
     }
 
-    return <object data-href={href} dangerouslySetInnerHTML={{ __html: getEmbed }} />
+    return <object data-index={index} dangerouslySetInnerHTML={{ __html: getEmbed }} />
+}
+
+const RtLinkCount = ({ href, children }) => {
+    const ref = useRef(null)
+    const [_href, _setHref] = useState(href)
+    const [_index, _setIndex] = useState(1)
+
+    useEffect(() => {
+        const timer = setTimeout(() => {
+            if (ref.current) {
+                const url = ref.current.childNodes[0].getAttribute('href')
+                if (url) {
+                    const split = url.split(INDEXER_NAME)
+
+                    if (split) {
+                        _setIndex(split[1])
+                        _setHref(split[0])
+                    }
+                }
+            }
+        }, 0)
+        return () => clearTimeout(timer)
+    }, [])
+
+    return (
+        <span ref={ref}>
+            <RtLink children={children} href={_href} index={_index} />
+        </span>
+    )
+
+    // return (
+    //     <a ref={ref} href={ref} title={`Open ${href}`}>
+    //         {children}
+    //     </a>
+    // )
 }
 
 const RtPreview: React.FC<IRtPreviewProps> = ({ children, className }) => {
     if (!children) return null
 
+    const ref = useRef(null)
+    const setRef = useCallback(node => {
+        if (ref.current) {
+            // Make sure to cleanup any events/references added to the last instance
+        }
+
+        if (node) {
+            // const linkNodes = node.childNodes[0].querySelectorAll('[data-oembed-type]')
+            const linkNodes: HTMLCollection = node.childNodes[0].getElementsByTagName('a')
+            if (linkNodes.length) {
+                Array.from(linkNodes).forEach((item, index) => {
+                    if (!item.getAttribute('data-indexer')) {
+                        item.setAttribute(
+                            'href',
+                            `${item.getAttribute('href')}/${INDEXER_NAME}${index + 1}`
+                        )
+                    }
+                    // else {
+                    //     console.log('here')
+                    //     const split = item.getAttribute('href').split(INDEXER_NAME)
+                    //
+                    //     if (split) {
+                    //         item.setAttribute(
+                    //             'href',
+                    //             `${split[0]}`
+                    //         )
+                    //     }
+                    //
+                    // }
+                })
+            }
+        }
+
+        ref.current = node
+    }, [])
+
     return (
-        <object className={'pt0 pb3'}>
+        <object ref={setRef} className={'pt0 pb3'}>
             <Markdown
                 className={classNames([
                     {
@@ -146,10 +212,11 @@ const RtPreview: React.FC<IRtPreviewProps> = ({ children, className }) => {
                     },
                 ])}
                 options={{
-                    overrides: {
-                        a: {
-                            component: RtLink,
-                        },
+                    createElement(type, props, children) {
+                        if (type === 'a') {
+                            return React.createElement(RtLinkCount, { ...props }, children)
+                        }
+                        return React.createElement(type, props, children)
                     },
                 }}
             >
