@@ -110,11 +110,9 @@ const RtLink: any = ({ children, href, index }) => {
             } else if (href.match(/t.me/)) {
                 // @ts-ignore
                 const tl = await import('/static/telegram.js')
-                setTimeout(
-                    () => {
-                        tl.default(window)
-                    }, 0
-                )
+                setTimeout(() => {
+                    tl.default(window)
+                }, 0)
             }
         }
 
@@ -213,14 +211,16 @@ const RtPreview: React.FC<IRtPreviewProps> = ({ children, className }) => {
     }, [])
 
     return (
-        <object ref={setRef} className={'pt0 pb3'}>
+        <object
+            ref={setRef}
+            className={classNames('pt0 pb3', [
+                {
+                    'black lh-copy measure-wide pt0 post-preview-content content-fade overflow-break-word': !className,
+                    [className]: !!className,
+                },
+            ])}
+        >
             <Markdown
-                className={classNames([
-                    {
-                        'black lh-copy measure-wide pt0 post-preview-content content-fade overflow-break-word': !className,
-                        [className]: !!className,
-                    },
-                ])}
                 options={{
                     createElement(type, props, children) {
                         if (type === 'a') {
