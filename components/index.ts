@@ -24,6 +24,7 @@ export { default as NotificationItem } from './notification-item/notification-it
 export { default as SharePost } from './share-post/share-post'
 export { default as RichTextPreview } from './rt-preview/rt-preview'
 export { default as ReplyHoverElements } from './reply-hover-elements/reply-hover-elements'
+export { default as ErrorBoundary } from './error-boundary/error-boundary'
 
 export { default as ChooseAccountName } from './modal/sign-up/choose-account-name'
 export { default as SectionHeader } from './modal/sign-up/header'

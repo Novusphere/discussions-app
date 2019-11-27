@@ -28,6 +28,7 @@ interface IReplies {
     following: ObservableMap<string, string>
     currentHighlightedPostUuid: string
     activePublicKey: string
+    setCurrentReplyContent: (content: string) => void
     hasAccount: boolean
 
     isCollapsed?: boolean
@@ -39,7 +40,6 @@ interface IRepliesState {
     isCollapsed: boolean
 }
 
-// @inject('userStore', 'newAuthStore', 'postsStore')
 @observer
 class Reply extends React.Component<IReplies, IRepliesState> {
     state = {
@@ -146,6 +146,7 @@ class Reply extends React.Component<IReplies, IRepliesState> {
             activePublicKey,
             hasAccount,
             following,
+            setCurrentReplyContent,
         } = this.props
 
         const { isCollapsed, isHover } = this.state
@@ -259,7 +260,10 @@ class Reply extends React.Component<IReplies, IRepliesState> {
                         ])}
                         open={this.replyModel.open}
                         uid={post.uuid}
-                        onContentChange={this.replyModel.setContent}
+                        onContentChange={(content) => {
+                            this.replyModel.setContent(content)
+                            setCurrentReplyContent(content)
+                        }}
                         value={this.replyModel.content}
                         loading={this.replyModel.onSubmit['pending']}
                         onSubmit={() => this.onSubmit(this.replyModel)}
@@ -273,6 +277,7 @@ class Reply extends React.Component<IReplies, IRepliesState> {
                                   key={postReply.uuid}
                               >
                                   <Reply
+                                      setCurrentReplyContent={setCurrentReplyContent}
                                       post={postReply}
                                       getModel={getModel}
                                       className={'ml3 child'}

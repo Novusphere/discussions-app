@@ -29,6 +29,8 @@ interface IOpeningPostProps {
     activeTag: TagModel
     activeThread: ThreadModel
     id: string
+    hasReplyContent: boolean
+    showPostWarningCloseModal: () => void
 }
 
 const OpeningPost: React.FC<IOpeningPostProps> = ({
@@ -40,13 +42,23 @@ const OpeningPost: React.FC<IOpeningPostProps> = ({
     watchPost,
     isWatchingPost,
     id,
+    hasReplyContent,
+    showPostWarningCloseModal,
 }) => {
     return (
         <div data-post-uuid={openingPost.uuid}>
             {typeof isPreview === 'undefined' && (
                 <div className={'pb2'}>
                     <Link href={`/tag/[name]`} as={`/tag/${openingPost.sub}`}>
-                        <a>
+                        <a
+                            onClick={e => {
+                                // e.preventDefault()
+                                //
+                                // if (hasReplyContent) {
+                                //     showPostWarningCloseModal()
+                                // }
+                            }}
+                        >
                             <button
                                 className={'tl flex items-center'}
                                 title={`Show all posts in ${openingPost.sub}`}

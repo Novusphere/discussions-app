@@ -9,6 +9,7 @@ import { NextRouter, withRouter } from 'next/router'
 import { Thread as NSThread } from '@novuspherejs'
 import { observable } from 'mobx'
 import { ReplyModel } from '@models/replyModel'
+import { ModalOptions } from '@globals'
 
 interface IThreadOuterProps {
     thread: NSThread
@@ -20,13 +21,14 @@ interface IThreadInnerProps {
     notificationsStore: IStores['notificationsStore']
     userStore: IStores['userStore']
     newAuthStore: IStores['newAuthStore']
+    uiStore: IStores['uiStore']
     router: NextRouter
 }
 
 interface IThreadState {}
 
 @(withRouter as any)
-@inject('postsStore', 'userStore', 'newAuthStore', 'tagStore', 'notificationsStore')
+@inject('postsStore', 'userStore', 'newAuthStore', 'tagStore', 'notificationsStore', 'uiStore')
 @observer
 class Thread extends React.Component<IThreadOuterProps & IThreadInnerProps, IThreadState> {
     @observable threadAsModel: ThreadModel = null
@@ -38,18 +40,34 @@ class Thread extends React.Component<IThreadOuterProps & IThreadInnerProps, IThr
         this.openingReplyModel = this.threadAsModel.rbModel(props.thread.openingPost)
     }
 
+    componentDidMount(): void {
+        window.addEventListener('beforeunload', this.handleWindowClose)
+    }
+
     componentWillUnmount(): void {
         this.threadAsModel.toggleEditing(false)
 
         if (this.props.postsStore.currentHighlightedPostUuid) {
             this.props.postsStore.highlightPostUuid('')
         }
+
+        if (process.browser) {
+            window.removeEventListener('beforeunload', this.handleWindowClose)
+        }
+    }
+
+    handleWindowClose = e => {
+        if (this.props.postsStore.hasReplyContent) {
+            e.preventDefault()
+            return (e.returnValue = 'You have unsaved changes - are you sure you wish to close?')
+        }
     }
 
     private renderOpeningPost = () => {
         const {
             router,
-            thread: { openingPost },
+            uiStore,
+            postsStore: { hasReplyContent },
             tagStore: { activeTag },
             notificationsStore: { isWatchingThread, toggleThreadWatch },
         } = this.props
@@ -58,6 +76,8 @@ class Thread extends React.Component<IThreadOuterProps & IThreadInnerProps, IThr
 
         return (
             <OpeningPost
+                showPostWarningCloseModal={() => uiStore.showModal(ModalOptions.postWarningClose)}
+                hasReplyContent={hasReplyContent}
                 openingPost={threadAsModel.openingPost}
                 asPath={router.asPath}
                 id={router.query.id as string}
@@ -71,15 +91,26 @@ class Thread extends React.Component<IThreadOuterProps & IThreadInnerProps, IThr
     }
 
     private renderOpeningPostReplyBox = () => {
+        const { threadAsModel } = this
+        const {
+            postsStore: { setCurrentReplyContent },
+            thread: { uuid },
+        } = this.props
+
+        const { onSubmit, content, open, setContent } = this.openingReplyModel
+
         return (
             <div className={'mb3'}>
                 <ReplyBox
-                    open={this.openingReplyModel.open}
-                    uid={this.props.thread.uuid}
-                    onContentChange={this.openingReplyModel.setContent}
-                    onSubmit={() => this.openingReplyModel.onSubmit(this.threadAsModel)}
-                    loading={this.openingReplyModel.onSubmit['pending']}
-                    value={this.openingReplyModel.content}
+                    open={open}
+                    uid={uuid}
+                    onContentChange={content => {
+                        setContent(content)
+                        setCurrentReplyContent(content)
+                    }}
+                    onSubmit={() => onSubmit(threadAsModel)}
+                    loading={onSubmit['pending']}
+                    value={content}
                 />
             </div>
         )
@@ -106,8 +137,8 @@ class Thread extends React.Component<IThreadOuterProps & IThreadInnerProps, IThr
         const {
             router,
             userStore: { toggleUserFollowing, following },
-            postsStore: { highlightPostUuid, currentHighlightedPostUuid },
-            newAuthStore: { activePublicKey, hasAccount }
+            postsStore: { highlightPostUuid, currentHighlightedPostUuid, setCurrentReplyContent },
+            newAuthStore: { activePublicKey, hasAccount },
         } = this.props
 
         const {
@@ -119,6 +150,7 @@ class Thread extends React.Component<IThreadOuterProps & IThreadInnerProps, IThr
                 {openingPostReplies.map(reply => {
                     return (
                         <Reply
+                            setCurrentReplyContent={setCurrentReplyContent}
                             currentPath={router.asPath}
                             post={reply}
                             key={reply.uuid}

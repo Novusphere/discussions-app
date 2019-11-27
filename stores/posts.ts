@@ -57,6 +57,8 @@ export default class Posts extends BaseStore {
     // all posts by filter
     @observable posts: Post[] = []
 
+    @observable currentReplyContent = ''
+
     @observable postsPosition = {
         items: 0,
         cursorId: undefined,
@@ -101,6 +103,15 @@ export default class Posts extends BaseStore {
             items: 0,
             cursorId: undefined,
         }
+    }
+
+    @action.bound
+    setCurrentReplyContent(content: string) {
+        this.currentReplyContent = content
+    }
+
+    @computed get hasReplyContent() {
+        return this.currentReplyContent !== ''
     }
 
     @task
