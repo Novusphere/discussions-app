@@ -18,13 +18,15 @@ interface IThreadInnerProps {
     postsStore: IStores['postsStore']
     tagStore: IStores['tagStore']
     notificationsStore: IStores['notificationsStore']
+    userStore: IStores['userStore']
+    newAuthStore: IStores['newAuthStore']
     router: NextRouter
 }
 
 interface IThreadState {}
 
 @(withRouter as any)
-@inject('postsStore', 'tagStore', 'notificationsStore')
+@inject('postsStore', 'userStore', 'newAuthStore', 'tagStore', 'notificationsStore')
 @observer
 class Thread extends React.Component<IThreadOuterProps & IThreadInnerProps, IThreadState> {
     @observable threadAsModel: ThreadModel = null
@@ -101,7 +103,12 @@ class Thread extends React.Component<IThreadOuterProps & IThreadInnerProps, IThr
     }
 
     private renderReplies = () => {
-        const { router } = this.props
+        const {
+            router,
+            userStore: { toggleUserFollowing, following },
+            postsStore: { highlightPostUuid, currentHighlightedPostUuid },
+            newAuthStore: { activePublicKey, hasAccount }
+        } = this.props
 
         const {
             threadAsModel: { openingPostReplies, rbModel, getRepliesFromMap, vote },
@@ -119,6 +126,12 @@ class Thread extends React.Component<IThreadOuterProps & IThreadInnerProps, IThr
                             voteHandler={vote}
                             threadReference={this.threadAsModel}
                             getRepliesFromMap={getRepliesFromMap}
+                            toggleUserFollowing={toggleUserFollowing}
+                            highlightPostUuid={highlightPostUuid}
+                            activePublicKey={activePublicKey}
+                            currentHighlightedPostUuid={currentHighlightedPostUuid}
+                            hasAccount={hasAccount}
+                            following={following}
                         />
                     )
                 })}

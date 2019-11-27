@@ -1,12 +1,11 @@
 import * as React from 'react'
 import moment from 'moment'
 import { ReplyBox, UserNameWithIcon, Votes, RichTextPreview, ReplyHoverElements } from '@components'
-import { inject, observer, Observer } from 'mobx-react'
+import { observer, Observer } from 'mobx-react'
 import { ReplyModel } from '@models/replyModel'
 import PostModel from '@models/postModel'
 import classNames from 'classnames'
 import { getPermaLink } from '@utils'
-import { IStores } from '@stores'
 import copy from 'clipboard-copy'
 import Router from 'next/router'
 
@@ -15,6 +14,7 @@ import Form from '../create-form/form'
 import { ThreadModel } from '@models/threadModel'
 import { task } from 'mobx-task'
 import { StickyContainer, Sticky } from 'react-sticky'
+import { ObservableMap } from 'mobx'
 
 interface IReplies {
     currentPath: string
@@ -23,10 +23,12 @@ interface IReplies {
     getModel: (post: PostModel) => ReplyModel
     voteHandler: (uuid: string, value: number) => void
     getRepliesFromMap: (uid: string) => PostModel[]
-
-    userStore?: IStores['userStore']
-    newAuthStore?: IStores['newAuthStore']
-    postsStore?: IStores['postsStore']
+    toggleUserFollowing: (user: string, pub: string) => void
+    highlightPostUuid: (uuid: string) => void
+    following: ObservableMap<string, string>
+    currentHighlightedPostUuid: string
+    activePublicKey: string
+    hasAccount: boolean
 
     isCollapsed?: boolean
     threadReference?: ThreadModel
@@ -37,7 +39,7 @@ interface IRepliesState {
     isCollapsed: boolean
 }
 
-@inject('userStore', 'newAuthStore', 'postsStore')
+// @inject('userStore', 'newAuthStore', 'postsStore')
 @observer
 class Reply extends React.Component<IReplies, IRepliesState> {
     state = {
@@ -58,7 +60,7 @@ class Reply extends React.Component<IReplies, IRepliesState> {
 
     private addAndScrollToUuid = (uuid: string) => {
         if (this.replyRef.current.dataset.postUuid === uuid) {
-            this.props.postsStore.highlightPostUuid(uuid)
+            this.props.highlightPostUuid(uuid)
         }
     }
 
@@ -89,8 +91,8 @@ class Reply extends React.Component<IReplies, IRepliesState> {
     }
 
     private toggleFollowStatus = () => {
-        const { post } = this.props
-        this.props.userStore.toggleUserFollowing(post.posterName, post.pub)
+        const { post, toggleUserFollowing } = this.props
+        toggleUserFollowing(post.posterName, post.pub)
     }
 
     private getPermaLinkUrl = async () => {
@@ -111,9 +113,7 @@ class Reply extends React.Component<IReplies, IRepliesState> {
             return null
         }
 
-        const { post, userStore, newAuthStore } = this.props
-        const { following } = userStore
-        const { activePublicKey, hasAccount } = newAuthStore
+        const { post, following, activePublicKey, hasAccount } = this.props
 
         return (
             <ReplyHoverElements
@@ -136,12 +136,16 @@ class Reply extends React.Component<IReplies, IRepliesState> {
             post,
             voteHandler,
             getModel,
+            className,
             getRepliesFromMap,
-            userStore,
-            newAuthStore,
             currentPath,
-            postsStore,
             threadReference,
+            currentHighlightedPostUuid,
+            toggleUserFollowing,
+            highlightPostUuid,
+            activePublicKey,
+            hasAccount,
+            following,
         } = this.props
 
         const { isCollapsed, isHover } = this.state
@@ -149,148 +153,146 @@ class Reply extends React.Component<IReplies, IRepliesState> {
         const [currentPathTrimmed] = currentPath.split('#')
 
         return (
-            <a id={post.uuid}>
-                <object>
-                    <div
-                        ref={this.replyRef}
-                        data-post-uuid={post.uuid}
-                        data-permalink={getPermaLink(currentPathTrimmed, post.uuid)}
-                        className={classNames([
-                            'post-reply black',
-                            {
-                                'permalink-highlight':
-                                    postsStore.currentHighlightedPostUuid === post.uuid,
-                            },
-                        ])}
-                        onMouseEnter={e => {
-                            if (!this.replyModel.editing) this.setHover(true)
-                        }}
-                        onMouseLeave={e => {
-                            if (!this.replyModel.editing) this.setHover(false)
-                        }}
-                    >
-                        <StickyContainer>
-                            <Sticky>
-                                {({ style }) => (
-                                    <div
-                                        style={{
-                                            ...style,
-                                            top: 60,
-                                            zIndex: 9999,
-                                        }}
-                                    >
-                                        <Observer>{() => this.renderHoverElements()}</Observer>
-                                    </div>
-                                )}
-                            </Sticky>
+            <div
+                id={post.uuid}
+                ref={this.replyRef}
+                data-post-uuid={post.uuid}
+                data-permalink={getPermaLink(currentPathTrimmed, post.uuid)}
+                className={classNames([
+                    'post-reply black mb2',
+                    {
+                        [className]: !!className,
+                        'permalink-highlight': currentHighlightedPostUuid === post.uuid,
+                    },
+                ])}
+                onMouseEnter={e => {
+                    if (!this.replyModel.editing) this.setHover(true)
+                }}
+                onMouseLeave={e => {
+                    if (!this.replyModel.editing) this.setHover(false)
+                }}
+            >
+                <StickyContainer>
+                    <Sticky>
+                        {({ style }) => (
                             <div
                                 style={{
-                                    height: !isCollapsed ? 'auto' : '30px',
+                                    ...style,
+                                    top: 60,
+                                    zIndex: 9999,
                                 }}
-                                className={classNames([
-                                    'parent flex flex-row pa2',
-                                    {
-                                        'post-content-hover': isHover,
-                                    },
-                                ])}
                             >
-                                <div
-                                    style={{
-                                        visibility: isCollapsed ? 'hidden' : 'visible',
-                                    }}
-                                    className={'flex flex-column justify-start items-center mr2'}
-                                >
-                                    <Votes
-                                        upVotes={post.upvotes}
-                                        downVotes={post.downvotes}
-                                        myVote={post.myVote}
-                                        uuid={post.uuid}
-                                        handler={voteHandler}
-                                    />
-                                </div>
-                                <div className={'flex flex-column'}>
-                                    <div className={'header pb0'}>
-                                        <div className={'pr2'}>{this.renderCollapseElements()}</div>
-                                        <UserNameWithIcon
-                                            pub={post.pub}
-                                            imageData={post.imageData}
-                                            name={post.posterName}
-                                        />
-                                        <span
-                                            className={'pl2 o-50 f6'}
-                                            title={moment(
-                                                post.edit ? post.editedAt : post.createdAt
-                                            ).format('YYYY-MM-DD HH:mm:ss')}
-                                        >
-                                            {post.edit && 'edited '}{' '}
-                                            {moment(
-                                                post.edit ? post.editedAt : post.createdAt
-                                            ).fromNow()}
-                                        </span>
-                                        {isCollapsed && (
-                                            <span className={'o-50 i f6 pl2'}>
-                                                ({replies.length} children)
-                                            </span>
-                                        )}
-                                    </div>
-                                    {this.replyModel.editing && (
-                                        <Form
-                                            form={this.replyModel.editForm}
-                                            fieldClassName={'pb0'}
-                                            hideSubmitButton
-                                            className={'w-100 mt3'}
-                                        />
-                                    )}
-                                    {!isCollapsed && !this.replyModel.editing && (
-                                        <RichTextPreview className={'f6 lh-copy reply-content'}>
-                                            {post.content}
-                                        </RichTextPreview>
-                                    )}
-                                </div>
+                                <Observer>{() => this.renderHoverElements()}</Observer>
                             </div>
-                            <ReplyBox
-                                id={`${post.uuid}-reply`}
-                                className={classNames([
-                                    'ph4 pb4',
-                                    {
-                                        'post-content-hover': isHover,
-                                    },
-                                ])}
-                                open={this.replyModel.open}
-                                uid={post.uuid}
-                                onContentChange={this.replyModel.setContent}
-                                value={this.replyModel.content}
-                                loading={this.replyModel.onSubmit['pending']}
-                                onSubmit={() => this.onSubmit(this.replyModel)}
+                        )}
+                    </Sticky>
+                    <div
+                        style={{
+                            height: !isCollapsed ? 'auto' : '30px',
+                        }}
+                        className={classNames([
+                            'parent flex flex-row pa2',
+                            {
+                                'post-content-hover': isHover,
+                            },
+                        ])}
+                    >
+                        <div
+                            style={{
+                                visibility: isCollapsed ? 'hidden' : 'visible',
+                            }}
+                            className={'flex flex-column justify-start items-center mr2'}
+                        >
+                            <Votes
+                                upVotes={post.upvotes}
+                                downVotes={post.downvotes}
+                                myVote={post.myVote}
+                                uuid={post.uuid}
+                                handler={voteHandler}
                             />
-
-                            {replies && replies.length
-                                ? replies.map(postReply => (
-                                      <div
-                                          onMouseLeave={() => this.setHover(true)}
-                                          onMouseEnter={() => this.setHover(false)}
-                                          key={postReply.uuid}
-                                      >
-                                          <Reply
-                                              post={postReply}
-                                              getModel={getModel}
-                                              className={'ml3'}
-                                              getRepliesFromMap={getRepliesFromMap}
-                                              voteHandler={voteHandler}
-                                              userStore={userStore}
-                                              newAuthStore={newAuthStore}
-                                              postsStore={postsStore}
-                                              currentPath={currentPath}
-                                              isCollapsed={isCollapsed}
-                                              threadReference={threadReference}
-                                          />
-                                      </div>
-                                  ))
-                                : null}
-                        </StickyContainer>
+                        </div>
+                        <div className={'flex flex-column'}>
+                            <div className={'header pb0'}>
+                                <div className={'pr2'}>{this.renderCollapseElements()}</div>
+                                <UserNameWithIcon
+                                    pub={post.pub}
+                                    imageData={post.imageData}
+                                    name={post.posterName}
+                                />
+                                <span
+                                    className={'pl2 o-50 f6'}
+                                    title={moment(
+                                        post.edit ? post.editedAt : post.createdAt
+                                    ).format('YYYY-MM-DD HH:mm:ss')}
+                                >
+                                    {post.edit && 'edited '}{' '}
+                                    {moment(post.edit ? post.editedAt : post.createdAt).fromNow()}
+                                </span>
+                                {isCollapsed && (
+                                    <span className={'o-50 i f6 pl2'}>
+                                        ({replies.length} children)
+                                    </span>
+                                )}
+                            </div>
+                            {this.replyModel.editing && (
+                                <Form
+                                    form={this.replyModel.editForm}
+                                    fieldClassName={'pb0'}
+                                    hideSubmitButton
+                                    className={'w-100 mt3'}
+                                />
+                            )}
+                            {!isCollapsed && !this.replyModel.editing && (
+                                <RichTextPreview className={'f6 lh-copy reply-content'}>
+                                    {post.content}
+                                </RichTextPreview>
+                            )}
+                        </div>
                     </div>
-                </object>
-            </a>
+                    <ReplyBox
+                        id={`${post.uuid}-reply`}
+                        className={classNames([
+                            'ph4 pb4',
+                            {
+                                'post-content-hover': isHover,
+                            },
+                        ])}
+                        open={this.replyModel.open}
+                        uid={post.uuid}
+                        onContentChange={this.replyModel.setContent}
+                        value={this.replyModel.content}
+                        loading={this.replyModel.onSubmit['pending']}
+                        onSubmit={() => this.onSubmit(this.replyModel)}
+                    />
+
+                    {replies && replies.length
+                        ? replies.map(postReply => (
+                              <div
+                                  onMouseLeave={() => this.setHover(true)}
+                                  onMouseEnter={() => this.setHover(false)}
+                                  key={postReply.uuid}
+                              >
+                                  <Reply
+                                      post={postReply}
+                                      getModel={getModel}
+                                      className={'ml3 child'}
+                                      getRepliesFromMap={getRepliesFromMap}
+                                      voteHandler={voteHandler}
+                                      currentPath={currentPath}
+                                      isCollapsed={isCollapsed}
+                                      threadReference={threadReference}
+                                      toggleUserFollowing={toggleUserFollowing}
+                                      highlightPostUuid={highlightPostUuid}
+                                      activePublicKey={activePublicKey}
+                                      currentHighlightedPostUuid={currentHighlightedPostUuid}
+                                      hasAccount={hasAccount}
+                                      following={following}
+                                  />
+                              </div>
+                          ))
+                        : null}
+                </StickyContainer>
+            </div>
         )
     }
 

@@ -1,4 +1,5 @@
-.permalink-highlight > div.parent:first-child {
+.permalink-highlight > div >:nth-child(2),
+.permalink-highlight > div >:nth-child(3) {
 	background-color: #faf7e6;
 
 	.post-content-hover {

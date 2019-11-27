@@ -6,6 +6,7 @@ export const ModalOptions = {
     walletUndetected: 'walletUndetected',
     signUp: 'signUp',
     signIn: 'signIn',
+    postWarningClose: 'postWarningClose',
 }
 
 export const Messages = {

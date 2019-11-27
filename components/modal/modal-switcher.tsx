@@ -2,7 +2,7 @@ import * as React from 'react'
 import { inject, observer } from 'mobx-react'
 import { IStores } from '@stores'
 import { ModalOptions } from '@globals'
-import { WalletUndetectedModal, SignInModal, SignUpModal } from '@components'
+import { WalletUndetectedModal, SignInModal, SignUpModal, PostWarningCloseModal } from '@components'
 
 interface IModalSwitcherProps {
     uiStore: IStores['uiStore']
@@ -19,6 +19,8 @@ class ModalSwitcher extends React.Component<IModalSwitcherProps> {
                 return <SignUpModal />
             case ModalOptions.walletUndetected:
                 return <WalletUndetectedModal />
+            case ModalOptions.postWarningClose:
+                return <PostWarningCloseModal />
             default:
                 return null
         }

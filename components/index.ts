@@ -31,6 +31,7 @@ export { default as GenerateKey } from './modal/sign-up/generate-key'
 export { default as VerifyKey } from './modal/sign-up/verification'
 
 // modals
+export { default as PostWarningCloseModal } from './modal/post-warning-close/post-warning-close'
 export { default as SignUpModal } from './modal/sign-up/sign-up-modal'
 export { default as WalletUndetectedModal } from './modal/wallet-undetected/wallet-undetected-modal'
 export { default as SignInModal } from './modal/sign-in/sign-in-modal'

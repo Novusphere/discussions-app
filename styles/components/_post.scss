@@ -79,6 +79,7 @@
 .opening-post,
 .post-reply,
 .post-preview {
+    cursor: default;
     word-break: break-word;
     a {
         @extend .dim;
@@ -178,7 +179,7 @@ button.reply {
 .child > .child,
 .child > .child > .child > .child {
     //background: #fff;
-    border-left: 1px solid #E9EBEE;
+    border-left: 1px solid #e8eaed;
 }
 
 /**
@@ -187,6 +188,6 @@ button.reply {
 .child,
 .child > .child > .child,
 .child > .child > .child > .child > .child {
-    border-left: 1px solid #E9EBEE;
+    border-left: 1px solid #e0e1e4;
     //background-color: #f7f7f7;
 }
