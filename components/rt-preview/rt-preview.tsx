@@ -129,6 +129,7 @@ const RtLink: any = ({ children, href, index }) => {
 
     return (
         <object
+            className={'rt-object'}
             data-index={index}
             dangerouslySetInnerHTML={{ __html: getEmbed }}
         />
@@ -162,12 +163,6 @@ const RtLinkCount = ({ href, children }) => {
             <RtLink children={children} href={_href} index={_index} />
         </span>
     )
-
-    // return (
-    //     <a ref={ref} href={ref} title={`Open ${href}`}>
-    //         {children}
-    //     </a>
-    // )
 }
 
 const RtPreview: React.FC<IRtPreviewProps> = ({ children, className }) => {
@@ -175,12 +170,7 @@ const RtPreview: React.FC<IRtPreviewProps> = ({ children, className }) => {
 
     const ref = useRef(null)
     const setRef = useCallback(node => {
-        if (ref.current) {
-            // Make sure to cleanup any events/references added to the last instance
-        }
-
         if (node) {
-            // const linkNodes = node.childNodes[0].querySelectorAll('[data-oembed-type]')
             const linkNodes: HTMLCollection = node.childNodes[0].getElementsByTagName('a')
             if (linkNodes.length) {
                 Array.from(linkNodes).forEach((item, index) => {
@@ -190,18 +180,6 @@ const RtPreview: React.FC<IRtPreviewProps> = ({ children, className }) => {
                             `${item.getAttribute('href')}/${INDEXER_NAME}${index + 1}`
                         )
                     }
-                    // else {
-                    //     console.log('here')
-                    //     const split = item.getAttribute('href').split(INDEXER_NAME)
-                    //
-                    //     if (split) {
-                    //         item.setAttribute(
-                    //             'href',
-                    //             `${split[0]}`
-                    //         )
-                    //     }
-                    //
-                    // }
                 })
             }
         }
