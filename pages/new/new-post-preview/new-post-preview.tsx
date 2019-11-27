@@ -57,6 +57,8 @@ class NewPostPreview extends React.Component<IPostPreviewProps> {
                 </span>
                 <div className={'mt3'}>
                     <OpeningPost
+                        hasReplyContent={false}
+                        showPostWarningCloseModal={() => null}
                         activeTag={null}
                         isPreview
                         activeThread={null}
