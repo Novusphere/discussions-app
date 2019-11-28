@@ -1,5 +1,5 @@
 import { computed, observable } from 'mobx'
-import { IPost } from '@stores/posts'
+import { IPost } from '@stores/postsStore'
 import { getIdenticon, getThreadUrl } from '@utils'
 import React from 'react'
 import { TagModel } from '@models/tagModel'

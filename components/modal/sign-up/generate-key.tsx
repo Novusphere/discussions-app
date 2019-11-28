@@ -1,5 +1,5 @@
 import * as React from 'react'
-import { BrianKey, SectionHeader } from '@components'
+import { GenerateBrainKey, SectionHeader } from '@components'
 import { Collapse } from '@components'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { faSpinner } from '@fortawesome/free-solid-svg-icons'
@@ -40,7 +40,7 @@ const GenerateKey: React.FC<IGenerateKeyProps> = ({
                     </span>
 
                     {generateBrianKey['result'] ? (
-                        <BrianKey results={generateBrianKey['result'].split(' ')} />
+                        <GenerateBrainKey results={generateBrianKey['result'].split(' ')} />
                     ) : (
                         <button
                             disabled={generateBrianKey['pending']}

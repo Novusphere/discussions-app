@@ -2,8 +2,7 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="2d14133e-344f-4fbf-9bb7-c9e5e96ae697" name="Default Changelist" comment="">
-      <change beforePath="$PROJECT_DIR$/components/rt-preview/rt-preview.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/components/rt-preview/rt-preview.tsx" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/components/rt-preview/style.scss" beforeDir="false" afterPath="$PROJECT_DIR$/components/rt-preview/style.scss" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
     </list>
     <ignored path="$PROJECT_DIR$/.tmp/" />
     <ignored path="$PROJECT_DIR$/temp/" />
@@ -15,24 +14,12 @@
     <option name="LAST_RESOLUTION" value="IGNORE" />
   </component>
   <component name="FileEditorManager">
-    <leaf>
-      <file pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/components/rt-preview/rt-preview.tsx">
-          <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="704">
-              <caret line="131" column="24" lean-forward="true" selection-start-line="131" selection-start-column="24" selection-end-line="131" selection-end-column="33" />
-              <folding>
-                <element signature="e#0#30#0" expanded="true" />
-              </folding>
-            </state>
-          </provider>
-        </entry>
-      </file>
+    <leaf SIDE_TABS_SIZE_LIMIT_KEY="300">
       <file pinned="false" current-in-tab="true">
-        <entry file="file://$PROJECT_DIR$/components/rt-preview/style.scss">
+        <entry file="file://$PROJECT_DIR$/components/Reply/Reply.tsx">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="48">
-              <caret line="3" column="24" selection-start-line="3" selection-start-column="24" selection-end-line="3" selection-end-column="24" />
+            <state relative-caret-position="112">
+              <caret line="8" column="33" lean-forward="true" selection-start-line="8" selection-start-column="33" selection-end-line="8" selection-end-column="33" />
             </state>
           </provider>
         </entry>
@@ -41,11 +28,6 @@
   </component>
   <component name="FindInProjectRecents">
     <findStrings>
-      <find>setHover</find>
-      <find>isHover</find>
-      <find>.reply-conten</find>
-      <find>.green</find>
-      <find>data-telegram-post</find>
       <find>hack</find>
       <find>iframe</find>
       <find>SCRIPT</find>
@@ -71,6 +53,11 @@
       <find>this.replyModel =</find>
       <find>&lt;Error</find>
       <find>routeChangeStart</find>
+      <find>import Settings</find>
+      <find>BrainKey</find>
+      <find>Editor</find>
+      <find>import { Edit</find>
+      <find>editor/editor</find>
     </findStrings>
     <replaceStrings>
       <replace>.child</replace>
@@ -109,15 +96,6 @@
   <component name="IdeDocumentHistory">
     <option name="CHANGED_PATHS">
       <list>
-        <option value="$PROJECT_DIR$/models/threadModel.ts" />
-        <option value="$PROJECT_DIR$/components/tag-preview/tag-preview.tsx" />
-        <option value="$PROJECT_DIR$/next.config.js" />
-        <option value="$PROJECT_DIR$/modules/quill-custom-video/index.js" />
-        <option value="$PROJECT_DIR$/modules/quill-custom-link/index.js" />
-        <option value="$PROJECT_DIR$/novusphere-js/nsdb.ts" />
-        <option value="$PROJECT_DIR$/styles/components/_editor.scss" />
-        <option value="$PROJECT_DIR$/modules/quill-mention/src/quill.mention.js" />
-        <option value="$PROJECT_DIR$/modules/quill-autoformat/src/quill-autoformat.js" />
         <option value="$PROJECT_DIR$/types/form.d.ts" />
         <option value="$PROJECT_DIR$/modules/quill-oembed/quill-oembed.ts" />
         <option value="$PROJECT_DIR$/components/create-form/form.tsx" />
@@ -128,7 +106,6 @@
         <option value="$PROJECT_DIR$/pages/notifications/index.tsx" />
         <option value="$PROJECT_DIR$/components/notification-item/notification-item.tsx" />
         <option value="$PROJECT_DIR$/components/reply-box/reply-box.tsx" />
-        <option value="$PROJECT_DIR$/models/replyModel.ts" />
         <option value="$PROJECT_DIR$/modules/telegram.js" />
         <option value="$PROJECT_DIR$/pages/_document.tsx" />
         <option value="$PROJECT_DIR$/stores/notifications.ts" />
@@ -151,7 +128,6 @@
         <option value="$PROJECT_DIR$/components/modal/modal-switcher.tsx" />
         <option value="$PROJECT_DIR$/components/reply/style.scss" />
         <option value="$PROJECT_DIR$/components/reply/reply.tsx" />
-        <option value="$PROJECT_DIR$/components/index.ts" />
         <option value="$PROJECT_DIR$/components/error-boundary/error-boundary.tsx" />
         <option value="$PROJECT_DIR$/pages/_app.tsx" />
         <option value="$PROJECT_DIR$/pages/tag/[name]/[id]/[title].tsx" />
@@ -160,6 +136,17 @@
         <option value="$PROJECT_DIR$/components/thread/thread.tsx" />
         <option value="$PROJECT_DIR$/components/rt-preview/rt-preview.tsx" />
         <option value="$PROJECT_DIR$/components/rt-preview/style.scss" />
+        <option value="$PROJECT_DIR$/pages/new/new-post-preview/new-post-preview.tsx" />
+        <option value="$PROJECT_DIR$/components/Form/Form.tsx" />
+        <option value="$PROJECT_DIR$/components/Reply/reply.tsx" />
+        <option value="$PROJECT_DIR$/components/index.ts" />
+        <option value="$PROJECT_DIR$/components/Editor/Editor.tsx" />
+        <option value="$PROJECT_DIR$/components/ReplyBox/ReplyBox.tsx" />
+        <option value="$PROJECT_DIR$/models/threadModel.ts" />
+        <option value="$PROJECT_DIR$/models/replyModel.ts" />
+        <option value="$PROJECT_DIR$/components/Reply/Reply.tsx" />
+        <option value="$PROJECT_DIR$/components/modal/sign-up/verification.tsx" />
+        <option value="$PROJECT_DIR$/components/modal/sign-up/choose-account-name.tsx" />
       </list>
     </option>
   </component>
@@ -196,45 +183,53 @@
               <item name="discussions-app" type="b2602c69:ProjectViewProjectNode" />
               <item name="discussions-app" type="462c0819:PsiDirectoryNode" />
               <item name="components" type="462c0819:PsiDirectoryNode" />
-              <item name="editor" type="462c0819:PsiDirectoryNode" />
+              <item name="OpeningPost" type="462c0819:PsiDirectoryNode" />
             </path>
             <path>
               <item name="discussions-app" type="b2602c69:ProjectViewProjectNode" />
               <item name="discussions-app" type="462c0819:PsiDirectoryNode" />
               <item name="components" type="462c0819:PsiDirectoryNode" />
-              <item name="rt-preview" type="462c0819:PsiDirectoryNode" />
+              <item name="PostPreview" type="462c0819:PsiDirectoryNode" />
             </path>
             <path>
               <item name="discussions-app" type="b2602c69:ProjectViewProjectNode" />
               <item name="discussions-app" type="462c0819:PsiDirectoryNode" />
               <item name="components" type="462c0819:PsiDirectoryNode" />
-              <item name="thread" type="462c0819:PsiDirectoryNode" />
+              <item name="Reply" type="462c0819:PsiDirectoryNode" />
+            </path>
+            <path>
+              <item name="discussions-app" type="b2602c69:ProjectViewProjectNode" />
+              <item name="discussions-app" type="462c0819:PsiDirectoryNode" />
+              <item name="components" type="462c0819:PsiDirectoryNode" />
+              <item name="ReplyHoverElements" type="462c0819:PsiDirectoryNode" />
+            </path>
+            <path>
+              <item name="discussions-app" type="b2602c69:ProjectViewProjectNode" />
+              <item name="discussions-app" type="462c0819:PsiDirectoryNode" />
+              <item name="components" type="462c0819:PsiDirectoryNode" />
+              <item name="RichTextPreview" type="462c0819:PsiDirectoryNode" />
+            </path>
+            <path>
+              <item name="discussions-app" type="b2602c69:ProjectViewProjectNode" />
+              <item name="discussions-app" type="462c0819:PsiDirectoryNode" />
+              <item name="components" type="462c0819:PsiDirectoryNode" />
+              <item name="TagPreview" type="462c0819:PsiDirectoryNode" />
+            </path>
+            <path>
+              <item name="discussions-app" type="b2602c69:ProjectViewProjectNode" />
+              <item name="discussions-app" type="462c0819:PsiDirectoryNode" />
+              <item name="components" type="462c0819:PsiDirectoryNode" />
+              <item name="VotingHandles" type="462c0819:PsiDirectoryNode" />
+            </path>
+            <path>
+              <item name="discussions-app" type="b2602c69:ProjectViewProjectNode" />
+              <item name="discussions-app" type="462c0819:PsiDirectoryNode" />
+              <item name="models" type="462c0819:PsiDirectoryNode" />
             </path>
             <path>
               <item name="discussions-app" type="b2602c69:ProjectViewProjectNode" />
               <item name="discussions-app" type="462c0819:PsiDirectoryNode" />
               <item name="pages" type="462c0819:PsiDirectoryNode" />
-            </path>
-            <path>
-              <item name="discussions-app" type="b2602c69:ProjectViewProjectNode" />
-              <item name="discussions-app" type="462c0819:PsiDirectoryNode" />
-              <item name="pages" type="462c0819:PsiDirectoryNode" />
-              <item name="tag" type="462c0819:PsiDirectoryNode" />
-            </path>
-            <path>
-              <item name="discussions-app" type="b2602c69:ProjectViewProjectNode" />
-              <item name="discussions-app" type="462c0819:PsiDirectoryNode" />
-              <item name="pages" type="462c0819:PsiDirectoryNode" />
-              <item name="tag" type="462c0819:PsiDirectoryNode" />
-              <item name="[name]" type="462c0819:PsiDirectoryNode" />
-            </path>
-            <path>
-              <item name="discussions-app" type="b2602c69:ProjectViewProjectNode" />
-              <item name="discussions-app" type="462c0819:PsiDirectoryNode" />
-              <item name="pages" type="462c0819:PsiDirectoryNode" />
-              <item name="tag" type="462c0819:PsiDirectoryNode" />
-              <item name="[name]" type="462c0819:PsiDirectoryNode" />
-              <item name="[id]" type="462c0819:PsiDirectoryNode" />
             </path>
             <path>
               <item name="discussions-app" type="b2602c69:ProjectViewProjectNode" />
@@ -270,19 +265,19 @@
     <property name="ts.external.directory.path" value="$PROJECT_DIR$/node_modules/typescript/lib" />
   </component>
   <component name="RecentsManager">
+    <key name="MoveFile.RECENT_KEYS">
+      <recent name="E:\Work\discussions-app\components\Form" />
+      <recent name="E:\Work\discussions-app\static" />
+      <recent name="E:\Work\discussions-app\components" />
+      <recent name="E:\Work\discussions-app\pages\tag" />
+      <recent name="E:\Work\discussions-app\pages\e\[name]" />
+    </key>
     <key name="CopyFile.RECENT_KEYS">
       <recent name="E:\Work\discussions-app\components\modal" />
       <recent name="E:\Work\discussions-app\modules" />
       <recent name="E:\Work\discussions-app\stores" />
       <recent name="E:\Work\discussions-app\components\modal\sign-in\brain-key" />
       <recent name="E:\Work\discussions-app\generator\templates" />
-    </key>
-    <key name="MoveFile.RECENT_KEYS">
-      <recent name="E:\Work\discussions-app\static" />
-      <recent name="E:\Work\discussions-app\components" />
-      <recent name="E:\Work\discussions-app\pages\tag" />
-      <recent name="E:\Work\discussions-app\pages\e\[name]" />
-      <recent name="E:\Work\discussions-app\pages\e\[sub]\[id]" />
     </key>
   </component>
   <component name="RunDashboard">
@@ -450,16 +445,17 @@
       <workItem from="1574698990523" duration="10000" />
       <workItem from="1574725801142" duration="10378000" />
       <workItem from="1574782727009" duration="77000" />
-      <workItem from="1574823696653" duration="5352000" />
+      <workItem from="1574823696653" duration="5491000" />
+      <workItem from="1574957510079" duration="5000" />
+      <workItem from="1574975142441" duration="1141000" />
     </task>
     <servers />
   </component>
   <component name="TimeTrackingManager">
-    <option name="totallyTimeSpent" value="785588000" />
+    <option name="totallyTimeSpent" value="786873000" />
   </component>
   <component name="ToolWindowManager">
     <frame x="-8" y="-8" width="2576" height="1416" extended-state="6" />
-    <editor active="true" />
     <layout>
       <window_info active="true" content_ui="combo" id="Project" order="0" sideWeight="0.4982538" visible="true" weight="0.11702128" />
       <window_info id="Structure" order="1" sideWeight="0.50174624" side_tool="true" weight="0.119779356" />
@@ -507,59 +503,6 @@
     <option name="version" value="1" />
   </component>
   <component name="editorHistoryManager">
-    <entry file="file://$PROJECT_DIR$/modules/quill-autoformat/src/quill-autoformat.js">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="288">
-          <caret line="18" column="8" selection-start-line="18" selection-start-column="8" selection-end-line="18" selection-end-column="8" />
-          <folding>
-            <element signature="e#0#26#0" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/modules/quill-mention/src/quill.mention.js">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="704">
-          <caret line="464" column="48" selection-start-line="464" selection-start-column="48" selection-end-line="464" selection-end-column="48" />
-          <folding>
-            <element signature="e#0#48#0" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/node_modules/@types/quill/index.d.ts">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="290">
-          <caret line="47" column="4" selection-start-line="47" selection-start-column="4" selection-end-line="47" selection-end-column="4" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/types/form.d.ts">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="717">
-          <caret line="59" column="20" selection-start-line="59" selection-start-column="20" selection-end-line="59" selection-end-column="20" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/node_modules/to-markdown/index.js">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="-2976">
-          <folding>
-            <element signature="n#!!doc" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/modules/quill-custom-video/index.js">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="672">
-          <caret line="42" column="37" selection-start-line="42" selection-start-column="37" selection-end-line="42" selection-end-column="37" />
-          <folding>
-            <element signature="e#0#35#0" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/styles/components/_editor.scss">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="720">
@@ -571,27 +514,6 @@
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="464">
           <caret line="67" selection-start-line="67" selection-end-line="67" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/components/create-form/form.tsx">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="51">
-          <caret line="160" column="45" lean-forward="true" selection-start-line="160" selection-start-column="45" selection-end-line="160" selection-end-column="45" />
-          <folding>
-            <element signature="e#0#30#0" expanded="true" />
-            <element signature="e#179#240#0" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/models/replyModel.ts">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="368">
-          <caret line="23" lean-forward="true" selection-start-line="23" selection-end-line="23" />
-          <folding>
-            <element signature="e#0#56#0" expanded="true" />
-          </folding>
         </state>
       </provider>
     </entry>
@@ -616,13 +538,6 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/components/reply-box/reply-box.tsx">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="1216">
-          <caret line="84" column="27" lean-forward="true" selection-start-line="84" selection-start-column="27" selection-end-line="84" selection-end-column="27" />
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/pages/_document.tsx">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="320">
@@ -633,7 +548,7 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/stores/notifications.ts">
+    <entry file="file://$PROJECT_DIR$/stores/notificationsStore.ts">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="534">
           <caret line="257" column="28" selection-start-line="257" selection-start-column="28" selection-end-line="257" selection-end-column="28" />
@@ -654,7 +569,7 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/stores/ui.ts">
+    <entry file="file://$PROJECT_DIR$/stores/uiStore.ts">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="320">
           <caret line="20" lean-forward="true" selection-start-line="20" selection-end-line="20" />
@@ -688,7 +603,7 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/components/title-header/title-header.tsx">
+    <entry file="file://$PROJECT_DIR$/components/TitleHeader/TitleHeader.tsx">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="303">
           <caret line="125" column="48" lean-forward="true" selection-start-line="125" selection-start-column="48" selection-end-line="125" selection-end-column="48" />
@@ -705,24 +620,14 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/components/sidebar/style.scss">
+    <entry file="file://$PROJECT_DIR$/components/SideBar/style.scss">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="272">
           <caret line="17" column="8" selection-start-line="17" selection-start-column="8" selection-end-line="17" selection-end-column="8" />
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/components/sidebar/sidebar.tsx">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="192">
-          <caret line="12" lean-forward="true" selection-start-line="12" selection-end-line="12" />
-          <folding>
-            <element signature="e#0#30#0" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/components/main-layout/main-layout.tsx">
+    <entry file="file://$PROJECT_DIR$/components/MainLayout/MainLayout.tsx">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="354">
           <caret line="58" column="51" lean-forward="true" selection-start-line="58" selection-start-column="51" selection-end-line="58" selection-end-column="51" />
@@ -732,7 +637,7 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/components/reply-hover-elements/reply-hover-elements.tsx">
+    <entry file="file://$PROJECT_DIR$/components/ReplyHoverElements/ReplyHoverElements.tsx">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="224">
           <caret line="36" selection-start-line="36" selection-end-line="36" />
@@ -762,22 +667,12 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/stores/tag.ts">
+    <entry file="file://$PROJECT_DIR$/stores/tagStore.ts">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="336">
           <caret line="21" column="19" lean-forward="true" selection-start-line="21" selection-start-column="19" selection-end-line="21" selection-end-column="19" />
           <folding>
             <element signature="e#0#51#0" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/components/editor/editor.tsx">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="1206">
-          <caret line="151" column="30" lean-forward="true" selection-start-line="151" selection-start-column="30" selection-end-line="151" selection-end-column="30" />
-          <folding>
-            <element signature="e#0#30#0" expanded="true" />
           </folding>
         </state>
       </provider>
@@ -789,7 +684,7 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/components/post-preview/post-preview.tsx">
+    <entry file="file://$PROJECT_DIR$/components/PostPreview/PostPreview.tsx">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="1504">
           <caret line="105" column="37" selection-start-line="105" selection-start-column="37" selection-end-line="105" selection-end-column="37" />
@@ -830,7 +725,7 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/components/reply/style.scss">
+    <entry file="file://$PROJECT_DIR$/components/Reply/style.scss">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="16">
           <caret line="1" column="42" selection-start-line="1" selection-start-column="42" selection-end-line="1" selection-end-column="42" />
@@ -844,13 +739,6 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/components/index.ts">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="416">
-          <caret line="26" column="33" selection-start-line="26" selection-start-column="20" selection-end-line="26" selection-end-column="33" />
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/pages/_app.tsx">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="848">
@@ -861,7 +749,7 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/components/error-boundary/error-boundary.tsx">
+    <entry file="file://$PROJECT_DIR$/components/ErrorBoundary/ErrorBoundary.tsx">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="400">
           <caret line="25" column="38" selection-start-line="25" selection-start-column="38" selection-end-line="25" selection-end-column="38" />
@@ -881,18 +769,6 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/components/reply/reply.tsx">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="480">
-          <caret line="30" column="31" selection-start-line="30" selection-start-column="31" selection-end-line="30" selection-end-column="31" />
-          <folding>
-            <element signature="e#0#30#0" expanded="true" />
-            <element signature="e#5192#5702#0" />
-            <element signature="e#5723#8866#0" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/components/modal/post-warning-close/post-warning-close.tsx">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="112">
@@ -903,7 +779,7 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/components/opening-post/opening-post.tsx">
+    <entry file="file://$PROJECT_DIR$/components/OpeningPost/OpeningPost.tsx">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="298">
           <caret line="32" column="41" lean-forward="true" selection-start-line="32" selection-start-column="41" selection-end-line="32" selection-end-column="41" />
@@ -913,7 +789,7 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/components/thread/thread.tsx">
+    <entry file="file://$PROJECT_DIR$/components/Thread/Thread.tsx">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="352">
           <caret line="86" column="49" lean-forward="true" selection-start-line="86" selection-start-column="49" selection-end-line="86" selection-end-column="49" />
@@ -924,7 +800,7 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/stores/posts.ts">
+    <entry file="file://$PROJECT_DIR$/stores/postsStore.ts">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="218">
           <caret line="108" column="26" selection-start-line="108" selection-start-column="4" selection-end-line="108" selection-end-column="26" />
@@ -934,7 +810,7 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/components/rt-preview/rt-preview.tsx">
+    <entry file="file://$PROJECT_DIR$/components/RichTextPreview/RichTextPreview.tsx">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="704">
           <caret line="131" column="24" lean-forward="true" selection-start-line="131" selection-start-column="24" selection-end-line="131" selection-end-column="33" />
@@ -944,10 +820,123 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/components/rt-preview/style.scss">
+    <entry file="file://$PROJECT_DIR$/components/RichTextPreview/style.scss">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="48">
           <caret line="3" column="24" selection-start-line="3" selection-start-column="24" selection-end-line="3" selection-end-column="24" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/pages/new/new-post-preview/new-post-preview.tsx">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="511">
+          <caret line="55" column="74" lean-forward="true" selection-start-line="55" selection-start-column="74" selection-end-line="55" selection-end-column="74" />
+          <folding>
+            <element signature="e#0#30#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/stores/settingsStore.ts">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="224">
+          <caret line="14" column="14" lean-forward="true" selection-start-line="14" selection-start-column="14" selection-end-line="14" selection-end-column="14" />
+          <folding>
+            <element signature="e#0#40#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/components/SideBar/SideBar.tsx">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="560">
+          <caret line="35" column="13" lean-forward="true" selection-start-line="35" selection-start-column="13" selection-end-line="35" selection-end-column="13" />
+          <folding>
+            <element signature="e#0#30#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/components/GenerateBrainKey/GenerateBrainKey.tsx">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="176">
+          <caret line="11" column="13" lean-forward="true" selection-start-line="11" selection-start-column="13" selection-end-line="11" selection-end-column="13" />
+          <folding>
+            <element signature="e#0#30#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/components/Form/Form.tsx">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="64">
+          <caret line="4" column="3" selection-start-line="4" selection-start-column="3" selection-end-line="4" selection-end-column="3" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/components/Editor/Editor.tsx">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="399">
+          <caret line="164" column="27" lean-forward="true" selection-start-line="164" selection-start-column="27" selection-end-line="164" selection-end-column="27" />
+          <folding>
+            <element signature="e#0#30#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/components/index.ts">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="176">
+          <caret line="11" column="55" lean-forward="true" selection-start-line="11" selection-start-column="55" selection-end-line="11" selection-end-column="55" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/components/ReplyBox/ReplyBox.tsx">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="160">
+          <caret line="10" column="48" selection-start-line="10" selection-start-column="48" selection-end-line="10" selection-end-column="48" />
+          <folding>
+            <element signature="e#0#30#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/models/feedModel.ts">
+      <provider selected="true" editor-type-id="text-editor">
+        <state>
+          <folding>
+            <element signature="e#0#48#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/models/notificationModel.ts">
+      <provider selected="true" editor-type-id="text-editor">
+        <state>
+          <folding>
+            <element signature="e#0#43#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/models/replyModel.ts">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="112">
+          <caret line="7" selection-start-line="7" selection-end-line="7" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/models/threadModel.ts">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="96">
+          <caret line="6" column="16" selection-start-line="6" selection-end-line="7" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/components/Reply/Reply.tsx">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="112">
+          <caret line="8" column="33" lean-forward="true" selection-start-line="8" selection-start-column="33" selection-end-line="8" selection-end-column="33" />
         </state>
       </provider>
     </entry>

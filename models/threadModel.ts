@@ -4,9 +4,9 @@ import { action, computed, observable } from 'mobx'
 import { ReplyModel } from '@models/replyModel'
 import _ from 'lodash'
 import PostModel from '@models/postModel'
+import { CreateForm } from '@components'
 import { discussions } from '@novuspherejs'
 import { getNewAuthStore, getUiStore, IStores } from '@stores'
-import CreateForm from '../components/create-form/create-form'
 import { task } from 'mobx-task'
 
 export class ThreadModel {

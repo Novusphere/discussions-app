@@ -1,6 +1,6 @@
 import Router from 'next/router'
 import { Post, discussions } from '@novuspherejs'
-import { IPost } from '@stores/posts'
+import { IPost } from '@stores/postsStore'
 import _ from 'lodash'
 
 const removeMd = require('remove-markdown')

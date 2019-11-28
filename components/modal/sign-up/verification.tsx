@@ -1,7 +1,6 @@
 import * as React from 'react'
-import { SectionHeader, Collapse, Form } from '@components'
+import { SectionHeader, Collapse, Form, CreateForm } from '@components'
 import { presets } from 'react-motion'
-import CreateForm from '../../create-form/create-form'
 
 interface IVerificationProps {
     form: CreateForm

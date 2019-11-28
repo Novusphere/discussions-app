@@ -1,8 +1,7 @@
 import * as React from 'react'
-import { SectionHeader, Form } from '@components'
+import { SectionHeader, Form, CreateForm } from '@components'
 import { Collapse } from '@components'
 import { observer } from 'mobx-react'
-import CreateForm from '../../create-form/create-form'
 
 interface IChooseAccountNameProps {
     form: CreateForm

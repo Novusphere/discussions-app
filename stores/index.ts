@@ -1,22 +1,22 @@
-import User, { getUserStore } from '@stores/user'
-import UI, { getUiStore } from '@stores/ui'
-import Tag, { getTagStore } from '@stores/tag'
-import Posts, { getPostsStore } from '@stores/posts'
-import Settings, { getSettingsStore } from '@stores/settings'
-import NewAuth, { getNewAuthStore } from './newAuth'
-import Notifications, { getNotificationsStore } from '@stores/notifications'
+import UserStore, { getUserStore } from '@stores/userStore'
+import UI, { getUiStore } from '@stores/uiStore'
+import TagStore, { getTagStore } from '@stores/tagStore'
+import PostsStore, { getPostsStore } from '@stores/postsStore'
+import SettingsStore, { getSettingsStore } from '@stores/settingsStore'
+import AuthStore, { getNewAuthStore } from './authStore'
+import NotificationsStore, { getNotificationsStore } from '@stores/notificationsStore'
 import SearchStore, { getSearchStore } from '@stores/searchStore'
 import SignUpStore, { getSignUpStore } from '@stores/signUpStore'
 import SignInStore, { getSignInStore } from '@stores/signInStore'
 
 export interface IStores {
-    userStore: User
+    userStore: UserStore
     uiStore: UI
-    tagStore: Tag
-    newAuthStore: NewAuth
-    postsStore: Posts
-    settingsStore: Settings
-    notificationsStore: Notifications
+    tagStore: TagStore
+    newAuthStore: AuthStore
+    postsStore: PostsStore
+    settingsStore: SettingsStore
+    notificationsStore: NotificationsStore
     searchStore: SearchStore
     signUpStore: SignUpStore
     signInStore: SignInStore
