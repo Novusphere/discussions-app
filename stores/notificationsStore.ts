@@ -1,11 +1,10 @@
 import { BaseStore, getOrCreateStore } from 'next-mobx-wrapper'
 import { action, computed, observable, observe, reaction } from 'mobx'
 import { task } from 'mobx-task'
-import { getAuthStore, getTagStore, getUiStore, IStores } from '@stores/index'
+import { getAuthStore, getTagStore, IStores } from '@stores/index'
 import { discussions } from '@novuspherejs'
 import { persist } from 'mobx-persist'
 import NotificationModel from '@models/notificationModel'
-import { computedFn } from 'mobx-utils'
 import { IPost } from '@stores/postsStore'
 
 export default class NotificationsStore extends BaseStore {
@@ -16,13 +15,7 @@ export default class NotificationsStore extends BaseStore {
     @observable
     lastCheckedNotifications = 0 // set default
 
-    // @persist('map')
-    // @observable
-    // watchingThread = observable.map<string, number>() // id: number
-    //
-    // @persist('map')
-    // @observable
-    // watchingThreadPostDiff = observable.map<string, number>() // how many new posts were there since watch began
+    @observable pingTheseMethods = []
 
     @observable notifications: NotificationModel[] = []
     @observable notificationTrayItems = observable.map<string, NotificationModel>() // max 5
@@ -41,7 +34,6 @@ export default class NotificationsStore extends BaseStore {
     @observable private watchThreadIntervalHandler: any = null
 
     private readonly authStore: IStores['authStore'] = getAuthStore()
-    private readonly uiStore: IStores['uiStore'] = getUiStore()
     private readonly tagStore: IStores['tagStore'] = getTagStore()
 
     constructor() {
@@ -52,8 +44,7 @@ export default class NotificationsStore extends BaseStore {
             hasAccount => {
                 if (hasAccount) {
                     this.fetchNotificationsAsTray()
-                    // this.updateWatchThreadCount()
-
+                    this.pingTheseMethods.forEach(method => method.call())
                     this.startNotificationInterval()
                 } else {
                     this.destroyNotificationInterval()
@@ -66,13 +57,12 @@ export default class NotificationsStore extends BaseStore {
                 this.unreadCount++
             }
         })
-
     }
 
     public startNotificationInterval = () => {
         this.notificationIntervalHandler = setInterval(() => {
             this.fetchNotificationsAsTray()
-            // this.updateWatchThreadCount()
+            this.pingTheseMethods.forEach(method => method.call())
         }, 20000)
     }
 
@@ -82,7 +72,6 @@ export default class NotificationsStore extends BaseStore {
             this.notificationIntervalHandler = null
         }
     }
-
 
     @computed get notificationTrayItemsSorted() {
         return Array.from(this.notificationTrayItems.values()).sort((a, b) =>
@@ -113,7 +102,6 @@ export default class NotificationsStore extends BaseStore {
     resetUnreadCount() {
         this.unreadCount = 0
     }
-
 
     @action.bound
     clearNotifications() {

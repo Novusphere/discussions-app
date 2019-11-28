@@ -55,7 +55,7 @@ export default class UserStore extends BaseStore {
             }
         })
 
-        setInterval(() => this.updateWatchThreadCount(), 2000)
+        this.notificationsStore.pingTheseMethods.push(this.updateWatchThreadCount)
     }
 
     @computed get followingKeys() {
