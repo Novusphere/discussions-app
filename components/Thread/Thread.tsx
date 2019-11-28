@@ -20,7 +20,7 @@ interface IThreadInnerProps {
     tagStore: IStores['tagStore']
     notificationsStore: IStores['notificationsStore']
     userStore: IStores['userStore']
-    newAuthStore: IStores['newAuthStore']
+    authStore: IStores['authStore']
     uiStore: IStores['uiStore']
     router: NextRouter
 }
@@ -28,7 +28,7 @@ interface IThreadInnerProps {
 interface IThreadState {}
 
 @(withRouter as any)
-@inject('postsStore', 'userStore', 'newAuthStore', 'tagStore', 'notificationsStore', 'uiStore')
+@inject('postsStore', 'userStore', 'authStore', 'tagStore', 'notificationsStore', 'uiStore')
 @observer
 class Thread extends React.Component<IThreadOuterProps & IThreadInnerProps, IThreadState> {
     @observable threadAsModel: ThreadModel = null
@@ -138,7 +138,7 @@ class Thread extends React.Component<IThreadOuterProps & IThreadInnerProps, IThr
             router,
             userStore: { toggleUserFollowing, following },
             postsStore: { highlightPostUuid, currentHighlightedPostUuid, setCurrentReplyContent },
-            newAuthStore: { activePublicKey, hasAccount },
+            authStore: { activePublicKey, hasAccount },
         } = this.props
 
         const {

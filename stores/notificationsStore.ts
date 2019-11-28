@@ -1,7 +1,7 @@
 import { BaseStore, getOrCreateStore } from 'next-mobx-wrapper'
 import { action, computed, observable, observe, reaction } from 'mobx'
 import { task } from 'mobx-task'
-import { getNewAuthStore, getTagStore, getUiStore, IStores } from '@stores/index'
+import { getAuthStore, getTagStore, getUiStore, IStores } from '@stores/index'
 import { discussions } from '@novuspherejs'
 import { persist } from 'mobx-persist'
 import NotificationModel from '@models/notificationModel'
@@ -40,7 +40,7 @@ export default class NotificationsStore extends BaseStore {
     @observable private notificationIntervalHandler: any = null
     @observable private watchThreadIntervalHandler: any = null
 
-    private readonly authStore: IStores['newAuthStore'] = getNewAuthStore()
+    private readonly authStore: IStores['authStore'] = getAuthStore()
     private readonly uiStore: IStores['uiStore'] = getUiStore()
     private readonly tagStore: IStores['tagStore'] = getTagStore()
 

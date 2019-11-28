@@ -3,7 +3,7 @@ import { CreateForm } from '@components'
 import { action, observable } from 'mobx'
 import { task } from 'mobx-task'
 import { discussions } from '@novuspherejs'
-import { getNewAuthStore, getUiStore, IStores } from '@stores/index'
+import { getAuthStore, getUiStore, IStores } from '@stores/index'
 
 export default class SignUpStore extends BaseStore {
     // signup object
@@ -21,7 +21,7 @@ export default class SignUpStore extends BaseStore {
     }
 
     private readonly uiStore: IStores['uiStore'] = getUiStore()
-    private readonly authStore: IStores['newAuthStore'] = getNewAuthStore()
+    private readonly authStore: IStores['authStore'] = getAuthStore()
 
     /**
      * Ui Controls

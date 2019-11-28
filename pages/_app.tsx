@@ -29,7 +29,7 @@ class DiscussionApp extends App {
     async componentDidMount(): Promise<void> {
         if (!isServer) {
             const {
-                newAuthStore,
+                authStore,
                 settingsStore,
                 userStore,
                 notificationsStore,
@@ -37,7 +37,7 @@ class DiscussionApp extends App {
             } = this.props.store
 
             const stores = {
-                auth: newAuthStore,
+                auth: authStore,
                 settings: settingsStore,
                 user: userStore,
                 notifications: notificationsStore,

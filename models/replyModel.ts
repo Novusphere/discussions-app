@@ -1,7 +1,7 @@
 import { action, computed, observable, set } from 'mobx'
 import { task } from 'mobx-task'
 import { generateUuid, getAttachmentValue } from '@utils'
-import { getNewAuthStore, getPostsStore, getUiStore, IStores } from '@stores'
+import { getAuthStore, getPostsStore, getUiStore, IStores } from '@stores'
 import PostModel from '@models/postModel'
 import { discussions } from '@novuspherejs'
 import { CreateForm } from '@components'
@@ -13,7 +13,6 @@ export class ReplyModel {
     @observable open = false
     @observable map: { [p: string]: PostModel }
 
-    public readonly newAuthStore: IStores['newAuthStore']
     public readonly postStore: IStores['postsStore']
     public readonly uiStore: IStores['uiStore']
 
@@ -22,13 +21,13 @@ export class ReplyModel {
 
     @observable editing = false
 
-    private readonly authStore: IStores['newAuthStore'] = getNewAuthStore()
+    private readonly authStore: IStores['authStore'] = getAuthStore()
 
     constructor(post: PostModel, map: { [p: string]: PostModel }) {
         this.post = post
         this.uid = post.uuid
         this.map = map
-        this.newAuthStore = getNewAuthStore()
+        this.authStore = getAuthStore()
         this.postStore = getPostsStore()
         this.uiStore = getUiStore()
     }
@@ -116,7 +115,7 @@ export class ReplyModel {
                 }
 
                 const model = new PostModel(reply as any)
-                const signedReply = model.sign(this.newAuthStore.postPriv)
+                const signedReply = model.sign(this.authStore.postPriv)
                 const confirmedReply = await discussions.post(signedReply as any)
 
                 this.post.content = confirmedReply.content
@@ -206,14 +205,14 @@ export class ReplyModel {
             }
         }
 
-        const posterName = this.newAuthStore.posterName
+        const posterName = this.authStore.posterName
 
-        if (posterName === this.newAuthStore.displayName.bk) {
+        if (posterName === this.authStore.displayName.bk) {
             reply.poster = undefined
             reply.displayName = posterName
         }
 
-        if (posterName === this.newAuthStore.displayName.scatter) {
+        if (posterName === this.authStore.displayName.scatter) {
             reply.poster = posterName
             reply.displayName = posterName
         }
@@ -231,7 +230,7 @@ export class ReplyModel {
     @task.resolved
     @action.bound
     async onSubmit(activeThread: any) {
-        if (!this.newAuthStore.hasAccount) {
+        if (!this.authStore.hasAccount) {
             this.uiStore.showToast('You must be logged in to comment', 'error')
             return
         }
@@ -246,7 +245,7 @@ export class ReplyModel {
         try {
             if (activeThread) {
                 const model = new PostModel(reply as any)
-                const signedReply = model.sign(this.newAuthStore.postPriv)
+                const signedReply = model.sign(this.authStore.postPriv)
                 const confirmedReply = await discussions.post(signedReply as any)
 
                 const confirmedModel = new PostModel({

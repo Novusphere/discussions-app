@@ -12,7 +12,7 @@ import { getIdenticon } from '@utils'
 
 interface ITitleHeaderProps {
     tagStore: IStores['tagStore']
-    newAuthStore: IStores['newAuthStore']
+    authStore: IStores['authStore']
     notificationsStore: IStores['notificationsStore']
     userStore: IStores['userStore']
     uiStore: IStores['uiStore']
@@ -22,7 +22,7 @@ interface ITitleHeaderState {
     search: string
 }
 
-@inject('tagStore', 'newAuthStore', 'userStore', 'uiStore', 'notificationsStore')
+@inject('tagStore', 'authStore', 'userStore', 'uiStore', 'notificationsStore')
 @observer
 class TitleHeader extends React.Component<ITitleHeaderProps, ITitleHeaderState> {
     state = {
@@ -30,7 +30,7 @@ class TitleHeader extends React.Component<ITitleHeaderProps, ITitleHeaderState> 
     }
 
     private renderUserSettings = () => {
-        const { logOut } = this.props.newAuthStore
+        const { logOut } = this.props.authStore
 
         return (
             <div className={'tooltip'} style={{ width: 200 }}>
@@ -62,7 +62,7 @@ class TitleHeader extends React.Component<ITitleHeaderProps, ITitleHeaderState> 
     private renderAuthActions = () => {
         const { notificationsStore } = this.props
         const { showModal } = this.props.uiStore
-        const { hasAccount, getActiveDisplayName, checkInitialConditions, activePublicKey } = this.props.newAuthStore
+        const { hasAccount, getActiveDisplayName, checkInitialConditions, activePublicKey } = this.props.authStore
 
         if (checkInitialConditions['pending']) {
             return <FontAwesomeIcon width={13} icon={faSpinner} spin />

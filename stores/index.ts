@@ -3,7 +3,7 @@ import UI, { getUiStore } from '@stores/uiStore'
 import TagStore, { getTagStore } from '@stores/tagStore'
 import PostsStore, { getPostsStore } from '@stores/postsStore'
 import SettingsStore, { getSettingsStore } from '@stores/settingsStore'
-import AuthStore, { getNewAuthStore } from './authStore'
+import AuthStore, { getAuthStore } from './authStore'
 import NotificationsStore, { getNotificationsStore } from '@stores/notificationsStore'
 import SearchStore, { getSearchStore } from '@stores/searchStore'
 import SignUpStore, { getSignUpStore } from '@stores/signUpStore'
@@ -13,7 +13,7 @@ export interface IStores {
     userStore: UserStore
     uiStore: UI
     tagStore: TagStore
-    newAuthStore: AuthStore
+    authStore: AuthStore
     postsStore: PostsStore
     settingsStore: SettingsStore
     notificationsStore: NotificationsStore
@@ -23,7 +23,7 @@ export interface IStores {
 }
 
 export {
-    getNewAuthStore,
+    getAuthStore,
     getPostsStore,
     getSettingsStore,
     getTagStore,

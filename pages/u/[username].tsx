@@ -12,7 +12,7 @@ import { InfiniteScrollFeed, PostPreview } from '@components'
 interface IUPageProps {
     userStore: IStores['userStore']
     postsStore: IStores['postsStore']
-    newAuthStore: IStores['newAuthStore']
+    authStore: IStores['authStore']
     tagStore: IStores['tagStore']
     uiStore: IStores['uiStore']
 
@@ -26,7 +26,7 @@ interface IUPageProps {
 
 // TO-DO: real data
 
-@inject('userStore', 'newAuthStore', 'postsStore', 'tagStore', 'uiStore')
+@inject('userStore', 'authStore', 'postsStore', 'tagStore', 'uiStore')
 @observer
 class U extends React.Component<IUPageProps> {
     static async getInitialProps({ query, store }) {
@@ -59,7 +59,7 @@ class U extends React.Component<IUPageProps> {
     }
 
     @computed get isSameUser() {
-        return this.props.username === this.props.newAuthStore.getActiveDisplayName
+        return this.props.username === this.props.authStore.getActiveDisplayName
     }
 
     private renderFollowingList = () => {

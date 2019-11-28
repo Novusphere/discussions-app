@@ -4,7 +4,7 @@ import { task } from 'mobx-task'
 import { BaseStore, getOrCreateStore } from 'next-mobx-wrapper'
 import { CreateForm } from '@components'
 import tag, { getTagStore } from '@stores/tagStore'
-import { getNewAuthStore, getUiStore, IStores } from '@stores'
+import { getAuthStore, getUiStore, IStores } from '@stores'
 import { generateUuid, getAttachmentValue, pushToThread, sleep } from '@utils'
 import { ThreadModel } from '@models/threadModel'
 import FeedModel from '@models/feedModel'
@@ -90,7 +90,7 @@ export default class PostsStore extends BaseStore {
 
     private readonly tagsStore: IStores['tagStore'] = getTagStore()
     private readonly uiStore: IStores['uiStore'] = getUiStore()
-    private readonly newAuthStore: IStores['newAuthStore'] = getNewAuthStore()
+    private readonly authStore: IStores['authStore'] = getAuthStore()
 
     @action.bound
     highlightPostUuid(uuid: string) {
@@ -237,7 +237,7 @@ export default class PostsStore extends BaseStore {
     @action
     public vote = async (uuid: string, value: number) => {
         try {
-            if (this.newAuthStore.hasAccount) {
+            if (this.authStore.hasAccount) {
                 await this.activeThread.vote(uuid, value)
             }
         } catch (error) {
@@ -305,16 +305,16 @@ export default class PostsStore extends BaseStore {
                         },
                         {
                             value: 'Post',
-                            disabled: !this.newAuthStore.hasAccount || !this.newPostData.sub,
-                            title: !this.newAuthStore.hasAccount
+                            disabled: !this.authStore.hasAccount || !this.newPostData.sub,
+                            title: !this.authStore.hasAccount
                                 ? 'You need to be logged in to post'
-                                : 'Post as ' + this.newAuthStore.posterName,
+                                : 'Post as ' + this.authStore.posterName,
 
                             onClick: task.resolved(async form => {
                                 if (!form.hasError && this.newPostData.sub.value) {
                                     const post = form.values()
                                     const uuid = generateUuid()
-                                    const posterName = this.newAuthStore.posterName
+                                    const posterName = this.authStore.posterName
 
                                     let inlineTags = post.content.match(/#([^\s.,;:!?]+)/gi)
                                     let tags = [this.newPostData.sub.value]
@@ -340,18 +340,18 @@ export default class PostsStore extends BaseStore {
                                         createdAt: Date.now(),
                                     }
 
-                                    if (posterName === this.newAuthStore.displayName.bk) {
+                                    if (posterName === this.authStore.displayName.bk) {
                                         newPost.poster = undefined
                                         newPost.displayName = posterName
                                     }
 
-                                    if (posterName === this.newAuthStore.displayName.scatter) {
+                                    if (posterName === this.authStore.displayName.scatter) {
                                         newPost.poster = posterName
                                         newPost.displayName = posterName
                                     }
 
                                     const model = new PostModel(newPost as any)
-                                    const signedReply = model.sign(this.newAuthStore.postPriv)
+                                    const signedReply = model.sign(this.authStore.postPriv)
                                     const submittedPost = await discussions.post(signedReply as any)
                                     const isPostValid = discussions.checkIfPostIsValid(
                                         submittedPost

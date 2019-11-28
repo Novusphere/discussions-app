@@ -6,7 +6,7 @@ import _ from 'lodash'
 import PostModel from '@models/postModel'
 import { CreateForm } from '@components'
 import { discussions } from '@novuspherejs'
-import { getNewAuthStore, getUiStore, IStores } from '@stores'
+import { getAuthStore, getUiStore, IStores } from '@stores'
 import { task } from 'mobx-task'
 
 export class ThreadModel {
@@ -25,7 +25,7 @@ export class ThreadModel {
 
     public replyBoxStatuses = observable.map<string, ReplyModel>()
 
-    private readonly authStore: IStores['newAuthStore'] = getNewAuthStore()
+    private readonly authStore: IStores['authStore'] = getAuthStore()
     private readonly uiStore: IStores['uiStore'] = getUiStore()
 
     /**

@@ -6,16 +6,16 @@ import PostModel from '@models/postModel'
 
 interface IPostPreviewProps {
     postsStore: IStores['postsStore']
-    newAuthStore: IStores['newAuthStore']
+    authStore: IStores['authStore']
     tagStore: IStores['tagStore']
 }
 
-@inject('postsStore', 'newAuthStore', 'tagStore')
+@inject('postsStore', 'authStore', 'tagStore')
 @observer
 class NewPostPreview extends React.Component<IPostPreviewProps> {
     public render(): React.ReactNode {
         const { preview } = this.props.postsStore
-        const { getActiveDisplayName, activePublicKey } = this.props.newAuthStore
+        const { getActiveDisplayName, activePublicKey } = this.props.authStore
 
         if (!preview) {
             return null

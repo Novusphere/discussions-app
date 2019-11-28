@@ -18,7 +18,7 @@ import dynamic from 'next/dynamic'
 const StepWizard: any = dynamic(() => import('react-step-wizard'))
 
 interface IWelcomeBackModalProps {
-    newAuthStore: IStores['newAuthStore']
+    authStore: IStores['authStore']
     uiStore: IStores['uiStore']
 }
 
@@ -26,7 +26,7 @@ interface IWelcomeBackModalState {
     clickedSignInOption: string
 }
 
-@inject('newAuthStore', 'uiStore')
+@inject('authStore', 'uiStore')
 @observer
 class SignInModal extends React.Component<IWelcomeBackModalProps, IWelcomeBackModalState> {
     state = {
@@ -44,7 +44,7 @@ class SignInModal extends React.Component<IWelcomeBackModalProps, IWelcomeBackMo
             })
         }
 
-        this.props.newAuthStore.setClickedSignInMethod(name)
+        this.props.authStore.setClickedSignInMethod(name)
     }
 
     renderButtons = (choosePasswordForm: any, setPassword: any, setNewBKAndPasswordForm: any, setPasswordScatter: any) => {
@@ -54,7 +54,7 @@ class SignInModal extends React.Component<IWelcomeBackModalProps, IWelcomeBackMo
             loginWithBK,
             handleStepSwitchForBK,
             hasBKAccount,
-        } = this.props.newAuthStore
+        } = this.props.authStore
 
         if (signInObject.ref) {
             switch (signInObject.step) {
@@ -129,12 +129,12 @@ class SignInModal extends React.Component<IWelcomeBackModalProps, IWelcomeBackMo
                     }
                     break
                 case 2:
-                    return this.props.newAuthStore.loginWithBK['match']({
+                    return this.props.authStore.loginWithBK['match']({
                         rejected: error => (
                             <>
                                 {JSON.stringify(error)}
                                 <button
-                                    disabled={this.props.newAuthStore.loginWithBK['pending']}
+                                    disabled={this.props.authStore.loginWithBK['pending']}
                                     onClick={setNewBKAndPasswordForm.onSubmit}
                                     className={'f6 link dim ph3 pv2 dib pointer white bg-red'}
                                 >
@@ -144,7 +144,7 @@ class SignInModal extends React.Component<IWelcomeBackModalProps, IWelcomeBackMo
                         ),
                         pending: () => (
                             <button
-                                disabled={this.props.newAuthStore.loginWithBK['pending']}
+                                disabled={this.props.authStore.loginWithBK['pending']}
                                 onClick={setNewBKAndPasswordForm.onSubmit}
                                 className={'f6 link dim ph3 pv2 dib pointer white bg-red'}
                             >
@@ -157,13 +157,13 @@ class SignInModal extends React.Component<IWelcomeBackModalProps, IWelcomeBackMo
                                     className={'b pointer dim'}
                                     title={'Sign in with another sign in boost'}
                                     onClick={() =>
-                                        this.props.newAuthStore.signInObject.ref.goToStep(1)
+                                        this.props.authStore.signInObject.ref.goToStep(1)
                                     }
                                 >
                                     Or log in with another sign in method
                                 </span>{' '}
                                 <button
-                                    disabled={this.props.newAuthStore.loginWithBK['pending']}
+                                    disabled={this.props.authStore.loginWithBK['pending']}
                                     onClick={setNewBKAndPasswordForm.onSubmit}
                                     className={'f6 link dim ph3 pv2 dib pointer white bg-red'}
                                 >
@@ -173,11 +173,11 @@ class SignInModal extends React.Component<IWelcomeBackModalProps, IWelcomeBackMo
                         ),
                     })
                 case 3:
-                    return this.props.newAuthStore.loginWithPassword['match']({
+                    return this.props.authStore.loginWithPassword['match']({
                         rejected: () => (
                             <>
                                 <button
-                                    disabled={this.props.newAuthStore.loginWithPassword['pending']}
+                                    disabled={this.props.authStore.loginWithPassword['pending']}
                                     onClick={setPassword.onSubmit}
                                     className={'f6 link dim ph3 pv2 dib pointer white bg-red'}
                                 >
@@ -187,7 +187,7 @@ class SignInModal extends React.Component<IWelcomeBackModalProps, IWelcomeBackMo
                         ),
                         pending: () => (
                             <button
-                                disabled={this.props.newAuthStore.loginWithPassword['pending']}
+                                disabled={this.props.authStore.loginWithPassword['pending']}
                                 onClick={setPassword.onSubmit}
                                 className={'f6 link dim ph3 pv2 dib pointer white bg-red'}
                             >
@@ -200,13 +200,13 @@ class SignInModal extends React.Component<IWelcomeBackModalProps, IWelcomeBackMo
                                     className={'b pointer dim'}
                                     title={'Sign in with another sign in boost'}
                                     onClick={() =>
-                                        this.props.newAuthStore.signInObject.ref.goToStep(1)
+                                        this.props.authStore.signInObject.ref.goToStep(1)
                                     }
                                 >
                                     Or log in with another sign in method
                                 </span>{' '}
                                 <button
-                                    disabled={this.props.newAuthStore.loginWithPassword['pending']}
+                                    disabled={this.props.authStore.loginWithPassword['pending']}
                                     onClick={setPassword.onSubmit}
                                     className={'f6 link dim ph3 pv2 dib pointer white bg-red'}
                                 >
@@ -218,11 +218,11 @@ class SignInModal extends React.Component<IWelcomeBackModalProps, IWelcomeBackMo
                 case 4:
                     break
                 case 5:
-                    return this.props.newAuthStore.initializeScatterLogin['match']({
+                    return this.props.authStore.initializeScatterLogin['match']({
                         rejected: () => (
                             <>
                                 <button
-                                    disabled={this.props.newAuthStore.initializeScatterLogin['pending']}
+                                    disabled={this.props.authStore.initializeScatterLogin['pending']}
                                     onClick={setPasswordScatter.onSubmit}
                                     className={'f6 link dim ph3 pv2 dib pointer white bg-red'}
                                 >
@@ -232,7 +232,7 @@ class SignInModal extends React.Component<IWelcomeBackModalProps, IWelcomeBackMo
                         ),
                         pending: () => (
                             <button
-                                disabled={this.props.newAuthStore.initializeScatterLogin['pending']}
+                                disabled={this.props.authStore.initializeScatterLogin['pending']}
                                 onClick={setPasswordScatter.onSubmit}
                                 className={'f6 link dim ph3 pv2 dib pointer white bg-red'}
                             >
@@ -245,13 +245,13 @@ class SignInModal extends React.Component<IWelcomeBackModalProps, IWelcomeBackMo
                                     className={'b pointer dim'}
                                     title={'Sign in with another sign in boost'}
                                     onClick={() =>
-                                        this.props.newAuthStore.signInObject.ref.goToStep(1)
+                                        this.props.authStore.signInObject.ref.goToStep(1)
                                     }
                                 >
                                     Or log in with another sign in method
                                 </span>{' '}
                                 <button
-                                    disabled={this.props.newAuthStore.initializeScatterLogin['pending']}
+                                    disabled={this.props.authStore.initializeScatterLogin['pending']}
                                     onClick={setPasswordScatter.onSubmit}
                                     className={'f6 link dim ph3 pv2 dib pointer white bg-red'}
                                 >
@@ -265,12 +265,12 @@ class SignInModal extends React.Component<IWelcomeBackModalProps, IWelcomeBackMo
     }
 
     private handleRememberClick = () => {
-        const { setPreferredSignInMethod } = this.props.newAuthStore
+        const { setPreferredSignInMethod } = this.props.authStore
         setPreferredSignInMethod(this.state.clickedSignInOption)
     }
 
     private renderRememberOption = () => {
-        const { signInObject, preferredSignInMethod } = this.props.newAuthStore
+        const { signInObject, preferredSignInMethod } = this.props.authStore
 
         if (signInObject.step === 1) {
             return (
@@ -291,11 +291,11 @@ class SignInModal extends React.Component<IWelcomeBackModalProps, IWelcomeBackMo
     }
 
     onStepChange = ({ activeStep }) => {
-        this.props.newAuthStore.signInObject.step = activeStep
+        this.props.authStore.signInObject.step = activeStep
     }
 
     setInstance = instance => {
-        this.props.newAuthStore.signInObject.ref = instance
+        this.props.authStore.signInObject.ref = instance
     }
 
     createAccountOnClick = () => {
@@ -303,11 +303,11 @@ class SignInModal extends React.Component<IWelcomeBackModalProps, IWelcomeBackMo
     }
 
     public render() {
-        const { signInObject } = this.props.newAuthStore
-        const choosePasswordForm = this.props.newAuthStore.choosePassword
-        const setPasswordBK = this.props.newAuthStore.setPasswordBK
-        const setPasswordScatter = this.props.newAuthStore.setPasswordScatter
-        const setNewBKAndPasswordForm = this.props.newAuthStore.setNewBKAndPasswordForm
+        const { signInObject } = this.props.authStore
+        const choosePasswordForm = this.props.authStore.choosePassword
+        const setPasswordBK = this.props.authStore.setPasswordBK
+        const setPasswordScatter = this.props.authStore.setPasswordScatter
+        const setNewBKAndPasswordForm = this.props.authStore.setNewBKAndPasswordForm
 
         return (
             <Modal>

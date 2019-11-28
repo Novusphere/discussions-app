@@ -8,6 +8,7 @@ import dynamic from 'next/dynamic'
 import { useState } from 'react'
 import { RichTextPreview } from '@components'
 
+// @ts-ignore
 const Editor = dynamic(() => import('../Editor/Editor'), {
     ssr: false,
 })

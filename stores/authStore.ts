@@ -464,4 +464,4 @@ export default class AuthStore extends BaseStore {
     }
 }
 
-export const getNewAuthStore = getOrCreateStore('newAuthStore', AuthStore)
+export const getAuthStore = getOrCreateStore('authStore', AuthStore)

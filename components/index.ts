@@ -9,6 +9,7 @@ export { default as CreateForm } from './CreateForm/CreateForm'
 export { default as Form } from './Form/Form'
 export { default as Modal } from './modal/modal-container'
 export { default as AppModals } from './modal/modal-switcher'
+// @ts-ignore
 export { default as RichTextEditor } from './Editor/Editor'
 export { default as ReplyBox } from './ReplyBox/ReplyBox'
 export { default as ShowFullThread } from './Thread/Thread'
