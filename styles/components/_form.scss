@@ -171,15 +171,3 @@ form {
     border-bottom-left-radius: 0;
     border-bottom-right-radius: 0;
 }
-
-.main-search {
-    @extend .pv2;
-    @extend .f5;
-
-    background: #F6F7F8;
-    border: 0.5px solid rgba(125, 136, 148, 0.5);
-    box-sizing: border-box;
-    border-radius: 4px;
-
-    &:focus {outline:0;}
-}

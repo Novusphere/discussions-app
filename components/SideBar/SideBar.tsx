@@ -60,9 +60,6 @@ class SideBar extends React.Component<ITagListOuterProps & ITagListInnerProps, I
             e.preventDefault()
 
             this.props.tagStore.addTag(this.state.tag)
-            // this.setState({
-            //     tag: '',
-            // })
         }
     }
 

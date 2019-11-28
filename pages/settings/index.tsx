@@ -11,7 +11,7 @@ interface ISettings {
 }
 
 import './style.scss'
-import ComingSoonMessage from '../../components/coming-soon-message/coming-soon-message'
+import { ComingSoon } from '@components'
 
 // TODO: Real Data
 
@@ -95,7 +95,7 @@ class Settings extends React.Component<ISettings> {
     public render() {
         return (
             <div className={'flex flex-row relative'}>
-                <ComingSoonMessage />
+                <ComingSoon />
                 <div className={'card w-30 mr5 pa3'}>{this.renderSidebarContent()}</div>
                 <div className={'card w-70 pa4'}>
                     <span className={'b black f4'}>Connections</span>

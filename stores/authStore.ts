@@ -87,6 +87,13 @@ export default class AuthStore extends BaseStore {
         return this.statusJson.scatter.post
     }
 
+    @computed get activePrivateKey() {
+        if (!this.hasAccount) return null
+        if (!this.statusJson.bk && !this.statusJson.scatter) return null
+
+        return this.postPriv
+    }
+
     @action.bound
     setClickedSignInMethod(method: string) {
         this.clickedSignInMethod = method

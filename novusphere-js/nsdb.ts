@@ -47,7 +47,6 @@ export class NSDB {
 
         const { data } = await axios.post(rurl, qs);
         if (data.error) {
-            console.error('Save account failed: ', qs);
             throw new Error(data.error);
         }
 

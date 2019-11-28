@@ -8,6 +8,7 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 
 interface IUserNotificationsOuterProps {
     notificationsStore: IStores['notificationsStore']
+    userStore: IStores['userStore']
 }
 
 interface IUserNotificationsInnerProps {}
@@ -30,7 +31,7 @@ class Notifications extends React.Component<
     async componentDidMount(): Promise<void> {
         this.props.notificationsStore.setTimeStamp()
         this.props.notificationsStore.resetUnreadCount()
-        this.props.notificationsStore.syncCountsForUnread()
+        this.props.userStore.syncCountsForUnread()
     }
 
     private clearNotifications = () => {

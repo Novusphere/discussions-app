@@ -16,13 +16,13 @@ export default class NotificationsStore extends BaseStore {
     @observable
     lastCheckedNotifications = 0 // set default
 
-    @persist('map')
-    @observable
-    watchingThread = observable.map<string, number>() // id: number
-
-    @persist('map')
-    @observable
-    watchingThreadPostDiff = observable.map<string, number>() // how many new posts were there since watch began
+    // @persist('map')
+    // @observable
+    // watchingThread = observable.map<string, number>() // id: number
+    //
+    // @persist('map')
+    // @observable
+    // watchingThreadPostDiff = observable.map<string, number>() // how many new posts were there since watch began
 
     @observable notifications: NotificationModel[] = []
     @observable notificationTrayItems = observable.map<string, NotificationModel>() // max 5
@@ -52,7 +52,7 @@ export default class NotificationsStore extends BaseStore {
             hasAccount => {
                 if (hasAccount) {
                     this.fetchNotificationsAsTray()
-                    this.updateWatchThreadCount()
+                    // this.updateWatchThreadCount()
 
                     this.startNotificationInterval()
                 } else {
@@ -67,36 +67,12 @@ export default class NotificationsStore extends BaseStore {
             }
         })
 
-        observe(this.watchingThread, async change => {
-            if (change.type === 'update') {
-                const count = change.newValue - this.watchingThreadPostDiff.get(change.name)
-
-                if (count > 0) {
-                    const thread = await discussions.getThread('3qk3dk57g39v1')
-                    const notificationModel = new NotificationModel({
-                        type: 'watch',
-                        post: {
-                            ...thread.openingPost,
-                            totalReplies: count,
-                        },
-                        tag: this.tagStore.tags.get(thread.openingPost.sub),
-                    })
-
-                    if (this.notificationTrayItems.size > 4) {
-                        const [, , , , last] = Array.from(this.notificationTrayItems.keys())
-                        this.notificationTrayItems.delete(last)
-                    }
-
-                    this.notificationTrayItems.set(thread.openingPost.uuid, notificationModel)
-                }
-            }
-        })
     }
 
     public startNotificationInterval = () => {
         this.notificationIntervalHandler = setInterval(() => {
             this.fetchNotificationsAsTray()
-            this.updateWatchThreadCount()
+            // this.updateWatchThreadCount()
         }, 20000)
     }
 
@@ -107,17 +83,6 @@ export default class NotificationsStore extends BaseStore {
         }
     }
 
-    @action.bound
-    async updateWatchThreadCount() {
-        if (!this.watchingThread.size) return
-
-        const threads = Array.from(this.watchingThread.keys())
-
-        await threads.map(async thread => {
-            const number = await discussions.getThreadReplyCount(thread)
-            this.watchingThread.set(thread, number)
-        })
-    }
 
     @computed get notificationTrayItemsSorted() {
         return Array.from(this.notificationTrayItems.values()).sort((a, b) =>
@@ -149,10 +114,6 @@ export default class NotificationsStore extends BaseStore {
         this.unreadCount = 0
     }
 
-    @action.bound
-    syncCountsForUnread() {
-        this.watchingThreadPostDiff.merge(this.watchingThread)
-    }
 
     @action.bound
     clearNotifications() {
@@ -249,28 +210,6 @@ export default class NotificationsStore extends BaseStore {
             throw error
         }
     }
-
-    @action.bound
-    toggleThreadWatch(id: string, count: number) {
-        if (this.watchingThread.has(id)) {
-            this.watchingThread.delete(id)
-            this.watchingThreadPostDiff.delete(id)
-            this.uiStore.showToast('You are no longer watching this thread', 'info')
-            return
-        }
-
-        if (this.watchingThread.size <= 4) {
-            this.watchingThread.set(id, count)
-            this.watchingThreadPostDiff.set(id, count)
-            this.uiStore.showToast('Success! You are watching this thread', 'success')
-        } else {
-            this.uiStore.showToast('You can only watch a maximum of 5 threads', 'info')
-        }
-    }
-
-    isWatchingThread = computedFn((id: string) => {
-        return this.watchingThread.has(id)
-    })
 }
 
 export const getNotificationsStore = getOrCreateStore('notificationsStore', NotificationsStore)

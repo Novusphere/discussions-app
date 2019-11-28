@@ -10,6 +10,8 @@ import { ModalOptions } from '@globals'
 import { UserNotifications } from '@components'
 import { getIdenticon } from '@utils'
 
+import './style.scss'
+
 interface ITitleHeaderProps {
     tagStore: IStores['tagStore']
     authStore: IStores['authStore']
@@ -60,9 +62,14 @@ class TitleHeader extends React.Component<ITitleHeaderProps, ITitleHeaderState> 
     }
 
     private renderAuthActions = () => {
-        const { notificationsStore } = this.props
+        const { notificationsStore, userStore } = this.props
         const { showModal } = this.props.uiStore
-        const { hasAccount, getActiveDisplayName, checkInitialConditions, activePublicKey } = this.props.authStore
+        const {
+            hasAccount,
+            getActiveDisplayName,
+            checkInitialConditions,
+            activePublicKey,
+        } = this.props.authStore
 
         if (checkInitialConditions['pending']) {
             return <FontAwesomeIcon width={13} icon={faSpinner} spin />
@@ -78,7 +85,12 @@ class TitleHeader extends React.Component<ITitleHeaderProps, ITitleHeaderState> 
                         interactive
                         interactiveBorder={20}
                         unmountHTMLWhenHide={true}
-                        html={<UserNotifications notificationsStore={notificationsStore} />}
+                        html={
+                            <UserNotifications
+                                notificationsStore={notificationsStore}
+                                userStore={userStore}
+                            />
+                        }
                         position={'bottom-end'}
                         trigger={'mouseenter'}
                     >
@@ -112,7 +124,10 @@ class TitleHeader extends React.Component<ITitleHeaderProps, ITitleHeaderState> 
                         position={'bottom-end'}
                         trigger={'mouseenter'}
                     >
-                        <Link href={`/u/[username]`} as={`/u/${getActiveDisplayName}-${activePublicKey}`}>
+                        <Link
+                            href={`/u/[username]`}
+                            as={`/u/${getActiveDisplayName}-${activePublicKey}`}
+                        >
                             <a
                                 rel={'Open your profile'}
                                 className={'flex items-center user-container pointer dim'}
@@ -175,9 +190,13 @@ class TitleHeader extends React.Component<ITitleHeaderProps, ITitleHeaderState> 
                 <div className={'container flex items-center justify-between'}>
                     <span className={'f4 black'}>{this.renderActiveTag()}</span>
 
-                    <div className={'mh4 flex-auto relative flex items-center'}>
+                    <div
+                        className={
+                            'mh4 flex-auto relative flex items-center main-search field-container'
+                        }
+                    >
                         <input
-                            className={'w-100 main-search pl4'}
+                            className={'w-100 pl4'}
                             placeholder={'Search on Discussions.app'}
                             onKeyDown={this.handleKeySearch}
                         />

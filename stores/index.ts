@@ -8,6 +8,7 @@ import NotificationsStore, { getNotificationsStore } from '@stores/notifications
 import SearchStore, { getSearchStore } from '@stores/searchStore'
 import SignUpStore, { getSignUpStore } from '@stores/signUpStore'
 import SignInStore, { getSignInStore } from '@stores/signInStore'
+import SyncStore, { getSyncStore } from '@stores/syncStore'
 
 export interface IStores {
     userStore: UserStore
@@ -20,6 +21,7 @@ export interface IStores {
     searchStore: SearchStore
     signUpStore: SignUpStore
     signInStore: SignInStore
+    syncStore: SyncStore
 }
 
 export {
@@ -33,4 +35,5 @@ export {
     getSearchStore,
     getSignUpStore,
     getSignInStore,
+    getSyncStore,
 }

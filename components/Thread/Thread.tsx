@@ -69,7 +69,7 @@ class Thread extends React.Component<IThreadOuterProps & IThreadInnerProps, IThr
             uiStore,
             postsStore: { hasReplyContent },
             tagStore: { activeTag },
-            notificationsStore: { isWatchingThread, toggleThreadWatch },
+            userStore: { isWatchingThread, toggleThreadWatch },
         } = this.props
 
         const { threadAsModel } = this
