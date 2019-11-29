@@ -275,6 +275,7 @@ export default class PostsStore extends BaseStore {
                 label: `Title`,
                 placeholder: 'Enter a post title',
                 rules: 'required|string|min:5|max:300',
+                disabled: !this.newPostData.sub,
                 hideLabels: true,
             },
             {
@@ -282,7 +283,7 @@ export default class PostsStore extends BaseStore {
                 label: 'Content',
                 hideLabels: true,
                 placeholder: 'Enter your content',
-                // rules: 'required',
+                disabled: !this.newPostData.sub,
                 type: 'richtext',
             },
             {

@@ -26,8 +26,19 @@ class NewPage extends React.Component<INewPageProps> {
         this.props.postsStore.clearPreview()
     }
 
+    private onChange = option => {
+        const cached = {
+            title: this.props.postsStore.newPostForm.form.$('title').value || '',
+            content: this.props.postsStore.newPostForm.form.$('content').value || '',
+        }
+        
+        this.props.postsStore.newPostData.sub = option
+        this.props.postsStore.newPostForm.form.$('title').value = cached.title
+        this.props.postsStore.newPostForm.form.$('content').value = cached.content
+    }
+
     public render(): React.ReactNode {
-        const { newPostForm, subFields, newPostData } = this.props.postsStore
+        const { subFields, newPostData } = this.props.postsStore
 
         return (
             <>
@@ -35,7 +46,7 @@ class NewPage extends React.Component<INewPageProps> {
                     <span className={'w-20 black f4 b'}>Create a post in</span>
                     <Creatable
                         formatCreateLabel={inputValue => `Make a new post in #${inputValue}`}
-                        onChange={option => (newPostData.sub = option)}
+                        onChange={this.onChange}
                         className={'w-80 db f6 react-select-dropdown'}
                         classNamePrefix={'rs'}
                         value={newPostData.sub}
@@ -43,7 +54,7 @@ class NewPage extends React.Component<INewPageProps> {
                     />
                 </div>
                 <div className={'card pa4'}>
-                    <Form form={newPostForm} hideSubmitButton />
+                    <Form form={this.props.postsStore.newPostForm} hideSubmitButton />
                     <div className={'pv3'}>
                         <NewPostPreview />
                     </div>

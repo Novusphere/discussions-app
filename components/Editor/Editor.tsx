@@ -11,6 +11,7 @@ interface IEditorProps {
     placeholder: string
     className?: string
     value?: any
+    disabled?: boolean
 }
 
 @inject('postsStore')
@@ -113,6 +114,10 @@ class EditorComponent extends React.Component<IEditorProps> {
         if (this.props.value) {
             this.updateContentByRef(this.showdownService.makeHtml(this.props.value))
         }
+
+        if (this.props.disabled) {
+            this.ref.current.getEditor().disable()
+        }
     }
 
     private updateContentByRef = content => {
@@ -126,7 +131,14 @@ class EditorComponent extends React.Component<IEditorProps> {
         if (nextProps.value === '') {
             this.updateContentByRef('')
         }
-    }m
+
+        if (!nextProps.disabled) {
+            if (this.ref.current) {
+                this.ref.current.getEditor().enable()
+            }
+        }
+    }
+    m
 
     public onChange = (text: string) => {
         const clean = sanitizeHTML(text, {
@@ -171,6 +183,10 @@ class EditorComponent extends React.Component<IEditorProps> {
                     'mention',
                     'hashtag',
                 ]}
+                style={{
+                    opacity: this.props.disabled ? 0.5 : 1,
+                    cursor: this.props.disabled ? 'not-allowed' : 'default',
+                }}
                 modules={{
                     autoformat: this.modules.autoformat,
                     mention: this.modules.mention,

@@ -35,8 +35,6 @@ export default class SyncStore extends BaseStore {
                     this.syncWatchingListWithDB(data.watching)
                 }
 
-                console.log('Class: SyncStore, Function: reaction, Line 30 data: ', data)
-
                 disposeSync()
             }
         })

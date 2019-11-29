@@ -217,6 +217,7 @@ class Form extends React.Component<FormProps> {
                                         <Editor
                                             placeholder={field.placeholder}
                                             value={field.value}
+                                            disabled={field.disabled}
                                             className={'db f6'}
                                             {...bind}
                                         />
