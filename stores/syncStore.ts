@@ -17,22 +17,26 @@ export default class SyncStore extends BaseStore {
 
         const disposeSync = autorun(async () => {
             if (this.authStore.hasAccount && this.authStore.activePrivateKey) {
-                const { data } = await this.getAccountWithPrivateKey(
+                const accountData = await this.getAccountWithPrivateKey(
                     this.authStore.activePrivateKey
                 )
 
-                this.syncedData = data
+                if (accountData) {
+                    const data = accountData['data']
 
-                if (data.tags) {
-                    this.syncSubscribedTagsWithDB(data.tags)
-                }
+                    this.syncedData = data
 
-                if (data.following) {
-                    this.syncFollowerListWitHDB(data.following)
-                }
+                    if (data.tags) {
+                        this.syncSubscribedTagsWithDB(data.tags)
+                    }
 
-                if (data.watching) {
-                    this.syncWatchingListWithDB(data.watching)
+                    if (data.following) {
+                        this.syncFollowerListWitHDB(data.following)
+                    }
+
+                    if (data.watching) {
+                        this.syncWatchingListWithDB(data.watching)
+                    }
                 }
 
                 disposeSync()
@@ -107,6 +111,5 @@ export default class SyncStore extends BaseStore {
         }
     }
 }
-
 
 export const getSyncStore = getOrCreateStore('syncStore', SyncStore)

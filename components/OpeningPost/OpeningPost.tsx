@@ -175,7 +175,7 @@ const OpeningPost: React.FC<IOpeningPostProps> = ({
                                             onClick={() => watchPost(id, activeThread.totalReplies)}
                                         >
                                             <FontAwesomeIcon
-                                                icon={!isWatchingPost(id) ? faEye : faEyeSlash}
+                                                icon={!isWatchingPost(id) ? faEyeSlash : faEye}
                                                 color={isWatchingPost(id) ? '#079E99' : '#b0b0b0'}
                                             />
                                         </span>
