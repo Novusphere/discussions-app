@@ -7,6 +7,6 @@ export const SignInOptions = [
     // },
     {
         name: SignInMethods.brainKey,
-        icon: '/static/wallets/scatter_badge_transparent.svg',
+        icon: '/static/wallets/brain-key.jpg',
     }
 ]

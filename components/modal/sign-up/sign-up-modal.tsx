@@ -40,7 +40,7 @@ class SignUpModal extends React.Component<ISignInModalProps, ISignInModalState> 
                                 signUpForm.onSubmit(e)
                                 goNext()
                             },
-                            signUpForm.Form.hasError
+                            signUpForm.Form ? signUpForm.Form.hasError : false,
                         )}
                     </>
                 )
