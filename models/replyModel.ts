@@ -242,42 +242,40 @@ export class ReplyModel {
 
         const reply = this.createPostObject()
 
-        console.log(reply.tags)
+        try {
+            if (activeThread) {
+                const model = new PostModel(reply as any)
+                const signedReply = model.sign(this.authStore.postPriv)
+                const confirmedReply = await discussions.post(signedReply as any)
 
-        // try {
-        //     if (activeThread) {
-        //         const model = new PostModel(reply as any)
-        //         const signedReply = model.sign(this.authStore.postPriv)
-        //         const confirmedReply = await discussions.post(signedReply as any)
-        //
-        //         const confirmedModel = new PostModel({
-        //             ...confirmedReply,
-        //         })
-        //
-        //         set(activeThread, {
-        //             map: {
-        //                 ...activeThread.map,
-        //                 [reply.id]: confirmedModel,
-        //             },
-        //         })
-        //
-        //         if (confirmedReply.parentUuid === this.post.threadUuid) {
-        //             set(activeThread, {
-        //                 openingPostReplies: [...activeThread.openingPostReplies, confirmedModel],
-        //             })
-        //         } else {
-        //             this.toggleOpen()
-        //         }
-        //
-        //         this.clearContent()
-        //         this.uiStore.showToast('Your reply has been submitted!', 'success')
-        //     } else {
-        //         this.uiStore.showToast('Failed to submit your reply', 'error')
-        //     }
-        // } catch (error) {
-        //     this.uiStore.showToast(error.message, 'error')
-        //     throw error
-        // }
+                const confirmedModel = new PostModel({
+                    ...confirmedReply,
+                })
+
+                set(activeThread, {
+                    map: {
+                        ...activeThread.map,
+                        [reply.id]: confirmedModel,
+                    },
+                })
+
+                if (confirmedReply.parentUuid === this.post.threadUuid) {
+                    set(activeThread, {
+                        openingPostReplies: [...activeThread.openingPostReplies, confirmedModel],
+                    })
+                } else {
+                    this.toggleOpen()
+                }
+
+                this.clearContent()
+                this.uiStore.showToast('Your reply has been submitted!', 'success')
+            } else {
+                this.uiStore.showToast('Failed to submit your reply', 'error')
+            }
+        } catch (error) {
+            this.uiStore.showToast(error.message, 'error')
+            throw error
+        }
     }
 
     @action toggleOpen = () => {
