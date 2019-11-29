@@ -11,20 +11,32 @@ interface IVoteProps {
     myVote: number
     className?: string
     handler: (uuid: string, value: number) => void
+    color?: string
+    horizontal?: boolean
 }
 
-const VotingHandles: React.FC<IVoteProps> = ({ uuid, upVotes, downVotes, myVote, handler, ...props }) => (
+const VotingHandles: React.FC<IVoteProps> = ({
+    uuid,
+    upVotes,
+    downVotes,
+    myVote,
+    handler,
+    color,
+    horizontal,
+    ...props
+}) => (
     <span
-        className={classNames([
-            'black f6 vote flex flex-column items-center disable-user-select ph1',
-        ])}
+        className={classNames(['black f6 vote flex items-center disable-user-select ph1'], {
+            'flex-row': horizontal,
+            'flex-column': !horizontal,
+        })}
         {...props}
     >
         <span onClick={async () => await handler(uuid, 1)}>
             <FontAwesomeIcon
                 width={13}
                 icon={faArrowUp}
-                color={'#b9b9b9'}
+                color={color ? color : '#b9b9b9'}
                 className={classNames([
                     'pointer disable-user-select',
                     {
@@ -34,11 +46,16 @@ const VotingHandles: React.FC<IVoteProps> = ({ uuid, upVotes, downVotes, myVote,
                 ])}
             />
         </span>
-        <span className={classNames(['f6 disable-user-select ph1'])} style={{ color: '#b9b9b9', whiteSpace: 'pre' }}>{upVotes + downVotes}</span>
+        <span
+            className={classNames(['f6 disable-user-select ph1'])}
+            style={{ color: color ? color : '#b9b9b9', whiteSpace: 'pre' }}
+        >
+            {upVotes + downVotes}
+        </span>
         <span onClick={async () => await handler(uuid, -1)}>
             <FontAwesomeIcon
                 width={13}
-                color={'#b9b9b9'}
+                color={color ? color : '#b9b9b9'}
                 icon={faArrowDown}
                 className={classNames([
                     'pointer disable-user-select',

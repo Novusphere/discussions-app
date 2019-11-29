@@ -89,7 +89,7 @@
 
     object {
         a {
-            color: #079E99 !important;
+            color: #079E99;
         }
     }
 }
@@ -128,47 +128,6 @@ button.reply {
     > p {
         margin: 0;
         padding: 0;
-    }
-}
-
-.hover-elements {
-    @extend .flex;
-    @extend .flex-row;
-    @extend .justify-center;
-    @extend .items-center;
-
-    z-index: 10;
-    background: #FFFFFF;
-    border: 1px solid #E9EBEE;
-    box-sizing: border-box;
-    border-radius: 4px;
-    position: absolute;
-    right: 0em;
-    top: -5px;
-
-    svg {
-        @extend .pointer;
-        @extend .ph2;
-        @extend .pv1;
-        border-right: 1px solid #E9EBEE;
-
-       path {
-           fill: #5B6780;
-       }
-
-        &:hover {
-            background-color: #E9EBEE;
-        }
-
-        &:last-of-type {
-            border-right: none;
-        }
-    }
-    
-    svg.red {
-        path {
-            fill: red !important;
-        }
     }
 }
 

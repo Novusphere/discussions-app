@@ -1,0 +1,47 @@
+@import '~tachyons';
+
+.hover-elements {
+  @extend .flex;
+  @extend .flex-row;
+  @extend .justify-center;
+  @extend .items-center;
+  @extend .mr1;
+
+  z-index: 10;
+  background: #FFFFFF;
+  border: 1px solid #E9EBEE;
+  box-sizing: border-box;
+  border-radius: 4px;
+  position: absolute;
+  right: 0;
+  top: 3px;
+
+  svg {
+    @extend .pointer;
+    @extend .ph2;
+    @extend .pv1;
+    border-right: 1px solid #E9EBEE;
+
+    path {
+      fill: #5B6780;
+    }
+
+    &:hover {
+      background-color: #E9EBEE;
+    }
+
+    &:last-of-type {
+      border-right: none;
+    }
+  }
+
+  svg.red {
+    path {
+      fill: red !important;
+    }
+  }
+}
+
+.hover-elements-sticky {
+  box-shadow: 0 0 8px #c9cccd;
+}

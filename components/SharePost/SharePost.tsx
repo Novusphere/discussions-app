@@ -42,13 +42,13 @@ const SharePost: React.FC<ISharePostProps> = () => {
                         permalink
                     </span>
 
-                    <span className={'pr3 f6 b0b0b0 dim pointer'} onClick={tweetCurrentPage} title={'Share to Twitter'}>
+                    <span
+                        className={'pr3 f6 b0b0b0 dim pointer'}
+                        onClick={tweetCurrentPage}
+                        title={'Share to Twitter'}
+                    >
                         twitter
                     </span>
-
-                    {/*<span className={'f6 b0b0b0 mr3'}>*/}
-                    {/*    mark as spam*/}
-                    {/*</span>*/}
                 </div>
             </CSSTransition>
             {renderIcon()}

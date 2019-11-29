@@ -13,7 +13,7 @@ import {
 import { openInNewTab } from '@utils'
 import PostModel from '@models/postModel'
 import { ReplyModel } from '@models/replyModel'
-import { observer } from 'mobx-react'
+import classNames from 'classnames'
 
 interface IReplyHoverElementsProps {
     post: PostModel
@@ -23,6 +23,7 @@ interface IReplyHoverElementsProps {
     isFollowing: boolean
     getPermaLinkUrl: () => void
     toggleFollowStatus: () => void
+    isSticky: boolean
 }
 
 const ReplyHoverElements: React.FC<IReplyHoverElementsProps> = ({
@@ -33,9 +34,17 @@ const ReplyHoverElements: React.FC<IReplyHoverElementsProps> = ({
     replyModel,
     getPermaLinkUrl,
     toggleFollowStatus,
+    isSticky,
 }) => {
     return (
-        <div className={'hover-elements disable-user-select'}>
+        <div
+            className={classNames([
+                'hover-elements disable-user-select',
+                {
+                    'hover-elements-sticky': isSticky,
+                },
+            ])}
+        >
             <span onClick={replyModel.toggleOpen} title={'Reply to post'}>
                 <FontAwesomeIcon icon={faReply} />
             </span>
@@ -69,4 +78,4 @@ const ReplyHoverElements: React.FC<IReplyHoverElementsProps> = ({
     )
 }
 
-export default (ReplyHoverElements)
+export default ReplyHoverElements

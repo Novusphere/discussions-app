@@ -12,7 +12,14 @@ import {
     faPen,
     faReply,
 } from '@fortawesome/free-solid-svg-icons'
-import { Attachments, UserNameWithIcon, VotingHandles, Form, SharePost, RichTextPreview } from '@components'
+import {
+    Attachments,
+    UserNameWithIcon,
+    VotingHandles,
+    Form,
+    SharePost,
+    RichTextPreview,
+} from '@components'
 import moment from 'moment'
 import PostModel from '@models/postModel'
 import { ThreadModel } from '@models/threadModel'
@@ -181,21 +188,18 @@ const OpeningPost: React.FC<IOpeningPostProps> = ({
                                         </span>
                                     )}
 
-                                    <span
+                                    <a
+                                        href={`https://eosq.app/tx/${openingPost.transaction}`}
+                                        target={'blank'}
                                         className={'mr4 black f6 pointer dim'}
                                         title={'View block'}
-                                        onClick={() =>
-                                            openInNewTab(
-                                                `https://eosq.app/tx/${openingPost.transaction}`
-                                            )
-                                        }
                                     >
                                         <FontAwesomeIcon
                                             width={13}
                                             color={'#b0b0b0'}
                                             icon={faLink}
                                         />
-                                    </span>
+                                    </a>
                                 </div>
 
                                 <SharePost />

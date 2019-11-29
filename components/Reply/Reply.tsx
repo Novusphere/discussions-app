@@ -1,6 +1,13 @@
 import * as React from 'react'
 import moment from 'moment'
-import { ReplyBox, UserNameWithIcon, VotingHandles, RichTextPreview, ReplyHoverElements, Form } from '@components'
+import {
+    ReplyBox,
+    UserNameWithIcon,
+    VotingHandles,
+    RichTextPreview,
+    ReplyHoverElements,
+    Form,
+} from '@components'
 import { observer, Observer } from 'mobx-react'
 import { ReplyModel } from '@models/replyModel'
 import PostModel from '@models/postModel'
@@ -107,7 +114,7 @@ class Reply extends React.Component<IReplies, IRepliesState> {
         })
     }
 
-    private renderHoverElements = () => {
+    private renderHoverElements = (isSticky = false) => {
         if (!this.state.isHover) {
             return null
         }
@@ -123,6 +130,23 @@ class Reply extends React.Component<IReplies, IRepliesState> {
                 hasAccount={hasAccount}
                 activePublicKey={activePublicKey}
                 isFollowing={following.has(post.pub)}
+                isSticky={isSticky}
+            />
+        )
+    }
+
+    private renderVoteHandlers = (color = undefined, horizontal = false) => {
+        const { post, voteHandler } = this.props
+
+        return (
+            <VotingHandles
+                horizontal={horizontal}
+                upVotes={post.upvotes}
+                downVotes={post.downvotes}
+                myVote={post.myVote}
+                uuid={post.uuid}
+                handler={voteHandler}
+                color={color}
             />
         )
     }
@@ -174,17 +198,21 @@ class Reply extends React.Component<IReplies, IRepliesState> {
             >
                 <StickyContainer>
                     <Sticky>
-                        {({ style }) => (
-                            <div
-                                style={{
-                                    ...style,
-                                    top: 60,
-                                    zIndex: 9999,
-                                }}
-                            >
-                                <Observer>{() => this.renderHoverElements()}</Observer>
-                            </div>
-                        )}
+                        {({ style, isSticky }) => {
+                            return (
+                                <div
+                                    style={{
+                                        ...style,
+                                        top: 55,
+                                        zIndex: 9999,
+                                    }}
+                                >
+                                    <Observer>
+                                        {() => this.renderRenderPostScroll(isSticky)}
+                                    </Observer>
+                                </div>
+                            )
+                        }}
                     </Sticky>
                     <div
                         style={{
@@ -203,31 +231,12 @@ class Reply extends React.Component<IReplies, IRepliesState> {
                             }}
                             className={'flex flex-column justify-start items-center mr2'}
                         >
-                            <VotingHandles
-                                upVotes={post.upvotes}
-                                downVotes={post.downvotes}
-                                myVote={post.myVote}
-                                uuid={post.uuid}
-                                handler={voteHandler}
-                            />
+                            {this.renderVoteHandlers()}
                         </div>
                         <div className={'flex flex-column'}>
                             <div className={'header pb0'}>
                                 <div className={'pr2'}>{this.renderCollapseElements()}</div>
-                                <UserNameWithIcon
-                                    pub={post.pub}
-                                    imageData={post.imageData}
-                                    name={post.posterName}
-                                />
-                                <span
-                                    className={'pl2 o-50 f6'}
-                                    title={moment(
-                                        post.edit ? post.editedAt : post.createdAt
-                                    ).format('YYYY-MM-DD HH:mm:ss')}
-                                >
-                                    {post.edit && 'edited '}{' '}
-                                    {moment(post.edit ? post.editedAt : post.createdAt).fromNow()}
-                                </span>
+                                {this.renderUserElements()}
                                 {isCollapsed && (
                                     <span className={'o-50 i f6 pl2'}>
                                         ({replies.length} children)
@@ -259,7 +268,7 @@ class Reply extends React.Component<IReplies, IRepliesState> {
                         ])}
                         open={this.replyModel.open}
                         uid={post.uuid}
-                        onContentChange={(content) => {
+                        onContentChange={content => {
                             this.replyModel.setContent(content)
                             setCurrentReplyContent(content)
                         }}
@@ -320,6 +329,52 @@ class Reply extends React.Component<IReplies, IRepliesState> {
             >
                 [-]
             </span>
+        )
+    }
+
+    private renderUserElements = () => {
+        const { post } = this.props
+        return (
+            <>
+                <UserNameWithIcon
+                    pub={post.pub}
+                    imageData={post.imageData}
+                    name={post.posterName}
+                />
+                <span
+                    className={'pl2 o-50 f6'}
+                    title={moment(post.edit ? post.editedAt : post.createdAt).format(
+                        'YYYY-MM-DD HH:mm:ss'
+                    )}
+                >
+                    {post.edit && 'edited '}{' '}
+                    {moment(post.edit ? post.editedAt : post.createdAt).fromNow()}
+                </span>
+            </>
+        )
+    }
+
+    private renderRenderPostScroll = (isSticky = false) => {
+        if (!isSticky) return this.renderHoverElements(false)
+        const { isHover } = this.state
+        return (
+            <div
+                className={classNames([
+                    'reply-scroll-container flex flex-row items-center justify-between',
+                    {
+                        'rsc-hover': isHover,
+                    },
+                ])}
+            >
+                <div className={'flex flex-row items-center'}>
+                    {this.renderVoteHandlers('white', true)}
+                    <div className={'flex flex-row items-center'}>
+                        <span className={'f6 b mh2'}>viewing reply by</span>
+                        {this.renderUserElements()}
+                    </div>
+                </div>
+                {this.renderHoverElements(isSticky)}
+            </div>
         )
     }
 }

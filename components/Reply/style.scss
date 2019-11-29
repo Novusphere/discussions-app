@@ -1,3 +1,5 @@
+@import '~tachyons';
+
 .permalink-highlight > div >:nth-child(2),
 .permalink-highlight > div >:nth-child(3) {
 	background-color: #faf7e6;
@@ -5,4 +7,23 @@
 	.post-content-hover {
 		background-color: #faf7e6 !important;
 	}
+}
+
+.reply-scroll-container {
+	@extend .pa3;
+	@extend .white;
+
+	border-radius: 4px;
+	opacity: 0;
+	transition: opacity 0.25s ease-in-out;
+	height: 30px;
+	background: #b2b2b2;
+
+	a {
+		color: white !important;
+	}
+}
+
+.rsc-hover {
+	opacity: 1;
 }
