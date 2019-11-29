@@ -6,6 +6,7 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { faExclamationTriangle, faShare } from '@fortawesome/free-solid-svg-icons'
 import copy from 'clipboard-copy'
 import { CSSTransition } from 'react-transition-group'
+import { tweetCurrentPage } from '@utils'
 
 interface ISharePostProps {}
 
@@ -19,7 +20,12 @@ const SharePost: React.FC<ISharePostProps> = () => {
                     setInProp(!inProp)
                 }}
             >
-                <FontAwesomeIcon width={13} icon={faShare} className={'pr3 black f6 pointer'} />
+                <FontAwesomeIcon
+                    width={13}
+                    icon={faShare}
+                    color={'#b0b0b0'}
+                    className={'pr3 dim f6 pointer'}
+                />
             </span>
         )
     }
@@ -29,16 +35,20 @@ const SharePost: React.FC<ISharePostProps> = () => {
             <CSSTransition unmountOnExit in={inProp} timeout={200} classNames={'slide'}>
                 <div>
                     <span
-                        className={'pr3 black f6 pointer mr1'}
-                        title={'Permalink'}
+                        className={'pr3 f6 b0b0b0 dim pointer'}
+                        title={'Copy URL to clipboard'}
                         onClick={() => copy(window.location.href.split('#')[0])}
                     >
-                        <span className={'f6 black'}>permalink</span>
+                        permalink
                     </span>
 
-                    <span className={'f6 black mr3'}>
-                        mark as spam
+                    <span className={'pr3 f6 b0b0b0 dim pointer'} onClick={tweetCurrentPage} title={'Share to Twitter'}>
+                        twitter
                     </span>
+
+                    {/*<span className={'f6 b0b0b0 mr3'}>*/}
+                    {/*    mark as spam*/}
+                    {/*</span>*/}
                 </div>
             </CSSTransition>
             {renderIcon()}

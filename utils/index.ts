@@ -12,7 +12,6 @@ const BigInt = require('big-integer')
 
 export * from './useScrollPosition'
 
-
 export const INDEXER_NAME = '__LINKINDEXER__'
 export const LINK_LIMIT = 1000
 
@@ -20,6 +19,18 @@ export const isDev = process.env.NODE_ENV === 'development'
 export const isServer = typeof window === 'undefined'
 export const sleep = milliseconds => {
     return new Promise(resolve => setTimeout(resolve, milliseconds))
+}
+
+export const tweetCurrentPage = () => {
+    window.open(
+        'https://twitter.com/share?url=' +
+            encodeURIComponent(window.location.href) +
+            '&text=' +
+            document.title,
+        '',
+        'menubar=no,toolbar=no,resizable=yes,scrollbars=yes,height=300,width=600'
+    )
+    return false
 }
 
 export const removeMD = (md: string) => {
