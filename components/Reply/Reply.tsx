@@ -357,6 +357,9 @@ class Reply extends React.Component<IReplies, IRepliesState> {
     private renderRenderPostScroll = (isSticky = false) => {
         if (!isSticky) return this.renderHoverElements(false)
         const { isHover } = this.state
+
+        return this.renderHoverElements(isSticky)
+
         return (
             <div
                 className={classNames([
