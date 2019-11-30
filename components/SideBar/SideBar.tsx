@@ -19,6 +19,7 @@ interface ITagListInnerProps {
     router: NextRouter
     tagStore: IStores['tagStore']
     postsStore: IStores['postsStore']
+    authStore: IStores['authStore']
 }
 
 interface ITagListState {
@@ -27,7 +28,7 @@ interface ITagListState {
 }
 
 @(withRouter as any)
-@inject('tagStore', 'postsStore')
+@inject('tagStore', 'postsStore', 'authStore')
 @observer
 class SideBar extends React.Component<ITagListOuterProps & ITagListInnerProps, ITagListState> {
     private sidebarContainer = React.createRef<HTMLUListElement>()
@@ -56,6 +57,8 @@ class SideBar extends React.Component<ITagListOuterProps & ITagListInnerProps, I
     private enterKeyEventListener = (e: KeyboardEvent) => {
         const key = e.code
 
+        if (!this.state.tag) return
+
         if (key.match(/NumpadEnter|Enter/)) {
             e.preventDefault()
 
@@ -63,8 +66,15 @@ class SideBar extends React.Component<ITagListOuterProps & ITagListInnerProps, I
         }
     }
 
+    componentDidMount(): void {
+        this.addEnterListener()
+    }
+
+    componentWillUnmount(): void {
+        this.removeEnterListener()
+    }
+
     private addEnterListener = () => {
-        console.log('entered')
         if (this.sidebarContainer) {
             this.sidebarContainer.current.addEventListener('scroll', this.handleScroll, true)
         }
@@ -73,7 +83,6 @@ class SideBar extends React.Component<ITagListOuterProps & ITagListInnerProps, I
     }
 
     private removeEnterListener = () => {
-        console.log('exit')
         if (this.sidebarContainer) {
             this.sidebarContainer.current.removeEventListener('scroll', this.handleScroll, true)
         }
@@ -169,6 +178,14 @@ class SideBar extends React.Component<ITagListOuterProps & ITagListInnerProps, I
         })
     }
 
+    private handleAddTag = () => {
+        this.props.tagStore.addTag(this.state.tag, () => {
+            this.setState({
+                tag: '',
+            })
+        })
+    }
+
     render() {
         const {
             className,
@@ -185,10 +202,7 @@ class SideBar extends React.Component<ITagListOuterProps & ITagListInnerProps, I
         return (
             <div className={className}>
                 {this.renderActiveTag()}
-                <ul
-                    className={'card mt0 pv4 ph2 list'}
-                    ref={this.sidebarContainer}
-                >
+                <ul className={'card mt0 pv4 ph2 list'} ref={this.sidebarContainer}>
                     {Array.from(tags.values())
                         .filter(tag => tag.root)
                         .map(tag => (
@@ -205,21 +219,27 @@ class SideBar extends React.Component<ITagListOuterProps & ITagListInnerProps, I
                                 {this.renderTopLevelTags(tag)}
                             </li>
                         ))}
-                    {/*<div className={'divider-line mb2'} />*/}
-                    <div className={'field-container mb2 relative flex-auto flex items-center'}>
-                        <input
-                            value={this.state.tag}
-                            onChange={this.handleAddTagChange}
-                            className={'w-100 tag-search pl4 f6'}
-                            placeholder={'Add a tag to subscribe'}
-                        />
-                        <span
-                            onClick={() => addTag(this.state.tag)}
-                            className={'absolute plus-icon ml2 pl1 dim pointer'}
-                        >
-                            <FontAwesomeIcon width={13} icon={faPlus} title={'Click to add tag'} />
-                        </span>
-                    </div>
+                    {!this.props.authStore.hasAccount && <div className={'divider-line mb2'} />}
+                    {this.props.authStore.hasAccount && (
+                        <div className={'field-container mb2 relative flex-auto flex items-center'}>
+                            <input
+                                value={this.state.tag}
+                                onChange={this.handleAddTagChange}
+                                className={'w-100 tag-search pl4 f6'}
+                                placeholder={'Add a tag to subscribe'}
+                            />
+                            <span
+                                onClick={this.handleAddTag}
+                                className={'absolute plus-icon ml2 pl1 dim pointer'}
+                            >
+                                <FontAwesomeIcon
+                                    width={13}
+                                    icon={faPlus}
+                                    title={'Click to add tag'}
+                                />
+                            </span>
+                        </div>
+                    )}
                     {subscribedSubsAsModels
                         .filter(tag => !tag.root)
                         .map((tag, index) => (

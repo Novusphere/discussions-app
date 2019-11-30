@@ -63,6 +63,14 @@ class Thread extends React.Component<IThreadOuterProps & IThreadInnerProps, IThr
         }
     }
 
+    private handleWatchPost = (id, replies) => {
+        if (!this.props.authStore.hasAccount) {
+            this.props.uiStore.showToast('You must be logged in to watch posts', 'error')
+            return
+        }
+        this.props.userStore.toggleThreadWatch(id, replies)
+    }
+
     private renderOpeningPost = () => {
         const {
             router,
@@ -85,7 +93,7 @@ class Thread extends React.Component<IThreadOuterProps & IThreadInnerProps, IThr
                 activeTag={activeTag}
                 canEditPost={threadAsModel.canEditPost}
                 isWatchingPost={isWatchingThread}
-                watchPost={toggleThreadWatch}
+                watchPost={this.handleWatchPost}
             />
         )
     }

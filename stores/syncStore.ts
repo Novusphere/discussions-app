@@ -2,13 +2,14 @@ import { BaseStore, getOrCreateStore } from 'next-mobx-wrapper'
 import { task } from 'mobx-task'
 import { action, autorun, observable, observe, reaction } from 'mobx'
 import { nsdb } from '@novuspherejs'
-import { getAuthStore, getTagStore, getUserStore, IStores } from '@stores/index'
+import { getAuthStore, getNotificationsStore, getTagStore, getUserStore, IStores } from '@stores/index'
 import { IAccountSync } from '@d.ts/account-sync'
 
 export default class SyncStore extends BaseStore {
     private readonly authStore: IStores['authStore'] = getAuthStore()
     private readonly tagStore: IStores['tagStore'] = getTagStore()
     private readonly userStore: IStores['userStore'] = getUserStore()
+    private readonly notificationsStore: IStores['notificationsStore'] = getNotificationsStore()
 
     @observable syncedData: any = null
 
@@ -37,6 +38,10 @@ export default class SyncStore extends BaseStore {
                     if (data.watching) {
                         this.syncWatchingListWithDB(data.watching)
                     }
+
+                    if (data.lastCheckedNotifications) {
+                        this.syncNotificationTimeWithDB(data.lastCheckedNotifications)
+                    }
                 }
 
                 disposeSync()
@@ -53,6 +58,15 @@ export default class SyncStore extends BaseStore {
             }
         )
 
+        reaction(
+            () => this.notificationsStore.lastCheckedNotifications,
+            (lastCheckedNotifications) => {
+                this.saveDataWithSyncedData({
+                    lastCheckedNotifications
+                })
+            }
+        )
+
         observe(this.userStore.following, change => {
             this.saveDataWithSyncedData({
                 following: change.object.toJSON(),
@@ -64,6 +78,11 @@ export default class SyncStore extends BaseStore {
                 watching: change.object.toJSON(),
             })
         })
+    }
+
+    @action.bound
+    syncNotificationTimeWithDB(time: number) {
+        this.notificationsStore.lastCheckedNotifications = time
     }
 
     @action.bound

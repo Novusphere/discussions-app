@@ -1,8 +1,9 @@
 import * as React from 'react'
 import { inject, observer } from 'mobx-react'
-import { Tab, Tabs, TabList, TabPanel } from 'react-tabs'
 import { Form } from '@components'
 import { IStores } from '@stores'
+import { ComingSoon } from '@components'
+import Router from 'next/router'
 
 interface ISettings {
     settingsStore: IStores['settingsStore']
@@ -11,18 +12,31 @@ interface ISettings {
 }
 
 import './style.scss'
-import { ComingSoon } from '@components'
 
 // TODO: Real Data
 
 @inject('settingsStore', 'postsStore', 'uiStore')
 @observer
 class Settings extends React.Component<ISettings> {
-    static async getInitialProps({ store }) {
+    static async getInitialProps({ store, res }) {
         const uiStore: IStores['uiStore'] = store.uiStore
         const tagStore: IStores['tagStore'] = store.tagStore
+        const authStore: IStores['authStore'] = store.authStore
+
         uiStore.toggleSidebarStatus(false)
         tagStore.destroyActiveTag()
+
+        // if (!authStore.hasAccount) {
+        //     if (res) {
+        //         res.writeHead(302, {
+        //             Location: '/',
+        //         })
+        //         res.end()
+        //     } else {
+        //         Router.push('/')
+        //     }
+        // }
+
         return {}
     }
 

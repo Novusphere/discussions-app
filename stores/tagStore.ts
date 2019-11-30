@@ -77,10 +77,12 @@ export default class TagStore extends BaseStore {
     }
 
     @action.bound
-    addTag(tagName: string) {
+    addTag(tagName: string, cb?: any) {
         if (this.subSubscriptionStatus.indexOf(tagName) === -1) {
             this.subSubscriptionStatus.unshift(tagName)
             this.uiStore.showToast(`You have subbed to ${tagName}`, 'success')
+            if (cb) cb()
+
         }
     }
 

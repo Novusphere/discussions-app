@@ -11,6 +11,7 @@ import { DefaultSeo } from 'next-seo'
 import Router from 'next/router'
 
 import '../styles/style.scss'
+import { reaction } from 'mobx'
 
 // configure({ enforceActions: 'observed' })
 useStaticRendering(isServer) // NOT `true` value
@@ -50,7 +51,9 @@ class DiscussionApp extends App {
             })
 
             Object.keys(stores).forEach(store => {
-                hydrate(store, stores[store])
+                hydrate(store, stores[store], {
+                    hasAccount: true,
+                })
             })
         }
     }

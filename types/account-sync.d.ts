@@ -1,5 +1,6 @@
 export interface IAccountSync {
     data: {
+        lastCheckedNotifications: number
         tags: string[]
         following: {
             [publicKey: string]: string

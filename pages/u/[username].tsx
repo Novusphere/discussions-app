@@ -62,6 +62,15 @@ class U extends React.Component<IUPageProps> {
         return this.props.username === this.props.authStore.getActiveDisplayName
     }
 
+    private handleUserFollowing = (user, pub) => {
+        if (!this.props.authStore.hasAccount) {
+            this.props.uiStore.showToast('You must be logged in follow users', 'error')
+            return
+        }
+
+        this.props.userStore.toggleUserFollowing(user, pub)
+    }
+
     private renderFollowingList = () => {
         if (!this.props.userStore.following.size) {
             return (
@@ -80,7 +89,7 @@ class U extends React.Component<IUPageProps> {
                     {follow}
                 </span>
                 <span
-                    onClick={() => this.props.userStore.toggleUserFollowing(follow, pubs[index])}
+                    onClick={() => this.handleUserFollowing(follow, pubs[index])}
                     title={'Click to unfollow'}
                 >
                     <FontAwesomeIcon
@@ -119,7 +128,7 @@ class U extends React.Component<IUPageProps> {
                             <button
                                 title={isFollowingUser(pub) ? 'Unfollow user' : 'Follow user'}
                                 className={'button-outline'}
-                                onClick={() => toggleUserFollowing(username, pub)}
+                                onClick={() => this.handleUserFollowing(username, pub)}
                             >
                                 {isFollowingUser(pub) ? 'Unfollow' : 'Follow'}
                             </button>
