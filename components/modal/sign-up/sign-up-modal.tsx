@@ -68,7 +68,7 @@ class SignUpModal extends React.Component<ISignInModalProps, ISignInModalState> 
                             e => {
                                 verifyBKForm.onSubmit(e)
                             },
-                            verifyBKForm.Form.hasError
+                            verifyBKForm.Form && verifyBKForm.Form.hasError
                         )}
                     </>
                 )

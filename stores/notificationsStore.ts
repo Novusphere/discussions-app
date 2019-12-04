@@ -49,6 +49,8 @@ export default class NotificationsStore extends BaseStore {
                 } else {
                     this.destroyNotificationInterval()
                 }
+            }, {
+                delay: 500,
             }
         )
 
