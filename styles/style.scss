@@ -4,7 +4,7 @@
 @import '~react-tabs/style/react-tabs.css';
 @import '~react-tippy/dist/tippy.css';
 @import 'components/all';
-@import "pages/all";
+@import 'pages/all';
 
 @import '~react-toastify/dist/ReactToastify.css';
 @import '~react-quill/dist/quill.snow.css';
@@ -59,15 +59,15 @@ a {
 }
 
 .bg-green {
-    background: #079E99 !important;
+    background: #079e99 !important;
 }
 
 .green {
-    color: #079E99 !important;
+    color: #079e99 !important;
 }
 
 .gray {
-    color: #7D8894 !important;
+    color: #7d8894 !important;
 }
 
 .sidebar {
@@ -147,7 +147,7 @@ a {
 }
 
 .small-title {
-    color: #7D8894;
+    color: #7d8894;
     font-family: IBM Plex Sans;
     font-style: normal;
     font-weight: 500;
@@ -169,4 +169,12 @@ a {
 
 .overflow-break-word {
     overflow-wrap: break-word;
+}
+
+.outline-container {
+    @extend .pa2;
+    border-color: hsl(0, 0%, 80%);
+    border-radius: 4px;
+    border-style: solid;
+    border-width: 1px;
 }

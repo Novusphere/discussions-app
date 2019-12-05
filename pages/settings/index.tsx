@@ -33,7 +33,7 @@ class Settings extends React.Component<ISettings, ISettingsState> {
     }
 
     state = {
-        activeSidebar: 'Connections',
+        activeSidebar: 'Moderation',
     }
 
     setLinkAsActive = link => {
@@ -127,6 +127,20 @@ class Settings extends React.Component<ISettings, ISettingsState> {
                     value={this.props.settingsStore.moderationSubValue}
                     options={this.props.postsStore.getPlausibleTagOptions}
                 />
+                <div className={'outline-container mt3'}>
+                    <div className={'flex flex-column space-between'}>
+                        <div className={'mb3'}>
+                            {this.props.settingsStore.moderationMembers.toJSON().map(item => (
+                                <span className={'db dim pointer'} key={item}>
+                                    {item}
+                                </span>
+                            ))}
+                        </div>
+                        <div className={'field-container'}>
+                            <input className={'w-100'} placeholder={'Enter a user'} />
+                        </div>
+                    </div>
+                </div>
             </div>
         </>
     )
