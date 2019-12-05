@@ -1,9 +1,8 @@
 import * as React from 'react'
 import { inject, observer } from 'mobx-react'
-import { Form } from '@components'
+import { Form, TagDropdown } from '@components'
 import { IStores } from '@stores'
-import { ComingSoon } from '@components'
-import Router from 'next/router'
+import classNames from 'classnames'
 
 interface ISettings {
     settingsStore: IStores['settingsStore']
@@ -15,9 +14,13 @@ import './style.scss'
 
 // TODO: Real Data
 
+interface ISettingsState {
+    activeSidebar: string
+}
+
 @inject('settingsStore', 'postsStore', 'uiStore')
 @observer
-class Settings extends React.Component<ISettings> {
+class Settings extends React.Component<ISettings, ISettingsState> {
     static async getInitialProps({ store, res }) {
         const uiStore: IStores['uiStore'] = store.uiStore
         const tagStore: IStores['tagStore'] = store.tagStore
@@ -26,155 +29,127 @@ class Settings extends React.Component<ISettings> {
         uiStore.toggleSidebarStatus(false)
         tagStore.destroyActiveTag()
 
-        // if (!authStore.hasAccount) {
-        //     if (res) {
-        //         res.writeHead(302, {
-        //             Location: '/',
-        //         })
-        //         res.end()
-        //     } else {
-        //         Router.push('/')
-        //     }
-        // }
-
         return {}
     }
 
-    private renderSetIdComponent = () => {
-        const { setIdForm } = this.props.settingsStore
-        return (
-            <>
-                <span className={'lh-copy'}>
-                    Use this panel to set your ID. This is used when posting anonymously to identify
-                    your posts. You can regenerate a new ID / Key at any time.
-                </span>
-                <Form form={setIdForm} hideSubmitButton className={'mv3'} />
-            </>
-        )
+    state = {
+        activeSidebar: 'Connections',
     }
 
-    private renderModerationComponent = () => {
-        const { moderationForm } = this.props.settingsStore
-        return (
-            <>
-                <span className={'lh-copy'}>
-                    Use this panel to control your delegated moderation settings.
-                    <a
-                        href={'https://github.com/Novusphere/eos-forum-mod-list'}
-                        title={'Click to learn more'}
-                    >
-                        Click here to learn more
-                    </a>
-                    .
-                </span>
-                <Form form={moderationForm} hideSubmitButton className={'mv3'} />
-            </>
-        )
-    }
-
-    private renderRawComponent = () => {
-        const { rawForm } = this.props.settingsStore
-        return (
-            <>
-                <span className={'lh-copy'}>
-                    <span className={'b'}>Warning:</span> You should not modify these settings
-                    unless you know what you're doing! If you incorrectly change something, click
-                    "reset" then "save" to restore the default settings.
-                </span>
-                <Form form={rawForm} hideSubmitButton />
-            </>
-        )
-    }
-
-    private renderAccountComponent = () => {
-        return <span>Test</span>
-    }
-
-    componentWillUnmount(): void {
-        this.props.postsStore.clearPreview()
+    setLinkAsActive = link => {
+        this.setState({
+            activeSidebar: link,
+        })
     }
 
     private renderSidebarContent = () => {
         return (
             <>
-                <span className={'b black f5'}>Settings</span>
-                <ul className={'list mt3'}>
-                    <li className={'mb2'}>Connections</li>
-                    <li className={'mb2'}>Trade</li>
+                <span className={'b black f5 sidebar'}>Settings</span>
+                <ul className={'list ph2 mt3'}>
+                    {[
+                        {
+                            name: 'Connections',
+                        },
+                        {
+                            name: 'Tokens',
+                        },
+                        {
+                            name: 'Moderation',
+                        },
+                    ].map(link => (
+                        <li
+                            onClick={() => this.setLinkAsActive(link.name)}
+                            className={classNames([
+                                'ph3 dim pv2 pointer',
+                                {
+                                    'sidebar-link-active': this.state.activeSidebar === link.name,
+                                },
+                            ])}
+                            key={link.name}
+                        >
+                            <span>{link.name}</span>
+                        </li>
+                    ))}
                 </ul>
             </>
         )
     }
 
+    private renderConnections = () => (
+        <>
+            <div className={'mt3'}>
+                <div className={'flex flex-row justify-between items-center bb b--light-gray pv3'}>
+                    <span className={'flex flex-column tl mr4'}>
+                        <span className={'b black f5 pb2'}>You are connected to Facebook</span>
+                        <span className={'f6 lh-copy'}>
+                            You can now post to your Facebook account whenever you post or comment
+                            on EOS. We will never post to Facebook or message your friends without
+                            your permission.
+                        </span>
+                    </span>
+
+                    <span className={'flex flex-column tr'}>
+                        <span className={'black b f6'}>Sahil Kohja</span>
+                        <span className={'red f6'}>(disconnect)</span>
+                    </span>
+                </div>
+
+                <div className={'flex flex-row justify-between items-center pv3'}>
+                    <span className={'flex flex-column tl mr4'}>
+                        <span className={'b black f5 pb2'}>You are connected to Twitter</span>
+                        <span className={'f6 lh-copy'}>
+                            You can now post to your Twitter account whenever you post or comment on
+                            EOS. We will never post to Twitter or message your friends without your
+                            permission.
+                        </span>
+                    </span>
+
+                    <span className={'flex flex-column tr'}>
+                        <span className={'black b f6'}>--</span>
+                        <span className={'green f6'}>(connect)</span>
+                    </span>
+                </div>
+            </div>
+        </>
+    )
+
+    private handleModerationTagOnChange = option => {
+        this.props.settingsStore.moderationSubValue = option
+    }
+
+    private renderModeration = () => (
+        <>
+            <div className={'mt3'}>
+                <TagDropdown
+                    formatCreateLabel={inputValue => `Choose a tag`}
+                    onChange={this.handleModerationTagOnChange}
+                    value={this.props.settingsStore.moderationSubValue}
+                    options={this.props.postsStore.getPlausibleTagOptions}
+                />
+            </div>
+        </>
+    )
+
+    private renderContent = () => {
+        switch (this.state.activeSidebar) {
+            case 'Connections':
+                return this.renderConnections()
+            case 'Moderation':
+                return this.renderModeration()
+        }
+    }
+
     public render() {
         return (
             <div className={'flex flex-row relative'}>
-                <ComingSoon />
-                <div className={'card w-30 mr5 pa3'}>{this.renderSidebarContent()}</div>
+                <div className={'card w-30 mr3 pa3'}>{this.renderSidebarContent()}</div>
                 <div className={'card w-70 pa4'}>
-                    <span className={'b black f4'}>Connections</span>
-
-                    <div className={'mt3'}>
-                        <div
-                            className={
-                                'flex flex-row justify-between items-center bb b--light-gray pv3'
-                            }
-                        >
-                            <span className={'flex flex-column tl mr4'}>
-                                <span className={'b black f5 pb2'}>
-                                    You are connected to Facebook
-                                </span>
-                                <span className={'f6 lh-copy'}>
-                                    You can now post to your Facebook account whenever you post or
-                                    comment on EOS. We will never post to Facebook or message your
-                                    friends without your permission.
-                                </span>
-                            </span>
-
-                            <span className={'flex flex-column tr'}>
-                                <span className={'black b f6'}>Sahil Kohja</span>
-                                <span className={'red f6'}>(disconnect)</span>
-                            </span>
-                        </div>
-
-                        <div className={'flex flex-row justify-between items-center pv3'}>
-                            <span className={'flex flex-column tl mr4'}>
-                                <span className={'b black f5 pb2'}>
-                                    You are connected to Twitter
-                                </span>
-                                <span className={'f6 lh-copy'}>
-                                    You can now post to your Twitter account whenever you post or
-                                    comment on EOS. We will never post to Twitter or message your
-                                    friends without your permission.
-                                </span>
-                            </span>
-
-                            <span className={'flex flex-column tr'}>
-                                <span className={'black b f6'}>--</span>
-                                <span className={'green f6'}>(connect)</span>
-                            </span>
-                        </div>
-                    </div>
+                    <span className={'b black f4'}>{this.state.activeSidebar}</span>
+                    {this.renderContent()}
                 </div>
             </div>
         )
-        // return (
-        //     <div className={'card pa4'}>
-        //         <Tabs>
-        //             <TabList>
-        //                 <Tab>Set ID</Tab>
-        //                 <Tab>Moderation</Tab>
-        //                 <Tab>Raw</Tab>
-        //                 <Tab>Account</Tab>
-        //             </TabList>
-        //
-        //             <TabPanel>{this.renderSetIdComponent()}</TabPanel>
-        //             <TabPanel>{this.renderModerationComponent()}</TabPanel>
-        //             <TabPanel>{this.renderRawComponent()}</TabPanel>
-        //             <TabPanel>{this.renderAccountComponent()}</TabPanel>
-        //         </Tabs>
-        //     </div>
-        // )
     }
 }
 

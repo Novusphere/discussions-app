@@ -3,10 +3,11 @@
   <component name="ChangeListManager">
     <list default="true" id="2d14133e-344f-4fbf-9bb7-c9e5e96ae697" name="Default Changelist" comment="">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/components/modal/sign-up/sign-up-modal.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/components/modal/sign-up/sign-up-modal.tsx" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/package-lock.json" beforeDir="false" afterPath="$PROJECT_DIR$/package-lock.json" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/package.json" beforeDir="false" afterPath="$PROJECT_DIR$/package.json" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/stores/notificationsStore.ts" beforeDir="false" afterPath="$PROJECT_DIR$/stores/notificationsStore.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/components/index.ts" beforeDir="false" afterPath="$PROJECT_DIR$/components/index.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/pages/new/index.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/pages/new/index.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/pages/settings/index.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/pages/settings/index.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/stores/postsStore.ts" beforeDir="false" afterPath="$PROJECT_DIR$/stores/postsStore.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/stores/settingsStore.ts" beforeDir="false" afterPath="$PROJECT_DIR$/stores/settingsStore.ts" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -42,7 +43,7 @@
     <property name="prettierjs.PrettierConfiguration.NodeInterpreter" value="project" />
     <property name="prettierjs.PrettierConfiguration.Package" value="$PROJECT_DIR$/node_modules/prettier" />
     <property name="settings.editor.selected.configurable" value="preferences.lookFeel" />
-    <property name="ts.external.directory.path" value="$APPLICATION_HOME_DIR$/plugins/JavaScriptLanguage/jsLanguageServicesImpl/external" />
+    <property name="ts.external.directory.path" value="$PROJECT_DIR$/node_modules/typescript/lib" />
   </component>
   <component name="RecentsManager">
     <key name="MoveFile.RECENT_KEYS">
@@ -229,7 +230,13 @@
       <workItem from="1574957510079" duration="5000" />
       <workItem from="1574975142441" duration="7198000" />
       <workItem from="1574988719019" duration="5061000" />
-      <workItem from="1575498565704" duration="753000" />
+      <workItem from="1575498565704" duration="1705000" />
+      <workItem from="1575503301895" duration="281000" />
+      <workItem from="1575503887492" duration="1088000" />
+      <workItem from="1575506132800" duration="115000" />
+      <workItem from="1575506717207" duration="274000" />
+      <workItem from="1575507566727" duration="274000" />
+      <workItem from="1575508063367" duration="280000" />
     </task>
     <servers />
   </component>
@@ -243,13 +250,17 @@
     </option>
   </component>
   <component name="WindowStateProjectService">
-    <state width="600" height="424" key="javadoc.popup" timestamp="1575499363062">
+    <state x="946" y="349" width="667" height="714" key="find.popup" timestamp="1575503963846">
       <screen x="0" y="23" width="2560" height="1366" />
     </state>
-    <state width="600" height="424" key="javadoc.popup/0.23.2560.1366/2560.23.1920.1057@0.23.2560.1366" timestamp="1575499363062" />
-    <state x="945" y="335" width="670" height="676" key="search.everywhere.popup" timestamp="1575498900864">
+    <state x="946" y="349" width="667" height="714" key="find.popup/0.23.2560.1366/2560.23.1920.1057@0.23.2560.1366" timestamp="1575503963846" />
+    <state width="600" height="424" key="javadoc.popup" timestamp="1575502768923">
       <screen x="0" y="23" width="2560" height="1366" />
     </state>
-    <state x="945" y="335" width="670" height="676" key="search.everywhere.popup/0.23.2560.1366/2560.23.1920.1057@0.23.2560.1366" timestamp="1575498900864" />
+    <state width="600" height="424" key="javadoc.popup/0.23.2560.1366/2560.23.1920.1057@0.23.2560.1366" timestamp="1575502768923" />
+    <state x="945" y="335" width="670" height="676" key="search.everywhere.popup" timestamp="1575506966682">
+      <screen x="0" y="23" width="2560" height="1366" />
+    </state>
+    <state x="945" y="335" width="670" height="676" key="search.everywhere.popup/0.23.2560.1366/2560.23.1920.1057@0.23.2560.1366" timestamp="1575506966682" />
   </component>
 </project>

@@ -1,7 +1,7 @@
 import * as React from 'react'
 import { inject, observer } from 'mobx-react'
 import { IStores } from '@stores'
-import { Form } from '@components'
+import { Form, TagDropdown } from '@components'
 import NewPostPreview from './new-post-preview/new-post-preview'
 import Creatable from 'react-select/creatable'
 
@@ -31,7 +31,7 @@ class NewPage extends React.Component<INewPageProps> {
             title: this.props.postsStore.newPostForm.form.$('title').value || '',
             content: this.props.postsStore.newPostForm.form.$('content').value || '',
         }
-        
+
         this.props.postsStore.newPostData.sub = option
         this.props.postsStore.newPostForm.form.$('title').value = cached.title
         this.props.postsStore.newPostForm.form.$('content').value = cached.content
@@ -44,11 +44,10 @@ class NewPage extends React.Component<INewPageProps> {
             <>
                 <div className={'flex flex-row items-center mb3'}>
                     <span className={'w-20 black f4 b'}>Create a post in</span>
-                    <Creatable
+                    <TagDropdown
                         formatCreateLabel={inputValue => `Make a new post in #${inputValue}`}
                         onChange={this.onChange}
-                        className={'w-80 db f6 react-select-dropdown'}
-                        classNamePrefix={'rs'}
+                        className={'w-80'}
                         value={newPostData.sub}
                         options={subFields.extra.options}
                     />

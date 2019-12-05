@@ -249,6 +249,15 @@ export default class PostsStore extends BaseStore {
         this.preview = null
     }
 
+    @computed get getPlausibleTagOptions() {
+        return this.tagsStore.subSubscriptionStatus
+            .filter(tag => ['home', 'all', 'feed'].indexOf(tag) === -1)
+            .map(tag => ({
+                value: tag,
+                label: `#${tag}`,
+            }))
+    }
+
     get subFields() {
         return {
             name: 'sub',
@@ -258,12 +267,7 @@ export default class PostsStore extends BaseStore {
             type: 'dropdown',
             hideLabels: true,
             extra: {
-                options: this.tagsStore.subSubscriptionStatus
-                    .filter(tag => ['home', 'all', 'feed'].indexOf(tag) === -1)
-                    .map(tag => ({
-                        value: tag,
-                        label: `#${tag}`,
-                    })),
+                options: this.getPlausibleTagOptions,
             },
         }
     }
