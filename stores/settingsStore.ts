@@ -70,7 +70,7 @@ export default class SettingsStore extends BaseStore {
         )
     }
 
-    get depositForm() {
+    get withdrawalForm() {
         return new CreateForm(
             {
                 onSubmit: form => {
@@ -101,6 +101,38 @@ export default class SettingsStore extends BaseStore {
                 {
                     name: 'to',
                     label: 'To',
+                    rules: 'required',
+                },
+            ]
+        )
+    }
+
+    get depositForm() {
+        return new CreateForm(
+            {
+                onSubmit: form => {
+                    console.log(form.values())
+                },
+            },
+            [
+                {
+                    name: 'amount',
+                    label: 'Amount',
+                    rules: 'required',
+                    hide: true,
+                },
+                {
+                    name: 'token',
+                    label: 'Token',
+                    type: 'dropdown',
+                    extra: {
+                        options: [
+                            {
+                                label: 'ATMOS',
+                                value: 'ATMOS',
+                            },
+                        ],
+                    },
                     rules: 'required',
                 },
             ]

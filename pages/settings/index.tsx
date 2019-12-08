@@ -237,11 +237,7 @@ class Settings extends React.Component<ISettings, ISettingsState> {
 
     private renderTokens = () => {
         const { activeIndex } = this.state.tokens
-        const { depositForm } = this.props.settingsStore
-
-        // @ts-ignore
-        // console.log(depositForm.form.select('amount'))
-        // console.log(depositForm.form.$('amount').value);
+        const { depositForm, withdrawalForm } = this.props.settingsStore
 
         return (
             <Tabs
@@ -259,8 +255,34 @@ class Settings extends React.Component<ISettings, ISettingsState> {
                         <input
                             placeholder={'0'}
                             className={'token-amount-box mt3 f1 gray b--transparent tc'}
-                            // value={depositForm.form.select('amount').value}
-                            onChange={(event => depositForm.form.$('amount').set('value', event.target.value))}
+                            onChange={event =>
+                                withdrawalForm.form.$('amount').set('value', event.target.value)
+                            }
+                        />
+                        <div
+                            className={
+                                'w-100 flex flex-column items-center outline-container pa4 mt3'
+                            }
+                        >
+                            <Form className={'db w-100'} form={withdrawalForm} hideSubmitButton />
+                            <button
+                                title={'Submit withdrawal'}
+                                className={'flex'}
+                                onClick={withdrawalForm.onSubmit}
+                            >
+                                <span className={'f6 white'}>Withdraw</span>
+                            </button>
+                        </div>
+                    </div>
+                </TabPanel>
+                <TabPanel>
+                    <div className={'flex flex-column items-center'}>
+                        <input
+                            placeholder={'0'}
+                            className={'token-amount-box mt3 f1 gray b--transparent tc'}
+                            onChange={event =>
+                                depositForm.form.$('amount').set('value', event.target.value)
+                            }
                         />
                         <div
                             className={
@@ -269,16 +291,15 @@ class Settings extends React.Component<ISettings, ISettingsState> {
                         >
                             <Form className={'db w-100'} form={depositForm} hideSubmitButton />
                             <button
-                                title={'Submit withdrawal'}
+                                title={'Submit deposit'}
                                 className={'flex'}
                                 onClick={depositForm.onSubmit}
                             >
-                                <span className={'f6 white'}>Withdraw</span>
+                                <span className={'f6 white'}>Deposit</span>
                             </button>
                         </div>
                     </div>
                 </TabPanel>
-                <TabPanel>You</TabPanel>
             </Tabs>
         )
     }
