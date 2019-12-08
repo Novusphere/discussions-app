@@ -1,6 +1,6 @@
 import * as React from 'react'
 import { inject, observer } from 'mobx-react'
-import { TagDropdown, UserNameWithIcon } from '@components'
+import { Form, TagDropdown, UserNameWithIcon } from '@components'
 import { IStores } from '@stores'
 import classNames from 'classnames'
 import './style.scss'
@@ -64,6 +64,9 @@ class Settings extends React.Component<ISettings, ISettingsState> {
                         },
                         {
                             name: 'Moderation',
+                        },
+                        {
+                            name: 'Airdrop',
                         },
                     ].map(link => (
                         <li
@@ -218,12 +221,20 @@ class Settings extends React.Component<ISettings, ISettingsState> {
         )
     }
 
+    private renderAirdrop = () => {
+        const { airdropForm } = this.props.settingsStore
+
+        return <Form form={airdropForm} />
+    }
+
     private renderContent = () => {
         switch (this.state.activeSidebar) {
             case 'Connections':
                 return this.renderConnections()
             case 'Moderation':
                 return this.renderModeration()
+            case 'Airdrop':
+                return this.renderAirdrop()
         }
     }
 

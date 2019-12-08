@@ -1,16 +1,14 @@
 import { BaseStore, getOrCreateStore } from 'next-mobx-wrapper'
 import { action, observable, reaction } from 'mobx'
 import { persist } from 'mobx-persist'
+import CreateForm from '../components/CreateForm/CreateForm'
 
 export default class SettingsStore extends BaseStore {
     @persist @observable localStorageVersion = '2.0.0'
 
     @observable moderationSubValue = null
 
-    @observable moderationMembers = observable.array<string>([
-        'gux',
-        'someuser'
-    ])
+    @observable moderationMembers = observable.array<string>(['gux', 'someuser'])
 
     constructor() {
         super()
@@ -27,6 +25,49 @@ export default class SettingsStore extends BaseStore {
     @action.bound
     setModerationMembers(members: string[]) {
         this.moderationMembers.replace(members)
+    }
+
+    get airdropForm() {
+        return new CreateForm(
+            {
+                onSubmit: form => {
+                    console.log(form.values())
+                },
+            },
+            [
+                {
+                    name: 'accountNames',
+                    label: 'Account Names',
+                    type: 'textarea',
+                    placeholder: 'Enter an account name followed by a line break',
+                    rules: 'required|string',
+                },
+                {
+                    name: 'token',
+                    label: 'Token',
+                    type: 'dropdown',
+                    extra: {
+                        options: [
+                            {
+                                label: 'ATMOS',
+                                value: 'ATMOS',
+                            },
+                        ],
+                    },
+                    rules: 'required',
+                },
+                {
+                    name: 'amount',
+                    label: 'Amount',
+                    rules: 'required|number',
+                },
+                {
+                    name: 'memoId',
+                    label: 'Memo ID',
+                    rules: 'required',
+                },
+            ]
+        )
     }
 }
 
