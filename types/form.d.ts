@@ -49,11 +49,13 @@ declare interface FormField {
     name: string
     label?: string
     placeholder?: string
+    description?: string
     rules?: string
     readonly?: boolean
     disabled?: boolean
     accessor?: Form$
     hideLabels?: boolean
+    containerClassName?: string
     hide?: boolean
 
     input?: (value) => any

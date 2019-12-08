@@ -43,7 +43,7 @@ class Settings extends React.Component<ISettings, ISettingsState> {
     }
 
     state = {
-        activeSidebar: 'Tokens',
+        activeSidebar: 'Airdrop',
         tokens: {
             activeIndex: 0,
         },
@@ -232,7 +232,7 @@ class Settings extends React.Component<ISettings, ISettingsState> {
     private renderAirdrop = () => {
         const { airdropForm } = this.props.settingsStore
 
-        return <Form form={airdropForm} />
+        return <Form form={airdropForm} hideSubmitButton />
     }
 
     private renderTokens = () => {

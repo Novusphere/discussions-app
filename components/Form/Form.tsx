@@ -7,8 +7,8 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 
 import dynamic from 'next/dynamic'
 
-const Editor  = dynamic(() => import('../Editor/Editor'), {
-    ssr: false
+const Editor = dynamic(() => import('../Editor/Editor'), {
+    ssr: false,
 })
 
 interface FormProps extends React.HTMLAttributes<HTMLFormElement> {
@@ -154,6 +154,12 @@ class Form extends React.Component<FormProps> {
                                     {!field.hideLabels && (
                                         <label htmlFor={field.accessor.id} className={'w-40'}>
                                             {field.accessor.label}
+
+                                            {field.description && (
+                                                <span className={'mt2 db f6 moon-gray'}>
+                                                    {field.description}
+                                                </span>
+                                            )}
                                         </label>
                                     )}
                                     <div
@@ -238,7 +244,7 @@ class Form extends React.Component<FormProps> {
                                 key={field.name}
                             >
                                 <div
-                                    className={classNames([
+                                    className={classNames(field.containerClassName, [
                                         {
                                             'w-80': !field.hideLabels,
                                             'w-100': field.hideLabels,
@@ -285,6 +291,12 @@ class Form extends React.Component<FormProps> {
                                     {!field.hideLabels && (
                                         <label htmlFor={field.accessor.id} className={'w-40'}>
                                             {field.accessor.label}
+
+                                            {field.description && (
+                                                <span className={'f6 gray'}>
+                                                    {field.description}
+                                                </span>
+                                            )}
                                         </label>
                                     )}
                                     <div
