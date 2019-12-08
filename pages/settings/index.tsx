@@ -1,8 +1,12 @@
 import * as React from 'react'
 import { inject, observer } from 'mobx-react'
-import { Form, TagDropdown } from '@components'
+import { TagDropdown, UserNameWithIcon } from '@components'
 import { IStores } from '@stores'
 import classNames from 'classnames'
+import './style.scss'
+import { getIdenticon } from '@utils'
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
+import { faMinusCircle, faPlus } from '@fortawesome/free-solid-svg-icons'
 
 interface ISettings {
     settingsStore: IStores['settingsStore']
@@ -10,12 +14,13 @@ interface ISettings {
     uiStore: IStores['uiStore']
 }
 
-import './style.scss'
-
 // TODO: Real Data
 
 interface ISettingsState {
     activeSidebar: string
+    moderation: {
+        user: string
+    }
 }
 
 @inject('settingsStore', 'postsStore', 'uiStore')
@@ -34,6 +39,9 @@ class Settings extends React.Component<ISettings, ISettingsState> {
 
     state = {
         activeSidebar: 'Moderation',
+        moderation: {
+            user: '',
+        },
     }
 
     setLinkAsActive = link => {
@@ -118,32 +126,97 @@ class Settings extends React.Component<ISettings, ISettingsState> {
         this.props.settingsStore.moderationSubValue = option
     }
 
-    private renderModeration = () => (
-        <>
-            <div className={'mt3'}>
-                <TagDropdown
-                    formatCreateLabel={inputValue => `Choose a tag`}
-                    onChange={this.handleModerationTagOnChange}
-                    value={this.props.settingsStore.moderationSubValue}
-                    options={this.props.postsStore.getPlausibleTagOptions}
-                />
-                <div className={'outline-container mt3'}>
-                    <div className={'flex flex-column space-between'}>
-                        <div className={'mb3'}>
-                            {this.props.settingsStore.moderationMembers.toJSON().map(item => (
-                                <span className={'db dim pointer'} key={item}>
-                                    {item}
+    private handleUserOnChange = e => {
+        this.setState({
+            moderation: {
+                user: e.target.value,
+            },
+        })
+    }
+
+    private handleAddUserToModeration = () => {
+        this.props.settingsStore.moderationMembers.push(this.state.moderation.user)
+        this.setState({
+            moderation: {
+                user: '',
+            },
+        })
+    }
+
+    private handleDeleteUserToModeration = user => {
+        this.props.settingsStore.moderationMembers.remove(user)
+    }
+
+    private renderModeration = () => {
+        const { moderationSubValue } = this.props.settingsStore
+        const { getPlausibleTagOptions } = this.props.postsStore
+
+        return (
+            <>
+                <div className={'mt3'}>
+                    <TagDropdown
+                        formatCreateLabel={inputValue => `Choose a tag`}
+                        onChange={this.handleModerationTagOnChange}
+                        value={moderationSubValue}
+                        options={getPlausibleTagOptions}
+                    />
+                    <div className={'outline-container mt3'}>
+                        <div className={'flex flex-column space-between'}>
+                            <div className={'mb3'}>
+                                {this.props.settingsStore.moderationMembers.toJSON().map(item => (
+                                    <span
+                                        className={
+                                            'flex items-center justify-between pv3 ph2 bb b--light-gray'
+                                        }
+                                        key={item}
+                                    >
+                                        <UserNameWithIcon
+                                            imageData={getIdenticon()}
+                                            name={item}
+                                            pub={item}
+                                        />
+                                        <span
+                                            onClick={() => this.handleDeleteUserToModeration(item)}
+                                            title={'Remove user from moderation'}
+                                        >
+                                            <FontAwesomeIcon
+                                                width={13}
+                                                icon={faMinusCircle}
+                                                className={'pointer dim'}
+                                                color={'red'}
+                                            />
+                                        </span>
+                                    </span>
+                                ))}
+                            </div>
+                            <div
+                                className={
+                                    'field-container mb2 relative flex-auto flex items-center'
+                                }
+                            >
+                                <input
+                                    value={this.state.moderation.user}
+                                    onChange={this.handleUserOnChange}
+                                    className={'w-100'}
+                                    placeholder={'Enter a user'}
+                                />
+                                <span
+                                    onClick={this.handleAddUserToModeration}
+                                    className={'plus-icon absolute dim pointer'}
+                                >
+                                    <FontAwesomeIcon
+                                        width={13}
+                                        icon={faPlus}
+                                        title={'Click to add a user'}
+                                    />
                                 </span>
-                            ))}
-                        </div>
-                        <div className={'field-container'}>
-                            <input className={'w-100'} placeholder={'Enter a user'} />
+                            </div>
                         </div>
                     </div>
                 </div>
-            </div>
-        </>
-    )
+            </>
+        )
+    }
 
     private renderContent = () => {
         switch (this.state.activeSidebar) {

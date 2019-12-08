@@ -1,4 +1,3 @@
-import { CreateForm } from '@components'
 import { BaseStore, getOrCreateStore } from 'next-mobx-wrapper'
 import { action, observable, reaction } from 'mobx'
 import { persist } from 'mobx-persist'
@@ -8,7 +7,10 @@ export default class SettingsStore extends BaseStore {
 
     @observable moderationSubValue = null
 
-    @observable moderationMembers = observable.array<string>()
+    @observable moderationMembers = observable.array<string>([
+        'gux',
+        'someuser'
+    ])
 
     constructor() {
         super()
@@ -16,7 +18,8 @@ export default class SettingsStore extends BaseStore {
         reaction(
             () => this.moderationSubValue,
             value => {
-                this.setModerationMembers([String(Math.random()), String(Math.random())])
+                // get moderators here
+                this.setModerationMembers([])
             }
         )
     }

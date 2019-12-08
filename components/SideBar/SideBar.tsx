@@ -192,7 +192,6 @@ class SideBar extends React.Component<ITagListOuterProps & ITagListInnerProps, I
             router,
             tagStore: {
                 tags,
-                addTag,
                 subscribedSubsAsModels,
                 subSubscriptionStatus,
                 toggleTagSubscribe,

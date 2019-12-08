@@ -3,9 +3,10 @@
   <component name="ChangeListManager">
     <list default="true" id="2d14133e-344f-4fbf-9bb7-c9e5e96ae697" name="Default Changelist" comment="">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/components/SideBar/SideBar.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/components/SideBar/SideBar.tsx" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/pages/settings/index.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/pages/settings/index.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/pages/settings/style.scss" beforeDir="false" afterPath="$PROJECT_DIR$/pages/settings/style.scss" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/stores/settingsStore.ts" beforeDir="false" afterPath="$PROJECT_DIR$/stores/settingsStore.ts" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/styles/style.scss" beforeDir="false" afterPath="$PROJECT_DIR$/styles/style.scss" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -234,7 +235,9 @@
       <workItem from="1575506132800" duration="115000" />
       <workItem from="1575506717207" duration="274000" />
       <workItem from="1575507566727" duration="274000" />
-      <workItem from="1575508063367" duration="716000" />
+      <workItem from="1575508063367" duration="821000" />
+      <workItem from="1575562287265" duration="53000" />
+      <workItem from="1575818026094" duration="1433000" />
     </task>
     <servers />
   </component>
@@ -248,18 +251,22 @@
     </option>
   </component>
   <component name="WindowStateProjectService">
-    <state x="946" y="361" width="667" height="741" key="find.popup" timestamp="1575508421665">
-      <screen x="0" y="23" width="2560" height="1417" />
+    <state x="818" y="23" key="#com.intellij.refactoring.rename.AutomaticRenamingDialog" timestamp="1575819071914">
+      <screen x="0" y="23" width="2560" height="1366" />
     </state>
-    <state x="946" y="349" width="667" height="714" key="find.popup/0.23.2560.1366/2560.23.1920.1057@0.23.2560.1366" timestamp="1575503963846" />
+    <state x="818" y="23" key="#com.intellij.refactoring.rename.AutomaticRenamingDialog/0.23.2560.1366/2560.23.1920.1057@0.23.2560.1366" timestamp="1575819071914" />
+    <state x="946" y="349" width="694" height="714" key="find.popup" timestamp="1575819572616">
+      <screen x="0" y="23" width="2560" height="1366" />
+    </state>
+    <state x="946" y="349" width="694" height="714" key="find.popup/0.23.2560.1366/2560.23.1920.1057@0.23.2560.1366" timestamp="1575819572616" />
     <state x="946" y="361" width="667" height="741" key="find.popup/0.23.2560.1417/2560.23.1920.1057@0.23.2560.1417" timestamp="1575508421665" />
     <state width="600" height="424" key="javadoc.popup" timestamp="1575502768923">
       <screen x="0" y="23" width="2560" height="1366" />
     </state>
     <state width="600" height="424" key="javadoc.popup/0.23.2560.1366/2560.23.1920.1057@0.23.2560.1366" timestamp="1575502768923" />
-    <state x="945" y="335" width="670" height="676" key="search.everywhere.popup" timestamp="1575506966682">
+    <state x="945" y="335" width="670" height="676" key="search.everywhere.popup" timestamp="1575819245218">
       <screen x="0" y="23" width="2560" height="1366" />
     </state>
-    <state x="945" y="335" width="670" height="676" key="search.everywhere.popup/0.23.2560.1366/2560.23.1920.1057@0.23.2560.1366" timestamp="1575506966682" />
+    <state x="945" y="335" width="670" height="676" key="search.everywhere.popup/0.23.2560.1366/2560.23.1920.1057@0.23.2560.1366" timestamp="1575819245218" />
   </component>
 </project>
