@@ -7,6 +7,8 @@ import './style.scss'
 import { getIdenticon } from '@utils'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { faMinusCircle, faPlus } from '@fortawesome/free-solid-svg-icons'
+import { Tab, TabList, TabPanel, Tabs } from 'react-tabs'
+import Link from 'next/link'
 
 interface ISettings {
     settingsStore: IStores['settingsStore']
@@ -18,6 +20,9 @@ interface ISettings {
 
 interface ISettingsState {
     activeSidebar: string
+    tokens: {
+        activeIndex: number
+    }
     moderation: {
         user: string
     }
@@ -38,7 +43,10 @@ class Settings extends React.Component<ISettings, ISettingsState> {
     }
 
     state = {
-        activeSidebar: 'Moderation',
+        activeSidebar: 'Tokens',
+        tokens: {
+            activeIndex: 0,
+        },
         moderation: {
             user: '',
         },
@@ -227,6 +235,54 @@ class Settings extends React.Component<ISettings, ISettingsState> {
         return <Form form={airdropForm} />
     }
 
+    private renderTokens = () => {
+        const { activeIndex } = this.state.tokens
+        const { depositForm } = this.props.settingsStore
+
+        // @ts-ignore
+        // console.log(depositForm.form.select('amount'))
+        // console.log(depositForm.form.$('amount').value);
+
+        return (
+            <Tabs
+                className={'mt2'}
+                selectedIndex={activeIndex}
+                onSelect={index => this.setState({ tokens: { activeIndex: index } })}
+            >
+                <TabList className={'settings-tabs'}>
+                    <Tab className={'settings-tab'}>Withdrawal</Tab>
+                    <Tab className={'settings-tab'}>Deposit</Tab>
+                </TabList>
+
+                <TabPanel>
+                    <div className={'flex flex-column items-center'}>
+                        <input
+                            placeholder={'0'}
+                            className={'token-amount-box mt3 f1 gray b--transparent tc'}
+                            // value={depositForm.form.select('amount').value}
+                            onChange={(event => depositForm.form.$('amount').set('value', event.target.value))}
+                        />
+                        <div
+                            className={
+                                'w-100 flex flex-column items-center outline-container pa4 mt3'
+                            }
+                        >
+                            <Form className={'db w-100'} form={depositForm} hideSubmitButton />
+                            <button
+                                title={'Submit withdrawal'}
+                                className={'flex'}
+                                onClick={depositForm.onSubmit}
+                            >
+                                <span className={'f6 white'}>Withdraw</span>
+                            </button>
+                        </div>
+                    </div>
+                </TabPanel>
+                <TabPanel>You</TabPanel>
+            </Tabs>
+        )
+    }
+
     private renderContent = () => {
         switch (this.state.activeSidebar) {
             case 'Connections':
@@ -235,6 +291,8 @@ class Settings extends React.Component<ISettings, ISettingsState> {
                 return this.renderModeration()
             case 'Airdrop':
                 return this.renderAirdrop()
+            case 'Tokens':
+                return this.renderTokens()
         }
     }
 

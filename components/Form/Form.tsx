@@ -108,6 +108,8 @@ class Form extends React.Component<FormProps> {
 
         const renderFields = fields => {
             return fields.map(field => {
+                if (field.hide) return null
+                
                 const bind = field.accessor.bind()
 
                 if (field.accessor.$extra && field.accessor.$extra.render === false) {

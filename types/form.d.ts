@@ -20,7 +20,7 @@ declare interface IForm {
         fields: any[]
         validate?: any
         onSubmit: (event?: FormEvent<HTMLFormElement>) => void
-        select: (key: string) => string
+        select: (key: string) => any
         $: (key: string) => Form$
         size: number
         submitting: boolean
@@ -54,6 +54,7 @@ declare interface FormField {
     disabled?: boolean
     accessor?: Form$
     hideLabels?: boolean
+    hide?: boolean
 
     input?: (value) => any
     output?: (value) => any

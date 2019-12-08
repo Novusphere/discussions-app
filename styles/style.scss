@@ -178,3 +178,11 @@ a {
     border-style: solid;
     border-width: 1px;
 }
+
+textarea:focus, input:focus{
+    outline: none;
+}
+
+*:focus {
+    outline: none;
+}
