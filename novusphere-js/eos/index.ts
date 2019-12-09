@@ -1,6 +1,6 @@
 const fetch = require('node-fetch');
 import { Api, JsonRpc } from 'eosjs';
-import { JsSignatureProvider } from 'eosjs/dist/eosjs-jssig';  
+import { JsSignatureProvider } from 'eosjs/dist/eosjs-jssig';
 import { DiscoveryData, WalletAuth, Wallet, WalletAccessContext, NetworkConfig } from 'eos-transit';
 import { IToken, getTokens, IAccountBalance, getAccountTokens } from './tokens';
 
@@ -212,7 +212,22 @@ export class EOS {
         if (!this.tokens) return [];
         return getAccountTokens(account, this.tokens);
     }
-
+    /**
+     * Returns the precision of a given token
+     * @param contract 
+     * @param symbol 
+     */
+    async getTokenPrecision(contract: string, symbol: string): Promise<number> {
+        const api = this.api;
+        const stats = await api.rpc.get_currency_stats(contract, symbol);
+        try {
+            const precision = stats[symbol].supply.split(" ")[0].split(".")[1].length;
+            return precision;
+        }
+        catch (ex) {
+            return 0;
+        }
+    }
     async login(account?: string, permission?: string): Promise<boolean> {
         if (!this.wallet) return false;
         await this.wallet.login(account, permission);
