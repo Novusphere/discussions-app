@@ -47,7 +47,7 @@ export default class SettingsStore extends BaseStore {
             // validate account names
             const invalidNames = []
 
-            console.log("validating account names");
+            console.log('validating account names')
 
             await accountNames
                 .split(',')
@@ -85,7 +85,10 @@ export default class SettingsStore extends BaseStore {
 
             await sleep(500)
 
-            if (accountNames.length <= AIRDROP_THRESHOLD) {
+            console.log('account names: ', accountNames.length)
+            console.log('threshold: ', AIRDROP_THRESHOLD)
+
+            if (accountNames.split(',').length < AIRDROP_THRESHOLD) {
                 console.log('would send contract via scatter')
                 // const result = await eos.transact(
                 //   config.transfer.map(t => ({
