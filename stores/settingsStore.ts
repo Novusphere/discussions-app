@@ -5,7 +5,8 @@ import { CreateForm } from '@components'
 import { task } from 'mobx-task'
 import axios from 'axios'
 import { getAuthStore, IStores } from '@stores/index'
-import { sleep } from '@utils'
+import { AIRDROP_THRESHOLD, sleep } from '@utils'
+import { eos } from '@novuspherejs'
 
 const fileDownload = require('js-file-download')
 
@@ -46,6 +47,8 @@ export default class SettingsStore extends BaseStore {
             // validate account names
             const invalidNames = []
 
+            console.log("validating account names");
+
             await accountNames
                 .split(',')
                 .slice()
@@ -68,17 +71,36 @@ export default class SettingsStore extends BaseStore {
                     }
                 })
 
-            await sleep(50 * accountNames.length)
+            await sleep(100 * accountNames.length)
 
             if (invalidNames.length) {
                 form.$('accountNames').invalidate(
                     `The names: ${invalidNames.join(
                         ','
-                    )} are invalid. Ensure you are entering a valid EOS username.`
+                    )} are invalid. Ensure you are entering valid EOS usernames.`
                 )
+
+                return
             }
 
             await sleep(500)
+
+            if (accountNames.length <= AIRDROP_THRESHOLD) {
+                console.log('would send contract via scatter')
+                // const result = await eos.transact(
+                //   config.transfer.map(t => ({
+                //       account: values.token.label,
+                //       name: 'transfer',
+                //       data: {
+                //           from: eos.auth.accountName,
+                //           to: accountNames[0],
+                //           quantity: `${values.amount} ${values.token.value}`,
+                //           memo: values.memoId,
+                //       }
+                //   })));
+
+                return
+            }
 
             values.actor = this.authStore.getActiveDisplayName
 
