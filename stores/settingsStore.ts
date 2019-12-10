@@ -88,6 +88,11 @@ export default class SettingsStore extends BaseStore {
             console.log('account names: ', accountNames.length)
             console.log('threshold: ', AIRDROP_THRESHOLD)
 
+            const precision = await eos.getTokenPrecision(values.token.label, values.token.value)
+            const amount: string = values.amount
+
+            values.amount = Number(amount).toFixed(precision)
+
             if (accountNames.split(',').length < AIRDROP_THRESHOLD) {
                 console.log('would send contract via scatter')
                 // const result = await eos.transact(
