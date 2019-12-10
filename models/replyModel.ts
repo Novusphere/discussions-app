@@ -94,6 +94,8 @@ export class ReplyModel {
         if (!form.hasError) {
             const { content } = form.values()
 
+            console.log('edited content: ', content)
+
             try {
                 let reply = this.createPostObject(true)
 
@@ -107,6 +109,8 @@ export class ReplyModel {
                     ),
                 }
 
+                console.log('generated reply: ', reply)
+
                 let tags = ReplyModel.matchContentForTags(content)
 
                 if (tags && tags.length) {
@@ -118,11 +122,15 @@ export class ReplyModel {
                 const signedReply = model.sign(this.authStore.postPriv)
                 const confirmedReply = await discussions.post(signedReply as any)
 
+                console.log('confirmed reply: ', confirmedReply)
+
                 this.post.content = confirmedReply.content
                 this.post.pub = confirmedReply.pub
                 this.post.editedAt = new Date(Date.now())
                 this.post.transaction = confirmedReply.transaction
                 this.post.edit = true
+
+                console.log('current post has been replaced with new edit: ', this.post)
 
                 this.uiStore.showToast('Your post has been edited!', 'success')
                 this.toggleEditing()
