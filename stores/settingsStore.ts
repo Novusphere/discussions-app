@@ -1,5 +1,5 @@
 import { BaseStore, getOrCreateStore } from 'next-mobx-wrapper'
-import { action, observable, reaction } from 'mobx'
+import { action, computed, observable, reaction } from 'mobx'
 import { persist } from 'mobx-persist'
 import { CreateForm } from '@components'
 import { task } from 'mobx-task'
@@ -36,6 +36,11 @@ export default class SettingsStore extends BaseStore {
         this.moderationMembers.replace(members)
     }
 
+    @computed get recipientCount() {
+        if (!this.airdropForm.form.$("accountNames").value) return 0
+        return this.airdropForm.form.$('accountNames').value.split(',').length
+    }
+
     @task.resolved
     @action.bound
     async handleAirDropSubmit(form) {
@@ -49,27 +54,24 @@ export default class SettingsStore extends BaseStore {
 
             console.log('validating account names')
 
-            await accountNames
-                .split(',')
-                .slice()
-                .map(async accountName => {
-                    await sleep(100)
+            await this.recipientCount.map(async accountName => {
+                await sleep(100)
 
-                    const { data, status } = await axios.post(
-                        'https://eos.eoscafeblock.com/v1/chain/get_table_by_scope',
-                        {
-                            code: 'eosio',
-                            table: 'userres',
-                            lower_bound: accountName,
-                            upper_bound: accountName,
-                            limit: 1,
-                        }
-                    )
-
-                    if (!data.rows.length || status !== 200) {
-                        invalidNames.push(accountName)
+                const { data, status } = await axios.post(
+                    'https://eos.eoscafeblock.com/v1/chain/get_table_by_scope',
+                    {
+                        code: 'eosio',
+                        table: 'userres',
+                        lower_bound: accountName,
+                        upper_bound: accountName,
+                        limit: 1,
                     }
-                })
+                )
+
+                if (!data.rows.length || status !== 200) {
+                    invalidNames.push(accountName)
+                }
+            })
 
             await sleep(100 * accountNames.length)
 
@@ -124,7 +126,7 @@ export default class SettingsStore extends BaseStore {
         }
     }
 
-    get airdropForm() {
+    @computed get airdropForm() {
         return new CreateForm({}, [
             {
                 name: 'accountNames',

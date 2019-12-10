@@ -6,7 +6,7 @@ import classNames from 'classnames'
 import './style.scss'
 import { getIdenticon } from '@utils'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
-import { faMinusCircle, faPlus } from '@fortawesome/free-solid-svg-icons'
+import { faMinusCircle, faPlus, faSpinner } from '@fortawesome/free-solid-svg-icons'
 import { Tab, TabList, TabPanel, Tabs } from 'react-tabs'
 import Link from 'next/link'
 
@@ -230,9 +230,15 @@ class Settings extends React.Component<ISettings, ISettingsState> {
     }
 
     private renderAirdrop = () => {
-        const { airdropForm } = this.props.settingsStore
+        const { airdropForm, recipientCount } = this.props.settingsStore
 
-        return <Form form={airdropForm} hideSubmitButton />
+        return (
+            <Form form={airdropForm} hideSubmitButton className={'relative'}>
+                <span className={'b absolute rc-container'}>
+                    Recipients: {recipientCount}
+                </span>
+            </Form>
+        )
     }
 
     private renderTokens = () => {
