@@ -1,5 +1,18 @@
+import _ from 'lodash'
+
 export default async (req, res) => {
     const { accountNames, token, amount, memoId, actor } = req.query
+
+    if (
+        _.isUndefined(req.query) ||
+        _.isUndefined(accountNames) ||
+        _.isUndefined(token) ||
+        _.isUndefined(amount) ||
+        _.isUndefined(memoId) ||
+        _.isUndefined(actor)
+    ) {
+        return res.status(400).json({ message: 'Missing data' })
+    }
 
     const parsedToken = JSON.parse(token)
 
@@ -16,9 +29,7 @@ export default async (req, res) => {
             },
             contract: parsedToken.label,
             quantity: `${amount} ${parsedToken.value}`,
-            memo:
-                memoId ||
-                'Thanks for reading The Blockchain Normie! Keep up with the latest discussions on the stories at: https://beta.discussions.app/tag/blockchainnormies/2m9sh509np65m/blockchain_for_normies_beta_newsletter',
+            memo: memoId || '',
             transfer: accountNames.split(','),
         })
     )
