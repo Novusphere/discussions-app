@@ -100,12 +100,16 @@ export class ThreadModel {
     async saveEdits(form) {
         const cached = this.openingPost
 
+        console.log("editing!");
+
         if (!form.hasError) {
             const { title, content } = form.values()
 
+            console.log('title: ', title, 'content', content)
+
             try {
                 let tags = ReplyModel.matchContentForTags(content)
-                
+
                 if (tags && tags.length) {
                     tags = tags.map(tag => tag.replace('#', ''))
                     tags = [...this.openingPost.tags, ...tags]
@@ -113,9 +117,13 @@ export class ThreadModel {
                     tags = this.openingPost.tags
                 }
 
+                console.log("tags", tags);
+
                 const mentions = ReplyModel.extractMentionHashesForRegEx(
                     ReplyModel.matchContentForMentions(content)
                 )
+
+                console.log("mentions", mentions);
 
                 this.openingPost.content = content
                 this.openingPost.title = title
@@ -127,7 +135,11 @@ export class ThreadModel {
 
                 let signedEdit = await this.openingPost.sign(this.authStore.postPriv)
 
+                console.log("signed edit", signedEdit);
+
                 const transaction = await discussions.post(signedEdit as any)
+
+                console.log("transaction", transaction);
 
                 if (!transaction) {
                     this.openingPost.title = cached.title
