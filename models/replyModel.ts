@@ -45,6 +45,7 @@ export class ReplyModel {
     }
 
     @computed get inlineMentions() {
+        return []
         return ReplyModel.matchContentForMentions(this.content)
     }
 
@@ -53,7 +54,14 @@ export class ReplyModel {
     }
 
     public static matchContentForTags(content: string) {
-        return content.match(/(?<=[\s>]|^)#(\w*[A-Za-z0-9]+\w*)\b(?!;)/gi)
+        let match = content.match(/(\s|^)\#\w\w+\b/gim)
+
+        if (match) {
+            return match.map(s => s.trim())
+        }
+
+        return []
+        // return content.match(/(?<=[\s>]|^)#(\w*[A-Za-z0-9]+\w*)\b(?!;)/gi)
     }
 
     public static matchContentForMentions(content: string) {
@@ -250,40 +258,42 @@ export class ReplyModel {
 
         const reply = this.createPostObject()
 
-        try {
-            if (activeThread) {
-                const model = new PostModel(reply as any)
-                const signedReply = model.sign(this.authStore.postPriv)
-                const confirmedReply = await discussions.post(signedReply as any)
-
-                const confirmedModel = new PostModel({
-                    ...confirmedReply,
-                })
-
-                set(activeThread, {
-                    map: {
-                        ...activeThread.map,
-                        [reply.id]: confirmedModel,
-                    },
-                })
-
-                if (confirmedReply.parentUuid === this.post.threadUuid) {
-                    set(activeThread, {
-                        openingPostReplies: [...activeThread.openingPostReplies, confirmedModel],
-                    })
-                } else {
-                    this.toggleOpen()
-                }
-
-                this.clearContent()
-                this.uiStore.showToast('Your reply has been submitted!', 'success')
-            } else {
-                this.uiStore.showToast('Failed to submit your reply', 'error')
-            }
-        } catch (error) {
-            this.uiStore.showToast(error.message, 'error')
-            throw error
-        }
+        console.log(reply)
+        //
+        // try {
+        //     if (activeThread) {
+        //         const model = new PostModel(reply as any)
+        //         const signedReply = model.sign(this.authStore.postPriv)
+        //         const confirmedReply = await discussions.post(signedReply as any)
+        //
+        //         const confirmedModel = new PostModel({
+        //             ...confirmedReply,
+        //         })
+        //
+        //         set(activeThread, {
+        //             map: {
+        //                 ...activeThread.map,
+        //                 [reply.id]: confirmedModel,
+        //             },
+        //         })
+        //
+        //         if (confirmedReply.parentUuid === this.post.threadUuid) {
+        //             set(activeThread, {
+        //                 openingPostReplies: [...activeThread.openingPostReplies, confirmedModel],
+        //             })
+        //         } else {
+        //             this.toggleOpen()
+        //         }
+        //
+        //         this.clearContent()
+        //         this.uiStore.showToast('Your reply has been submitted!', 'success')
+        //     } else {
+        //         this.uiStore.showToast('Failed to submit your reply', 'error')
+        //     }
+        // } catch (error) {
+        //     this.uiStore.showToast(error.message, 'error')
+        //     throw error
+        // }
     }
 
     @action toggleOpen = () => {

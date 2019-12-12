@@ -60,6 +60,7 @@ class DiscussionApp extends App {
 
     public render() {
         const { Component, pageProps, store } = (this as any).props
+
         return (
             <Provider {...store}>
                 <MainLayout>

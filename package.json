@@ -30,7 +30,6 @@
         "immutable": "4.0.0-rc.12",
         "js-file-download": "^0.4.8",
         "lodash": "4.17.14",
-        "markdown-to-jsx": "^6.10.3",
         "mobx": "5.14.2",
         "mobx-persist": "0.4.1",
         "mobx-react": "6.1.4",
