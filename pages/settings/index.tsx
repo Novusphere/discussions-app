@@ -57,6 +57,10 @@ class Settings extends React.Component<ISettings, ISettingsState> {
         })
     }
 
+    componentWillUnmount(): void {
+        this.props.settingsStore.thresholdTxID = ''
+    }
+
     private renderSidebarContent = () => {
         return (
             <>
@@ -236,12 +240,11 @@ class Settings extends React.Component<ISettings, ISettingsState> {
                 <Form form={airdropForm} hideSubmitButton className={'relative'}>
                     <span className={'b absolute rc-container'}>Recipients: {recipientCount}</span>
                 </Form>
-                <a
-                    href={`https://eosq.app/tx/${thresholdTxID}`}
-                    className={'pt3 b f6 success'}
-                >
-                    Success! Your transaction has been submitted, click here to view!
-                </a>
+                <span className={'w-100 flex items-center justify-end'}>
+                    <a href={`https://eosq.app/tx/${thresholdTxID}`} className={'pt3 b f6 success'}>
+                        Success! Your transaction has been submitted, click here to view!
+                    </a>
+                </span>
             </>
         )
     }

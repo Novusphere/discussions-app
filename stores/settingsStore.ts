@@ -4,8 +4,8 @@ import { persist } from 'mobx-persist'
 import { CreateForm } from '@components'
 import { task } from 'mobx-task'
 import axios from 'axios'
-import { getAuthStore, IStores } from '@stores/index'
-import { AIRDROP_THRESHOLD, sleep } from '@utils'
+import { getAuthStore, getUiStore, IStores } from '@stores/index'
+import { sleep } from '@utils'
 import { eos } from '@novuspherejs'
 
 const fileDownload = require('js-file-download')
@@ -19,9 +19,10 @@ export default class SettingsStore extends BaseStore {
 
     @observable tokens = []
 
-    @observable thresholdTxID = '123'
+    @observable thresholdTxID = ''
 
     private readonly authStore: IStores['authStore'] = getAuthStore()
+    private readonly uiStore: IStores['uiStore'] = getUiStore()
 
     constructor() {
         super()
@@ -53,6 +54,68 @@ export default class SettingsStore extends BaseStore {
     @computed get recipientCount() {
         if (!this.airdropForm.form.$('accountNames').value) return 0
         return this.airdropForm.form.$('accountNames').value.split(',').length
+    }
+
+    @task.resolved
+    @action.bound
+    async handleDownloadAirDropSubmit(form) {
+        const values = form.values()
+
+        const accountNames = values.accountNames
+
+        try {
+            // validate account names
+            const invalidNames = []
+
+            await this.recipients.map(async accountName => {
+                await sleep(100)
+
+                const { data, status } = await axios.post(
+                    'https://eos.eoscafeblock.com/v1/chain/get_table_by_scope',
+                    {
+                        code: 'eosio',
+                        table: 'userres',
+                        lower_bound: accountName,
+                        upper_bound: accountName,
+                        limit: 1,
+                    }
+                )
+
+                if (!data.rows.length || status !== 200) {
+                    invalidNames.push(accountName)
+                }
+            })
+
+            await sleep(100 * accountNames.length)
+
+            if (invalidNames.length) {
+                form.$('accountNames').invalidate(
+                    `The names: ${invalidNames.join(
+                        ','
+                    )} are invalid. Ensure you are entering valid EOS usernames.`
+                )
+
+                return
+            }
+
+            await sleep(500)
+
+            const precision = await eos.getTokenPrecision(values.token.value, values.token.label)
+            const amount: string = values.amount
+
+            values.amount = Number(amount).toFixed(precision)
+            values.actor = this.authStore.getActiveDisplayName
+
+            if (form.hasError) return
+
+            const { data } = await axios.get('/api/writeFile', {
+                params: values,
+            })
+
+            fileDownload(JSON.stringify(data), 'airdrop.json')
+        } catch (error) {
+            return error
+        }
     }
 
     @task.resolved
@@ -103,15 +166,15 @@ export default class SettingsStore extends BaseStore {
             const amount: string = values.amount
 
             values.amount = Number(amount).toFixed(precision)
+            values.actor = this.authStore.getActiveDisplayName
 
-            if (this.recipientCount < AIRDROP_THRESHOLD) {
+            const actions = []
 
-                const actions = []
+            // scatter detection
+            await eos.detectWallet()
+            await eos.login()
 
-                // scatter detection
-                await eos.detectWallet()
-                await eos.login()
-
+            if (typeof eos.auth !== 'undefined') {
                 this.recipients.map(async recipient => {
                     actions.push({
                         account: values.token.value,
@@ -125,22 +188,11 @@ export default class SettingsStore extends BaseStore {
                     })
                 })
 
-                const txId = await eos.transact(actions)
-
-                this.thresholdTxID = txId
-
-                return
+                this.thresholdTxID = await eos.transact(actions)
+            } else {
+                this.uiStore.showToast('Failed to detect Scatter', 'error')
             }
 
-            values.actor = this.authStore.getActiveDisplayName
-
-            if (form.hasError) return
-
-            const { data } = await axios.get('/api/writeFile', {
-                params: values,
-            })
-
-            fileDownload(JSON.stringify(data), 'airdrop.json')
         } catch (error) {
             return error
         }
@@ -181,6 +233,12 @@ export default class SettingsStore extends BaseStore {
                 containerClassName: 'flex flex-row items-center justify-end',
                 extra: {
                     options: [
+                        {
+                            value: 'Download Airdrop',
+                            className: 'white bg-green',
+                            title: 'Download Airdrop',
+                            onClick: this.handleDownloadAirDropSubmit,
+                        },
                         {
                             value: 'Airdrop',
                             className: 'white bg-green',
