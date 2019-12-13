@@ -62,6 +62,7 @@
         "remove-markdown": "^0.3.0",
         "sanitize-html": "^1.20.1",
         "showdown": "^1.9.0",
+        "markdown-to-jsx": "6.10.3",
         "tachyons": "4.11.1",
         "to-markdown": "^3.1.1",
         "turndown": "5.0.3",

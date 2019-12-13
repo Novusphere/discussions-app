@@ -29,9 +29,12 @@ export class NSDB {
         const rurl = `${this.api}/discussions/account/data`;
 
         const { data } = await axios.post(rurl, qs);
+
+        console.log(data)
+
         if (data.error) {
             console.error('Get account failed: ', qs);
-            throw new Error(data.error);
+            throw new Error(data.message);
         }
 
         return data.payload;

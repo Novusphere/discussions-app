@@ -17,10 +17,20 @@ export default class SettingsStore extends BaseStore {
 
     @observable moderationMembers = observable.array<string>(['gux', 'someuser'])
 
+    @observable tokens = []
+
     private readonly authStore: IStores['authStore'] = getAuthStore()
 
     constructor() {
         super()
+
+        axios
+            .get(
+                'https://raw.githubusercontent.com/Novusphere/eos-forum-settings/master/tokens.json'
+            )
+            .then(({ data }) => {
+                this.tokens = data.map(q => ({ label: q.name, value: q.account, symbol: q.symbol }))
+            })
 
         reaction(
             () => this.moderationSubValue,
@@ -36,8 +46,13 @@ export default class SettingsStore extends BaseStore {
         this.moderationMembers.replace(members)
     }
 
+    @computed get recipients() {
+        if (!this.airdropForm.form.$('accountNames').value) return []
+        return this.airdropForm.form.$('accountNames').value.split(',')
+    }
+
     @computed get recipientCount() {
-        if (!this.airdropForm.form.$("accountNames").value) return 0
+        if (!this.airdropForm.form.$('accountNames').value) return 0
         return this.airdropForm.form.$('accountNames').value.split(',').length
     }
 
@@ -54,7 +69,16 @@ export default class SettingsStore extends BaseStore {
 
             console.log('validating account names')
 
-            await this.recipientCount.map(async accountName => {
+            console.log(this.recipientCount)
+
+            console.log(accountNames)
+
+            await this.recipients.map(async accountName => {
+                console.log(
+                    'Class: SettingsStore, Function: await, Line 62 accountName: ',
+                    accountName
+                )
+
                 await sleep(100)
 
                 const { data, status } = await axios.post(
@@ -67,6 +91,8 @@ export default class SettingsStore extends BaseStore {
                         limit: 1,
                     }
                 )
+
+                console.log('Class: SettingsStore, Function: await, Line 77 data: ', data)
 
                 if (!data.rows.length || status !== 200) {
                     invalidNames.push(accountName)
@@ -90,24 +116,28 @@ export default class SettingsStore extends BaseStore {
             console.log('account names: ', accountNames.length)
             console.log('threshold: ', AIRDROP_THRESHOLD)
 
-            const precision = await eos.getTokenPrecision(values.token.label, values.token.value)
+            const precision = await eos.getTokenPrecision(values.token.value, values.token.label)
             const amount: string = values.amount
 
             values.amount = Number(amount).toFixed(precision)
 
-            if (accountNames.split(',').length < AIRDROP_THRESHOLD) {
+            if (this.recipientCount < AIRDROP_THRESHOLD) {
                 console.log('would send contract via scatter')
-                // const result = await eos.transact(
-                //   config.transfer.map(t => ({
-                //       account: values.token.label,
-                //       name: 'transfer',
-                //       data: {
-                //           from: eos.auth.accountName,
-                //           to: accountNames[0],
-                //           quantity: `${values.amount} ${values.token.value}`,
-                //           memo: values.memoId,
-                //       }
-                //   })));
+                const result = await eos.transact({
+                    account: values.token.value,
+                    name: 'transfer',
+                    data: {
+                        from: eos.auth.accountName,
+                        to: accountNames[0],
+                        quantity: `${values.amount} ${values.token.label}`,
+                        memo: values.memoId,
+                    },
+                })
+
+                console.log(
+                    'Class: SettingsStore, Function: handleAirDropSubmit, Line 111 result: ',
+                    result
+                )
 
                 return
             }
@@ -115,6 +145,8 @@ export default class SettingsStore extends BaseStore {
             values.actor = this.authStore.getActiveDisplayName
 
             if (form.hasError) return
+
+            console.log(values)
 
             const { data } = await axios.get('/api/writeFile', {
                 params: values,
@@ -140,12 +172,7 @@ export default class SettingsStore extends BaseStore {
                 label: 'Token',
                 type: 'dropdown',
                 extra: {
-                    options: [
-                        {
-                            label: 'novusphereio',
-                            value: 'ATMOS',
-                        },
-                    ],
+                    options: this.tokens,
                 },
                 rules: 'required',
             },

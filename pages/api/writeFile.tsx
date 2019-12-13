@@ -27,8 +27,8 @@ export default async (req, res) => {
                 actor: actor,
                 permission: 'active',
             },
-            contract: parsedToken.label,
-            quantity: `${amount} ${parsedToken.value}`,
+            contract: parsedToken.value,
+            quantity: `${amount} ${parsedToken.symbol}`,
             memo: memoId || '',
             transfer: accountNames.split(','),
         })
