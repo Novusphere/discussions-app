@@ -137,7 +137,7 @@ class Form extends React.Component<FormProps> {
                                         <Select
                                             className={'db f6 react-select-dropdown'}
                                             classNamePrefix={'rs'}
-                                            options={field.accessor.$extra.options}
+                                            options={Array.from(field.accessor.$extra.options)}
                                             {...bind}
                                         />
                                         <span className={'error f6 db pv2'}>

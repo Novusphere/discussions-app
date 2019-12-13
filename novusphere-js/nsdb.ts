@@ -30,8 +30,6 @@ export class NSDB {
 
         const { data } = await axios.post(rurl, qs);
 
-        console.log(data)
-
         if (data.error) {
             console.error('Get account failed: ', qs);
             throw new Error(data.message);

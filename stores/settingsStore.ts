@@ -38,7 +38,14 @@ export default class SettingsStore extends BaseStore {
 
     @action.bound
     setTokens(tokens: any) {
-        this.tokens = tokens.map(q => ({ label: q.name, value: q.account, symbol: q.symbol }))
+        this.tokens = tokens.map(q => {
+            return ({
+                label: `${q.name} (${q.account})`,
+                name: q.name,
+                value: q.account,
+                symbol: q.symbol
+            });
+        })
     }
 
     @action.bound
@@ -100,7 +107,7 @@ export default class SettingsStore extends BaseStore {
 
             await sleep(500)
 
-            const precision = await eos.getTokenPrecision(values.token.value, values.token.label)
+            const precision = await eos.getTokenPrecision(values.token.value, values.token.name)
             const amount: string = values.amount
 
             values.amount = Number(amount).toFixed(precision)
@@ -162,7 +169,7 @@ export default class SettingsStore extends BaseStore {
 
             await sleep(500)
 
-            const precision = await eos.getTokenPrecision(values.token.value, values.token.label)
+            const precision = await eos.getTokenPrecision(values.token.value, values.token.name)
             const amount: string = values.amount
 
             values.amount = Number(amount).toFixed(precision)
@@ -182,7 +189,7 @@ export default class SettingsStore extends BaseStore {
                         data: {
                             from: eos.auth.accountName,
                             to: recipient,
-                            quantity: `${values.amount} ${values.token.label}`,
+                            quantity: `${values.amount} ${values.token.symbol}`,
                             memo: values.memoId,
                         },
                     })
@@ -192,7 +199,6 @@ export default class SettingsStore extends BaseStore {
             } else {
                 this.uiStore.showToast('Failed to detect Scatter', 'error')
             }
-
         } catch (error) {
             return error
         }
@@ -212,7 +218,7 @@ export default class SettingsStore extends BaseStore {
                 label: 'Token',
                 type: 'dropdown',
                 extra: {
-                    options: this.tokens,
+                    options: this.tokens || [],
                 },
                 rules: 'required',
             },

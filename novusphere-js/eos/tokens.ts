@@ -24,13 +24,13 @@ export async function getTokens() : Promise<IToken[]> {
     for (let i = 0; i < TOKEN_ENDPOINTS.length; i++) {
         let request = await fetch(TOKEN_ENDPOINTS[i]);
         let json = await request.json();
-        for (let key in json) {
-            if (key in tokens) {
-                Object.assign(tokens[key], json[key]);
-            }
-            else {
-                tokens[key] = json[key];
-            }
+
+        for (let j = 0; j < json.length; j++) {
+            let v = json[j];
+            if (v.chain && v.chain != 'eos') continue;
+            let v0 = tokens.find(t => t.symbol == v.symbol && t.account == v.account);
+            if (v0) Object.assign(v0, v);
+            else tokens.push(v);
         }
     }
 

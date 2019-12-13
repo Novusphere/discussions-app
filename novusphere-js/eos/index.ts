@@ -75,7 +75,7 @@ export class EOS {
             });
         }
 
-        this.tokens = await getTokens();
+        this.tokens = Array.from(await getTokens());
     }
 
     private async tryConnectWallet(selectedProvider) {
