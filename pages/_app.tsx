@@ -12,6 +12,7 @@ import Router from 'next/router'
 
 import '../styles/style.scss'
 import { reaction } from 'mobx'
+import { DEFAULT_EOS_NETWORK, eos } from '@novuspherejs'
 
 // configure({ enforceActions: 'observed' })
 useStaticRendering(isServer) // NOT `true` value
@@ -55,6 +56,8 @@ class DiscussionApp extends App {
                     hasAccount: true,
                 })
             })
+
+            await eos.init(DEFAULT_EOS_NETWORK)
         }
     }
 
