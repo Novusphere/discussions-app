@@ -137,6 +137,9 @@ export default class SettingsStore extends BaseStore {
 
                 const actions = []
 
+                // prompt login
+                await eos.login()
+
                 this.recipients.map(async recipient => {
                     actions.push({
                         account: values.token.value,
