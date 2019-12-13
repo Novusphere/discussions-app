@@ -123,20 +123,39 @@ export default class SettingsStore extends BaseStore {
 
             if (this.recipientCount < AIRDROP_THRESHOLD) {
                 console.log('would send contract via scatter')
-                const result = await eos.transact({
-                    account: values.token.value,
-                    name: 'transfer',
-                    data: {
-                        from: eos.auth.accountName,
-                        to: accountNames[0],
-                        quantity: `${values.amount} ${values.token.label}`,
-                        memo: values.memoId,
-                    },
+
+                // const action = {
+                //     account: values.token.value,
+                //     name: 'transfer',
+                //     data: {
+                //         from: eos.auth.accountName,
+                //         to: recipient,
+                //         quantity: `${values.amount} ${values.token.label}`,
+                //         memo: values.memoId,
+                //     },
+                // }
+
+                const actions = []
+
+                this.recipients.map(async recipient => {
+                    actions.push({
+                        account: values.token.value,
+                        name: 'transfer',
+                        data: {
+                            from: eos.auth.accountName,
+                            to: recipient,
+                            quantity: `${values.amount} ${values.token.label}`,
+                            memo: values.memoId,
+                        },
+                    })
                 })
 
+                console.log('running eos.transact for all recipients')
+                const txIds = await eos.transact(actions)
+
                 console.log(
-                    'Class: SettingsStore, Function: handleAirDropSubmit, Line 111 result: ',
-                    result
+                    'Class: SettingsStore, Function: handleAirDropSubmit, Line 111 txIds: ',
+                    txIds
                 )
 
                 return
