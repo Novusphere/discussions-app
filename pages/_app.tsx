@@ -58,6 +58,8 @@ class DiscussionApp extends App {
             })
 
             await eos.init(DEFAULT_EOS_NETWORK)
+
+            settingsStore.setTokens(eos.tokens)
         }
     }
 

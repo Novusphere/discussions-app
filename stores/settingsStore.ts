@@ -24,14 +24,6 @@ export default class SettingsStore extends BaseStore {
     constructor() {
         super()
 
-        axios
-            .get(
-                'https://raw.githubusercontent.com/Novusphere/eos-forum-settings/master/tokens.json'
-            )
-            .then(({ data }) => {
-                this.tokens = data.map(q => ({ label: q.name, value: q.account, symbol: q.symbol }))
-            })
-
         reaction(
             () => this.moderationSubValue,
             value => {
@@ -39,6 +31,11 @@ export default class SettingsStore extends BaseStore {
                 this.setModerationMembers([])
             }
         )
+    }
+
+    @action.bound
+    setTokens(tokens: any) {
+        this.tokens = tokens.map(q => ({ label: q.name, value: q.account, symbol: q.symbol }))
     }
 
     @action.bound
