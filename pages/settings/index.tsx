@@ -243,6 +243,7 @@ class Settings extends React.Component<ISettings, ISettingsState> {
                 {thresholdTxID && (
                     <span className={'w-100 flex items-center justify-end'}>
                         <a
+                            target={'_blank'}
                             href={`https://eosq.app/tx/${thresholdTxID}`}
                             className={'pt3 b f6 success'}
                         >
