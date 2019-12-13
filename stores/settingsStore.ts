@@ -138,8 +138,11 @@ export default class SettingsStore extends BaseStore {
                 const actions = []
 
                 // scatter detection
+                console.log('detecting scatter')
                 await eos.detectWallet()
                 await eos.login()
+
+                console.log('scatter detected, continuing')
 
                 this.recipients.map(async recipient => {
                     actions.push({
