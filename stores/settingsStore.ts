@@ -19,6 +19,8 @@ export default class SettingsStore extends BaseStore {
 
     @observable tokens = []
 
+    @observable thresholdTxID = '123'
+
     private readonly authStore: IStores['authStore'] = getAuthStore()
 
     constructor() {
@@ -64,18 +66,7 @@ export default class SettingsStore extends BaseStore {
             // validate account names
             const invalidNames = []
 
-            console.log('validating account names')
-
-            console.log(this.recipientCount)
-
-            console.log(accountNames)
-
             await this.recipients.map(async accountName => {
-                console.log(
-                    'Class: SettingsStore, Function: await, Line 62 accountName: ',
-                    accountName
-                )
-
                 await sleep(100)
 
                 const { data, status } = await axios.post(
@@ -88,8 +79,6 @@ export default class SettingsStore extends BaseStore {
                         limit: 1,
                     }
                 )
-
-                console.log('Class: SettingsStore, Function: await, Line 77 data: ', data)
 
                 if (!data.rows.length || status !== 200) {
                     invalidNames.push(accountName)
@@ -110,36 +99,18 @@ export default class SettingsStore extends BaseStore {
 
             await sleep(500)
 
-            console.log('account names: ', accountNames.length)
-            console.log('threshold: ', AIRDROP_THRESHOLD)
-
             const precision = await eos.getTokenPrecision(values.token.value, values.token.label)
             const amount: string = values.amount
 
             values.amount = Number(amount).toFixed(precision)
 
             if (this.recipientCount < AIRDROP_THRESHOLD) {
-                console.log('would send contract via scatter')
-
-                // const action = {
-                //     account: values.token.value,
-                //     name: 'transfer',
-                //     data: {
-                //         from: eos.auth.accountName,
-                //         to: recipient,
-                //         quantity: `${values.amount} ${values.token.label}`,
-                //         memo: values.memoId,
-                //     },
-                // }
 
                 const actions = []
 
                 // scatter detection
-                console.log('detecting scatter')
                 await eos.detectWallet()
                 await eos.login()
-
-                console.log('scatter detected, continuing')
 
                 this.recipients.map(async recipient => {
                     actions.push({
@@ -154,13 +125,9 @@ export default class SettingsStore extends BaseStore {
                     })
                 })
 
-                console.log('running eos.transact for all recipients')
-                const txIds = await eos.transact(actions)
+                const txId = await eos.transact(actions)
 
-                console.log(
-                    'Class: SettingsStore, Function: handleAirDropSubmit, Line 111 txIds: ',
-                    txIds
-                )
+                this.thresholdTxID = txId
 
                 return
             }
@@ -168,8 +135,6 @@ export default class SettingsStore extends BaseStore {
             values.actor = this.authStore.getActiveDisplayName
 
             if (form.hasError) return
-
-            console.log(values)
 
             const { data } = await axios.get('/api/writeFile', {
                 params: values,
@@ -217,9 +182,9 @@ export default class SettingsStore extends BaseStore {
                 extra: {
                     options: [
                         {
-                            value: 'Download Airdrop',
+                            value: 'Airdrop',
                             className: 'white bg-green',
-                            title: 'Generate AirDrop File',
+                            title: 'AirDrop',
                             onClick: this.handleAirDropSubmit,
                         },
                     ],

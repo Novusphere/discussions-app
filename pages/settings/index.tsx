@@ -6,9 +6,8 @@ import classNames from 'classnames'
 import './style.scss'
 import { getIdenticon } from '@utils'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
-import { faMinusCircle, faPlus, faSpinner } from '@fortawesome/free-solid-svg-icons'
+import { faMinusCircle, faPlus } from '@fortawesome/free-solid-svg-icons'
 import { Tab, TabList, TabPanel, Tabs } from 'react-tabs'
-import Link from 'next/link'
 
 interface ISettings {
     settingsStore: IStores['settingsStore']
@@ -230,14 +229,20 @@ class Settings extends React.Component<ISettings, ISettingsState> {
     }
 
     private renderAirdrop = () => {
-        const { airdropForm, recipientCount } = this.props.settingsStore
+        const { airdropForm, recipientCount, thresholdTxID } = this.props.settingsStore
 
         return (
-            <Form form={airdropForm} hideSubmitButton className={'relative'}>
-                <span className={'b absolute rc-container'}>
-                    Recipients: {recipientCount}
-                </span>
-            </Form>
+            <>
+                <Form form={airdropForm} hideSubmitButton className={'relative'}>
+                    <span className={'b absolute rc-container'}>Recipients: {recipientCount}</span>
+                </Form>
+                <a
+                    href={`https://eosq.app/tx/${thresholdTxID}`}
+                    className={'pt3 b f6 success'}
+                >
+                    Success! Your transaction has been submitted, click here to view!
+                </a>
+            </>
         )
     }
 
