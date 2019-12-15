@@ -30,7 +30,7 @@ export default async (req, res) => {
             contract: parsedToken.value,
             quantity: `${amount} ${parsedToken.symbol}`,
             memo: memoId || '',
-            transfer: accountNames.split(','),
+            transfer: accountNames,
         })
     )
 

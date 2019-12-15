@@ -175,6 +175,7 @@ class Form extends React.Component<FormProps> {
                                             cols="50"
                                             {...bind}
                                             className={'db f6 form-input'}
+                                            onKeyPress={e => e.stopPropagation()}
                                             {...(field.onComplete && {
                                                 onBlur: () => {
                                                     form.form
