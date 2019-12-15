@@ -30,10 +30,12 @@ class MainLayout extends React.Component<IMainLayoutProps> {
                 <StickyContainer>
                     <Sticky>
                         {({ style }) => (
-                            <header style={{
-                                ...style,
-                                zIndex: 9998,
-                            }}>
+                            <header
+                                style={{
+                                    ...style,
+                                    zIndex: 9998,
+                                }}
+                            >
                                 <TitleHeader />
                             </header>
                         )}
@@ -76,8 +78,7 @@ class MainLayout extends React.Component<IMainLayoutProps> {
                     <footer>
                         <div className="tc lh-copy">
                             <p className={'b'}>
-                                Version: {getVersion()} (
-                                {this.props.settingsStore.localStorageVersion})
+                                Version: {getVersion()} ({process.env.BUILD_ID})
                             </p>
                             <p>
                                 This site is hosted entirely from{' '}

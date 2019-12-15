@@ -1,6 +1,7 @@
 // next.config.js
 const withSass = require('@zeit/next-sass')
 const withCSS = require('@zeit/next-css')
+const webpack = require('webpack')
 
 module.exports = withCSS(
     withSass({
@@ -8,7 +9,7 @@ module.exports = withCSS(
             return String(Date.now())
         },
         generateEtags: false,
-        webpack: config => {
+        webpack: (config, options) => {
             config.module.rules.push({
                 test: /\.(eot|woff|woff2|ttf|svg|png|jpg|gif)$/,
                 use: {
@@ -19,6 +20,12 @@ module.exports = withCSS(
                     },
                 },
             })
+
+            config.plugins.push(
+                new webpack.DefinePlugin({
+                    'process.env.BUILD_ID': JSON.stringify(options.buildId),
+                })
+            )
 
             return config
         },
