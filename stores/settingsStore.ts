@@ -174,6 +174,10 @@ export default class SettingsStore extends BaseStore {
 
             const actions = []
 
+            // logout user
+            // https://github.com/Novusphere/discussions-app/issues/102
+            await eos.logout()
+
             // scatter detection
             await eos.detectWallet()
             await eos.login()
