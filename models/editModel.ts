@@ -1,5 +1,4 @@
 import { action, computed, observable, set } from 'mobx'
-import { IPost } from '@stores/postsStore'
 import { generateUuid, getAttachmentValue } from '@utils'
 import PostModel from '@models/postModel'
 import { discussions, sleep } from '@novuspherejs'
@@ -144,9 +143,23 @@ class EditModel {
             const model = new PostModel(reply as any)
             const signedReply = model.sign(this.postPriv)
             const response = await discussions.post(signedReply as any)
-            await sleep(5000)
-            return response
-        } catch (error) {}
+
+            return new Promise((resolve, reject) => {
+                const int = setInterval(async () => {
+                    const submitted = await discussions.wasEditSubmitted(
+                        this.cached.transaction,
+                        response.uuid
+                    )
+
+                    if (submitted) {
+                        clearInterval(int)
+                        return resolve(response)
+                    }
+                }, 2000)
+            })
+        } catch (error) {
+            return error
+        }
     }
 }
 

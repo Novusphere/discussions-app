@@ -7,7 +7,7 @@ const bip39 = require('bip39')
 import * as bip32 from 'bip32'
 import ecc from 'eosjs-ecc'
 import axios from 'axios'
-import { INSDBSearchQuery } from '../../nsdb';
+import { INSDBSearchQuery } from '../../nsdb'
 //import { isDev } from '@utils'
 
 export interface IBrainKeyPair {
@@ -291,14 +291,14 @@ export default class DiscussionsService {
 
     async getThreadReplyCount(_id: string): Promise<number> {
         let dId = Post.decodeId(_id)
-        const isServer = false; // ?
+        const isServer = false // ?
         const searchQuery = {
             pipeline: [
                 {
                     $match: {
                         createdAt: {
-                            $gte: dId.timeGte,// + (!isDev && isServer ? 18000000 : 0),
-                            $lte: dId.timeLte,// + (!isDev && isServer ? 18000000 : 0),
+                            $gte: dId.timeGte, // + (!isDev && isServer ? 18000000 : 0),
+                            $lte: dId.timeLte, // + (!isDev && isServer ? 18000000 : 0),
                         },
                         transaction: { $regex: `^${dId.txid32}` },
                     },
@@ -312,7 +312,7 @@ export default class DiscussionsService {
 
         let op = Post.fromDbObject(sq.payload[0])
 
-        return op.totalReplies;
+        return op.totalReplies
     }
 
     async getThread(_id: string, isServer = false): Promise<Thread | null> {
@@ -323,8 +323,8 @@ export default class DiscussionsService {
                 {
                     $match: {
                         createdAt: {
-                            $gte: dId.timeGte,// + (!isDev && isServer ? 18000000 : 0),
-                            $lte: dId.timeLte,// + (!isDev && isServer ? 18000000 : 0),
+                            $gte: dId.timeGte, // + (!isDev && isServer ? 18000000 : 0),
+                            $lte: dId.timeLte, // + (!isDev && isServer ? 18000000 : 0),
                         },
                         transaction: { $regex: `^${dId.txid32}` },
                     },
@@ -506,4 +506,24 @@ export default class DiscussionsService {
             throw error
         }
     }
-};
+
+    async wasEditSubmitted(txId: string, editUuid: string) {
+        try {
+            const query = await nsdb.search({
+                limit: 1,
+                pipeline: [
+                    {
+                        $match: {
+                            transaction: txId,
+                            edit: editUuid,
+                        },
+                    },
+                ],
+            })
+
+            return query.payload.length > 0
+        } catch (error) {
+            throw error
+        }
+    }
+}
