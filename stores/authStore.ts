@@ -10,7 +10,8 @@ import { bkToStatusJson, sleep } from '@utils'
 
 export default class AuthStore extends BaseStore {
     @persist('object')
-    @observable displayName = {
+    @observable
+    displayName = {
         bk: null,
         scatter: null,
     }
@@ -23,7 +24,8 @@ export default class AuthStore extends BaseStore {
     @observable privateKey = ''
 
     @persist('object')
-    @observable statusJson = {
+    @observable
+    statusJson = {
         bk: null,
         scatter: null,
     }
@@ -105,6 +107,14 @@ export default class AuthStore extends BaseStore {
      */
     @computed get posterName(): string {
         return this.getActiveDisplayName
+    }
+
+    // return bk or scatter
+    @computed get posterType(): string {
+        const posterName = this.posterName
+
+        if (posterName === this.displayName.bk) return 'bk'
+        return 'scatter'
     }
 
     @computed get getActiveDisplayName() {

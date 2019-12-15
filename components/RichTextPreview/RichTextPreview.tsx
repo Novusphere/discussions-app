@@ -121,9 +121,11 @@ const RtLink: any = ({ children, href, index }) => {
 
     if (!getEmbed || index > LINK_LIMIT) {
         return (
-            <a data-indexer-set="true" data-index={index} href={_href} title={`Open ${href}`}>
-                {children}
-            </a>
+            <object>
+                <a data-indexer-set="true" data-index={index} href={_href} title={`Open ${href}`}>
+                    {children}
+                </a>
+            </object>
         )
     }
 
