@@ -59,6 +59,7 @@ class Settings extends React.Component<ISettings, ISettingsState> {
 
     componentWillUnmount(): void {
         this.props.settingsStore.thresholdTxID = ''
+        this.props.settingsStore.errorMessage = ''
     }
 
     private renderSidebarContent = () => {
@@ -233,7 +234,7 @@ class Settings extends React.Component<ISettings, ISettingsState> {
     }
 
     private renderAirdrop = () => {
-        const { airdropForm, recipientCount, thresholdTxID } = this.props.settingsStore
+        const { airdropForm, recipientCount, thresholdTxID, errorMessage } = this.props.settingsStore
 
         return (
             <>
@@ -249,6 +250,11 @@ class Settings extends React.Component<ISettings, ISettingsState> {
                         >
                             Success! Your transaction has been submitted, click here to view!
                         </a>
+                    </span>
+                )}
+                {errorMessage && (
+                    <span className={'w-100 red flex items-center justify-end'}>
+                        {errorMessage}
                     </span>
                 )}
             </>

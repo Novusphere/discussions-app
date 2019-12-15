@@ -12,14 +12,11 @@ const fileDownload = require('js-file-download')
 
 export default class SettingsStore extends BaseStore {
     @persist @observable localStorageVersion = '2.0.0'
-
     @observable moderationSubValue = null
-
     @observable moderationMembers = observable.array<string>(['gux', 'someuser'])
-
     @observable tokens = []
-
     @observable thresholdTxID = ''
+    @observable errorMessage = ''
 
     private readonly authStore: IStores['authStore'] = getAuthStore()
     private readonly uiStore: IStores['uiStore'] = getUiStore()
@@ -200,6 +197,7 @@ export default class SettingsStore extends BaseStore {
                 this.uiStore.showToast('Failed to detect Scatter', 'error')
             }
         } catch (error) {
+            this.errorMessage = error.message
             return error
         }
     }
