@@ -72,13 +72,10 @@
     },
     "scripts": {
         "dev": "next",
-        "build": "cross-env NODE_ENV=production next build",
+        "build": "rm -rf .next/ && cross-env NODE_ENV=production next build",
         "start": "cross-env NODE_ENV=production next start",
         "dev-prod": "cross-env NODE_ENV=production next",
         "njstest": "tsc --target es5 novusphere-js/test.ts && node novusphere-js/test.js",
-        "_dev": "nodemon",
-        "_build": "next build",
-        "_start": "cross-env NODE_ENV=production node dist/index.js",
         "plop": "plop --plopfile ./generator/index.js",
         "build-editor": "webpack --mode=development --config=./modules/quill-autoformat/webpack.config.js"
     },
