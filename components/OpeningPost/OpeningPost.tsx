@@ -141,7 +141,7 @@ const OpeningPost: React.FC<IOpeningPostProps> = ({
                         </RichTextPreview>
                     )}
 
-                    {openingPost.attachment && <Attachments attachment={openingPost.attachment} />}
+                    {/*{openingPost.attachment && <Attachments attachment={openingPost.attachment} />}*/}
 
                     {activeThread && activeThread.openingPost && (
                         <div className={'footer flex items-center pt3'}>

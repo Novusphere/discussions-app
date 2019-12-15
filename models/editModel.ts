@@ -1,11 +1,11 @@
 import { action, computed, observable, set } from 'mobx'
-import { IPost } from "@stores/postsStore";
-import { generateUuid, getAttachmentValue } from "@utils";
-import PostModel from "@models/postModel";
+import { IPost } from '@stores/postsStore'
+import { generateUuid, getAttachmentValue } from '@utils'
+import PostModel from '@models/postModel'
 import { discussions, sleep } from '@novuspherejs'
 
 interface IEditModelProps {
-    content: string,
+    content: string
     title?: string // if no title, then it is not an OP
     posterName: string
     posterType: string
@@ -61,20 +61,28 @@ class EditModel {
         return EditModel.matchContentForTags(this.content)
     }
 
+    @computed get mentions() {
+        if (this.title || this.content === this.cached.content) {
+            return this.inlineMentionHashes
+        }
+
+        return [
+            ...this.inlineMentionHashes,
+            this.cached.pub, // the person's pub you are replying to
+        ]
+    }
+
     @action.bound
-    private createPostObject(isEdit = false) {
+    public createPostObject(isEdit = false) {
         let reply = {
             poster: null,
             displayName: null,
-            title: '',
+            title: this.title,
             createdAt: new Date(Date.now()),
-            content: this.cached.content,
+            content: this.content,
             sub: this.cached.sub,
             chain: 'eos',
-            mentions: [
-                ...this.inlineMentionHashes,
-                this.cached.pub, // the person's pub you are replying to
-            ],
+            mentions: this.mentions,
             tags: [this.cached.sub],
             id: '',
             uuid: '',

@@ -163,6 +163,7 @@ class EditorComponent extends React.Component<IEditorProps> {
             <Editor
                 ref={this.ref}
                 key={'editor'}
+                debug={'error'}
                 placeholder={placeholder}
                 onChange={this.onChange}
                 formats={[

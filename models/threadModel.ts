@@ -1,6 +1,6 @@
 import Thread from '@novuspherejs/discussions/thread'
 import { Post } from '@novuspherejs/discussions/post'
-import { action, computed, observable } from 'mobx'
+import { action, computed, observable, set } from 'mobx'
 import { ReplyModel } from '@models/replyModel'
 import _ from 'lodash'
 import PostModel from '@models/postModel'
@@ -8,6 +8,7 @@ import { CreateForm } from '@components'
 import { discussions } from '@novuspherejs'
 import { getAuthStore, getUiStore, IStores } from '@stores'
 import { task } from 'mobx-task'
+import EditModel from '@models/editModel'
 
 export class ThreadModel {
     @observable public map: { [p: string]: PostModel } | undefined
@@ -98,67 +99,41 @@ export class ThreadModel {
     @task.resolved
     @action.bound
     async saveEdits(form) {
-        console.log(form.values())
-        // const cached = this.openingPost
-        //
-        // console.log("editing!");
-        //
-        // if (!form.hasError) {
-        //     const { title, content } = form.values()
-        //
-        //     console.log('title: ', title, 'content', content)
-        //
-        //     try {
-        //         let tags = ReplyModel.matchContentForTags(content)
-        //
-        //         if (tags && tags.length) {
-        //             tags = tags.map(tag => tag.replace('#', ''))
-        //             tags = [...this.openingPost.tags, ...tags]
-        //         } else {
-        //             tags = this.openingPost.tags
-        //         }
-        //
-        //         console.log("tags", tags);
-        //
-        //         const mentions = ReplyModel.extractMentionHashesForRegEx(
-        //             ReplyModel.matchContentForMentions(content)
-        //         )
-        //
-        //         console.log("mentions", mentions);
-        //
-        //         this.openingPost.content = content
-        //         this.openingPost.title = title
-        //         this.openingPost.tags = tags
-        //         this.openingPost.mentions = mentions
-        //         this.openingPost.parentUuid = this.openingPost.uuid
-        //         this.openingPost.edit = true
-        //         this.openingPost.poster = undefined
-        //
-        //         let signedEdit = await this.openingPost.sign(this.authStore.postPriv)
-        //
-        //         console.log("signed edit", signedEdit);
-        //
-        //         const transaction = await discussions.post(signedEdit as any)
-        //
-        //         console.log("transaction", transaction);
-        //
-        //         if (!transaction) {
-        //             this.openingPost.title = cached.title
-        //             this.openingPost.content = cached.content
-        //             this.uiStore.showToast('There was an error editing your post', 'error')
-        //             return
-        //         }
-        //
-        //         this.openingPost.editedAt = new Date(Date.now())
-        //         this.uiStore.showToast('Your post has been edited!', 'success')
-        //         this.toggleEditing()
-        //     } catch (error) {
-        //         console.error(error)
-        //         this.openingPost.title = cached.title
-        //         this.openingPost.content = cached.content
-        //         this.uiStore.showToast('There was an error editing your post', 'error')
-        //     }
-        // }
+        if (!form.hasError) {
+            const { title, content } = form.values()
+            const { postPriv, posterType, posterName } = this.authStore
+            const cached = this.openingPost
+
+            try {
+                const editModel = new EditModel({
+                    content: content,
+                    title: title,
+                    posterName: posterName,
+                    posterType: posterType,
+                    postPriv: postPriv,
+                    cached: cached,
+                })
+
+                const response = await editModel.submitEdits()
+
+                if (!response) {
+                    this.openingPost.title = cached.title
+                    this.openingPost.content = cached.content
+                    return this.uiStore.showToast('There was an error editing your post', 'error')
+                }
+
+                set(this.openingPost, response)
+
+                this.openingPost.editedAt = new Date(Date.now())
+                this.uiStore.showToast('Your post has been edited!', 'success')
+                this.toggleEditing()
+            } catch (error) {
+                console.error(error)
+                this.openingPost.title = cached.title
+                this.openingPost.content = cached.content
+                this.uiStore.showToast('There was an error editing your post', 'error')
+            }
+        }
     }
 
     get editForm() {
