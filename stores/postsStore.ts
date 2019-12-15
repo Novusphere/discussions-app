@@ -5,7 +5,7 @@ import { BaseStore, getOrCreateStore } from 'next-mobx-wrapper'
 import { CreateForm } from '@components'
 import tag, { getTagStore } from '@stores/tagStore'
 import { getAuthStore, getUiStore, IStores } from '@stores'
-import { generateUuid, getAttachmentValue, pushToThread, sleep } from '@utils'
+import { encodeId, generateUuid, getAttachmentValue, pushToThread, sleep } from '@utils'
 import { ThreadModel } from '@models/threadModel'
 import FeedModel from '@models/feedModel'
 import _ from 'lodash'
@@ -72,6 +72,8 @@ export default class PostsStore extends BaseStore {
     @observable newPostData = {
         sub: null, // { value: '', label: '' }
     }
+
+    @observable posting = false // for spinner
 
     /**
      * Manage getRepliesFromMap within a post (not opening post)
@@ -272,7 +274,85 @@ export default class PostsStore extends BaseStore {
         }
     }
 
-    get newPostForm() {
+    @task.resolved
+    @action.bound
+    async handleSubmit(form) {
+        this.posting = true
+        if (!form.hasError && this.newPostData.sub.value) {
+            this.posting = true
+            const post = form.values()
+            const uuid = generateUuid()
+            const posterName = this.authStore.posterName
+
+            let inlineTags = post.content.match(/#([^\s.,;:!?]+)/gi)
+            let tags = [this.newPostData.sub.value]
+
+            if (inlineTags && inlineTags.length) {
+                inlineTags = inlineTags.map(tag => tag.replace('#', ''))
+                tags = [...tags, ...inlineTags]
+            }
+
+            const newPost = {
+                poster: null,
+                displayName: null,
+                title: post.title,
+                content: post.content,
+                sub: this.newPostData.sub.value,
+                chain: 'eos',
+                mentions: [],
+                tags: tags,
+                uuid: uuid,
+                parentUuid: '',
+                threadUuid: uuid,
+                attachment: getAttachmentValue(post),
+                createdAt: Date.now(),
+            }
+
+            if (posterName === this.authStore.displayName.bk) {
+                newPost.poster = undefined
+                newPost.displayName = posterName
+            }
+
+            if (posterName === this.authStore.displayName.scatter) {
+                newPost.poster = posterName
+                newPost.displayName = posterName
+            }
+
+            const model = new PostModel(newPost as any)
+            const signedReply = model.sign(this.authStore.postPriv)
+            const submittedPost = await discussions.post(signedReply as any)
+            const isPostValid = discussions.checkIfPostIsValid(submittedPost)
+
+            return new Promise((resolve, reject) => {
+                if (isPostValid) {
+                    const int = setInterval(async () => {
+                        const id = encodeId(submittedPost)
+                        const getThread = await discussions.getThread(id)
+
+                        if (getThread) {
+                            if (int) {
+                                clearInterval(int)
+                                this.posting = false
+                                resolve()
+                            }
+
+                            await pushToThread(submittedPost)
+                            this.uiStore.showToast('Your post has been created!', 'success')
+                            this.clearPreview()
+                        }
+                    }, 2000)
+                } else {
+                    this.uiStore.showToast('Unable to verify post was created.!', 'error')
+                    this.posting = false
+                    reject()
+                }
+            })
+        } else {
+            this.posting = false
+        }
+    }
+
+    @computed get newPostForm() {
         return new CreateForm({}, [
             {
                 name: 'title',
@@ -289,6 +369,7 @@ export default class PostsStore extends BaseStore {
                 placeholder: 'Enter your content',
                 disabled: !this.newPostData.sub,
                 type: 'richtext',
+                rules: 'required',
             },
             {
                 name: 'buttons',
@@ -315,70 +396,7 @@ export default class PostsStore extends BaseStore {
                                 ? 'You need to be logged in to post'
                                 : 'Post as ' + this.authStore.posterName,
 
-                            onClick: task.resolved(async form => {
-                                if (!form.hasError && this.newPostData.sub.value) {
-                                    const post = form.values()
-                                    const uuid = generateUuid()
-                                    const posterName = this.authStore.posterName
-
-                                    let inlineTags = post.content.match(/#([^\s.,;:!?]+)/gi)
-                                    let tags = [this.newPostData.sub.value]
-
-                                    if (inlineTags && inlineTags.length) {
-                                        inlineTags = inlineTags.map(tag => tag.replace('#', ''))
-                                        tags = [...tags, ...inlineTags]
-                                    }
-
-                                    const newPost = {
-                                        poster: null,
-                                        displayName: null,
-                                        title: post.title,
-                                        content: post.content,
-                                        sub: this.newPostData.sub.value,
-                                        chain: 'eos',
-                                        mentions: [],
-                                        tags: tags,
-                                        uuid: uuid,
-                                        parentUuid: '',
-                                        threadUuid: uuid,
-                                        attachment: getAttachmentValue(post),
-                                        createdAt: Date.now(),
-                                    }
-
-                                    if (posterName === this.authStore.displayName.bk) {
-                                        newPost.poster = undefined
-                                        newPost.displayName = posterName
-                                    }
-
-                                    if (posterName === this.authStore.displayName.scatter) {
-                                        newPost.poster = posterName
-                                        newPost.displayName = posterName
-                                    }
-
-                                    const model = new PostModel(newPost as any)
-                                    const signedReply = model.sign(this.authStore.postPriv)
-                                    const submittedPost = await discussions.post(signedReply as any)
-                                    const isPostValid = discussions.checkIfPostIsValid(
-                                        submittedPost
-                                    )
-
-                                    if (isPostValid) {
-                                        // // TODO: Add check to make sure the thread is actually posted onto the chain
-                                        await sleep(5000)
-                                        await pushToThread(submittedPost)
-                                        this.uiStore.showToast(
-                                            'Your post has been created!',
-                                            'success'
-                                        )
-                                        this.clearPreview()
-                                    } else {
-                                        this.uiStore.showToast(
-                                            'Unable to verify post was created.!',
-                                            'error'
-                                        )
-                                    }
-                                }
-                            }),
+                            onClick: this.handleSubmit,
                         },
                     ],
                 },

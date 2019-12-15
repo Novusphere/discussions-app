@@ -50,44 +50,48 @@ class Form extends React.Component<FormProps> {
         const renderButton = (field, type, rest) => {
             if (Array.isArray(field.accessor.$extra.options)) {
                 return field.accessor.$extra.options.map(
-                    ({ value, disabled, title, className, onClick }) => (
-                        <button
-                            datatype={type}
-                            onClick={e => {
-                                form.onSubmit(e)
+                    ({ value, disabled, title, className, onClick, loading }) => {
+                        const isLoading = loading || onClick && onClick['state'] && onClick['state'] === 'pending'
 
-                                if (onClick) {
-                                    onClick(form.form)
+                        return (
+                            <button
+                                datatype={type}
+                                onClick={e => {
+                                    form.onSubmit(e)
+
+                                    if (onClick) {
+                                        onClick(form.form)
+                                    }
+
+                                    e.preventDefault()
+                                }}
+                                disabled={
+                                    disabled ||
+                                    (isLoading) ||
+                                    false
                                 }
-
-                                e.preventDefault()
-                            }}
-                            disabled={
-                                disabled ||
-                                (onClick && onClick['state'] && onClick['state'] === 'pending') ||
-                                false
-                            }
-                            key={`${field.name}-${value}`}
-                            title={title || null}
-                            className={classNames([
-                                'mt3 f6 link dim ph3 pv2 dib mr2 pointer',
-                                {
-                                    'white bg-green': !className,
-                                    [className]: className,
-                                },
-                            ])}
-                        >
-                            {onClick && onClick['state'] && onClick['state'] === 'pending' ? (
-                                <FontAwesomeIcon
-                                    width={13}
-                                    icon={faSpinner}
-                                    spin
-                                    className={'mr1'}
-                                />
-                            ) : null}
-                            {value}
-                        </button>
-                    )
+                                key={`${field.name}-${value}`}
+                                title={title || null}
+                                className={classNames([
+                                    'mt3 f6 link dim ph3 pv2 dib mr2 pointer',
+                                    {
+                                        'white bg-green': !className,
+                                        [className]: className,
+                                    },
+                                ])}
+                            >
+                                {isLoading ? (
+                                    <FontAwesomeIcon
+                                        width={13}
+                                        icon={faSpinner}
+                                        spin
+                                        className={'mr1'}
+                                    />
+                                ) : null}
+                                {value}
+                            </button>
+                        )
+                    }
                 )
             }
 
