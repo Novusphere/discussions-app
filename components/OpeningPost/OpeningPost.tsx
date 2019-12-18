@@ -38,6 +38,7 @@ interface IOpeningPostProps {
     id: string
     hasReplyContent: boolean
     showPostWarningCloseModal: () => void
+    toggleBlockPost: (threadUuid: string) => void
 }
 
 const OpeningPost: React.FC<IOpeningPostProps> = ({
@@ -51,6 +52,7 @@ const OpeningPost: React.FC<IOpeningPostProps> = ({
     id,
     hasReplyContent,
     showPostWarningCloseModal,
+    toggleBlockPost,
 }) => {
     return (
         <div data-post-uuid={openingPost.uuid}>
@@ -191,7 +193,7 @@ const OpeningPost: React.FC<IOpeningPostProps> = ({
                                     <a
                                         href={`https://eosq.app/tx/${openingPost.transaction}`}
                                         target={'blank'}
-                                        className={'mr4 black f6 pointer dim'}
+                                        className={'mr3 black f6 pointer dim'}
                                         title={'View block'}
                                     >
                                         <FontAwesomeIcon
@@ -200,6 +202,13 @@ const OpeningPost: React.FC<IOpeningPostProps> = ({
                                             icon={faLink}
                                         />
                                     </a>
+
+                                    <span
+                                        className={'pointer dim'}
+                                        onClick={() => toggleBlockPost(openingPost.threadUuid)}
+                                    >
+                                        Block Thread
+                                    </span>
                                 </div>
 
                                 <SharePost />

@@ -77,7 +77,7 @@ class Thread extends React.Component<IThreadOuterProps & IThreadInnerProps, IThr
             uiStore,
             postsStore: { hasReplyContent },
             tagStore: { activeTag },
-            userStore: { isWatchingThread, toggleThreadWatch },
+            userStore: { isWatchingThread, toggleThreadWatch, toggleBlockPost },
         } = this.props
 
         const { threadAsModel } = this
@@ -93,6 +93,7 @@ class Thread extends React.Component<IThreadOuterProps & IThreadInnerProps, IThr
                 activeTag={activeTag}
                 canEditPost={threadAsModel.canEditPost}
                 isWatchingPost={isWatchingThread}
+                toggleBlockPost={toggleBlockPost}
                 watchPost={this.handleWatchPost}
             />
         )

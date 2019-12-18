@@ -9,7 +9,8 @@ import NotificationModel from '@models/notificationModel'
 export default class UserStore extends BaseStore {
     @persist('map') @observable following = observable.map<string, string>()
     @persist('map') @observable watching = observable.map<string, [number, number]>() // [currentCount, prevCount]
-    @persist('map') @observable blocked = observable.map<string, string>() // [pubKey, displayName]
+    @persist('map') @observable blockedUsers = observable.map<string, string>() // [pubKey, displayName]
+    @persist('map') @observable blockedPosts = observable.map<string, string>() // [uuid, yyyydd]
 
     private readonly uiStore: IStores['uiStore'] = getUiStore()
     private readonly tagStore: IStores['tagStore'] = getTagStore()
@@ -118,17 +119,27 @@ export default class UserStore extends BaseStore {
 
     @action.bound
     toggleBlockUser(displayName: string, pubKey: string) {
-        if (this.blocked.has(pubKey)) {
-            this.blocked.delete(pubKey)
+        if (this.blockedUsers.has(pubKey)) {
+            this.blockedUsers.delete(pubKey)
         } else {
-            this.blocked.set(pubKey, displayName)
+            this.blockedUsers.set(pubKey, displayName)
         }
     }
 
     isUserBlocked = computedFn((pubKey: string) => {
-        return this.blocked.has(pubKey)
+        return this.blockedUsers.has(pubKey)
     })
 
+    @action.bound
+    toggleBlockPost(uuid: string) {
+        if (this.blockedPosts.has(uuid)) {
+            this.blockedPosts.delete(uuid)
+        } else {
+            const date = new Date(Date.now())
+            const dateStamp = `${date.getFullYear()}${date.getMonth()}`
+            this.blockedPosts.set(uuid, dateStamp)
+        }
+    }
 }
 
 export const getUserStore = getOrCreateStore('userStore', UserStore)
