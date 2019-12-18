@@ -33,7 +33,6 @@ class Settings extends React.Component<ISettings, ISettingsState> {
     static async getInitialProps({ store, res }) {
         const uiStore: IStores['uiStore'] = store.uiStore
         const tagStore: IStores['tagStore'] = store.tagStore
-        const authStore: IStores['authStore'] = store.authStore
 
         uiStore.toggleSidebarStatus(false)
         tagStore.destroyActiveTag()
@@ -42,7 +41,7 @@ class Settings extends React.Component<ISettings, ISettingsState> {
     }
 
     state = {
-        activeSidebar: 'Airdrop',
+        activeSidebar: 'Moderation',
         tokens: {
             activeIndex: 0,
         },

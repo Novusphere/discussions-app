@@ -12,6 +12,7 @@ const fileDownload = require('js-file-download')
 
 export default class SettingsStore extends BaseStore {
     @persist @observable localStorageVersion = '2.0.0'
+
     @observable moderationSubValue = null
     @observable moderationMembers = observable.array<string>(['gux', 'someuser'])
     @observable tokens = []

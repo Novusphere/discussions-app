@@ -2,8 +2,15 @@ import { BaseStore, getOrCreateStore } from 'next-mobx-wrapper'
 import { task } from 'mobx-task'
 import { action, autorun, observable, observe, reaction } from 'mobx'
 import { nsdb } from '@novuspherejs'
-import { getAuthStore, getNotificationsStore, getTagStore, getUserStore, IStores } from '@stores/index'
+import {
+    getAuthStore,
+    getNotificationsStore,
+    getTagStore,
+    getUserStore,
+    IStores,
+} from '@stores/index'
 import { IAccountSync } from '@d.ts/account-sync'
+import _ from 'lodash'
 
 export default class SyncStore extends BaseStore {
     private readonly authStore: IStores['authStore'] = getAuthStore()
@@ -27,20 +34,24 @@ export default class SyncStore extends BaseStore {
 
                     this.syncedData = data
 
-                    if (data.tags) {
+                    if (!_.isUndefined(data.tags)) {
                         this.syncSubscribedTagsWithDB(data.tags)
                     }
 
-                    if (data.following) {
+                    if (!_.isUndefined(data.following)) {
                         this.syncFollowerListWitHDB(data.following)
                     }
 
-                    if (data.watching) {
+                    if (!_.isUndefined(data.watching)) {
                         this.syncWatchingListWithDB(data.watching)
                     }
 
-                    if (data.lastCheckedNotifications) {
+                    if (!_.isUndefined(data.lastCheckedNotifications)) {
                         this.syncNotificationTimeWithDB(data.lastCheckedNotifications)
+                    }
+
+                    if (!_.isUndefined(data.moderation)) {
+                        this.syncModerationListWithDB(data.moderation)
                     }
                 }
 
@@ -60,9 +71,9 @@ export default class SyncStore extends BaseStore {
 
         reaction(
             () => this.notificationsStore.lastCheckedNotifications,
-            (lastCheckedNotifications) => {
+            lastCheckedNotifications => {
                 this.saveDataWithSyncedData({
-                    lastCheckedNotifications
+                    lastCheckedNotifications,
                 })
             }
         )
@@ -76,6 +87,20 @@ export default class SyncStore extends BaseStore {
         observe(this.userStore.watching, change => {
             this.saveDataWithSyncedData({
                 watching: change.object.toJSON(),
+            })
+        })
+
+        observe(this.userStore.blocked, change => {
+            const moderationListToSync = []
+
+            change.object.forEach((name, pub) => {
+                moderationListToSync.push(`${name}:${pub}`)
+            })
+
+            this.saveDataWithSyncedData({
+                moderation: {
+                    blockedUsers: moderationListToSync,
+                },
             })
         })
     }
@@ -101,9 +126,25 @@ export default class SyncStore extends BaseStore {
     }
 
     @action.bound
+    syncModerationListWithDB(moderation) {
+        if (moderation.blockedUsers) {
+            this.userStore.blocked.clear()
+
+            moderation.blockedUsers.forEach(user => {
+                const [name, pub] = user.split(':')
+                this.userStore.blocked.set(pub, name)
+            })
+        }
+
+        // do blockedPosts
+    }
+
+    @action.bound
     private async saveDataWithSyncedData(data: any) {
-        if (this.authStore.activePrivateKey) {
-            this.saveAccountDataWithPrivateKey(this.authStore.activePrivateKey, {
+        const { activePrivateKey } = this.authStore
+
+        if (activePrivateKey) {
+            this.saveAccountDataWithPrivateKey(activePrivateKey, {
                 ...this.syncedData,
                 ...data,
             })

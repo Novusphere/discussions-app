@@ -7,16 +7,9 @@ import { discussions } from '@novuspherejs'
 import NotificationModel from '@models/notificationModel'
 
 export default class UserStore extends BaseStore {
-    /**
-     * Observable map of users the current account is following
-     * TODO: Sync with an API
-     * {
-     *     pub: username
-     * }
-     */
     @persist('map') @observable following = observable.map<string, string>()
-
     @persist('map') @observable watching = observable.map<string, [number, number]>() // [currentCount, prevCount]
+    @persist('map') @observable blocked = observable.map<string, string>() // [pubKey, displayName]
 
     private readonly uiStore: IStores['uiStore'] = getUiStore()
     private readonly tagStore: IStores['tagStore'] = getTagStore()
@@ -122,6 +115,20 @@ export default class UserStore extends BaseStore {
     isWatchingThread = computedFn((id: string) => {
         return this.watching.has(id)
     })
+
+    @action.bound
+    toggleBlockUser(displayName: string, pubKey: string) {
+        if (this.blocked.has(pubKey)) {
+            this.blocked.delete(pubKey)
+        } else {
+            this.blocked.set(pubKey, displayName)
+        }
+    }
+
+    isUserBlocked = computedFn((pubKey: string) => {
+        return this.blocked.has(pubKey)
+    })
+
 }
 
 export const getUserStore = getOrCreateStore('userStore', UserStore)

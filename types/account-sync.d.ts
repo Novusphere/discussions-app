@@ -8,6 +8,10 @@ export interface IAccountSync {
         watching: {
             [encodedThreadId: string]: [number, number] //[count, diffCount]
         }
+        moderation: {
+            blockedUsers: string[]
+            blockedPosts: { [yyyymm: number]: string[] }
+        }
     }
     pub: string
     time: number

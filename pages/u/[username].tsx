@@ -71,6 +71,10 @@ class U extends React.Component<IUPageProps> {
         this.props.userStore.toggleUserFollowing(user, pub)
     }
 
+    private handleUserBlock = (user, pub) => {
+        this.props.userStore.toggleBlockUser(user, pub)
+    }
+
     private renderFollowingList = () => {
         if (!this.props.userStore.following.size) {
             return (
@@ -108,7 +112,7 @@ class U extends React.Component<IUPageProps> {
             icon,
             username,
             pub,
-            userStore: { toggleUserFollowing, isFollowingUser },
+            userStore: { toggleUserFollowing, isFollowingUser, isUserBlocked },
         } = this.props
 
         return (
@@ -154,6 +158,21 @@ class U extends React.Component<IUPageProps> {
                         <li className={'pa0 mb2'}>EOS</li>
                     </ul>
                 </div>
+
+                {!this.isSameUser && (
+                    <div className={'mt4 flex flex-column'}>
+                        <span className={'small-title mb2'}>Options</span>
+
+                        <ul className={'list'}>
+                            <li
+                                className={'red f6 pointer dim'}
+                                onClick={() => this.handleUserBlock(username, pub)}
+                            >
+                                {isUserBlocked(pub) ? 'Unblock User' : 'Block User'}
+                            </li>
+                        </ul>
+                    </div>
+                )}
 
                 {this.isSameUser && (
                     <div className={'mt4 flex flex-column'}>
@@ -215,6 +234,5 @@ class U extends React.Component<IUPageProps> {
         )
     }
 }
-
 
 export default U
