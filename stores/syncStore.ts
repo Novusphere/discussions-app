@@ -128,40 +128,6 @@ export default class SyncStore extends BaseStore {
                 })
             }
         })
-
-        // observe(this.userStore.blockedUsers, change => {
-        //     const moderationListToSync = []
-        //
-        //     change.object.forEach((name, pub) => {
-        //         moderationListToSync.push(`${name}:${pub}`)
-        //     })
-        //
-        //     this.saveDataWithSyncedData({
-        //         moderation: {
-        //             blockedUsers: moderationListToSync,
-        //         },
-        //     })
-        // })
-        //
-        // observe(this.userStore.blockedPosts, change => {
-        //     const blockedListToSync = {}
-        //     const data = _.cloneDeep(change.object)
-        //
-        //     data.forEach((timestamp, uuid) => {
-        //         const prev = blockedListToSync[timestamp] || []
-        //         Object.assign(blockedListToSync, {
-        //             [timestamp]: [...prev, uuid],
-        //         })
-        //     })
-        //
-        //     console.log(blockedListToSync)
-        //
-        //     this.saveDataWithSyncedData({
-        //         moderation: {
-        //             blockedPosts: blockedListToSync,
-        //         },
-        //     })
-        // })
     }
 
     @action.bound

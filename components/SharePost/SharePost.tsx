@@ -8,9 +8,12 @@ import copy from 'clipboard-copy'
 import { CSSTransition } from 'react-transition-group'
 import { tweetCurrentPage } from '@utils'
 
-interface ISharePostProps {}
+interface ISharePostProps {
+    toggleBlockPost: (uuid: string) => void
+    uuid: string
+}
 
-const SharePost: React.FC<ISharePostProps> = () => {
+const SharePost: React.FC<ISharePostProps> = ({ toggleBlockPost, uuid }) => {
     const [inProp, setInProp] = useState(false)
 
     const renderIcon = () => {
@@ -34,6 +37,10 @@ const SharePost: React.FC<ISharePostProps> = () => {
         <div className={'disable-user-select flex flex-row items-center'}>
             <CSSTransition unmountOnExit in={inProp} timeout={200} classNames={'slide'}>
                 <div>
+                    <span className={'pr3 f6 b0b0b0 dim pointer'} onClick={() => toggleBlockPost(uuid)}>
+                        block thread
+                    </span>
+
                     <span
                         className={'pr3 f6 b0b0b0 dim pointer'}
                         title={'Copy URL to clipboard'}

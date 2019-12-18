@@ -193,7 +193,7 @@ const OpeningPost: React.FC<IOpeningPostProps> = ({
                                     <a
                                         href={`https://eosq.app/tx/${openingPost.transaction}`}
                                         target={'blank'}
-                                        className={'mr3 black f6 pointer dim'}
+                                        className={'black f6 pointer dim'}
                                         title={'View block'}
                                     >
                                         <FontAwesomeIcon
@@ -202,16 +202,12 @@ const OpeningPost: React.FC<IOpeningPostProps> = ({
                                             icon={faLink}
                                         />
                                     </a>
-
-                                    <span
-                                        className={'pointer dim'}
-                                        onClick={() => toggleBlockPost(openingPost.threadUuid)}
-                                    >
-                                        Block Thread
-                                    </span>
                                 </div>
 
-                                <SharePost />
+                                <SharePost
+                                    toggleBlockPost={toggleBlockPost}
+                                    uuid={openingPost.threadUuid}
+                                />
                             </div>
                         </div>
                     )}
