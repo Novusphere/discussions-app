@@ -53,6 +53,7 @@ const OpeningPost: React.FC<IOpeningPostProps> = ({
     hasReplyContent,
     showPostWarningCloseModal,
     toggleBlockPost,
+    asPath,
 }) => {
     return (
         <div data-post-uuid={openingPost.uuid}>
@@ -204,10 +205,7 @@ const OpeningPost: React.FC<IOpeningPostProps> = ({
                                     </a>
                                 </div>
 
-                                <SharePost
-                                    toggleBlockPost={toggleBlockPost}
-                                    uuid={openingPost.threadUuid}
-                                />
+                                <SharePost toggleBlockPost={toggleBlockPost} id={asPath} />
                             </div>
                         </div>
                     )}

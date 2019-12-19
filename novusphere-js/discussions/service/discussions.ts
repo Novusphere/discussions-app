@@ -315,7 +315,7 @@ export default class DiscussionsService {
         return op.totalReplies
     }
 
-    async getThread(_id: string, isServer = false): Promise<Thread | null> {
+    async getThread(_id: string, isServer = false, decoded = false): Promise<Thread | null> {
         let dId = Post.decodeId(_id)
 
         const searchQuery = {
@@ -501,6 +501,22 @@ export default class DiscussionsService {
                 cursorId,
                 count,
                 limit,
+            })
+        } catch (error) {
+            throw error
+        }
+    }
+
+    async getPostsByTransaction(transaction: string) {
+        try {
+            return await nsdb.search({
+                pipeline: [
+                    {
+                        $match: {
+                            transaction,
+                        },
+                    },
+                ],
             })
         } catch (error) {
             throw error

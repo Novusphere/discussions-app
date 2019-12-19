@@ -10,10 +10,10 @@ import { tweetCurrentPage } from '@utils'
 
 interface ISharePostProps {
     toggleBlockPost: (uuid: string) => void
-    uuid: string
+    id: string
 }
 
-const SharePost: React.FC<ISharePostProps> = ({ toggleBlockPost, uuid }) => {
+const SharePost: React.FC<ISharePostProps> = ({ toggleBlockPost, id }) => {
     const [inProp, setInProp] = useState(false)
 
     const renderIcon = () => {
@@ -37,7 +37,7 @@ const SharePost: React.FC<ISharePostProps> = ({ toggleBlockPost, uuid }) => {
         <div className={'disable-user-select flex flex-row items-center'}>
             <CSSTransition unmountOnExit in={inProp} timeout={200} classNames={'slide'}>
                 <div>
-                    <span className={'pr3 f6 b0b0b0 dim pointer'} onClick={() => toggleBlockPost(uuid)}>
+                    <span className={'pr3 f6 b0b0b0 dim pointer'} onClick={() => toggleBlockPost(id)}>
                         block thread
                     </span>
 

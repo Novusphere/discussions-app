@@ -1,8 +1,7 @@
 import { observable, set } from 'mobx'
 import { Post } from '@novuspherejs'
 import ecc from 'eosjs-ecc'
-import { getIdenticon } from '@utils'
-
+import { encodeId, getIdenticon } from '@utils'
 
 class PostModel {
     @observable public map: { [p: string]: PostModel } | undefined
@@ -34,6 +33,8 @@ class PostModel {
     @observable imageData
     @observable posterName
 
+    @observable blockedId
+
     constructor(post: Post) {
         set(this, post)
 
@@ -50,6 +51,8 @@ class PostModel {
         } else {
             this.posterName = this.poster
         }
+
+        this.blockedId = `${post.threadUuid}/${post.uuid}`
     }
 
     sign = (privKey: string) => {
@@ -61,6 +64,5 @@ class PostModel {
         return this
     }
 }
-
 
 export default PostModel

@@ -10,7 +10,7 @@ export default class UserStore extends BaseStore {
     @persist('map') @observable following = observable.map<string, string>()
     @persist('map') @observable watching = observable.map<string, [number, number]>() // [currentCount, prevCount]
     @persist('map') @observable blockedUsers = observable.map<string, string>() // [pubKey, displayName]
-    @persist('map') @observable blockedPosts = observable.map<string, string>() // [uuid, yyyydd]
+    @persist('map') @observable blockedPosts = observable.map<string, string>() // [asPathURL, yyyydd]
 
     private readonly uiStore: IStores['uiStore'] = getUiStore()
     private readonly tagStore: IStores['tagStore'] = getTagStore()
@@ -130,14 +130,17 @@ export default class UserStore extends BaseStore {
         return this.blockedUsers.has(pubKey)
     })
 
+    /**
+     * @param {string} asPathURL - i.e. /tag/test/1hx6xdq9iwehn/testt
+     */
     @action.bound
-    toggleBlockPost(uuid: string) {
-        if (this.blockedPosts.has(uuid)) {
-            this.blockedPosts.delete(uuid)
+    toggleBlockPost(asPathURL: string) {
+        if (this.blockedPosts.has(asPathURL)) {
+            this.blockedPosts.delete(asPathURL)
         } else {
             const date = new Date(Date.now())
             const dateStamp = `${date.getFullYear()}${date.getMonth()}`
-            this.blockedPosts.set(uuid, dateStamp)
+            this.blockedPosts.set(asPathURL, dateStamp)
         }
     }
 }

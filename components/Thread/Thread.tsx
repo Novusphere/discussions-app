@@ -25,7 +25,8 @@ interface IThreadInnerProps {
     router: NextRouter
 }
 
-interface IThreadState {}
+interface IThreadState {
+}
 
 @(withRouter as any)
 @inject('postsStore', 'userStore', 'authStore', 'tagStore', 'notificationsStore', 'uiStore')
@@ -40,8 +41,8 @@ class Thread extends React.Component<IThreadOuterProps & IThreadInnerProps, IThr
         this.openingReplyModel = this.threadAsModel.rbModel(props.thread.openingPost)
     }
 
-    componentDidMount(): void {
-        window.addEventListener('beforeunload', this.handleWindowClose)
+    async componentDidMount(): Promise<void> {
+         window.addEventListener('beforeunload', this.handleWindowClose)
     }
 
     componentWillUnmount(): void {
@@ -145,7 +146,7 @@ class Thread extends React.Component<IThreadOuterProps & IThreadInnerProps, IThr
     private renderReplies = () => {
         const {
             router,
-            userStore: { toggleUserFollowing, following },
+            userStore: { toggleUserFollowing, following, toggleBlockPost },
             postsStore: { highlightPostUuid, currentHighlightedPostUuid, setCurrentReplyContent },
             authStore: { activePublicKey, hasAccount },
         } = this.props
@@ -173,6 +174,7 @@ class Thread extends React.Component<IThreadOuterProps & IThreadInnerProps, IThr
                             currentHighlightedPostUuid={currentHighlightedPostUuid}
                             hasAccount={hasAccount}
                             following={following}
+                            toggleBlockPost={toggleBlockPost}
                         />
                     )
                 })}

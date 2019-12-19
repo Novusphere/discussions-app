@@ -3,6 +3,7 @@ import * as React from 'react'
 import './style.scss'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import {
+    faFlag,
     faLink,
     faPen,
     faReply,
@@ -23,6 +24,7 @@ interface IReplyHoverElementsProps {
     isFollowing: boolean
     getPermaLinkUrl: () => void
     toggleFollowStatus: () => void
+    toggleToggleBlock: () => void
     isSticky: boolean
 }
 
@@ -34,6 +36,7 @@ const ReplyHoverElements: React.FC<IReplyHoverElementsProps> = ({
     replyModel,
     getPermaLinkUrl,
     toggleFollowStatus,
+    toggleToggleBlock,
     isSticky,
 }) => {
     return (
@@ -74,6 +77,9 @@ const ReplyHoverElements: React.FC<IReplyHoverElementsProps> = ({
                     )}
                 </span>
             ) : null}
+            <span title={'Mark as spam'} onClick={toggleToggleBlock}>
+                <FontAwesomeIcon icon={faFlag} />
+            </span>
         </div>
     )
 }

@@ -8,12 +8,14 @@ import { getIdenticon } from '@utils'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { faMinusCircle, faPlus } from '@fortawesome/free-solid-svg-icons'
 import { Tab, TabList, TabPanel, Tabs } from 'react-tabs'
+import Link from 'next/link'
 
 interface ISettings {
     settingsStore: IStores['settingsStore']
     postsStore: IStores['postsStore']
     uiStore: IStores['uiStore']
     userStore: IStores['userStore']
+    tagStore: IStores['tagStore']
 }
 
 // TODO: Real Data
@@ -28,7 +30,7 @@ interface ISettingsState {
     }
 }
 
-@inject('settingsStore', 'postsStore', 'uiStore', 'userStore')
+@inject('settingsStore', 'postsStore', 'uiStore', 'userStore', 'tagStore')
 @observer
 class Settings extends React.Component<ISettings, ISettingsState> {
     static async getInitialProps({ store, res }) {
@@ -340,66 +342,80 @@ class Settings extends React.Component<ISettings, ISettingsState> {
 
     private renderBlocked = () => {
         const { blockedPosts, blockedUsers } = this.props.userStore
+        const { tags } = this.props.tagStore
+
+        const blockedPostsAsArray = Array.from(blockedPosts.keys())
+        const blockedUsersAsArray = Array.from(blockedUsers.keys())
 
         return (
             <>
                 <h3>Users</h3>
-                <p className={'lh-copy'}>These are the users you have blocked.</p>
-                <div className={'outline-container mt3'}>
-                    <div className={'flex flex-column space-between'}>
-                        <div className={'mb3'}>
-                            {Array.from(blockedUsers.keys()).map((pub, index, array) => (
-                                <span
-                                    className={classNames([
-                                        'flex items-center justify-between ph2',
-                                        {
-                                            'bb b--light-gray pv3': index !== array.length - 1,
-                                            'pt3': index === array.length - 1
-                                        },
-                                    ])}
-                                    key={pub}
-                                >
-                                    <UserNameWithIcon
-                                        imageData={getIdenticon(pub)}
-                                        name={blockedUsers.get(pub)}
-                                        pub={pub}
-                                    />
+                {!blockedUsersAsArray.length ? (
+                    <span className={'moon-gray f6 i'}>You have no blocked users</span>
+                ) : (
+                    <div className={'outline-container mt3'}>
+                        <div className={'flex flex-column space-between'}>
+                            <div className={'mb3'}>
+                                {blockedUsersAsArray.map((pub, index, array) => (
                                     <span
-                                        onClick={() => blockedUsers.delete(pub)}
-                                        title={'Unblock User'}
+                                        className={classNames([
+                                            'flex items-center justify-between ph2',
+                                            {
+                                                'bb b--light-gray pv3': index !== array.length - 1,
+                                                pt3: index === array.length - 1,
+                                            },
+                                        ])}
+                                        key={pub}
                                     >
-                                        <FontAwesomeIcon
-                                            width={13}
-                                            icon={faMinusCircle}
-                                            className={'pointer dim'}
-                                            color={'red'}
+                                        <UserNameWithIcon
+                                            imageData={getIdenticon(pub)}
+                                            name={blockedUsers.get(pub)}
+                                            pub={pub}
                                         />
+                                        <span
+                                            onClick={() => blockedUsers.delete(pub)}
+                                            title={'Unblock User'}
+                                        >
+                                            <FontAwesomeIcon
+                                                width={13}
+                                                icon={faMinusCircle}
+                                                className={'pointer dim'}
+                                                color={'red'}
+                                            />
+                                        </span>
                                     </span>
-                                </span>
-                            ))}
+                                ))}
+                            </div>
                         </div>
                     </div>
-                </div>
+                )}
 
                 <h3>Posts</h3>
-                <p className={'lh-copy'}>These are the posts you have blocked.</p>
                 <div className={'outline-container mt3'}>
                     <div className={'flex flex-column space-between'}>
                         <div className={'mb3'}>
-                            {Array.from(blockedPosts.keys()).map((pub, index, array) => (
+                            {blockedPostsAsArray.map((url, index, array) => (
                                 <span
                                     className={classNames([
                                         'flex items-center justify-between ph2',
                                         {
                                             'bb b--light-gray pv3': index !== array.length - 1,
-                                            'pt3': index === array.length - 1
+                                            pt3: index === array.length - 1,
                                         },
                                     ])}
-                                    key={pub}
+                                    key={url}
                                 >
-                                    {pub}
+                                    <Link href={'/tag/[name]/[id]/[title]'} as={url}>
+                                        <a className={'flex flex-row items-center'}>
+                                            <img
+                                                className={'tag-icon pr2'}
+                                                src={tags.get(url.split('/')[2]).icon}
+                                            />
+                                            <span>{url}</span>
+                                        </a>
+                                    </Link>
                                     <span
-                                        onClick={() => blockedPosts.delete(pub)}
+                                        onClick={() => blockedPosts.delete(url)}
                                         title={'Unblock Post'}
                                     >
                                         <FontAwesomeIcon

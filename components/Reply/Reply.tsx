@@ -34,8 +34,9 @@ interface IReplies {
     following: ObservableMap<string, string>
     currentHighlightedPostUuid: string
     activePublicKey: string
-    setCurrentReplyContent: (coRntent: string) => void
+    setCurrentReplyContent: (content: string) => void
     hasAccount: boolean
+    toggleBlockPost: (asPathURL: string) => void
 
     isCollapsed?: boolean
     threadReference?: ThreadModel
@@ -114,6 +115,12 @@ class Reply extends React.Component<IReplies, IRepliesState> {
         })
     }
 
+    private toggleToggleBlock = () => {
+        const { dataset } = this.replyRef.current
+        const { permalink } = dataset
+        this.props.toggleBlockPost(permalink)
+    }
+
     private renderHoverElements = (isSticky = false) => {
         if (!this.state.isHover) {
             return null
@@ -127,6 +134,7 @@ class Reply extends React.Component<IReplies, IRepliesState> {
                 replyModel={this.replyModel}
                 getPermaLinkUrl={this.getPermaLinkUrl}
                 toggleFollowStatus={this.toggleFollowStatus}
+                toggleToggleBlock={this.toggleToggleBlock}
                 hasAccount={hasAccount}
                 activePublicKey={activePublicKey}
                 isFollowing={following.has(post.pub)}
@@ -170,6 +178,7 @@ class Reply extends React.Component<IReplies, IRepliesState> {
             hasAccount,
             following,
             setCurrentReplyContent,
+            toggleBlockPost,
         } = this.props
 
         const { isCollapsed, isHover } = this.state
@@ -300,6 +309,7 @@ class Reply extends React.Component<IReplies, IRepliesState> {
                                       currentHighlightedPostUuid={currentHighlightedPostUuid}
                                       hasAccount={hasAccount}
                                       following={following}
+                                      toggleBlockPost={toggleBlockPost}
                                   />
                               </div>
                           ))
