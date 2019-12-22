@@ -43,6 +43,7 @@ interface IReplies {
     threadReference?: ThreadModel
     blockedContentSetting: BlockedContentSetting
     blockedPosts: ObservableMap<string, string>
+    blockedUsers: ObservableMap<string, string>
 }
 
 interface IRepliesState {
@@ -108,9 +109,10 @@ class Reply extends React.Component<IReplies, IRepliesState> {
             () => {
                 if (
                     this.props.blockedContentSetting &&
-                    this.props.blockedPosts.has(this.state.permaLink)
+                    (this.props.blockedPosts.has(this.state.permaLink) ||
+                        this.props.blockedUsers.has(this.props.post.pub))
                 ) {
-                    this.replyModel.toggleOpen()
+                    this.replyModel.open = false
 
                     this.setState({
                         isCollapsed: this.props.blockedContentSetting === 'collapsed',
@@ -214,6 +216,7 @@ class Reply extends React.Component<IReplies, IRepliesState> {
             toggleBlockPost,
             blockedContentSetting,
             blockedPosts,
+            blockedUsers,
         } = this.props
 
         const { isCollapsed, isHover, isHidden, isSpam, permaLink } = this.state
@@ -355,6 +358,7 @@ class Reply extends React.Component<IReplies, IRepliesState> {
                                       following={following}
                                       toggleBlockPost={toggleBlockPost}
                                       blockedPosts={blockedPosts}
+                                      blockedUsers={blockedUsers}
                                   />
                               </div>
                           ))

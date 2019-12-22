@@ -147,7 +147,7 @@ class Thread extends React.Component<IThreadOuterProps & IThreadInnerProps, IThr
     private renderReplies = () => {
         const {
             router,
-            userStore: { toggleUserFollowing, following, toggleBlockPost, blockedPosts },
+            userStore: { toggleUserFollowing, following, toggleBlockPost, blockedPosts, blockedUsers },
             postsStore: { highlightPostUuid, currentHighlightedPostUuid, setCurrentReplyContent },
             authStore: { activePublicKey, hasAccount },
             settingsStore: { blockedContentSetting }
@@ -179,6 +179,7 @@ class Thread extends React.Component<IThreadOuterProps & IThreadInnerProps, IThr
                             toggleBlockPost={toggleBlockPost}
                             blockedContentSetting={blockedContentSetting}
                             blockedPosts={blockedPosts}
+                            blockedUsers={blockedUsers}
                         />
                     )
                 })}

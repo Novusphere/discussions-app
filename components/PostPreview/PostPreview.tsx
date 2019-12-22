@@ -21,6 +21,7 @@ interface IPostPreviewProps {
     disableVoteHandler?: boolean // in case voting needs to be disabled
     blockedContentSetting: BlockedContentSetting
     blockedPosts: ObservableMap<string, string>
+    blockedUsers: ObservableMap<string, string>
 }
 
 const PostPreview: React.FC<IPostPreviewProps> = ({
@@ -31,6 +32,7 @@ const PostPreview: React.FC<IPostPreviewProps> = ({
     voteHandler,
     blockedContentSetting,
     blockedPosts,
+    blockedUsers,
 }) => {
     const [url, setUrl] = useState('')
     const [postModel, setPostModel] = useState(null)
@@ -54,7 +56,11 @@ const PostPreview: React.FC<IPostPreviewProps> = ({
         getUrl()
     }, [])
 
-    if (blockedContentSetting === 'hidden' && blockedPosts.has(url)) {
+    const isSpam = blockedPosts.has(url) || blockedUsers.has(post.pub)
+    const shouldBeCollapsed = blockedContentSetting === 'collapsed' && isSpam
+    const shouldBeHidden = isSpam && blockedContentSetting === 'hidden'
+
+    if (shouldBeHidden) {
         return null
     }
 
@@ -63,7 +69,7 @@ const PostPreview: React.FC<IPostPreviewProps> = ({
             className={'post-preview'}
             data-url={url}
             style={{
-                opacity: blockedContentSetting === 'collapsed' && blockedPosts.has(url) ? 0.5 : 1,
+                opacity: isSpam && blockedContentSetting === 'collapsed' ? 0.5 : 1,
             }}
         >
             <div className={'flex flex-auto'}>
@@ -73,7 +79,7 @@ const PostPreview: React.FC<IPostPreviewProps> = ({
                     }
                     style={{ width: '40px' }}
                 >
-                    {disableVoteHandler || blockedPosts.has(url)
+                    {disableVoteHandler || isSpam
                         ? null
                         : postModel && (
                               <VotingHandles
@@ -88,10 +94,10 @@ const PostPreview: React.FC<IPostPreviewProps> = ({
                 <Link href={'/tag/[name]/[id]/[title]'} as={url}>
                     <a className={'no-style w-100'}>
                         <div className={'flex flex-column post-content w-100'}>
-                            {blockedContentSetting === 'collapsed' && blockedPosts.has(url) && (
+                            {shouldBeCollapsed && (
                                 <span className={'silver'}>This post was marked as spam.</span>
                             )}
-                            {!blockedPosts.has(url) && (
+                            {!shouldBeCollapsed && (
                                 <>
                                     <div className={'flex f6 lh-copy black items-center'}>
                                         {tag && (
