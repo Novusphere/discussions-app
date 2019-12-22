@@ -23,9 +23,11 @@ interface IInfiniteScrollFeedState {}
 
 interface IInfiniteScrollFeedInnerProps {
     tagStore: IStores['tagStore']
+    settingsStore: IStores['settingsStore']
+    userStore: IStores['userStore']
 }
 
-@inject('tagStore')
+@inject('tagStore', 'settingsStore', 'userStore')
 @observer
 class InfiniteScrollFeed extends React.Component<
     IInfiniteScrollFeedOuterProps & IInfiniteScrollFeedInnerProps,
@@ -57,6 +59,8 @@ class InfiniteScrollFeed extends React.Component<
             withAnchorUid,
             children,
             tagStore: { tags },
+            settingsStore: { blockedContentSetting },
+            userStore: { blockedPosts },
         } = this.props
 
         return (
@@ -79,6 +83,8 @@ class InfiniteScrollFeed extends React.Component<
                                           : tags.get(post.sub)
                                   }
                                   voteHandler={post.vote}
+                                  blockedContentSetting={blockedContentSetting}
+                                  blockedPosts={blockedPosts}
                                   {...(withAnchorUid && { notificationUuid: post.uuid })}
                               />
                           )

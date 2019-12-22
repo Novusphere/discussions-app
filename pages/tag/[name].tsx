@@ -29,8 +29,8 @@ class Tag extends React.Component<ITagProps, ITagPageState> {
         const tag = query.name
 
         tagStore.setActiveTag(tag)
-
         postsStore.resetPositionAndPosts()
+
         const posts = await postsStore.getPostsByTag([tag])
 
         return {
@@ -57,6 +57,7 @@ class Tag extends React.Component<ITagProps, ITagPageState> {
                 tag,
             },
         } = this
+
 
         return (
             <>

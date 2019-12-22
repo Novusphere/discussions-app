@@ -10,6 +10,8 @@ import Link from 'next/link'
 import { useEffect, useState } from 'react'
 import { getThreadUrl } from '@utils'
 import { Post } from '@novuspherejs'
+import { BlockedContentSetting } from '@stores/settingsStore'
+import { ObservableMap } from 'mobx'
 
 interface IPostPreviewProps {
     post: Post
@@ -17,6 +19,8 @@ interface IPostPreviewProps {
     notificationUuid?: string
     voteHandler?: (uuid: string, value: number) => Promise<void>
     disableVoteHandler?: boolean // in case voting needs to be disabled
+    blockedContentSetting: BlockedContentSetting
+    blockedPosts: ObservableMap<string, string>
 }
 
 const PostPreview: React.FC<IPostPreviewProps> = ({
@@ -25,6 +29,8 @@ const PostPreview: React.FC<IPostPreviewProps> = ({
     tag,
     notificationUuid,
     voteHandler,
+    blockedContentSetting,
+    blockedPosts,
 }) => {
     const [url, setUrl] = useState('')
     const [postModel, setPostModel] = useState(null)
@@ -48,15 +54,26 @@ const PostPreview: React.FC<IPostPreviewProps> = ({
         getUrl()
     }, [])
 
+    if (blockedContentSetting === 'hidden' && blockedPosts.has(url)) {
+        return null
+    }
+
     return (
-        <div className={'post-preview'} data-url={url}>
+        <div
+            className={'post-preview'}
+            data-url={url}
+            style={{
+                opacity: blockedContentSetting === 'collapsed' && blockedPosts.has(url) ? 0.5 : 1,
+            }}
+        >
             <div className={'flex flex-auto'}>
                 <div
                     className={
                         'bg-light-gray flex tc justify-center ph2 pv4 relative z-2 flex-auto'
                     }
+                    style={{ width: '40px' }}
                 >
-                    {disableVoteHandler
+                    {disableVoteHandler || blockedPosts.has(url)
                         ? null
                         : postModel && (
                               <VotingHandles
@@ -71,57 +88,69 @@ const PostPreview: React.FC<IPostPreviewProps> = ({
                 <Link href={'/tag/[name]/[id]/[title]'} as={url}>
                     <a className={'no-style w-100'}>
                         <div className={'flex flex-column post-content w-100'}>
-                            <div className={'flex f6 lh-copy black items-center'}>
-                                {tag && (
-                                    <img
-                                        src={tag.icon}
-                                        title={`${tag.name} icon`}
-                                        className={'tag-image'}
-                                    />
-                                )}
-                                <span className={'b ttu'}>{post.sub}</span>
-                                <span className={'ph1 b'}>&#183;</span>
-                                {postModel && (
-                                    <UserNameWithIcon
-                                        imageData={postModel.imageData}
-                                        pub={postModel.pub}
-                                        name={postModel.posterName}
-                                        imageSize={20}
-                                    />
-                                )}
-                                <span className={'ph1 b'}>&#183;</span>
-                                <span
-                                    className={'o-50 pl2'}
-                                    title={moment(post.createdAt)
-                                        .toDate()
-                                        .toLocaleString()}
-                                >
-                                    {moment(post.createdAt).fromNow()}
-                                </span>
-                            </div>
-                            <div className={'flex justify-between items-center pt1'}>
-                                <span className={'black f3 b lh-title'}>{post.title}</span>
-                            </div>
-
-                            <RichTextPreview>{post.content}</RichTextPreview>
-
-                            <div className={'flex z-2 footer b'}>
-                                <object>
-                                    <Link href={'/tag/[name]/[id]/[title]'} as={`${url}#comments`}>
-                                        <a className={'o-80 f6 ml2 dim pointer'}>
-                                            <FontAwesomeIcon
-                                                width={13}
-                                                icon={faComment}
-                                                className={'pr2'}
+                            {blockedContentSetting === 'collapsed' && blockedPosts.has(url) && (
+                                <span className={'silver'}>This post was marked as spam.</span>
+                            )}
+                            {!blockedPosts.has(url) && (
+                                <>
+                                    <div className={'flex f6 lh-copy black items-center'}>
+                                        {tag && (
+                                            <img
+                                                src={tag.icon}
+                                                title={`${tag.name} icon`}
+                                                className={'tag-image'}
                                             />
-                                            {post.totalReplies} comments
-                                        </a>
-                                    </Link>
-                                </object>
-                                <span className={'o-80 f6 ml2 dim pointer'}>share</span>
-                                <span className={'o-80 f6 ml2 dim pointer'}>reply</span>
-                                <span className={'o-80 f6 ml2 dim pointer'}>mark as spam</span>
-                            </div>
+                                        )}
+                                        <span className={'b ttu'}>{post.sub}</span>
+                                        <span className={'ph1 b'}>&#183;</span>
+                                        {postModel && (
+                                            <UserNameWithIcon
+                                                imageData={postModel.imageData}
+                                                pub={postModel.pub}
+                                                name={postModel.posterName}
+                                                imageSize={20}
+                                            />
+                                        )}
+                                        <span className={'ph1 b'}>&#183;</span>
+                                        <span
+                                            className={'o-50 pl2'}
+                                            title={moment(post.createdAt)
+                                                .toDate()
+                                                .toLocaleString()}
+                                        >
+                                            {moment(post.createdAt).fromNow()}
+                                        </span>
+                                    </div>
+                                    <div className={'flex justify-between items-center pt1'}>
+                                        <span className={'black f3 b lh-title'}>{post.title}</span>
+                                    </div>
+
+                                    <RichTextPreview>{post.content}</RichTextPreview>
+
+                                    <div className={'flex z-2 footer b'}>
+                                        <object>
+                                            <Link
+                                                href={'/tag/[name]/[id]/[title]'}
+                                                as={`${url}#comments`}
+                                            >
+                                                <a className={'o-80 f6 ml2 dim pointer'}>
+                                                    <FontAwesomeIcon
+                                                        width={13}
+                                                        icon={faComment}
+                                                        className={'pr2'}
+                                                    />
+                                                    {post.totalReplies} comments
+                                                </a>
+                                            </Link>
+                                        </object>
+                                        <span className={'o-80 f6 ml2 dim pointer'}>share</span>
+                                        <span className={'o-80 f6 ml2 dim pointer'}>reply</span>
+                                        <span className={'o-80 f6 ml2 dim pointer'}>
+                                            mark as spam
+                                        </span>
+                                    </div>
+                                </>
+                            )}
                         </div>
                     </a>
                 </Link>

@@ -11,14 +11,18 @@ import { DefaultSeo } from 'next-seo'
 import Router from 'next/router'
 
 import '../styles/style.scss'
-import { reaction } from 'mobx'
-import { DEFAULT_EOS_NETWORK, eos } from '@novuspherejs'
+import { eos } from '@novuspherejs'
 
 // configure({ enforceActions: 'observed' })
 useStaticRendering(isServer) // NOT `true` value
 toast.configure()
 
 Router.events.on('routeChangeComplete', url => pageview(url))
+
+export const hydrate = storage => create({
+    storage: storage,
+    jsonify: true,
+})
 
 class DiscussionApp extends App {
     public props: any
@@ -46,15 +50,8 @@ class DiscussionApp extends App {
                 tags: tagStore,
             }
 
-            const hydrate = create({
-                storage: localStorage,
-                jsonify: true,
-            })
-
             Object.keys(stores).forEach(store => {
-                hydrate(store, stores[store], {
-                    hasAccount: true,
-                })
+                hydrate(localStorage)(store, stores[store])
             })
 
             await eos.init({

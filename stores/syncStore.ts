@@ -12,6 +12,8 @@ import {
 } from '@stores/index'
 import { IAccountSync } from '@d.ts/account-sync'
 import _ from 'lodash'
+import { hydrate } from '../pages/_app'
+import { isServer } from '@utils'
 
 export default class SyncStore extends BaseStore {
     private readonly authStore: IStores['authStore'] = getAuthStore()
@@ -134,6 +136,11 @@ export default class SyncStore extends BaseStore {
                 this.saveDataWithSyncedData({
                     moderation: moderation,
                 })
+
+                // if (!isServer) {
+                //     hydrate(localStorage)('user', this.userStore).rehydrate()
+                // }
+                // hydrate('user', this.userStore).rehydrate()
             }
         })
     }
