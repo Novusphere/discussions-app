@@ -38,7 +38,7 @@ const SharePost: React.FC<ISharePostProps> = ({ toggleBlockPost, id }) => {
             <CSSTransition unmountOnExit in={inProp} timeout={200} classNames={'slide'}>
                 <div>
                     <span className={'pr3 f6 b0b0b0 dim pointer'} onClick={() => toggleBlockPost(id)}>
-                        block thread
+                        mark as spam
                     </span>
 
                     <span
