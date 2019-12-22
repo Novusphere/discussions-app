@@ -10,6 +10,7 @@ import { Thread as NSThread } from '@novuspherejs'
 import { observable } from 'mobx'
 import { ReplyModel } from '@models/replyModel'
 import { ModalOptions } from '@globals'
+import { getPermaLink } from '@utils'
 
 interface IThreadOuterProps {
     thread: NSThread
@@ -26,11 +27,18 @@ interface IThreadInnerProps {
     router: NextRouter
 }
 
-interface IThreadState {
-}
+interface IThreadState {}
 
 @(withRouter as any)
-@inject('postsStore', 'userStore', 'authStore', 'tagStore', 'notificationsStore', 'uiStore', 'settingsStore')
+@inject(
+    'postsStore',
+    'userStore',
+    'authStore',
+    'tagStore',
+    'notificationsStore',
+    'uiStore',
+    'settingsStore'
+)
 @observer
 class Thread extends React.Component<IThreadOuterProps & IThreadInnerProps, IThreadState> {
     @observable threadAsModel: ThreadModel = null
@@ -43,7 +51,7 @@ class Thread extends React.Component<IThreadOuterProps & IThreadInnerProps, IThr
     }
 
     async componentDidMount(): Promise<void> {
-         window.addEventListener('beforeunload', this.handleWindowClose)
+        window.addEventListener('beforeunload', this.handleWindowClose)
     }
 
     componentWillUnmount(): void {
@@ -147,10 +155,16 @@ class Thread extends React.Component<IThreadOuterProps & IThreadInnerProps, IThr
     private renderReplies = () => {
         const {
             router,
-            userStore: { toggleUserFollowing, following, toggleBlockPost, blockedPosts, blockedUsers },
+            userStore: {
+                toggleUserFollowing,
+                following,
+                toggleBlockPost,
+                blockedPosts,
+                blockedUsers,
+            },
             postsStore: { highlightPostUuid, currentHighlightedPostUuid, setCurrentReplyContent },
             authStore: { activePublicKey, hasAccount },
-            settingsStore: { blockedContentSetting, unsignedPostsIsSpam }
+            settingsStore: { blockedContentSetting, unsignedPostsIsSpam },
         } = this.props
 
         const {
@@ -178,8 +192,9 @@ class Thread extends React.Component<IThreadOuterProps & IThreadInnerProps, IThr
                             following={following}
                             toggleBlockPost={toggleBlockPost}
                             blockedContentSetting={blockedContentSetting}
+                            permaLink={getPermaLink(router.asPath.split('#')[0], reply.uuid)}
                             blockedPosts={blockedPosts}
-                            blockedUsers={blockedUsers}
+                            isBlockedUser={blockedUsers.has(reply.pub)}
                             unsignedPostsIsSpam={unsignedPostsIsSpam}
                         />
                     )

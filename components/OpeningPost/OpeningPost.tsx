@@ -205,7 +205,10 @@ const OpeningPost: React.FC<IOpeningPostProps> = ({
                                     </a>
                                 </div>
 
-                                <SharePost toggleBlockPost={toggleBlockPost} id={asPath} />
+                                <SharePost
+                                    toggleBlockPost={toggleBlockPost}
+                                    id={asPath.split('#')[0]}
+                                />
                             </div>
                         </div>
                     )}

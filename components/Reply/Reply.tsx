@@ -1,12 +1,12 @@
 import * as React from 'react'
 import moment from 'moment'
 import {
+    Form,
     ReplyBox,
+    ReplyHoverElements,
+    RichTextPreview,
     UserNameWithIcon,
     VotingHandles,
-    RichTextPreview,
-    ReplyHoverElements,
-    Form,
 } from '@components'
 import { observer, Observer } from 'mobx-react'
 import { ReplyModel } from '@models/replyModel'
@@ -19,7 +19,7 @@ import Router from 'next/router'
 import './style.scss'
 import { ThreadModel } from '@models/threadModel'
 import { task } from 'mobx-task'
-import { StickyContainer, Sticky } from 'react-sticky'
+import { Sticky, StickyContainer } from 'react-sticky'
 import { ObservableMap } from 'mobx'
 import { BlockedContentSetting } from '@stores/settingsStore'
 
@@ -43,8 +43,9 @@ interface IReplies {
     threadReference?: ThreadModel
     blockedContentSetting: BlockedContentSetting
     blockedPosts: ObservableMap<string, string>
-    blockedUsers: ObservableMap<string, string>
+    permaLink: string
     unsignedPostsIsSpam: boolean
+    isBlockedUser: boolean
 }
 
 interface IRepliesState {
@@ -52,7 +53,6 @@ interface IRepliesState {
     isCollapsed: boolean
     isHidden: boolean
     isSpam: boolean
-    permaLink: string
 }
 
 @observer
@@ -62,7 +62,6 @@ class Reply extends React.Component<IReplies, IRepliesState> {
         isCollapsed: false,
         isHidden: false,
         isSpam: false,
-        permaLink: '',
     }
 
     @task.resolved
@@ -88,8 +87,6 @@ class Reply extends React.Component<IReplies, IRepliesState> {
     async componentDidMount(): Promise<void> {
         this.setReplyModel()
 
-        await sleep(100)
-
         const [og, reply] = window.location.href.split('#')
 
         this.url = og
@@ -101,29 +98,42 @@ class Reply extends React.Component<IReplies, IRepliesState> {
             }
         }
 
-        const [currentPathTrimmed] = this.props.currentPath.split('#')
+        await sleep(1000)
 
-        this.setState(
-            {
-                permaLink: getPermaLink(currentPathTrimmed, this.props.post.uuid),
-            },
-            () => {
-                if (
-                    ((this.props.unsignedPostsIsSpam || this.props.blockedContentSetting) &&
-                        (this.props.blockedPosts.has(this.state.permaLink) ||
-                            this.props.blockedUsers.has(this.props.post.pub))) ||
-                    !this.props.post.sig
-                ) {
-                    this.replyModel.open = false
+        this.setBlockedStatus()
+    }
 
-                    this.setState({
-                        isCollapsed: this.props.blockedContentSetting === 'collapsed',
-                        isHidden: this.props.blockedContentSetting === 'hidden',
-                        isSpam: true,
-                    })
-                }
+    private setBlockedStatus = () => {
+        const {
+            blockedContentSetting,
+            post,
+            unsignedPostsIsSpam,
+            blockedPosts,
+            isBlockedUser,
+            permaLink,
+        } = this.props
+
+        if (unsignedPostsIsSpam || blockedContentSetting) {
+            if (blockedPosts.has(permaLink) || isBlockedUser || !post.sig) {
+                this.replyModel.open = false
+
+                this.setState({
+                    isCollapsed: blockedContentSetting === 'collapsed',
+                    isHidden: blockedContentSetting === 'hidden',
+                    isSpam: true,
+                })
             }
-        )
+        }
+    }
+
+    componentDidUpdate(
+        prevProps: Readonly<IReplies>,
+        prevState: Readonly<IRepliesState>,
+        snapshot?: any
+    ): void {
+        if (prevProps.isBlockedUser !== this.props.isBlockedUser) {
+            this.setBlockedStatus()
+        }
     }
 
     private replyRef = React.createRef<HTMLDivElement>()
@@ -163,7 +173,7 @@ class Reply extends React.Component<IReplies, IRepliesState> {
             return null
         }
 
-        const { post, following, activePublicKey, hasAccount, blockedPosts } = this.props
+        const { post, following, activePublicKey, hasAccount, blockedPosts, permaLink } = this.props
 
         return (
             <ReplyHoverElements
@@ -175,8 +185,9 @@ class Reply extends React.Component<IReplies, IRepliesState> {
                 hasAccount={hasAccount}
                 activePublicKey={activePublicKey}
                 isFollowing={following.has(post.pub)}
-                isMarkedAsSpam={blockedPosts.has(this.state.permaLink)}
+                isMarkedAsSpam={blockedPosts.has(permaLink)}
                 isSticky={isSticky}
+                onMarkSpamComplete={this.setBlockedStatus}
             />
         )
     }
@@ -219,11 +230,12 @@ class Reply extends React.Component<IReplies, IRepliesState> {
             toggleBlockPost,
             blockedContentSetting,
             blockedPosts,
-            blockedUsers,
+            isBlockedUser,
             unsignedPostsIsSpam,
+            permaLink,
         } = this.props
 
-        const { isCollapsed, isHover, isSpam, permaLink } = this.state
+        const { isCollapsed, isHover, isSpam } = this.state
         const replies = getRepliesFromMap(post.uuid)
 
         return (
@@ -337,36 +349,43 @@ class Reply extends React.Component<IReplies, IRepliesState> {
                     />
 
                     {replies && replies.length
-                        ? replies.map(postReply => (
-                              <div
-                                  onMouseLeave={() => this.setHover(true)}
-                                  onMouseEnter={() => this.setHover(false)}
-                                  key={postReply.uuid}
-                              >
-                                  <Reply
-                                      blockedContentSetting={blockedContentSetting}
-                                      setCurrentReplyContent={setCurrentReplyContent}
-                                      post={postReply}
-                                      getModel={getModel}
-                                      className={'ml3 child'}
-                                      getRepliesFromMap={getRepliesFromMap}
-                                      voteHandler={voteHandler}
-                                      currentPath={currentPath}
-                                      isCollapsed={isCollapsed}
-                                      threadReference={threadReference}
-                                      toggleUserFollowing={toggleUserFollowing}
-                                      highlightPostUuid={highlightPostUuid}
-                                      activePublicKey={activePublicKey}
-                                      currentHighlightedPostUuid={currentHighlightedPostUuid}
-                                      hasAccount={hasAccount}
-                                      following={following}
-                                      toggleBlockPost={toggleBlockPost}
-                                      blockedPosts={blockedPosts}
-                                      blockedUsers={blockedUsers}
-                                      unsignedPostsIsSpam={unsignedPostsIsSpam}
-                                  />
-                              </div>
-                          ))
+                        ? replies.map(postReply => {
+                              const _permaLink = getPermaLink(
+                                  currentPath.split('#')[0],
+                                  postReply.uuid
+                              )
+                              return (
+                                  <div
+                                      onMouseLeave={() => this.setHover(true)}
+                                      onMouseEnter={() => this.setHover(false)}
+                                      key={postReply.uuid}
+                                  >
+                                      <Reply
+                                          blockedContentSetting={blockedContentSetting}
+                                          setCurrentReplyContent={setCurrentReplyContent}
+                                          post={postReply}
+                                          getModel={getModel}
+                                          className={'ml3 child'}
+                                          getRepliesFromMap={getRepliesFromMap}
+                                          voteHandler={voteHandler}
+                                          currentPath={currentPath}
+                                          isCollapsed={isCollapsed}
+                                          threadReference={threadReference}
+                                          toggleUserFollowing={toggleUserFollowing}
+                                          highlightPostUuid={highlightPostUuid}
+                                          activePublicKey={activePublicKey}
+                                          currentHighlightedPostUuid={currentHighlightedPostUuid}
+                                          hasAccount={hasAccount}
+                                          following={following}
+                                          toggleBlockPost={toggleBlockPost}
+                                          blockedPosts={blockedPosts}
+                                          unsignedPostsIsSpam={unsignedPostsIsSpam}
+                                          isBlockedUser={isBlockedUser}
+                                          permaLink={_permaLink}
+                                      />
+                                  </div>
+                              )
+                          })
                         : null}
                 </StickyContainer>
             </div>

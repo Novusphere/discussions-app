@@ -169,6 +169,7 @@ export default class SyncStore extends BaseStore {
         }
 
         if (moderation.hasOwnProperty('blockedUsers')) {
+            this.userStore.blockedUsers.clear()
             _.forEach(moderation.blockedUsers, user => {
                 const [name, pub] = user.split(':')
                 if (!this.userStore.blockedUsers.has(pub)) {
@@ -178,6 +179,7 @@ export default class SyncStore extends BaseStore {
         }
 
         if (moderation.hasOwnProperty('blockedPosts')) {
+            this.userStore.blockedPosts.clear()
             _.forEach(moderation.blockedPosts, (posts, date) => {
                 _.forEach(posts, post => {
                     if (!this.userStore.blockedPosts.has(post)) {
