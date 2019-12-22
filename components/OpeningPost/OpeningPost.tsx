@@ -38,7 +38,7 @@ interface IOpeningPostProps {
     id: string
     hasReplyContent: boolean
     showPostWarningCloseModal: () => void
-    toggleBlockPost: (threadUuid: string) => void
+    toggleBlockPost?: (threadUuid: string) => void
 }
 
 const OpeningPost: React.FC<IOpeningPostProps> = ({
