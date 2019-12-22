@@ -22,6 +22,10 @@ export default class SettingsStore extends BaseStore {
     @observable
     blockedContentSetting: BlockedContentSetting = 'hidden'
 
+    @persist
+    @observable
+    unsignedPostsIsSpam = true
+
     @observable tokens = []
     @observable thresholdTxID = ''
     @observable errorMessage = ''
@@ -39,6 +43,11 @@ export default class SettingsStore extends BaseStore {
                 this.setModerationMembers([])
             }
         )
+    }
+
+    @action.bound
+    setUnsignedPostsAsSpamSetting(setting: boolean) {
+        this.unsignedPostsIsSpam = setting
     }
 
     @action.bound
@@ -71,6 +80,14 @@ export default class SettingsStore extends BaseStore {
                         if (value) this.setBlockedContentSetting('collapsed')
                         else this.setBlockedContentSetting('hidden')
                     }
+                },
+                {
+                    name: 'unsignedPosts',
+                    label: 'Hide Unsigned Posts',
+                    type: 'switch',
+                    description: "If a post has no signature hide it with the above settings.",
+                    value: this.unsignedPostsIsSpam,
+                    onChange: value => this.setUnsignedPostsAsSpamSetting(value)
                 },
             ]
         )

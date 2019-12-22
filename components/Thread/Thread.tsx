@@ -150,7 +150,7 @@ class Thread extends React.Component<IThreadOuterProps & IThreadInnerProps, IThr
             userStore: { toggleUserFollowing, following, toggleBlockPost, blockedPosts, blockedUsers },
             postsStore: { highlightPostUuid, currentHighlightedPostUuid, setCurrentReplyContent },
             authStore: { activePublicKey, hasAccount },
-            settingsStore: { blockedContentSetting }
+            settingsStore: { blockedContentSetting, unsignedPostsIsSpam }
         } = this.props
 
         const {
@@ -180,6 +180,7 @@ class Thread extends React.Component<IThreadOuterProps & IThreadInnerProps, IThr
                             blockedContentSetting={blockedContentSetting}
                             blockedPosts={blockedPosts}
                             blockedUsers={blockedUsers}
+                            unsignedPostsIsSpam={unsignedPostsIsSpam}
                         />
                     )
                 })}

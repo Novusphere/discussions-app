@@ -44,6 +44,7 @@ interface IReplies {
     blockedContentSetting: BlockedContentSetting
     blockedPosts: ObservableMap<string, string>
     blockedUsers: ObservableMap<string, string>
+    unsignedPostsIsSpam: boolean
 }
 
 interface IRepliesState {
@@ -108,9 +109,11 @@ class Reply extends React.Component<IReplies, IRepliesState> {
             },
             () => {
                 if (
-                    this.props.blockedContentSetting &&
-                    (this.props.blockedPosts.has(this.state.permaLink) ||
-                        this.props.blockedUsers.has(this.props.post.pub))
+                    this.props.unsignedPostsIsSpam ||
+                    (this.props.blockedContentSetting &&
+                        (this.props.blockedPosts.has(this.state.permaLink) ||
+                            this.props.blockedUsers.has(this.props.post.pub))) ||
+                    !this.props.post.sig
                 ) {
                     this.replyModel.open = false
 
@@ -218,9 +221,10 @@ class Reply extends React.Component<IReplies, IRepliesState> {
             blockedContentSetting,
             blockedPosts,
             blockedUsers,
+            unsignedPostsIsSpam,
         } = this.props
 
-        const { isCollapsed, isHover, isHidden, isSpam, permaLink } = this.state
+        const { isCollapsed, isHover, isSpam, permaLink } = this.state
         const replies = getRepliesFromMap(post.uuid)
 
         return (
@@ -308,7 +312,7 @@ class Reply extends React.Component<IReplies, IRepliesState> {
                                 />
                             )}
                             {!isCollapsed && !this.replyModel.editing && (
-                                <RichTextPreview className={'f6 lh-copy reply-content'}>
+                                <RichTextPreview className={'f6 lh-copy reply-content mt2'}>
                                     {post.content}
                                 </RichTextPreview>
                             )}
@@ -360,6 +364,7 @@ class Reply extends React.Component<IReplies, IRepliesState> {
                                       toggleBlockPost={toggleBlockPost}
                                       blockedPosts={blockedPosts}
                                       blockedUsers={blockedUsers}
+                                      unsignedPostsIsSpam={unsignedPostsIsSpam}
                                   />
                               </div>
                           ))

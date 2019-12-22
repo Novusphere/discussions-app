@@ -342,7 +342,11 @@ class Settings extends React.Component<ISettings, ISettingsState> {
 
     private renderBlocked = () => {
         const { blockedPosts, blockedUsers } = this.props.userStore
-        const { blockedContentSetting, setBlockedContentSetting, blockedSettingForm } = this.props.settingsStore
+        const {
+            blockedContentSetting,
+            setBlockedContentSetting,
+            blockedSettingForm,
+        } = this.props.settingsStore
         const { tags } = this.props.tagStore
 
         const blockedPostsAsArray = Array.from(blockedPosts.keys())
@@ -400,45 +404,49 @@ class Settings extends React.Component<ISettings, ISettingsState> {
                 )}
 
                 <h3>Posts</h3>
-                <div className={'outline-container mt3'}>
-                    <div className={'flex flex-column space-between'}>
-                        <div className={'mb3'}>
-                            {blockedPostsAsArray.map((url, index, array) => (
-                                <span
-                                    className={classNames([
-                                        'flex items-center justify-between ph2',
-                                        {
-                                            'bb b--light-gray pv3': index !== array.length - 1,
-                                            pt3: index === array.length - 1,
-                                        },
-                                    ])}
-                                    key={url}
-                                >
-                                    <Link href={'/tag/[name]/[id]/[title]'} as={url}>
-                                        <a className={'flex flex-row items-center'}>
-                                            <img
-                                                className={'tag-icon pr2'}
-                                                src={tags.get(url.split('/')[2]).icon}
-                                            />
-                                            <span>{url}</span>
-                                        </a>
-                                    </Link>
+                {!blockedPostsAsArray.length ? (
+                    <span className={'moon-gray f6 i'}>You have no blocked posts</span>
+                ) : (
+                    <div className={'outline-container mt3'}>
+                        <div className={'flex flex-column space-between'}>
+                            <div className={'mb3'}>
+                                {blockedPostsAsArray.map((url, index, array) => (
                                     <span
-                                        onClick={() => blockedPosts.delete(url)}
-                                        title={'Unblock Post'}
+                                        className={classNames([
+                                            'flex items-center justify-between ph2',
+                                            {
+                                                'bb b--light-gray pv3': index !== array.length - 1,
+                                                pt3: index === array.length - 1,
+                                            },
+                                        ])}
+                                        key={url}
                                     >
-                                        <FontAwesomeIcon
-                                            width={13}
-                                            icon={faMinusCircle}
-                                            className={'pointer dim'}
-                                            color={'red'}
-                                        />
+                                        <Link href={'/tag/[name]/[id]/[title]'} as={url}>
+                                            <a className={'flex flex-row items-center'}>
+                                                <img
+                                                    className={'tag-icon pr2'}
+                                                    src={tags.get(url.split('/')[2]).icon}
+                                                />
+                                                <span>{url}</span>
+                                            </a>
+                                        </Link>
+                                        <span
+                                            onClick={() => blockedPosts.delete(url)}
+                                            title={'Unblock Post'}
+                                        >
+                                            <FontAwesomeIcon
+                                                width={13}
+                                                icon={faMinusCircle}
+                                                className={'pointer dim'}
+                                                color={'red'}
+                                            />
+                                        </span>
                                     </span>
-                                </span>
-                            ))}
+                                ))}
+                            </div>
                         </div>
                     </div>
-                </div>
+                )}
             </>
         )
     }

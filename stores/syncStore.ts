@@ -12,8 +12,6 @@ import {
 } from '@stores/index'
 import { IAccountSync } from '@d.ts/account-sync'
 import _ from 'lodash'
-import { hydrate } from '../pages/_app'
-import { isServer } from '@utils'
 
 export default class SyncStore extends BaseStore {
     private readonly authStore: IStores['authStore'] = getAuthStore()
@@ -95,11 +93,10 @@ export default class SyncStore extends BaseStore {
         })
 
         autorun(() => {
-            if (
-                this.userStore.blockedUsers ||
-                this.userStore.blockedPosts ||
-                this.settingsStore.blockedContentSetting
-            ) {
+            const { blockedContentSetting, unsignedPostsIsSpam } = this.settingsStore
+            const { blockedUsers, blockedPosts } = this.userStore
+
+            if (blockedUsers || blockedPosts || blockedContentSetting) {
                 const moderation = {
                     blockedUsers: null,
                     blockedPosts: null,
@@ -108,13 +105,13 @@ export default class SyncStore extends BaseStore {
 
                 const blockedUsersToSync = []
 
-                this.userStore.blockedUsers.forEach((name, pub) => {
+                blockedUsers.forEach((name, pub) => {
                     blockedUsersToSync.push(`${name}:${pub}`)
                 })
 
                 const blockedPostsToSync = {}
 
-                this.userStore.blockedPosts.forEach((timestamp, uuid) => {
+                blockedPosts.forEach((timestamp, uuid) => {
                     const prev = blockedPostsToSync[timestamp] || []
                     Object.assign(blockedPostsToSync, {
                         [timestamp]: [...prev, uuid],
@@ -130,17 +127,13 @@ export default class SyncStore extends BaseStore {
                         ...moderation.blockedPosts,
                         ...blockedPostsToSync,
                     },
-                    blockedContentSetting: this.settingsStore.blockedContentSetting,
+                    blockedContentSetting: blockedContentSetting,
+                    unsignedPostsIsSpam: unsignedPostsIsSpam,
                 })
 
                 this.saveDataWithSyncedData({
                     moderation: moderation,
                 })
-
-                // if (!isServer) {
-                //     hydrate(localStorage)('user', this.userStore).rehydrate()
-                // }
-                // hydrate('user', this.userStore).rehydrate()
             }
         })
     }
@@ -169,6 +162,10 @@ export default class SyncStore extends BaseStore {
     syncModerationListWithDB(moderation) {
         if (moderation.hasOwnProperty('blockedContentSetting')) {
             this.settingsStore.setBlockedContentSetting(moderation.blockedContentSetting)
+        }
+
+        if (moderation.hasOwnProperty('unsignedPostsIsSpam')) {
+            this.settingsStore.setUnsignedPostsAsSpamSetting(moderation.unsignedPostsIsSpam)
         }
 
         if (moderation.hasOwnProperty('blockedUsers')) {
