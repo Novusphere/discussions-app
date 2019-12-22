@@ -161,7 +161,7 @@ class Reply extends React.Component<IReplies, IRepliesState> {
             return null
         }
 
-        const { post, following, activePublicKey, hasAccount } = this.props
+        const { post, following, activePublicKey, hasAccount, blockedPosts } = this.props
 
         return (
             <ReplyHoverElements
@@ -173,6 +173,7 @@ class Reply extends React.Component<IReplies, IRepliesState> {
                 hasAccount={hasAccount}
                 activePublicKey={activePublicKey}
                 isFollowing={following.has(post.pub)}
+                isMarkedAsSpam={blockedPosts.has(this.state.permaLink)}
                 isSticky={isSticky}
             />
         )

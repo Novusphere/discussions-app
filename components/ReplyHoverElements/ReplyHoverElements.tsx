@@ -26,6 +26,7 @@ interface IReplyHoverElementsProps {
     toggleFollowStatus: () => void
     toggleToggleBlock: () => void
     isSticky: boolean
+    isMarkedAsSpam: boolean
 }
 
 const ReplyHoverElements: React.FC<IReplyHoverElementsProps> = ({
@@ -38,6 +39,7 @@ const ReplyHoverElements: React.FC<IReplyHoverElementsProps> = ({
     toggleFollowStatus,
     toggleToggleBlock,
     isSticky,
+    isMarkedAsSpam,
 }) => {
     return (
         <div
@@ -77,8 +79,16 @@ const ReplyHoverElements: React.FC<IReplyHoverElementsProps> = ({
                     )}
                 </span>
             ) : null}
-            <span title={'Mark as spam'} onClick={toggleToggleBlock}>
-                <FontAwesomeIcon icon={faFlag} />
+            <span
+                title={!isMarkedAsSpam ? 'Mark as spam' : 'Unmark as spam'}
+                onClick={toggleToggleBlock}
+            >
+                <FontAwesomeIcon
+                    icon={faFlag}
+                    className={classNames({
+                        red: isMarkedAsSpam,
+                    })}
+                />
             </span>
         </div>
     )
