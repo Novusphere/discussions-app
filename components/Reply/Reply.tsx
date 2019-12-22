@@ -109,8 +109,7 @@ class Reply extends React.Component<IReplies, IRepliesState> {
             },
             () => {
                 if (
-                    this.props.unsignedPostsIsSpam ||
-                    (this.props.blockedContentSetting &&
+                    ((this.props.unsignedPostsIsSpam || this.props.blockedContentSetting) &&
                         (this.props.blockedPosts.has(this.state.permaLink) ||
                             this.props.blockedUsers.has(this.props.post.pub))) ||
                     !this.props.post.sig
