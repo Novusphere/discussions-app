@@ -12,7 +12,7 @@ import { observer, Observer } from 'mobx-react'
 import { ReplyModel } from '@models/replyModel'
 import PostModel from '@models/postModel'
 import classNames from 'classnames'
-import { getPermaLink } from '@utils'
+import { getPermaLink, sleep } from '@utils'
 import copy from 'clipboard-copy'
 import Router from 'next/router'
 
@@ -21,6 +21,7 @@ import { ThreadModel } from '@models/threadModel'
 import { task } from 'mobx-task'
 import { StickyContainer, Sticky } from 'react-sticky'
 import { ObservableMap } from 'mobx'
+import { BlockedContentSetting } from '@stores/settingsStore'
 
 interface IReplies {
     currentPath: string
@@ -40,11 +41,16 @@ interface IReplies {
 
     isCollapsed?: boolean
     threadReference?: ThreadModel
+    blockedContentSetting: BlockedContentSetting
+    blockedPosts: ObservableMap<string, string>
 }
 
 interface IRepliesState {
     isHover: boolean
     isCollapsed: boolean
+    isHidden: boolean
+    isSpam: boolean
+    permaLink: string
 }
 
 @observer
@@ -52,6 +58,9 @@ class Reply extends React.Component<IReplies, IRepliesState> {
     state = {
         isHover: false,
         isCollapsed: false,
+        isHidden: false,
+        isSpam: false,
+        permaLink: '',
     }
 
     @task.resolved
@@ -74,8 +83,10 @@ class Reply extends React.Component<IReplies, IRepliesState> {
     private url: string
     private replyModel: ReplyModel
 
-    componentDidMount(): void {
+    async componentDidMount(): Promise<void> {
         this.setReplyModel()
+
+        await sleep(100)
 
         const [og, reply] = window.location.href.split('#')
 
@@ -87,6 +98,28 @@ class Reply extends React.Component<IReplies, IRepliesState> {
                 this.replyModel.toggleOpen()
             }
         }
+
+        const [currentPathTrimmed] = this.props.currentPath.split('#')
+
+        this.setState(
+            {
+                permaLink: getPermaLink(currentPathTrimmed, this.props.post.uuid),
+            },
+            () => {
+                if (
+                    this.props.blockedContentSetting &&
+                    this.props.blockedPosts.has(this.state.permaLink)
+                ) {
+                    this.replyModel.toggleOpen()
+
+                    this.setState({
+                        isCollapsed: this.props.blockedContentSetting === 'collapsed',
+                        isHidden: this.props.blockedContentSetting === 'hidden',
+                        isSpam: true,
+                    })
+                }
+            }
+        )
     }
 
     private replyRef = React.createRef<HTMLDivElement>()
@@ -160,7 +193,7 @@ class Reply extends React.Component<IReplies, IRepliesState> {
     }
 
     render() {
-        if (this.props.isCollapsed) return null
+        if (this.props.isCollapsed || this.state.isHidden) return null
         if (this.setReplyModel['pending']) return null
 
         const {
@@ -179,18 +212,19 @@ class Reply extends React.Component<IReplies, IRepliesState> {
             following,
             setCurrentReplyContent,
             toggleBlockPost,
+            blockedContentSetting,
+            blockedPosts,
         } = this.props
 
-        const { isCollapsed, isHover } = this.state
+        const { isCollapsed, isHover, isHidden, isSpam, permaLink } = this.state
         const replies = getRepliesFromMap(post.uuid)
-        const [currentPathTrimmed] = currentPath.split('#')
 
         return (
             <div
                 id={post.uuid}
                 ref={this.replyRef}
                 data-post-uuid={post.uuid}
-                data-permalink={getPermaLink(currentPathTrimmed, post.uuid)}
+                data-permalink={permaLink}
                 className={classNames([
                     'post-reply black mb2',
                     {
@@ -217,7 +251,9 @@ class Reply extends React.Component<IReplies, IRepliesState> {
                                     }}
                                 >
                                     <Observer>
-                                        {() => this.renderRenderPostScroll(isSticky)}
+                                        {() =>
+                                            !isCollapsed && this.renderRenderPostScroll(isSticky)
+                                        }
                                     </Observer>
                                 </div>
                             )
@@ -225,7 +261,7 @@ class Reply extends React.Component<IReplies, IRepliesState> {
                     </Sticky>
                     <div
                         style={{
-                            height: !isCollapsed ? 'auto' : '30px',
+                            height: !isCollapsed ? 'auto' : '50px',
                         }}
                         className={classNames([
                             'parent flex flex-row pa2',
@@ -246,12 +282,19 @@ class Reply extends React.Component<IReplies, IRepliesState> {
                             <div className={'header pb0'}>
                                 <div className={'pr2'}>{this.renderCollapseElements()}</div>
                                 {this.renderUserElements()}
-                                {isCollapsed && (
-                                    <span className={'o-50 i f6 pl2'}>
-                                        ({replies.length} children)
-                                    </span>
-                                )}
+                                <div className={'db'}>
+                                    {isCollapsed && (
+                                        <span className={'o-50 i f6 pl2 db'}>
+                                            ({replies.length} children)
+                                        </span>
+                                    )}
+                                </div>
                             </div>
+                            {isSpam && isCollapsed && (
+                                <span className={'o-30 i f6 pt1 db'}>
+                                    This post is hidden as it was marked as spam.
+                                </span>
+                            )}
                             {this.replyModel.editing && (
                                 <Form
                                     form={this.replyModel.editForm}
@@ -294,6 +337,7 @@ class Reply extends React.Component<IReplies, IRepliesState> {
                                   key={postReply.uuid}
                               >
                                   <Reply
+                                      blockedContentSetting={blockedContentSetting}
                                       setCurrentReplyContent={setCurrentReplyContent}
                                       post={postReply}
                                       getModel={getModel}
@@ -310,6 +354,7 @@ class Reply extends React.Component<IReplies, IRepliesState> {
                                       hasAccount={hasAccount}
                                       following={following}
                                       toggleBlockPost={toggleBlockPost}
+                                      blockedPosts={blockedPosts}
                                   />
                               </div>
                           ))

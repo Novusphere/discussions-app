@@ -5,6 +5,7 @@ import { nsdb } from '@novuspherejs'
 import {
     getAuthStore,
     getNotificationsStore,
+    getSettingsStore,
     getTagStore,
     getUserStore,
     IStores,
@@ -17,6 +18,7 @@ export default class SyncStore extends BaseStore {
     private readonly tagStore: IStores['tagStore'] = getTagStore()
     private readonly userStore: IStores['userStore'] = getUserStore()
     private readonly notificationsStore: IStores['notificationsStore'] = getNotificationsStore()
+    private readonly settingsStore: IStores['settingsStore'] = getSettingsStore()
 
     @observable syncedData: any = null
 
@@ -91,10 +93,15 @@ export default class SyncStore extends BaseStore {
         })
 
         autorun(() => {
-            if (this.userStore.blockedUsers || this.userStore.blockedPosts) {
+            if (
+                this.userStore.blockedUsers ||
+                this.userStore.blockedPosts ||
+                this.settingsStore.blockedContentSetting
+            ) {
                 const moderation = {
                     blockedUsers: null,
                     blockedPosts: null,
+                    blockedContentSetting: '',
                 }
 
                 const blockedUsersToSync = []
@@ -121,6 +128,7 @@ export default class SyncStore extends BaseStore {
                         ...moderation.blockedPosts,
                         ...blockedPostsToSync,
                     },
+                    blockedContentSetting: this.settingsStore.blockedContentSetting,
                 })
 
                 this.saveDataWithSyncedData({
@@ -152,7 +160,11 @@ export default class SyncStore extends BaseStore {
 
     @action.bound
     syncModerationListWithDB(moderation) {
-        if (moderation.blockedUsers) {
+        if (moderation.hasOwnProperty('blockedContentSetting')) {
+            this.settingsStore.setBlockedContentSetting(moderation.blockedContentSetting)
+        }
+
+        if (moderation.hasOwnProperty('blockedUsers')) {
             _.forEach(moderation.blockedUsers, user => {
                 const [name, pub] = user.split(':')
                 if (!this.userStore.blockedUsers.has(pub)) {
@@ -161,7 +173,7 @@ export default class SyncStore extends BaseStore {
             })
         }
 
-        if (moderation.blockedPosts) {
+        if (moderation.hasOwnProperty('blockedPosts')) {
             _.forEach(moderation.blockedPosts, (posts, date) => {
                 _.forEach(posts, post => {
                     if (!this.userStore.blockedPosts.has(post)) {

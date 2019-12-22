@@ -342,6 +342,7 @@ class Settings extends React.Component<ISettings, ISettingsState> {
 
     private renderBlocked = () => {
         const { blockedPosts, blockedUsers } = this.props.userStore
+        const { blockedContentSetting, setBlockedContentSetting, blockedSettingForm } = this.props.settingsStore
         const { tags } = this.props.tagStore
 
         const blockedPostsAsArray = Array.from(blockedPosts.keys())
@@ -349,6 +350,14 @@ class Settings extends React.Component<ISettings, ISettingsState> {
 
         return (
             <>
+                <div className={'mb4 db'}>
+                    <h3>Display Blocked Content</h3>
+                    <span className={'silver f6'}>
+                        Here you can set how you wish to view blocked content.
+                    </span>
+                    <Form form={blockedSettingForm} hideSubmitButton className={'mt3'} />
+                </div>
+                <hr />
                 <h3>Users</h3>
                 {!blockedUsersAsArray.length ? (
                     <span className={'moon-gray f6 i'}>You have no blocked users</span>

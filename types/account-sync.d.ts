@@ -1,7 +1,10 @@
+import { BlockedContentSetting } from '@stores/settingsStore'
+
 export interface IAccountSync {
     data: {
         lastCheckedNotifications: number
         tags: string[]
+        blockedContentSetting: BlockedContentSetting
         following: {
             [publicKey: string]: string
         }

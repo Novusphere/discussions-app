@@ -10,11 +10,18 @@ import { eos } from '@novuspherejs'
 
 const fileDownload = require('js-file-download')
 
+export type BlockedContentSetting = 'hidden' | 'collapsed'
+
 export default class SettingsStore extends BaseStore {
     @persist @observable localStorageVersion = '2.0.0'
 
     @observable moderationSubValue = null
     @observable moderationMembers = observable.array<string>(['gux', 'someuser'])
+
+    @persist
+    @observable
+    blockedContentSetting: BlockedContentSetting = 'hidden'
+
     @observable tokens = []
     @observable thresholdTxID = ''
     @observable errorMessage = ''
@@ -31,6 +38,41 @@ export default class SettingsStore extends BaseStore {
                 // get moderators here
                 this.setModerationMembers([])
             }
+        )
+    }
+
+    @action.bound
+    setBlockedContentSetting(type: BlockedContentSetting) {
+        this.blockedContentSetting = type
+    }
+
+    @computed get blockedSettingForm() {
+        return new CreateForm(
+            {},
+            [
+                {
+                    name: 'hidden',
+                    label: 'Hidden',
+                    type: 'switch',
+                    description: "Hide blocked content entirely including all replies.",
+                    value: this.blockedContentSetting === 'hidden',
+                    onChange: value => {
+                        if (value) this.setBlockedContentSetting('hidden')
+                        else this.setBlockedContentSetting('collapsed')
+                    }
+                },
+                {
+                    name: 'collapsed',
+                    label: 'Collapse',
+                    type: 'switch',
+                    description: "Auto-Collapse all blocked content, with the ability to expand the post.",
+                    value: this.blockedContentSetting === 'collapsed',
+                    onChange: value => {
+                        if (value) this.setBlockedContentSetting('collapsed')
+                        else this.setBlockedContentSetting('hidden')
+                    }
+                },
+            ]
         )
     }
 

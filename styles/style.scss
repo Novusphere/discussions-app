@@ -179,10 +179,20 @@ a {
     border-width: 1px;
 }
 
-textarea:focus, input:focus{
+textarea:focus,
+input:focus {
     outline: none;
 }
 
 *:focus {
     outline: none;
+}
+
+hr {
+    display: block;
+    height: 1px;
+    border: 0;
+    border-top: 1px solid #eaeaea;
+    margin: 1em 0;
+    padding: 0;
 }

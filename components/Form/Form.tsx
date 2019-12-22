@@ -4,6 +4,7 @@ import classNames from 'classnames'
 import Select from 'react-select'
 import { faSpinner } from '@fortawesome/free-solid-svg-icons'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
+import Switch from 'react-switch'
 
 import dynamic from 'next/dynamic'
 
@@ -51,7 +52,9 @@ class Form extends React.Component<FormProps> {
             if (Array.isArray(field.accessor.$extra.options)) {
                 return field.accessor.$extra.options.map(
                     ({ value, disabled, title, className, onClick, loading }) => {
-                        const isLoading = loading || onClick && onClick['state'] && onClick['state'] === 'pending'
+                        const isLoading =
+                            loading ||
+                            (onClick && onClick['state'] && onClick['state'] === 'pending')
 
                         return (
                             <button
@@ -65,11 +68,7 @@ class Form extends React.Component<FormProps> {
 
                                     e.preventDefault()
                                 }}
-                                disabled={
-                                    disabled ||
-                                    (isLoading) ||
-                                    false
-                                }
+                                disabled={disabled || isLoading || false}
                                 key={`${field.name}-${value}`}
                                 title={title || null}
                                 className={classNames([
@@ -289,6 +288,46 @@ class Form extends React.Component<FormProps> {
                                 ))}
                             </div>
                         )
+                    case 'switch':
+                        return (
+                            <React.Fragment key={field.name}>
+                                <div className={'field-container pb3 inline-labels flex flex-row'} style={{
+                                    alignItems: 'flex-start',
+                                }}>
+                                    {!field.hideLabels && (
+                                        <label htmlFor={field.accessor.id} className={'w-40'}>
+                                            {field.accessor.label}
+                                        </label>
+                                    )}
+                                    <div
+                                        className={classNames([
+                                            'w-60 flex flex-column',
+                                            {
+                                                'w-100': field.hideLabels,
+                                            },
+                                        ])}
+                                    >
+                                        <Switch
+                                            uncheckedIcon={false}
+                                            checkedIcon={false}
+                                            onColor={'#079e99'}
+                                            offColor={'#a8a8a8'}
+                                            onChange={(value, event) => {
+                                                form.form.onSubmit(event)
+                                                field.onChange(value)
+                                            }}
+                                            checked={field.value}
+                                        />
+                                        {field.description && (
+                                            <span className={'mt2 db f6 moon-gray lh-copy'}>{field.description}</span>
+                                        )}
+                                        <span className={'error f6 db pv2'}>
+                                            {field.accessor.error}
+                                        </span>
+                                    </div>
+                                </div>
+                            </React.Fragment>
+                        )
                     default:
                         return (
                             <React.Fragment key={field.name}>
@@ -298,7 +337,7 @@ class Form extends React.Component<FormProps> {
                                             {field.accessor.label}
 
                                             {field.description && (
-                                                <span className={'f6 gray'}>
+                                                <span className={'mt2 db f6 moon-gray lh-copy'}>
                                                     {field.description}
                                                 </span>
                                             )}
