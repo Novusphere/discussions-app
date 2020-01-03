@@ -6,7 +6,7 @@ import classNames from 'classnames'
 import './style.scss'
 import { getIdenticon } from '@utils'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
-import { faMinusCircle, faPlus } from '@fortawesome/free-solid-svg-icons'
+import { faMinusCircle, faPlus, faSpinner } from '@fortawesome/free-solid-svg-icons'
 import { Tab, TabList, TabPanel, Tabs } from 'react-tabs'
 import Link from 'next/link'
 
@@ -22,11 +22,9 @@ interface ISettings {
 
 interface ISettingsState {
     activeSidebar: string
+    enteredUserForModeration: string
     tokens: {
         activeIndex: number
-    }
-    moderation: {
-        user: string
     }
 }
 
@@ -44,12 +42,10 @@ class Settings extends React.Component<ISettings, ISettingsState> {
     }
 
     state = {
-        activeSidebar: 'Blocked',
+        enteredUserForModeration: '',
+        activeSidebar: 'Moderation',
         tokens: {
             activeIndex: 0,
-        },
-        moderation: {
-            user: '',
         },
     }
 
@@ -142,48 +138,61 @@ class Settings extends React.Component<ISettings, ISettingsState> {
         </>
     )
 
-    private handleModerationTagOnChange = option => {
-        this.props.settingsStore.moderationSubValue = option
-    }
-
     private handleUserOnChange = e => {
         this.setState({
-            moderation: {
-                user: e.target.value,
-            },
+            enteredUserForModeration: e.target.value,
         })
     }
 
     private handleAddUserToModeration = () => {
-        this.props.settingsStore.moderationMembers.push(this.state.moderation.user)
-        this.setState({
-            moderation: {
-                user: '',
-            },
-        })
+        let cached = this.state.enteredUserForModeration
+
+        this.props.userStore
+            .setModerationMemberByTag(this.state.enteredUserForModeration)
+            .then(() => {
+                this.setState({
+                    enteredUserForModeration: '',
+                })
+            })
+            .catch(() => {
+                this.setState({
+                    enteredUserForModeration: cached,
+                })
+            })
     }
 
     private handleDeleteUserToModeration = user => {
-        this.props.settingsStore.moderationMembers.remove(user)
+        const option = this.props.userStore.activeDelegatedTag
+        this.props.userStore.setModerationMemberByTag(user, option.value)
     }
 
     private renderModeration = () => {
-        const { moderationSubValue } = this.props.settingsStore
         const { getPlausibleTagOptions } = this.props.postsStore
+        const {
+            activeDelegatedTagMembers,
+            activeDelegatedTag,
+            setActiveDelegatedTag,
+            setModerationMemberByTag,
+        } = this.props.userStore
 
         return (
             <>
                 <div className={'mt3'}>
                     <TagDropdown
                         formatCreateLabel={inputValue => `Choose a tag`}
-                        onChange={this.handleModerationTagOnChange}
-                        value={moderationSubValue}
+                        onChange={setActiveDelegatedTag}
+                        value={activeDelegatedTag}
                         options={getPlausibleTagOptions}
                     />
                     <div className={'outline-container mt3'}>
                         <div className={'flex flex-column space-between'}>
                             <div className={'mb3'}>
-                                {this.props.settingsStore.moderationMembers.toJSON().map(item => (
+                                {!activeDelegatedTagMembers.length && (
+                                    <span className={'mv3 db moon-gray f6 w-100 tc'}>
+                                        Add a user by typing their name:key below
+                                    </span>
+                                )}
+                                {activeDelegatedTagMembers.slice().map(item => (
                                     <span
                                         className={
                                             'flex items-center justify-between pv3 ph2 bb b--light-gray'
@@ -215,7 +224,8 @@ class Settings extends React.Component<ISettings, ISettingsState> {
                                 }
                             >
                                 <input
-                                    value={this.state.moderation.user}
+                                    value={this.state.enteredUserForModeration}
+                                    disabled={setModerationMemberByTag['pending']}
                                     onChange={this.handleUserOnChange}
                                     className={'w-100'}
                                     placeholder={'Enter a user'}
@@ -224,13 +234,22 @@ class Settings extends React.Component<ISettings, ISettingsState> {
                                     onClick={this.handleAddUserToModeration}
                                     className={'plus-icon absolute dim pointer'}
                                 >
-                                    <FontAwesomeIcon
-                                        width={13}
-                                        icon={faPlus}
-                                        title={'Click to add a user'}
-                                    />
+                                    {setModerationMemberByTag['pending'] ? (
+                                        <FontAwesomeIcon width={13} icon={faSpinner} spin />
+                                    ) : (
+                                        <FontAwesomeIcon
+                                            width={13}
+                                            icon={faPlus}
+                                            title={'Click to add a user'}
+                                        />
+                                    )}
                                 </span>
                             </div>
+                            {setModerationMemberByTag['rejected'] && (
+                                <span className={'error f6 pv2'}>
+                                    {setModerationMemberByTag['error']['message']}
+                                </span>
+                            )}
                         </div>
                     </div>
                 </div>
@@ -342,13 +361,9 @@ class Settings extends React.Component<ISettings, ISettingsState> {
 
     private renderBlocked = () => {
         const { blockedPosts, blockedUsers } = this.props.userStore
-        const {
-            blockedContentSetting,
-            setBlockedContentSetting,
-            blockedSettingForm,
-        } = this.props.settingsStore
-        const { tags } = this.props.tagStore
+        const { blockedSettingForm } = this.props.settingsStore
 
+        const { tags } = this.props.tagStore
         const blockedPostsAsArray = Array.from(blockedPosts.keys())
         const blockedUsersAsArray = Array.from(blockedUsers.keys())
 

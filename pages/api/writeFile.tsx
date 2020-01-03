@@ -1,7 +1,8 @@
 import _ from 'lodash'
 
 export default async (req, res) => {
-    const { accountNames, token, amount, memoId, actor } = req.query
+    const { token, amount, memoId, actor } = req.query
+    const accountNames = req.query['accountNames[]']
 
     if (
         _.isUndefined(req.query) ||

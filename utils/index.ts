@@ -575,3 +575,25 @@ export const getHost = url => {
     parser.href = url
     return parser.host.toLowerCase()
 }
+
+import axios from 'axios'
+
+export const checkIfNameIsValid = async (accountName: string): Promise<boolean> => {
+    try {
+        const { data } = await axios.post(
+            'https://eos.eoscafeblock.com/v1/chain/get_table_by_scope',
+            {
+                code: 'eosio',
+                table: 'userres',
+                lower_bound: accountName,
+                upper_bound: accountName,
+                limit: 1,
+            }
+        )
+
+        if (data.rows.length > 0) return true
+        throw new Error(`${accountName} is not a valid EOS username, please try again.`)
+    } catch (error) {
+        throw new Error(`${accountName} is not a valid EOS username, please try again.`)
+    }
+}

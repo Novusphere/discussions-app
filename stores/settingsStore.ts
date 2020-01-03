@@ -5,7 +5,7 @@ import { CreateForm } from '@components'
 import { task } from 'mobx-task'
 import axios from 'axios'
 import { getAuthStore, getUiStore, IStores } from '@stores/index'
-import { sleep } from '@utils'
+import { sleep, checkIfNameIsValid } from '@utils'
 import { eos } from '@novuspherejs'
 
 const fileDownload = require('js-file-download')
@@ -14,9 +14,6 @@ export type BlockedContentSetting = 'hidden' | 'collapsed'
 
 export default class SettingsStore extends BaseStore {
     @persist @observable localStorageVersion = '2.0.0'
-
-    @observable moderationSubValue = null
-    @observable moderationMembers = observable.array<string>(['gux', 'someuser'])
 
     @persist
     @observable
@@ -35,14 +32,6 @@ export default class SettingsStore extends BaseStore {
 
     constructor() {
         super()
-
-        reaction(
-            () => this.moderationSubValue,
-            value => {
-                // get moderators here
-                this.setModerationMembers([])
-            }
-        )
     }
 
     @action.bound
@@ -56,41 +45,39 @@ export default class SettingsStore extends BaseStore {
     }
 
     @computed get blockedSettingForm() {
-        return new CreateForm(
-            {},
-            [
-                {
-                    name: 'hidden',
-                    label: 'Hidden',
-                    type: 'switch',
-                    description: "Hide blocked content entirely including all replies.",
-                    value: this.blockedContentSetting === 'hidden',
-                    onChange: value => {
-                        if (value) this.setBlockedContentSetting('hidden')
-                        else this.setBlockedContentSetting('collapsed')
-                    }
+        return new CreateForm({}, [
+            {
+                name: 'hidden',
+                label: 'Hidden',
+                type: 'switch',
+                description: 'Hide blocked content entirely including all replies.',
+                value: this.blockedContentSetting === 'hidden',
+                onChange: value => {
+                    if (value) this.setBlockedContentSetting('hidden')
+                    else this.setBlockedContentSetting('collapsed')
                 },
-                {
-                    name: 'collapsed',
-                    label: 'Collapse',
-                    type: 'switch',
-                    description: "Auto-Collapse all blocked content, with the ability to expand the post.",
-                    value: this.blockedContentSetting === 'collapsed',
-                    onChange: value => {
-                        if (value) this.setBlockedContentSetting('collapsed')
-                        else this.setBlockedContentSetting('hidden')
-                    }
+            },
+            {
+                name: 'collapsed',
+                label: 'Collapse',
+                type: 'switch',
+                description:
+                    'Auto-Collapse all blocked content, with the ability to expand the post.',
+                value: this.blockedContentSetting === 'collapsed',
+                onChange: value => {
+                    if (value) this.setBlockedContentSetting('collapsed')
+                    else this.setBlockedContentSetting('hidden')
                 },
-                {
-                    name: 'unsignedPosts',
-                    label: 'Hide Unsigned Posts',
-                    type: 'switch',
-                    description: "If a post has no signature hide it with the above settings.",
-                    value: this.unsignedPostsIsSpam,
-                    onChange: value => this.setUnsignedPostsAsSpamSetting(value)
-                },
-            ]
-        )
+            },
+            {
+                name: 'unsignedPosts',
+                label: 'Hide Unsigned Posts',
+                type: 'switch',
+                description: 'If a post has no signature hide it with the above settings.',
+                value: this.unsignedPostsIsSpam,
+                onChange: value => this.setUnsignedPostsAsSpamSetting(value),
+            },
+        ])
     }
 
     @action.bound
@@ -103,11 +90,6 @@ export default class SettingsStore extends BaseStore {
                 symbol: q.symbol,
             }
         })
-    }
-
-    @action.bound
-    setModerationMembers(members: string[]) {
-        this.moderationMembers.replace(members)
     }
 
     @computed get recipients() {
@@ -132,21 +114,8 @@ export default class SettingsStore extends BaseStore {
 
         await values.accountNames.map(async accountName => {
             await sleep(100)
-
-            const { data, status } = await axios.post(
-                'https://eos.eoscafeblock.com/v1/chain/get_table_by_scope',
-                {
-                    code: 'eosio',
-                    table: 'userres',
-                    lower_bound: accountName,
-                    upper_bound: accountName,
-                    limit: 1,
-                }
-            )
-
-            if (!data.rows.length || status !== 200) {
-                invalidNames.push(accountName)
-            }
+            const isValidAccountName = await checkIfNameIsValid(accountName)
+            if (!isValidAccountName) invalidNames.push(accountName)
         })
 
         await sleep(100 * this.recipientCount)

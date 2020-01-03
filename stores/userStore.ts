@@ -5,12 +5,19 @@ import { computedFn } from 'mobx-utils'
 import { getNotificationsStore, getTagStore, getUiStore, IStores } from '@stores/index'
 import { discussions } from '@novuspherejs'
 import NotificationModel from '@models/notificationModel'
+import { checkIfNameIsValid } from '@utils'
+import { task } from 'mobx-task'
 
 export default class UserStore extends BaseStore {
     @persist('map') @observable following = observable.map<string, string>()
     @persist('map') @observable watching = observable.map<string, [number, number]>() // [currentCount, prevCount]
     @persist('map') @observable blockedUsers = observable.map<string, string>() // [pubKey, displayName]
     @persist('map') @observable blockedPosts = observable.map<string, string>() // [asPathURL, yyyydd]
+    @persist('map') @observable delegated = observable.map<string, string[]>() // [tagName, string[]]
+
+    @persist('object')
+    @observable
+    activeDelegatedTag = { value: '', label: '' }
 
     private readonly uiStore: IStores['uiStore'] = getUiStore()
     private readonly tagStore: IStores['tagStore'] = getTagStore()
@@ -50,6 +57,63 @@ export default class UserStore extends BaseStore {
         })
 
         this.notificationsStore.pingTheseMethods.push(this.updateWatchThreadCount)
+    }
+
+    @computed get activeDelegatedTagMembers() {
+        if (!this.activeDelegatedTag) return []
+        if (!this.delegated.has(this.activeDelegatedTag.value)) return []
+        return this.delegated.get(this.activeDelegatedTag.value)
+    }
+
+    @action.bound
+    private async validateAccountNameAndReturnMap(
+        accountName: string,
+        map: string[]
+    ): Promise<string[]> {
+        let cache = map
+
+        try {
+            // validate the member
+            const isValidAccountName = await checkIfNameIsValid(accountName)
+
+            if (isValidAccountName) {
+                cache.push(accountName)
+            }
+
+            return cache
+        } catch (error) {
+            throw error
+            // return error.message
+        }
+    }
+
+    @task.resolved({ swallow: true })
+    @action.bound
+    async setModerationMemberByTag(accountName: string, tagName = this.activeDelegatedTag.value) {
+        try {
+            if (this.delegated.has(tagName)) {
+                let members = this.delegated.get(tagName)
+                const index = members.indexOf(accountName)
+
+                if (index !== -1) {
+                    members.splice(index, 1)
+                } else {
+                    members = await this.validateAccountNameAndReturnMap(accountName, members)
+                }
+
+                this.delegated.set(tagName, members)
+            } else {
+                const members = await this.validateAccountNameAndReturnMap(accountName, [])
+                this.delegated.set(tagName, members)
+            }
+        } catch (error) {
+            throw error
+        }
+    }
+
+    @action.bound
+    setActiveDelegatedTag(option) {
+        this.activeDelegatedTag = option
     }
 
     @computed get followingKeys() {
