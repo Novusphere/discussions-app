@@ -9,11 +9,12 @@ import { CSSTransition } from 'react-transition-group'
 import { tweetCurrentPage } from '@utils'
 
 interface ISharePostProps {
+    toggleAddAsModerator: () => void
     toggleBlockPost: (uuid: string) => void
     id: string
 }
 
-const SharePost: React.FC<ISharePostProps> = ({ toggleBlockPost, id }) => {
+const SharePost: React.FC<ISharePostProps> = ({ toggleBlockPost, id, toggleAddAsModerator }) => {
     const [inProp, setInProp] = useState(false)
 
     const renderIcon = () => {
@@ -37,8 +38,18 @@ const SharePost: React.FC<ISharePostProps> = ({ toggleBlockPost, id }) => {
         <div className={'disable-user-select flex flex-row items-center'}>
             <CSSTransition unmountOnExit in={inProp} timeout={200} classNames={'slide'}>
                 <div>
-                    <span className={'pr3 f6 b0b0b0 dim pointer'} onClick={() => toggleBlockPost(id)}>
+                    <span
+                        className={'pr3 f6 b0b0b0 dim pointer'}
+                        onClick={() => toggleBlockPost(id)}
+                    >
                         mark as spam
+                    </span>
+
+                    <span
+                        className={'pr3 f6 b0b0b0 dim pointer'}
+                        onClick={toggleAddAsModerator}
+                    >
+                        assign moderation
                     </span>
 
                     <span

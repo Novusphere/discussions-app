@@ -73,6 +73,19 @@ class Thread extends React.Component<IThreadOuterProps & IThreadInnerProps, IThr
         }
     }
 
+    addAsModerator = () => {
+        const {
+            threadAsModel,
+            props: {
+                userStore: { setModerationMemberByTag },
+                tagStore: { activeTag },
+            },
+        } = this
+
+        const mergedNameWithPub = `${threadAsModel.openingPost.posterName}:${threadAsModel.openingPost.pub}`
+        setModerationMemberByTag(mergedNameWithPub, activeTag.name)
+    }
+
     private handleWatchPost = (id, replies) => {
         if (!this.props.authStore.hasAccount) {
             this.props.uiStore.showToast('You must be logged in to watch posts', 'error')
@@ -94,6 +107,7 @@ class Thread extends React.Component<IThreadOuterProps & IThreadInnerProps, IThr
 
         return (
             <OpeningPost
+                addAsModerator={this.addAsModerator}
                 showPostWarningCloseModal={() => uiStore.showModal(ModalOptions.postWarningClose)}
                 hasReplyContent={hasReplyContent}
                 openingPost={threadAsModel.openingPost}

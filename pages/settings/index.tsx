@@ -138,32 +138,31 @@ class Settings extends React.Component<ISettings, ISettingsState> {
         </>
     )
 
-    private handleUserOnChange = e => {
-        this.setState({
-            enteredUserForModeration: e.target.value,
-        })
-    }
+    // private handleUserOnChange = e => {
+    //     this.setState({
+    //         enteredUserForModeration: e.target.value,
+    //     })
+    // }
 
-    private handleAddUserToModeration = () => {
-        let cached = this.state.enteredUserForModeration
-
-        this.props.userStore
-            .setModerationMemberByTag(this.state.enteredUserForModeration)
-            .then(() => {
-                this.setState({
-                    enteredUserForModeration: '',
-                })
-            })
-            .catch(() => {
-                this.setState({
-                    enteredUserForModeration: cached,
-                })
-            })
-    }
+    // private handleAddUserToModeration = () => {
+    //     let cached = this.state.enteredUserForModeration
+    //
+    //     this.props.userStore
+    //         .setModerationMemberByTag(this.state.enteredUserForModeration)
+    //         .then(() => {
+    //             this.setState({
+    //                 enteredUserForModeration: '',
+    //             })
+    //         })
+    //         .catch(() => {
+    //             this.setState({
+    //                 enteredUserForModeration: cached,
+    //             })
+    //         })
+    // }
 
     private handleDeleteUserToModeration = user => {
-        const option = this.props.userStore.activeDelegatedTag
-        this.props.userStore.setModerationMemberByTag(user, option.value)
+        this.props.userStore.setModerationMemberByTag(user)
     }
 
     private renderModeration = () => {
@@ -189,67 +188,75 @@ class Settings extends React.Component<ISettings, ISettingsState> {
                             <div className={'mb3'}>
                                 {!activeDelegatedTagMembers.length && (
                                     <span className={'mv3 db moon-gray f6 w-100 tc'}>
-                                        Add a user by typing their name:key below
+                                        There are no moderators for this tag.
                                     </span>
                                 )}
-                                {activeDelegatedTagMembers.slice().map(item => (
-                                    <span
-                                        className={
-                                            'flex items-center justify-between pv3 ph2 bb b--light-gray'
-                                        }
-                                        key={item}
-                                    >
-                                        <UserNameWithIcon
-                                            imageData={getIdenticon()}
-                                            name={item}
-                                            pub={item}
-                                        />
+                                {activeDelegatedTagMembers.slice().map(item => {
+                                    const [name, key, tag] = item.split(':')
+
+                                    return (
                                         <span
-                                            onClick={() => this.handleDeleteUserToModeration(item)}
-                                            title={'Remove user from moderation'}
+                                            className={
+                                                'flex items-center justify-between pv3 ph2 bb b--light-gray'
+                                            }
+                                            key={item}
                                         >
-                                            <FontAwesomeIcon
-                                                width={13}
-                                                icon={faMinusCircle}
-                                                className={'pointer dim'}
-                                                color={'red'}
+                                            <UserNameWithIcon
+                                                imageData={getIdenticon(key)}
+                                                name={name}
+                                                pub={key}
                                             />
+                                            <span
+                                                onClick={() =>
+                                                    this.handleDeleteUserToModeration(
+                                                        `${name}:${key}`
+                                                    )
+                                                }
+                                                title={'Remove user from moderation'}
+                                            >
+                                                <FontAwesomeIcon
+                                                    width={13}
+                                                    icon={faMinusCircle}
+                                                    className={'pointer dim'}
+                                                    color={'red'}
+                                                />
+                                            </span>
                                         </span>
-                                    </span>
-                                ))}
+                                    )
+                                })}
                             </div>
-                            <div
-                                className={
-                                    'field-container mb2 relative flex-auto flex items-center'
-                                }
-                            >
-                                <input
-                                    value={this.state.enteredUserForModeration}
-                                    disabled={setModerationMemberByTag['pending']}
-                                    onChange={this.handleUserOnChange}
-                                    className={'w-100'}
-                                    placeholder={'Enter a user'}
-                                />
-                                <span
-                                    onClick={this.handleAddUserToModeration}
-                                    className={'plus-icon absolute dim pointer'}
-                                >
-                                    {setModerationMemberByTag['pending'] ? (
-                                        <FontAwesomeIcon width={13} icon={faSpinner} spin />
-                                    ) : (
-                                        <FontAwesomeIcon
-                                            width={13}
-                                            icon={faPlus}
-                                            title={'Click to add a user'}
-                                        />
-                                    )}
-                                </span>
-                            </div>
-                            {setModerationMemberByTag['rejected'] && (
-                                <span className={'error f6 pv2'}>
-                                    {setModerationMemberByTag['error']['message']}
-                                </span>
-                            )}
+                            {/*<div*/}
+                            {/*    className={*/}
+                            {/*        'field-container mb2 relative flex-auto flex items-center'*/}
+                            {/*    }*/}
+                            {/*>*/}
+                            {/*    <input*/}
+                            {/*        value={this.state.enteredUserForModeration}*/}
+                            {/*        disabled={setModerationMemberByTag['pending']}*/}
+                            {/*        onChange={this.handleUserOnChange}*/}
+                            {/*        className={'w-100'}*/}
+                            {/*        placeholder={'Enter a user'}*/}
+                            {/*    />*/}
+                            {/*    <span*/}
+                            {/*        onClick={this.handleAddUserToModeration}*/}
+                            {/*        className={'plus-icon absolute dim pointer'}*/}
+                            {/*    >*/}
+                            {/*        {setModerationMemberByTag['pending'] ? (*/}
+                            {/*            <FontAwesomeIcon width={13} icon={faSpinner} spin />*/}
+                            {/*        ) : (*/}
+                            {/*            <FontAwesomeIcon*/}
+                            {/*                width={13}*/}
+                            {/*                icon={faPlus}*/}
+                            {/*                title={'Click to add a user'}*/}
+                            {/*            />*/}
+                            {/*        )}*/}
+                            {/*    </span>*/}
+                            {/*</div>*/}
+                            {/*{setModerationMemberByTag['rejected'] && (*/}
+                            {/*    <span className={'error f6 pv2'}>*/}
+                            {/*        {setModerationMemberByTag['error']['message']}*/}
+                            {/*    </span>*/}
+                            {/*)}*/}
                         </div>
                     </div>
                 </div>

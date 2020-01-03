@@ -155,7 +155,8 @@ form {
 
 .rs__single-value,
 .rs__placeholder {
-    font-size: 1rem;
+    @extend .f6;
+    //font-size: 1rem;
     font-weight: 400;
     color: #495057;
 }

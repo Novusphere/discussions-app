@@ -39,6 +39,7 @@ interface IOpeningPostProps {
     hasReplyContent: boolean
     showPostWarningCloseModal: () => void
     toggleBlockPost?: (threadUuid: string) => void
+    addAsModerator: () => void
 }
 
 const OpeningPost: React.FC<IOpeningPostProps> = ({
@@ -54,6 +55,7 @@ const OpeningPost: React.FC<IOpeningPostProps> = ({
     showPostWarningCloseModal,
     toggleBlockPost,
     asPath,
+    addAsModerator,
 }) => {
     return (
         <div data-post-uuid={openingPost.uuid}>
@@ -207,6 +209,7 @@ const OpeningPost: React.FC<IOpeningPostProps> = ({
 
                                 <SharePost
                                     toggleBlockPost={toggleBlockPost}
+                                    toggleAddAsModerator={addAsModerator}
                                     id={asPath.split('#')[0]}
                                 />
                             </div>

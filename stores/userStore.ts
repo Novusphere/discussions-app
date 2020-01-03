@@ -1,4 +1,4 @@
-import { observable, action, computed, observe } from 'mobx'
+import { action, computed, observable, observe } from 'mobx'
 import { BaseStore, getOrCreateStore } from 'next-mobx-wrapper'
 import { persist } from 'mobx-persist'
 import { computedFn } from 'mobx-utils'
@@ -13,7 +13,12 @@ export default class UserStore extends BaseStore {
     @persist('map') @observable watching = observable.map<string, [number, number]>() // [currentCount, prevCount]
     @persist('map') @observable blockedUsers = observable.map<string, string>() // [pubKey, displayName]
     @persist('map') @observable blockedPosts = observable.map<string, string>() // [asPathURL, yyyydd]
-    @persist('map') @observable delegated = observable.map<string, string[]>() // [tagName, string[]]
+    @persist('map') @observable delegated = observable.map<string, string>() // [name:pubKey:tagName, tagName]
+
+    // // this will get populated once we sync delegated members
+    // @persist('object')
+    // @observable
+    // blockedByDelegation = observable.map<string, string>() // either blockedUsers or blockedPosts
 
     @persist('object')
     @observable
@@ -61,23 +66,39 @@ export default class UserStore extends BaseStore {
 
     @computed get activeDelegatedTagMembers() {
         if (!this.activeDelegatedTag) return []
-        if (!this.delegated.has(this.activeDelegatedTag.value)) return []
-        return this.delegated.get(this.activeDelegatedTag.value)
+
+        const keys = Array.from(this.delegated.keys())
+        const values = Array.from(this.delegated.values())
+        const names = []
+
+        values.forEach((tagName, index) => {
+            if (tagName !== this.activeDelegatedTag.value) return
+
+            const accountNameWithPubKey = keys[index]
+            if (names.indexOf(accountNameWithPubKey) === -1) {
+                names.push(accountNameWithPubKey)
+            }
+        })
+
+        console.log(names)
+
+        return names
     }
 
     @action.bound
     private async validateAccountNameAndReturnMap(
-        accountName: string,
+        accountNameWithPubKey: string,
         map: string[]
     ): Promise<string[]> {
         let cache = map
 
         try {
             // validate the member
-            const isValidAccountName = await checkIfNameIsValid(accountName)
+            const [name] = accountNameWithPubKey.split(':')
+            const isValidAccountName = await checkIfNameIsValid(name)
 
             if (isValidAccountName) {
-                cache.push(accountName)
+                cache.push(accountNameWithPubKey)
             }
 
             return cache
@@ -89,22 +110,21 @@ export default class UserStore extends BaseStore {
 
     @task.resolved({ swallow: true })
     @action.bound
-    async setModerationMemberByTag(accountName: string, tagName = this.activeDelegatedTag.value) {
+    async setModerationMemberByTag(
+        accountNameWithPubKey: string,
+        tagName = this.activeDelegatedTag.value
+    ) {
+        const mergedName = `${accountNameWithPubKey}:${tagName}`
+
         try {
-            if (this.delegated.has(tagName)) {
-                let members = this.delegated.get(tagName)
-                const index = members.indexOf(accountName)
-
-                if (index !== -1) {
-                    members.splice(index, 1)
+            if (this.delegated.has(mergedName)) {
+                if (this.delegated.get(mergedName) === tagName) {
+                    this.delegated.delete(mergedName)
                 } else {
-                    members = await this.validateAccountNameAndReturnMap(accountName, members)
+                    this.delegated.set(mergedName, tagName)
                 }
-
-                this.delegated.set(tagName, members)
             } else {
-                const members = await this.validateAccountNameAndReturnMap(accountName, [])
-                this.delegated.set(tagName, members)
+                this.delegated.set(mergedName, tagName)
             }
         } catch (error) {
             throw error

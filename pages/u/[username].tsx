@@ -7,7 +7,7 @@ import { faMinusCircle } from '@fortawesome/free-solid-svg-icons'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { computed } from 'mobx'
 import { getIdenticon, isServer, sleep } from '@utils'
-import { InfiniteScrollFeed, PostPreview } from '@components'
+import { InfiniteScrollFeed, PostPreview, TagDropdown } from '@components'
 
 interface IUPageProps {
     userStore: IStores['userStore']
@@ -107,12 +107,24 @@ class U extends React.Component<IUPageProps> {
         ))
     }
 
+    private addAsModerator = () => {
+        const usernameWithKey = `${this.props.username}:${this.props.pub}`
+        this.props.userStore.setModerationMemberByTag(usernameWithKey)
+    }
+
     private renderSidebarContent = () => {
         const {
             icon,
             username,
             pub,
-            userStore: { toggleUserFollowing, isFollowingUser, isUserBlocked },
+            postsStore: { getPlausibleTagOptions },
+            userStore: {
+                delegated,
+                isFollowingUser,
+                isUserBlocked,
+                activeDelegatedTag,
+                setActiveDelegatedTag,
+            },
         } = this.props
 
         return (
@@ -163,12 +175,39 @@ class U extends React.Component<IUPageProps> {
                     <div className={'mt4 flex flex-column'}>
                         <span className={'small-title mb2'}>Options</span>
 
-                        <ul className={'list'}>
+                        <ul className={'list lh-copy'}>
                             <li
                                 className={'red f6 pointer dim'}
                                 onClick={() => this.handleUserBlock(username, pub)}
                             >
-                                {isUserBlocked(pub) ? 'Unblock User' : 'Block User'}
+                                <button
+                                    className={
+                                        'mt1 w-100 f6 link dim ph3 pv2 dib white bg-red pointer'
+                                    }
+                                    type="submit"
+                                >
+                                    {isUserBlocked(pub) ? 'Unblock User' : 'Block User'}
+                                </button>
+                            </li>
+                            <li className={'f6 mt2'}>
+                                <TagDropdown
+                                    className={'f6'}
+                                    formatCreateLabel={inputValue => `Choose a tag`}
+                                    onChange={setActiveDelegatedTag}
+                                    value={activeDelegatedTag}
+                                    options={getPlausibleTagOptions}
+                                />
+                                <button
+                                    className={
+                                        'mt1 w-100 f6 link dim ph3 pv2 dib white bg-green pointer'
+                                    }
+                                    type="submit"
+                                    onClick={this.addAsModerator}
+                                >
+                                    {delegated.has(`${username}:${pub}:${activeDelegatedTag.value}`)
+                                        ? 'Remove as moderator'
+                                        : 'Add as moderator'}
+                                </button>
                             </li>
                         </ul>
                     </div>

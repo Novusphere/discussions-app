@@ -72,13 +72,15 @@ a {
 
 .sidebar {
     height: 100%;
-    overflow: hidden;
-    position: sticky;
-    max-height: calc(100vh - 55px - 15px);
+    //overflow: hidden;
+    //position: sticky;
+    //max-height: calc(100vh - 55px - 15px);
 
     ul {
-        overflow-y: auto;
-        overflow-x: hidden;
+        position: relative;
+        //overflow: hidden;
+        //overflow-y: auto;
+        //overflow-x: hidden;
     }
 }
 
