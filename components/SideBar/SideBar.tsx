@@ -220,7 +220,7 @@ class SideBar extends React.Component<ITagListOuterProps & ITagListInnerProps, I
                         ))}
                     {!this.props.authStore.hasAccount && <div className={'divider-line mb2'} />}
                     {this.props.authStore.hasAccount && (
-                        <div className={'field-container mb2 flex-auto flex items-center'}>
+                        <div className={'field-container mb2 relative flex-auto flex items-center'}>
                             <input
                                 value={this.state.tag}
                                 onChange={this.handleAddTagChange}
