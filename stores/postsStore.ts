@@ -204,7 +204,7 @@ export default class PostsStore extends BaseStore {
             if (!thread) return null
             this.activeThread = new ThreadModel(thread)
             this.activeThreadId = id
-            return this.activeThread
+            return Promise.resolve(this.activeThread)
         } catch (error) {
             throw error
         }

@@ -57,6 +57,8 @@ export default class SyncStore extends BaseStore {
                     }
                 }
 
+                this.userStore.updateFromActiveDelegatedMembers()
+
                 disposeSync()
             }
         })

@@ -175,6 +175,7 @@ class Thread extends React.Component<IThreadOuterProps & IThreadInnerProps, IThr
                 toggleBlockPost,
                 blockedPosts,
                 blockedUsers,
+                blockedByDelegation,
             },
             postsStore: { highlightPostUuid, currentHighlightedPostUuid, setCurrentReplyContent },
             authStore: { activePublicKey, hasAccount },
@@ -208,6 +209,7 @@ class Thread extends React.Component<IThreadOuterProps & IThreadInnerProps, IThr
                             blockedContentSetting={blockedContentSetting}
                             permaLink={getPermaLink(router.asPath.split('#')[0], reply.uuid)}
                             blockedPosts={blockedPosts}
+                            blockedByDelegation={blockedByDelegation}
                             isBlockedUser={blockedUsers.has(reply.pub)}
                             unsignedPostsIsSpam={unsignedPostsIsSpam}
                         />

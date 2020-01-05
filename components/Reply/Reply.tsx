@@ -43,6 +43,7 @@ interface IReplies {
     threadReference?: ThreadModel
     blockedContentSetting: BlockedContentSetting
     blockedPosts: ObservableMap<string, string>
+    blockedByDelegation: ObservableMap<string, string>
     permaLink: string
     unsignedPostsIsSpam: boolean
     isBlockedUser: boolean
@@ -99,7 +100,6 @@ class Reply extends React.Component<IReplies, IRepliesState> {
         }
 
         await sleep(1000)
-
         this.setBlockedStatus()
     }
 
@@ -111,18 +111,24 @@ class Reply extends React.Component<IReplies, IRepliesState> {
             blockedPosts,
             isBlockedUser,
             permaLink,
+            blockedByDelegation,
         } = this.props
 
-        if (unsignedPostsIsSpam || blockedContentSetting) {
-            if (blockedPosts.has(permaLink) || isBlockedUser || !post.sig) {
-                this.replyModel.open = false
+        let isBlockedByDelegation =
+            blockedByDelegation.has(permaLink) || blockedByDelegation.has(post.pub)
 
-                this.setState({
-                    isCollapsed: blockedContentSetting === 'collapsed',
-                    isHidden: blockedContentSetting === 'hidden',
-                    isSpam: true,
-                })
-            }
+        if (
+            blockedPosts.has(permaLink) ||
+            isBlockedUser ||
+            isBlockedByDelegation ||
+            (unsignedPostsIsSpam && !post.pub)
+        ) {
+            this.replyModel.open = false
+            this.setState({
+                isCollapsed: blockedContentSetting === 'collapsed',
+                isHidden: blockedContentSetting === 'hidden',
+                isSpam: true,
+            })
         }
     }
 
@@ -233,6 +239,7 @@ class Reply extends React.Component<IReplies, IRepliesState> {
             isBlockedUser,
             unsignedPostsIsSpam,
             permaLink,
+            blockedByDelegation,
         } = this.props
 
         const { isCollapsed, isHover, isSpam } = this.state
@@ -382,6 +389,7 @@ class Reply extends React.Component<IReplies, IRepliesState> {
                                           unsignedPostsIsSpam={unsignedPostsIsSpam}
                                           isBlockedUser={isBlockedUser}
                                           permaLink={_permaLink}
+                                          blockedByDelegation={blockedByDelegation}
                                       />
                                   </div>
                               )

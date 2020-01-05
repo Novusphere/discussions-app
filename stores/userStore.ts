@@ -5,8 +5,9 @@ import { computedFn } from 'mobx-utils'
 import { getNotificationsStore, getTagStore, getUiStore, IStores } from '@stores/index'
 import { discussions } from '@novuspherejs'
 import NotificationModel from '@models/notificationModel'
-import { checkIfNameIsValid } from '@utils'
+import { checkIfNameIsValid, sleep } from '@utils'
 import { task } from 'mobx-task'
+import axios from 'axios'
 
 export default class UserStore extends BaseStore {
     @persist('map') @observable following = observable.map<string, string>()
@@ -15,10 +16,8 @@ export default class UserStore extends BaseStore {
     @persist('map') @observable blockedPosts = observable.map<string, string>() // [asPathURL, yyyydd]
     @persist('map') @observable delegated = observable.map<string, string>() // [name:pubKey:tagName, tagName]
 
-    // // this will get populated once we sync delegated members
-    // @persist('object')
-    // @observable
-    // blockedByDelegation = observable.map<string, string>() // either blockedUsers or blockedPosts
+    @observable
+    blockedByDelegation = observable.map<string, string>() // either blockedUsers or blockedPosts
 
     @persist('object')
     @observable
@@ -80,8 +79,6 @@ export default class UserStore extends BaseStore {
             }
         })
 
-        console.log(names)
-
         return names
     }
 
@@ -108,6 +105,47 @@ export default class UserStore extends BaseStore {
         }
     }
 
+    @action.bound
+    async updateFromActiveDelegatedMembers() {
+        try {
+            return await Array.from(this.delegated.keys()).map(async delegatedMember => {
+                const [, key, ] = delegatedMember.split(':')
+                const { data } = await axios.get(`http://atmosdb.novusphere.io/discussions/moderation/${key}`)
+                console.log(data)
+
+                if (data.hasOwnProperty('moderation')) {
+                    const blockedPosts = data['moderation']['blockedPosts']
+                    const blockedPostsKeys = Object.keys(blockedPosts)
+
+                    if (blockedPostsKeys.length) {
+                        blockedPostsKeys.forEach(datestamp => {
+                            const blockedPostForDateStamp: string[] = blockedPosts[datestamp]
+                            if (blockedPostForDateStamp.length) {
+                                blockedPostForDateStamp.forEach(blockedPost => {
+                                    // console.log(blockedPost, datestamp)
+                                    if (this.blockedByDelegation)
+                                        this.blockedByDelegation.set(blockedPost, datestamp)
+                                })
+                            }
+                        })
+                    }
+                }
+            })
+        } catch (error) {
+            throw error
+        }
+    }
+
+    @action.bound
+    private async setAndUpdateDelegatedPosts(mergedName: string, tagName: string) {
+        this.delegated.set(mergedName, tagName)
+        try {
+            return await this.updateFromActiveDelegatedMembers()
+        } catch (error) {
+            return error
+        }
+    }
+
     @task.resolved({ swallow: true })
     @action.bound
     async setModerationMemberByTag(
@@ -121,13 +159,13 @@ export default class UserStore extends BaseStore {
                 if (this.delegated.get(mergedName) === tagName) {
                     this.delegated.delete(mergedName)
                 } else {
-                    this.delegated.set(mergedName, tagName)
+                    await this.setAndUpdateDelegatedPosts(mergedName, tagName)
                 }
             } else {
-                this.delegated.set(mergedName, tagName)
+                await this.setAndUpdateDelegatedPosts(mergedName, tagName)
             }
         } catch (error) {
-            throw error
+            return error
         }
     }
 

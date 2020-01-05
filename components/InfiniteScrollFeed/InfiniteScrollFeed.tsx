@@ -60,7 +60,7 @@ class InfiniteScrollFeed extends React.Component<
             children,
             tagStore: { tags },
             settingsStore: { blockedContentSetting, unsignedPostsIsSpam },
-            userStore: { blockedPosts, blockedUsers },
+            userStore: { blockedPosts, blockedUsers, blockedByDelegation },
         } = this.props
 
         return (
@@ -86,6 +86,7 @@ class InfiniteScrollFeed extends React.Component<
                                   blockedContentSetting={blockedContentSetting}
                                   blockedPosts={blockedPosts}
                                   blockedUsers={blockedUsers}
+                                  blockedByDelegation={blockedByDelegation}
                                   unsignedPostsIsSpam={unsignedPostsIsSpam}
                                   {...(withAnchorUid && { notificationUuid: post.uuid })}
                               />

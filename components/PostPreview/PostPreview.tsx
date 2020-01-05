@@ -22,6 +22,7 @@ interface IPostPreviewProps {
     blockedContentSetting: BlockedContentSetting
     blockedPosts: ObservableMap<string, string>
     blockedUsers: ObservableMap<string, string>
+    blockedByDelegation: ObservableMap<string, string>
     unsignedPostsIsSpam: boolean
 }
 
@@ -34,6 +35,8 @@ const PostPreview: React.FC<IPostPreviewProps> = ({
     blockedContentSetting,
     blockedPosts,
     blockedUsers,
+    blockedByDelegation,
+    unsignedPostsIsSpam,
 }) => {
     const [url, setUrl] = useState('')
     const [postModel, setPostModel] = useState(null)
@@ -57,7 +60,13 @@ const PostPreview: React.FC<IPostPreviewProps> = ({
         getUrl()
     }, [])
 
-    const isSpam = blockedPosts.has(url) || blockedUsers.has(post.pub) || !post.sig
+    const isSpam =
+        blockedPosts.has(url) ||
+        blockedUsers.has(post.pub) ||
+        blockedByDelegation.has(url) ||
+        blockedByDelegation.has(post.pub) ||
+        (unsignedPostsIsSpam && !post.pub)
+
     const shouldBeCollapsed = blockedContentSetting === 'collapsed' && isSpam
     const shouldBeHidden = isSpam && blockedContentSetting === 'hidden'
 
