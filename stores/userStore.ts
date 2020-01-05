@@ -111,7 +111,6 @@ export default class UserStore extends BaseStore {
             return await Array.from(this.delegated.keys()).map(async delegatedMember => {
                 const [, key, ] = delegatedMember.split(':')
                 const { data } = await axios.get(`http://atmosdb.novusphere.io/discussions/moderation/${key}`)
-                console.log(data)
 
                 if (data.hasOwnProperty('moderation')) {
                     const blockedPosts = data['moderation']['blockedPosts']
@@ -122,7 +121,6 @@ export default class UserStore extends BaseStore {
                             const blockedPostForDateStamp: string[] = blockedPosts[datestamp]
                             if (blockedPostForDateStamp.length) {
                                 blockedPostForDateStamp.forEach(blockedPost => {
-                                    // console.log(blockedPost, datestamp)
                                     if (this.blockedByDelegation)
                                         this.blockedByDelegation.set(blockedPost, datestamp)
                                 })
