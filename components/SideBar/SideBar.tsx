@@ -253,6 +253,7 @@ class SideBar extends React.Component<ITagListOuterProps & ITagListInnerProps, I
                                 ])}
                             >
                                 <Tooltip
+                                    open={true}
                                     disabled={this.state.isScrolling}
                                     animateFill={false}
                                     interactive

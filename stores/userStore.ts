@@ -109,8 +109,10 @@ export default class UserStore extends BaseStore {
     async updateFromActiveDelegatedMembers() {
         try {
             return await Array.from(this.delegated.keys()).map(async delegatedMember => {
-                const [, key, ] = delegatedMember.split(':')
-                const { data } = await axios.get(`http://atmosdb.novusphere.io/discussions/moderation/${key}`)
+                const [, key] = delegatedMember.split(':')
+                const { data } = await axios.get(
+                    `http://atmosdb.novusphere.io/discussions/moderation/${key}`
+                )
 
                 if (data.hasOwnProperty('moderation')) {
                     const blockedPosts = data['moderation']['blockedPosts']
@@ -136,6 +138,19 @@ export default class UserStore extends BaseStore {
 
     @action.bound
     private async setAndUpdateDelegatedPosts(mergedName: string, tagName: string) {
+        console.log({
+            mergedName,
+            tagName,
+        })
+
+        if (!tagName || tagName === '') {
+            this.uiStore.showToast(
+                'An empty tag string is not valid. Set this user as a global mod instead.',
+                'error'
+            )
+            return
+        }
+
         this.delegated.set(mergedName, tagName)
         try {
             return await this.updateFromActiveDelegatedMembers()
