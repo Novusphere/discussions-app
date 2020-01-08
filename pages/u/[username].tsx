@@ -195,7 +195,7 @@ class U extends React.Component<IUPageProps> {
                                     formatCreateLabel={inputValue => `Choose a tag`}
                                     onChange={setActiveDelegatedTag}
                                     value={activeDelegatedTag}
-                                    options={getPlausibleTagOptions}
+                                    options={[{ value: 'all', label: '#all' }, ...getPlausibleTagOptions]}
                                 />
                                 <button
                                     className={
@@ -247,7 +247,7 @@ class U extends React.Component<IUPageProps> {
     public render(): React.ReactNode {
         return (
             <div className={'flex flex-row'}>
-                <div className={'card sidebar w-30 mr3 pa3'}>{this.renderSidebarContent()}</div>
+                <div className={'card w-30 mr3 pa3'} style={{ maxHeight: '90vh' }}>{this.renderSidebarContent()}</div>
                 <div className={'w-70'}>
                     <Tabs selectedIndex={1} onSelect={index => console.log(index)}>
                         <TabList className={'settings-tabs'}>
