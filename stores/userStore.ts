@@ -145,7 +145,7 @@ export default class UserStore extends BaseStore {
 
         if (!tagName || tagName === '') {
             this.uiStore.showToast(
-                'An empty tag string is not valid. Set this user as a global mod instead.',
+                'An empty tag string is not valid. Set this user as a global mod by setting the tag to be "all".',
                 'error'
             )
             return

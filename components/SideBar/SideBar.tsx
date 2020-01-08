@@ -253,7 +253,6 @@ class SideBar extends React.Component<ITagListOuterProps & ITagListInnerProps, I
                                 ])}
                             >
                                 <Tooltip
-                                    open={true}
                                     disabled={this.state.isScrolling}
                                     animateFill={false}
                                     interactive
@@ -268,13 +267,13 @@ class SideBar extends React.Component<ITagListOuterProps & ITagListInnerProps, I
                                     }
                                     position={'left-end'}
                                     unmountHTMLWhenHide={false}
-                                    offset={0}
+                                    offset={150}
                                     stickyDuration={0}
                                     sticky={true}
                                     duration={0}
                                     animation={'fade'}
                                     className={'interactive-hover'}
-                                    distance={0}
+                                    distance={350}
                                     trigger={'mouseenter focus'}
                                 >
                                     <Link href={`/tag/[name]`} as={`/tag/${tag.name}`}>
