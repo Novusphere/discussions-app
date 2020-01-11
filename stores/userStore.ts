@@ -152,6 +152,9 @@ export default class UserStore extends BaseStore {
         }
 
         this.delegated.set(mergedName, tagName)
+
+        this.uiStore.showToast('Added user as a moderator', 'success')
+
         try {
             return await this.updateFromActiveDelegatedMembers()
         } catch (error) {
