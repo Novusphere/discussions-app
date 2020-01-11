@@ -49,7 +49,7 @@ const SharePost: React.FC<ISharePostProps> = ({ toggleBlockPost, id, toggleAddAs
                         className={'pr3 f6 b0b0b0 dim pointer'}
                         onClick={toggleAddAsModerator}
                     >
-                        assign moderation
+                        set as moderator
                     </span>
 
                     <span
