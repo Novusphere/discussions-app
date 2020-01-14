@@ -321,7 +321,7 @@ export default class SettingsStore extends BaseStore {
                 label: 'Memo ID',
                 rules: 'required',
                 disabled: true,
-                value: this.authStore.activeUidWalletKey,
+                value: this.authStore.activePublicKey,
             },
             {
                 name: 'buttons',
