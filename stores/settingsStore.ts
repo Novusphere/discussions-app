@@ -6,7 +6,10 @@ import { task } from 'mobx-task'
 import axios from 'axios'
 import { getAuthStore, getUiStore, IStores } from '@stores/index'
 import { sleep, checkIfNameIsValid } from '@utils'
-import { eos } from '@novuspherejs'
+import { eos, nsdb } from '@novuspherejs'
+import { ApiGetUnifiedId } from 'interfaces/ApiGet-UnifiedId'
+import { symbol } from 'prop-types'
+import { memo } from 'react'
 
 const fileDownload = require('js-file-download')
 
@@ -24,6 +27,7 @@ export default class SettingsStore extends BaseStore {
     unsignedPostsIsSpam = true
 
     @observable tokens = []
+    @observable supportedTokensForUnifiedWallet = []
     @observable thresholdTxID = ''
     @observable errorMessage = ''
 
@@ -32,6 +36,10 @@ export default class SettingsStore extends BaseStore {
 
     constructor() {
         super()
+
+        nsdb.getSupportedTokensForUnifiedWallet().then(data => {
+            this.setDepositTokenOptions(data)
+        })
     }
 
     @action.bound
@@ -90,6 +98,17 @@ export default class SettingsStore extends BaseStore {
                 symbol: q.symbol,
             }
         })
+    }
+
+    @action.bound
+    setDepositTokenOptions(depositTokens: ApiGetUnifiedId) {
+        this.supportedTokensForUnifiedWallet = depositTokens.map(token => ({
+            label: token.symbol,
+            value: token.contract,
+            contract: token.p2k.contract,
+            chain: token.p2k.chain,
+            decimals: token.precision,
+        }))
     }
 
     @computed get recipients() {
@@ -245,6 +264,77 @@ export default class SettingsStore extends BaseStore {
                             className: 'white bg-green',
                             title: 'AirDrop',
                             onClick: this.handleAirDropSubmit,
+                        },
+                    ],
+                },
+            },
+        ])
+    }
+
+    @task.resolved
+    @action.bound
+    async handleDepositSubmit() {
+        try {
+            const { form } = this.depositsForm
+            const { amount, memoId, token } = form.values()
+            const { label, value, contract, decimals, chain } = token
+
+            const transaction = {
+                contract: value,
+                name: 'transfer',
+                data: {
+                    from: this.authStore.displayName.scatter,
+                    to: contract,
+                    quantity: `${Number(amount).toFixed(decimals)} ${label}`,
+                    memo: memoId,
+                },
+            }
+
+            console.log('submitting transaction: ', transaction)
+            const resp = await eos.transact(transaction)
+            console.log(resp)
+            this.uiStore.showToast('Deposit successfully submitted!', 'success')
+        } catch (error) {
+            this.uiStore.showToast('Deposit failed to submit', 'error')
+            throw error
+        }
+    }
+
+    @computed get depositsForm() {
+        return new CreateForm({}, [
+            {
+                name: 'token',
+                label: 'Token',
+                type: 'dropdown',
+                extra: {
+                    options: this.supportedTokensForUnifiedWallet || [],
+                },
+                rules: 'required',
+            },
+            {
+                name: 'amount',
+                label: 'Amount',
+                rules: 'required|numeric',
+            },
+            {
+                name: 'memoId',
+                label: 'Memo ID',
+                rules: 'required',
+                disabled: true,
+                value: this.authStore.activeUidWalletKey,
+            },
+            {
+                name: 'buttons',
+                type: 'button',
+                hideLabels: true,
+                containerClassName: 'flex flex-row items-center justify-end',
+                extra: {
+                    options: [
+                        {
+                            value: 'Submit Deposit',
+                            className: 'white bg-green',
+                            title: 'Submit Deposit',
+                            onClick: this.handleDepositSubmit,
                         },
                     ],
                 },

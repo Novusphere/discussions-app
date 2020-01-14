@@ -51,7 +51,7 @@ class Form extends React.Component<FormProps> {
         const renderButton = (field, type, rest) => {
             if (Array.isArray(field.accessor.$extra.options)) {
                 return field.accessor.$extra.options.map(
-                    ({ value, disabled, title, className, onClick, loading }) => {
+                    ({ value, disabled, title, className, onClick, loading }, index, array) => {
                         const isLoading =
                             loading ||
                             (onClick && onClick['state'] && onClick['state'] === 'pending')
@@ -72,9 +72,10 @@ class Form extends React.Component<FormProps> {
                                 key={`${field.name}-${value}`}
                                 title={title || null}
                                 className={classNames([
-                                    'mt3 f6 link dim ph3 pv2 dib mr2 pointer',
+                                    'mt3 f6 link dim ph3 pv2 dib pointer',
                                     {
                                         'white bg-green': !className,
+                                        mr2: index !== array.length - 1,
                                         [className]: className,
                                     },
                                 ])}
@@ -291,9 +292,12 @@ class Form extends React.Component<FormProps> {
                     case 'switch':
                         return (
                             <React.Fragment key={field.name}>
-                                <div className={'field-container pb3 inline-labels flex flex-row'} style={{
-                                    alignItems: 'flex-start',
-                                }}>
+                                <div
+                                    className={'field-container pb3 inline-labels flex flex-row'}
+                                    style={{
+                                        alignItems: 'flex-start',
+                                    }}
+                                >
                                     {!field.hideLabels && (
                                         <label htmlFor={field.accessor.id} className={'w-40'}>
                                             {field.accessor.label}
@@ -319,7 +323,9 @@ class Form extends React.Component<FormProps> {
                                             checked={field.value}
                                         />
                                         {field.description && (
-                                            <span className={'mt2 db f6 moon-gray lh-copy'}>{field.description}</span>
+                                            <span className={'mt2 db f6 moon-gray lh-copy'}>
+                                                {field.description}
+                                            </span>
                                         )}
                                         <span className={'error f6 db pv2'}>
                                             {field.accessor.error}

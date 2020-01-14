@@ -17,7 +17,7 @@ export default class AuthStore extends BaseStore {
     }
 
     @persist @observable postPriv = ''
-    @persist @observable tipPub = ''
+    @persist @observable uidWalletPubKey = ''
     @persist @observable preferredSignInMethod = SignInMethods.brainKey
 
     // private stuff
@@ -40,13 +40,24 @@ export default class AuthStore extends BaseStore {
 
     // status
     @observable hasAccount = false
+    @observable hasScatterAccount = false
 
     private readonly uiStore: IStores['uiStore'] = getUiStore()
 
-    constructor() {
-        super()
-
-        this.checkInitialConditions()
+    @task.resolved
+    @action.bound
+    async connectScatterWallet() {
+        try {
+            const wallet = await this.initializeScatterLogin()
+            if (wallet.connected) {
+                ;(wallet as any).connect()
+                console.log('found wallet: ', wallet)
+                this.hasScatterAccount = true
+                this.displayName.scatter = wallet.auth.accountName
+            }
+        } catch (error) {
+            throw error
+        }
     }
 
     @task
@@ -54,20 +65,14 @@ export default class AuthStore extends BaseStore {
     async checkInitialConditions() {
         await sleep(100)
 
-        if (this.getActiveDisplayName && this.postPriv && this.tipPub) {
-            // if (this.preferredSignInMethod === SignInMethods.scatter) {
-            //     try {
-            //         return await this.initializeScatterLogin()
-            //     } catch (error) {
-            //         this.hasAccount = false
-            //         return error
-            //     }
-            // }
-
-            if (this.preferredSignInMethod === SignInMethods.brainKey) {
-                if (this.statusJson.bk && this.postPriv && this.tipPub && this.displayName.bk) {
-                    this.hasAccount = true
-                }
+        if (this.getActiveDisplayName && this.postPriv) {
+            if (
+                this.statusJson.bk &&
+                this.postPriv &&
+                this.displayName.bk
+            ) {
+                this.hasAccount = true
+                this.connectScatterWallet()
             }
         } else {
             this.hasAccount = false
@@ -87,6 +92,11 @@ export default class AuthStore extends BaseStore {
         }
 
         return this.statusJson.scatter.post
+    }
+
+    @computed get activeUidWalletKey() {
+        if (!this.activePublicKey) return null
+        return this.uidWalletPubKey
     }
 
     @computed get activePrivateKey() {
@@ -365,7 +375,7 @@ export default class AuthStore extends BaseStore {
 
     @task.resolved
     @action.bound
-    async initializeScatterLogin() {
+    async initializeScatterLogin(): Promise<Scatter.RootObject> {
         try {
             await init()
             const wallet = await eos.detectWallet()
@@ -373,18 +383,7 @@ export default class AuthStore extends BaseStore {
             if (typeof wallet !== 'boolean' && wallet) {
                 // prompt login
                 await eos.login()
-
-                console.log('time to ask for your password')
-
-                if (this.uiStore.activeModal !== ModalOptions.signIn) {
-                    this.uiStore.showModal(ModalOptions.signIn)
-                    await sleep(50)
-                    this.signInObject.ref.goToStep(5)
-                }
-
-                if (this.uiStore.activeModal === ModalOptions.signIn) {
-                    this.signInObject.ref.goToStep(5)
-                }
+                return wallet as any
             } else {
                 throw new Error('Failed to detect wallet')
             }
@@ -403,7 +402,7 @@ export default class AuthStore extends BaseStore {
             const json = await discussions.bkRetrieveStatusEOS(accountName)
             const bk = await discussions.bkFromStatusJson(json, password)
 
-            await this.storeKeys(bk)
+            // await this.storeKeys(bk)
 
             if (!bk) {
                 return
@@ -470,8 +469,10 @@ export default class AuthStore extends BaseStore {
         try {
             const keys = await discussions.bkToKeys(bk)
 
+            console.log(keys)
+
             this.postPriv = keys.post.priv
-            this.tipPub = keys.tip.pub
+            this.uidWalletPubKey = keys.uidwallet.pub
 
             return keys
         } catch (error) {

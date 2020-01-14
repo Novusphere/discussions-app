@@ -110,18 +110,18 @@ export default class DiscussionsService {
 
     async bkToKeys(
         bk: string
-    ): Promise<{ post: { priv: string; pub: string }; tip: { priv: string; pub: string } }> {
+    ): Promise<{ post: { priv: string; pub: string }; uidwallet: { priv: string; pub: string } }> {
         const seed = await bip39.mnemonicToSeed(bk)
         const node = await bip32.fromSeed(seed)
 
         const keys = {
             post: null,
-            tip: null,
+            uidwallet: null,
         }
 
         //keys['BTC'] = this.bkGetBitcoin(node);
         keys['post'] = this.bkGetEOS(node, 0)
-        keys['tip'] = this.bkGetEOS(node, 1)
+        keys['uidwallet'] = this.bkGetEOS(node, 1)
         return keys
     }
 

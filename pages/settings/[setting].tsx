@@ -9,6 +9,7 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { faMinusCircle, faPlus, faSpinner } from '@fortawesome/free-solid-svg-icons'
 import { Tab, TabList, TabPanel, Tabs } from 'react-tabs'
 import Link from 'next/link'
+import { NextRouter, withRouter } from 'next/router'
 
 interface ISettings {
     settingsStore: IStores['settingsStore']
@@ -16,6 +17,9 @@ interface ISettings {
     uiStore: IStores['uiStore']
     userStore: IStores['userStore']
     tagStore: IStores['tagStore']
+    router: NextRouter
+
+    setting: string
 }
 
 // TODO: Real Data
@@ -28,30 +32,40 @@ interface ISettingsState {
     }
 }
 
+@(withRouter as any)
 @inject('settingsStore', 'postsStore', 'uiStore', 'userStore', 'tagStore')
 @observer
 class Settings extends React.Component<ISettings, ISettingsState> {
-    static async getInitialProps({ store, res }) {
+    static async getInitialProps({ store, query }) {
         const uiStore: IStores['uiStore'] = store.uiStore
         const tagStore: IStores['tagStore'] = store.tagStore
+        const setting = query.setting
 
         uiStore.toggleSidebarStatus(false)
         tagStore.destroyActiveTag()
 
-        return {}
+        return {
+            setting: setting.toLowerCase(),
+        }
     }
 
-    state = {
-        enteredUserForModeration: '',
-        activeSidebar: 'Moderation',
-        tokens: {
-            activeIndex: 0,
-        },
+    constructor(props) {
+        super(props)
+
+        this.state = {
+            enteredUserForModeration: '',
+            activeSidebar: props.setting,
+            tokens: {
+                activeIndex: 0,
+            },
+        }
     }
 
     setLinkAsActive = link => {
+        const lowerCaseLink = link.toLowerCase()
+        this.props.router.replace('/settings/[setting]', `/settings/${link}`, { shallow: true })
         this.setState({
-            activeSidebar: link,
+            activeSidebar: lowerCaseLink,
         })
     }
 
@@ -67,19 +81,22 @@ class Settings extends React.Component<ISettings, ISettingsState> {
                 <ul className={'list ph2 mt3'}>
                     {[
                         {
-                            name: 'Connections',
+                            name: 'connections',
                         },
                         {
-                            name: 'Tokens',
+                            name: 'tokens',
                         },
                         {
-                            name: 'Moderation',
+                            name: 'moderation',
                         },
                         {
-                            name: 'Airdrop',
+                            name: 'airdrop',
                         },
                         {
-                            name: 'Blocked',
+                            name: 'deposits',
+                        },
+                        {
+                            name: 'blocked',
                         },
                     ].map(link => (
                         <li
@@ -137,29 +154,6 @@ class Settings extends React.Component<ISettings, ISettingsState> {
             </div>
         </>
     )
-
-    // private handleUserOnChange = e => {
-    //     this.setState({
-    //         enteredUserForModeration: e.target.value,
-    //     })
-    // }
-
-    // private handleAddUserToModeration = () => {
-    //     let cached = this.state.enteredUserForModeration
-    //
-    //     this.props.userStore
-    //         .setModerationMemberByTag(this.state.enteredUserForModeration)
-    //         .then(() => {
-    //             this.setState({
-    //                 enteredUserForModeration: '',
-    //             })
-    //         })
-    //         .catch(() => {
-    //             this.setState({
-    //                 enteredUserForModeration: cached,
-    //             })
-    //         })
-    // }
 
     private handleDeleteUserToModeration = user => {
         this.props.userStore.setModerationMemberByTag(user)
@@ -473,18 +467,31 @@ class Settings extends React.Component<ISettings, ISettingsState> {
         )
     }
 
+    private renderDeposits = () => {
+        const { depositsForm } = this.props.settingsStore
+
+        return (
+            <>
+                <Form form={depositsForm} hideSubmitButton className={'relative'} />
+            </>
+        )
+    }
+
     private renderContent = () => {
         switch (this.state.activeSidebar) {
-            case 'Connections':
+            default:
+            case 'connections':
                 return this.renderConnections()
-            case 'Moderation':
+            case 'moderation':
                 return this.renderModeration()
-            case 'Airdrop':
+            case 'airdrop':
                 return this.renderAirdrop()
-            case 'Tokens':
+            case 'tokens':
                 return this.renderTokens()
-            case 'Blocked':
+            case 'blocked':
                 return this.renderBlocked()
+            case 'deposits':
+                return this.renderDeposits()
         }
     }
 

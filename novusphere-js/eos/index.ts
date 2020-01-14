@@ -5,7 +5,8 @@ import { DiscoveryData, WalletAuth, Wallet, WalletAccessContext, NetworkConfig }
 import { IToken, getTokens, IAccountBalance, getAccountTokens } from './tokens';
 
 export const DEFAULT_EOS_NETWORK: NetworkConfig = {
-    host: 'eos.greymass.com',
+    // host: 'eos.greymass.com',
+    host: 'nodes.get-scatter.com',
     port: 443,
     protocol: 'https',
     chainId: 'aca376f206b8fc25a6ed44dbdc66547c36c6c33e3a119ffbeaef943642f0e906'

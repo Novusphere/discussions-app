@@ -31,32 +31,32 @@ class TitleHeader extends React.Component<ITitleHeaderProps, ITitleHeaderState> 
         search: '',
     }
 
+    componentDidMount(): void {
+        this.props.authStore.checkInitialConditions()
+    }
+
     private renderUserSettings = () => {
-        const { logOut } = this.props.authStore
+        const { logOut, hasScatterAccount, connectScatterWallet } = this.props.authStore
 
         return (
-            <div className={'tooltip'} style={{ width: 200 }}>
-                <Link href={'/settings'}>
-                    <a rel={'Open settings'} className={'db mb2'}>
-                        settings
-                    </a>
+            <div className={'tooltip flex flex-column'} style={{ width: 200 }}>
+                <Link href={'/settings/connections'}>
+                    <a rel={'Open settings'}>settings</a>
                 </Link>
-                <a title={'ATMOS Balance'} className={'db mb2'}>
-                    0 ATMOS
-                </a>
-                <a
-                    rel={'Open settings'}
-                    className={'db pointer'}
-                    onClick={() => {
-                        logOut()
-                    }}
-                >
-                    {logOut['match']({
-                        pending: () => <FontAwesomeIcon width={13} icon={faSpinner} spin />,
-                        rejected: () => 'Unable to disconnect',
-                        resolved: () => 'disconnect',
-                    })}
-                </a>
+                {!hasScatterAccount && (
+                    <a rel={'Connect Scatter'} onClick={connectScatterWallet}>
+                        connect wallet
+                        {connectScatterWallet['pending'] && (
+                            <FontAwesomeIcon className={'ml2'} width={13} icon={faSpinner} spin />
+                        )}
+                    </a>
+                )}
+                {hasScatterAccount && (
+                    <Link href={'/settings/deposits'}>
+                        <a rel={'Deposit'}>deposit</a>
+                    </Link>
+                )}
+                {hasScatterAccount && <a rel={'Disconnect Scatter'}>disconnect wallet</a>}
             </div>
         )
     }
