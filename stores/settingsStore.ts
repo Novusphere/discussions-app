@@ -280,7 +280,7 @@ export default class SettingsStore extends BaseStore {
             const { label, value, contract, decimals, chain } = token
 
             const transaction = {
-                contract: value,
+                account: value,
                 name: 'transfer',
                 data: {
                     from: this.authStore.displayName.scatter,
