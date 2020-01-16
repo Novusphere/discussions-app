@@ -11,6 +11,7 @@ import { UserNotifications } from '@components'
 import { getIdenticon } from '@utils'
 
 import './style.scss'
+import { log } from 'util'
 
 interface ITitleHeaderProps {
     tagStore: IStores['tagStore']
@@ -44,7 +45,9 @@ class TitleHeader extends React.Component<ITitleHeaderProps, ITitleHeaderState> 
                     <a rel={'Open settings'}>settings</a>
                 </Link>
                 {balances.map(balance => (
-                    <a key={balance} title={'Balance'}>{balance}</a>
+                    <a key={balance} title={'Balance'}>
+                        {balance}
+                    </a>
                 ))}
                 {!hasScatterAccount && (
                     <a rel={'Connect Scatter'} onClick={connectScatterWallet}>
@@ -59,7 +62,11 @@ class TitleHeader extends React.Component<ITitleHeaderProps, ITitleHeaderState> 
                         <a rel={'Deposit'}>deposit</a>
                     </Link>
                 )}
-                {hasScatterAccount && <a rel={'Disconnect Scatter'}>disconnect wallet</a>}
+                {hasScatterAccount && (
+                    <a rel={'Disconnect Scatter'} onClick={logOut}>
+                        disconnect wallet
+                    </a>
+                )}
             </div>
         )
     }

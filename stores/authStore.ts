@@ -183,8 +183,7 @@ export default class AuthStore extends BaseStore {
     async logOut() {
         try {
             await eos.logout()
-            this.hasAccount = false
-            this.uiStore.showToast('You have signed out!', 'success')
+            this.uiStore.showToast('You have disconnected your wallet!', 'success')
         } catch (error) {
             throw error
         }
