@@ -6,10 +6,11 @@ import classNames from 'classnames'
 import './style.scss'
 import { getIdenticon } from '@utils'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
-import { faMinusCircle, faPlus, faSpinner } from '@fortawesome/free-solid-svg-icons'
+import { faMinusCircle } from '@fortawesome/free-solid-svg-icons'
 import { Tab, TabList, TabPanel, Tabs } from 'react-tabs'
 import Link from 'next/link'
 import { NextRouter, withRouter } from 'next/router'
+import _ from 'lodash'
 
 interface ISettings {
     settingsStore: IStores['settingsStore']
@@ -119,7 +120,7 @@ class Settings extends React.Component<ISettings, ISettingsState> {
                             ])}
                             key={link.name}
                         >
-                            <span>{link.name}</span>
+                            <span>{_.upperFirst(link.name)}</span>
                         </li>
                     ))}
                 </ul>
@@ -491,7 +492,7 @@ class Settings extends React.Component<ISettings, ISettingsState> {
             <div className={'flex flex-row relative'}>
                 <div className={'card w-30 mr3 pa3'}>{this.renderSidebarContent()}</div>
                 <div className={'card w-70 pa4'}>
-                    <span className={'b black f4'}>{this.state.activeSidebar}</span>
+                    <span className={'b black f4'}>{_.upperFirst(this.state.activeSidebar)}</span>
                     {this.renderContent()}
                 </div>
             </div>

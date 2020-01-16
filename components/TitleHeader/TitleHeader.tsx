@@ -58,7 +58,7 @@ class TitleHeader extends React.Component<ITitleHeaderProps, ITitleHeaderState> 
                     </a>
                 )}
                 {hasScatterAccount && (
-                    <Link href={'/settings/tokens?side=1'}>
+                    <Link href={'/settings/tokens?side=0'}>
                         <a rel={'Deposit'}>deposit</a>
                     </Link>
                 )}

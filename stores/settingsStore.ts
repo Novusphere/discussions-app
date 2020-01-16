@@ -441,6 +441,7 @@ export default class SettingsStore extends BaseStore {
                 label: 'To',
                 rules: 'required',
                 value: eos.auth ? eos.auth.accountName : '',
+                placeholder: 'An EOS account name',
             },
             {
                 name: 'memo',
@@ -534,6 +535,7 @@ export default class SettingsStore extends BaseStore {
                 name: 'to',
                 label: 'To',
                 rules: 'required',
+                placeholder: 'An EOS address'
             },
             {
                 name: 'memo',
