@@ -17,9 +17,11 @@ interface ISettings {
     uiStore: IStores['uiStore']
     userStore: IStores['userStore']
     tagStore: IStores['tagStore']
+    authStore: IStores['authStore']
     router: NextRouter
 
     setting: string
+    side?: string
 }
 
 // TODO: Real Data
@@ -33,19 +35,25 @@ interface ISettingsState {
 }
 
 @(withRouter as any)
-@inject('settingsStore', 'postsStore', 'uiStore', 'userStore', 'tagStore')
+@inject('settingsStore', 'postsStore', 'uiStore', 'userStore', 'tagStore', 'authStore')
 @observer
 class Settings extends React.Component<ISettings, ISettingsState> {
     static async getInitialProps({ store, query }) {
         const uiStore: IStores['uiStore'] = store.uiStore
         const tagStore: IStores['tagStore'] = store.tagStore
         const setting = query.setting
+        let side = ''
+
+        if (query.hasOwnProperty('side')) {
+            side = query.side
+        }
 
         uiStore.toggleSidebarStatus(false)
         tagStore.destroyActiveTag()
 
         return {
             setting: setting.toLowerCase(),
+            side,
         }
     }
 
@@ -56,14 +64,19 @@ class Settings extends React.Component<ISettings, ISettingsState> {
             enteredUserForModeration: '',
             activeSidebar: props.setting,
             tokens: {
-                activeIndex: 0,
+                activeIndex: Number(props.side),
             },
         }
     }
 
     setLinkAsActive = link => {
-        const lowerCaseLink = link.toLowerCase()
+        let lowerCaseLink = link.toLowerCase()
         this.props.router.replace('/settings/[setting]', `/settings/${link}`, { shallow: true })
+
+        if (lowerCaseLink.indexOf('?') !== -1) {
+            lowerCaseLink = lowerCaseLink.split('?')[0]
+        }
+
         this.setState({
             activeSidebar: lowerCaseLink,
         })
@@ -91,9 +104,6 @@ class Settings extends React.Component<ISettings, ISettingsState> {
                         },
                         {
                             name: 'airdrop',
-                        },
-                        {
-                            name: 'deposits',
                         },
                         {
                             name: 'blocked',
@@ -291,16 +301,20 @@ class Settings extends React.Component<ISettings, ISettingsState> {
         )
     }
 
+    private setTokenTab = index => {
+        this.setState({ tokens: { activeIndex: index } })
+        this.setLinkAsActive(
+            `${this.state.activeSidebar}?side=${index}`
+        )
+    }
+
     private renderTokens = () => {
         const { activeIndex } = this.state.tokens
-        const { depositForm, withdrawalForm } = this.props.settingsStore
+        const { balances } = this.props.authStore
+        const { depositsForm, withdrawalForm } = this.props.settingsStore
 
         return (
-            <Tabs
-                className={'mt2'}
-                selectedIndex={activeIndex}
-                onSelect={index => this.setState({ tokens: { activeIndex: index } })}
-            >
+            <Tabs className={'mt2'} selectedIndex={activeIndex} onSelect={this.setTokenTab}>
                 <TabList className={'settings-tabs'}>
                     <Tab className={'settings-tab'}>Withdrawal</Tab>
                     <Tab className={'settings-tab'}>Deposit</Tab>
@@ -308,51 +322,30 @@ class Settings extends React.Component<ISettings, ISettingsState> {
 
                 <TabPanel>
                     <div className={'flex flex-column items-center'}>
-                        <input
-                            placeholder={'0'}
-                            className={'token-amount-box mt3 f1 gray b--transparent tc'}
-                            onChange={event =>
-                                withdrawalForm.form.$('amount').set('value', event.target.value)
-                            }
-                        />
+                        {/*<input*/}
+                        {/*    placeholder={'0'}*/}
+                        {/*    className={'token-amount-box mt3 f1 gray b--transparent tc'}*/}
+                        {/*    onChange={event =>*/}
+                        {/*        withdrawalForm.form.$('amount').set('value', event.target.value)*/}
+                        {/*    }*/}
+                        {/*/>*/}
                         <div
                             className={
                                 'w-100 flex flex-column items-center outline-container pa4 mt3'
                             }
                         >
                             <Form className={'db w-100'} form={withdrawalForm} hideSubmitButton />
-                            <button
-                                title={'Submit withdrawal'}
-                                className={'flex'}
-                                onClick={withdrawalForm.onSubmit}
-                            >
-                                <span className={'f6 white'}>Withdraw</span>
-                            </button>
                         </div>
                     </div>
                 </TabPanel>
                 <TabPanel>
                     <div className={'flex flex-column items-center'}>
-                        <input
-                            placeholder={'0'}
-                            className={'token-amount-box mt3 f1 gray b--transparent tc'}
-                            onChange={event =>
-                                depositForm.form.$('amount').set('value', event.target.value)
-                            }
-                        />
                         <div
                             className={
                                 'w-100 flex flex-column items-center outline-container pa4 mt3'
                             }
                         >
-                            <Form className={'db w-100'} form={depositForm} hideSubmitButton />
-                            <button
-                                title={'Submit deposit'}
-                                className={'flex'}
-                                onClick={depositForm.onSubmit}
-                            >
-                                <span className={'f6 white'}>Deposit</span>
-                            </button>
+                            <Form className={'db w-100'} form={depositsForm} hideSubmitButton />
                         </div>
                     </div>
                 </TabPanel>
@@ -467,16 +460,6 @@ class Settings extends React.Component<ISettings, ISettingsState> {
         )
     }
 
-    private renderDeposits = () => {
-        const { depositsForm } = this.props.settingsStore
-
-        return (
-            <>
-                <Form form={depositsForm} hideSubmitButton className={'relative'} />
-            </>
-        )
-    }
-
     private renderContent = () => {
         switch (this.state.activeSidebar) {
             default:
@@ -490,8 +473,6 @@ class Settings extends React.Component<ISettings, ISettingsState> {
                 return this.renderTokens()
             case 'blocked':
                 return this.renderBlocked()
-            case 'deposits':
-                return this.renderDeposits()
         }
     }
 

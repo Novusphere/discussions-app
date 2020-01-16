@@ -36,13 +36,16 @@ class TitleHeader extends React.Component<ITitleHeaderProps, ITitleHeaderState> 
     }
 
     private renderUserSettings = () => {
-        const { logOut, hasScatterAccount, connectScatterWallet } = this.props.authStore
+        const { logOut, hasScatterAccount, connectScatterWallet, balances } = this.props.authStore
 
         return (
             <div className={'tooltip flex flex-column'} style={{ width: 200 }}>
                 <Link href={'/settings/connections'}>
                     <a rel={'Open settings'}>settings</a>
                 </Link>
+                {balances.map(balance => (
+                    <a key={balance} title={'Balance'}>{balance}</a>
+                ))}
                 {!hasScatterAccount && (
                     <a rel={'Connect Scatter'} onClick={connectScatterWallet}>
                         connect wallet
@@ -52,7 +55,7 @@ class TitleHeader extends React.Component<ITitleHeaderProps, ITitleHeaderState> 
                     </a>
                 )}
                 {hasScatterAccount && (
-                    <Link href={'/settings/deposits'}>
+                    <Link href={'/settings/tokens?side=1'}>
                         <a rel={'Deposit'}>deposit</a>
                     </Link>
                 )}

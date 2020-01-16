@@ -1,5 +1,5 @@
 import { BaseStore, getOrCreateStore } from 'next-mobx-wrapper'
-import { action, computed, observable } from 'mobx'
+import { action, computed, observable, reaction } from 'mobx'
 import { persist } from 'mobx-persist'
 import { ModalOptions, SignInMethods } from '@globals'
 import { CreateForm } from '@components'
@@ -42,18 +42,35 @@ export default class AuthStore extends BaseStore {
     @observable hasAccount = false
     @observable hasScatterAccount = false
 
+    // wallet
+    @observable balances: string[] = []
+
     private readonly uiStore: IStores['uiStore'] = getUiStore()
+
+    constructor() {
+        super()
+
+        reaction(
+            () => this.activePublicKey,
+            async (address) => {
+                if (address) {
+                    this.balances = await eos.getBalance(address)
+                }
+            }
+        )
+    }
 
     @task.resolved
     @action.bound
     async connectScatterWallet() {
         try {
             const wallet = await this.initializeScatterLogin()
+
             if (wallet.connected) {
                 ;(wallet as any).connect()
-                console.log('found wallet: ', wallet)
                 this.hasScatterAccount = true
                 this.displayName.scatter = wallet.auth.accountName
+
             }
         } catch (error) {
             throw error

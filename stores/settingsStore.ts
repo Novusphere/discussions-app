@@ -8,8 +8,7 @@ import { getAuthStore, getUiStore, IStores } from '@stores/index'
 import { sleep, checkIfNameIsValid } from '@utils'
 import { eos, nsdb } from '@novuspherejs'
 import { ApiGetUnifiedId } from 'interfaces/ApiGet-UnifiedId'
-import { symbol } from 'prop-types'
-import { memo } from 'react'
+import ecc from 'eosjs-ecc'
 
 const fileDownload = require('js-file-download')
 
@@ -108,6 +107,7 @@ export default class SettingsStore extends BaseStore {
             contract: token.p2k.contract,
             chain: token.p2k.chain,
             decimals: token.precision,
+            fee: token.fee,
         }))
     }
 
@@ -342,73 +342,92 @@ export default class SettingsStore extends BaseStore {
         ])
     }
 
-    get withdrawalForm() {
-        return new CreateForm(
-            {
-                onSubmit: form => {
-                    console.log(form.values())
-                },
-            },
-            [
-                {
-                    name: 'amount',
-                    label: 'Amount',
-                    rules: 'required',
-                    hide: true,
-                },
-                {
-                    name: 'token',
-                    label: 'Token',
-                    type: 'dropdown',
-                    extra: {
-                        options: [
-                            {
-                                label: 'ATMOS',
-                                value: 'ATMOS',
-                            },
-                        ],
-                    },
-                    rules: 'required',
-                },
-                {
-                    name: 'to',
-                    label: 'To',
-                    rules: 'required',
-                },
-            ]
-        )
+    @task.resolved
+    @action.bound
+    async handleWithdrawalSubmit() {
+        const { form } = this.withdrawalForm
+        const { amount, token, to } = form.values()
+        const {
+            label,
+            value,
+            contract,
+            decimals,
+            chain,
+            fee: { flat, percent },
+        } = token
+        const fromAddress = this.authStore.activePrivateKey
+        const amountasNumber = Number(amount)
+        const fee = amountasNumber * percent + flat
+
+        try {
+            const robj = {
+                chain: parseInt(String(chain)),
+                from: ecc.privateToPublic(fromAddress),
+                to: 'EOS1111111111111111111111111111111114T1Anm', // special withdraw address
+                amount: amountasNumber,
+                fee: fee,
+                nonce: new Date().getTime(),
+                memo: '',
+                sig: '',
+            }
+
+            robj.sig = eos.transactionSignature(
+                robj.chain,
+                fromAddress,
+                robj.to,
+                robj.amount,
+                robj.fee,
+                robj.nonce,
+                robj.memo
+            )
+
+            console.log(robj)
+
+            this.uiStore.showToast('Withdrawal successfully submitted!', 'success')
+        } catch (error) {
+            this.uiStore.showToast('Withdrawal failed to submit', 'error')
+            throw error
+        }
     }
 
-    get depositForm() {
-        return new CreateForm(
+    @computed get withdrawalForm() {
+        return new CreateForm({}, [
             {
-                onSubmit: form => {
-                    console.log(form.values())
+                name: 'amount',
+                label: 'Amount',
+                rules: 'required',
+            },
+            {
+                name: 'token',
+                label: 'Token',
+                type: 'dropdown',
+                extra: {
+                    options: this.supportedTokensForUnifiedWallet || [],
+                },
+                rules: 'required',
+            },
+            {
+                name: 'to',
+                label: 'To',
+                rules: 'required',
+            },
+            {
+                name: 'buttons',
+                type: 'button',
+                hideLabels: true,
+                containerClassName: 'flex flex-row items-center justify-end',
+                extra: {
+                    options: [
+                        {
+                            value: 'Submit Withdrawal',
+                            className: 'white bg-green',
+                            title: 'Submit Withdrawal',
+                            onClick: this.handleWithdrawalSubmit,
+                        },
+                    ],
                 },
             },
-            [
-                {
-                    name: 'amount',
-                    label: 'Amount',
-                    rules: 'required',
-                    hide: true,
-                },
-                {
-                    name: 'token',
-                    label: 'Token',
-                    type: 'dropdown',
-                    extra: {
-                        options: [
-                            {
-                                label: 'ATMOS',
-                                value: 'ATMOS',
-                            },
-                        ],
-                    },
-                    rules: 'required',
-                },
-            ]
-        )
+        ])
     }
 }
 
