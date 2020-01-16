@@ -303,23 +303,44 @@ class Settings extends React.Component<ISettings, ISettingsState> {
 
     private setTokenTab = index => {
         this.setState({ tokens: { activeIndex: index } })
-        this.setLinkAsActive(
-            `${this.state.activeSidebar}?side=${index}`
-        )
+        this.setLinkAsActive(`${this.state.activeSidebar}?side=${index}`)
     }
 
     private renderTokens = () => {
         const { activeIndex } = this.state.tokens
         const { balances } = this.props.authStore
-        const { depositsForm, withdrawalForm } = this.props.settingsStore
+        const { depositsForm, withdrawalForm, transferForm } = this.props.settingsStore
 
         return (
             <Tabs className={'mt2'} selectedIndex={activeIndex} onSelect={this.setTokenTab}>
                 <TabList className={'settings-tabs'}>
-                    <Tab className={'settings-tab'}>Withdrawal</Tab>
                     <Tab className={'settings-tab'}>Deposit</Tab>
+                    <Tab className={'settings-tab'}>Transfer</Tab>
+                    <Tab className={'settings-tab'}>Withdrawal</Tab>
                 </TabList>
 
+                <TabPanel>
+                    <div className={'flex flex-column items-center'}>
+                        <div
+                            className={
+                                'w-100 flex flex-column items-center outline-container pa4 mt3'
+                            }
+                        >
+                            <Form className={'db w-100'} form={depositsForm} hideSubmitButton />
+                        </div>
+                    </div>
+                </TabPanel>
+                <TabPanel>
+                    <div className={'flex flex-column items-center'}>
+                        <div
+                            className={
+                                'w-100 flex flex-column items-center outline-container pa4 mt3'
+                            }
+                        >
+                            <Form className={'db w-100'} form={transferForm} hideSubmitButton />
+                        </div>
+                    </div>
+                </TabPanel>
                 <TabPanel>
                     <div className={'flex flex-column items-center'}>
                         {/*<input*/}
@@ -335,17 +356,6 @@ class Settings extends React.Component<ISettings, ISettingsState> {
                             }
                         >
                             <Form className={'db w-100'} form={withdrawalForm} hideSubmitButton />
-                        </div>
-                    </div>
-                </TabPanel>
-                <TabPanel>
-                    <div className={'flex flex-column items-center'}>
-                        <div
-                            className={
-                                'w-100 flex flex-column items-center outline-container pa4 mt3'
-                            }
-                        >
-                            <Form className={'db w-100'} form={depositsForm} hideSubmitButton />
                         </div>
                     </div>
                 </TabPanel>

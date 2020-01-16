@@ -342,6 +342,35 @@ export default class SettingsStore extends BaseStore {
         ])
     }
 
+    @action.bound
+    private async getSignatureAndSubmit(robj, fromAddress) {
+        try {
+            robj.sig = eos.transactionSignature(
+                robj.chain,
+                fromAddress,
+                robj.to,
+                robj.amount,
+                robj.fee,
+                robj.nonce,
+                robj.memo
+            )
+
+            const { data } = await axios.post(
+                'https://atmosdb.novusphere.io/unifiedid/relay',
+                `data=${encodeURIComponent(JSON.stringify(robj))}`,
+                {
+                    headers: {
+                        'Content-Type': 'application/x-www-form-urlencoded',
+                    },
+                }
+            )
+
+            return data
+        } catch (error) {
+            throw error
+        }
+    }
+
     @task.resolved
     @action.bound
     async handleWithdrawalSubmit() {
@@ -376,25 +405,7 @@ export default class SettingsStore extends BaseStore {
                 sig: '',
             }
 
-            robj.sig = eos.transactionSignature(
-                robj.chain,
-                fromAddress,
-                robj.to,
-                robj.amount,
-                robj.fee,
-                robj.nonce,
-                robj.memo
-            )
-
-            const { data } = await axios.post(
-                'https://atmosdb.novusphere.io/unifiedid/relay',
-                `data=${encodeURIComponent(JSON.stringify(robj))}`,
-                {
-                    headers: {
-                        'Content-Type': 'application/x-www-form-urlencoded',
-                    },
-                }
-            )
+            const data = await this.getSignatureAndSubmit(robj, fromAddress)
 
             if (data.error) {
                 this.uiStore.showToast('Withdrawal failed to submit', 'error')
@@ -402,9 +413,7 @@ export default class SettingsStore extends BaseStore {
             }
 
             this.uiStore.showToast('Withdrawal successfully submitted!', 'success')
-
             ;(form as any).clear()
-
         } catch (error) {
             this.uiStore.showToast('Withdrawal failed to submit', 'error')
             throw error
@@ -450,6 +459,99 @@ export default class SettingsStore extends BaseStore {
                             className: 'white bg-green',
                             title: 'Submit Withdrawal',
                             onClick: this.handleWithdrawalSubmit,
+                        },
+                    ],
+                },
+            },
+        ])
+    }
+
+    @task.resolved
+    @action.bound
+    async handleTransferSubmit() {
+        const { form } = this.transferForm
+        const { amount, token, to, memo } = form.values()
+
+        if (!token) return
+
+        const {
+            label,
+            value,
+            contract,
+            decimals,
+            chain,
+            fee: { flat, percent },
+        } = token
+
+        const { getActiveDisplayName, activePrivateKey } = this.authStore
+        const fromAddress = activePrivateKey
+        const amountasNumber = Number(amount)
+        const fee = amountasNumber * percent + flat
+
+        try {
+            const robj = {
+                chain: parseInt(String(chain)),
+                from: ecc.privateToPublic(fromAddress),
+                to: to,
+                amount: `${Number(amount).toFixed(decimals)} ${label}`,
+                fee: `${Number(fee).toFixed(decimals)} ${label}`,
+                nonce: new Date().getTime(),
+                memo: memo,
+                sig: '',
+            }
+
+            const data = await this.getSignatureAndSubmit(robj, fromAddress)
+
+            if (data.error) {
+                this.uiStore.showToast('Transfer failed to submit', 'error')
+                return
+            }
+            this.uiStore.showToast('Transfer successfully submitted!', 'success')
+            ;(form as any).clear()
+        } catch (error) {
+            this.uiStore.showToast('Transfer failed to submit', 'error')
+            throw error
+        }
+    }
+
+    @computed get transferForm() {
+        return new CreateForm({}, [
+            {
+                name: 'amount',
+                label: 'Amount',
+                rules: 'required',
+            },
+            {
+                name: 'token',
+                label: 'Token',
+                type: 'dropdown',
+                extra: {
+                    options: this.supportedTokensForUnifiedWallet || [],
+                },
+                rules: 'required',
+            },
+            {
+                name: 'to',
+                label: 'To',
+                rules: 'required',
+            },
+            {
+                name: 'memo',
+                label: 'Memo',
+                rules: 'required',
+            },
+            {
+                name: 'buttons',
+                type: 'button',
+                hideLabels: true,
+                containerClassName: 'flex flex-row items-center justify-end',
+                extra: {
+                    options: [
+                        {
+                            value: 'Submit Transfer',
+                            className: 'white bg-green',
+                            title: 'Submit Transfer',
+                            onClick: this.handleTransferSubmit,
                         },
                     ],
                 },
