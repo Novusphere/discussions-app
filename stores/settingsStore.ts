@@ -1,11 +1,11 @@
 import { BaseStore, getOrCreateStore } from 'next-mobx-wrapper'
-import { action, computed, observable, reaction } from 'mobx'
+import { action, computed, observable } from 'mobx'
 import { persist } from 'mobx-persist'
 import { CreateForm } from '@components'
 import { task } from 'mobx-task'
 import axios from 'axios'
 import { getAuthStore, getUiStore, IStores } from '@stores/index'
-import { sleep, checkIfNameIsValid } from '@utils'
+import { checkIfNameIsValid, sleep } from '@utils'
 import { eos, nsdb } from '@novuspherejs'
 import { ApiGetUnifiedId } from 'interfaces/ApiGet-UnifiedId'
 import ecc from 'eosjs-ecc'
@@ -346,7 +346,10 @@ export default class SettingsStore extends BaseStore {
     @action.bound
     async handleWithdrawalSubmit() {
         const { form } = this.withdrawalForm
-        const { amount, token, to } = form.values()
+        const { amount, token, to, memo } = form.values()
+
+        if (!token) return
+
         const {
             label,
             value,
@@ -355,7 +358,9 @@ export default class SettingsStore extends BaseStore {
             chain,
             fee: { flat, percent },
         } = token
-        const fromAddress = this.authStore.activePrivateKey
+
+        const { getActiveDisplayName, activePrivateKey } = this.authStore
+        const fromAddress = activePrivateKey
         const amountasNumber = Number(amount)
         const fee = amountasNumber * percent + flat
 
@@ -364,10 +369,10 @@ export default class SettingsStore extends BaseStore {
                 chain: parseInt(String(chain)),
                 from: ecc.privateToPublic(fromAddress),
                 to: 'EOS1111111111111111111111111111111114T1Anm', // special withdraw address
-                amount: amountasNumber,
-                fee: fee,
+                amount: `${Number(amount).toFixed(decimals)} ${label}`,
+                fee: `${Number(fee).toFixed(decimals)} ${label}`,
                 nonce: new Date().getTime(),
-                memo: '',
+                memo: `${to}:${memo}`,
                 sig: '',
             }
 
@@ -381,9 +386,25 @@ export default class SettingsStore extends BaseStore {
                 robj.memo
             )
 
-            console.log(robj)
+            const { data } = await axios.post(
+                'https://atmosdb.novusphere.io/unifiedid/relay',
+                `data=${encodeURIComponent(JSON.stringify(robj))}`,
+                {
+                    headers: {
+                        'Content-Type': 'application/x-www-form-urlencoded',
+                    },
+                }
+            )
+
+            if (data.error) {
+                this.uiStore.showToast('Withdrawal failed to submit', 'error')
+                return
+            }
 
             this.uiStore.showToast('Withdrawal successfully submitted!', 'success')
+
+            ;(form as any).clear()
+
         } catch (error) {
             this.uiStore.showToast('Withdrawal failed to submit', 'error')
             throw error
@@ -409,6 +430,12 @@ export default class SettingsStore extends BaseStore {
             {
                 name: 'to',
                 label: 'To',
+                rules: 'required',
+                value: eos.auth ? eos.auth.accountName : '',
+            },
+            {
+                name: 'memo',
+                label: 'Memo',
                 rules: 'required',
             },
             {
