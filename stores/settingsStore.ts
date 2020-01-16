@@ -155,7 +155,7 @@ export default class SettingsStore extends BaseStore {
         const amount: string = values.amount
 
         values.amount = Number(amount).toFixed(precision)
-        values.actor = this.authStore.getActiveDisplayName
+        values.actor = this.authStore.activeDisplayName
 
         return values
     }
@@ -388,7 +388,7 @@ export default class SettingsStore extends BaseStore {
             fee: { flat, percent },
         } = token
 
-        const { getActiveDisplayName, activePrivateKey } = this.authStore
+        const { activeDisplayName, activePrivateKey } = this.authStore
         const fromAddress = activePrivateKey
         const amountasNumber = Number(amount)
         const fee = amountasNumber * percent + flat
@@ -483,7 +483,7 @@ export default class SettingsStore extends BaseStore {
             fee: { flat, percent },
         } = token
 
-        const { getActiveDisplayName, activePrivateKey } = this.authStore
+        const { activeDisplayName, activePrivateKey } = this.authStore
         const fromAddress = activePrivateKey
         const amountasNumber = Number(amount)
         const fee = amountasNumber * percent + flat

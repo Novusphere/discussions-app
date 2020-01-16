@@ -15,7 +15,7 @@ interface IPostPreviewProps {
 class NewPostPreview extends React.Component<IPostPreviewProps> {
     public render(): React.ReactNode {
         const { preview } = this.props.postsStore
-        const { getActiveDisplayName, activePublicKey } = this.props.authStore
+        const { activeDisplayName, activePublicKey } = this.props.authStore
 
         if (!preview) {
             return null
@@ -30,7 +30,7 @@ class NewPostPreview extends React.Component<IPostPreviewProps> {
             threadUuid: '',
             uuid: '',
             title: preview.title,
-            poster: getActiveDisplayName,
+            poster: activeDisplayName,
             content: preview.content,
             createdAt: Date.now() as any,
             sub: preview.sub.value,

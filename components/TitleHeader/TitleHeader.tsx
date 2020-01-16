@@ -69,7 +69,7 @@ class TitleHeader extends React.Component<ITitleHeaderProps, ITitleHeaderState> 
         const { showModal } = this.props.uiStore
         const {
             hasAccount,
-            getActiveDisplayName,
+            activeDisplayName,
             checkInitialConditions,
             activePublicKey,
         } = this.props.authStore
@@ -129,13 +129,13 @@ class TitleHeader extends React.Component<ITitleHeaderProps, ITitleHeaderState> 
                     >
                         <Link
                             href={`/u/[username]`}
-                            as={`/u/${getActiveDisplayName}-${activePublicKey}`}
+                            as={`/u/${activeDisplayName}-${activePublicKey}`}
                         >
                             <a
                                 rel={'Open your profile'}
                                 className={'flex items-center user-container pointer dim'}
                             >
-                                <span className={'b f6 pl1 pr3 black'}>{getActiveDisplayName}</span>
+                                <span className={'b f6 pl1 pr3 black'}>{activeDisplayName}</span>
                                 <img
                                     width={30}
                                     height={30}

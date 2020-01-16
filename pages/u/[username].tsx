@@ -59,7 +59,7 @@ class U extends React.Component<IUPageProps> {
     }
 
     @computed get isSameUser() {
-        return this.props.username === this.props.authStore.getActiveDisplayName
+        return this.props.username === this.props.authStore.activeDisplayName
     }
 
     private handleUserFollowing = (user, pub) => {

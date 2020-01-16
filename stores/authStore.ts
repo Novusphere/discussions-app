@@ -82,7 +82,7 @@ export default class AuthStore extends BaseStore {
     async checkInitialConditions() {
         await sleep(100)
 
-        if (this.getActiveDisplayName && this.postPriv) {
+        if (this.activeDisplayName && this.postPriv) {
             if (
                 this.statusJson.bk &&
                 this.postPriv &&
@@ -97,18 +97,21 @@ export default class AuthStore extends BaseStore {
     }
 
     @computed get isBKAccount() {
-        return this.getActiveDisplayName === this.displayName.bk
+        return this.activeDisplayName === this.displayName.bk
     }
 
     @computed get activePublicKey() {
         if (!this.hasAccount) return null
-        if (!this.statusJson.bk && !this.statusJson.scatter) return null
 
-        if (this.isBKAccount) {
+        if (this.statusJson.bk) {
             return this.statusJson.bk.post
         }
 
-        return this.statusJson.scatter.post
+        if (this.statusJson.scatter) {
+            return this.statusJson.scatter.post
+        }
+
+        return null
     }
 
     @computed get activeUidWalletKey() {
@@ -133,7 +136,7 @@ export default class AuthStore extends BaseStore {
      * user is logged in via a non-scatter method
      */
     @computed get posterName(): string {
-        return this.getActiveDisplayName
+        return this.activeDisplayName
     }
 
     // return bk or scatter
@@ -144,20 +147,12 @@ export default class AuthStore extends BaseStore {
         return 'scatter'
     }
 
-    @computed get getActiveDisplayName() {
-        if (this.clickedSignInMethod === SignInMethods.brainKey) {
+    @computed get activeDisplayName() {
+        if (this.statusJson.bk) {
             return this.displayName.bk
         }
 
-        if (this.clickedSignInMethod === SignInMethods.scatter) {
-            return this.displayName.scatter
-        }
-
-        if (!this.clickedSignInMethod) {
-            if (this.preferredSignInMethod === SignInMethods.brainKey) {
-                return this.displayName.bk
-            }
-
+        if (this.statusJson.scatter) {
             return this.displayName.scatter
         }
 
