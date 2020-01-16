@@ -31,12 +31,9 @@ export default class SettingsStore extends BaseStore {
     @observable thresholdTxID = ''
     @observable errorMessage = ''
 
-    @observable walletAction: null | 'depositing' | 'withdrawing' | 'transferring' = null
-
     // loading states
     @observable loadingStates = {
         transferring: false,
-        depositing: false,
         withdrawing: false,
     }
 
@@ -383,7 +380,7 @@ export default class SettingsStore extends BaseStore {
 
     @task.resolved
     @action.bound
-    async handleWithdrawalSubmit() {
+    async handleWithdrawalSubmit(walletPrivateKey: string) {
         const { form } = this.withdrawalForm
         const { amount, token, to, memo } = form.values()
 
@@ -398,15 +395,13 @@ export default class SettingsStore extends BaseStore {
             fee: { flat, percent },
         } = token
 
-        const { activeDisplayName, activePrivateKey } = this.authStore
-        const fromAddress = activePrivateKey
         const amountasNumber = Number(amount)
         const fee = amountasNumber * percent + flat
 
         try {
             const robj = {
                 chain: parseInt(String(chain)),
-                from: ecc.privateToPublic(fromAddress),
+                from: ecc.privateToPublic(walletPrivateKey),
                 to: 'EOS1111111111111111111111111111111114T1Anm', // special withdraw address
                 amount: `${Number(amount).toFixed(decimals)} ${label}`,
                 fee: `${Number(fee).toFixed(decimals)} ${label}`,
@@ -415,66 +410,79 @@ export default class SettingsStore extends BaseStore {
                 sig: '',
             }
 
-            const data = await this.getSignatureAndSubmit(robj, fromAddress)
+            const data = await this.getSignatureAndSubmit(robj, walletPrivateKey)
 
             if (data.error) {
                 this.uiStore.showToast('Withdrawal failed to submit', 'error')
                 return
             }
 
+            await this.authStore.fetchBalancesForCurrentWallet()
+
             this.uiStore.showToast('Withdrawal successfully submitted!', 'success')
             ;(form as any).clear()
+            this.loadingStates.withdrawing = false
         } catch (error) {
+            this.loadingStates.withdrawing = false
             this.uiStore.showToast('Withdrawal failed to submit', 'error')
             throw error
         }
     }
 
     @computed get withdrawalForm() {
-        return new CreateForm({}, [
+        return new CreateForm(
             {
-                name: 'amount',
-                label: 'Amount',
-                rules: 'required',
-            },
-            {
-                name: 'token',
-                label: 'Token',
-                type: 'dropdown',
-                extra: {
-                    options: this.supportedTokensForUnifiedWallet || [],
-                },
-                rules: 'required',
-            },
-            {
-                name: 'to',
-                label: 'To',
-                rules: 'required',
-                value: eos.auth ? eos.auth.accountName : '',
-                placeholder: 'An EOS account name',
-            },
-            {
-                name: 'memo',
-                label: 'Memo',
-                rules: 'required',
-            },
-            {
-                name: 'buttons',
-                type: 'button',
-                hideLabels: true,
-                containerClassName: 'flex flex-row items-center justify-end',
-                extra: {
-                    options: [
-                        {
-                            value: 'Submit Withdrawal',
-                            className: 'white bg-green',
-                            title: 'Submit Withdrawal',
-                            onClick: this.handleWithdrawalSubmit,
-                        },
-                    ],
+                onSubmit: form => {
+                    if (form.isValid) {
+                        this.loadingStates.withdrawing = true
+                        this.showPasswordEntryModal()
+                    }
                 },
             },
-        ])
+            [
+                {
+                    name: 'amount',
+                    label: 'Amount',
+                    rules: 'required',
+                },
+                {
+                    name: 'token',
+                    label: 'Token',
+                    type: 'dropdown',
+                    extra: {
+                        options: this.supportedTokensForUnifiedWallet || [],
+                    },
+                    rules: 'required',
+                },
+                {
+                    name: 'to',
+                    label: 'To',
+                    rules: 'required',
+                    value: eos.auth ? eos.auth.accountName : '',
+                    placeholder: 'An EOS account name',
+                },
+                {
+                    name: 'memo',
+                    label: 'Memo',
+                    rules: 'required',
+                },
+                {
+                    name: 'buttons',
+                    type: 'button',
+                    hideLabels: true,
+                    containerClassName: 'flex flex-row items-center justify-end',
+                    extra: {
+                        options: [
+                            {
+                                value: 'Submit Withdrawal',
+                                className: 'white bg-green',
+                                title: 'Submit Withdrawal',
+                            },
+                        ],
+                    },
+                },
+            ]
+        )
     }
 
     @computed get passwordReEntryForm() {
@@ -501,18 +509,12 @@ export default class SettingsStore extends BaseStore {
 
                         this.uiStore.hideModal()
 
-                        console.log('current action: ', this.walletAction)
+                        if (this.loadingStates.withdrawing) {
+                            this.handleWithdrawalSubmit(walletPrivateKey)
+                        }
 
-                        switch (this.walletAction) {
-                            case 'depositing':
-                                break
-                            case 'withdrawing':
-                                break
-                            case 'transferring':
-                                this.handleTransferSubmit(walletPrivateKey)
-                                break
-                            default:
-                                break
+                        if (this.loadingStates.transferring) {
+                            this.handleTransferSubmit(walletPrivateKey)
                         }
                     } catch (error) {
                         form.$('password').invalidate(error.message)
@@ -579,7 +581,6 @@ export default class SettingsStore extends BaseStore {
 
             this.uiStore.showToast('Transfer successfully submitted!', 'success')
             ;(form as any).clear()
-            this.walletAction = null
             this.loadingStates.transferring = false
         } catch (error) {
             this.loadingStates.transferring = false
@@ -592,11 +593,10 @@ export default class SettingsStore extends BaseStore {
         return new CreateForm(
             {
                 onSubmit: form => {
-                    // if (form.isValid) {
-                    this.walletAction = 'transferring'
-                    this.loadingStates.transferring = true
-                    this.showPasswordEntryModal()
-                    // }
+                    if (form.isValid) {
+                        this.loadingStates.transferring = true
+                        this.showPasswordEntryModal()
+                    }
                 },
             },
             [

@@ -66,10 +66,10 @@ class Form extends React.Component<FormProps> {
                             <button
                                 datatype={type}
                                 onClick={e => {
+                                    form.onSubmit(e)
+
                                     if (onClick) {
                                         onClick(form.form)
-                                    } else {
-                                        form.onSubmit(e)
                                     }
 
                                     e.preventDefault()

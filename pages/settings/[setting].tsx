@@ -314,7 +314,7 @@ class Settings extends React.Component<ISettings, ISettingsState> {
             depositsForm,
             withdrawalForm,
             transferForm,
-            loadingStates: { transferring },
+            loadingStates: { transferring, withdrawing },
         } = this.props.settingsStore
 
         return (
@@ -354,19 +354,17 @@ class Settings extends React.Component<ISettings, ISettingsState> {
                 </TabPanel>
                 <TabPanel>
                     <div className={'flex flex-column items-center'}>
-                        {/*<input*/}
-                        {/*    placeholder={'0'}*/}
-                        {/*    className={'token-amount-box mt3 f1 gray b--transparent tc'}*/}
-                        {/*    onChange={event =>*/}
-                        {/*        withdrawalForm.form.$('amount').set('value', event.target.value)*/}
-                        {/*    }*/}
-                        {/*/>*/}
                         <div
                             className={
                                 'w-100 flex flex-column items-center outline-container pa4 mt3'
                             }
                         >
-                            <Form className={'db w-100'} form={withdrawalForm} hideSubmitButton />
+                            <Form
+                                className={'db w-100'}
+                                form={withdrawalForm}
+                                hideSubmitButton
+                                loading={withdrawing}
+                            />
                         </div>
                     </div>
                 </TabPanel>
