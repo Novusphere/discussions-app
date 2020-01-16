@@ -6,9 +6,10 @@ import { task } from 'mobx-task'
 import axios from 'axios'
 import { getAuthStore, getUiStore, IStores } from '@stores/index'
 import { checkIfNameIsValid, sleep } from '@utils'
-import { eos, nsdb } from '@novuspherejs'
+import { discussions, eos, nsdb } from '@novuspherejs'
 import { ApiGetUnifiedId } from 'interfaces/ApiGet-UnifiedId'
 import ecc from 'eosjs-ecc'
+import { ModalOptions } from '@globals'
 
 const fileDownload = require('js-file-download')
 
@@ -29,6 +30,15 @@ export default class SettingsStore extends BaseStore {
     @observable supportedTokensForUnifiedWallet = []
     @observable thresholdTxID = ''
     @observable errorMessage = ''
+
+    @observable walletAction: null | 'depositing' | 'withdrawing' | 'transferring' = null
+
+    // loading states
+    @observable loadingStates = {
+        transferring: false,
+        depositing: false,
+        withdrawing: false,
+    }
 
     private readonly authStore: IStores['authStore'] = getAuthStore()
     private readonly uiStore: IStores['uiStore'] = getUiStore()
@@ -321,7 +331,7 @@ export default class SettingsStore extends BaseStore {
                 label: 'Memo ID',
                 rules: 'required',
                 disabled: true,
-                value: this.authStore.activePublicKey,
+                value: this.authStore.uidWalletPubKey,
             },
             {
                 name: 'buttons',
@@ -467,9 +477,68 @@ export default class SettingsStore extends BaseStore {
         ])
     }
 
+    @computed get passwordReEntryForm() {
+        return new CreateForm(
+            {
+                onSubmit: async form => {
+                    const { password } = form.values()
+
+                    // un-encrypt their bk
+                    const {
+                        statusJson: {
+                            bk: { bk, bkc },
+                        },
+                    } = this.authStore
+
+                    try {
+                        const walletPrivateKey = await discussions.encryptedBKToKeys(
+                            bk,
+                            bkc,
+                            password
+                        )
+
+                        console.log('got wallet private key!', walletPrivateKey)
+
+                        this.uiStore.hideModal()
+
+                        console.log('current action: ', this.walletAction)
+
+                        switch (this.walletAction) {
+                            case 'depositing':
+                                break
+                            case 'withdrawing':
+                                break
+                            case 'transferring':
+                                this.handleTransferSubmit(walletPrivateKey)
+                                break
+                            default:
+                                break
+                        }
+                    } catch (error) {
+                        form.$('password').invalidate(error.message)
+                        return error
+                    }
+                },
+            },
+            [
+                {
+                    name: 'password',
+                    label: 'Password',
+                    rules: 'required',
+                    type: 'password',
+                },
+            ]
+        )
+    }
+
+    @action.bound
+    async showPasswordEntryModal() {
+        this.uiStore.showModal(ModalOptions.walletActionPasswordReentry)
+    }
+
     @task.resolved
     @action.bound
-    async handleTransferSubmit() {
+    async handleTransferSubmit(walletPrivateKey: string) {
         const { form } = this.transferForm
         const { amount, token, to, memo } = form.values()
 
@@ -484,15 +553,13 @@ export default class SettingsStore extends BaseStore {
             fee: { flat, percent },
         } = token
 
-        const { activeDisplayName, activePrivateKey } = this.authStore
-        const fromAddress = activePrivateKey
         const amountasNumber = Number(amount)
         const fee = amountasNumber * percent + flat
 
         try {
             const robj = {
                 chain: parseInt(String(chain)),
-                from: ecc.privateToPublic(fromAddress),
+                from: ecc.privateToPublic(walletPrivateKey),
                 to: to,
                 amount: `${Number(amount).toFixed(decimals)} ${label}`,
                 fee: `${Number(fee).toFixed(decimals)} ${label}`,
@@ -501,64 +568,80 @@ export default class SettingsStore extends BaseStore {
                 sig: '',
             }
 
-            const data = await this.getSignatureAndSubmit(robj, fromAddress)
+            const data = await this.getSignatureAndSubmit(robj, walletPrivateKey)
 
             if (data.error) {
                 this.uiStore.showToast('Transfer failed to submit', 'error')
                 return
             }
+
+            await this.authStore.fetchBalancesForCurrentWallet()
+
             this.uiStore.showToast('Transfer successfully submitted!', 'success')
             ;(form as any).clear()
+            this.walletAction = null
+            this.loadingStates.transferring = false
         } catch (error) {
+            this.loadingStates.transferring = false
             this.uiStore.showToast('Transfer failed to submit', 'error')
             throw error
         }
     }
 
     @computed get transferForm() {
-        return new CreateForm({}, [
+        return new CreateForm(
             {
-                name: 'amount',
-                label: 'Amount',
-                rules: 'required',
-            },
-            {
-                name: 'token',
-                label: 'Token',
-                type: 'dropdown',
-                extra: {
-                    options: this.supportedTokensForUnifiedWallet || [],
-                },
-                rules: 'required',
-            },
-            {
-                name: 'to',
-                label: 'To',
-                rules: 'required',
-                placeholder: 'An EOS address'
-            },
-            {
-                name: 'memo',
-                label: 'Memo',
-                rules: 'required',
-            },
-            {
-                name: 'buttons',
-                type: 'button',
-                hideLabels: true,
-                containerClassName: 'flex flex-row items-center justify-end',
-                extra: {
-                    options: [
-                        {
-                            value: 'Submit Transfer',
-                            className: 'white bg-green',
-                            title: 'Submit Transfer',
-                            onClick: this.handleTransferSubmit,
-                        },
-                    ],
+                onSubmit: form => {
+                    // if (form.isValid) {
+                    this.walletAction = 'transferring'
+                    this.loadingStates.transferring = true
+                    this.showPasswordEntryModal()
+                    // }
                 },
             },
-        ])
+            [
+                {
+                    name: 'amount',
+                    label: 'Amount',
+                    rules: 'required',
+                },
+                {
+                    name: 'token',
+                    label: 'Token',
+                    type: 'dropdown',
+                    extra: {
+                        options: this.supportedTokensForUnifiedWallet || [],
+                    },
+                    rules: 'required',
+                },
+                {
+                    name: 'to',
+                    label: 'To',
+                    rules: 'required',
+                    placeholder: 'An EOS address',
+                },
+                {
+                    name: 'memo',
+                    label: 'Memo',
+                    rules: 'required',
+                },
+                {
+                    name: 'buttons',
+                    type: 'button',
+                    hideLabels: true,
+                    containerClassName: 'flex flex-row items-center justify-end',
+                    extra: {
+                        options: [
+                            {
+                                value: 'Submit Transfer',
+                                className: 'white bg-green',
+                                title: 'Submit Transfer',
+                            },
+                        ],
+                    },
+                },
+            ]
+        )
     }
 }
 

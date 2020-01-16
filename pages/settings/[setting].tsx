@@ -310,7 +310,12 @@ class Settings extends React.Component<ISettings, ISettingsState> {
     private renderTokens = () => {
         const { activeIndex } = this.state.tokens
         const { balances } = this.props.authStore
-        const { depositsForm, withdrawalForm, transferForm } = this.props.settingsStore
+        const {
+            depositsForm,
+            withdrawalForm,
+            transferForm,
+            loadingStates: { transferring },
+        } = this.props.settingsStore
 
         return (
             <Tabs className={'mt2'} selectedIndex={activeIndex} onSelect={this.setTokenTab}>
@@ -338,7 +343,12 @@ class Settings extends React.Component<ISettings, ISettingsState> {
                                 'w-100 flex flex-column items-center outline-container pa4 mt3'
                             }
                         >
-                            <Form className={'db w-100'} form={transferForm} hideSubmitButton />
+                            <Form
+                                className={'db w-100'}
+                                form={transferForm}
+                                hideSubmitButton
+                                loading={transferring}
+                            />
                         </div>
                     </div>
                 </TabPanel>

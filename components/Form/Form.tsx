@@ -17,6 +17,7 @@ interface FormProps extends React.HTMLAttributes<HTMLFormElement> {
     className?: string
     fieldClassName?: string
     hideSubmitButton?: boolean
+    loading?: boolean
 }
 
 class Form extends React.Component<FormProps> {
@@ -44,26 +45,31 @@ class Form extends React.Component<FormProps> {
     }
 
     render() {
-        const { form, children, hideSubmitButton, fieldClassName, ...props } = this.props
+        const { form, children, hideSubmitButton, fieldClassName, loading, ...props } = this.props
 
         if (typeof form === 'undefined' || typeof form.fields === 'undefined') return null
 
         const renderButton = (field, type, rest) => {
             if (Array.isArray(field.accessor.$extra.options)) {
                 return field.accessor.$extra.options.map(
-                    ({ value, disabled, title, className, onClick, loading }, index, array) => {
+                    (
+                        { value, disabled, title, className, onClick, loading: fieldLoading },
+                        index,
+                        array
+                    ) => {
                         const isLoading =
                             loading ||
+                            fieldLoading ||
                             (onClick && onClick['state'] && onClick['state'] === 'pending')
 
                         return (
                             <button
                                 datatype={type}
                                 onClick={e => {
-                                    form.onSubmit(e)
-
                                     if (onClick) {
                                         onClick(form.form)
+                                    } else {
+                                        form.onSubmit(e)
                                     }
 
                                     e.preventDefault()

@@ -31,12 +31,12 @@ class ModalContainer extends React.Component<IModalContainerProps> {
                     {() =>
                         (this.props.children as any)({
                             CloseButton: () => (
-                                <a
-                                    className="f6 link dim ph3 pv2 dib white bg-green mr2 pointer"
+                                <button
+                                    className="f6 link dim ph3 pv2 dib white bg-gray white mr2 pointer"
                                     onClick={() => hideModal()}
                                 >
                                     Close
-                                </a>
+                                </button>
                             ),
                             CloseIcon: () => (
                                 <span className={'black dim pointer'} onClick={() => hideModal()}>

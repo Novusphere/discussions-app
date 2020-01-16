@@ -51,13 +51,23 @@ export default class AuthStore extends BaseStore {
         super()
 
         reaction(
-            () => this.activePublicKey,
-            async (address) => {
-                if (address) {
-                    this.balances = await eos.getBalance(address)
-                }
+            () => this.uidWalletPubKey,
+            async (uidWalletPubKey) => {
+                this.fetchBalancesForCurrentWallet()
             }
         )
+    }
+
+    @task.resolved
+    @action.bound
+    async fetchBalancesForCurrentWallet() {
+        try {
+            if (!this.uidWalletPubKey) return
+            this.balances = await eos.getBalance(this.uidWalletPubKey)
+        } catch (error) {
+            this.balances = []
+            return error
+        }
     }
 
     @task.resolved
@@ -479,12 +489,8 @@ export default class AuthStore extends BaseStore {
     private async storeKeys(bk: string) {
         try {
             const keys = await discussions.bkToKeys(bk)
-
-            console.log(keys)
-
             this.postPriv = keys.post.priv
             this.uidWalletPubKey = keys.uidwallet.pub
-
             return keys
         } catch (error) {
             console.log(error)

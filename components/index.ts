@@ -39,6 +39,7 @@ export { default as SignUpModal } from './modal/sign-up/sign-up-modal'
 export { default as WalletUndetectedModal } from './modal/wallet-undetected/wallet-undetected-modal'
 export { default as SignInModal } from './modal/sign-in/sign-in-modal'
 export { default as SignInModalOptions } from './modal/sign-in/scatter/select-sign-in-option'
+export { default as WalletActionPasswordReEntry } from './modal/WalletActionPasswordReEntry/WalletActionPasswordReEntry'
 
 export { default as BrainKeySetPassword } from './modal/sign-in/brain-key/set-password'
 export { default as SetNewBK } from './modal/sign-in/brain-key/set-new-bk'
