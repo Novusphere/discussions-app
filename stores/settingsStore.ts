@@ -59,7 +59,13 @@ export default class SettingsStore extends BaseStore {
                 const {
                     fee: { percent, flat },
                 } = this.authStore.selectedToken
-                let _value = Number(form.$(initial).value)
+
+                let formValue = form.$(initial).value
+
+                if (isNaN(Number(formValue))) {
+                    formValue = 0
+                }
+                let _value = Number(formValue)
                 const fee = _value * percent + flat
                 form.$('fee').set('value', fee)
                 form.$(final).set('value', final === 'amount' ? _value - fee : _value + fee)
