@@ -374,6 +374,7 @@ class Form extends React.Component<FormProps> {
                                             {...bind}
                                             className={'db f6 form-input'}
                                             {...field.bind}
+                                            autoComplete={field.autoComplete || 'on'}
                                             {...(field.onComplete && {
                                                 onBlur: () => {
                                                     form.form

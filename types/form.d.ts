@@ -53,6 +53,7 @@ declare interface FormField {
     description?: string
     rules?: string
     readonly?: boolean
+    autoComplete?: "off" | "on"
     disabled?: boolean
     accessor?: Form$
     hideLabels?: boolean

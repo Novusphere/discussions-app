@@ -312,6 +312,7 @@ export default class SettingsStore extends BaseStore {
                 name: 'amount',
                 label: 'Amount',
                 rules: 'required|numeric',
+                autoComplete: 'off',
             },
             {
                 name: 'memoId',
@@ -430,18 +431,20 @@ export default class SettingsStore extends BaseStore {
                 },
             },
             [
+                this.tokenDropdown,
                 {
                     name: 'amount',
                     label: 'Amount',
                     rules: 'required',
+                    autoComplete: 'off',
                 },
-                this.tokenDropdown,
                 {
                     name: 'to',
                     label: 'To',
                     rules: 'required',
                     value: eos.auth ? eos.auth.accountName : '',
                     placeholder: 'An EOS account name',
+                    autoComplete: 'off',
                 },
                 {
                     name: 'memo',
@@ -586,6 +589,7 @@ export default class SettingsStore extends BaseStore {
                     name: 'amount',
                     label: 'Amount',
                     rules: 'required',
+                    autoComplete: 'off',
                 },
                 this.tokenDropdown,
                 {
@@ -593,6 +597,7 @@ export default class SettingsStore extends BaseStore {
                     label: 'To',
                     rules: 'required',
                     placeholder: 'i.e. EOS65RgavjK71JQxZZBV1Sj99fE2QN87SF55vKNi99mXg7ZW8sm2a',
+                    autoComplete: 'off',
                 },
                 {
                     name: 'memo',
