@@ -55,19 +55,20 @@ class TitleHeader extends React.Component<ITitleHeaderProps, ITitleHeaderState> 
                     <a rel={'Open your profile'}>profile</a>
                 </Link>
 
-                <Link href={'/settings/connections'}>
+                <Link href={'/settings/[setting]'} as={'/settings/connections'}>
                     <a rel={'Open settings'}>settings</a>
                 </Link>
-                <Link href={'/settings/connections'}>
+
+                <Link href={'/settings/[setting]'} as={'/settings/connections'}>
                     <a rel={'Open connections'}>connections</a>
                 </Link>
 
-                <Link href={'/settings/wallet?side=0'}>
+                <Link href={'/settings/[setting]'} as={'/settings/wallet?side=0'}>
                     <a rel={'Open your wallet'}>wallet</a>
                 </Link>
 
                 {balances.size && (
-                    <Link href={'/settings/wallet?side=0'}>
+                    <Link href={'/settings/[setting]'} as={'/settings/wallet?side=0'}>
                         <a rel={'View your balances'}>
                             <hr className={'mv0 mh0'} />
                             {Array.from(balances).map(([symbol, amount]) => (

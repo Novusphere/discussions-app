@@ -43,6 +43,9 @@ class Settings extends React.Component<ISettings, ISettingsState> {
         const uiStore: IStores['uiStore'] = store.uiStore
         const tagStore: IStores['tagStore'] = store.tagStore
         const setting = query.setting
+
+        console.log(setting)
+
         let side = ''
 
         if (query.hasOwnProperty('side')) {
@@ -70,17 +73,29 @@ class Settings extends React.Component<ISettings, ISettingsState> {
         }
     }
 
+    componentDidUpdate(prevProps: Readonly<ISettings>, prevState: Readonly<ISettingsState>, snapshot?: any): void {
+        if (this.props.setting !== prevProps.setting) {
+            this.setLinkAsActive(this.props.setting)
+        }
+    }
+
     setLinkAsActive = link => {
         let lowerCaseLink = link.toLowerCase()
-        this.props.router.replace('/settings/[setting]', `/settings/${link}`, { shallow: true })
 
-        if (lowerCaseLink.indexOf('?') !== -1) {
-            lowerCaseLink = lowerCaseLink.split('?')[0]
-        }
+        this.setState(
+            {
+                activeSidebar: lowerCaseLink,
+            },
+            () => {
+                this.props.router.replace('/settings/[setting]', `/settings/${link}`, {
+                    shallow: true,
+                })
 
-        this.setState({
-            activeSidebar: lowerCaseLink,
-        })
+                if (lowerCaseLink.indexOf('?') !== -1) {
+                    lowerCaseLink = lowerCaseLink.split('?')[0]
+                }
+            }
+        )
     }
 
     componentWillUnmount(): void {
