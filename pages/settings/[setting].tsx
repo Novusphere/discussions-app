@@ -73,7 +73,11 @@ class Settings extends React.Component<ISettings, ISettingsState> {
         }
     }
 
-    componentDidUpdate(prevProps: Readonly<ISettings>, prevState: Readonly<ISettingsState>, snapshot?: any): void {
+    componentDidUpdate(
+        prevProps: Readonly<ISettings>,
+        prevState: Readonly<ISettingsState>,
+        snapshot?: any
+    ): void {
         if (this.props.setting !== prevProps.setting) {
             this.setLinkAsActive(this.props.setting)
         }
@@ -82,20 +86,17 @@ class Settings extends React.Component<ISettings, ISettingsState> {
     setLinkAsActive = link => {
         let lowerCaseLink = link.toLowerCase()
 
-        this.setState(
-            {
-                activeSidebar: lowerCaseLink,
-            },
-            () => {
-                this.props.router.replace('/settings/[setting]', `/settings/${link}`, {
-                    shallow: true,
-                })
+        this.props.router.replace('/settings/[setting]', `/settings/${link}`, {
+            shallow: true,
+        })
 
-                if (lowerCaseLink.indexOf('?') !== -1) {
-                    lowerCaseLink = lowerCaseLink.split('?')[0]
-                }
-            }
-        )
+        if (lowerCaseLink.indexOf('?') !== -1) {
+            lowerCaseLink = lowerCaseLink.split('?')[0]
+        }
+
+        this.setState({
+            activeSidebar: lowerCaseLink,
+        })
     }
 
     componentWillUnmount(): void {
