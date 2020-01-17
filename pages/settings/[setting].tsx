@@ -334,7 +334,7 @@ class Settings extends React.Component<ISettings, ISettingsState> {
 
     private renderTokens = () => {
         const { activeIndex } = this.state.tokens
-        const { selectedToken, hasScatterAccount } = this.props.authStore
+        const { selectedToken, hasAccount } = this.props.authStore
         const {
             depositsForm,
             withdrawalForm,
@@ -342,8 +342,8 @@ class Settings extends React.Component<ISettings, ISettingsState> {
             loadingStates: { transferring, withdrawing },
         } = this.props.settingsStore
 
-        // if (!hasScatterAccount)
-        //     return <div className={'db'}>Please connect your Scatter account to continue.</div>
+        if (!hasAccount)
+            return <div className={'db'}>Please login to continue.</div>
 
         return (
             <>
