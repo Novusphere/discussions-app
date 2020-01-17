@@ -27,7 +27,7 @@ export { default as SharePost } from './SharePost/SharePost'
 export { default as RichTextPreview } from './RichTextPreview/RichTextPreview'
 export { default as ReplyHoverElements } from './ReplyHoverElements/ReplyHoverElements'
 export { default as ErrorBoundary } from './ErrorBoundary/ErrorBoundary'
-
+export { default as CopyToClipboard } from './CopyToClipboard/CopyToClipboard'
 export { default as ChooseAccountName } from './modal/sign-up/choose-account-name'
 export { default as SectionHeader } from './modal/sign-up/header'
 export { default as GenerateKey } from './modal/sign-up/generate-key'
@@ -39,7 +39,9 @@ export { default as SignUpModal } from './modal/sign-up/sign-up-modal'
 export { default as WalletUndetectedModal } from './modal/wallet-undetected/wallet-undetected-modal'
 export { default as SignInModal } from './modal/sign-in/sign-in-modal'
 export { default as SignInModalOptions } from './modal/sign-in/scatter/select-sign-in-option'
-export { default as WalletActionPasswordReEntry } from './modal/WalletActionPasswordReEntry/WalletActionPasswordReEntry'
+export {
+    default as WalletActionPasswordReEntry,
+} from './modal/WalletActionPasswordReEntry/WalletActionPasswordReEntry'
 
 export { default as BrainKeySetPassword } from './modal/sign-in/brain-key/set-password'
 export { default as SetNewBK } from './modal/sign-in/brain-key/set-new-bk'

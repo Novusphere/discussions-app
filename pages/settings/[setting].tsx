@@ -1,6 +1,6 @@
 import * as React from 'react'
 import { inject, observer } from 'mobx-react'
-import { Form, TagDropdown, UserNameWithIcon } from '@components'
+import { CopyToClipboard, Form, TagDropdown, UserNameWithIcon } from '@components'
 import { IStores } from '@stores'
 import classNames from 'classnames'
 import './style.scss'
@@ -324,6 +324,7 @@ class Settings extends React.Component<ISettings, ISettingsState> {
 
     private renderTokens = () => {
         const { activeIndex } = this.state.tokens
+        const { selectedToken } = this.props.authStore
         const {
             depositsForm,
             withdrawalForm,
@@ -349,19 +350,30 @@ class Settings extends React.Component<ISettings, ISettingsState> {
                             >
                                 <Form className={'db w-100'} form={depositsForm} hideSubmitButton />
 
-                                <div className={'mt3'}>
-                                    <span className={'db lh-copy f6'}>
-                                        Alternatively, to manually deposit funds from your wallet or
-                                        an exchange please send them to
-                                    </span>
-                                    <br />
-                                    <span className={'db lh-copy f6'}>
-                                        <strong>Please note:</strong> It's important you use this
-                                        memo EXACTLY! If you are depositing from an exchange and
-                                        cannot specify a memo then you must first withdraw to an EOS
-                                        wallet of your own first!
-                                    </span>
-                                </div>
+                                {selectedToken && (
+                                    <div className={'mt3'}>
+                                        <span className={'db lh-copy f6'}>
+                                            Alternatively, to manually deposit funds from your
+                                            wallet or an exchange please send them to
+                                        </span>
+                                        <div className={'mv3'}>
+                                            <CopyToClipboard
+                                                label={'Account'}
+                                                value={selectedToken.contract}
+                                            />
+                                            <CopyToClipboard
+                                                label={'Memo'}
+                                                value={depositsForm.form.$('memoId').value}
+                                            />
+                                        </div>
+                                        <span className={'db lh-copy f6'}>
+                                            <strong>Please note:</strong> It's important you use
+                                            this memo EXACTLY! If you are depositing from an
+                                            exchange and cannot specify a memo then you must first
+                                            withdraw to an EOS wallet of your own first!
+                                        </span>
+                                    </div>
+                                )}
                             </div>
                         </div>
                     </TabPanel>
