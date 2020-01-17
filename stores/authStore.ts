@@ -112,7 +112,7 @@ export default class AuthStore extends BaseStore {
             let balance = await eos.getBalance(this.uidWalletPubKey, chain, contract)
 
             if (!balance.length) {
-                balance = [{ symbol: symbol, amount: '0' }]
+                return
             }
 
             this.balances.set(symbol, balance[0].amount)
