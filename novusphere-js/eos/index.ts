@@ -201,7 +201,7 @@ export class EOS {
         return this.wallet
     }
 
-    async transact(actions: any): Promise<string | undefined> {
+    async transact(actions: any): Promise<any | undefined> {
         if (!this.wallet) return undefined
 
         const auth = this.auth

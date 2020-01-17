@@ -276,9 +276,15 @@ export default class SettingsStore extends BaseStore {
                     },
                 }
 
-                await eos.transact(transaction)
-                await this.authStore.fetchBalanceForSelectedToken()
+                const transaction_id = await eos.transact(transaction)
                 this.uiStore.showToast('Deposit successfully submitted!', 'success')
+                this.uiStore.showToast('Click here to view your transaction', 'info', () =>
+                    this.openTXInNewTab(transaction_id)
+                )
+
+                await sleep(2500)
+                await this.authStore.fetchBalanceForSelectedToken()
+                ;(form as any).clear()
             }
         } catch (error) {
             this.uiStore.showToast('Deposit failed to submit', 'error')
@@ -408,11 +414,17 @@ export default class SettingsStore extends BaseStore {
                 return
             }
 
-            await this.authStore.fetchBalanceForSelectedToken()
+            const { transaction_id } = data
 
             this.uiStore.showToast('Withdrawal successfully submitted!', 'success')
+            this.uiStore.showToast('Click here to view your transaction', 'info', () =>
+                this.openTXInNewTab(transaction_id)
+            )
             ;(form as any).clear()
             this.loadingStates.withdrawing = false
+
+            await sleep(2000)
+            await this.authStore.fetchBalanceForSelectedToken()
         } catch (error) {
             this.loadingStates.withdrawing = false
             this.uiStore.showToast('Withdrawal failed to submit', 'error')
@@ -490,8 +502,6 @@ export default class SettingsStore extends BaseStore {
                             password
                         )
 
-                        console.log('got wallet private key!', walletPrivateKey)
-
                         this.uiStore.hideModal()
 
                         if (this.loadingStates.withdrawing) {
@@ -562,16 +572,26 @@ export default class SettingsStore extends BaseStore {
                 return
             }
 
-            await this.authStore.fetchBalanceForSelectedToken()
+            const { transaction_id } = data
 
             this.uiStore.showToast('Transfer successfully submitted!', 'success')
+            this.uiStore.showToast('Click here to view your transaction', 'info', () =>
+                this.openTXInNewTab(transaction_id)
+            )
             ;(form as any).clear()
             this.loadingStates.transferring = false
+
+            await sleep(2000)
+            await this.authStore.fetchBalanceForSelectedToken()
         } catch (error) {
             this.loadingStates.transferring = false
             this.uiStore.showToast('Transfer failed to submit', 'error')
             throw error
         }
+    }
+
+    private openTXInNewTab = tx => {
+        window.open(`https://bloks.io/transaction/${tx}`)
     }
 
     @computed get transferForm() {

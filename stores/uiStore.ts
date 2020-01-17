@@ -31,10 +31,15 @@ export default class UiStore extends BaseStore {
         this.activeModal = ''
     }
 
-    showToast = (message: string, type: 'error' | 'info' | 'success' | 'warn') => {
+    showToast = (
+        message: string,
+        type: 'error' | 'info' | 'success' | 'warn',
+        onClick = undefined
+    ) => {
         return toast[type](message, {
             hideProgressBar: true,
             pauseOnHover: false,
+            onClick,
         })
     }
 }

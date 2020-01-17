@@ -61,12 +61,22 @@ export default class AuthStore extends BaseStore {
 
         nsdb.getSupportedTokensForUnifiedWallet().then(async data => {
             this.setDepositTokenOptions(data)
+            this.refreshAllBalances()
+        })
+    }
 
-            await data.map(async datum => {
-                await sleep(100)
+    @task.resolved
+    @action.bound
+    async refreshAllBalances() {
+        try {
+            await sleep(250)
+            await this.supportedTokensForUnifiedWallet.map(async datum => {
+                await sleep(250)
                 await this.fetchBalanceForSelectedToken(datum)
             })
-        })
+        } catch (error) {
+            throw error
+        }
     }
 
     @action.bound
@@ -83,7 +93,7 @@ export default class AuthStore extends BaseStore {
         this.selectedToken = this.supportedTokensForUnifiedWallet[0]
     }
 
-    @task.resolved
+    @task
     @action.bound
     async fetchBalanceForSelectedToken(token = this.selectedToken) {
         try {

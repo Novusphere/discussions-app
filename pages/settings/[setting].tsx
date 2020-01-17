@@ -6,7 +6,7 @@ import classNames from 'classnames'
 import './style.scss'
 import { getIdenticon } from '@utils'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
-import { faMinusCircle, faSpinner } from '@fortawesome/free-solid-svg-icons'
+import { faMinusCircle, faSpinner, faSyncAlt } from '@fortawesome/free-solid-svg-icons'
 import { Tab, TabList, TabPanel, Tabs } from 'react-tabs'
 import Link from 'next/link'
 import { NextRouter, withRouter } from 'next/router'
@@ -89,11 +89,11 @@ class Settings extends React.Component<ISettings, ISettingsState> {
     }
 
     private renderSidebarContent = () => {
-        const { balances, fetchBalanceForSelectedToken } = this.props.authStore
+        const { balances, refreshAllBalances } = this.props.authStore
 
         return (
             <>
-                <span className={'b black f5 sidebar'}>Settings</span>
+                <span className={'b black f5'}>Settings</span>
                 <ul className={'list ph2 mt3'}>
                     {[
                         {
@@ -126,18 +126,28 @@ class Settings extends React.Component<ISettings, ISettingsState> {
                         </li>
                     ))}
                 </ul>
-                <ul className={'list ph2 mt4'}>
-                    <span className={'f6 b black mr2'}>Balances</span>
-                    {fetchBalanceForSelectedToken['pending'] && (
+                <span className={'b black f5 flex flex-row justify-between'}>
+                    <span>Balances</span>
+                    {refreshAllBalances['pending'] && (
                         <FontAwesomeIcon width={13} icon={faSpinner} spin />
                     )}
-                    {!fetchBalanceForSelectedToken['pending'] &&
-                        Array.from(balances).map(([symbol, amount]) => (
-                            <div key={symbol} className={'mt3 f6 flex flex-row justify-between'}>
-                                <span>{symbol}</span>
-                                <span>{amount}</span>
-                            </div>
-                        ))}
+                    {!refreshAllBalances['pending'] && (
+                        <span
+                            className={'pointer dim'}
+                            title={'Refresh'}
+                            onClick={refreshAllBalances}
+                        >
+                            <FontAwesomeIcon icon={faSyncAlt} width={13} />
+                        </span>
+                    )}
+                </span>
+                <ul className={'list ph2 mt3'}>
+                    {Array.from(balances).map(([symbol, amount]) => (
+                        <div key={symbol} className={'mt3 f6 flex flex-row justify-between'}>
+                            <span>{symbol}</span>
+                            <span>{amount}</span>
+                        </div>
+                    ))}
                 </ul>
             </>
         )
