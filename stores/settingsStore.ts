@@ -1,5 +1,5 @@
 import { BaseStore, getOrCreateStore } from 'next-mobx-wrapper'
-import { action, computed, observable } from 'mobx'
+import { action, autorun, computed, observable, reaction } from 'mobx'
 import { persist } from 'mobx-persist'
 import { CreateForm } from '@components'
 import { task } from 'mobx-task'
@@ -35,8 +35,68 @@ export default class SettingsStore extends BaseStore {
         withdrawing: false,
     }
 
+    @observable blurStates = {
+        depositing: {
+            amount: false,
+            finalAmount: false,
+        },
+        transferring: {
+            amount: false,
+            finalAmount: false,
+        },
+        withdrawing: {
+            amount: false,
+            finalAmount: false,
+        },
+    }
+
     private readonly authStore: IStores['authStore'] = getAuthStore()
     private readonly uiStore: IStores['uiStore'] = getUiStore()
+
+    constructor() {
+        super()
+
+        autorun(() => {
+            if (!this.authStore.selectedToken) return
+
+            const setFormInputsForFeesAndAmounts = ({ form }, initial = 'amount', final = 'finalAmount') => {
+                const {
+                    fee: { percent, flat },
+                } = this.authStore.selectedToken
+                let _value = Number(form.$(initial).value)
+                const fee = _value * percent + flat
+                form.$('fee').set('value', fee)
+                form.$(final).set('value', _value + fee)
+            }
+
+            if (this.blurStates.depositing.amount) {
+                setFormInputsForFeesAndAmounts(this.depositsForm)
+            }
+
+            if (this.blurStates.depositing.finalAmount) {
+                setFormInputsForFeesAndAmounts(this.depositsForm, 'finalAmount', 'amount')
+            }
+
+            if (this.blurStates.transferring.amount) {
+                setFormInputsForFeesAndAmounts(this.transferForm)
+            }
+
+            if (this.blurStates.transferring.finalAmount) {
+                setFormInputsForFeesAndAmounts(this.transferForm, 'finalAmount', 'amount')
+            }
+
+            if (this.blurStates.withdrawing.amount) {
+                setFormInputsForFeesAndAmounts(this.withdrawalForm)
+            }
+
+            if (this.blurStates.withdrawing.finalAmount) {
+                setFormInputsForFeesAndAmounts(this.withdrawalForm, 'finalAmount', 'amount')
+            }
+        })
+    }
+
+    @action.bound
+
 
     @action.bound
     setUnsignedPostsAsSpamSetting(setting: boolean) {
@@ -311,6 +371,20 @@ export default class SettingsStore extends BaseStore {
         }
     }
 
+    // @computed get calculateFee() {
+    //     let fee = '0',
+    //         flat = '0',
+    //         amount = '0'
+    //
+    //     if (this.authStore.selectedToken) {
+    //         amount = this.depositsForm.form.$('amount').value
+    //         fee = this.authStore.selectedToken.fee.percent
+    //         flat = this.authStore.selectedToken.fee.flat
+    //     }
+    //
+    //     return String(Number(fee) * Number(amount))
+    // }
+
     @computed get depositsForm() {
         return new CreateForm({}, [
             this.tokenDropdown,
@@ -319,6 +393,27 @@ export default class SettingsStore extends BaseStore {
                 label: 'Amount',
                 rules: 'required|numeric',
                 autoComplete: 'off',
+                onFocus: () => {
+                    this.blurStates.depositing.amount = true
+                },
+                onBlur: () => {
+                    this.blurStates.depositing.amount = false
+                },
+            },
+            {
+                name: 'fee',
+                label: 'Fee',
+                disabled: true,
+            },
+            {
+                name: 'finalAmount',
+                label: 'Final Amount',
+                onFocus: () => {
+                    this.blurStates.depositing.finalAmount = true
+                },
+                onBlur: () => {
+                    this.blurStates.depositing.finalAmount = false
+                },
             },
             {
                 name: 'memoId',
@@ -326,6 +421,8 @@ export default class SettingsStore extends BaseStore {
                 rules: 'required',
                 disabled: true,
                 value: this.authStore.uidWalletPubKey,
+                type: 'hidden',
+                hideLabels: true,
             },
             {
                 name: 'buttons',
@@ -449,6 +546,27 @@ export default class SettingsStore extends BaseStore {
                     label: 'Amount',
                     rules: 'required',
                     autoComplete: 'off',
+                    onFocus: () => {
+                        this.blurStates.withdrawing.amount = true
+                    },
+                    onBlur: () => {
+                        this.blurStates.withdrawing.amount = false
+                    },
+                },
+                {
+                    name: 'fee',
+                    label: 'Fee',
+                    disabled: true,
+                },
+                {
+                    name: 'finalAmount',
+                    label: 'Final Amount',
+                    onFocus: () => {
+                        this.blurStates.withdrawing.finalAmount = true
+                    },
+                    onBlur: () => {
+                        this.blurStates.withdrawing.finalAmount = false
+                    },
                 },
                 {
                     name: 'to',
@@ -611,6 +729,27 @@ export default class SettingsStore extends BaseStore {
                     label: 'Amount',
                     rules: 'required',
                     autoComplete: 'off',
+                    onFocus: () => {
+                        this.blurStates.transferring.amount = true
+                    },
+                    onBlur: () => {
+                        this.blurStates.transferring.amount = false
+                    },
+                },
+                {
+                    name: 'fee',
+                    label: 'Fee',
+                    disabled: true,
+                },
+                {
+                    name: 'finalAmount',
+                    label: 'Final Amount',
+                    onFocus: () => {
+                        this.blurStates.transferring.finalAmount = true
+                    },
+                    onBlur: () => {
+                        this.blurStates.transferring.finalAmount = false
+                    },
                 },
                 {
                     name: 'to',

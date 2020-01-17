@@ -342,8 +342,8 @@ class Settings extends React.Component<ISettings, ISettingsState> {
             loadingStates: { transferring, withdrawing },
         } = this.props.settingsStore
 
-        if (!hasScatterAccount)
-            return <div className={'db'}>Please connect your Scatter account to continue.</div>
+        // if (!hasScatterAccount)
+        //     return <div className={'db'}>Please connect your Scatter account to continue.</div>
 
         return (
             <>

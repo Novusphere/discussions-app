@@ -77,6 +77,8 @@ declare interface FormField {
     submitting?: boolean
     value?: string | { value: string; className?: string }[] | boolean
     onChange?: any
+    onFocus?: any
+    onBlur?: any
     onComplete?: (form: any) => void
 
     options?: {
