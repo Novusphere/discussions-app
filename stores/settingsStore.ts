@@ -248,7 +248,7 @@ export default class SettingsStore extends BaseStore {
 
                 this.thresholdTxID = await eos.transact(actions)
             } else {
-                this.uiStore.showToast('Failed to detect Scatter', 'error')
+                this.uiStore.showToast('Failed to detect EOS Wallet', 'error')
             }
         } catch (error) {
             this.errorMessage = error.message

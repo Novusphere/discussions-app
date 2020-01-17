@@ -465,10 +465,10 @@ export default class AuthStore extends BaseStore {
                 await eos.login()
                 return wallet as any
             } else {
-                throw new Error('Failed to detect wallet')
+                throw new Error('Failed to detect EOS wallet')
             }
         } catch (error) {
-            this.uiStore.showToast('Failed to detect wallet', 'error')
+            this.uiStore.showToast('Failed to detect EOS wallet', 'error')
             console.log(error)
             return error
         }
