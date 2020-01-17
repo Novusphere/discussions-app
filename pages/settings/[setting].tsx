@@ -324,7 +324,7 @@ class Settings extends React.Component<ISettings, ISettingsState> {
 
     private renderTokens = () => {
         const { activeIndex } = this.state.tokens
-        const { selectedToken } = this.props.authStore
+        const { selectedToken, hasScatterAccount } = this.props.authStore
         const {
             depositsForm,
             withdrawalForm,
@@ -332,9 +332,12 @@ class Settings extends React.Component<ISettings, ISettingsState> {
             loadingStates: { transferring, withdrawing },
         } = this.props.settingsStore
 
+        if (!hasScatterAccount)
+            return <div className={'db'}>Please connect your Scatter account to continue.</div>
+
         return (
             <>
-                <Tabs className={'mt2'} selectedIndex={activeIndex} onSelect={this.setTokenTab}>
+                <Tabs selectedIndex={activeIndex} onSelect={this.setTokenTab}>
                     <TabList className={'settings-tabs'}>
                         <Tab className={'settings-tab'}>Deposit</Tab>
                         <Tab className={'settings-tab'}>Transfer</Tab>
@@ -543,7 +546,7 @@ class Settings extends React.Component<ISettings, ISettingsState> {
                 <div className={'card w-30 mr3 pa3'}>{this.renderSidebarContent()}</div>
                 <div className={'card w-70 pa4'}>
                     <span className={'b black f4'}>{_.upperFirst(this.state.activeSidebar)}</span>
-                    {this.renderContent()}
+                    <div className={'mt3'}>{this.renderContent()}</div>
                 </div>
             </div>
         )

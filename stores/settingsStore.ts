@@ -261,23 +261,25 @@ export default class SettingsStore extends BaseStore {
     async handleDepositSubmit() {
         try {
             const { form } = this.depositsForm
-            const { amount, memoId, token } = form.values()
-            const { label, value, contract, decimals, chain } = token
+            if (form.isValid) {
+                const { amount, memoId, token } = form.values()
+                const { label, value, contract, decimals, chain } = token
 
-            const transaction = {
-                account: value,
-                name: 'transfer',
-                data: {
-                    from: this.authStore.displayName.scatter,
-                    to: contract,
-                    quantity: `${Number(amount).toFixed(decimals)} ${label}`,
-                    memo: memoId,
-                },
+                const transaction = {
+                    account: value,
+                    name: 'transfer',
+                    data: {
+                        from: this.authStore.displayName.scatter,
+                        to: contract,
+                        quantity: `${Number(amount).toFixed(decimals)} ${label}`,
+                        memo: memoId,
+                    },
+                }
+
+                await eos.transact(transaction)
+                await this.authStore.fetchBalanceForSelectedToken()
+                this.uiStore.showToast('Deposit successfully submitted!', 'success')
             }
-
-            await eos.transact(transaction)
-            await this.authStore.fetchBalanceForSelectedToken()
-            this.uiStore.showToast('Deposit successfully submitted!', 'success')
         } catch (error) {
             this.uiStore.showToast('Deposit failed to submit', 'error')
             throw error
