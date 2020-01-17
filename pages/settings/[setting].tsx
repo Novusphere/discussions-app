@@ -100,7 +100,7 @@ class Settings extends React.Component<ISettings, ISettingsState> {
                             name: 'connections',
                         },
                         {
-                            name: 'tokens',
+                            name: 'wallet',
                         },
                         {
                             name: 'moderation',
@@ -543,7 +543,7 @@ class Settings extends React.Component<ISettings, ISettingsState> {
                 return this.renderModeration()
             case 'airdrop':
                 return this.renderAirdrop()
-            case 'tokens':
+            case 'wallet':
                 return this.renderTokens()
             case 'blocked':
                 return this.renderBlocked()

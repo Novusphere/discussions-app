@@ -39,36 +39,34 @@ class TitleHeader extends React.Component<ITitleHeaderProps, ITitleHeaderState> 
     private renderUserSettings = () => {
         const { logOut, hasScatterAccount, connectScatterWallet, balances } = this.props.authStore
 
-
         return (
             <div className={'tooltip flex flex-column'} style={{ width: 200 }}>
                 <Link href={'/settings/connections'}>
                     <a rel={'Open settings'}>settings</a>
                 </Link>
 
-                {Array.from(balances).map(([symbol, amount]) => (
-                    <a key={symbol} title={'Balance'}>
-                        {amount} {symbol}
-                    </a>
-                ))}
-
                 {!hasScatterAccount && (
-                    <a rel={'Connect Scatter'} onClick={connectScatterWallet}>
-                        connect wallet
-                        {connectScatterWallet['pending'] && (
-                            <FontAwesomeIcon className={'ml2'} width={13} icon={faSpinner} spin />
-                        )}
-                    </a>
-                )}
-                {hasScatterAccount && (
-                    <Link href={'/settings/tokens?side=0'}>
-                        <a rel={'Deposit'}>deposit</a>
+                    <Link href={'/settings/connections'}>
+                        <a rel={'Open settings'}>connections</a>
                     </Link>
                 )}
                 {hasScatterAccount && (
-                    <a rel={'Disconnect Scatter'} onClick={logOut}>
-                        disconnect wallet
-                    </a>
+                    <Link href={'/settings/wallet?side=0'}>
+                        <a rel={'Wallet'}>wallet</a>
+                    </Link>
+                )}
+
+                {balances.size && (
+                    <Link href={'/settings/wallet?side=0'}>
+                        <a rel={'View your balances'}>
+                            <hr className={'mv0 mh0'} />
+                            {Array.from(balances).map(([symbol, amount]) => (
+                                <span key={symbol} className={'db'} style={{ paddingLeft: 0 }}>
+                                    {amount} {symbol}
+                                </span>
+                            ))}
+                        </a>
+                    </Link>
                 )}
             </div>
         )
@@ -129,6 +127,7 @@ class TitleHeader extends React.Component<ITitleHeaderProps, ITitleHeaderState> 
                         </button>
                     </Link>
                     <Tooltip
+                        open={true}
                         animateFill={false}
                         interactive
                         interactiveBorder={20}
