@@ -62,7 +62,7 @@ export default class SettingsStore extends BaseStore {
                 let _value = Number(form.$(initial).value)
                 const fee = _value * percent + flat
                 form.$('fee').set('value', fee)
-                form.$(final).set('value', _value + fee)
+                form.$(final).set('value', _value - fee)
             }
 
             if (this.blurStates.transferring.amount) {
