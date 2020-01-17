@@ -585,13 +585,13 @@ export default class SettingsStore extends BaseStore {
                 },
             },
             [
+                this.tokenDropdown,
                 {
                     name: 'amount',
                     label: 'Amount',
                     rules: 'required',
                     autoComplete: 'off',
                 },
-                this.tokenDropdown,
                 {
                     name: 'to',
                     label: 'To',
