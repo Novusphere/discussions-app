@@ -111,7 +111,7 @@ export default class UserStore extends BaseStore {
             return await Array.from(this.delegated.keys()).map(async delegatedMember => {
                 const [, key] = delegatedMember.split(':')
                 const { data } = await axios.get(
-                    `http://atmosdb.novusphere.io/discussions/moderation/${key}`
+                    `https://atmosdb.novusphere.io/discussions/moderation/${key}`
                 )
 
                 if (data.hasOwnProperty('moderation')) {

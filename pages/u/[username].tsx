@@ -24,8 +24,6 @@ interface IUPageProps {
     posts: Post[]
 }
 
-// TO-DO: real data
-
 @inject('userStore', 'authStore', 'postsStore', 'tagStore', 'uiStore')
 @observer
 class U extends React.Component<IUPageProps> {
