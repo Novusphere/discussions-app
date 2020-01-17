@@ -62,11 +62,9 @@ class TitleHeader extends React.Component<ITitleHeaderProps, ITitleHeaderState> 
                     <a rel={'Open connections'}>connections</a>
                 </Link>
 
-                {hasScatterAccount && (
-                    <Link href={'/settings/wallet?side=0'}>
-                        <a rel={'Open your wallet'}>wallet</a>
-                    </Link>
-                )}
+                <Link href={'/settings/wallet?side=0'}>
+                    <a rel={'Open your wallet'}>wallet</a>
+                </Link>
 
                 {balances.size && (
                     <Link href={'/settings/wallet?side=0'}>

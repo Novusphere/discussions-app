@@ -170,9 +170,9 @@ class Settings extends React.Component<ISettings, ISettingsState> {
                         }
                     >
                         <span className={'flex flex-column tl mr4'}>
-                            <span className={'b black f5 pb2'}>Scatter</span>
+                            <span className={'b black f5 pb2'}>EOS Wallet</span>
                             <span className={'f6 lh-copy'}>
-                                You can connect your Scatter account to Discussions App.
+                                You can connect your EOS wallets to Discussions App.
                             </span>
                         </span>
 

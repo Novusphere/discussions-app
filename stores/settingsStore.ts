@@ -36,10 +36,6 @@ export default class SettingsStore extends BaseStore {
     }
 
     @observable blurStates = {
-        depositing: {
-            amount: false,
-            finalAmount: false,
-        },
         transferring: {
             amount: false,
             finalAmount: false,
@@ -67,14 +63,6 @@ export default class SettingsStore extends BaseStore {
                 const fee = _value * percent + flat
                 form.$('fee').set('value', fee)
                 form.$(final).set('value', _value + fee)
-            }
-
-            if (this.blurStates.depositing.amount) {
-                setFormInputsForFeesAndAmounts(this.depositsForm)
-            }
-
-            if (this.blurStates.depositing.finalAmount) {
-                setFormInputsForFeesAndAmounts(this.depositsForm, 'finalAmount', 'amount')
             }
 
             if (this.blurStates.transferring.amount) {
@@ -371,20 +359,6 @@ export default class SettingsStore extends BaseStore {
         }
     }
 
-    // @computed get calculateFee() {
-    //     let fee = '0',
-    //         flat = '0',
-    //         amount = '0'
-    //
-    //     if (this.authStore.selectedToken) {
-    //         amount = this.depositsForm.form.$('amount').value
-    //         fee = this.authStore.selectedToken.fee.percent
-    //         flat = this.authStore.selectedToken.fee.flat
-    //     }
-    //
-    //     return String(Number(fee) * Number(amount))
-    // }
-
     @computed get depositsForm() {
         return new CreateForm({}, [
             this.tokenDropdown,
@@ -393,27 +367,6 @@ export default class SettingsStore extends BaseStore {
                 label: 'Amount',
                 rules: 'required|numeric',
                 autoComplete: 'off',
-                onFocus: () => {
-                    this.blurStates.depositing.amount = true
-                },
-                onBlur: () => {
-                    this.blurStates.depositing.amount = false
-                },
-            },
-            {
-                name: 'fee',
-                label: 'Fee',
-                disabled: true,
-            },
-            {
-                name: 'finalAmount',
-                label: 'Final Amount',
-                onFocus: () => {
-                    this.blurStates.depositing.finalAmount = true
-                },
-                onBlur: () => {
-                    this.blurStates.depositing.finalAmount = false
-                },
             },
             {
                 name: 'memoId',
