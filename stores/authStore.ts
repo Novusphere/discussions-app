@@ -46,6 +46,7 @@ export default class AuthStore extends BaseStore {
     // wallet
     balances = observable.map<string, string>()
     @observable supportedTokensForUnifiedWallet = []
+
     @observable selectedToken = null
 
     private readonly uiStore: IStores['uiStore'] = getUiStore()
@@ -88,6 +89,7 @@ export default class AuthStore extends BaseStore {
             chain: token.p2k.chain,
             decimals: token.precision,
             fee: token.fee,
+            min: token.min,
         }))
 
         this.selectedToken = this.supportedTokensForUnifiedWallet[0]

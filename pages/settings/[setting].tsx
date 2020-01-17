@@ -44,8 +44,6 @@ class Settings extends React.Component<ISettings, ISettingsState> {
         const tagStore: IStores['tagStore'] = store.tagStore
         const setting = query.setting
 
-        console.log(setting)
-
         let side = ''
 
         if (query.hasOwnProperty('side')) {

@@ -1,12 +1,12 @@
 import { BaseStore, getOrCreateStore } from 'next-mobx-wrapper'
-import { action, autorun, computed, observable, reaction } from 'mobx'
+import { action, autorun, computed, observable } from 'mobx'
 import { persist } from 'mobx-persist'
 import { CreateForm } from '@components'
 import { task } from 'mobx-task'
 import axios from 'axios'
 import { getAuthStore, getUiStore, IStores } from '@stores/index'
 import { checkIfNameIsValid, sleep } from '@utils'
-import { discussions, eos, nsdb } from '@novuspherejs'
+import { discussions, eos } from '@novuspherejs'
 import ecc from 'eosjs-ecc'
 import { ModalOptions } from '@globals'
 
@@ -55,20 +55,26 @@ export default class SettingsStore extends BaseStore {
         autorun(() => {
             if (!this.authStore.selectedToken) return
 
-            const setFormInputsForFeesAndAmounts = ({ form }, initial = 'amount', final = 'finalAmount') => {
+            const setFormInputsForFeesAndAmounts = (
+                { form },
+                initial = 'amount',
+                final = 'finalAmount'
+            ) => {
                 const {
-                    fee: { percent, flat },
+                    fee: { percent, flat }, decimals,
                 } = this.authStore.selectedToken
 
                 let formValue = form.$(initial).value
-
-                if (isNaN(Number(formValue))) {
-                    formValue = 0
-                }
                 let _value = Number(formValue)
+
+                if (isNaN(_value)) {
+                    _value = 0
+                }
+
                 const fee = _value * percent + flat
-                form.$('fee').set('value', fee)
-                form.$(final).set('value', final === 'amount' ? _value - fee : _value + fee)
+                form.$('fee').set('value', fee.toFixed(decimals))
+                const finalValue = final === 'amount' ? _value - fee : _value + fee
+                form.$(final).set('value', finalValue.toFixed(decimals))
             }
 
             if (this.blurStates.transferring.amount) {
@@ -90,8 +96,6 @@ export default class SettingsStore extends BaseStore {
     }
 
     @action.bound
-
-
     @action.bound
     setUnsignedPostsAsSpamSetting(setting: boolean) {
         this.unsignedPostsIsSpam = setting
@@ -347,17 +351,18 @@ export default class SettingsStore extends BaseStore {
     }
 
     @computed get tokenDropdown() {
+        const { supportedTokensForUnifiedWallet, selectedToken } = this.authStore
+
         return {
             name: 'token',
             label: 'Token',
             type: 'dropdown',
             extra: {
-                options: this.authStore.supportedTokensForUnifiedWallet || [],
+                options: supportedTokensForUnifiedWallet || [],
             },
             value:
-                this.authStore.selectedToken ||
-                (this.authStore.supportedTokensForUnifiedWallet.length &&
-                    this.authStore.supportedTokensForUnifiedWallet[0]),
+                selectedToken ||
+                (supportedTokensForUnifiedWallet.length && supportedTokensForUnifiedWallet[0]),
             rules: 'required',
             onSelect: selected => {
                 this.authStore.selectedToken = selected
@@ -466,7 +471,7 @@ export default class SettingsStore extends BaseStore {
             const data = await this.getSignatureAndSubmit(robj, walletPrivateKey)
 
             if (data.error) {
-                this.uiStore.showToast('Withdrawal failed to submit', 'error')
+                this.uiStore.showToast(data.message, 'error')
                 return
             }
 
@@ -489,6 +494,12 @@ export default class SettingsStore extends BaseStore {
     }
 
     @computed get withdrawalForm() {
+        let min = 0
+
+        if (this.authStore.supportedTokensForUnifiedWallet.length) {
+            min = this.authStore.selectedToken.min
+        }
+
         return new CreateForm(
             {
                 onSubmit: form => {
@@ -503,7 +514,7 @@ export default class SettingsStore extends BaseStore {
                 {
                     name: 'amount',
                     label: 'Amount',
-                    rules: 'required',
+                    rules: `required|numeric|min:${min}`,
                     autoComplete: 'off',
                     onFocus: () => {
                         this.blurStates.withdrawing.amount = true
@@ -538,7 +549,6 @@ export default class SettingsStore extends BaseStore {
                 {
                     name: 'memo',
                     label: 'Memo',
-                    rules: 'required',
                 },
                 {
                     name: 'buttons',
@@ -645,7 +655,7 @@ export default class SettingsStore extends BaseStore {
             const data = await this.getSignatureAndSubmit(robj, walletPrivateKey)
 
             if (data.error) {
-                this.uiStore.showToast('Transfer failed to submit', 'error')
+                this.uiStore.showToast(data.message, 'error')
                 return
             }
 
@@ -672,6 +682,12 @@ export default class SettingsStore extends BaseStore {
     }
 
     @computed get transferForm() {
+        let min = 0
+
+        if (this.authStore.supportedTokensForUnifiedWallet.length) {
+            min = this.authStore.selectedToken.min
+        }
+
         return new CreateForm(
             {
                 onSubmit: form => {
@@ -686,7 +702,7 @@ export default class SettingsStore extends BaseStore {
                 {
                     name: 'amount',
                     label: 'Amount',
-                    rules: 'required',
+                    rules: `required|numeric|min:${min}`,
                     autoComplete: 'off',
                     onFocus: () => {
                         this.blurStates.transferring.amount = true
@@ -720,7 +736,6 @@ export default class SettingsStore extends BaseStore {
                 {
                     name: 'memo',
                     label: 'Memo',
-                    rules: 'required',
                 },
                 {
                     name: 'buttons',

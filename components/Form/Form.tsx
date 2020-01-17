@@ -7,6 +7,7 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import Switch from 'react-switch'
 
 import dynamic from 'next/dynamic'
+import { sleep } from '@utils'
 
 const Editor = dynamic(() => import('../Editor/Editor'), {
     ssr: false,
@@ -20,6 +21,7 @@ interface FormProps extends React.HTMLAttributes<HTMLFormElement> {
     loading?: boolean
 }
 
+@observer
 class Form extends React.Component<FormProps> {
     private enterKeyEventListener = (e: KeyboardEvent) => {
         const key = e.code
@@ -421,4 +423,12 @@ class Form extends React.Component<FormProps> {
     }
 }
 
-export default observer(Form)
+export default dynamic(
+    async () => {
+        return Promise.resolve(Form)
+    },
+    {
+        ssr: false,
+        loading: () => <p>...</p>,
+    }
+)
