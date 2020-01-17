@@ -10,6 +10,8 @@ import { bkToStatusJson, sleep } from '@utils'
 import { ApiGetUnifiedId } from '../interfaces/ApiGet-UnifiedId'
 
 export default class AuthStore extends BaseStore {
+    static LOG_OUT_USER_INTEGER = 1579089600
+
     @persist('object')
     @observable
     displayName = {
@@ -48,6 +50,9 @@ export default class AuthStore extends BaseStore {
     @observable supportedTokensForUnifiedWallet = []
 
     @observable selectedToken = null
+
+    @persist
+    @observable logOutTimestamp = AuthStore.LOG_OUT_USER_INTEGER
 
     private readonly uiStore: IStores['uiStore'] = getUiStore()
 
@@ -157,9 +162,14 @@ export default class AuthStore extends BaseStore {
     async checkInitialConditions() {
         await sleep(100)
 
+        if (this.logOutTimestamp === AuthStore.LOG_OUT_USER_INTEGER) {
+            return
+        }
+
         if (this.activeDisplayName && this.postPriv) {
             if (this.statusJson.bk && this.postPriv && this.displayName.bk) {
                 this.hasAccount = true
+                this.logOutTimestamp = Date.now()
                 this.connectScatterWallet()
             }
         } else {
@@ -521,6 +531,7 @@ export default class AuthStore extends BaseStore {
     @action.bound
     private completeSignInProcess() {
         this.hasAccount = true
+        this.logOutTimestamp = Date.now()
 
         if (this.signInObject.ref) {
             this.signInObject.ref.goToStep(1)
