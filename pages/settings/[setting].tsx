@@ -153,43 +153,59 @@ class Settings extends React.Component<ISettings, ISettingsState> {
         )
     }
 
-    private renderConnections = () => (
-        <>
-            <div className={'mt3'}>
-                <div className={'flex flex-row justify-between items-center bb b--light-gray pv3'}>
-                    <span className={'flex flex-column tl mr4'}>
-                        <span className={'b black f5 pb2'}>You are connected to Facebook</span>
-                        <span className={'f6 lh-copy'}>
-                            You can now post to your Facebook account whenever you post or comment
-                            on EOS. We will never post to Facebook or message your friends without
-                            your permission.
+    private renderConnections = () => {
+        const {
+            hasScatterAccount,
+            connectScatterWallet,
+            disconnectScatterWallet,
+            displayName: { scatter: scatterDisplayName },
+        } = this.props.authStore
+
+        return (
+            <>
+                <div className={'mt3'}>
+                    <div
+                        className={
+                            'flex flex-row justify-between items-center pv3' // bb b--light-gray
+                        }
+                    >
+                        <span className={'flex flex-column tl mr4'}>
+                            <span className={'b black f5 pb2'}>Scatter</span>
+                            <span className={'f6 lh-copy'}>
+                                You can connect your Scatter account to Discussions App.
+                            </span>
                         </span>
-                    </span>
 
-                    <span className={'flex flex-column tr'}>
-                        <span className={'black b f6'}>Sahil Kohja</span>
-                        <span className={'red f6'}>(disconnect)</span>
-                    </span>
+                        {!hasScatterAccount && (
+                            <span className={'flex flex-row tr'}>
+                                <span
+                                    className={'green f6 pointer dim pr2'}
+                                    onClick={connectScatterWallet}
+                                >
+                                    (connect)
+                                </span>
+                                {connectScatterWallet['pending'] && (
+                                    <FontAwesomeIcon width={13} icon={faSpinner} spin />
+                                )}
+                            </span>
+                        )}
+
+                        {hasScatterAccount && (
+                            <span className={'flex flex-column tr'}>
+                                <span className={'black b f6 pb2'}>{scatterDisplayName}</span>
+                                <span
+                                    className={'red f6 pointer dim'}
+                                    onClick={disconnectScatterWallet}
+                                >
+                                    (disconnect)
+                                </span>
+                            </span>
+                        )}
+                    </div>
                 </div>
-
-                <div className={'flex flex-row justify-between items-center pv3'}>
-                    <span className={'flex flex-column tl mr4'}>
-                        <span className={'b black f5 pb2'}>You are connected to Twitter</span>
-                        <span className={'f6 lh-copy'}>
-                            You can now post to your Twitter account whenever you post or comment on
-                            EOS. We will never post to Twitter or message your friends without your
-                            permission.
-                        </span>
-                    </span>
-
-                    <span className={'flex flex-column tr'}>
-                        <span className={'black b f6'}>--</span>
-                        <span className={'green f6'}>(connect)</span>
-                    </span>
-                </div>
-            </div>
-        </>
-    )
+            </>
+        )
+    }
 
     private handleDeleteUserToModeration = user => {
         this.props.userStore.setModerationMemberByTag(user)
@@ -342,8 +358,7 @@ class Settings extends React.Component<ISettings, ISettingsState> {
             loadingStates: { transferring, withdrawing },
         } = this.props.settingsStore
 
-        if (!hasAccount)
-            return <div className={'db'}>Please login to continue.</div>
+        if (!hasAccount) return <div className={'db'}>Please login to continue.</div>
 
         return (
             <>

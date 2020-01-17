@@ -37,22 +37,34 @@ class TitleHeader extends React.Component<ITitleHeaderProps, ITitleHeaderState> 
     }
 
     private renderUserSettings = () => {
-        const { logOut, hasScatterAccount, connectScatterWallet, balances } = this.props.authStore
+        const {
+            logOut,
+            hasScatterAccount,
+            activePublicKey,
+            activeDisplayName,
+            balances,
+        } = this.props.authStore
 
         return (
             <div className={'tooltip flex flex-column'} style={{ width: 200 }}>
+                <a rel={'Logout'} onClick={logOut}>
+                    logout
+                </a>
+
+                <Link href={`/u/[username]`} as={`/u/${activeDisplayName}-${activePublicKey}`}>
+                    <a rel={'Open your profile'}>profile</a>
+                </Link>
+
                 <Link href={'/settings/connections'}>
                     <a rel={'Open settings'}>settings</a>
                 </Link>
+                <Link href={'/settings/connections'}>
+                    <a rel={'Open connections'}>connections</a>
+                </Link>
 
-                {!hasScatterAccount && (
-                    <Link href={'/settings/connections'}>
-                        <a rel={'Open settings'}>connections</a>
-                    </Link>
-                )}
                 {hasScatterAccount && (
                     <Link href={'/settings/wallet?side=0'}>
-                        <a rel={'Wallet'}>wallet</a>
+                        <a rel={'Open your wallet'}>wallet</a>
                     </Link>
                 )}
 
@@ -127,7 +139,6 @@ class TitleHeader extends React.Component<ITitleHeaderProps, ITitleHeaderState> 
                         </button>
                     </Link>
                     <Tooltip
-                        open={true}
                         animateFill={false}
                         interactive
                         interactiveBorder={20}

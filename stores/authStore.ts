@@ -137,6 +137,19 @@ export default class AuthStore extends BaseStore {
         }
     }
 
+    @task.resolved
+    @action.bound
+    async disconnectScatterWallet() {
+        try {
+            await eos.logout()
+            this.hasScatterAccount = false
+            this.displayName.scatter = null
+            this.uiStore.showToast('You have disconnected your scatter wallet!', 'success')
+        } catch (error) {
+            throw error
+        }
+    }
+
     @task
     @action.bound
     async checkInitialConditions() {
@@ -238,8 +251,8 @@ export default class AuthStore extends BaseStore {
     @action.bound
     async logOut() {
         try {
-            await eos.logout()
-            this.uiStore.showToast('You have disconnected your wallet!', 'success')
+            this.hasAccount = false
+            this.uiStore.showToast('You have logged out!', 'success')
         } catch (error) {
             throw error
         }
