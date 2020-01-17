@@ -23,15 +23,7 @@ export class EOS {
 
     private _api: Api
 
-    transactionSignature = (
-        chainId,
-        fromPrivateKey,
-        toPublicKey,
-        amount,
-        fee,
-        nonce,
-        memo
-    ) => {
+    transactionSignature = (chainId, fromPrivateKey, toPublicKey, amount, fee, nonce, memo) => {
         // expect quantity inputs for amount and fee that look like:
         // 1.2000 EOS
         function quantity(q) {
@@ -325,15 +317,15 @@ export class EOS {
         }
     }
 
-    async getBalance(address: string) {
+    async getBalance(address: string, chain: string, code: string) {
         try {
-            const chain = parseInt('0')
+            const _chain = parseInt(chain)
             const bound = `0x${ecc.sha256(ecc.PublicKey.fromString(address).toBuffer(), 'hex')}`
 
             const balances = await this.api.rpc.get_table_rows({
                 json: true,
-                code: 'nsuidcntract',
-                scope: chain,
+                code: code,
+                scope: _chain,
                 table: 'accounts',
                 limit: 100,
                 key_type: 'i256',
@@ -342,25 +334,15 @@ export class EOS {
                 index_position: 2,
             })
 
-            console.log(balances)
-
             if (!balances.rows.length) return []
 
-            return balances.rows.map(({ balance }) => balance)
-        } catch (error) {
-            throw error
-        }
-    }
-
-    async getCurrentBalance() {
-        if (!this.wallet) {
-            return
-        }
-
-        const address = this.wallet.auth.publicKey
-
-        try {
-            return await this.getBalance(this.wallet.auth.publicKey)
+            return balances.rows.map(({ balance }) => {
+                const [amount, symbol] = balance.split(' ')
+                return {
+                    symbol,
+                    amount,
+                }
+            })
         } catch (error) {
             throw error
         }

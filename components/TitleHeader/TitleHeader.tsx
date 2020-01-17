@@ -39,16 +39,19 @@ class TitleHeader extends React.Component<ITitleHeaderProps, ITitleHeaderState> 
     private renderUserSettings = () => {
         const { logOut, hasScatterAccount, connectScatterWallet, balances } = this.props.authStore
 
+
         return (
             <div className={'tooltip flex flex-column'} style={{ width: 200 }}>
                 <Link href={'/settings/connections'}>
                     <a rel={'Open settings'}>settings</a>
                 </Link>
-                {balances.map(balance => (
-                    <a key={balance} title={'Balance'}>
-                        {balance}
+
+                {Array.from(balances).map(([symbol, amount]) => (
+                    <a key={symbol} title={'Balance'}>
+                        {amount} {symbol}
                     </a>
                 ))}
+
                 {!hasScatterAccount && (
                     <a rel={'Connect Scatter'} onClick={connectScatterWallet}>
                         connect wallet

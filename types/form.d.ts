@@ -58,11 +58,12 @@ declare interface FormField {
     hideLabels?: boolean
     containerClassName?: string
     hide?: boolean
-
+    onSelect?: (props) => void
     input?: (value) => any
     output?: (value) => any
     type?: string | 'password' | 'text' | 'checkbox' | 'button' | 'dropdown' | 'textarea' | 'richtext' | 'radiogroup' | 'switch'
     render?: boolean
+    defaultValue?: any
     checked?: boolean
     observers?: any[]
     extra?: any

@@ -7,7 +7,6 @@ import axios from 'axios'
 import { getAuthStore, getUiStore, IStores } from '@stores/index'
 import { checkIfNameIsValid, sleep } from '@utils'
 import { discussions, eos, nsdb } from '@novuspherejs'
-import { ApiGetUnifiedId } from 'interfaces/ApiGet-UnifiedId'
 import ecc from 'eosjs-ecc'
 import { ModalOptions } from '@globals'
 
@@ -27,7 +26,6 @@ export default class SettingsStore extends BaseStore {
     unsignedPostsIsSpam = true
 
     @observable tokens = []
-    @observable supportedTokensForUnifiedWallet = []
     @observable thresholdTxID = ''
     @observable errorMessage = ''
 
@@ -39,14 +37,6 @@ export default class SettingsStore extends BaseStore {
 
     private readonly authStore: IStores['authStore'] = getAuthStore()
     private readonly uiStore: IStores['uiStore'] = getUiStore()
-
-    constructor() {
-        super()
-
-        nsdb.getSupportedTokensForUnifiedWallet().then(data => {
-            this.setDepositTokenOptions(data)
-        })
-    }
 
     @action.bound
     setUnsignedPostsAsSpamSetting(setting: boolean) {
@@ -104,18 +94,6 @@ export default class SettingsStore extends BaseStore {
                 symbol: q.symbol,
             }
         })
-    }
-
-    @action.bound
-    setDepositTokenOptions(depositTokens: ApiGetUnifiedId) {
-        this.supportedTokensForUnifiedWallet = depositTokens.map(token => ({
-            label: token.symbol,
-            value: token.contract,
-            contract: token.p2k.contract,
-            chain: token.p2k.chain,
-            decimals: token.precision,
-            fee: token.fee,
-        }))
     }
 
     @computed get recipients() {
@@ -297,9 +275,8 @@ export default class SettingsStore extends BaseStore {
                 },
             }
 
-            console.log('submitting transaction: ', transaction)
-            const resp = await eos.transact(transaction)
-            console.log(resp)
+            await eos.transact(transaction)
+            await this.authStore.fetchBalanceForSelectedToken()
             this.uiStore.showToast('Deposit successfully submitted!', 'success')
         } catch (error) {
             this.uiStore.showToast('Deposit failed to submit', 'error')
@@ -307,17 +284,28 @@ export default class SettingsStore extends BaseStore {
         }
     }
 
+    @computed get tokenDropdown() {
+        return {
+            name: 'token',
+            label: 'Token',
+            type: 'dropdown',
+            extra: {
+                options: this.authStore.supportedTokensForUnifiedWallet || [],
+            },
+            value:
+                this.authStore.selectedToken ||
+                (this.authStore.supportedTokensForUnifiedWallet.length &&
+                    this.authStore.supportedTokensForUnifiedWallet[0]),
+            rules: 'required',
+            onSelect: selected => {
+                this.authStore.selectedToken = selected
+            },
+        }
+    }
+
     @computed get depositsForm() {
         return new CreateForm({}, [
-            {
-                name: 'token',
-                label: 'Token',
-                type: 'dropdown',
-                extra: {
-                    options: this.supportedTokensForUnifiedWallet || [],
-                },
-                rules: 'required',
-            },
+            this.tokenDropdown,
             {
                 name: 'amount',
                 label: 'Amount',
@@ -417,7 +405,7 @@ export default class SettingsStore extends BaseStore {
                 return
             }
 
-            await this.authStore.fetchBalancesForCurrentWallet()
+            await this.authStore.fetchBalanceForSelectedToken()
 
             this.uiStore.showToast('Withdrawal successfully submitted!', 'success')
             ;(form as any).clear()
@@ -445,15 +433,7 @@ export default class SettingsStore extends BaseStore {
                     label: 'Amount',
                     rules: 'required',
                 },
-                {
-                    name: 'token',
-                    label: 'Token',
-                    type: 'dropdown',
-                    extra: {
-                        options: this.supportedTokensForUnifiedWallet || [],
-                    },
-                    rules: 'required',
-                },
+                this.tokenDropdown,
                 {
                     name: 'to',
                     label: 'To',
@@ -577,7 +557,7 @@ export default class SettingsStore extends BaseStore {
                 return
             }
 
-            await this.authStore.fetchBalancesForCurrentWallet()
+            await this.authStore.fetchBalanceForSelectedToken()
 
             this.uiStore.showToast('Transfer successfully submitted!', 'success')
             ;(form as any).clear()
@@ -605,20 +585,12 @@ export default class SettingsStore extends BaseStore {
                     label: 'Amount',
                     rules: 'required',
                 },
-                {
-                    name: 'token',
-                    label: 'Token',
-                    type: 'dropdown',
-                    extra: {
-                        options: this.supportedTokensForUnifiedWallet || [],
-                    },
-                    rules: 'required',
-                },
+                this.tokenDropdown,
                 {
                     name: 'to',
                     label: 'To',
                     rules: 'required',
-                    placeholder: 'An EOS address',
+                    placeholder: 'i.e. EOS65RgavjK71JQxZZBV1Sj99fE2QN87SF55vKNi99mXg7ZW8sm2a',
                 },
                 {
                     name: 'memo',

@@ -128,6 +128,7 @@ class Form extends React.Component<FormProps> {
 
                 switch (form.types[field.name]) {
                     case 'dropdown':
+                        const options = Array.from(field.accessor.$extra.options)
                         return (
                             <React.Fragment key={field.name}>
                                 <div className={'field-container pb3 inline-labels'}>
@@ -147,8 +148,14 @@ class Form extends React.Component<FormProps> {
                                         <Select
                                             className={'db f6 react-select-dropdown'}
                                             classNamePrefix={'rs'}
-                                            options={Array.from(field.accessor.$extra.options)}
+                                            options={options}
                                             {...bind}
+                                            onChange={(nv, am) => {
+                                                bind.onChange(nv, am)
+                                                if (field.hasOwnProperty('onSelect')) {
+                                                    field.onSelect(nv, am)
+                                                }
+                                            }}
                                         />
                                         <span className={'error f6 db pv2'}>
                                             {field.accessor.error}

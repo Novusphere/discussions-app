@@ -1,12 +1,13 @@
 import { BaseStore, getOrCreateStore } from 'next-mobx-wrapper'
-import { action, computed, observable, reaction } from 'mobx'
+import { action, autorun, computed, observable, reaction } from 'mobx'
 import { persist } from 'mobx-persist'
 import { ModalOptions, SignInMethods } from '@globals'
 import { CreateForm } from '@components'
 import { task } from 'mobx-task'
-import { discussions, eos, init } from '@novuspherejs'
+import { discussions, eos, init, nsdb } from '@novuspherejs'
 import { getUiStore, IStores } from '@stores/index'
 import { bkToStatusJson, sleep } from '@utils'
+import { ApiGetUnifiedId } from '../interfaces/ApiGet-UnifiedId'
 
 export default class AuthStore extends BaseStore {
     @persist('object')
@@ -43,29 +44,69 @@ export default class AuthStore extends BaseStore {
     @observable hasScatterAccount = false
 
     // wallet
-    @observable balances: string[] = []
+    balances = observable.map<string, string>()
+    @observable supportedTokensForUnifiedWallet = []
+    @observable selectedToken = null
 
     private readonly uiStore: IStores['uiStore'] = getUiStore()
 
     constructor() {
         super()
 
-        reaction(
-            () => this.uidWalletPubKey,
-            async (uidWalletPubKey) => {
-                this.fetchBalancesForCurrentWallet()
+        autorun(() => {
+            if (this.uidWalletPubKey && this.selectedToken) {
+                this.fetchBalanceForSelectedToken()
             }
-        )
+        })
+
+        nsdb.getSupportedTokensForUnifiedWallet().then(async data => {
+            this.setDepositTokenOptions(data)
+
+            await data.map(async datum => {
+                await sleep(100)
+                await this.fetchBalanceForSelectedToken(datum)
+            })
+        })
+    }
+
+    @action.bound
+    setDepositTokenOptions(depositTokens: ApiGetUnifiedId) {
+        this.supportedTokensForUnifiedWallet = depositTokens.map(token => ({
+            label: token.symbol,
+            value: token.contract,
+            contract: token.p2k.contract,
+            chain: token.p2k.chain,
+            decimals: token.precision,
+            fee: token.fee,
+        }))
+
+        this.selectedToken = this.supportedTokensForUnifiedWallet[0]
     }
 
     @task.resolved
     @action.bound
-    async fetchBalancesForCurrentWallet() {
+    async fetchBalanceForSelectedToken(token = this.selectedToken) {
         try {
-            if (!this.uidWalletPubKey) return
-            this.balances = await eos.getBalance(this.uidWalletPubKey)
+            let symbol, chain, contract
+
+            if (!token.hasOwnProperty('symbol')) {
+                symbol = token.label
+                chain = token.chain
+                contract = token.contract
+            } else {
+                symbol = token.symbol
+                chain = token.p2k.chain
+                contract = token.p2k.contract
+            }
+
+            let balance = await eos.getBalance(this.uidWalletPubKey, chain, contract)
+
+            if (!balance.length) {
+                balance = [{ symbol: symbol, amount: '0' }]
+            }
+
+            this.balances.set(symbol, balance[0].amount)
         } catch (error) {
-            this.balances = []
             return error
         }
     }
@@ -80,7 +121,6 @@ export default class AuthStore extends BaseStore {
                 ;(wallet as any).connect()
                 this.hasScatterAccount = true
                 this.displayName.scatter = wallet.auth.accountName
-
             }
         } catch (error) {
             throw error
@@ -93,11 +133,7 @@ export default class AuthStore extends BaseStore {
         await sleep(100)
 
         if (this.activeDisplayName && this.postPriv) {
-            if (
-                this.statusJson.bk &&
-                this.postPriv &&
-                this.displayName.bk
-            ) {
+            if (this.statusJson.bk && this.postPriv && this.displayName.bk) {
                 this.hasAccount = true
                 this.connectScatterWallet()
             }

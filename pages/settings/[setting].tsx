@@ -6,7 +6,7 @@ import classNames from 'classnames'
 import './style.scss'
 import { getIdenticon } from '@utils'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
-import { faMinusCircle } from '@fortawesome/free-solid-svg-icons'
+import { faMinusCircle, faSpinner } from '@fortawesome/free-solid-svg-icons'
 import { Tab, TabList, TabPanel, Tabs } from 'react-tabs'
 import Link from 'next/link'
 import { NextRouter, withRouter } from 'next/router'
@@ -89,6 +89,8 @@ class Settings extends React.Component<ISettings, ISettingsState> {
     }
 
     private renderSidebarContent = () => {
+        const { balances, fetchBalanceForSelectedToken } = this.props.authStore
+
         return (
             <>
                 <span className={'b black f5 sidebar'}>Settings</span>
@@ -123,6 +125,19 @@ class Settings extends React.Component<ISettings, ISettingsState> {
                             <span>{_.upperFirst(link.name)}</span>
                         </li>
                     ))}
+                </ul>
+                <ul className={'list ph2 mt4'}>
+                    <span className={'f6 b black mr2'}>Balances</span>
+                    {fetchBalanceForSelectedToken['pending'] && (
+                        <FontAwesomeIcon width={13} icon={faSpinner} spin />
+                    )}
+                    {!fetchBalanceForSelectedToken['pending'] &&
+                        Array.from(balances).map(([symbol, amount]) => (
+                            <div key={symbol} className={'mt3 f6 flex flex-row justify-between'}>
+                                <span>{symbol}</span>
+                                <span>{amount}</span>
+                            </div>
+                        ))}
                 </ul>
             </>
         )
@@ -309,7 +324,6 @@ class Settings extends React.Component<ISettings, ISettingsState> {
 
     private renderTokens = () => {
         const { activeIndex } = this.state.tokens
-        const { balances } = this.props.authStore
         const {
             depositsForm,
             withdrawalForm,
@@ -318,57 +332,73 @@ class Settings extends React.Component<ISettings, ISettingsState> {
         } = this.props.settingsStore
 
         return (
-            <Tabs className={'mt2'} selectedIndex={activeIndex} onSelect={this.setTokenTab}>
-                <TabList className={'settings-tabs'}>
-                    <Tab className={'settings-tab'}>Deposit</Tab>
-                    <Tab className={'settings-tab'}>Transfer</Tab>
-                    <Tab className={'settings-tab'}>Withdrawal</Tab>
-                </TabList>
+            <>
+                <Tabs className={'mt2'} selectedIndex={activeIndex} onSelect={this.setTokenTab}>
+                    <TabList className={'settings-tabs'}>
+                        <Tab className={'settings-tab'}>Deposit</Tab>
+                        <Tab className={'settings-tab'}>Transfer</Tab>
+                        <Tab className={'settings-tab'}>Withdrawal</Tab>
+                    </TabList>
 
-                <TabPanel>
-                    <div className={'flex flex-column items-center'}>
-                        <div
-                            className={
-                                'w-100 flex flex-column items-center outline-container pa4 mt3'
-                            }
-                        >
-                            <Form className={'db w-100'} form={depositsForm} hideSubmitButton />
+                    <TabPanel>
+                        <div className={'flex flex-column items-center'}>
+                            <div
+                                className={
+                                    'w-100 flex flex-column items-center outline-container pa4 mt3'
+                                }
+                            >
+                                <Form className={'db w-100'} form={depositsForm} hideSubmitButton />
+
+                                <div className={'mt3'}>
+                                    <span className={'db lh-copy f6'}>
+                                        Alternatively, to manually deposit funds from your wallet or
+                                        an exchange please send them to
+                                    </span>
+                                    <br />
+                                    <span className={'db lh-copy f6'}>
+                                        <strong>Please note:</strong> It's important you use this
+                                        memo EXACTLY! If you are depositing from an exchange and
+                                        cannot specify a memo then you must first withdraw to an EOS
+                                        wallet of your own first!
+                                    </span>
+                                </div>
+                            </div>
                         </div>
-                    </div>
-                </TabPanel>
-                <TabPanel>
-                    <div className={'flex flex-column items-center'}>
-                        <div
-                            className={
-                                'w-100 flex flex-column items-center outline-container pa4 mt3'
-                            }
-                        >
-                            <Form
-                                className={'db w-100'}
-                                form={transferForm}
-                                hideSubmitButton
-                                loading={transferring}
-                            />
+                    </TabPanel>
+                    <TabPanel>
+                        <div className={'flex flex-column items-center'}>
+                            <div
+                                className={
+                                    'w-100 flex flex-column items-center outline-container pa4 mt3'
+                                }
+                            >
+                                <Form
+                                    className={'db w-100'}
+                                    form={transferForm}
+                                    hideSubmitButton
+                                    loading={transferring}
+                                />
+                            </div>
                         </div>
-                    </div>
-                </TabPanel>
-                <TabPanel>
-                    <div className={'flex flex-column items-center'}>
-                        <div
-                            className={
-                                'w-100 flex flex-column items-center outline-container pa4 mt3'
-                            }
-                        >
-                            <Form
-                                className={'db w-100'}
-                                form={withdrawalForm}
-                                hideSubmitButton
-                                loading={withdrawing}
-                            />
+                    </TabPanel>
+                    <TabPanel>
+                        <div className={'flex flex-column items-center'}>
+                            <div
+                                className={
+                                    'w-100 flex flex-column items-center outline-container pa4 mt3'
+                                }
+                            >
+                                <Form
+                                    className={'db w-100'}
+                                    form={withdrawalForm}
+                                    hideSubmitButton
+                                    loading={withdrawing}
+                                />
+                            </div>
                         </div>
-                    </div>
-                </TabPanel>
-            </Tabs>
+                    </TabPanel>
+                </Tabs>
+            </>
         )
     }
 
