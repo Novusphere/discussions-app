@@ -13,6 +13,11 @@
     pointer-events: auto;
     background-color: #fff;
     outline: 0;
+    max-height: calc(100vh - 2rem);
+    box-shadow: 0 0 30px 0 rgba(0, 0, 0, 0.25);
+    overflow-y: auto;
+    z-index: 999999-1;
+    border-radius: 10px;
 }
 .modal-backdrop {
     background-color: rgba(0, 0, 0, 0.3);
@@ -21,7 +26,7 @@
     position: fixed;
     top: 0;
     left: 0;
-    z-index: 1050;
+    z-index: 999999;
     width: 100%;
     height: 100%;
     overflow: hidden;
@@ -35,6 +40,7 @@
     width: auto;
     margin: 0.5rem;
     pointer-events: none;
+    max-height: 100vh;
 }
 .modal.fade .modal-dialog {
     transition: transform 0.3s ease-out;
