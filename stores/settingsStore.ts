@@ -61,7 +61,8 @@ export default class SettingsStore extends BaseStore {
                 final = 'finalAmount'
             ) => {
                 const {
-                    fee: { percent, flat }, decimals,
+                    fee: { percent, flat },
+                    decimals,
                 } = this.authStore.selectedToken
 
                 let formValue = form.$(initial).value
@@ -318,7 +319,13 @@ export default class SettingsStore extends BaseStore {
     async handleDepositSubmit() {
         try {
             const { form } = this.depositsForm
+
             if (form.isValid) {
+                if (!this.authStore.hasEOSWalletAccount) {
+                    this.uiStore.showToast('Please connect an EOS wallet to continue.', 'error')
+                    return
+                }
+
                 const { amount, memoId, token } = form.values()
                 const { label, value, contract, decimals, chain } = token
 
