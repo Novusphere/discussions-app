@@ -470,6 +470,7 @@ export default class SettingsStore extends BaseStore {
             const data = await this.getSignatureAndSubmit(robj, walletPrivateKey)
 
             if (data.error) {
+                this.loadingStates.withdrawing = false
                 this.uiStore.showToast(data.message, 'error')
                 return
             }
