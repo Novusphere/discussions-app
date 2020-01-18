@@ -24,8 +24,6 @@ interface IUPageProps {
     posts: Post[]
 }
 
-// TO-DO: real data
-
 @inject('userStore', 'authStore', 'postsStore', 'tagStore', 'uiStore')
 @observer
 class U extends React.Component<IUPageProps> {
@@ -59,7 +57,7 @@ class U extends React.Component<IUPageProps> {
     }
 
     @computed get isSameUser() {
-        return this.props.username === this.props.authStore.getActiveDisplayName
+        return this.props.username === this.props.authStore.activeDisplayName
     }
 
     private handleUserFollowing = (user, pub) => {

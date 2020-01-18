@@ -1,12 +1,14 @@
 import { BaseStore, getOrCreateStore } from 'next-mobx-wrapper'
-import { action, computed, observable, reaction } from 'mobx'
+import { action, autorun, computed, observable } from 'mobx'
 import { persist } from 'mobx-persist'
 import { CreateForm } from '@components'
 import { task } from 'mobx-task'
 import axios from 'axios'
 import { getAuthStore, getUiStore, IStores } from '@stores/index'
-import { sleep, checkIfNameIsValid } from '@utils'
-import { eos } from '@novuspherejs'
+import { checkIfNameIsValid, sleep } from '@utils'
+import { discussions, eos } from '@novuspherejs'
+import ecc from 'eosjs-ecc'
+import { ModalOptions } from '@globals'
 
 const fileDownload = require('js-file-download')
 
@@ -27,13 +29,73 @@ export default class SettingsStore extends BaseStore {
     @observable thresholdTxID = ''
     @observable errorMessage = ''
 
+    // loading states
+    @observable loadingStates = {
+        transferring: false,
+        withdrawing: false,
+    }
+
+    @observable blurStates = {
+        transferring: {
+            amount: false,
+            finalAmount: false,
+        },
+        withdrawing: {
+            amount: false,
+            finalAmount: false,
+        },
+    }
+
     private readonly authStore: IStores['authStore'] = getAuthStore()
     private readonly uiStore: IStores['uiStore'] = getUiStore()
 
     constructor() {
         super()
+
+        autorun(() => {
+            if (!this.authStore.selectedToken) return
+
+            const setFormInputsForFeesAndAmounts = (
+                { form },
+                initial = 'amount',
+                final = 'finalAmount'
+            ) => {
+                const {
+                    fee: { percent, flat }, decimals,
+                } = this.authStore.selectedToken
+
+                let formValue = form.$(initial).value
+                let _value = Number(formValue)
+
+                if (isNaN(_value)) {
+                    _value = 0
+                }
+
+                const fee = _value * percent + flat
+                form.$('fee').set('value', fee.toFixed(decimals))
+                const finalValue = final === 'amount' ? _value - fee : _value + fee
+                form.$(final).set('value', finalValue.toFixed(decimals))
+            }
+
+            if (this.blurStates.transferring.amount) {
+                setFormInputsForFeesAndAmounts(this.transferForm)
+            }
+
+            if (this.blurStates.transferring.finalAmount) {
+                setFormInputsForFeesAndAmounts(this.transferForm, 'finalAmount', 'amount')
+            }
+
+            if (this.blurStates.withdrawing.amount) {
+                setFormInputsForFeesAndAmounts(this.withdrawalForm)
+            }
+
+            if (this.blurStates.withdrawing.finalAmount) {
+                setFormInputsForFeesAndAmounts(this.withdrawalForm, 'finalAmount', 'amount')
+            }
+        })
     }
 
+    @action.bound
     @action.bound
     setUnsignedPostsAsSpamSetting(setting: boolean) {
         this.unsignedPostsIsSpam = setting
@@ -136,7 +198,7 @@ export default class SettingsStore extends BaseStore {
         const amount: string = values.amount
 
         values.amount = Number(amount).toFixed(precision)
-        values.actor = this.authStore.getActiveDisplayName
+        values.actor = this.authStore.activeDisplayName
 
         return values
     }
@@ -190,7 +252,7 @@ export default class SettingsStore extends BaseStore {
 
                 this.thresholdTxID = await eos.transact(actions)
             } else {
-                this.uiStore.showToast('Failed to detect Scatter', 'error')
+                this.uiStore.showToast('Failed to detect EOS Wallet', 'error')
             }
         } catch (error) {
             this.errorMessage = error.message
@@ -252,70 +314,443 @@ export default class SettingsStore extends BaseStore {
         ])
     }
 
-    get withdrawalForm() {
+    @task.resolved
+    @action.bound
+    async handleDepositSubmit() {
+        try {
+            const { form } = this.depositsForm
+            if (form.isValid) {
+                const { amount, memoId, token } = form.values()
+                const { label, value, contract, decimals, chain } = token
+
+                const transaction = {
+                    account: value,
+                    name: 'transfer',
+                    data: {
+                        from: this.authStore.displayName.scatter,
+                        to: contract,
+                        quantity: `${Number(amount).toFixed(decimals)} ${label}`,
+                        memo: memoId,
+                    },
+                }
+
+                const transaction_id = await eos.transact(transaction)
+                this.uiStore.showToast('Deposit successfully submitted!', 'success')
+                this.uiStore.showToast('Click here to view your transaction', 'info', () =>
+                    this.openTXInNewTab(transaction_id)
+                )
+
+                await sleep(2500)
+                await this.authStore.fetchBalanceForSelectedToken()
+                ;(form as any).clear()
+            }
+        } catch (error) {
+            this.uiStore.showToast('Deposit failed to submit', 'error')
+            throw error
+        }
+    }
+
+    @computed get tokenDropdown() {
+        const { supportedTokensForUnifiedWallet, selectedToken } = this.authStore
+
+        return {
+            name: 'token',
+            label: 'Token',
+            type: 'dropdown',
+            extra: {
+                options: supportedTokensForUnifiedWallet || [],
+            },
+            value:
+                selectedToken ||
+                (supportedTokensForUnifiedWallet.length && supportedTokensForUnifiedWallet[0]),
+            rules: 'required',
+            onSelect: selected => {
+                this.authStore.selectedToken = selected
+            },
+        }
+    }
+
+    @computed get depositsForm() {
+        return new CreateForm({}, [
+            this.tokenDropdown,
+            {
+                name: 'amount',
+                label: 'Amount',
+                rules: 'required|numeric',
+                autoComplete: 'off',
+            },
+            {
+                name: 'memoId',
+                label: 'Memo ID',
+                rules: 'required',
+                disabled: true,
+                value: this.authStore.uidWalletPubKey,
+                type: 'hidden',
+                hideLabels: true,
+            },
+            {
+                name: 'buttons',
+                type: 'button',
+                hideLabels: true,
+                containerClassName: 'flex flex-row items-center justify-end',
+                extra: {
+                    options: [
+                        {
+                            value: 'Submit Deposit',
+                            className: 'white bg-green',
+                            title: 'Submit Deposit',
+                            onClick: this.handleDepositSubmit,
+                        },
+                    ],
+                },
+            },
+        ])
+    }
+
+    @action.bound
+    private async getSignatureAndSubmit(robj, fromAddress) {
+        try {
+            robj.sig = eos.transactionSignature(
+                robj.chain,
+                fromAddress,
+                robj.to,
+                robj.amount,
+                robj.fee,
+                robj.nonce,
+                robj.memo
+            )
+
+            const { data } = await axios.post(
+                'https://atmosdb.novusphere.io/unifiedid/relay',
+                `data=${encodeURIComponent(JSON.stringify(robj))}`,
+                {
+                    headers: {
+                        'Content-Type': 'application/x-www-form-urlencoded',
+                    },
+                }
+            )
+
+            return data
+        } catch (error) {
+            throw error
+        }
+    }
+
+    @task.resolved
+    @action.bound
+    async handleWithdrawalSubmit(walletPrivateKey: string) {
+        const { form } = this.withdrawalForm
+        const { amount, token, to, memo } = form.values()
+
+        if (!token) return
+
+        const {
+            label,
+            value,
+            contract,
+            decimals,
+            chain,
+            fee: { flat, percent },
+        } = token
+
+        const amountasNumber = Number(amount)
+        const fee = amountasNumber * percent + flat
+
+        try {
+            const robj = {
+                chain: parseInt(String(chain)),
+                from: ecc.privateToPublic(walletPrivateKey),
+                to: 'EOS1111111111111111111111111111111114T1Anm', // special withdraw address
+                amount: `${Number(amount).toFixed(decimals)} ${label}`,
+                fee: `${Number(fee).toFixed(decimals)} ${label}`,
+                nonce: new Date().getTime(),
+                memo: `${to}:${memo}`,
+                sig: '',
+            }
+
+            const data = await this.getSignatureAndSubmit(robj, walletPrivateKey)
+
+            if (data.error) {
+                this.uiStore.showToast(data.message, 'error')
+                return
+            }
+
+            const { transaction_id } = data
+
+            this.uiStore.showToast('Withdrawal successfully submitted!', 'success')
+            this.uiStore.showToast('Click here to view your transaction', 'info', () =>
+                this.openTXInNewTab(transaction_id)
+            )
+            ;(form as any).clear()
+            this.loadingStates.withdrawing = false
+
+            await sleep(2000)
+            await this.authStore.fetchBalanceForSelectedToken()
+        } catch (error) {
+            this.loadingStates.withdrawing = false
+            this.uiStore.showToast('Withdrawal failed to submit', 'error')
+            throw error
+        }
+    }
+
+    @computed get withdrawalForm() {
+        let min = 0
+
+        if (this.authStore.supportedTokensForUnifiedWallet.length) {
+            min = this.authStore.selectedToken.min
+        }
+
         return new CreateForm(
             {
                 onSubmit: form => {
-                    console.log(form.values())
+                    if (form.isValid) {
+                        this.loadingStates.withdrawing = true
+                        this.showPasswordEntryModal()
+                    }
                 },
             },
             [
+                this.tokenDropdown,
                 {
                     name: 'amount',
                     label: 'Amount',
-                    rules: 'required',
-                    hide: true,
+                    rules: `required|numeric|min:${min}`,
+                    autoComplete: 'off',
+                    onFocus: () => {
+                        this.blurStates.withdrawing.amount = true
+                    },
+                    onBlur: () => {
+                        this.blurStates.withdrawing.amount = false
+                    },
                 },
                 {
-                    name: 'token',
-                    label: 'Token',
-                    type: 'dropdown',
-                    extra: {
-                        options: [
-                            {
-                                label: 'ATMOS',
-                                value: 'ATMOS',
-                            },
-                        ],
+                    name: 'fee',
+                    label: 'Fee',
+                    disabled: true,
+                },
+                {
+                    name: 'finalAmount',
+                    label: 'Final Amount',
+                    onFocus: () => {
+                        this.blurStates.withdrawing.finalAmount = true
                     },
-                    rules: 'required',
+                    onBlur: () => {
+                        this.blurStates.withdrawing.finalAmount = false
+                    },
                 },
                 {
                     name: 'to',
                     label: 'To',
                     rules: 'required',
+                    value: eos.auth ? eos.auth.accountName : '',
+                    placeholder: 'An EOS account name',
+                    autoComplete: 'off',
+                },
+                {
+                    name: 'memo',
+                    label: 'Memo',
+                },
+                {
+                    name: 'buttons',
+                    type: 'button',
+                    hideLabels: true,
+                    containerClassName: 'flex flex-row items-center justify-end',
+                    extra: {
+                        options: [
+                            {
+                                value: 'Submit Withdrawal',
+                                className: 'white bg-green',
+                                title: 'Submit Withdrawal',
+                            },
+                        ],
+                    },
                 },
             ]
         )
     }
 
-    get depositForm() {
+    @computed get passwordReEntryForm() {
         return new CreateForm(
             {
-                onSubmit: form => {
-                    console.log(form.values())
+                onSubmit: async form => {
+                    const { password } = form.values()
+
+                    // un-encrypt their bk
+                    const {
+                        statusJson: {
+                            bk: { bk, bkc },
+                        },
+                    } = this.authStore
+
+                    try {
+                        const walletPrivateKey = await discussions.encryptedBKToKeys(
+                            bk,
+                            bkc,
+                            password
+                        )
+
+                        this.uiStore.hideModal()
+
+                        if (this.loadingStates.withdrawing) {
+                            this.handleWithdrawalSubmit(walletPrivateKey)
+                        }
+
+                        if (this.loadingStates.transferring) {
+                            this.handleTransferSubmit(walletPrivateKey)
+                        }
+                    } catch (error) {
+                        form.$('password').invalidate(error.message)
+                        return error
+                    }
                 },
             },
             [
                 {
+                    name: 'password',
+                    label: 'Password',
+                    rules: 'required',
+                    type: 'password',
+                },
+            ]
+        )
+    }
+
+    @action.bound
+    async showPasswordEntryModal() {
+        this.uiStore.showModal(ModalOptions.walletActionPasswordReentry)
+    }
+
+    @task.resolved
+    @action.bound
+    async handleTransferSubmit(walletPrivateKey: string) {
+        const { form } = this.transferForm
+        const { amount, token, to, memo } = form.values()
+
+        if (!token) return
+
+        const {
+            label,
+            value,
+            contract,
+            decimals,
+            chain,
+            fee: { flat, percent },
+        } = token
+
+        const amountasNumber = Number(amount)
+        const fee = amountasNumber * percent + flat
+
+        try {
+            const robj = {
+                chain: parseInt(String(chain)),
+                from: ecc.privateToPublic(walletPrivateKey),
+                to: to,
+                amount: `${Number(amount).toFixed(decimals)} ${label}`,
+                fee: `${Number(fee).toFixed(decimals)} ${label}`,
+                nonce: new Date().getTime(),
+                memo: memo,
+                sig: '',
+            }
+
+            const data = await this.getSignatureAndSubmit(robj, walletPrivateKey)
+
+            if (data.error) {
+                this.uiStore.showToast(data.message, 'error')
+                return
+            }
+
+            const { transaction_id } = data
+
+            this.uiStore.showToast('Transfer successfully submitted!', 'success')
+            this.uiStore.showToast('Click here to view your transaction', 'info', () =>
+                this.openTXInNewTab(transaction_id)
+            )
+            ;(form as any).clear()
+            this.loadingStates.transferring = false
+
+            await sleep(2000)
+            await this.authStore.fetchBalanceForSelectedToken()
+        } catch (error) {
+            this.loadingStates.transferring = false
+            this.uiStore.showToast('Transfer failed to submit', 'error')
+            throw error
+        }
+    }
+
+    private openTXInNewTab = tx => {
+        window.open(`https://bloks.io/transaction/${tx}`)
+    }
+
+    @computed get transferForm() {
+        let min = 0
+
+        if (this.authStore.supportedTokensForUnifiedWallet.length) {
+            min = this.authStore.selectedToken.min
+        }
+
+        return new CreateForm(
+            {
+                onSubmit: form => {
+                    if (form.isValid) {
+                        this.loadingStates.transferring = true
+                        this.showPasswordEntryModal()
+                    }
+                },
+            },
+            [
+                this.tokenDropdown,
+                {
                     name: 'amount',
                     label: 'Amount',
-                    rules: 'required',
-                    hide: true,
+                    rules: `required|numeric|min:${min}`,
+                    autoComplete: 'off',
+                    onFocus: () => {
+                        this.blurStates.transferring.amount = true
+                    },
+                    onBlur: () => {
+                        this.blurStates.transferring.amount = false
+                    },
                 },
                 {
-                    name: 'token',
-                    label: 'Token',
-                    type: 'dropdown',
+                    name: 'fee',
+                    label: 'Fee',
+                    disabled: true,
+                },
+                {
+                    name: 'finalAmount',
+                    label: 'Final Amount',
+                    onFocus: () => {
+                        this.blurStates.transferring.finalAmount = true
+                    },
+                    onBlur: () => {
+                        this.blurStates.transferring.finalAmount = false
+                    },
+                },
+                {
+                    name: 'to',
+                    label: 'To',
+                    rules: 'required',
+                    placeholder: 'i.e. EOS65RgavjK71JQxZZBV1Sj99fE2QN87SF55vKNi99mXg7ZW8sm2a',
+                    autoComplete: 'off',
+                },
+                {
+                    name: 'memo',
+                    label: 'Memo',
+                },
+                {
+                    name: 'buttons',
+                    type: 'button',
+                    hideLabels: true,
+                    containerClassName: 'flex flex-row items-center justify-end',
                     extra: {
                         options: [
                             {
-                                label: 'ATMOS',
-                                value: 'ATMOS',
+                                value: 'Submit Transfer',
+                                className: 'white bg-green',
+                                title: 'Submit Transfer',
                             },
                         ],
                     },
-                    rules: 'required',
                 },
             ]
         )

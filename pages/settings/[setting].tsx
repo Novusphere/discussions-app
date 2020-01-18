@@ -1,14 +1,16 @@
 import * as React from 'react'
 import { inject, observer } from 'mobx-react'
-import { Form, TagDropdown, UserNameWithIcon } from '@components'
+import { CopyToClipboard, Form, TagDropdown, UserNameWithIcon } from '@components'
 import { IStores } from '@stores'
 import classNames from 'classnames'
 import './style.scss'
 import { getIdenticon } from '@utils'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
-import { faMinusCircle, faPlus, faSpinner } from '@fortawesome/free-solid-svg-icons'
+import { faMinusCircle, faSpinner, faSyncAlt } from '@fortawesome/free-solid-svg-icons'
 import { Tab, TabList, TabPanel, Tabs } from 'react-tabs'
 import Link from 'next/link'
+import { NextRouter, withRouter } from 'next/router'
+import _ from 'lodash'
 
 interface ISettings {
     settingsStore: IStores['settingsStore']
@@ -16,6 +18,11 @@ interface ISettings {
     uiStore: IStores['uiStore']
     userStore: IStores['userStore']
     tagStore: IStores['tagStore']
+    authStore: IStores['authStore']
+    router: NextRouter
+
+    setting: string
+    side?: string
 }
 
 // TODO: Real Data
@@ -28,30 +35,65 @@ interface ISettingsState {
     }
 }
 
-@inject('settingsStore', 'postsStore', 'uiStore', 'userStore', 'tagStore')
+@(withRouter as any)
+@inject('settingsStore', 'postsStore', 'uiStore', 'userStore', 'tagStore', 'authStore')
 @observer
 class Settings extends React.Component<ISettings, ISettingsState> {
-    static async getInitialProps({ store, res }) {
+    static async getInitialProps({ store, query }) {
         const uiStore: IStores['uiStore'] = store.uiStore
         const tagStore: IStores['tagStore'] = store.tagStore
+        const setting = query.setting
+
+        let side = ''
+
+        if (query.hasOwnProperty('side')) {
+            side = query.side
+        }
 
         uiStore.toggleSidebarStatus(false)
         tagStore.destroyActiveTag()
 
-        return {}
+        return {
+            setting: setting.toLowerCase(),
+            side,
+        }
     }
 
-    state = {
-        enteredUserForModeration: '',
-        activeSidebar: 'Moderation',
-        tokens: {
-            activeIndex: 0,
-        },
+    constructor(props) {
+        super(props)
+
+        this.state = {
+            enteredUserForModeration: '',
+            activeSidebar: props.setting,
+            tokens: {
+                activeIndex: Number(props.side),
+            },
+        }
+    }
+
+    componentDidUpdate(
+        prevProps: Readonly<ISettings>,
+        prevState: Readonly<ISettingsState>,
+        snapshot?: any
+    ): void {
+        if (this.props.setting !== prevProps.setting) {
+            this.setLinkAsActive(this.props.setting)
+        }
     }
 
     setLinkAsActive = link => {
+        let lowerCaseLink = link.toLowerCase()
+
+        this.props.router.replace('/settings/[setting]', `/settings/${link}`, {
+            shallow: true,
+        })
+
+        if (lowerCaseLink.indexOf('?') !== -1) {
+            lowerCaseLink = lowerCaseLink.split('?')[0]
+        }
+
         this.setState({
-            activeSidebar: link,
+            activeSidebar: lowerCaseLink,
         })
     }
 
@@ -61,25 +103,27 @@ class Settings extends React.Component<ISettings, ISettingsState> {
     }
 
     private renderSidebarContent = () => {
+        const { balances, refreshAllBalances } = this.props.authStore
+
         return (
             <>
-                <span className={'b black f5 sidebar'}>Settings</span>
+                <span className={'b black f5'}>Settings</span>
                 <ul className={'list ph2 mt3'}>
                     {[
                         {
-                            name: 'Connections',
+                            name: 'connections',
                         },
                         {
-                            name: 'Tokens',
+                            name: 'wallet',
                         },
                         {
-                            name: 'Moderation',
+                            name: 'moderation',
                         },
                         {
-                            name: 'Airdrop',
+                            name: 'airdrop',
                         },
                         {
-                            name: 'Blocked',
+                            name: 'blocked',
                         },
                     ].map(link => (
                         <li
@@ -92,74 +136,90 @@ class Settings extends React.Component<ISettings, ISettingsState> {
                             ])}
                             key={link.name}
                         >
-                            <span>{link.name}</span>
+                            <span>{_.upperFirst(link.name)}</span>
                         </li>
+                    ))}
+                </ul>
+                <span className={'b black f5 flex flex-row justify-between'}>
+                    <span>Balances</span>
+                    {refreshAllBalances['pending'] && (
+                        <FontAwesomeIcon width={13} icon={faSpinner} spin />
+                    )}
+                    {!refreshAllBalances['pending'] && (
+                        <span
+                            className={'pointer dim'}
+                            title={'Refresh'}
+                            onClick={refreshAllBalances}
+                        >
+                            <FontAwesomeIcon icon={faSyncAlt} width={13} />
+                        </span>
+                    )}
+                </span>
+                <ul className={'list ph2 mt3'}>
+                    {Array.from(balances).map(([symbol, amount]) => (
+                        <div key={symbol} className={'mt3 f6 flex flex-row justify-between'}>
+                            <span>{symbol}</span>
+                            <span>{amount}</span>
+                        </div>
                     ))}
                 </ul>
             </>
         )
     }
 
-    private renderConnections = () => (
-        <>
-            <div className={'mt3'}>
-                <div className={'flex flex-row justify-between items-center bb b--light-gray pv3'}>
-                    <span className={'flex flex-column tl mr4'}>
-                        <span className={'b black f5 pb2'}>You are connected to Facebook</span>
-                        <span className={'f6 lh-copy'}>
-                            You can now post to your Facebook account whenever you post or comment
-                            on EOS. We will never post to Facebook or message your friends without
-                            your permission.
+    private renderConnections = () => {
+        const {
+            hasScatterAccount,
+            connectScatterWallet,
+            disconnectScatterWallet,
+            displayName: { scatter: scatterDisplayName },
+        } = this.props.authStore
+
+        return (
+            <>
+                <div className={'mt3'}>
+                    <div
+                        className={
+                            'flex flex-row justify-between items-center pv3' // bb b--light-gray
+                        }
+                    >
+                        <span className={'flex flex-column tl mr4'}>
+                            <span className={'b black f5 pb2'}>EOS Wallet</span>
+                            <span className={'f6 lh-copy'}>
+                                You can connect your EOS wallets to Discussions App.
+                            </span>
                         </span>
-                    </span>
 
-                    <span className={'flex flex-column tr'}>
-                        <span className={'black b f6'}>Sahil Kohja</span>
-                        <span className={'red f6'}>(disconnect)</span>
-                    </span>
+                        {!hasScatterAccount && (
+                            <span className={'flex flex-row tr'}>
+                                <span
+                                    className={'green f6 pointer dim pr2'}
+                                    onClick={connectScatterWallet}
+                                >
+                                    (connect)
+                                </span>
+                                {connectScatterWallet['pending'] && (
+                                    <FontAwesomeIcon width={13} icon={faSpinner} spin />
+                                )}
+                            </span>
+                        )}
+
+                        {hasScatterAccount && (
+                            <span className={'flex flex-column tr'}>
+                                <span className={'black b f6 pb2'}>{scatterDisplayName}</span>
+                                <span
+                                    className={'red f6 pointer dim'}
+                                    onClick={disconnectScatterWallet}
+                                >
+                                    (disconnect)
+                                </span>
+                            </span>
+                        )}
+                    </div>
                 </div>
-
-                <div className={'flex flex-row justify-between items-center pv3'}>
-                    <span className={'flex flex-column tl mr4'}>
-                        <span className={'b black f5 pb2'}>You are connected to Twitter</span>
-                        <span className={'f6 lh-copy'}>
-                            You can now post to your Twitter account whenever you post or comment on
-                            EOS. We will never post to Twitter or message your friends without your
-                            permission.
-                        </span>
-                    </span>
-
-                    <span className={'flex flex-column tr'}>
-                        <span className={'black b f6'}>--</span>
-                        <span className={'green f6'}>(connect)</span>
-                    </span>
-                </div>
-            </div>
-        </>
-    )
-
-    // private handleUserOnChange = e => {
-    //     this.setState({
-    //         enteredUserForModeration: e.target.value,
-    //     })
-    // }
-
-    // private handleAddUserToModeration = () => {
-    //     let cached = this.state.enteredUserForModeration
-    //
-    //     this.props.userStore
-    //         .setModerationMemberByTag(this.state.enteredUserForModeration)
-    //         .then(() => {
-    //             this.setState({
-    //                 enteredUserForModeration: '',
-    //             })
-    //         })
-    //         .catch(() => {
-    //             this.setState({
-    //                 enteredUserForModeration: cached,
-    //             })
-    //         })
-    // }
+            </>
+        )
+    }
 
     private handleDeleteUserToModeration = user => {
         this.props.userStore.setModerationMemberByTag(user)
@@ -297,72 +357,102 @@ class Settings extends React.Component<ISettings, ISettingsState> {
         )
     }
 
+    private setTokenTab = index => {
+        this.setState({ tokens: { activeIndex: index } })
+        this.setLinkAsActive(`${this.state.activeSidebar}?side=${index}`)
+    }
+
     private renderTokens = () => {
         const { activeIndex } = this.state.tokens
-        const { depositForm, withdrawalForm } = this.props.settingsStore
+        const { selectedToken, hasAccount } = this.props.authStore
+        const {
+            depositsForm,
+            withdrawalForm,
+            transferForm,
+            loadingStates: { transferring, withdrawing },
+        } = this.props.settingsStore
+
+        if (!hasAccount) return <div className={'db'}>Please login to continue.</div>
 
         return (
-            <Tabs
-                className={'mt2'}
-                selectedIndex={activeIndex}
-                onSelect={index => this.setState({ tokens: { activeIndex: index } })}
-            >
-                <TabList className={'settings-tabs'}>
-                    <Tab className={'settings-tab'}>Withdrawal</Tab>
-                    <Tab className={'settings-tab'}>Deposit</Tab>
-                </TabList>
+            <>
+                <Tabs selectedIndex={activeIndex} onSelect={this.setTokenTab}>
+                    <TabList className={'settings-tabs'}>
+                        <Tab className={'settings-tab'}>Deposit</Tab>
+                        <Tab className={'settings-tab'}>Transfer</Tab>
+                        <Tab className={'settings-tab'}>Withdrawal</Tab>
+                    </TabList>
 
-                <TabPanel>
-                    <div className={'flex flex-column items-center'}>
-                        <input
-                            placeholder={'0'}
-                            className={'token-amount-box mt3 f1 gray b--transparent tc'}
-                            onChange={event =>
-                                withdrawalForm.form.$('amount').set('value', event.target.value)
-                            }
-                        />
-                        <div
-                            className={
-                                'w-100 flex flex-column items-center outline-container pa4 mt3'
-                            }
-                        >
-                            <Form className={'db w-100'} form={withdrawalForm} hideSubmitButton />
-                            <button
-                                title={'Submit withdrawal'}
-                                className={'flex'}
-                                onClick={withdrawalForm.onSubmit}
+                    <TabPanel>
+                        <div className={'flex flex-column items-center'}>
+                            <div
+                                className={
+                                    'w-100 flex flex-column items-center outline-container pa4 mt3'
+                                }
                             >
-                                <span className={'f6 white'}>Withdraw</span>
-                            </button>
+                                <Form className={'db w-100'} form={depositsForm} hideSubmitButton />
+
+                                {selectedToken && (
+                                    <div className={'mt3'}>
+                                        <span className={'db lh-copy f6'}>
+                                            Alternatively, to manually deposit funds from your
+                                            wallet or an exchange please send them to
+                                        </span>
+                                        <div className={'mv3'}>
+                                            <CopyToClipboard
+                                                label={'Account'}
+                                                value={selectedToken.contract}
+                                            />
+                                            <CopyToClipboard
+                                                label={'Memo'}
+                                                value={depositsForm.form.$('memoId').value}
+                                            />
+                                        </div>
+                                        <span className={'db lh-copy f6'}>
+                                            <strong>Please note:</strong> It's important you use
+                                            this memo EXACTLY! If you are depositing from an
+                                            exchange and cannot specify a memo then you must first
+                                            withdraw to an EOS wallet of your own first!
+                                        </span>
+                                    </div>
+                                )}
+                            </div>
                         </div>
-                    </div>
-                </TabPanel>
-                <TabPanel>
-                    <div className={'flex flex-column items-center'}>
-                        <input
-                            placeholder={'0'}
-                            className={'token-amount-box mt3 f1 gray b--transparent tc'}
-                            onChange={event =>
-                                depositForm.form.$('amount').set('value', event.target.value)
-                            }
-                        />
-                        <div
-                            className={
-                                'w-100 flex flex-column items-center outline-container pa4 mt3'
-                            }
-                        >
-                            <Form className={'db w-100'} form={depositForm} hideSubmitButton />
-                            <button
-                                title={'Submit deposit'}
-                                className={'flex'}
-                                onClick={depositForm.onSubmit}
+                    </TabPanel>
+                    <TabPanel>
+                        <div className={'flex flex-column items-center'}>
+                            <div
+                                className={
+                                    'w-100 flex flex-column items-center outline-container pa4 mt3'
+                                }
                             >
-                                <span className={'f6 white'}>Deposit</span>
-                            </button>
+                                <Form
+                                    className={'db w-100'}
+                                    form={transferForm}
+                                    hideSubmitButton
+                                    loading={transferring}
+                                />
+                            </div>
                         </div>
-                    </div>
-                </TabPanel>
-            </Tabs>
+                    </TabPanel>
+                    <TabPanel>
+                        <div className={'flex flex-column items-center'}>
+                            <div
+                                className={
+                                    'w-100 flex flex-column items-center outline-container pa4 mt3'
+                                }
+                            >
+                                <Form
+                                    className={'db w-100'}
+                                    form={withdrawalForm}
+                                    hideSubmitButton
+                                    loading={withdrawing}
+                                />
+                            </div>
+                        </div>
+                    </TabPanel>
+                </Tabs>
+            </>
         )
     }
 
@@ -475,15 +565,16 @@ class Settings extends React.Component<ISettings, ISettingsState> {
 
     private renderContent = () => {
         switch (this.state.activeSidebar) {
-            case 'Connections':
+            default:
+            case 'connections':
                 return this.renderConnections()
-            case 'Moderation':
+            case 'moderation':
                 return this.renderModeration()
-            case 'Airdrop':
+            case 'airdrop':
                 return this.renderAirdrop()
-            case 'Tokens':
+            case 'wallet':
                 return this.renderTokens()
-            case 'Blocked':
+            case 'blocked':
                 return this.renderBlocked()
         }
     }
@@ -493,8 +584,8 @@ class Settings extends React.Component<ISettings, ISettingsState> {
             <div className={'flex flex-row relative'}>
                 <div className={'card w-30 mr3 pa3'}>{this.renderSidebarContent()}</div>
                 <div className={'card w-70 pa4'}>
-                    <span className={'b black f4'}>{this.state.activeSidebar}</span>
-                    {this.renderContent()}
+                    <span className={'b black f4'}>{_.upperFirst(this.state.activeSidebar)}</span>
+                    <div className={'mt3'}>{this.renderContent()}</div>
                 </div>
             </div>
         )

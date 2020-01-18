@@ -1,14 +1,17 @@
 import { BaseStore, getOrCreateStore } from 'next-mobx-wrapper'
-import { action, computed, observable } from 'mobx'
+import { action, autorun, computed, observable, reaction } from 'mobx'
 import { persist } from 'mobx-persist'
 import { ModalOptions, SignInMethods } from '@globals'
 import { CreateForm } from '@components'
 import { task } from 'mobx-task'
-import { discussions, eos, init } from '@novuspherejs'
+import { discussions, eos, init, nsdb } from '@novuspherejs'
 import { getUiStore, IStores } from '@stores/index'
 import { bkToStatusJson, sleep } from '@utils'
+import { ApiGetUnifiedId } from '../interfaces/ApiGet-UnifiedId'
 
 export default class AuthStore extends BaseStore {
+    static LOG_OUT_USER_INTEGER = 1579089600
+
     @persist('object')
     @observable
     displayName = {
@@ -17,7 +20,7 @@ export default class AuthStore extends BaseStore {
     }
 
     @persist @observable postPriv = ''
-    @persist @observable tipPub = ''
+    @persist @observable uidWalletPubKey = ''
     @persist @observable preferredSignInMethod = SignInMethods.brainKey
 
     // private stuff
@@ -40,13 +43,118 @@ export default class AuthStore extends BaseStore {
 
     // status
     @observable hasAccount = false
+    @observable hasScatterAccount = false
+
+    // wallet
+    balances = observable.map<string, string>()
+    @observable supportedTokensForUnifiedWallet = []
+
+    @observable selectedToken = null
+
+    @persist
+    @observable logOutTimestamp = AuthStore.LOG_OUT_USER_INTEGER
 
     private readonly uiStore: IStores['uiStore'] = getUiStore()
 
     constructor() {
         super()
 
-        this.checkInitialConditions()
+        autorun(() => {
+            if (this.uidWalletPubKey && this.selectedToken) {
+                this.fetchBalanceForSelectedToken()
+            }
+        })
+
+        nsdb.getSupportedTokensForUnifiedWallet().then(async data => {
+            this.setDepositTokenOptions(data)
+            this.refreshAllBalances()
+        })
+    }
+
+    @task.resolved
+    @action.bound
+    async refreshAllBalances() {
+        try {
+            await sleep(250)
+            await this.supportedTokensForUnifiedWallet.map(async datum => {
+                await sleep(250)
+                await this.fetchBalanceForSelectedToken(datum)
+            })
+        } catch (error) {
+            throw error
+        }
+    }
+
+    @action.bound
+    setDepositTokenOptions(depositTokens: ApiGetUnifiedId) {
+        this.supportedTokensForUnifiedWallet = depositTokens.map(token => ({
+            label: token.symbol,
+            value: token.contract,
+            contract: token.p2k.contract,
+            chain: token.p2k.chain,
+            decimals: token.precision,
+            fee: token.fee,
+            min: token.min,
+        }))
+
+        this.selectedToken = this.supportedTokensForUnifiedWallet[0]
+    }
+
+    @task
+    @action.bound
+    async fetchBalanceForSelectedToken(token = this.selectedToken) {
+        try {
+            let symbol, chain, contract
+
+            if (!token.hasOwnProperty('symbol')) {
+                symbol = token.label
+                chain = token.chain
+                contract = token.contract
+            } else {
+                symbol = token.symbol
+                chain = token.p2k.chain
+                contract = token.p2k.contract
+            }
+
+            let balance = await eos.getBalance(this.uidWalletPubKey, chain, contract)
+
+            if (!balance.length) {
+                return
+            }
+
+            this.balances.set(symbol, balance[0].amount)
+        } catch (error) {
+            return error
+        }
+    }
+
+    @task.resolved
+    @action.bound
+    async connectScatterWallet() {
+        try {
+            const wallet = await this.initializeScatterLogin()
+
+            if (wallet.connected) {
+                ;(wallet as any).connect()
+                this.hasScatterAccount = true
+                this.displayName.scatter = wallet.auth.accountName
+            }
+        } catch (error) {
+            throw error
+        }
+    }
+
+    @task.resolved
+    @action.bound
+    async disconnectScatterWallet() {
+        try {
+            await eos.logout()
+            this.hasScatterAccount = false
+            this.displayName.scatter = null
+            this.uiStore.showToast('You have disconnected your scatter wallet!', 'success')
+        } catch (error) {
+            throw error
+        }
     }
 
     @task
@@ -54,20 +162,15 @@ export default class AuthStore extends BaseStore {
     async checkInitialConditions() {
         await sleep(100)
 
-        if (this.getActiveDisplayName && this.postPriv && this.tipPub) {
-            // if (this.preferredSignInMethod === SignInMethods.scatter) {
-            //     try {
-            //         return await this.initializeScatterLogin()
-            //     } catch (error) {
-            //         this.hasAccount = false
-            //         return error
-            //     }
-            // }
+        if (this.logOutTimestamp === AuthStore.LOG_OUT_USER_INTEGER) {
+            return
+        }
 
-            if (this.preferredSignInMethod === SignInMethods.brainKey) {
-                if (this.statusJson.bk && this.postPriv && this.tipPub && this.displayName.bk) {
-                    this.hasAccount = true
-                }
+        if (this.activeDisplayName && this.postPriv) {
+            if (this.statusJson.bk && this.postPriv && this.displayName.bk) {
+                this.hasAccount = true
+                this.logOutTimestamp = Date.now()
+                this.connectScatterWallet()
             }
         } else {
             this.hasAccount = false
@@ -75,18 +178,26 @@ export default class AuthStore extends BaseStore {
     }
 
     @computed get isBKAccount() {
-        return this.getActiveDisplayName === this.displayName.bk
+        return this.activeDisplayName === this.displayName.bk
     }
 
     @computed get activePublicKey() {
         if (!this.hasAccount) return null
-        if (!this.statusJson.bk && !this.statusJson.scatter) return null
 
-        if (this.isBKAccount) {
+        if (this.statusJson.bk) {
             return this.statusJson.bk.post
         }
 
-        return this.statusJson.scatter.post
+        if (this.statusJson.scatter) {
+            return this.statusJson.scatter.post
+        }
+
+        return null
+    }
+
+    @computed get activeUidWalletKey() {
+        if (!this.activePublicKey) return null
+        return this.uidWalletPubKey
     }
 
     @computed get activePrivateKey() {
@@ -106,7 +217,7 @@ export default class AuthStore extends BaseStore {
      * user is logged in via a non-scatter method
      */
     @computed get posterName(): string {
-        return this.getActiveDisplayName
+        return this.activeDisplayName
     }
 
     // return bk or scatter
@@ -117,20 +228,12 @@ export default class AuthStore extends BaseStore {
         return 'scatter'
     }
 
-    @computed get getActiveDisplayName() {
-        if (this.clickedSignInMethod === SignInMethods.brainKey) {
+    @computed get activeDisplayName() {
+        if (this.statusJson.bk) {
             return this.displayName.bk
         }
 
-        if (this.clickedSignInMethod === SignInMethods.scatter) {
-            return this.displayName.scatter
-        }
-
-        if (!this.clickedSignInMethod) {
-            if (this.preferredSignInMethod === SignInMethods.brainKey) {
-                return this.displayName.bk
-            }
-
+        if (this.statusJson.scatter) {
             return this.displayName.scatter
         }
 
@@ -160,9 +263,8 @@ export default class AuthStore extends BaseStore {
     @action.bound
     async logOut() {
         try {
-            await eos.logout()
             this.hasAccount = false
-            this.uiStore.showToast('You have signed out!', 'success')
+            this.uiStore.showToast('You have logged out!', 'success')
         } catch (error) {
             throw error
         }
@@ -365,7 +467,7 @@ export default class AuthStore extends BaseStore {
 
     @task.resolved
     @action.bound
-    async initializeScatterLogin() {
+    async initializeScatterLogin(): Promise<Scatter.RootObject> {
         try {
             await init()
             const wallet = await eos.detectWallet()
@@ -373,23 +475,12 @@ export default class AuthStore extends BaseStore {
             if (typeof wallet !== 'boolean' && wallet) {
                 // prompt login
                 await eos.login()
-
-                console.log('time to ask for your password')
-
-                if (this.uiStore.activeModal !== ModalOptions.signIn) {
-                    this.uiStore.showModal(ModalOptions.signIn)
-                    await sleep(50)
-                    this.signInObject.ref.goToStep(5)
-                }
-
-                if (this.uiStore.activeModal === ModalOptions.signIn) {
-                    this.signInObject.ref.goToStep(5)
-                }
+                return wallet as any
             } else {
-                throw new Error('Failed to detect wallet')
+                throw new Error('Failed to detect EOS wallet')
             }
         } catch (error) {
-            this.uiStore.showToast('Failed to detect wallet', 'error')
+            this.uiStore.showToast('Failed to detect EOS wallet', 'error')
             console.log(error)
             return error
         }
@@ -403,7 +494,7 @@ export default class AuthStore extends BaseStore {
             const json = await discussions.bkRetrieveStatusEOS(accountName)
             const bk = await discussions.bkFromStatusJson(json, password)
 
-            await this.storeKeys(bk)
+            // await this.storeKeys(bk)
 
             if (!bk) {
                 return
@@ -440,6 +531,7 @@ export default class AuthStore extends BaseStore {
     @action.bound
     private completeSignInProcess() {
         this.hasAccount = true
+        this.logOutTimestamp = Date.now()
 
         if (this.signInObject.ref) {
             this.signInObject.ref.goToStep(1)
@@ -469,10 +561,8 @@ export default class AuthStore extends BaseStore {
     private async storeKeys(bk: string) {
         try {
             const keys = await discussions.bkToKeys(bk)
-
             this.postPriv = keys.post.priv
-            this.tipPub = keys.tip.pub
-
+            this.uidWalletPubKey = keys.uidwallet.pub
             return keys
         } catch (error) {
             console.log(error)

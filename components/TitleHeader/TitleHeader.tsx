@@ -11,6 +11,7 @@ import { UserNotifications } from '@components'
 import { getIdenticon } from '@utils'
 
 import './style.scss'
+import { log } from 'util'
 
 interface ITitleHeaderProps {
     tagStore: IStores['tagStore']
@@ -31,32 +32,53 @@ class TitleHeader extends React.Component<ITitleHeaderProps, ITitleHeaderState> 
         search: '',
     }
 
+    componentDidMount(): void {
+        this.props.authStore.checkInitialConditions()
+    }
+
     private renderUserSettings = () => {
-        const { logOut } = this.props.authStore
+        const {
+            logOut,
+            hasScatterAccount,
+            activePublicKey,
+            activeDisplayName,
+            balances,
+        } = this.props.authStore
 
         return (
-            <div className={'tooltip'} style={{ width: 200 }}>
-                <Link href={'/settings'}>
-                    <a rel={'Open settings'} className={'db mb2'}>
-                        settings
-                    </a>
+            <div className={'tooltip flex flex-column'} style={{ width: 200 }}>
+                <a rel={'Logout'} onClick={logOut}>
+                    logout
+                </a>
+
+                <Link href={`/u/[username]`} as={`/u/${activeDisplayName}-${activePublicKey}`}>
+                    <a rel={'Open your profile'}>profile</a>
                 </Link>
-                <a title={'ATMOS Balance'} className={'db mb2'}>
-                    0 ATMOS
-                </a>
-                <a
-                    rel={'Open settings'}
-                    className={'db pointer'}
-                    onClick={() => {
-                        logOut()
-                    }}
-                >
-                    {logOut['match']({
-                        pending: () => <FontAwesomeIcon width={13} icon={faSpinner} spin />,
-                        rejected: () => 'Unable to disconnect',
-                        resolved: () => 'disconnect',
-                    })}
-                </a>
+
+                <Link href={'/settings/[setting]'} as={'/settings/connections'}>
+                    <a rel={'Open settings'}>settings</a>
+                </Link>
+
+                <Link href={'/settings/[setting]'} as={'/settings/connections'}>
+                    <a rel={'Open connections'}>connections</a>
+                </Link>
+
+                <Link href={'/settings/[setting]'} as={'/settings/wallet?side=0'}>
+                    <a rel={'Open your wallet'}>wallet</a>
+                </Link>
+
+                {balances.size && (
+                    <Link href={'/settings/[setting]'} as={'/settings/wallet?side=0'}>
+                        <a rel={'View your balances'}>
+                            <hr className={'mv0 mh0'} />
+                            {Array.from(balances).map(([symbol, amount]) => (
+                                <span key={symbol} className={'db'} style={{ paddingLeft: 0 }}>
+                                    {amount} {symbol}
+                                </span>
+                            ))}
+                        </a>
+                    </Link>
+                )}
             </div>
         )
     }
@@ -66,7 +88,7 @@ class TitleHeader extends React.Component<ITitleHeaderProps, ITitleHeaderState> 
         const { showModal } = this.props.uiStore
         const {
             hasAccount,
-            getActiveDisplayName,
+            activeDisplayName,
             checkInitialConditions,
             activePublicKey,
         } = this.props.authStore
@@ -126,13 +148,13 @@ class TitleHeader extends React.Component<ITitleHeaderProps, ITitleHeaderState> 
                     >
                         <Link
                             href={`/u/[username]`}
-                            as={`/u/${getActiveDisplayName}-${activePublicKey}`}
+                            as={`/u/${activeDisplayName}-${activePublicKey}`}
                         >
                             <a
                                 rel={'Open your profile'}
                                 className={'flex items-center user-container pointer dim'}
                             >
-                                <span className={'b f6 pl1 pr3 black'}>{getActiveDisplayName}</span>
+                                <span className={'b f6 pl1 pr3 black'}>{activeDisplayName}</span>
                                 <img
                                     width={30}
                                     height={30}

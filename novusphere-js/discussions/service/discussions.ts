@@ -99,6 +99,23 @@ export default class DiscussionsService {
         return JSON.stringify(status)
     }
 
+    async encryptedBKToKeys(bk: string, bkc: string, password: string): Promise<any> {
+        try {
+            // check if password is right
+            const comparison = this.aesDecrypt(bkc, password)
+
+            if (comparison !== 'test') {
+                throw new Error('The password you have entered is invalid.')
+            }
+
+            const unencryptedBk = this.aesDecrypt(bk, password)
+            const keys = await this.bkToKeys(unencryptedBk)
+            return keys.uidwallet.priv
+        } catch (error) {
+            throw error
+        }
+    }
+
     private bkGetEOS(node: bip32.BIP32Interface, n: number): IBrainKeyPair {
         let child = node.derivePath(`m/80'/0'/0'/${n}`)
         const wif = child.toWIF()
@@ -110,18 +127,18 @@ export default class DiscussionsService {
 
     async bkToKeys(
         bk: string
-    ): Promise<{ post: { priv: string; pub: string }; tip: { priv: string; pub: string } }> {
+    ): Promise<{ post: { priv: string; pub: string }; uidwallet: { priv: string; pub: string } }> {
         const seed = await bip39.mnemonicToSeed(bk)
         const node = await bip32.fromSeed(seed)
 
         const keys = {
             post: null,
-            tip: null,
+            uidwallet: null,
         }
 
         //keys['BTC'] = this.bkGetBitcoin(node);
         keys['post'] = this.bkGetEOS(node, 0)
-        keys['tip'] = this.bkGetEOS(node, 1)
+        keys['uidwallet'] = this.bkGetEOS(node, 1)
         return keys
     }
 

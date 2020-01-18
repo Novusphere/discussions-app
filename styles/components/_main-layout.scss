@@ -2,13 +2,13 @@
 	@extend .justify-center;
 	@extend .items-center;
 	@extend .flex;
-
-	height: 278px;
+	background: #101011;
+	height: 75px;
 
 	img {
 		@extend .w-100;
-		object-fit: cover;
-		height: 278px;
+		object-fit: contain;
+		height: 75px;
 	}
 }
 

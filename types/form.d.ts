@@ -17,6 +17,7 @@ declare interface IForm {
     onSubmit: (event?: FormEvent<HTMLFormElement>) => void
     onClear: (event?: FormEvent<HTMLFormElement>) => void
     form: {
+        values: () => any
         fields: any[]
         validate?: any
         onSubmit: (event?: FormEvent<HTMLFormElement>) => void
@@ -52,16 +53,18 @@ declare interface FormField {
     description?: string
     rules?: string
     readonly?: boolean
+    autoComplete?: "off" | "on"
     disabled?: boolean
     accessor?: Form$
     hideLabels?: boolean
     containerClassName?: string
     hide?: boolean
-
+    onSelect?: (props) => void
     input?: (value) => any
     output?: (value) => any
     type?: string | 'password' | 'text' | 'checkbox' | 'button' | 'dropdown' | 'textarea' | 'richtext' | 'radiogroup' | 'switch'
     render?: boolean
+    defaultValue?: any
     checked?: boolean
     observers?: any[]
     extra?: any
@@ -74,6 +77,8 @@ declare interface FormField {
     submitting?: boolean
     value?: string | { value: string; className?: string }[] | boolean
     onChange?: any
+    onFocus?: any
+    onBlur?: any
     onComplete?: (form: any) => void
 
     options?: {

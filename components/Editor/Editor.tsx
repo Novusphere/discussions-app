@@ -57,7 +57,10 @@ class EditorComponent extends React.Component<IEditorProps> {
         const showdown = showdownImport.default
 
         this.turndownService = new Turndown()
-        this.showdownService = new showdown.Converter()
+        this.showdownService = new showdown.Converter({
+            smartIndentationFix: true,
+            simpleLineBreaks: true,
+        })
 
         this.quillBase.Quill.register('modules/mention', Mention)
         this.quillBase.Quill.register('modules/autoformat', Autoformat)
@@ -123,7 +126,11 @@ class EditorComponent extends React.Component<IEditorProps> {
     private updateContentByRef = content => {
         if (this.ref && this.ref.current && typeof this.props.value !== 'undefined') {
             const editor = this.ref.current.getEditor()
-            editor['container']['childNodes'][0].innerHTML = content
+            console.log('html content: ', content)
+            editor.root.innerHTML = content
+            // editor.root.innerHTML = `<ul><li>What</li><li>Are</li><li>It</li></ul><blockquote><p>- Wayne Gretzky - Michael Scott - Albert Einstein</p><p>What</p><p>Are</p><p>It</p></blockquote>`
+            console.log(editor.root)
+            // editor['container']['childNodes'][0].innerHTML = content
         }
     }
 
@@ -138,7 +145,6 @@ class EditorComponent extends React.Component<IEditorProps> {
             }
         }
     }
-    m
 
     public onChange = (text: string) => {
         const clean = sanitizeHTML(text, {

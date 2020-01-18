@@ -7,6 +7,7 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import Switch from 'react-switch'
 
 import dynamic from 'next/dynamic'
+import { sleep } from '@utils'
 
 const Editor = dynamic(() => import('../Editor/Editor'), {
     ssr: false,
@@ -17,8 +18,10 @@ interface FormProps extends React.HTMLAttributes<HTMLFormElement> {
     className?: string
     fieldClassName?: string
     hideSubmitButton?: boolean
+    loading?: boolean
 }
 
+@observer
 class Form extends React.Component<FormProps> {
     private enterKeyEventListener = (e: KeyboardEvent) => {
         const key = e.code
@@ -44,16 +47,21 @@ class Form extends React.Component<FormProps> {
     }
 
     render() {
-        const { form, children, hideSubmitButton, fieldClassName, ...props } = this.props
+        const { form, children, hideSubmitButton, fieldClassName, loading, ...props } = this.props
 
         if (typeof form === 'undefined' || typeof form.fields === 'undefined') return null
 
         const renderButton = (field, type, rest) => {
             if (Array.isArray(field.accessor.$extra.options)) {
                 return field.accessor.$extra.options.map(
-                    ({ value, disabled, title, className, onClick, loading }) => {
+                    (
+                        { value, disabled, title, className, onClick, loading: fieldLoading },
+                        index,
+                        array
+                    ) => {
                         const isLoading =
                             loading ||
+                            fieldLoading ||
                             (onClick && onClick['state'] && onClick['state'] === 'pending')
 
                         return (
@@ -72,9 +80,10 @@ class Form extends React.Component<FormProps> {
                                 key={`${field.name}-${value}`}
                                 title={title || null}
                                 className={classNames([
-                                    'mt3 f6 link dim ph3 pv2 dib mr2 pointer',
+                                    'mt3 f6 link dim ph3 pv2 dib pointer',
                                     {
                                         'white bg-green': !className,
+                                        mr2: index !== array.length - 1,
                                         [className]: className,
                                     },
                                 ])}
@@ -121,6 +130,7 @@ class Form extends React.Component<FormProps> {
 
                 switch (form.types[field.name]) {
                     case 'dropdown':
+                        const options = Array.from(field.accessor.$extra.options)
                         return (
                             <React.Fragment key={field.name}>
                                 <div className={'field-container pb3 inline-labels'}>
@@ -140,8 +150,14 @@ class Form extends React.Component<FormProps> {
                                         <Select
                                             className={'db f6 react-select-dropdown'}
                                             classNamePrefix={'rs'}
-                                            options={Array.from(field.accessor.$extra.options)}
+                                            options={options}
                                             {...bind}
+                                            onChange={(nv, am) => {
+                                                bind.onChange(nv, am)
+                                                if (field.hasOwnProperty('onSelect')) {
+                                                    field.onSelect(nv, am)
+                                                }
+                                            }}
                                         />
                                         <span className={'error f6 db pv2'}>
                                             {field.accessor.error}
@@ -291,9 +307,12 @@ class Form extends React.Component<FormProps> {
                     case 'switch':
                         return (
                             <React.Fragment key={field.name}>
-                                <div className={'field-container pb3 inline-labels flex flex-row'} style={{
-                                    alignItems: 'flex-start',
-                                }}>
+                                <div
+                                    className={'field-container pb3 inline-labels flex flex-row'}
+                                    style={{
+                                        alignItems: 'flex-start',
+                                    }}
+                                >
                                     {!field.hideLabels && (
                                         <label htmlFor={field.accessor.id} className={'w-40'}>
                                             {field.accessor.label}
@@ -319,7 +338,9 @@ class Form extends React.Component<FormProps> {
                                             checked={field.value}
                                         />
                                         {field.description && (
-                                            <span className={'mt2 db f6 moon-gray lh-copy'}>{field.description}</span>
+                                            <span className={'mt2 db f6 moon-gray lh-copy'}>
+                                                {field.description}
+                                            </span>
                                         )}
                                         <span className={'error f6 db pv2'}>
                                             {field.accessor.error}
@@ -355,6 +376,9 @@ class Form extends React.Component<FormProps> {
                                             {...bind}
                                             className={'db f6 form-input'}
                                             {...field.bind}
+                                            autoComplete={field.autoComplete || 'on'}
+                                            onBlur={field.onBlur || null}
+                                            onFocus={field.onFocus || null}
                                             {...(field.onComplete && {
                                                 onBlur: () => {
                                                     form.form
@@ -399,4 +423,12 @@ class Form extends React.Component<FormProps> {
     }
 }
 
-export default observer(Form)
+export default dynamic(
+    async () => {
+        return Promise.resolve(Form)
+    },
+    {
+        ssr: false,
+        loading: () => <p>...</p>,
+    }
+)

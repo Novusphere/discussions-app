@@ -7,6 +7,7 @@ export const ModalOptions = {
     signUp: 'signUp',
     signIn: 'signIn',
     postWarningClose: 'postWarningClose',
+    walletActionPasswordReentry: 'walletActionPasswordReentry',
 }
 
 export const Messages = {

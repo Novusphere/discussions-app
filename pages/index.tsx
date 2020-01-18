@@ -13,14 +13,11 @@ interface IIndexPage {
 @inject('postsStore', 'tagStore', 'uiStore')
 @observer
 class Index extends React.Component<IIndexPage> {
-    componentWillMount(): void {
+    async componentDidMount(): Promise<void> {
         this.props.postsStore.resetPositionAndPosts()
         this.props.tagStore.destroyActiveTag()
         this.props.uiStore.toggleSidebarStatus(true)
         this.props.uiStore.toggleBannerStatus(true)
-    }
-
-    async componentDidMount(): Promise<void> {
         await sleep(500)
         await this.props.postsStore.getPostsForSubs()
     }
