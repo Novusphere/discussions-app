@@ -486,6 +486,7 @@ export default class DiscussionsService {
                 limit,
                 pipeline: [{ $match: searchQuery }, { $sort: { createdAt: -1 } }],
             })
+
             let posts = query.payload.map(o => Post.fromDbObject(o))
 
             return {

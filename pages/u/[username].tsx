@@ -19,6 +19,7 @@ interface IUPageProps {
     data: any
 
     username: string
+    uidw: string
     pub: string
     icon: string
     posts: Post[]
@@ -41,7 +42,10 @@ class U extends React.Component<IUPageProps> {
         await sleep(500)
         const posts = await postsStore.getPostsForKeys([pub])
 
+        let uidw = null
+
         return {
+            uidw,
             posts,
             icon,
             username,
@@ -115,6 +119,7 @@ class U extends React.Component<IUPageProps> {
             icon,
             username,
             pub,
+            uidw,
             postsStore: { getPlausibleTagOptions },
             userStore: {
                 delegated,
@@ -136,7 +141,7 @@ class U extends React.Component<IUPageProps> {
                         alt={'Icon'}
                     />
                     <div className={'ml3 flex flex-column items-start justify-center'}>
-                        <span className={'b black f5 mb2'}>{this.props.username}</span>
+                        <span className={'b black f5 mb2'}>{username}</span>
                         <span className={'b f6 mb2'}>192 Followers</span>
                         {!this.isSameUser && (
                             <button
@@ -149,26 +154,13 @@ class U extends React.Component<IUPageProps> {
                         )}
                     </div>
                 </div>
-
                 <div className={'mt4 flex flex-column'}>
-                    <span className={'small-title mb2'}>Contacts</span>
+                    <span className={'small-title mb2'}>Wallets</span>
 
                     <ul className={'list'}>
-                        <li className={'pa0 mb2'}>@{this.props.username}</li>
-                        <li className={'pa0 mb2'}>{this.props.username}</li>
-                        <li className={'pa0 mb2'}>{this.props.username}</li>
-                        <li className={'pa0 mb2'}>{this.props.username}.com</li>
+                        <li className={'pa0 mb2'}>{typeof uidw === 'string' ? uidw : '--'}</li>
                     </ul>
                 </div>
-
-                <div className={'mt4 flex flex-column'}>
-                    <span className={'small-title mb2'}>Connected Accounts</span>
-
-                    <ul className={'list'}>
-                        <li className={'pa0 mb2'}>EOS</li>
-                    </ul>
-                </div>
-
                 {!this.isSameUser && (
                     <div className={'mt4 flex flex-column'}>
                         <span className={'small-title mb2'}>Options</span>
@@ -193,7 +185,10 @@ class U extends React.Component<IUPageProps> {
                                     formatCreateLabel={inputValue => `Choose a tag`}
                                     onChange={setActiveDelegatedTag}
                                     value={activeDelegatedTag}
-                                    options={[{ value: 'all', label: '#all' }, ...getPlausibleTagOptions]}
+                                    options={[
+                                        { value: 'all', label: '#all' },
+                                        ...getPlausibleTagOptions,
+                                    ]}
                                 />
                                 <button
                                     className={
@@ -210,7 +205,6 @@ class U extends React.Component<IUPageProps> {
                         </ul>
                     </div>
                 )}
-
                 {this.isSameUser && (
                     <div className={'mt4 flex flex-column'}>
                         <span className={'small-title mb2'}>Following (only visible to you)</span>
@@ -245,7 +239,9 @@ class U extends React.Component<IUPageProps> {
     public render(): React.ReactNode {
         return (
             <div className={'flex flex-row'}>
-                <div className={'card w-30 mr3 pa3'} style={{ maxHeight: '90vh' }}>{this.renderSidebarContent()}</div>
+                <div className={'card w-30 mr3 pa3'} style={{ maxHeight: '90vh' }}>
+                    {this.renderSidebarContent()}
+                </div>
                 <div className={'w-70'}>
                     <Tabs selectedIndex={1} onSelect={index => console.log(index)}>
                         <TabList className={'settings-tabs'}>

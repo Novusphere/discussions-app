@@ -115,6 +115,7 @@ export class Post {
 
     static fromDbObject(o: any) : Post {
         let p = new Post(o.chain);
+        console.log(o)
         p.id = o.id;
         p.transaction = o.transaction;
         p.blockApprox = o.blockApprox;
@@ -144,6 +145,7 @@ export class Post {
         p.totalReplies = o.totalReplies;
         p.upvotes = o.upvotes;
         p.downvotes = o.downvotes;
+        p.uidw = null;
         if (o.myVote && o.myVote.length > 0) {
             p.myVote = o.myVote[0].value;
         }
