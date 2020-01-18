@@ -1,7 +1,6 @@
 import * as React from 'react'
 
 import './style.scss'
-import { openInNewTab } from '@utils'
 import Link from 'next/link'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import {
@@ -13,7 +12,6 @@ import {
     faReply,
 } from '@fortawesome/free-solid-svg-icons'
 import {
-    Attachments,
     UserNameWithIcon,
     VotingHandles,
     Form,
@@ -62,15 +60,7 @@ const OpeningPost: React.FC<IOpeningPostProps> = ({
             {typeof isPreview === 'undefined' && (
                 <div className={'pb2'}>
                     <Link href={`/tag/[name]`} as={`/tag/${openingPost.sub}`}>
-                        <a
-                            onClick={e => {
-                                // e.preventDefault()
-                                //
-                                // if (hasReplyContent) {
-                                //     showPostWarningCloseModal()
-                                // }
-                            }}
-                        >
+                        <a>
                             <button
                                 className={'tl flex items-center'}
                                 title={`Show all posts in ${openingPost.sub}`}
@@ -145,8 +135,6 @@ const OpeningPost: React.FC<IOpeningPostProps> = ({
                             {openingPost.content}
                         </RichTextPreview>
                     )}
-
-                    {/*{openingPost.attachment && <Attachments attachment={openingPost.attachment} />}*/}
 
                     {activeThread && activeThread.openingPost && (
                         <div className={'footer flex items-center pt3'}>

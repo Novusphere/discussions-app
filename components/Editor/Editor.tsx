@@ -126,10 +126,10 @@ class EditorComponent extends React.Component<IEditorProps> {
     private updateContentByRef = content => {
         if (this.ref && this.ref.current && typeof this.props.value !== 'undefined') {
             const editor = this.ref.current.getEditor()
-            console.log('html content: ', content)
+            // console.log('html content: ', content)
             editor.root.innerHTML = content
             // editor.root.innerHTML = `<ul><li>What</li><li>Are</li><li>It</li></ul><blockquote><p>- Wayne Gretzky - Michael Scott - Albert Einstein</p><p>What</p><p>Are</p><p>It</p></blockquote>`
-            console.log(editor.root)
+            // console.log(editor.root)
             // editor['container']['childNodes'][0].innerHTML = content
         }
     }

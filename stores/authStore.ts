@@ -52,7 +52,16 @@ export default class AuthStore extends BaseStore {
     @observable selectedToken = null
 
     @persist
-    @observable logOutTimestamp = AuthStore.LOG_OUT_USER_INTEGER
+    @observable
+    logOutTimestamp = AuthStore.LOG_OUT_USER_INTEGER
+
+    @persist
+    @observable
+    autoConnectEOSWallet = false
+
+    @persist
+    @observable
+    autoLogin = false
 
     private readonly uiStore: IStores['uiStore'] = getUiStore()
 
@@ -132,10 +141,13 @@ export default class AuthStore extends BaseStore {
     @action.bound
     async connectScatterWallet() {
         try {
+            if (!this.autoConnectEOSWallet) return
+
             const wallet = await this.initializeScatterLogin()
 
             if (wallet.connected) {
                 ;(wallet as any).connect()
+                this.autoConnectEOSWallet = true
                 this.hasScatterAccount = true
                 this.displayName.scatter = wallet.auth.accountName
             }
@@ -149,6 +161,7 @@ export default class AuthStore extends BaseStore {
     async disconnectScatterWallet() {
         try {
             await eos.logout()
+            this.autoConnectEOSWallet = false
             this.hasScatterAccount = false
             this.displayName.scatter = null
             this.uiStore.showToast('You have disconnected your scatter wallet!', 'success')
@@ -162,7 +175,7 @@ export default class AuthStore extends BaseStore {
     async checkInitialConditions() {
         await sleep(100)
 
-        if (this.logOutTimestamp === AuthStore.LOG_OUT_USER_INTEGER) {
+        if (this.logOutTimestamp === AuthStore.LOG_OUT_USER_INTEGER || !this.autoLogin) {
             return
         }
 
@@ -422,12 +435,6 @@ export default class AuthStore extends BaseStore {
             }
 
             const unparsedJSON = await bkToStatusJson(bk, displayName, password, null)
-
-            console.log(
-                'Class: NewAuth, Function: loginWithBK, Line 363 unparsedJSON: ',
-                unparsedJSON
-            )
-
             if (unparsedJSON) {
                 const statusJSON = JSON.parse(unparsedJSON)
                 this.statusJson.bk = statusJSON
@@ -441,7 +448,7 @@ export default class AuthStore extends BaseStore {
                     this.uiStore.showToast('You have successfully signed in!', 'success')
                 }
             } else {
-                console.log('failed')
+                this.uiStore.showToast('Something went wrong!', 'error')
             }
         } catch (error) {
             this.uiStore.showToast('Something went wrong!', 'error')
@@ -531,6 +538,7 @@ export default class AuthStore extends BaseStore {
     @action.bound
     private completeSignInProcess() {
         this.hasAccount = true
+        this.autoLogin = true
         this.logOutTimestamp = Date.now()
 
         if (this.signInObject.ref) {
