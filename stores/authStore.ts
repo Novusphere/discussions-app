@@ -42,8 +42,11 @@ export default class AuthStore extends BaseStore {
     }
 
     // status
+    @persist
     @observable hasAccount = false
-    @observable hasScatterAccount = false
+
+    @persist
+    @observable hasEOSWalletAccount = false
 
     // wallet
     balances = observable.map<string, string>()
@@ -54,14 +57,6 @@ export default class AuthStore extends BaseStore {
     @persist
     @observable
     logOutTimestamp = AuthStore.LOG_OUT_USER_INTEGER
-
-    @persist
-    @observable
-    autoConnectEOSWallet = false
-
-    @persist
-    @observable
-    autoLogin = false
 
     private readonly uiStore: IStores['uiStore'] = getUiStore()
 
@@ -141,14 +136,13 @@ export default class AuthStore extends BaseStore {
     @action.bound
     async connectScatterWallet() {
         try {
-            if (!this.autoConnectEOSWallet) return
+            if (!this.hasEOSWalletAccount) return
 
             const wallet = await this.initializeScatterLogin()
 
             if (wallet.connected) {
                 ;(wallet as any).connect()
-                this.autoConnectEOSWallet = true
-                this.hasScatterAccount = true
+                this.hasEOSWalletAccount = true
                 this.displayName.scatter = wallet.auth.accountName
             }
         } catch (error) {
@@ -161,8 +155,7 @@ export default class AuthStore extends BaseStore {
     async disconnectScatterWallet() {
         try {
             await eos.logout()
-            this.autoConnectEOSWallet = false
-            this.hasScatterAccount = false
+            this.hasEOSWalletAccount = false
             this.displayName.scatter = null
             this.uiStore.showToast('You have disconnected your scatter wallet!', 'success')
         } catch (error) {
@@ -175,7 +168,7 @@ export default class AuthStore extends BaseStore {
     async checkInitialConditions() {
         await sleep(100)
 
-        if (this.logOutTimestamp === AuthStore.LOG_OUT_USER_INTEGER || !this.autoLogin) {
+        if (this.logOutTimestamp === AuthStore.LOG_OUT_USER_INTEGER || !this.hasAccount) {
             return
         }
 
@@ -538,7 +531,6 @@ export default class AuthStore extends BaseStore {
     @action.bound
     private completeSignInProcess() {
         this.hasAccount = true
-        this.autoLogin = true
         this.logOutTimestamp = Date.now()
 
         if (this.signInObject.ref) {

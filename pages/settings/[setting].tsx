@@ -169,7 +169,7 @@ class Settings extends React.Component<ISettings, ISettingsState> {
 
     private renderConnections = () => {
         const {
-            hasScatterAccount,
+            hasEOSWalletAccount,
             connectScatterWallet,
             disconnectScatterWallet,
             displayName: { scatter: scatterDisplayName },
@@ -190,7 +190,7 @@ class Settings extends React.Component<ISettings, ISettingsState> {
                             </span>
                         </span>
 
-                        {!hasScatterAccount && (
+                        {!hasEOSWalletAccount && (
                             <span className={'flex flex-row tr'}>
                                 <span
                                     className={'green f6 pointer dim pr2'}
@@ -204,7 +204,7 @@ class Settings extends React.Component<ISettings, ISettingsState> {
                             </span>
                         )}
 
-                        {hasScatterAccount && (
+                        {hasEOSWalletAccount && (
                             <span className={'flex flex-column tr'}>
                                 <span className={'black b f6 pb2'}>{scatterDisplayName}</span>
                                 <span

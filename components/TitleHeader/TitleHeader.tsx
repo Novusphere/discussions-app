@@ -39,7 +39,7 @@ class TitleHeader extends React.Component<ITitleHeaderProps, ITitleHeaderState> 
     private renderUserSettings = () => {
         const {
             logOut,
-            hasScatterAccount,
+            hasEOSWalletAccount,
             activePublicKey,
             activeDisplayName,
             balances,

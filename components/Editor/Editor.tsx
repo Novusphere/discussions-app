@@ -126,25 +126,27 @@ class EditorComponent extends React.Component<IEditorProps> {
     private updateContentByRef = content => {
         if (this.ref && this.ref.current && typeof this.props.value !== 'undefined') {
             const editor = this.ref.current.getEditor()
-            // console.log('html content: ', content)
-            editor.root.innerHTML = content
+            console.log('html content: ', content)
+            editor['container']['childNodes'][0].innerHTML = content
+            console.log(editor['container']['childNodes'])
+            // editor.root.innerHTML = content
             // editor.root.innerHTML = `<ul><li>What</li><li>Are</li><li>It</li></ul><blockquote><p>- Wayne Gretzky - Michael Scott - Albert Einstein</p><p>What</p><p>Are</p><p>It</p></blockquote>`
             // console.log(editor.root)
-            // editor['container']['childNodes'][0].innerHTML = content
+            //
         }
     }
 
-    componentWillReceiveProps(nextProps: Readonly<IEditorProps>, nextContext: any): void {
-        if (nextProps.value === '') {
-            this.updateContentByRef('')
-        }
-
-        if (!nextProps.disabled) {
-            if (this.ref.current) {
-                this.ref.current.getEditor().enable()
-            }
-        }
-    }
+    // componentWillReceiveProps(nextProps: Readonly<IEditorProps>, nextContext: any): void {
+    //     if (nextProps.value === '') {
+    //         this.updateContentByRef('')
+    //     }
+    //
+    //     if (!nextProps.disabled) {
+    //         if (this.ref.current) {
+    //             this.ref.current.getEditor().enable()
+    //         }
+    //     }
+    // }
 
     public onChange = (text: string) => {
         const clean = sanitizeHTML(text, {
@@ -172,24 +174,23 @@ class EditorComponent extends React.Component<IEditorProps> {
                 debug={'error'}
                 placeholder={placeholder}
                 onChange={this.onChange}
-                formats={[
-                    'header',
-                    'font',
-                    'size',
-                    'bold',
-                    'italic',
-                    'underline',
-                    'strike',
-                    'blockquote',
-                    'list',
-                    'bullet',
-                    'indent',
-                    'link',
-                    'image',
-                    'video',
-                    'mention',
-                    'hashtag',
-                ]}
+                // formats={[
+                //     'header',
+                //     'size',
+                //     'bold',
+                //     'italic',
+                //     'underline',
+                //     'strike',
+                //     'blockquote',
+                //     'list',
+                //     'bullet',
+                //     'indent',
+                //     'link',
+                //     'image',
+                //     'video',
+                //     'mention',
+                //     'hashtag',
+                // ]}
                 style={{
                     opacity: this.props.disabled ? 0.5 : 1,
                     cursor: this.props.disabled ? 'not-allowed' : 'default',
@@ -201,7 +202,7 @@ class EditorComponent extends React.Component<IEditorProps> {
                     toolbar: [
                         [{ header: 1 }, { header: 2 }], // custom button values
                         [{ list: 'ordered' }, { list: 'bullet' }],
-                        ['bold', 'italic', 'blockquote', 'list', 'bullet', 'link', 'image'],
+                        ['bold', 'italic', 'blockquote', 'link', 'image'],
                     ],
                 }}
             />

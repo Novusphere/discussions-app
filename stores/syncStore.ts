@@ -25,8 +25,9 @@ export default class SyncStore extends BaseStore {
     constructor() {
         super()
 
-        const disposeSync = autorun(async () => {
-            if (this.authStore.hasAccount && this.authStore.activePrivateKey) {
+        reaction(
+            () => this.authStore.hasAccount,
+            async () => {
                 const accountData = await this.getAccountWithPrivateKey(
                     this.authStore.activePrivateKey
                 )
@@ -58,10 +59,8 @@ export default class SyncStore extends BaseStore {
                 }
 
                 this.userStore.updateFromActiveDelegatedMembers()
-
-                disposeSync()
             }
-        })
+        )
 
         // sync tag subs
         reaction(
