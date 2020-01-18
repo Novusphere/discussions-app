@@ -115,7 +115,6 @@ export class Post {
 
     static fromDbObject(o: any) : Post {
         let p = new Post(o.chain);
-        console.log(o)
         p.id = o.id;
         p.transaction = o.transaction;
         p.blockApprox = o.blockApprox;
