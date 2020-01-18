@@ -81,23 +81,17 @@ class MainLayout extends React.Component<IMainLayoutProps> {
                                 Version: {getVersion()} ({process.env.BUILD_ID})
                             </p>
                             <p>
-                                This site is hosted entirely from{' '}
-                                <a href="https://github.com/Novusphere/novusphere-eos/tree/gh-pages">
-                                    GitHub Pages
-                                </a>{' '}
-                                and is fully{' '}
+                                This site is fully{' '}
                                 <a href="https://github.com/Novusphere/novusphere-eos">
                                     open source
                                 </a>
                                 .
-                                <br />
+                                <br /><br />
                                 The developers of this software take no responsibility for the
                                 content displayed.
                                 <br />
-                                No images, files or media are hosted by the forum,
-                                <br />
-                                please contact the respective site owners hosting content in breach
-                                of DMCA.
+                                No images, files or media are hosted directly by the forum, please
+                                contact the respective site owners hosting content in breach of DMCA
                             </p>
                         </div>
                     </footer>
