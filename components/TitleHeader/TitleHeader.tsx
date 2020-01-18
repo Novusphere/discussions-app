@@ -48,29 +48,30 @@ class TitleHeader extends React.Component<ITitleHeaderProps, ITitleHeaderState> 
         return (
             <div className={'tooltip flex flex-column'} style={{ width: 200 }}>
                 <a rel={'Logout'} onClick={logOut}>
-                    logout
+                    Logout
                 </a>
 
                 <Link href={`/u/[username]`} as={`/u/${activeDisplayName}-${activePublicKey}`}>
-                    <a rel={'Open your profile'}>profile</a>
+                    <a rel={'Open your profile'}>Profile</a>
                 </Link>
 
                 <Link href={'/settings/[setting]'} as={'/settings/connections'}>
-                    <a rel={'Open settings'}>settings</a>
+                    <a rel={'Open settings'}>Settings</a>
                 </Link>
 
                 <Link href={'/settings/[setting]'} as={'/settings/connections'}>
-                    <a rel={'Open connections'}>connections</a>
+                    <a rel={'Open connections'}>Connections</a>
                 </Link>
 
                 <Link href={'/settings/[setting]'} as={'/settings/wallet?side=0'}>
-                    <a rel={'Open your wallet'}>wallet</a>
+                    <a rel={'Open your wallet'}>Wallet</a>
                 </Link>
+
+                <hr className={'mv0 mh0'} />
 
                 {balances.size && (
                     <Link href={'/settings/[setting]'} as={'/settings/wallet?side=0'}>
                         <a rel={'View your balances'}>
-                            <hr className={'mv0 mh0'} />
                             {Array.from(balances).map(([symbol, amount]) => (
                                 <span key={symbol} className={'db'} style={{ paddingLeft: 0 }}>
                                     {amount} {symbol}
@@ -191,7 +192,7 @@ class TitleHeader extends React.Component<ITitleHeaderProps, ITitleHeaderState> 
     private renderActiveTag = () => {
         return (
             <Link href={'/'} prefetch={false}>
-                <a>home</a>
+                <a>Home</a>
             </Link>
         )
     }
