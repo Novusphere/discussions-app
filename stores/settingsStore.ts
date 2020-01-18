@@ -96,7 +96,6 @@ export default class SettingsStore extends BaseStore {
     }
 
     @action.bound
-    @action.bound
     setUnsignedPostsAsSpamSetting(setting: boolean) {
         this.unsignedPostsIsSpam = setting
     }
