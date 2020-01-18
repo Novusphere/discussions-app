@@ -248,6 +248,10 @@ export default class DiscussionsService {
             metadata.edit = true
         }
 
+        if (p.uidw) {
+            metadata.uidw = p.uidw
+        }
+
         const post = {
             poster: p.poster,
             content: p.content,

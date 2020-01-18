@@ -87,6 +87,7 @@ class EditModel {
             uuid: '',
             parentUuid: this.cached.uuid,
             threadUuid: this.cached.threadUuid,
+            uidw: this.cached.uidw,
             attachment: getAttachmentValue(this.cached.content),
             upvotes: 0,
             downvotes: 0,

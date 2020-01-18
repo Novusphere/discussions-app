@@ -12,6 +12,7 @@ export interface PostMetaData {
     mentions?: string[];
     attachment?: Attachment;
     edit?: boolean
+    uidw?: string
 }
 
 export class Post {
@@ -36,6 +37,7 @@ export class Post {
     tags: string[];
     mentions: string[];
     edit: boolean;
+    uidw: string;
 
     // Discussion ID Post Data
     pub: string;

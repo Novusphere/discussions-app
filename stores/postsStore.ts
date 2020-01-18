@@ -283,6 +283,7 @@ export default class PostsStore extends BaseStore {
             const post = form.values()
             const uuid = generateUuid()
             const posterName = this.authStore.posterName
+            const uidw = this.authStore.activeUidWalletKey
 
             let inlineTags = post.content.match(/#([^\s.,;:!?]+)/gi)
             let tags = [this.newPostData.sub.value]
@@ -306,6 +307,7 @@ export default class PostsStore extends BaseStore {
                 threadUuid: uuid,
                 attachment: getAttachmentValue(post),
                 createdAt: Date.now(),
+                uidw: uidw,
             }
 
             if (posterName === this.authStore.displayName.bk) {

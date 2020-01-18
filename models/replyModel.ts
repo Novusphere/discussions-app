@@ -139,7 +139,7 @@ export class ReplyModel {
             return
         }
 
-        const { postPriv, posterType, posterName } = this.authStore
+        const { postPriv, posterType, posterName, activeUidWalletKey } = this.authStore
 
         const instance = new EditModel({
             content: this.content,
@@ -153,6 +153,7 @@ export class ReplyModel {
         })
 
         const reply = instance.createPostObject()
+        reply.uidw = activeUidWalletKey
 
         try {
             if (activeThread) {
