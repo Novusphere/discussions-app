@@ -43,10 +43,12 @@ export default class AuthStore extends BaseStore {
 
     // status
     @persist
-    @observable hasAccount = false
+    @observable
+    hasAccount = false
 
     @persist
-    @observable hasEOSWalletAccount = false
+    @observable
+    hasEOSWalletAccount = false
 
     // wallet
     balances = observable.map<string, string>()
@@ -136,8 +138,6 @@ export default class AuthStore extends BaseStore {
     @action.bound
     async connectScatterWallet() {
         try {
-            if (!this.hasEOSWalletAccount) return
-
             const wallet = await this.initializeScatterLogin()
 
             if (wallet.connected) {
@@ -176,7 +176,8 @@ export default class AuthStore extends BaseStore {
             if (this.statusJson.bk && this.postPriv && this.displayName.bk) {
                 this.hasAccount = true
                 this.logOutTimestamp = Date.now()
-                this.connectScatterWallet()
+
+                if (this.hasEOSWalletAccount) this.connectScatterWallet()
             }
         } else {
             this.hasAccount = false
