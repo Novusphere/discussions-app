@@ -11,10 +11,16 @@ import { tweetCurrentPage } from '@utils'
 interface ISharePostProps {
     toggleAddAsModerator: () => void
     toggleBlockPost: (uuid: string) => void
+    isBlockedPost: boolean
     id: string
 }
 
-const SharePost: React.FC<ISharePostProps> = ({ toggleBlockPost, id, toggleAddAsModerator }) => {
+const SharePost: React.FC<ISharePostProps> = ({
+    toggleBlockPost,
+    id,
+    toggleAddAsModerator,
+    isBlockedPost,
+}) => {
     const [inProp, setInProp] = useState(false)
 
     const renderIcon = () => {
@@ -42,13 +48,10 @@ const SharePost: React.FC<ISharePostProps> = ({ toggleBlockPost, id, toggleAddAs
                         className={'pr3 f6 b0b0b0 dim pointer'}
                         onClick={() => toggleBlockPost(id)}
                     >
-                        mark as spam
+                        {isBlockedPost ? 'unmark as spam' : 'mark as spam'}
                     </span>
 
-                    <span
-                        className={'pr3 f6 b0b0b0 dim pointer'}
-                        onClick={toggleAddAsModerator}
-                    >
+                    <span className={'pr3 f6 b0b0b0 dim pointer'} onClick={toggleAddAsModerator}>
                         set as moderator
                     </span>
 

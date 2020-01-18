@@ -66,6 +66,7 @@ class NewPostPreview extends React.Component<IPostPreviewProps> {
                         openingPost={new PostModel(post as any)}
                         asPath={null}
                         id={null}
+                        isBlockedPost={false}
                     />
                 </div>
             </>

@@ -275,10 +275,12 @@ export default class UserStore extends BaseStore {
     toggleBlockPost(asPathURL: string) {
         if (this.blockedPosts.has(asPathURL)) {
             this.blockedPosts.delete(asPathURL)
+            this.uiStore.showToast('This post has been unmarked as spam!', 'success')
         } else {
             const date = new Date(Date.now())
             const dateStamp = `${date.getFullYear()}${date.getMonth()}`
             this.blockedPosts.set(asPathURL, dateStamp)
+            this.uiStore.showToast('This post has been marked as spam!', 'success')
         }
     }
 }

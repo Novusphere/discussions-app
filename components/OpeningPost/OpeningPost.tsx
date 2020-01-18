@@ -11,13 +11,7 @@ import {
     faPen,
     faReply,
 } from '@fortawesome/free-solid-svg-icons'
-import {
-    UserNameWithIcon,
-    VotingHandles,
-    Form,
-    SharePost,
-    RichTextPreview,
-} from '@components'
+import { UserNameWithIcon, VotingHandles, Form, SharePost, RichTextPreview } from '@components'
 import moment from 'moment'
 import PostModel from '@models/postModel'
 import { ThreadModel } from '@models/threadModel'
@@ -37,6 +31,7 @@ interface IOpeningPostProps {
     hasReplyContent: boolean
     showPostWarningCloseModal: () => void
     toggleBlockPost?: (threadUuid: string) => void
+    isBlockedPost: boolean
     addAsModerator: () => void
 }
 
@@ -52,6 +47,7 @@ const OpeningPost: React.FC<IOpeningPostProps> = ({
     hasReplyContent,
     showPostWarningCloseModal,
     toggleBlockPost,
+    isBlockedPost,
     asPath,
     addAsModerator,
 }) => {
@@ -196,6 +192,7 @@ const OpeningPost: React.FC<IOpeningPostProps> = ({
                                 </div>
 
                                 <SharePost
+                                    isBlockedPost={isBlockedPost}
                                     toggleBlockPost={toggleBlockPost}
                                     toggleAddAsModerator={addAsModerator}
                                     id={asPath.split('#')[0]}
