@@ -6,6 +6,7 @@ import NewPostPreview from './new-post-preview/new-post-preview'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { faSpinner } from '@fortawesome/free-solid-svg-icons'
 import { useCallback, useEffect, useState } from 'react'
+import { sanityCheckTag } from '@utils'
 
 const NewPage = ({ postsStore }) => {
     const [form, setForm] = useState(null)
@@ -27,7 +28,10 @@ const NewPage = ({ postsStore }) => {
                 content: form.form.$('content').value || '',
             }
 
-            postsStore.newPostData.sub = option
+            postsStore.newPostData.sub = {
+                label: `#${sanityCheckTag(option.label)}`,
+                value: sanityCheckTag(option.value),
+            }
 
             // set form again
             const _form = postsStore.newPostForm

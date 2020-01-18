@@ -10,6 +10,7 @@ import { IStores } from '@stores'
 import './style.scss'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { faPlus } from '@fortawesome/free-solid-svg-icons'
+import { sanityCheckTag } from '@utils'
 
 interface ITagListOuterProps {
     className: string
@@ -61,8 +62,7 @@ class SideBar extends React.Component<ITagListOuterProps & ITagListInnerProps, I
 
         if (key.match(/NumpadEnter|Enter/)) {
             e.preventDefault()
-
-            this.props.tagStore.addTag(this.state.tag)
+            this.handleAddTag()
         }
     }
 
@@ -173,13 +173,15 @@ class SideBar extends React.Component<ITagListOuterProps & ITagListInnerProps, I
     }
 
     private handleAddTagChange = e => {
+        const value = e.target.value
+
         this.setState({
-            tag: e.target.value,
+            tag: value,
         })
     }
 
     private handleAddTag = () => {
-        this.props.tagStore.addTag(this.state.tag, () => {
+        this.props.tagStore.addTag(sanityCheckTag(this.state.tag), () => {
             this.setState({
                 tag: '',
             })

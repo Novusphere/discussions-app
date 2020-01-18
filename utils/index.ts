@@ -20,6 +20,16 @@ export const sleep = milliseconds => {
     return new Promise(resolve => setTimeout(resolve, milliseconds))
 }
 
+export const sanityCheckTag = (tagName: string) => {
+    const match = tagName.match(/([A-Z])\w+/gi)
+
+    if (match && match.length) {
+        return match[0]
+    }
+
+    return tagName
+}
+
 export const tweetCurrentPage = () => {
     window.open(
         'https://twitter.com/share?url=' +
