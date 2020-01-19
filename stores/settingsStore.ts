@@ -428,7 +428,7 @@ export default class SettingsStore extends BaseStore {
 
             const { data } = await axios.post(
                 'https://atmosdb.novusphere.io/unifiedid/relay',
-                `data=${encodeURIComponent(JSON.stringify(robj))}`,
+                `data=${encodeURIComponent(JSON.stringify({ transfers: [ robj ]}))}`,
                 {
                     headers: {
                         'Content-Type': 'application/x-www-form-urlencoded',
