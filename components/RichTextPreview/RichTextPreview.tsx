@@ -63,6 +63,7 @@ const RtLink: any = ({ children, href, index }) => {
                 ):
                     embed = await nsdb.cors(`https://api.instagram.com/oembed/?url=${href}`)
                     break
+                case /https?:\/\/(www.)?tradingview.com\//.test(href):
                 case /(.|)http[s]?:\/\/(\w|[:\/.%-])+\.(png|jpg|jpeg|gif)(\?(\w|[:\/.%-])+)?(.|)/.test(
                     href
                 ):

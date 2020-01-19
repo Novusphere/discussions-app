@@ -116,8 +116,6 @@ export class ThreadModel {
 
                 const response = await editModel.submitEdits()
 
-                console.log(response)
-
                 if (!response) {
                     this.openingPost.title = cached.title
                     this.openingPost.content = cached.content
