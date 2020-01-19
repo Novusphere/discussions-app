@@ -6,7 +6,7 @@ import { Tab, Tabs, TabList, TabPanel } from 'react-tabs'
 import { faMinusCircle } from '@fortawesome/free-solid-svg-icons'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { computed } from 'mobx'
-import { getIdenticon, isServer, sleep } from '@utils'
+import { getIdenticon, isServer, sleep, trimAddress } from '@utils'
 import { InfiniteScrollFeed, PostPreview, TagDropdown } from '@components'
 
 interface IUPageProps {
@@ -42,7 +42,7 @@ class U extends React.Component<IUPageProps> {
         await sleep(500)
         const posts = await postsStore.getPostsForKeys([pub])
 
-        let uidw = null
+        let uidw = posts[0].uidw
 
         return {
             uidw,
@@ -132,15 +132,15 @@ class U extends React.Component<IUPageProps> {
 
         return (
             <>
-                <div className={'flex flex-row items-center'}>
+                <div className={'flex flex-row items-center flex-wrap'}>
                     <img
                         width={100}
                         height={100}
                         src={icon}
-                        className={'post-icon mr2'}
+                        className={'post-icon mr3'}
                         alt={'Icon'}
                     />
-                    <div className={'ml3 flex flex-column items-start justify-center'}>
+                    <div className={'flex flex-column items-start justify-center'}>
                         <span className={'b black f5 mb2'}>{username}</span>
                         <span className={'b f6 mb2'}>192 Followers</span>
                         {!this.isSameUser && (
@@ -158,7 +158,9 @@ class U extends React.Component<IUPageProps> {
                     <span className={'small-title mb2'}>Wallets</span>
 
                     <ul className={'list'}>
-                        <li className={'pa0 mb2'}>{typeof uidw === 'string' ? uidw : '--'}</li>
+                        <li className={'pa0 mb2'} title={uidw}>
+                            {typeof uidw === 'string' ? trimAddress(uidw) : '--'}
+                        </li>
                     </ul>
                 </div>
                 {!this.isSameUser && (

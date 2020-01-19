@@ -144,7 +144,7 @@ export class Post {
         p.totalReplies = o.totalReplies;
         p.upvotes = o.upvotes;
         p.downvotes = o.downvotes;
-        p.uidw = null;
+        p.uidw = o.uidw || null;
         if (o.myVote && o.myVote.length > 0) {
             p.myVote = o.myVote[0].value;
         }
@@ -156,7 +156,7 @@ export class Post {
         let txid32 = n.shiftRight(32).toString(16).padStart(8, '0');
         let timeOffset = n.and(new BigInt('ffffffff', 16));
         let time = (timeOffset.valueOf() * 1000) + TIME_ENCODE_GENESIS;
-        
+
         return {
             txid32: txid32,
             timeGte: time - 1000*60*3,

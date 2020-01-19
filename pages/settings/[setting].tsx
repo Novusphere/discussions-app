@@ -156,6 +156,9 @@ class Settings extends React.Component<ISettings, ISettingsState> {
                     )}
                 </span>
                 <ul className={'list ph2 mt3'}>
+                    {Array.from(balances).length === 0 && (
+                        <span className={'moon-gray f6 i'}>You have no balances.</span>
+                    )}
                     {Array.from(balances).map(([symbol, amount]) => (
                         <div key={symbol} className={'mt3 f6 flex flex-row justify-between'}>
                             <span>{symbol}</span>

@@ -6,7 +6,6 @@ import { CreateForm } from '@components'
 import EditModel from '@models/editModel'
 import { Messages } from '@globals'
 import { discussions } from '@novuspherejs'
-import { getAttachmentValue } from '@utils'
 
 export class ReplyModel {
     @observable uid = ''

@@ -9,11 +9,10 @@ import { useCallback, useEffect, useState } from 'react'
 import { sanityCheckTag } from '@utils'
 
 const NewPage = ({ postsStore }) => {
-    const [form, setForm] = useState(null)
+    const [form, setForm] = useState(postsStore.newPostForm)
     const { subFields, newPostData } = postsStore
 
     useEffect(() => {
-        setForm(postsStore.newPostForm)
         return () => {
             postsStore.clearPreview()
         }

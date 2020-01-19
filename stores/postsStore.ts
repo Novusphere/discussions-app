@@ -363,6 +363,7 @@ export default class PostsStore extends BaseStore {
                 rules: 'required|string|min:5|max:300',
                 disabled: !this.newPostData.sub,
                 hideLabels: true,
+                autoComplete: 'off',
             },
             {
                 name: 'content',
@@ -372,6 +373,7 @@ export default class PostsStore extends BaseStore {
                 disabled: !this.newPostData.sub,
                 type: 'richtext',
                 rules: 'required',
+                autoComplete: 'off',
             },
             {
                 name: 'buttons',

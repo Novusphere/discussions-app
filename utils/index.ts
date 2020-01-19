@@ -607,3 +607,9 @@ export const checkIfNameIsValid = async (accountName: string): Promise<boolean> 
         throw new Error(`${accountName} is not a valid EOS username, please try again.`)
     }
 }
+
+export const trimAddress = (address: string) => {
+    const first = address.slice(0, address.length / 3)
+    const last = address.slice(address.length - 4, address.length)
+    return `${first}...${last}`
+}
