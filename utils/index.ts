@@ -9,7 +9,7 @@ const removeMd = require('remove-markdown')
 const pjson = require('../package.json')
 const uuid = require('uuidv4')
 
-const BigInt = require('big-integer')
+import ecc from 'eosjs-ecc'
 
 export * from './useScrollPosition'
 
@@ -613,13 +613,31 @@ export const trimAddress = (address: string) => {
     return `${first}...${last}`
 }
 
+export const submitRelay = async (transfers: any[]) => {
+    try {
+        const { data } = await axios.post(
+            'https://atmosdb.novusphere.io/unifiedid/relay',
+            `data=${encodeURIComponent(JSON.stringify({ transfers }))}`,
+            {
+                headers: {
+                    'Content-Type': 'application/x-www-form-urlencoded',
+                },
+            }
+        )
+
+        return data
+    } catch (error) {
+        throw error
+    }
+}
+
 export const transformTipsToTransfers = (
     tips: any[],
     replyingToUIDW: string,
-    fromAddress: string,
+    privateKey: string,
     tokens: any[]
 ) => {
-    const sigs = tips.map(tip => {
+    return tips.map(tip => {
         let symbol = tip.symbol.toUpperCase()
 
         // find token to get chain and contract
@@ -629,10 +647,12 @@ export const transformTipsToTransfers = (
             const {
                 label,
                 decimals,
-                chain,
+                chain: _chain,
                 fee: { flat, percent },
             } = token
 
+            const chain = parseInt(String(_chain))
+            const from = ecc.privateToPublic(privateKey)
             const nonce = new Date().getTime()
             const amountasNumber = Number(tip.amount)
             const totalFee = amountasNumber * percent + flat
@@ -650,19 +670,18 @@ export const transformTipsToTransfers = (
                 }
             }
 
-            console.log({
+            const sig = eos.transactionSignature(chain, privateKey, to, amount, fee, nonce, memo)
+
+            return {
                 chain,
-                fromAddress,
+                from,
                 to,
                 amount,
                 fee,
                 nonce,
                 memo,
-            })
-
-            return eos.transactionSignature(chain, fromAddress, to, amount, fee, nonce, memo)
+                sig,
+            }
         }
     })
-
-    return sigs
 }

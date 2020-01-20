@@ -5,7 +5,7 @@ import { CreateForm } from '@components'
 import { task } from 'mobx-task'
 import axios from 'axios'
 import { getAuthStore, getUiStore, IStores } from '@stores/index'
-import { checkIfNameIsValid, sleep } from '@utils'
+import { checkIfNameIsValid, sleep, submitRelay } from '@utils'
 import { discussions, eos } from '@novuspherejs'
 import ecc from 'eosjs-ecc'
 import { ModalOptions } from '@globals'
@@ -426,17 +426,7 @@ export default class SettingsStore extends BaseStore {
                 robj.memo
             )
 
-            const { data } = await axios.post(
-                'https://atmosdb.novusphere.io/unifiedid/relay',
-                `data=${encodeURIComponent(JSON.stringify({ transfers: [ robj ]}))}`,
-                {
-                    headers: {
-                        'Content-Type': 'application/x-www-form-urlencoded',
-                    },
-                }
-            )
-
-            return data
+            return submitRelay([robj])
         } catch (error) {
             throw error
         }
@@ -597,6 +587,7 @@ export default class SettingsStore extends BaseStore {
                         )
 
                         this.uiStore.hideModal()
+                        this.authStore.setWalletPrivateKey(walletPrivateKey)
 
                         if (this.loadingStates.withdrawing) {
                             this.handleWithdrawalSubmit(walletPrivateKey)
@@ -605,9 +596,6 @@ export default class SettingsStore extends BaseStore {
                         if (this.loadingStates.transferring) {
                             this.handleTransferSubmit(walletPrivateKey)
                         }
-
-
-
                     } catch (error) {
                         form.$('password').invalidate(error.message)
                         return error

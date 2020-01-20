@@ -6,7 +6,7 @@ import { CreateForm } from '@components'
 import EditModel from '@models/editModel'
 import { Messages, ModalOptions } from '@globals'
 import { discussions } from '@novuspherejs'
-import { transformTipsToTransfers } from '@utils'
+import { sleep, submitRelay, transformTipsToTransfers } from '@utils'
 
 export class ReplyModel {
     @observable uid = ''
@@ -121,6 +121,16 @@ export class ReplyModel {
         ])
     }
 
+    @action.bound
+    private waitForUserInput(cb: any) {
+        const int = setInterval(() => {
+            if (this.authStore.temporaryWalletPrivateKey) {
+                clearInterval(int)
+                return cb(this.authStore.temporaryWalletPrivateKey)
+            }
+        }, 100)
+    }
+
     @task.resolved
     @action.bound
     async onSubmit(activeThread: any) {
@@ -158,44 +168,81 @@ export class ReplyModel {
 
         try {
             if (activeThread) {
+                const finishSubmitting = async () => {
+                    try {
+                        const model = new PostModel(reply as any)
+                        const signedReply = model.sign(this.authStore.postPriv)
+                        const confirmedReply = await discussions.post(signedReply as any)
+
+                        const confirmedModel = new PostModel({
+                            ...confirmedReply,
+                        })
+
+                        set(activeThread, {
+                            map: {
+                                ...activeThread.map,
+                                [reply.id]: confirmedModel,
+                            },
+                        })
+
+                        if (confirmedReply.parentUuid === this.post.threadUuid) {
+                            set(activeThread, {
+                                openingPostReplies: [
+                                    ...activeThread.openingPostReplies,
+                                    confirmedModel,
+                                ],
+                            })
+                        } else {
+                            this.toggleOpen()
+                        }
+
+                        this.clearContent()
+                        this.uiStore.showToast('Your reply has been submitted!', 'success')
+                    } catch (error) {
+                        this.uiStore.showToast(error.message, 'error')
+                        throw error
+                    }
+                }
+
                 // deal with tips
                 if (reply.tips) {
                     // prompt user to enter password
                     this.uiStore.showModal(ModalOptions.walletActionPasswordReentry)
 
-                    reply.tips = transformTipsToTransfers(
-                        reply.tips,
-                        this.post.uidw,
-                        activeUidWalletKey,
-                        supportedTokensForUnifiedWallet
-                    )
-                }
+                    return new Promise(resolve => {
+                        this.waitForUserInput(async key => {
+                            if (!key) {
+                                // throw error
+                                this.uiStore.showToast(
+                                    "Skipping tips as you currently don't have a wallet key. Please re-login to generate one.",
+                                    'error'
+                                )
+                                reply.tips = []
+                                return
+                            }
 
-                // const model = new PostModel(reply as any)
-                // const signedReply = model.sign(this.authStore.postPriv)
-                // const confirmedReply = await discussions.post(signedReply as any)
-                //
-                // const confirmedModel = new PostModel({
-                //     ...confirmedReply,
-                // })
-                //
-                // set(activeThread, {
-                //     map: {
-                //         ...activeThread.map,
-                //         [reply.id]: confirmedModel,
-                //     },
-                // })
-                //
-                // if (confirmedReply.parentUuid === this.post.threadUuid) {
-                //     set(activeThread, {
-                //         openingPostReplies: [...activeThread.openingPostReplies, confirmedModel],
-                //     })
-                // } else {
-                //     this.toggleOpen()
-                // }
-                //
-                // this.clearContent()
-                // this.uiStore.showToast('Your reply has been submitted!', 'success')
+                            // cache key
+                            const privateKey = `${key}`
+                            // clear key from app
+                            this.authStore.clearWalletPrivateKey()
+
+                            if (privateKey) {
+                                reply.tips = transformTipsToTransfers(
+                                    reply.tips,
+                                    this.post.uidw,
+                                    privateKey,
+                                    supportedTokensForUnifiedWallet
+                                )
+
+                                await finishSubmitting()
+                                await submitRelay(reply.tips)
+                                resolve()
+                            }
+                        })
+                    })
+                } else {
+                    await finishSubmitting()
+                }
             } else {
                 this.uiStore.showToast('Failed to submit your reply', 'error')
             }

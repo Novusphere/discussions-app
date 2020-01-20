@@ -60,6 +60,9 @@ export default class AuthStore extends BaseStore {
     @observable
     logOutTimestamp = AuthStore.LOG_OUT_USER_INTEGER
 
+    @observable
+    temporaryWalletPrivateKey = ''
+
     private readonly uiStore: IStores['uiStore'] = getUiStore()
 
     constructor() {
@@ -75,6 +78,16 @@ export default class AuthStore extends BaseStore {
             this.setDepositTokenOptions(data)
             this.refreshAllBalances()
         })
+    }
+
+    @action.bound
+    setWalletPrivateKey(key: string)  {
+        this.temporaryWalletPrivateKey = key
+    }
+
+    @action.bound
+    clearWalletPrivateKey() {
+        this.temporaryWalletPrivateKey = ''
     }
 
     @task.resolved
