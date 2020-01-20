@@ -276,6 +276,9 @@ export default class DiscussionsService {
 
                 if (data.error) {
                     console.error('Post that failed: ', post)
+                    if (data.hasOwnProperty('message')) {
+                        throw new Error(`Failed to post: ${data.message}`)
+                    }
                     throw new Error(`Failed to post: ${JSON.stringify(data)}`)
                 }
                 p.transaction = data.transaction

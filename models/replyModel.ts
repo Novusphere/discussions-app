@@ -173,30 +173,23 @@ export class ReplyModel {
                 const askForPassAndSubmit = async () => {
                     return new Promise((resolve, reject) => {
                         return this.waitForUserInput(async (key, hasRenteredPassword) => {
-                            console.log({
-                                key,
-                                hasRenteredPassword,
-                            })
                             if (!key) {
-                                // throw error
-                                this.uiStore.showToast(
-                                    "Skipping tips as you currently don't have a wallet key. Please re-login to generate one.",
-                                    'error'
-                                )
                                 reply.transfers = []
-                                return reject()
+                                return reject(
+                                    new Error(
+                                        "Skipping tips as you currently don't have a wallet key. Please re-login to generate one."
+                                    )
+                                )
                             }
 
                             this.authStore.hasRenteredPassword = false
 
                             if (key === 'false') {
-                                this.uiStore.showToast(
-                                    'The password you have entered is invalid.',
-                                    'error'
-                                )
                                 this.uiStore.hideModal()
                                 this.authStore.clearWalletPrivateKey()
-                                return reject()
+                                return reject(
+                                    new Error('The password you have entered is invalid.')
+                                )
                             }
 
                             // cache key
@@ -212,8 +205,12 @@ export class ReplyModel {
                                     supportedTokensForUnifiedWallet
                                 )
 
-                                await finishSubmitting()
-                                resolve()
+                                try {
+                                    await finishSubmitting()
+                                    resolve()
+                                } catch (error) {
+                                    return reject(error.message)
+                                }
                             }
                         })
                     })
