@@ -252,7 +252,7 @@ export default class DiscussionsService {
             metadata.uidw = p.uidw
         }
 
-        const post = {
+        let post = {
             poster: p.poster,
             content: p.content,
             uuid: p.uuid,
@@ -261,9 +261,13 @@ export default class DiscussionsService {
             tags: Array.from(tags),
             mentions: [],
             metadata: JSON.stringify(metadata),
-            transaction: '',
-            transfers: p.transfers,
-            notify: JSON.stringify({ name: 'tip', data: { parentUuid: p.parentUuid } }),
+            transaction: ''
+        }
+
+        if (p.transfers && p.transfers.length > 0) {
+
+            post.transfers = p.transfers;
+            post.notify = JSON.stringify({ name: 'tip', data: { parentUuid: p.parentUuid } });
         }
 
         try {
