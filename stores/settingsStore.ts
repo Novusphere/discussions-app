@@ -570,35 +570,39 @@ export default class SettingsStore extends BaseStore {
         return new CreateForm(
             {
                 onSubmit: async form => {
-                    const { password } = form.values()
+                    if (form.isValid) {
+                        this.authStore.hasRenteredPassword = true
+                        const { password } = form.values()
 
-                    // un-encrypt their bk
-                    const {
-                        statusJson: {
-                            bk: { bk, bkc },
-                        },
-                    } = this.authStore
+                        // un-encrypt their bk
+                        const {
+                            statusJson: {
+                                bk: { bk, bkc },
+                            },
+                        } = this.authStore
 
-                    try {
-                        const walletPrivateKey = await discussions.encryptedBKToKeys(
-                            bk,
-                            bkc,
-                            password
-                        )
+                        try {
+                            const walletPrivateKey = await discussions.encryptedBKToKeys(
+                                bk,
+                                bkc,
+                                password
+                            )
 
-                        this.uiStore.hideModal()
-                        this.authStore.setWalletPrivateKey(walletPrivateKey)
+                            this.uiStore.hideModal()
+                            this.authStore.setWalletPrivateKey(walletPrivateKey)
 
-                        if (this.loadingStates.withdrawing) {
-                            this.handleWithdrawalSubmit(walletPrivateKey)
+                            if (this.loadingStates.withdrawing) {
+                                this.handleWithdrawalSubmit(walletPrivateKey)
+                            }
+
+                            if (this.loadingStates.transferring) {
+                                this.handleTransferSubmit(walletPrivateKey)
+                            }
+                        } catch (error) {
+                            form.$('password').invalidate(error.message)
+                            this.authStore.setWalletPrivateKey('false')
+                            return error
                         }
-
-                        if (this.loadingStates.transferring) {
-                            this.handleTransferSubmit(walletPrivateKey)
-                        }
-                    } catch (error) {
-                        form.$('password').invalidate(error.message)
-                        return error
                     }
                 },
             },

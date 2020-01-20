@@ -6,7 +6,7 @@ import { CreateForm } from '@components'
 import EditModel from '@models/editModel'
 import { Messages, ModalOptions } from '@globals'
 import { discussions } from '@novuspherejs'
-import { sleep, submitRelay, transformTipsToTransfers } from '@utils'
+import { submitRelay, transformTipsToTransfers } from '@utils'
 
 export class ReplyModel {
     @observable uid = ''
@@ -124,9 +124,11 @@ export class ReplyModel {
     @action.bound
     private waitForUserInput(cb: any) {
         const int = setInterval(() => {
-            if (this.authStore.temporaryWalletPrivateKey) {
+            const { temporaryWalletPrivateKey, hasRenteredPassword } = this.authStore
+
+            if (temporaryWalletPrivateKey) {
                 clearInterval(int)
-                return cb(this.authStore.temporaryWalletPrivateKey)
+                return cb(temporaryWalletPrivateKey, hasRenteredPassword)
             }
         }, 100)
     }
@@ -168,6 +170,56 @@ export class ReplyModel {
 
         try {
             if (activeThread) {
+                const askForPassAndSubmit = async () => {
+                    return new Promise((resolve, reject) => {
+                        return this.waitForUserInput(async (key, hasRenteredPassword) => {
+                            console.log({
+                                key,
+                                hasRenteredPassword,
+                            })
+                            if (!key) {
+                                // throw error
+                                this.uiStore.showToast(
+                                    "Skipping tips as you currently don't have a wallet key. Please re-login to generate one.",
+                                    'error'
+                                )
+                                reply.tips = []
+                                return reject()
+                            }
+
+                            this.authStore.hasRenteredPassword = false
+
+                            if (key === 'false') {
+                                this.uiStore.showToast(
+                                    'The password you have entered is invalid.',
+                                    'error'
+                                )
+                                this.uiStore.hideModal()
+                                this.authStore.clearWalletPrivateKey()
+                                return reject()
+                            }
+
+                            // cache key
+                            const privateKey = `${key}`
+                            // clear key from app
+                            this.authStore.clearWalletPrivateKey()
+
+                            if (privateKey) {
+                                reply.tips = transformTipsToTransfers(
+                                    reply.tips,
+                                    this.post.uidw,
+                                    privateKey,
+                                    supportedTokensForUnifiedWallet
+                                )
+
+                                await finishSubmitting()
+                                await submitRelay(reply.tips)
+                                resolve()
+                            }
+                        })
+                    })
+                }
+
                 const finishSubmitting = async () => {
                     try {
                         const model = new PostModel(reply as any)
@@ -208,38 +260,7 @@ export class ReplyModel {
                 if (reply.tips) {
                     // prompt user to enter password
                     this.uiStore.showModal(ModalOptions.walletActionPasswordReentry)
-
-                    return new Promise(resolve => {
-                        this.waitForUserInput(async key => {
-                            if (!key) {
-                                // throw error
-                                this.uiStore.showToast(
-                                    "Skipping tips as you currently don't have a wallet key. Please re-login to generate one.",
-                                    'error'
-                                )
-                                reply.tips = []
-                                return
-                            }
-
-                            // cache key
-                            const privateKey = `${key}`
-                            // clear key from app
-                            this.authStore.clearWalletPrivateKey()
-
-                            if (privateKey) {
-                                reply.tips = transformTipsToTransfers(
-                                    reply.tips,
-                                    this.post.uidw,
-                                    privateKey,
-                                    supportedTokensForUnifiedWallet
-                                )
-
-                                await finishSubmitting()
-                                await submitRelay(reply.tips)
-                                resolve()
-                            }
-                        })
-                    })
+                    await askForPassAndSubmit()
                 } else {
                     await finishSubmitting()
                 }
@@ -247,7 +268,7 @@ export class ReplyModel {
                 this.uiStore.showToast('Failed to submit your reply', 'error')
             }
         } catch (error) {
-            this.uiStore.showToast(error.message, 'error')
+            // this.uiStore.showToast(error.message, 'error')
             throw error
         }
     }

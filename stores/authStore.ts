@@ -63,6 +63,9 @@ export default class AuthStore extends BaseStore {
     @observable
     temporaryWalletPrivateKey = ''
 
+    @observable
+    hasRenteredPassword = false
+
     private readonly uiStore: IStores['uiStore'] = getUiStore()
 
     constructor() {
