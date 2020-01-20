@@ -263,6 +263,7 @@ export default class DiscussionsService {
             metadata: JSON.stringify(metadata),
             transaction: '',
             transfers: p.transfers,
+            notify: JSON.stringify({ name: 'tip', data: { parentUuid: p.parentUuid } }),
         }
 
         try {

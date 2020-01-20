@@ -1,6 +1,6 @@
 import { BaseStore, getOrCreateStore } from 'next-mobx-wrapper'
 import { task } from 'mobx-task'
-import { action, autorun, observable, observe, reaction } from 'mobx'
+import { action, autorun, observable, observe, reaction, when } from 'mobx'
 import { nsdb } from '@novuspherejs'
 import {
     getAuthStore,
@@ -56,6 +56,10 @@ export default class SyncStore extends BaseStore {
                     if (!_.isUndefined(data.moderation)) {
                         this.syncModerationListWithDB(data.moderation)
                     }
+
+                    if (!_.isUndefined(data.uidw)) {
+                        this.syncUIDWWithDB(data.uidw)
+                    }
                 }
 
                 this.userStore.updateFromActiveDelegatedMembers()
@@ -92,6 +96,15 @@ export default class SyncStore extends BaseStore {
                 watching: change.object.toJSON(),
             })
         })
+
+        when(
+            () => this.authStore.uidWalletPubKey.length > 0,
+            () => {
+                this.saveDataWithSyncedData({
+                    uidw: this.authStore.activeUidWalletKey,
+                })
+            }
+        )
 
         autorun(() => {
             const { blockedContentSetting, unsignedPostsIsSpam } = this.settingsStore
@@ -137,6 +150,11 @@ export default class SyncStore extends BaseStore {
                 })
             }
         })
+    }
+
+    @action.bound
+    syncUIDWWithDB(uidw: string) {
+        this.authStore.uidWalletPubKey = uidw
     }
 
     @action.bound

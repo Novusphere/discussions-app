@@ -14,7 +14,8 @@ export interface IAccountSync {
         moderation: {
             blockedUsers: string[]
             blockedPosts: { [yyyymm: number]: string[] }
-        }
+        },
+        uidw: string
     }
     pub: string
     time: number
