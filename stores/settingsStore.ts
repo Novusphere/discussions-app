@@ -605,6 +605,9 @@ export default class SettingsStore extends BaseStore {
                         if (this.loadingStates.transferring) {
                             this.handleTransferSubmit(walletPrivateKey)
                         }
+
+
+
                     } catch (error) {
                         form.$('password').invalidate(error.message)
                         return error

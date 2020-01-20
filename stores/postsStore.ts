@@ -3,9 +3,9 @@ import { discussions, Post } from '@novuspherejs'
 import { task } from 'mobx-task'
 import { BaseStore, getOrCreateStore } from 'next-mobx-wrapper'
 import { CreateForm } from '@components'
-import tag, { getTagStore } from '@stores/tagStore'
+import { getTagStore } from '@stores/tagStore'
 import { getAuthStore, getUiStore, IStores } from '@stores'
-import { encodeId, generateUuid, getAttachmentValue, pushToThread, sleep } from '@utils'
+import { encodeId, generateUuid, getAttachmentValue, pushToThread } from '@utils'
 import { ThreadModel } from '@models/threadModel'
 import FeedModel from '@models/feedModel'
 import _ from 'lodash'
@@ -227,7 +227,7 @@ export default class PostsStore extends BaseStore {
                 }
 
                 return {
-                    id: posts.pub,
+                    id: `${posts.pub}-${posts.uidw}`,
                     value: poster,
                     icon: posts.imageData,
                 }

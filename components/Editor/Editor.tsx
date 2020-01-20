@@ -40,12 +40,17 @@ class EditorComponent extends React.Component<IEditorProps> {
             Quill: quillEditor.Quill,
         }
 
+        this.quillBase.Quill.debug('error')
+
         const mention = await import('quill-mention')
         const Mention = mention.default
 
         const autoformat = await import('@modules/quill-autoformat/dist/quill-autoformat.js')
         const Autoformat = autoformat.default
         const Hashtag = autoformat.Hashtag
+
+        const eosTip = await import('@modules/eos-tip/src/eos.tip.js')
+        const EosTip = eosTip.default
 
         const blockEmbedLink = await import('quill-magic-url')
         const MagicUrl = blockEmbedLink.default
@@ -63,30 +68,55 @@ class EditorComponent extends React.Component<IEditorProps> {
         })
 
         this.quillBase.Quill.register('modules/mention', Mention)
+        // this.quillBase.Quill.register('modules/eos-tip', EosTip)
         this.quillBase.Quill.register('modules/autoformat', Autoformat)
         this.quillBase.Quill.register('formats/hashtag', Hashtag)
         this.quillBase.Quill.register('modules/magicUrl', MagicUrl)
 
         this.modules = {
+            // 'eos-tip': {
+            //     fixMentionsToQuill: true,
+            //     tippableList: async (searchTerm, renderList) => {
+            //         const values = this.props.postsStore.getPossibleUsersToTag
+            //
+            //         if (searchTerm.length === 0) {
+            //             renderList(values, searchTerm)
+            //         }
+            //         else {
+            //             const matches = []
+            //             for (let i = 0; i < values.length; i++) {
+            //                 if (~values[i].value.toLowerCase().indexOf(searchTerm.toLowerCase())) {
+            //                     matches.push(values[i])
+            //                 }
+            //             }
+            //             renderList(matches, searchTerm)
+            //         }
+            //     },
+            //     renderItem: item => {
+            //         const image = `<img width=20 height=20 src="${item.icon}" class="mention-list-icon" />`
+            //         return `<span class="mention-list-item" title={${item.id}}>${image} <span>${item.value}</span></span>`
+            //     },
+            //     onSelect: (item, insertItem) => {
+            //         item.value = `<a href=https://beta.discussions.app/u/${item.value}-${item.id}-${item.uidw}>@${item.value}</a>`
+            //         item.denotationChar = ''
+            //         return insertItem(item)
+            //     },
+            // },
             mention: {
                 fixMentionsToQuill: true,
                 mentionDenotationChars: ['@'],
                 source: async (searchTerm, renderList, mentionChar) => {
                     const accounts = this.props.postsStore.getPossibleUsersToTag
 
-                    let values
-
-                    if (mentionChar === '@') {
-                        values = accounts
-                    }
-
                     if (searchTerm.length === 0) {
-                        renderList(values, searchTerm)
+                        renderList(accounts, searchTerm)
                     } else {
                         const matches = []
-                        for (let i = 0; i < values.length; i++) {
-                            if (~values[i].value.toLowerCase().indexOf(searchTerm.toLowerCase())) {
-                                matches.push(values[i])
+                        for (let i = 0; i < accounts.length; i++) {
+                            if (
+                                ~accounts[i].value.toLowerCase().indexOf(searchTerm.toLowerCase())
+                            ) {
+                                matches.push(accounts[i])
                             }
                         }
                         renderList(matches, searchTerm)
@@ -168,23 +198,6 @@ class EditorComponent extends React.Component<IEditorProps> {
                 debug={'error'}
                 placeholder={placeholder}
                 onChange={this.onChange}
-                // formats={[
-                //     'header',
-                //     'size',
-                //     'bold',
-                //     'italic',
-                //     'underline',
-                //     'strike',
-                //     'blockquote',
-                //     'list',
-                //     'bullet',
-                //     'indent',
-                //     'link',
-                //     'image',
-                //     'video',
-                //     'mention',
-                //     'hashtag',
-                // ]}
                 style={{
                     opacity: this.props.disabled ? 0.5 : 1,
                     cursor: this.props.disabled ? 'not-allowed' : 'default',
@@ -192,6 +205,7 @@ class EditorComponent extends React.Component<IEditorProps> {
                 modules={{
                     autoformat: this.modules.autoformat,
                     mention: this.modules.mention,
+                    // 'eos-tip': this.modules['eos-tip'],
                     magicUrl: true,
                     toolbar: [
                         [{ header: 1 }, { header: 2 }], // custom button values

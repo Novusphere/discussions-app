@@ -23,6 +23,7 @@ class PostModel {
     @observable edit
     @observable tags
     @observable mentions
+    @observable uidw
 
     @observable transaction
 

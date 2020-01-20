@@ -1,7 +1,8 @@
 import Router from 'next/router'
-import { Post, discussions } from '@novuspherejs'
+import { discussions, eos, Post } from '@novuspherejs'
 import { IPost } from '@stores/postsStore'
 import _ from 'lodash'
+import axios from 'axios'
 
 const removeMd = require('remove-markdown')
 
@@ -586,8 +587,6 @@ export const getHost = url => {
     return parser.host.toLowerCase()
 }
 
-import axios from 'axios'
-
 export const checkIfNameIsValid = async (accountName: string): Promise<boolean> => {
     try {
         const { data } = await axios.post(
@@ -612,4 +611,58 @@ export const trimAddress = (address: string) => {
     const first = address.slice(0, address.length / 3)
     const last = address.slice(address.length - 4, address.length)
     return `${first}...${last}`
+}
+
+export const transformTipsToTransfers = (
+    tips: any[],
+    replyingToUIDW: string,
+    fromAddress: string,
+    tokens: any[]
+) => {
+    const sigs = tips.map(tip => {
+        let symbol = tip.symbol.toUpperCase()
+
+        // find token to get chain and contract
+        let token = tokens.find(t => t.label === symbol)
+
+        if (token) {
+            const {
+                label,
+                decimals,
+                chain,
+                fee: { flat, percent },
+            } = token
+
+            const nonce = new Date().getTime()
+            const amountasNumber = Number(tip.amount)
+            const totalFee = amountasNumber * percent + flat
+            const amount = `${Number(tip.amount).toFixed(decimals)} ${label}`
+            const fee = `${Number(totalFee).toFixed(decimals)} ${label}`
+            const memo = ''
+
+            let to = replyingToUIDW
+
+            if (tip.username) {
+                const [, , uidwFromUrl] = tip.url.split('-')
+
+                if (uidwFromUrl) {
+                    to = uidwFromUrl
+                }
+            }
+
+            console.log({
+                chain,
+                fromAddress,
+                to,
+                amount,
+                fee,
+                nonce,
+                memo,
+            })
+
+            return eos.transactionSignature(chain, fromAddress, to, amount, fee, nonce, memo)
+        }
+    })
+
+    return sigs
 }

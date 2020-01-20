@@ -19,6 +19,7 @@ class WalletActionPasswordReEntry extends React.Component<
 > {
     public render() {
         const { passwordReEntryForm } = this.props.settingsStore
+
         return (
             <Modal>
                 {({ CloseButton }) => (

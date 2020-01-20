@@ -52,8 +52,8 @@ export default class AuthStore extends BaseStore {
 
     // wallet
     balances = observable.map<string, string>()
-    @observable supportedTokensForUnifiedWallet = []
 
+    @observable supportedTokensForUnifiedWallet = []
     @observable selectedToken = null
 
     @persist
@@ -93,17 +93,27 @@ export default class AuthStore extends BaseStore {
 
     @action.bound
     setDepositTokenOptions(depositTokens: ApiGetUnifiedId) {
-        this.supportedTokensForUnifiedWallet = depositTokens.map(token => ({
-            label: token.symbol,
-            value: token.contract,
-            contract: token.p2k.contract,
-            chain: token.p2k.chain,
-            decimals: token.precision,
-            fee: token.fee,
-            min: token.min,
-        }))
+        let tokens = []
+
+        this.supportedTokensForUnifiedWallet = depositTokens.map(token => {
+            tokens.push(token.symbol)
+
+            return {
+                label: token.symbol,
+                value: token.contract,
+                contract: token.p2k.contract,
+                chain: token.p2k.chain,
+                decimals: token.precision,
+                fee: token.fee,
+                min: token.min,
+            }
+        })
 
         this.selectedToken = this.supportedTokensForUnifiedWallet[0]
+
+        if (typeof window !== 'undefined') {
+            window.localStorage.setItem('supp_tokens', tokens.join('|'))
+        }
     }
 
     @task

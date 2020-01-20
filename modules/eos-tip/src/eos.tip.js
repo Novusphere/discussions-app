@@ -1,4 +1,4 @@
-import ReactQuill, { Quill } from 'react-quill';
+import { Quill } from 'react-quill'
 
 import Keys from './constants/keys'
 import './quill.mention.css'
@@ -6,7 +6,7 @@ import './blots/mention'
 
 const numberIsNaN = require('./imports/numberisnan.js')
 
-class Mention {
+class EosTip {
     constructor(quill, options) {
         this.isOpen = false
         this.itemIndex = 0
@@ -18,14 +18,14 @@ class Mention {
         this.quill = quill
 
         this.options = {
-            source: null,
+            tippableList: null,
             renderItem(item, searchTerm) {
                 return `${item.value}`
             },
             onSelect(item, insertItem) {
                 insertItem(item)
             },
-            mentionDenotationChars: ['@'],
+            mentionDenotationChars: ['#tip'],
             showDenotationChar: true,
             allowedChars: /^[a-zA-Z0-9_]*$/,
             minChars: 0,
@@ -422,9 +422,17 @@ class Mention {
         const mentionCharIndex = this.options.mentionDenotationChars.reduce((prev, cur) => {
             const previousIndex = prev
             const mentionIndex = beforeCursorPos.lastIndexOf(cur)
-
             return mentionIndex > previousIndex ? mentionIndex : previousIndex
         }, -1)
+
+        // console.log({
+        //     range,
+        //     startPos,
+        //     beforeCursorPos,
+        //     cursorPos: this.cursorPos,
+        //     mentionCharIndex,
+        // })
+
         if (mentionCharIndex > -1) {
             if (
                 this.options.isolateCharacter &&
@@ -433,12 +441,17 @@ class Mention {
                 this.hideMentionList()
                 return
             }
-            const mentionCharPos = this.cursorPos - (beforeCursorPos.length - mentionCharIndex)
-            this.mentionCharPos = mentionCharPos
+            this.mentionCharPos = this.cursorPos - (beforeCursorPos.length - mentionCharIndex)
+
             const textAfter = beforeCursorPos.substring(mentionCharIndex + 1)
+
             if (textAfter.length >= this.options.minChars && this.hasValidChars(textAfter)) {
                 const mentionChar = beforeCursorPos[mentionCharIndex]
-                this.options.source(textAfter, this.renderList.bind(this, mentionChar), mentionChar)
+                this.options.tippableList(
+                    textAfter,
+                    this.renderList.bind(this, mentionChar),
+                    mentionChar
+                )
             } else {
                 this.hideMentionList()
             }
@@ -462,6 +475,6 @@ class Mention {
     }
 }
 
-Quill.register('modules/mention', Mention, true)
+Quill.register('modules/eos-tip', EosTip, true)
 
-export default Mention
+export default EosTip

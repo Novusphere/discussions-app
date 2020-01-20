@@ -1,7 +1,8 @@
 import { action, computed, observable, set } from 'mobx'
 import { generateUuid, getAttachmentValue } from '@utils'
 import PostModel from '@models/postModel'
-import { discussions, sleep } from '@novuspherejs'
+import { discussions } from '@novuspherejs'
+const matchAll = require('string.prototype.matchall')
 
 interface IEditModelProps {
     content: string
@@ -35,6 +36,37 @@ class EditModel {
         return []
     }
 
+    public static matchTipForTags(content: string) {
+        let tokens = 'ATMOS|EOS'
+
+        if (typeof window !== 'undefined') {
+            tokens = window.localStorage.getItem('supp_tokens')
+        }
+
+        // this is a fix for removing zero-width characters from a js string
+        const _content = content.replace(/[\u200B-\u200D\uFEFF]/g, '')
+        const regex = new RegExp(
+            `\\(https\\:\\/\\/beta\\.discussions\\.app\\/tag\\/tip\\)\\s(?<amount>[0-9\\.]+)\\s(?<symbol>${tokens})(?:\\s\\[(?<username>.*?)\\]\\((?<url>.*?)\\))?`,
+            'gim'
+        )
+
+        let results = matchAll(_content, regex)
+        let tips = []
+
+        for (let result of results) {
+            const { amount, symbol, username, url } = result.groups
+
+            tips.push({
+                amount,
+                symbol,
+                username,
+                url,
+            })
+        }
+
+        return tips
+    }
+
     // old post
     @observable cached: any = null
     @observable posterName = ''
@@ -58,6 +90,10 @@ class EditModel {
 
     @computed get inlineTags() {
         return EditModel.matchContentForTags(this.content)
+    }
+
+    @computed get inlineTips() {
+        return EditModel.matchTipForTags(this.content)
     }
 
     @computed get mentions() {
@@ -93,6 +129,7 @@ class EditModel {
             downvotes: 0,
             myVote: 0,
             edit: undefined,
+            tips: undefined,
         }
 
         if (!isEdit) {
@@ -124,6 +161,12 @@ class EditModel {
         if (tags && tags.length) {
             tags = tags.map(tag => tag.replace('#', ''))
             reply.tags = [...reply.tags, ...tags]
+        }
+
+        let tips = this.inlineTips
+
+        if (tips && tips.length) {
+            reply.tips = tips
         }
 
         return reply

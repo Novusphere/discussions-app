@@ -1,9 +1,9 @@
 const path = require('path')
 
 const config = {
-    entry: './modules/quill-mention/src/quill.mention.js',
+    entry: './modules/eos-tip/src/eos.tip.js',
     output: {
-        filename: 'quill-mention.js',
+        filename: 'eos-tip.js',
         path: path.resolve(__dirname, 'dist'),
         library: 'QuillMention',
         libraryTarget: 'umd',
