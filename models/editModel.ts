@@ -129,7 +129,7 @@ class EditModel {
             downvotes: 0,
             myVote: 0,
             edit: undefined,
-            tips: undefined,
+            transfers: undefined,
         }
 
         if (!isEdit) {
@@ -166,7 +166,7 @@ class EditModel {
         let tips = this.inlineTips
 
         if (tips && tips.length) {
-            reply.tips = tips
+            reply.transfers = tips
         }
 
         return reply

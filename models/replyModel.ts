@@ -6,7 +6,7 @@ import { CreateForm } from '@components'
 import EditModel from '@models/editModel'
 import { Messages, ModalOptions } from '@globals'
 import { discussions } from '@novuspherejs'
-import { submitRelay, transformTipsToTransfers } from '@utils'
+import { submitRelay, submitRelayAsPost, transformTipsToTransfers } from '@utils'
 
 export class ReplyModel {
     @observable uid = ''
@@ -183,7 +183,7 @@ export class ReplyModel {
                                     "Skipping tips as you currently don't have a wallet key. Please re-login to generate one.",
                                     'error'
                                 )
-                                reply.tips = []
+                                reply.transfers = []
                                 return reject()
                             }
 
@@ -205,15 +205,14 @@ export class ReplyModel {
                             this.authStore.clearWalletPrivateKey()
 
                             if (privateKey) {
-                                reply.tips = transformTipsToTransfers(
-                                    reply.tips,
+                                reply.transfers = transformTipsToTransfers(
+                                    reply.transfers,
                                     this.post.uidw,
                                     privateKey,
                                     supportedTokensForUnifiedWallet
                                 )
 
                                 await finishSubmitting()
-                                await submitRelay(reply.tips)
                                 resolve()
                             }
                         })
@@ -257,7 +256,7 @@ export class ReplyModel {
                 }
 
                 // deal with tips
-                if (reply.tips) {
+                if (reply.transfers) {
                     // prompt user to enter password
                     this.uiStore.showModal(ModalOptions.walletActionPasswordReentry)
                     await askForPassAndSubmit()

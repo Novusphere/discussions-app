@@ -36,6 +36,8 @@ class PostModel {
 
     @observable blockedId
 
+    @observable transfers
+
     constructor(post: Post) {
         set(this, post)
 

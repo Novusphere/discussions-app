@@ -39,6 +39,8 @@ export class Post {
     edit: boolean;
     uidw: string;
 
+    transfers: any[];
+
     // Discussion ID Post Data
     pub: string;
     sig: string;

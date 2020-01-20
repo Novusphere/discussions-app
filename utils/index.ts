@@ -1,5 +1,5 @@
 import Router from 'next/router'
-import { discussions, eos, Post } from '@novuspherejs'
+import { discussions, eos, Post, nsdb } from '@novuspherejs'
 import { IPost } from '@stores/postsStore'
 import _ from 'lodash'
 import axios from 'axios'
@@ -625,6 +625,18 @@ export const submitRelay = async (transfers: any[]) => {
             }
         )
 
+        return data
+    } catch (error) {
+        throw error
+    }
+}
+
+export const submitRelayAsPost = async (transfers: any[]) => {
+    try {
+        const { data } = await axios.post(
+            `${nsdb.api}/discussions/post`,
+            `data=${encodeURIComponent(JSON.stringify({ transfers }))}`
+        )
         return data
     } catch (error) {
         throw error

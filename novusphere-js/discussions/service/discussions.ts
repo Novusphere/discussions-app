@@ -262,6 +262,7 @@ export default class DiscussionsService {
             mentions: [],
             metadata: JSON.stringify(metadata),
             transaction: '',
+            transfers: p.transfers,
         }
 
         try {
