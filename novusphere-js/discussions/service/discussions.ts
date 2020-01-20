@@ -252,7 +252,7 @@ export default class DiscussionsService {
             metadata.uidw = p.uidw
         }
 
-        let post = {
+        let post:any = {
             poster: p.poster,
             content: p.content,
             uuid: p.uuid,
