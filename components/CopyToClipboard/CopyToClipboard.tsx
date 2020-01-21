@@ -5,13 +5,13 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import copy from 'clipboard-copy'
 
 interface ICopyToClipboardProps {
-    label: string
+    label?: string
     value: string
 }
 
 const CopyToClipboard: React.FC<ICopyToClipboardProps> = ({ label, value }) => (
     <div className={'field-container pb3 inline-labels relative'}>
-        <label className={'w-40'}>{label}</label>
+        {label && <label className={'w-40'}>{label}</label>}
         <input
             value={value}
             disabled={true}

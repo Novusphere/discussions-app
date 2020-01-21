@@ -7,7 +7,7 @@ import { faMinusCircle } from '@fortawesome/free-solid-svg-icons'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { computed } from 'mobx'
 import { getIdenticon, isServer, sleep, trimAddress } from '@utils'
-import { InfiniteScrollFeed, PostPreview, TagDropdown } from '@components'
+import { CopyToClipboard, InfiniteScrollFeed, PostPreview, TagDropdown } from '@components'
 
 interface IUPageProps {
     userStore: IStores['userStore']
@@ -163,7 +163,7 @@ class U extends React.Component<IUPageProps> {
 
                     <ul className={'list'}>
                         <li className={'pa0 mb2'} title={uidw}>
-                            {typeof uidw === 'string' ? trimAddress(uidw) : '--'}
+                            {typeof uidw === 'string' ? <CopyToClipboard value={uidw} /> : '--'}
                         </li>
                     </ul>
                 </div>
@@ -256,17 +256,19 @@ class U extends React.Component<IUPageProps> {
                             <Tab className={'settings-tab'}>Latest</Tab>
                         </TabList>
 
-                        <TabPanel>
-                            <div className={'card settings-card'}>
-                                There are no blog posts from this uer.
-                            </div>
-                        </TabPanel>
-                        <TabPanel>{this.renderUsersPosts()}</TabPanel>
-                        <TabPanel>
-                            <div className={'card settings-card'}>
-                                There are no posts from this user.
-                            </div>
-                        </TabPanel>
+                        <div className={'mt3'}>
+                            <TabPanel>
+                                <div className={'card settings-card'}>
+                                    There are no blog posts from this uer.
+                                </div>
+                            </TabPanel>
+                            <TabPanel>{this.renderUsersPosts()}</TabPanel>
+                            <TabPanel>
+                                <div className={'card settings-card'}>
+                                    There are no posts from this user.
+                                </div>
+                            </TabPanel>
+                        </div>
                     </Tabs>
                 </div>
             </div>

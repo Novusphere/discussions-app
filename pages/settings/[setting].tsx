@@ -108,7 +108,7 @@ class Settings extends React.Component<ISettings, ISettingsState> {
         return (
             <>
                 <span className={'b black f5'}>Settings</span>
-                <ul className={'list ph2 mt3'}>
+                <ul className={'list mv3'}>
                     {[
                         {
                             name: 'connections',
@@ -155,12 +155,12 @@ class Settings extends React.Component<ISettings, ISettingsState> {
                         </span>
                     )}
                 </span>
-                <ul className={'list ph2 mt3'}>
+                <ul className={'list mv3'}>
                     {Array.from(balances).length === 0 && (
                         <span className={'moon-gray f6 i'}>You have no balances.</span>
                     )}
                     {Array.from(balances).map(([symbol, amount]) => (
-                        <div key={symbol} className={'mt3 f6 flex flex-row justify-between'}>
+                        <div key={symbol} className={'mt3 f6 flex flex-row justify-between ph3 pv2'}>
                             <span>{symbol}</span>
                             <span>{amount}</span>
                         </div>
