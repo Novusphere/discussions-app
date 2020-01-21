@@ -5,7 +5,7 @@ import { CreateForm } from '@components'
 import { task } from 'mobx-task'
 import axios from 'axios'
 import { getAuthStore, getUiStore, IStores } from '@stores/index'
-import { checkIfNameIsValid, sleep, submitRelay } from '@utils'
+import { checkIfNameIsValid, sleep, submitRelayAsync } from '@utils'
 import { discussions, eos } from '@novuspherejs'
 import ecc from 'eosjs-ecc'
 import { ModalOptions } from '@globals'
@@ -426,7 +426,7 @@ export default class SettingsStore extends BaseStore {
                 robj.memo
             )
 
-            return submitRelay([robj])
+            return submitRelayAsync([robj])
         } catch (error) {
             throw error
         }

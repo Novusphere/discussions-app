@@ -613,7 +613,7 @@ export const trimAddress = (address: string) => {
     return `${first}...${last}`
 }
 
-export const submitRelay = async (transfers: any[]) => {
+export const submitRelayAsync = async (transfers: any[]) => {
     try {
         const { data } = await axios.post(
             'https://atmosdb.novusphere.io/unifiedid/relay',
@@ -631,11 +631,13 @@ export const submitRelay = async (transfers: any[]) => {
     }
 }
 
-export const submitRelayAsPost = async (transfers: any[]) => {
+export const voteAsync = async ({ voter, uuid, value, nonce, pub, sig }) => {
     try {
         const { data } = await axios.post(
-            `${nsdb.api}/discussions/post`,
-            `data=${encodeURIComponent(JSON.stringify({ transfers }))}`
+            `${nsdb.api}/discussions/vote`,
+            `data=${encodeURIComponent(
+                JSON.stringify({ voter, uuid, value, metadata: JSON.stringify({ nonce, pub, sig }) })
+            )}`
         )
         return data
     } catch (error) {

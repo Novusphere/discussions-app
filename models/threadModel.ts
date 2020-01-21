@@ -5,11 +5,11 @@ import { ReplyModel } from '@models/replyModel'
 import _ from 'lodash'
 import PostModel from '@models/postModel'
 import { CreateForm } from '@components'
-import { discussions } from '@novuspherejs'
 import { getAuthStore, getUiStore, IStores } from '@stores'
 import { task } from 'mobx-task'
 import EditModel from '@models/editModel'
-import { eos } from '@novuspherejs'
+import ecc from 'eosjs-ecc'
+import { voteAsync } from '@utils'
 
 export class ThreadModel {
     @observable public map: { [p: string]: PostModel } | undefined
@@ -227,16 +227,17 @@ export class ThreadModel {
      * @return {void}
      */
     @action vote = async (uuid: string, myNewVote: number) => {
+        console.log(uuid, myNewVote)
         const type = myNewVote === 1 ? 'upvotes' : 'downvotes'
+        const post = this.map[uuid]
+        const originalVote = post[type] + myNewVote
 
-        try {
-            await discussions.vote(uuid, myNewVote)
-
+        const internallyUpdateVote = _myNewVote => {
             // opening post
             if (uuid === this.uuid) {
                 if (this.openingPost['myVote'] === 0) {
-                    this.openingPost[type] = this.openingPost[type] + myNewVote
-                    this.openingPost['myVote'] = myNewVote
+                    this.openingPost[type] = this.openingPost[type] + _myNewVote
+                    this.openingPost['myVote'] = _myNewVote
                 } else if (this.openingPost['myVote'] === 1) {
                     this.openingPost['upvotes'] = this.openingPost['upvotes'] - 1
                     this.openingPost['myVote'] = 0
@@ -248,8 +249,8 @@ export class ThreadModel {
 
             if (this.map) {
                 if (this.map[uuid].myVote === 0) {
-                    this.map[uuid][type] = this.map[uuid][type] + myNewVote
-                    this.map[uuid].myVote = myNewVote
+                    // this.map[uuid][type] = originalVote
+                    this.map[uuid].myVote = _myNewVote
                 } else if (this.map[uuid].myVote === 1) {
                     this.map[uuid]['upvotes'] = this.map[uuid]['upvotes'] - 1
                     this.map[uuid].myVote = 0
@@ -258,8 +259,45 @@ export class ThreadModel {
                     this.map[uuid].myVote = 0
                 }
             }
+        }
+
+        try {
+            const { postPriv } = this.authStore
+            const pub = ecc.privateToPublic(postPriv)
+            const nonce = new Date().getTime()
+            const hash0 = ecc.sha256(`${myNewVote} ${uuid} ${nonce}`)
+            const sig = ecc.sign(hash0, postPriv)
+            const value = myNewVote
+
+            console.log({
+                value,
+                nonce,
+                myNewVote,
+                uuid,
+                postPriv,
+                pub,
+                hash0,
+            })
+
+            const data = await voteAsync({
+                voter: '',
+                uuid,
+                value,
+                nonce,
+                pub,
+                sig,
+            })
+
+            if (data.error) {
+                internallyUpdateVote(post[type])
+                this.uiStore.showToast(`Failed to ${type.split('s')[0]} this post`, 'error')
+                return
+            }
+
+            internallyUpdateVote(myNewVote)
         } catch (error) {
             console.log(error)
+            internallyUpdateVote(post[type])
             throw error
         }
     }
