@@ -19,10 +19,11 @@ toast.configure()
 
 Router.events.on('routeChangeComplete', url => pageview(url))
 
-export const hydrate = storage => create({
-    storage: storage,
-    jsonify: true,
-})
+export const hydrate = storage =>
+    create({
+        storage: storage,
+        jsonify: true,
+    })
 
 class DiscussionApp extends App {
     public props: any
@@ -34,6 +35,14 @@ class DiscussionApp extends App {
      */
     async componentDidMount(): Promise<void> {
         if (!isServer) {
+            await eos.initializeTokens()
+            await eos.init({
+                host: 'nodes.get-scatter.com',
+                port: 443,
+                protocol: 'https',
+                chainId: 'aca376f206b8fc25a6ed44dbdc66547c36c6c33e3a119ffbeaef943642f0e906',
+            })
+
             const {
                 authStore,
                 settingsStore,
@@ -52,13 +61,6 @@ class DiscussionApp extends App {
 
             Object.keys(stores).forEach(store => {
                 hydrate(localStorage)(store, stores[store])
-            })
-
-            await eos.init({
-                host: 'nodes.get-scatter.com',
-                port: 443,
-                protocol: 'https',
-                chainId: 'aca376f206b8fc25a6ed44dbdc66547c36c6c33e3a119ffbeaef943642f0e906'
             })
 
             settingsStore.setTokens(eos.tokens)
@@ -102,4 +104,4 @@ class DiscussionApp extends App {
     }
 }
 
-export default (withMobx(Stores))(DiscussionApp)
+export default withMobx(Stores)(DiscussionApp)

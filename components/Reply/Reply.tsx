@@ -22,6 +22,7 @@ import { task } from 'mobx-task'
 import { Sticky, StickyContainer } from 'react-sticky'
 import { ObservableMap } from 'mobx'
 import { BlockedContentSetting } from '@stores/settingsStore'
+import { PostTips } from '@novuspherejs/discussions/post'
 
 interface IReplies {
     currentPath: string
@@ -47,6 +48,8 @@ interface IReplies {
     permaLink: string
     unsignedPostsIsSpam: boolean
     isBlockedUser: boolean
+
+    tokenImages: { [symbol: string]: string }
 }
 
 interface IRepliesState {
@@ -240,6 +243,7 @@ class Reply extends React.Component<IReplies, IRepliesState> {
             unsignedPostsIsSpam,
             permaLink,
             blockedByDelegation,
+            tokenImages,
         } = this.props
 
         const { isCollapsed, isHover, isSpam } = this.state
@@ -305,7 +309,7 @@ class Reply extends React.Component<IReplies, IRepliesState> {
                             {this.renderVoteHandlers()}
                         </div>
                         <div className={'flex flex-column'}>
-                            <div className={'header pb0'}>
+                            <div className={'flex flex-row items-center header pb0'}>
                                 <div className={'pr2'}>{this.renderCollapseElements()}</div>
                                 {this.renderUserElements()}
                                 <div className={'db'}>
@@ -390,6 +394,7 @@ class Reply extends React.Component<IReplies, IRepliesState> {
                                           isBlockedUser={isBlockedUser}
                                           permaLink={_permaLink}
                                           blockedByDelegation={blockedByDelegation}
+                                          tokenImages={tokenImages}
                                       />
                                   </div>
                               )
@@ -423,8 +428,29 @@ class Reply extends React.Component<IReplies, IRepliesState> {
         )
     }
 
+    private renderTips = (tips: PostTips | null) => {
+        if (!tips || !this.props.tokenImages) return null
+
+        return Object.keys(tips).map(symbol => {
+            if (!this.props.tokenImages[symbol]) return null
+
+            return (
+                <span key={symbol} className={'ph2 flex flex-row items-center'}>
+                    <img
+                        src={this.props.tokenImages[symbol]}
+                        alt={`${symbol} image`}
+                        className={'dib'}
+                        width={'25px'}
+                    />
+                    <span className={'f6 gray dib'}> x {tips[symbol]}</span>
+                </span>
+            )
+        })
+    }
+
     private renderUserElements = () => {
         const { post } = this.props
+
         return (
             <>
                 <UserNameWithIcon
@@ -441,6 +467,7 @@ class Reply extends React.Component<IReplies, IRepliesState> {
                     {post.edit && 'edited '}{' '}
                     {moment(post.edit ? post.editedAt : post.createdAt).fromNow()}
                 </span>
+                {this.renderTips(post.tips)}
             </>
         )
     }

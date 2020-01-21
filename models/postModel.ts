@@ -1,7 +1,8 @@
 import { observable, set } from 'mobx'
 import { Post } from '@novuspherejs'
 import ecc from 'eosjs-ecc'
-import { encodeId, getIdenticon } from '@utils'
+import { getIdenticon } from '@utils'
+import { PostTips } from '@novuspherejs/discussions/post'
 
 class PostModel {
     @observable public map: { [p: string]: PostModel } | undefined
@@ -24,6 +25,7 @@ class PostModel {
     @observable tags
     @observable mentions
     @observable uidw
+    @observable tips: PostTips
 
     @observable transaction
 

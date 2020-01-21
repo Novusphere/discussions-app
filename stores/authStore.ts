@@ -54,6 +54,7 @@ export default class AuthStore extends BaseStore {
     balances = observable.map<string, string>()
 
     @observable supportedTokensForUnifiedWallet = []
+    @observable supportedTokensImages: { [symbol: string]: string } = {}
     @observable selectedToken = null
 
     @persist
@@ -80,11 +81,15 @@ export default class AuthStore extends BaseStore {
         nsdb.getSupportedTokensForUnifiedWallet().then(async data => {
             this.setDepositTokenOptions(data)
             this.refreshAllBalances()
+
+            sleep(1000).then(() => {
+                this.updateTokenImages(data)
+            })
         })
     }
 
     @action.bound
-    setWalletPrivateKey(key: string)  {
+    setWalletPrivateKey(key: string) {
         this.temporaryWalletPrivateKey = key
     }
 
@@ -105,6 +110,31 @@ export default class AuthStore extends BaseStore {
         } catch (error) {
             throw error
         }
+    }
+
+    @action.bound
+    updateTokenImages(depositTokens) {
+        depositTokens.map(token => {
+            if (!eos.tokens) return
+
+            if (
+                !this.supportedTokensImages ||
+                !this.supportedTokensImages.hasOwnProperty(token.symbol)
+            ) {
+                let logo
+
+                const tokenFromList = eos.tokens.find(t => t.name === token.symbol)
+
+                if (tokenFromList) {
+                    logo = tokenFromList.logo
+                }
+
+                this.supportedTokensImages = {
+                    ...this.supportedTokensImages,
+                    [token.symbol]: logo,
+                }
+            }
+        })
     }
 
     @action.bound

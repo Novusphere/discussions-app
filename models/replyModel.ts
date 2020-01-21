@@ -6,7 +6,7 @@ import { CreateForm } from '@components'
 import EditModel from '@models/editModel'
 import { Messages, ModalOptions } from '@globals'
 import { discussions } from '@novuspherejs'
-import { submitRelay, submitRelayAsPost, transformTipsToTransfers } from '@utils'
+import { transformTipsToTransfers } from '@utils'
 
 export class ReplyModel {
     @observable uid = ''
@@ -187,6 +187,7 @@ export class ReplyModel {
                             if (key === 'false') {
                                 this.uiStore.hideModal()
                                 this.authStore.clearWalletPrivateKey()
+                                this.uiStore.showToast('The password you have entered is invalid.', 'error')
                                 return reject(
                                     new Error('The password you have entered is invalid.')
                                 )

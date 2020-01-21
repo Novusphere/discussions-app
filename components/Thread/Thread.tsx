@@ -179,7 +179,7 @@ class Thread extends React.Component<IThreadOuterProps & IThreadInnerProps, IThr
                 blockedByDelegation,
             },
             postsStore: { highlightPostUuid, currentHighlightedPostUuid, setCurrentReplyContent },
-            authStore: { activePublicKey, hasAccount },
+            authStore: { activePublicKey, hasAccount, supportedTokensImages },
             settingsStore: { blockedContentSetting, unsignedPostsIsSpam },
         } = this.props
 
@@ -213,6 +213,7 @@ class Thread extends React.Component<IThreadOuterProps & IThreadInnerProps, IThr
                             blockedByDelegation={blockedByDelegation}
                             isBlockedUser={blockedUsers.has(reply.pub)}
                             unsignedPostsIsSpam={unsignedPostsIsSpam}
+                            tokenImages={supportedTokensImages}
                         />
                     )
                 })}

@@ -9,6 +9,7 @@ import { discussions } from '@novuspherejs'
 import { getAuthStore, getUiStore, IStores } from '@stores'
 import { task } from 'mobx-task'
 import EditModel from '@models/editModel'
+import { eos } from '@novuspherejs'
 
 export class ThreadModel {
     @observable public map: { [p: string]: PostModel } | undefined
@@ -21,7 +22,6 @@ export class ThreadModel {
     @observable openingPostReplies: PostModel[] = []
 
     @observable editing = false
-
     @observable openingPostReplyModel: ReplyModel = null
 
     public replyBoxStatuses = observable.map<string, ReplyModel>()
@@ -59,7 +59,6 @@ export class ThreadModel {
         this.openingPostReplyModel = openingPostReplyModel
         openingPostReplyModel.toggleOpen()
         this.replyBoxStatuses.set(this.uuid, openingPostReplyModel)
-
         this.openingPostReplies = _.filter(this.map, post => post.parentUuid === this.uuid)
     }
 

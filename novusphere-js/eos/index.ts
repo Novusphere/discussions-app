@@ -138,7 +138,9 @@ export class EOS {
                 ],
             })
         }
+    }
 
+    async initializeTokens() {
         this.tokens = Array.from(await getTokens())
     }
 
