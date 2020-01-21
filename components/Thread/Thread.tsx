@@ -98,6 +98,7 @@ class Thread extends React.Component<IThreadOuterProps & IThreadInnerProps, IThr
         const {
             router,
             uiStore,
+            authStore: { supportedTokensImages },
             postsStore: { hasReplyContent },
             tagStore: { activeTag },
             userStore: { isWatchingThread, toggleThreadWatch, toggleBlockPost, blockedPosts },
@@ -120,6 +121,7 @@ class Thread extends React.Component<IThreadOuterProps & IThreadInnerProps, IThr
                 toggleBlockPost={toggleBlockPost}
                 watchPost={this.handleWatchPost}
                 isBlockedPost={blockedPosts.has(router.asPath)}
+                tokenImages={supportedTokensImages}
             />
         )
     }

@@ -1,6 +1,6 @@
 import * as React from 'react'
 import moment from 'moment'
-import { RichTextPreview, UserNameWithIcon, VotingHandles } from '@components'
+import { RichTextPreview, Tips, UserNameWithIcon, VotingHandles } from '@components'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { faComment } from '@fortawesome/free-solid-svg-icons'
 import { TagModel } from '@models/tagModel'
@@ -16,6 +16,7 @@ import { ObservableMap } from 'mobx'
 interface IPostPreviewProps {
     post: Post
     tag: TagModel
+    tokenImages: any
     notificationUuid?: string
     voteHandler?: (uuid: string, value: number) => Promise<void>
     disableVoteHandler?: boolean // in case voting needs to be disabled
@@ -30,6 +31,7 @@ const PostPreview: React.FC<IPostPreviewProps> = ({
     disableVoteHandler,
     post,
     tag,
+    tokenImages,
     notificationUuid,
     voteHandler,
     blockedContentSetting,
@@ -136,6 +138,7 @@ const PostPreview: React.FC<IPostPreviewProps> = ({
                                         >
                                             {moment(post.createdAt).fromNow()}
                                         </span>
+                                        <Tips tokenImages={tokenImages} tips={post.tips} />
                                     </div>
                                     <div className={'flex justify-between items-center pt1'}>
                                         <span className={'black f3 b lh-title'}>{post.title}</span>

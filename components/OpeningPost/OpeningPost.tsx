@@ -11,12 +11,13 @@ import {
     faPen,
     faReply,
 } from '@fortawesome/free-solid-svg-icons'
-import { UserNameWithIcon, VotingHandles, Form, SharePost, RichTextPreview } from '@components'
+import { UserNameWithIcon, VotingHandles, Form, SharePost, RichTextPreview, Tips } from '@components'
 import moment from 'moment'
 import PostModel from '@models/postModel'
 import { ThreadModel } from '@models/threadModel'
 import { observer } from 'mobx-react'
 import { TagModel } from '@models/tagModel'
+import { PostTips } from '@novuspherejs/discussions/post'
 
 interface IOpeningPostProps {
     isPreview?: boolean
@@ -33,6 +34,7 @@ interface IOpeningPostProps {
     toggleBlockPost?: (threadUuid: string) => void
     isBlockedPost: boolean
     addAsModerator: () => void
+    tokenImages: { [symbol: string]: string }
 }
 
 const OpeningPost: React.FC<IOpeningPostProps> = ({
@@ -50,6 +52,7 @@ const OpeningPost: React.FC<IOpeningPostProps> = ({
     isBlockedPost,
     asPath,
     addAsModerator,
+    tokenImages,
 }) => {
     return (
         <div data-post-uuid={openingPost.uuid}>
@@ -106,6 +109,7 @@ const OpeningPost: React.FC<IOpeningPostProps> = ({
                                 openingPost.edit ? openingPost.editedAt : openingPost.createdAt
                             ).fromNow()}
                         </span>
+                        <Tips tokenImages={tokenImages} tips={openingPost.tips} />
                     </div>
 
                     <div className={'flex justify-between items-center pb1'}>

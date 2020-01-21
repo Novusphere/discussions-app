@@ -5,6 +5,7 @@ import {
     ReplyBox,
     ReplyHoverElements,
     RichTextPreview,
+    Tips,
     UserNameWithIcon,
     VotingHandles,
 } from '@components'
@@ -428,32 +429,8 @@ class Reply extends React.Component<IReplies, IRepliesState> {
         )
     }
 
-    private renderTips = (tips: PostTips | null) => {
-        if (!tips || !this.props.tokenImages) return null
-
-        return Object.keys(tips).map(symbol => {
-            const tokenImageSymbol = this.props.tokenImages[symbol]
-
-            if (!tokenImageSymbol) return null
-
-            const [img, precision] = tokenImageSymbol
-
-            return (
-                <span key={symbol} className={'ph2 flex flex-row items-center'}>
-                    <img
-                        src={img}
-                        alt={`${symbol} image`}
-                        className={'dib'}
-                        width={'25px'}
-                    />
-                    <span className={'f6 gray dib'}> x {tips[symbol].toFixed(precision)}</span>
-                </span>
-            )
-        })
-    }
-
     private renderUserElements = () => {
-        const { post } = this.props
+        const { post, tokenImages } = this.props
 
         return (
             <>
@@ -471,7 +448,7 @@ class Reply extends React.Component<IReplies, IRepliesState> {
                     {post.edit && 'edited '}{' '}
                     {moment(post.edit ? post.editedAt : post.createdAt).fromNow()}
                 </span>
-                {this.renderTips(post.tips)}
+                <Tips tokenImages={tokenImages} tips={post.tips} />
             </>
         )
     }
