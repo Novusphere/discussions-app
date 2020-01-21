@@ -668,7 +668,7 @@ export const transformTipsToTransfers = (
             const nonce = new Date().getTime()
             const amountasNumber = Number(tip.amount)
             const totalFee = amountasNumber * percent + flat
-            const amount = `${Number(tip.amount).toFixed(decimals)} ${label}`
+            const amount = `${Number(tip.amount - totalFee).toFixed(decimals)} ${label}`
             const fee = `${Number(totalFee).toFixed(decimals)} ${label}`
             const memo = ''
 
