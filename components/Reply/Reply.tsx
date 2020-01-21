@@ -432,17 +432,21 @@ class Reply extends React.Component<IReplies, IRepliesState> {
         if (!tips || !this.props.tokenImages) return null
 
         return Object.keys(tips).map(symbol => {
-            if (!this.props.tokenImages[symbol]) return null
+            const tokenImageSymbol = this.props.tokenImages[symbol]
+
+            if (!tokenImageSymbol) return null
+
+            const [img, precision] = tokenImageSymbol
 
             return (
                 <span key={symbol} className={'ph2 flex flex-row items-center'}>
                     <img
-                        src={this.props.tokenImages[symbol]}
+                        src={img}
                         alt={`${symbol} image`}
                         className={'dib'}
                         width={'25px'}
                     />
-                    <span className={'f6 gray dib'}> x {tips[symbol]}</span>
+                    <span className={'f6 gray dib'}> x {tips[symbol].toFixed(precision)}</span>
                 </span>
             )
         })

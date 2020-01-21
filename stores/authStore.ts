@@ -131,7 +131,7 @@ export default class AuthStore extends BaseStore {
 
                 this.supportedTokensImages = {
                     ...this.supportedTokensImages,
-                    [token.symbol]: logo,
+                    [token.symbol]: [logo, token.precision],
                 }
             }
         })
