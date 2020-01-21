@@ -42,7 +42,11 @@ class U extends React.Component<IUPageProps> {
         await sleep(500)
         const posts = await postsStore.getPostsForKeys([pub])
 
-        let uidw = posts[0].uidw
+        let uidw
+
+        if (posts.length) {
+            uidw = posts[0].uidw
+        }
 
         return {
             uidw,

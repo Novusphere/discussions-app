@@ -159,8 +159,9 @@ export class Post {
         }
         p.tips = o.tips.length
             ? o.tips.reduce((acc, curr) => {
-                  const [, symbol] = curr.data.amount.split(' ')
-                  acc[symbol] = (acc[symbol] ? acc[symbol] : 0) + 1
+                  const [amount, symbol] = curr.data.amount.split(' ')
+                  const [fee] = curr.data.fee.split(' ')
+                  acc[symbol] = (acc[symbol] ? acc[symbol] : 0) + (Number(amount) + Number(fee))
                   return acc
               }, {})
             : null
