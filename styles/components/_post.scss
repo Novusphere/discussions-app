@@ -43,6 +43,10 @@
     @extend .h-100;
     background: white;
 
+    ul {
+        padding-left: 2em;
+    }
+
     .tag-image {
         width: 24px !important;
         padding-right: 5px;
