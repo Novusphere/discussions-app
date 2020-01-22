@@ -1,7 +1,6 @@
 import * as React from 'react'
 import { inject, observer } from 'mobx-react'
 import { IStores } from '@stores'
-import { ShowFullThread } from '@components'
 import Router, { NextRouter, withRouter } from 'next/router'
 import { Thread } from '@novuspherejs'
 import { NextSeo } from 'next-seo'
@@ -15,7 +14,6 @@ interface IEPageProps {
     postsStore: IStores['postsStore']
     uiStore: IStores['uiStore']
     tagStore: IStores['tagStore']
-    authStore: IStores['authStore']
     // thread: any
     query: {
         name: string
@@ -31,7 +29,7 @@ interface IEPageState {
 }
 
 @(withRouter as any)
-@inject('postsStore', 'tagStore', 'uiStore', 'authStore')
+@inject('postsStore', 'tagStore', 'uiStore')
 @observer
 class E extends React.Component<IEPageProps, IEPageState> {
     private rn: any = null
@@ -74,13 +72,15 @@ class E extends React.Component<IEPageProps, IEPageState> {
 
             await Router.replace('/tag/[name]/[id]/[title]', url, { shallow: true })
         }
+
+        // generate thread
+        this.props.postsStore.hydrateThread()
     }
 
     public render(): React.ReactNode {
         const {
             thread,
             query,
-            authStore: { supportedTokensImages },
             tagStore: { activeTag },
         } = this.props
 
@@ -116,7 +116,7 @@ class E extends React.Component<IEPageProps, IEPageState> {
                         ],
                     }}
                 />
-                <NewThread thread={thread} supportedTokensImages={supportedTokensImages} />
+                <NewThread threadSerialized={thread} />
                 {/*<ShowFullThread thread={thread} />*/}
             </>
         )

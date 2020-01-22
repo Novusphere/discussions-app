@@ -32,7 +32,7 @@ const VotingHandles: React.FC<IVoteProps> = ({
         })}
         {...props}
     >
-        <span onClick={async () => await handler(uuid, 1)}>
+        <span onClick={() => handler(uuid, myVote === 0 ? 1 : 0)}>
             <FontAwesomeIcon
                 width={13}
                 icon={faArrowUp}
@@ -50,9 +50,9 @@ const VotingHandles: React.FC<IVoteProps> = ({
             className={classNames(['f6 disable-user-select ph1'])}
             style={{ color: color ? color : '#b9b9b9', whiteSpace: 'pre' }}
         >
-            {upVotes + downVotes}
+            {upVotes - downVotes}
         </span>
-        <span onClick={async () => await handler(uuid, -1)}>
+        <span onClick={() => handler(uuid, myVote === 0 ? -1 : 0)}>
             <FontAwesomeIcon
                 width={13}
                 color={color ? color : '#b9b9b9'}

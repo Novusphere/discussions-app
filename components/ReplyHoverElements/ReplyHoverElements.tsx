@@ -12,13 +12,15 @@ import {
     faUserPlus,
 } from '@fortawesome/free-solid-svg-icons'
 import { openInNewTab } from '@utils'
-import PostModel from '@models/postModel'
 import { ReplyModel } from '@models/replyModel'
 import classNames from 'classnames'
+import { Post } from '@novuspherejs'
+import PostModel from '@models/postModel'
+import { NewReplyModel } from '@models/newReplyModel'
 
 interface IReplyHoverElementsProps {
-    post: PostModel
-    replyModel: ReplyModel
+    post: Post | PostModel
+    replyModel: ReplyModel | NewReplyModel
     hasAccount: boolean
     activePublicKey: string
     isFollowing: boolean

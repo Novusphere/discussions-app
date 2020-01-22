@@ -33,6 +33,7 @@ export { default as ChooseAccountName } from './modal/sign-up/choose-account-nam
 export { default as SectionHeader } from './modal/sign-up/header'
 export { default as GenerateKey } from './modal/sign-up/generate-key'
 export { default as VerifyKey } from './modal/sign-up/verification'
+export { default as Replies } from './Replies/Replies'
 
 // modals
 export { default as PostWarningCloseModal } from './modal/post-warning-close/post-warning-close'

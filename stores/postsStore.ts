@@ -1,5 +1,5 @@
 import { action, computed, observable } from 'mobx'
-import { discussions, Post } from '@novuspherejs'
+import { discussions, Post, Thread } from '@novuspherejs'
 import { task } from 'mobx-task'
 import { BaseStore, getOrCreateStore } from 'next-mobx-wrapper'
 import { CreateForm } from '@components'
@@ -93,6 +93,7 @@ export default class PostsStore extends BaseStore {
      */
     @observable openingPostReplyContent = ''
 
+    @observable activeThreadSerialized: Thread
     @observable activeThread: ThreadModel
 
     @observable currentHighlightedPostUuid = ''
@@ -205,16 +206,21 @@ export default class PostsStore extends BaseStore {
 
     @task
     @action.bound
-    public async getAndSetThread(id: string, isServer = false): Promise<null | ThreadModel> {
+    public async getAndSetThread(id: string, isServer = false): Promise<null | Thread> {
         try {
             const thread = await discussions.getThread(id, isServer)
             if (!thread) return null
-            this.activeThread = new ThreadModel(thread)
+            this.activeThreadSerialized = thread
             this.activeThreadId = id
-            return Promise.resolve(this.activeThread)
+            return thread
         } catch (error) {
             throw error
         }
+    }
+
+    @action.bound
+    public async hydrateThread() {
+        this.activeThread = new ThreadModel(this.activeThreadSerialized)
     }
 
     /**
