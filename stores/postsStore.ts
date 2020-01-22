@@ -5,11 +5,18 @@ import { BaseStore, getOrCreateStore } from 'next-mobx-wrapper'
 import { CreateForm } from '@components'
 import { getTagStore } from '@stores/tagStore'
 import { getAuthStore, getUiStore, IStores } from '@stores'
-import { encodeId, generateUuid, getAttachmentValue, pushToThread } from '@utils'
+import {
+    encodeId,
+    generateUuid,
+    generateVoteObject,
+    getAttachmentValue,
+    pushToThread,
+} from '@utils'
 import { ThreadModel } from '@models/threadModel'
 import FeedModel from '@models/feedModel'
 import _ from 'lodash'
 import PostModel from '@models/postModel'
+import ecc from 'eosjs-ecc'
 
 export interface IAttachment {
     value: string
@@ -293,6 +300,14 @@ export default class PostsStore extends BaseStore {
                 tags = [...tags, ...inlineTags]
             }
 
+            const value = 1
+            const { postPriv } = this.authStore
+            const { data: vote } = generateVoteObject({
+                uuid,
+                postPriv,
+                value,
+            })
+
             const newPost = {
                 poster: null,
                 displayName: null,
@@ -308,6 +323,7 @@ export default class PostsStore extends BaseStore {
                 attachment: getAttachmentValue(post),
                 createdAt: Date.now(),
                 uidw: uidw,
+                vote: vote,
             }
 
             if (posterName === this.authStore.displayName.bk) {

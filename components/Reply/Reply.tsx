@@ -23,7 +23,6 @@ import { task } from 'mobx-task'
 import { Sticky, StickyContainer } from 'react-sticky'
 import { ObservableMap } from 'mobx'
 import { BlockedContentSetting } from '@stores/settingsStore'
-import { PostTips } from '@novuspherejs/discussions/post'
 
 interface IReplies {
     currentPath: string

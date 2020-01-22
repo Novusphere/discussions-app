@@ -29,6 +29,7 @@ export class Post {
     threadUuid: string
     editUuid: string
     uuid: string
+    vote: any
     title: string
     poster: string
     displayName: string

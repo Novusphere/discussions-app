@@ -17,7 +17,6 @@ import PostModel from '@models/postModel'
 import { ThreadModel } from '@models/threadModel'
 import { observer } from 'mobx-react'
 import { TagModel } from '@models/tagModel'
-import { PostTips } from '@novuspherejs/discussions/post'
 
 interface IOpeningPostProps {
     isPreview?: boolean

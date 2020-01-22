@@ -1,15 +1,14 @@
 import Router from 'next/router'
-import { discussions, eos, Post, nsdb } from '@novuspherejs'
+import { discussions, eos, nsdb, Post } from '@novuspherejs'
 import { IPost } from '@stores/postsStore'
 import _ from 'lodash'
 import axios from 'axios'
+import ecc from 'eosjs-ecc'
 
 const removeMd = require('remove-markdown')
 
 const pjson = require('../package.json')
 const uuid = require('uuidv4')
-
-import ecc from 'eosjs-ecc'
 
 export * from './useScrollPosition'
 
@@ -636,7 +635,12 @@ export const voteAsync = async ({ voter, uuid, value, nonce, pub, sig }) => {
         const { data } = await axios.post(
             `${nsdb.api}/discussions/vote`,
             `data=${encodeURIComponent(
-                JSON.stringify({ voter, uuid, value, metadata: JSON.stringify({ nonce, pub, sig }) })
+                JSON.stringify({
+                    voter,
+                    uuid,
+                    value,
+                    metadata: JSON.stringify({ nonce, pub, sig }),
+                })
             )}`
         )
         return data
@@ -698,4 +702,27 @@ export const transformTipsToTransfers = (
             }
         }
     })
+}
+
+export const generateVoteObject = ({ uuid, postPriv, value }) => {
+    const pub = ecc.privateToPublic(postPriv)
+    const nonce = new Date().getTime()
+    const hash0 = ecc.sha256(`${value} ${uuid} ${nonce}`)
+    const sig = ecc.sign(hash0, postPriv)
+
+    return {
+        pub,
+        sig,
+        nonce,
+        data: {
+            voter: '',
+            uuid: uuid,
+            value: 1,
+            metadata: JSON.stringify({
+                nonce: nonce,
+                pub: pub,
+                sig: sig,
+            }),
+        },
+    }
 }

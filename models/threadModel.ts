@@ -9,7 +9,7 @@ import { getAuthStore, getUiStore, IStores } from '@stores'
 import { task } from 'mobx-task'
 import EditModel from '@models/editModel'
 import ecc from 'eosjs-ecc'
-import { voteAsync } from '@utils'
+import { generateVoteObject, voteAsync } from '@utils'
 
 export class ThreadModel {
     @observable public map: { [p: string]: PostModel } | undefined
@@ -230,13 +230,13 @@ export class ThreadModel {
         console.log(uuid, myNewVote)
         const type = myNewVote === 1 ? 'upvotes' : 'downvotes'
         const post = this.map[uuid]
-        const originalVote = post[type] + myNewVote
+        const updatedVote = post[type] + myNewVote
 
         const internallyUpdateVote = _myNewVote => {
             // opening post
             if (uuid === this.uuid) {
                 if (this.openingPost['myVote'] === 0) {
-                    this.openingPost[type] = this.openingPost[type] + _myNewVote
+                    this.openingPost[type] = updatedVote
                     this.openingPost['myVote'] = _myNewVote
                 } else if (this.openingPost['myVote'] === 1) {
                     this.openingPost['upvotes'] = this.openingPost['upvotes'] - 1
@@ -249,7 +249,7 @@ export class ThreadModel {
 
             if (this.map) {
                 if (this.map[uuid].myVote === 0) {
-                    // this.map[uuid][type] = originalVote
+                    this.map[uuid][type] = updatedVote
                     this.map[uuid].myVote = _myNewVote
                 } else if (this.map[uuid].myVote === 1) {
                     this.map[uuid]['upvotes'] = this.map[uuid]['upvotes'] - 1
@@ -262,30 +262,24 @@ export class ThreadModel {
         }
 
         try {
+            internallyUpdateVote(myNewVote)
+
             const { postPriv } = this.authStore
-            const pub = ecc.privateToPublic(postPriv)
-            const nonce = new Date().getTime()
-            const hash0 = ecc.sha256(`${myNewVote} ${uuid} ${nonce}`)
-            const sig = ecc.sign(hash0, postPriv)
             const value = myNewVote
 
-            console.log({
-                value,
-                nonce,
-                myNewVote,
+            const voteObject = generateVoteObject({
                 uuid,
                 postPriv,
-                pub,
-                hash0,
+                value,
             })
 
             const data = await voteAsync({
                 voter: '',
                 uuid,
                 value,
-                nonce,
-                pub,
-                sig,
+                nonce: voteObject.nonce,
+                pub: voteObject.pub,
+                sig: voteObject.sig,
             })
 
             if (data.error) {
@@ -294,7 +288,6 @@ export class ThreadModel {
                 return
             }
 
-            internallyUpdateVote(myNewVote)
         } catch (error) {
             console.log(error)
             internallyUpdateVote(post[type])

@@ -1,5 +1,5 @@
 import { action, computed, observable, set } from 'mobx'
-import { generateUuid, getAttachmentValue } from '@utils'
+import { generateUuid, generateVoteObject, getAttachmentValue } from '@utils'
 import PostModel from '@models/postModel'
 import { discussions } from '@novuspherejs'
 const matchAll = require('string.prototype.matchall')
@@ -108,7 +108,7 @@ class EditModel {
     }
 
     @action.bound
-    public createPostObject(isEdit = false) {
+    public createPostObject(isEdit = false, postPriv = '') {
         let reply = {
             poster: null,
             displayName: null,
@@ -130,6 +130,7 @@ class EditModel {
             myVote: 0,
             edit: undefined,
             transfers: undefined,
+            vote: null,
         }
 
         if (!isEdit) {
@@ -137,10 +138,20 @@ class EditModel {
             reply.id = generatedUuid
             reply.uuid = generatedUuid
 
+            const value = 1
+
             reply = {
                 ...reply,
-                upvotes: reply.displayName && reply.poster ? 1 : 0,
-                myVote: reply.displayName && reply.poster ? 1 : 0,
+                upvotes: 1,
+                myVote: 1,
+            }
+
+            if (postPriv) {
+                reply.vote = generateVoteObject({
+                    uuid: generatedUuid,
+                    postPriv: postPriv,
+                    value: value,
+                }).data
             }
         }
 

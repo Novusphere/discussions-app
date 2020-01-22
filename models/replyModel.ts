@@ -165,7 +165,7 @@ export class ReplyModel {
             },
         })
 
-        const reply = instance.createPostObject()
+        const reply = instance.createPostObject(false, postPriv)
         reply.uidw = activeUidWalletKey
 
         try {

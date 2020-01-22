@@ -252,22 +252,22 @@ export default class DiscussionsService {
             metadata.uidw = p.uidw
         }
 
-        let post:any = {
+        let post: any = {
             poster: p.poster,
             content: p.content,
             uuid: p.uuid,
+            vote: p.vote,
             threadUuid: p.threadUuid,
             parentUuid: p.parentUuid,
             tags: Array.from(tags),
             mentions: [],
             metadata: JSON.stringify(metadata),
-            transaction: ''
+            transaction: '',
         }
 
         if (p.transfers && p.transfers.length > 0) {
-
-            post.transfers = p.transfers;
-            post.notify = JSON.stringify({ name: 'tip', data: { parentUuid: p.parentUuid } });
+            post.transfers = p.transfers
+            post.notify = JSON.stringify({ name: 'tip', data: { parentUuid: p.parentUuid } })
         }
 
         try {
