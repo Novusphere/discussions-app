@@ -73,11 +73,7 @@ const ReplyBox: React.FC<IReplyProps> = ({
                 <button
                     disabled={loading}
                     className={'mt3 f6 link dim ph3 pv2 dib mr2 pointer white bg-green'}
-                    onClick={() => {
-                        onSubmit(uid).catch(err => {
-                            console.error(err)
-                        })
-                    }}
+                    onClick={() => onSubmit(uid)}
                 >
                     {loading ? <FontAwesomeIcon width={13} icon={faSpinner} spin /> : 'Post reply'}
                 </button>

@@ -1,9 +1,11 @@
 import * as React from 'react'
-import { useCallback, useLayoutEffect, useMemo, useState } from 'react'
+import { useCallback, useEffect, useLayoutEffect, useMemo, useState } from 'react'
 import { Post } from '@novuspherejs'
 import { getPermaLink } from '@utils'
 import classNames from 'classnames'
 import {
+    Form,
+    ReplyBox,
     ReplyHoverElements,
     RichTextPreview,
     Tips,
@@ -17,6 +19,9 @@ import { Observer, useObserver } from 'mobx-react'
 import { getAuthStore, getUserStore, IStores } from '@stores'
 import { NextRouter } from 'next/router'
 import { ObservableMap } from 'mobx'
+import { faSpinner } from '@fortawesome/free-solid-svg-icons'
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
+import { task } from 'mobx-task'
 
 interface IReplyProps {
     router: NextRouter
@@ -29,6 +34,12 @@ interface IReplyProps {
     blockedPosts: ObservableMap<string, string>
     toggleFollowStatus: (user, pub) => void
     className?: string
+    postPriv: string
+    posterType: string
+    posterName: string
+    activeUidWalletKey: string
+    supportedTokensForUnifiedWallet: any[]
+    showToast: (m: string, t: string) => void
 }
 
 // TODO: Implement blocked posts statuses
@@ -44,12 +55,19 @@ const Reply: React.FC<IReplyProps> = ({
     activePublicKey,
     isFollowing,
     className,
+    postPriv,
+    posterType,
+    posterName,
+    activeUidWalletKey,
+    supportedTokensForUnifiedWallet,
+    showToast,
 }) => {
+    const [replyContent, setReplyContent] = useState(reply.content)
     const [replyModel, setReplyModel] = useState<NewReplyModel>(null)
     const [hover, setHover] = useState(false)
     const [collapsed, setCollapse] = useState(false)
 
-    useLayoutEffect(() => {
+    useEffect(() => {
         setReplyModel(new NewReplyModel(reply))
     }, [])
 
@@ -161,12 +179,39 @@ const Reply: React.FC<IReplyProps> = ({
         [hover, hasReplyModelLoaded]
     )
 
-    return (
+    const onReplySubmit = useCallback(async () => {
+        try {
+            if (!hasAccount) {
+                showToast('You must be logged in to comment', 'error')
+                return
+            }
+            // submit reply and update the child replies
+            const reply = await replyModel.submitReply()
+        } catch (error) {
+            showToast(error.message, 'error')
+        }
+    }, [replyModel, hasAccount])
+
+    const onEditSave = useCallback(async () => {
+        try {
+            if (!hasAccount) {
+                showToast('You must be logged in to edit', 'error')
+                return
+            }
+            const editedContent = await replyModel.saveEdits(replyModel.editForm.form)
+            console.log(editedContent)
+            setReplyContent(editedContent)
+        } catch (error) {
+            showToast(error.message, 'error')
+        }
+    }, [replyModel, hasAccount])
+
+    return useObserver(() => (
         <div
             id={reply.uuid}
             data-post-uuid={reply.uuid}
             className={classNames([
-                'post-reply black mb2 w-100',
+                'post-reply black mb2',
                 {
                     [className]: !!className,
                     'permalink-highlight': currentHighlightedPostUuid === reply.uuid,
@@ -194,8 +239,11 @@ const Reply: React.FC<IReplyProps> = ({
                     }}
                 </Sticky>
                 <div
+                    style={{
+                        height: !collapsed ? 'auto' : '50px',
+                    }}
                     className={classNames([
-                        'parent flex flex-row pa2 w-100',
+                        'parent flex flex-row pa2',
                         {
                             'post-content-hover': hover,
                         },
@@ -217,7 +265,7 @@ const Reply: React.FC<IReplyProps> = ({
                         />
                     </div>
 
-                    <div className={'flex flex-column'}>
+                    <div className={'flex flex-column w-100'}>
                         <div className={'flex flex-row items-center header pb0'}>
                             <div className={'pr2'}>{renderCollapseElements()}</div>
                             {renderUserElements()}
@@ -230,51 +278,109 @@ const Reply: React.FC<IReplyProps> = ({
                             </div>
                         </div>
 
+                        {replyModel && replyModel.editing && (
+                            <>
+                                <Form
+                                    form={replyModel.editForm}
+                                    fieldClassName={'pb0'}
+                                    hideSubmitButton
+                                    className={'w-100 mt3'}
+                                />
+
+                                <div className={'flex flex-row items-center justify-start pb3'}>
+                                    <button
+                                        className={
+                                            'f6 link dim ph3 pv2 dib mr1 pointer white bg-red'
+                                        }
+                                        onClick={replyModel.toggleEditing}
+                                    >
+                                        Cancel
+                                    </button>
+
+                                    <button
+                                        disabled={replyModel.saveEdits['pending']}
+                                        className={'f6 link dim ph3 pv2 dib pointer white bg-green'}
+                                        onClick={onEditSave}
+                                    >
+                                        {replyModel.saveEdits['pending'] ? (
+                                            <FontAwesomeIcon width={13} icon={faSpinner} spin />
+                                        ) : (
+                                            'Save Edit'
+                                        )}
+                                    </button>
+                                </div>
+                            </>
+                        )}
+
                         {!collapsed && (
                             <RichTextPreview
                                 className={classNames([
                                     'f6 lh-copy reply-content mt2',
                                     {
-                                        hidden: replyModel && replyModel.editing,
-                                        visible: !hasReplyModelLoaded || !replyModel.editing,
+                                        dn: replyModel && replyModel.editing ? 'hidden' : 'visible',
+                                        dib: !replyModel || !replyModel.editing,
                                     },
                                 ])}
                             >
-                                {reply.content}
+                                {replyContent}
                             </RichTextPreview>
                         )}
-
-                        {!collapsed &&
-                            reply.replies.map(reply => (
-                                <div
-                                    key={reply.uuid}
-                                    onMouseLeave={() => setHover(true)}
-                                    onMouseEnter={() => setHover(false)}
-                                >
-                                    <Reply
-                                        className={'ml3 child'}
-                                        router={router}
-                                        currentHighlightedPostUuid={currentHighlightedPostUuid}
-                                        reply={reply}
-                                        supportedTokensImages={supportedTokensImages}
-                                        toggleFollowStatus={toggleFollowStatus}
-                                        blockedPosts={blockedPosts}
-                                        isFollowing={isFollowing}
-                                        activePublicKey={activePublicKey}
-                                        hasAccount={hasAccount}
-                                    />
-                                </div>
-                            ))}
                     </div>
                 </div>
+                {replyModel && (
+                    <ReplyBox
+                        id={`${reply.uuid}-reply`}
+                        className={classNames([
+                            'pl4 pr2 pb4',
+                            {
+                                'post-content-hover': hover,
+                            },
+                        ])}
+                        open={replyModel.open}
+                        uid={reply.uuid}
+                        onContentChange={replyModel.setReplyContent}
+                        value={replyModel.replyContent}
+                        loading={replyModel.submitReply['pending']}
+                        onSubmit={onReplySubmit}
+                    />
+                )}
+
+                {!collapsed &&
+                    reply.replies.map(reply => (
+                        <div
+                            key={reply.uuid}
+                            onMouseLeave={() => setHover(true)}
+                            onMouseEnter={() => setHover(false)}
+                        >
+                            <Reply
+                                className={'ml3 child'}
+                                router={router}
+                                currentHighlightedPostUuid={currentHighlightedPostUuid}
+                                reply={reply}
+                                supportedTokensImages={supportedTokensImages}
+                                toggleFollowStatus={toggleFollowStatus}
+                                blockedPosts={blockedPosts}
+                                isFollowing={isFollowing}
+                                activePublicKey={activePublicKey}
+                                hasAccount={hasAccount}
+                                postPriv={postPriv}
+                                posterType={posterType}
+                                posterName={posterName}
+                                activeUidWalletKey={activeUidWalletKey}
+                                supportedTokensForUnifiedWallet={supportedTokensForUnifiedWallet}
+                                showToast={showToast}
+                            />
+                        </div>
+                    ))}
             </StickyContainer>
         </div>
-    )
+    ))
 }
 
 interface IRepliesProps {
     authStore: IStores['authStore']
     userStore: IStores['userStore']
+    uiStore: IStores['uiStore']
     router: NextRouter
     supportedTokensImages: any
     currentHighlightedPostUuid: string
@@ -288,6 +394,7 @@ const Replies: React.FC<IRepliesProps> = ({
     currentHighlightedPostUuid,
     supportedTokensImages,
     router,
+    uiStore,
 }) => {
     return useObserver(() => (
         <div className={'card'}>
@@ -296,6 +403,7 @@ const Replies: React.FC<IRepliesProps> = ({
                     router={router}
                     key={reply.uuid}
                     reply={reply}
+                    showToast={uiStore.showToast}
                     currentHighlightedPostUuid={currentHighlightedPostUuid}
                     supportedTokensImages={supportedTokensImages}
                     toggleFollowStatus={userStore.toggleUserFollowing}
@@ -303,6 +411,11 @@ const Replies: React.FC<IRepliesProps> = ({
                     isFollowing={userStore.isFollowingUser}
                     hasAccount={authStore.hasAccount}
                     activePublicKey={authStore.activePublicKey}
+                    postPriv={authStore.postPriv}
+                    posterType={authStore.posterType}
+                    posterName={authStore.posterName}
+                    activeUidWalletKey={authStore.activeUidWalletKey}
+                    supportedTokensForUnifiedWallet={authStore.supportedTokensForUnifiedWallet}
                 />
             ))}
         </div>

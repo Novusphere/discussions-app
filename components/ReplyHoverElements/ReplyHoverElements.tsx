@@ -17,6 +17,7 @@ import classNames from 'classnames'
 import { Post } from '@novuspherejs'
 import PostModel from '@models/postModel'
 import { NewReplyModel } from '@models/newReplyModel'
+import { useObserver } from 'mobx-react-lite'
 
 interface IReplyHoverElementsProps {
     post: Post | PostModel
@@ -45,7 +46,7 @@ const ReplyHoverElements: React.FC<IReplyHoverElementsProps> = ({
     isMarkedAsSpam,
     onMarkSpamComplete,
 }) => {
-    return (
+    return useObserver(() => (
         <div
             className={classNames([
                 'hover-elements disable-user-select',
@@ -57,7 +58,7 @@ const ReplyHoverElements: React.FC<IReplyHoverElementsProps> = ({
             <span onClick={replyModel.toggleOpen} title={'Reply to post'}>
                 <FontAwesomeIcon icon={faReply} />
             </span>
-            {replyModel.canEditPost && (
+            {activePublicKey === post.pub && (
                 <span title={'Edit post'} onClick={() => replyModel.toggleEditing()}>
                     <FontAwesomeIcon icon={faPen} />
                 </span>
@@ -98,7 +99,7 @@ const ReplyHoverElements: React.FC<IReplyHoverElementsProps> = ({
                 />
             </span>
         </div>
-    )
+    ))
 }
 
 export default ReplyHoverElements

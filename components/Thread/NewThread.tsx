@@ -13,10 +13,11 @@ interface INewThreadProps {
     authStore?: IStores['authStore']
     settingsStore?: IStores['settingsStore']
     userStore?: IStores['userStore']
+    uiStore?: IStores['uiStore']
 }
 
 @(withRouter as any)
-@inject('authStore', 'postsStore', 'settingsStore', 'userStore')
+@inject('authStore', 'postsStore', 'settingsStore', 'userStore', 'uiStore')
 @observer
 export class NewThread extends React.Component<INewThreadProps, any> {
     render() {
@@ -25,7 +26,8 @@ export class NewThread extends React.Component<INewThreadProps, any> {
                 router,
                 threadSerialized,
                 userStore,
-                authStore: { supportedTokensImages },
+                authStore,
+                uiStore,
                 postsStore: { currentHighlightedPostUuid },
                 settingsStore: { blockedContentSetting },
             },
@@ -35,10 +37,11 @@ export class NewThread extends React.Component<INewThreadProps, any> {
             <>
                 <NewOpeningPost router={router} openingPost={threadSerialized.openingPost} />
                 <Replies
-                    authStore={this.props.authStore}
-                    userStore={this.props.userStore}
+                    authStore={authStore}
+                    userStore={userStore}
+                    uiStore={uiStore}
                     router={router}
-                    supportedTokensImages={supportedTokensImages}
+                    supportedTokensImages={authStore.supportedTokensImages}
                     replies={threadSerialized.openingPost.replies}
                     currentHighlightedPostUuid={currentHighlightedPostUuid}
                 />

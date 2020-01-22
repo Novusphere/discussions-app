@@ -236,11 +236,14 @@ class Form extends React.Component<FormProps> {
                                     )}
                                     <div
                                         className={classNames([
-                                            'w-60 h-100 flex flex-column',
+                                            'w-60 flex flex-column',
                                             {
                                                 'w-100': field.hideLabels,
                                             },
                                         ])}
+                                        style={{
+                                            minHeight: '100px',
+                                        }}
                                     >
                                         <Editor
                                             placeholder={field.placeholder}
