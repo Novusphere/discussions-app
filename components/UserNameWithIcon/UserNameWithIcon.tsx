@@ -11,7 +11,7 @@ interface IUserNameWithIconProps {
 
 const UserNameWithIcon: React.FC<IUserNameWithIconProps> = ({
     imageSize,
-    imageData,
+    imageData= getDefaultIdenticon,
     name,
     pub,
 }) => {

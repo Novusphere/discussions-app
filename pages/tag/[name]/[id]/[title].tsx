@@ -8,12 +8,14 @@ import { NextSeo } from 'next-seo'
 import { getThreadUrl, removeMD } from '@utils'
 import Head from 'next/head'
 import _ from 'lodash'
+import { NewThread } from '../../../../components/Thread/NewThread'
 
 interface IEPageProps {
     router: NextRouter
     postsStore: IStores['postsStore']
     uiStore: IStores['uiStore']
     tagStore: IStores['tagStore']
+    authStore: IStores['authStore']
     // thread: any
     query: {
         name: string
@@ -29,7 +31,7 @@ interface IEPageState {
 }
 
 @(withRouter as any)
-@inject('postsStore', 'tagStore', 'uiStore')
+@inject('postsStore', 'tagStore', 'uiStore', 'authStore')
 @observer
 class E extends React.Component<IEPageProps, IEPageState> {
     private rn: any = null
@@ -78,6 +80,7 @@ class E extends React.Component<IEPageProps, IEPageState> {
         const {
             thread,
             query,
+            authStore: { supportedTokensImages },
             tagStore: { activeTag },
         } = this.props
 
@@ -113,7 +116,8 @@ class E extends React.Component<IEPageProps, IEPageState> {
                         ],
                     }}
                 />
-                <ShowFullThread thread={thread} />
+                <NewThread thread={thread} supportedTokensImages={supportedTokensImages} />
+                {/*<ShowFullThread thread={thread} />*/}
             </>
         )
     }

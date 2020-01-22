@@ -1,6 +1,7 @@
 //@ts-ignore
 import ecc from 'eosjs-ecc'
 import { Attachment } from './attachment'
+import { getIdenticon } from '@utils'
 const BigInt = require('big-integer')
 const TIME_ENCODE_GENESIS = 1483246800000 // 2017-1-1
 
@@ -42,6 +43,8 @@ export class Post {
     edit: boolean
     uidw: string
     tips: PostTips
+
+    imageData: string
 
     transfers: any[]
 
@@ -139,6 +142,7 @@ export class Post {
         p.sub = o.sub
         p.tags = o.tags
         p.mentions = o.mentions
+        p.imageData = getIdenticon(o.pub)
         if (o.edit) {
             p.edit = true
             p.editUuid = o.edit

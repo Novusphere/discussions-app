@@ -37,19 +37,10 @@ class PostModel {
     @observable posterName
 
     @observable blockedId
-
     @observable transfers
 
     constructor(post: Post) {
         set(this, post)
-
-        let imageData = getIdenticon()
-
-        if (this.pub) {
-            imageData = getIdenticon(this.pub)
-        }
-
-        this.imageData = imageData
 
         if (this.displayName) {
             this.posterName = this.displayName
