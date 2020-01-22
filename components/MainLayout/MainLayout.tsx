@@ -82,7 +82,7 @@ class MainLayout extends React.Component<IMainLayoutProps> {
                             </p>
                             <p>
                                 This site is fully{' '}
-                                <a href="https://github.com/Novusphere/novusphere-eos">
+                                <a href="https://github.com/Novusphere/discussions-app">
                                     open source
                                 </a>
                                 .
