@@ -69,7 +69,11 @@ export class NewThread extends React.Component<INewThreadProps, any> {
                         </button>
                     </a>
                 </Link>
-                <NewOpeningPost router={router} openingPost={threadSerialized.openingPost} />
+                <NewOpeningPost
+                    router={router}
+                    openingPost={threadSerialized.openingPost}
+                    activeThread={postsStore.activeThreadSerialized}
+                />
                 <Replies
                     authStore={authStore}
                     userStore={userStore}

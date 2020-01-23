@@ -10,7 +10,7 @@ import {
     VotingHandles,
 } from '@components'
 import moment from 'moment'
-import { Post } from '@novuspherejs'
+import { Post, Thread } from '@novuspherejs'
 import { inject, observer } from 'mobx-react'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import {
@@ -24,10 +24,12 @@ import {
 import { NextRouter } from 'next/router'
 import { IStores } from '@stores'
 import { autorun, IReactionDisposer } from 'mobx'
+import { generateVoteObject, voteAsync } from '@utils'
 
 interface INewOpeningPostOuterProps {
     router: NextRouter
     openingPost: Post
+    activeThread: Thread
 }
 
 interface INewOpeningPostInnerProps {
@@ -39,11 +41,19 @@ interface INewOpeningPostInnerProps {
     settingsStore: IStores['settingsStore']
 }
 
+interface INewOpeningPostState {
+    myVote: any[]
+    myVoteValue: number
+    upvotes: number
+    downvotes: number
+    threadEditing: boolean
+}
+
 @inject('authStore', 'uiStore', 'userStore', 'tagStore', 'postsStore', 'settingsStore')
 @observer
 class NewOpeningPost extends React.Component<
     INewOpeningPostOuterProps & INewOpeningPostInnerProps,
-    any
+    INewOpeningPostState
 > {
     private disposer: IReactionDisposer = null
 
@@ -52,6 +62,10 @@ class NewOpeningPost extends React.Component<
 
         this.state = {
             myVote: props.openingPost.myVote,
+            myVoteValue:
+                props.openingPost.myVote && props.openingPost.myVote.length > 0
+                    ? props.openingPost.myVote[0].value
+                    : 0,
             upvotes: props.openingPost.upvotes,
             downvotes: props.openingPost.downvotes,
 
@@ -59,11 +73,30 @@ class NewOpeningPost extends React.Component<
         }
     }
 
+    componentDidUpdate(
+        prevProps: Readonly<INewOpeningPostOuterProps & INewOpeningPostInnerProps>,
+        prevState: Readonly<INewOpeningPostState>,
+        snapshot?: any
+    ): void {
+        if (!prevProps.activeThread && this.props.activeThread) {
+            this.setState({
+                myVote: this.props.activeThread.openingPost.myVote,
+                myVoteValue:
+                    this.props.activeThread.openingPost.myVote &&
+                    this.props.activeThread.openingPost.myVote.length > 0
+                        ? this.props.activeThread.openingPost.myVote[0].value
+                        : 0,
+                upvotes: this.props.activeThread.openingPost.upvotes,
+                downvotes: this.props.activeThread.openingPost.downvotes,
+            })
+        }
+    }
+
     componentDidMount(): void {
         this.disposer = autorun(() => {
             if (this.props.postsStore.activeThread) {
                 this.setState({
-                    editing: this.props.postsStore.activeThread.editing,
+                    threadEditing: this.props.postsStore.activeThread.editing,
                 })
             }
         })
@@ -74,8 +107,7 @@ class NewOpeningPost extends React.Component<
     }
 
     // TODO: FIX THIS
-    private handleVoting = async (uuid, myNewVote) => {
-        console.log('new vote: ', myNewVote)
+    private handleVoting = async (uuid, value) => {
         // const type = myNewVote === 1 ? 'upvotes' : 'downvotes'
         // let currentVote = this.state[type]
         //
@@ -105,6 +137,70 @@ class NewOpeningPost extends React.Component<
         // } catch (error) {
         //     throw error
         // }
+
+        let type = 'neutral'
+
+        switch (value) {
+            case 1:
+                type = 'upvote'
+                break
+            case -1:
+                type = 'downvote'
+                break
+        }
+
+        try {
+            const voteObject = generateVoteObject({
+                uuid,
+                postPriv: this.props.authStore.postPriv,
+                value,
+            })
+
+            switch (type) {
+                case 'neutral':
+                    if (this.state.myVoteValue === 1) {
+                        this.setState(prevState => ({
+                            downvotes: prevState.downvotes + 1,
+                        }))
+                    } else if (this.state.myVoteValue === -1) {
+                        this.setState(prevState => ({
+                            upvotes: prevState.upvotes + 1,
+                        }))
+                    }
+
+                    break
+                case 'upvote':
+                    this.setState(prevState => ({
+                        upvotes: prevState.upvotes + 1,
+                    }))
+                    break
+                case 'downvote':
+                    this.setState(prevState => ({
+                        downvotes: prevState.downvotes + 1,
+                    }))
+                    break
+            }
+
+            this.setState({
+                myVote: [voteObject],
+                myVoteValue: value,
+            })
+
+            const data = await voteAsync({
+                voter: '',
+                uuid,
+                value,
+                nonce: voteObject.nonce,
+                pub: voteObject.pub,
+                sig: voteObject.sig,
+            })
+
+            if (data.error) {
+                this.props.uiStore.showToast(`Failed to ${type.split('s')[0]} this post`, 'error')
+            }
+        } catch (error) {
+            this.props.uiStore.showToast(error.message, 'error')
+        }
     }
 
     private handleWatchPost = (id, replies) => {
@@ -129,7 +225,7 @@ class NewOpeningPost extends React.Component<
     }
 
     private renderOpeningPost = () => {
-        const { myVote, upvotes, downvotes } = this.state
+        const { myVote, myVoteValue, upvotes, downvotes } = this.state
         const {
             router,
             openingPost,
@@ -172,12 +268,12 @@ class NewOpeningPost extends React.Component<
                             <Tips tokenImages={supportedTokensImages} tips={openingPost.tips} />
                         </div>
 
-                        {!this.state.editing && (
+                        {!this.state.threadEditing && (
                             <div className={'flex justify-between items-center pb1'}>
                                 <span className={'black f4 b'}>{openingPost.title}</span>
                                 <VotingHandles
                                     uuid={openingPost.uuid}
-                                    myVote={myVote}
+                                    myVote={myVoteValue}
                                     upVotes={upvotes}
                                     downVotes={downvotes}
                                     handler={this.handleVoting}
