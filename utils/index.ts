@@ -101,7 +101,7 @@ export const getThreadUrl = async (post, permalinkUuid?: string) => {
 
     // if a post is a comment not a opening post
     if (post.title === '') {
-        const thread = await discussions.getThread(id)
+        const thread = await discussions.getThread(id, '')
         const newId = encodeId(thread.openingPost as any)
         url = `/tag/${thread.openingPost.sub}/${newId}/${getThreadTitle(thread)}`
     } else {
@@ -718,7 +718,7 @@ export const generateVoteObject = ({ uuid, postPriv, value }) => {
         data: {
             voter: '',
             uuid: uuid,
-            value: 1,
+            value: value,
             metadata: JSON.stringify({
                 nonce: nonce,
                 pub: pub,

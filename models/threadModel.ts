@@ -8,7 +8,6 @@ import { CreateForm } from '@components'
 import { getAuthStore, getUiStore, IStores } from '@stores'
 import { task } from 'mobx-task'
 import EditModel from '@models/editModel'
-import ecc from 'eosjs-ecc'
 import { generateVoteObject, voteAsync } from '@utils'
 
 export class ThreadModel {
@@ -18,7 +17,6 @@ export class ThreadModel {
     @observable public title: string
     @observable public sub: string
 
-    @observable public replies: PostModel[]
     @observable openingPostReplies: PostModel[] = []
 
     @observable editing = false

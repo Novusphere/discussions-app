@@ -5,18 +5,11 @@ import { BaseStore, getOrCreateStore } from 'next-mobx-wrapper'
 import { CreateForm } from '@components'
 import { getTagStore } from '@stores/tagStore'
 import { getAuthStore, getUiStore, IStores } from '@stores'
-import {
-    encodeId,
-    generateUuid,
-    generateVoteObject,
-    getAttachmentValue,
-    pushToThread,
-} from '@utils'
+import { encodeId, generateUuid, generateVoteObject, getAttachmentValue, pushToThread } from '@utils'
 import { ThreadModel } from '@models/threadModel'
 import FeedModel from '@models/feedModel'
 import _ from 'lodash'
 import PostModel from '@models/postModel'
-import ecc from 'eosjs-ecc'
 
 export interface IAttachment {
     value: string
@@ -101,6 +94,10 @@ export default class PostsStore extends BaseStore {
     private readonly tagsStore: IStores['tagStore'] = getTagStore()
     private readonly uiStore: IStores['uiStore'] = getUiStore()
     private readonly authStore: IStores['authStore'] = getAuthStore()
+
+    constructor() {
+        super()
+    }
 
     @action.bound
     highlightPostUuid(uuid: string) {
@@ -206,21 +203,17 @@ export default class PostsStore extends BaseStore {
 
     @task
     @action.bound
-    public async getAndSetThread(id: string, isServer = false): Promise<null | Thread> {
+    public async getAndSetThread(id: string): Promise<null | Thread> {
         try {
-            const thread = await discussions.getThread(id, isServer)
+            const thread = await discussions.getThread(id, this.authStore.activePublicKey)
             if (!thread) return null
             this.activeThreadSerialized = thread
             this.activeThreadId = id
+            this.activeThread = new ThreadModel(thread)
             return thread
         } catch (error) {
             throw error
         }
-    }
-
-    @action.bound
-    public async hydrateThread() {
-        this.activeThread = new ThreadModel(this.activeThreadSerialized)
     }
 
     /**
@@ -307,7 +300,7 @@ export default class PostsStore extends BaseStore {
             }
 
             const value = 1
-            const { postPriv } = this.authStore
+            const { postPriv, activePublicKey } = this.authStore
             const { data: vote } = generateVoteObject({
                 uuid,
                 postPriv,
@@ -351,7 +344,7 @@ export default class PostsStore extends BaseStore {
                 if (isPostValid) {
                     const int = setInterval(async () => {
                         const id = encodeId(submittedPost)
-                        const getThread = await discussions.getThread(id)
+                        const getThread = await discussions.getThread(id, activePublicKey)
 
                         if (getThread) {
                             if (int) {

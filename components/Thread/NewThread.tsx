@@ -5,8 +5,13 @@ import { Replies } from '@components'
 import { inject, observer } from 'mobx-react'
 import { IStores } from '@stores'
 import { NextRouter, withRouter } from 'next/router'
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
+import { faChevronLeft } from '@fortawesome/free-solid-svg-icons'
+import Link from 'next/link'
+import { autorun } from 'mobx'
 
 interface INewThreadProps {
+    id: string
     router?: NextRouter
     threadSerialized: Thread
     postsStore?: IStores['postsStore']
@@ -14,12 +19,25 @@ interface INewThreadProps {
     settingsStore?: IStores['settingsStore']
     userStore?: IStores['userStore']
     uiStore?: IStores['uiStore']
+    tagStore?: IStores['tagStore']
 }
 
 @(withRouter as any)
-@inject('authStore', 'postsStore', 'settingsStore', 'userStore', 'uiStore')
+@inject('authStore', 'postsStore', 'settingsStore', 'userStore', 'uiStore', 'tagStore')
 @observer
 export class NewThread extends React.Component<INewThreadProps, any> {
+    async componentDidMount() {
+        autorun(() => {
+            if (
+                this.props.authStore.hasAccount &&
+                this.props.id &&
+                !this.props.postsStore.activeThreadSerialized
+            ) {
+                this.props.postsStore.getAndSetThread(this.props.id)
+            }
+        })
+    }
+
     render() {
         const {
             props: {
@@ -30,11 +48,33 @@ export class NewThread extends React.Component<INewThreadProps, any> {
                 uiStore,
                 postsStore,
                 settingsStore,
+                tagStore,
             },
         } = this
 
+        const activeTag = tagStore.tags.get(threadSerialized.openingPost.sub)
+
         return (
             <>
+                <Link href={`/tag/[name]`} as={`/tag/${threadSerialized.openingPost.sub}`}>
+                    <a>
+                        <button
+                            className={'tl flex items-center mb2'}
+                            title={`Show all posts in ${threadSerialized.openingPost.sub}`}
+                        >
+                            <FontAwesomeIcon width={13} icon={faChevronLeft} className={'pr1'} />
+                            {activeTag && (
+                                <img
+                                    width={20}
+                                    height={20}
+                                    src={activeTag.icon}
+                                    className={'activeTag-image'}
+                                />
+                            )}
+                            {`#${threadSerialized.openingPost.sub}`}
+                        </button>
+                    </a>
+                </Link>
                 <NewOpeningPost router={router} openingPost={threadSerialized.openingPost} />
                 <Replies
                     authStore={authStore}
@@ -45,6 +85,7 @@ export class NewThread extends React.Component<INewThreadProps, any> {
                     router={router}
                     supportedTokensImages={authStore.supportedTokensImages}
                     replies={threadSerialized.openingPost.replies}
+                    activeThread={postsStore.activeThreadSerialized}
                 />
             </>
         )

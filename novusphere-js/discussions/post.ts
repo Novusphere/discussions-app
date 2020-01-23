@@ -67,7 +67,7 @@ export class Post {
     depth: number // only used if Thread object created with
 
     // Aggregate Data
-    myVote: number
+    myVote: { value: number }[]
 
     hasAttachment(): boolean {
         return (
@@ -123,7 +123,7 @@ export class Post {
         this.upvotes = 0
         this.downvotes = 0
         this.depth = 0
-        this.myVote = 0
+        this.myVote = []
     }
 
     static fromDbObject(o: any): Post {
@@ -159,9 +159,7 @@ export class Post {
         p.upvotes = o.upvotes
         p.downvotes = o.downvotes
         p.uidw = o.uidw || null
-        if (o.myVote && o.myVote.length > 0) {
-            p.myVote = o.myVote[0].value
-        }
+        p.myVote = o.myVote
         p.tips = o.tips.length
             ? o.tips.reduce((acc, curr) => {
                   const [amount, symbol] = curr.data.amount.split(' ')

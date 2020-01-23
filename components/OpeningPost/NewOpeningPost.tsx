@@ -314,8 +314,6 @@ class NewOpeningPost extends React.Component<
     }
 
     render() {
-        const { openingPost } = this.props
-
         return (
             <>
                 {this.renderOpeningPost()}

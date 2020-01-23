@@ -4,7 +4,7 @@ import { IStores } from '@stores'
 import Router, { NextRouter, withRouter } from 'next/router'
 import { Thread } from '@novuspherejs'
 import { NextSeo } from 'next-seo'
-import { getThreadUrl, removeMD } from '@utils'
+import { getThreadUrl, removeMD, sleep } from '@utils'
 import Head from 'next/head'
 import _ from 'lodash'
 import { NewThread } from '../../../../components/Thread/NewThread'
@@ -36,7 +36,7 @@ class E extends React.Component<IEPageProps, IEPageState> {
 
     static async getInitialProps({ query, store, req }) {
         const postsStore: IStores['postsStore'] = store.postsStore
-        const thread = await postsStore.getAndSetThread(query.id, !!req)
+        const thread = await postsStore.getAndSetThread(query.id)
 
         return {
             query,
@@ -72,9 +72,6 @@ class E extends React.Component<IEPageProps, IEPageState> {
 
             await Router.replace('/tag/[name]/[id]/[title]', url, { shallow: true })
         }
-
-        // generate thread
-        this.props.postsStore.hydrateThread()
     }
 
     public render(): React.ReactNode {
@@ -116,7 +113,7 @@ class E extends React.Component<IEPageProps, IEPageState> {
                         ],
                     }}
                 />
-                <NewThread threadSerialized={thread} />
+                <NewThread threadSerialized={thread} id={query.id} />
                 {/*<ShowFullThread thread={thread} />*/}
             </>
         )

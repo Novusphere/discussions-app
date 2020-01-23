@@ -1,7 +1,7 @@
 import * as React from 'react'
 import { useCallback, useEffect, useMemo } from 'react'
-import { discussions, Post } from '@novuspherejs'
-import { getPermaLink, transformTipsToTransfers } from '@utils'
+import { discussions, Post, Thread } from '@novuspherejs'
+import { generateVoteObject, getPermaLink, transformTipsToTransfers, voteAsync } from '@utils'
 import classNames from 'classnames'
 import {
     Form,
@@ -15,7 +15,7 @@ import {
 import { NewReplyModel } from '@models/newReplyModel'
 import moment from 'moment'
 import { Sticky, StickyContainer } from 'react-sticky'
-import { Observer, useObserver, useLocalStore, observer } from 'mobx-react'
+import { Observer, useLocalStore, observer } from 'mobx-react'
 import { IStores } from '@stores'
 import Router, { NextRouter } from 'next/router'
 import { ObservableMap } from 'mobx'
@@ -26,6 +26,7 @@ import PostModel from '@models/postModel'
 import copy from 'clipboard-copy'
 import { BlockedContentSetting } from '@stores/settingsStore'
 import { useComputed } from 'mobx-react-lite'
+import { ThreadModel } from '@models/threadModel'
 
 interface IReplyProps {
     router: NextRouter
@@ -59,9 +60,6 @@ interface IReplyProps {
     blockedByDelegation: ObservableMap<string, string>
 }
 
-// TODO: Implement blocked posts statuses
-// TODO: Implement collapse
-// TODO: Implement voting
 const Reply: React.FC<IReplyProps> = observer(
     ({
         reply,
@@ -103,21 +101,29 @@ const Reply: React.FC<IReplyProps> = observer(
                 editing: false,
                 hidden: false,
 
+                myVote: reply.myVote,
+                downvotes: reply.downvotes,
+                upvotes: reply.upvotes,
+
+                get myVoteValue() {
+                    if (source.reply.myVote && source.reply.myVote.length) {
+                        return source.reply.myVote[0].value
+                    }
+
+                    return 0
+                },
+
                 get spam() {
                     let isBlockedByDelegation =
                         source.blockedByDelegation.has(replyStore.permaLinkURL) ||
-                        source.blockedByDelegation.has(replyStore.reply.pub)
+                        source.blockedByDelegation.has(reply.pub)
 
                     return (
                         source.blockedPosts.has(replyStore.permaLinkURL) ||
                         source.blockedUsers.has(reply.pub) ||
                         isBlockedByDelegation ||
-                        (source.unsignedPostsIsSpam && !replyStore.reply.pub)
+                        (source.unsignedPostsIsSpam && !reply.pub)
                     )
-                },
-
-                get reply() {
-                    return source.reply
                 },
 
                 get isMarkedAsSpam() {
@@ -125,7 +131,7 @@ const Reply: React.FC<IReplyProps> = observer(
                 },
 
                 get permaLinkURL() {
-                    return getPermaLink(router.asPath.split('#')[0], replyStore.reply.uuid)
+                    return getPermaLink(router.asPath.split('#')[0], reply.uuid)
                 },
 
                 async copyAndScrollToPermalinkURL() {
@@ -134,7 +140,7 @@ const Reply: React.FC<IReplyProps> = observer(
                         shallow: true,
                     })
 
-                    highlightPostUuid(replyStore.reply.uuid)
+                    highlightPostUuid(reply.uuid)
                 },
 
                 setBlockedStatus() {
@@ -183,6 +189,63 @@ const Reply: React.FC<IReplyProps> = observer(
                     replyStore.setBlockedStatus()
                 },
 
+                async handleVote(uuid: string, value: number) {
+                    let type = 'neutral'
+
+                    switch (value) {
+                        case 1:
+                            type = 'upvote'
+                            break
+                        case -1:
+                            type = 'downvote'
+                            break
+                    }
+
+                    try {
+                        const voteObject = generateVoteObject({
+                            uuid,
+                            postPriv: source.postPriv,
+                            value,
+                        })
+
+                        switch (type) {
+                            case 'neutral':
+                                if (replyStore.myVoteValue === 1) {
+                                    replyStore.downvotes += 1
+                                } else if (replyStore.myVoteValue === -1) {
+                                    replyStore.upvotes += 1
+                                }
+
+                                break
+                            case 'upvote':
+                                replyStore.upvotes += 1
+                                // replyStore.myVote = 1
+                                break
+                            case 'downvote':
+                                replyStore.downvotes += 1
+                                // replyStore.myVote = -1
+                                break
+                        }
+
+                        replyStore.myVote = [voteObject.data]
+
+                        const data = await voteAsync({
+                            voter: '',
+                            uuid,
+                            value,
+                            nonce: voteObject.nonce,
+                            pub: voteObject.pub,
+                            sig: voteObject.sig,
+                        })
+
+                        if (data.error) {
+                            showToast(`Failed to ${type.split('s')[0]} this post`, 'error')
+                        }
+                    } catch (error) {
+                        showToast(error.message, 'error')
+                    }
+                },
+
                 async submitEdit() {
                     replyStore.setEditingLoading(true)
                     try {
@@ -215,11 +278,11 @@ const Reply: React.FC<IReplyProps> = observer(
                                 if (submitted) {
                                     clearInterval(int)
 
-                                    replyStore.reply.content = response.content
-                                    replyStore.reply.edit = true
-                                    replyStore.reply.editedAt = new Date(Date.now())
-                                    replyStore.reply.transaction = response.transaction
-                                    replyStore.reply.pub = response.pub
+                                    reply.content = response.content
+                                    reply.edit = true
+                                    reply.editedAt = new Date(Date.now())
+                                    reply.transaction = response.transaction
+                                    reply.pub = response.pub
 
                                     replyStore.setReplyContent(editedReply.content)
                                     replyStore.setEditingLoading(false)
@@ -282,7 +345,7 @@ const Reply: React.FC<IReplyProps> = observer(
                         const signedReply = model.sign(source.postPriv)
                         const confirmedReply = await discussions.post(signedReply as any)
 
-                        replyStore.reply.replies.push(confirmedReply)
+                        reply.replies.push(confirmedReply)
                         replyStore.replyModel.clearReplyContent()
                         replyStore.replyModel.toggleOpen()
 
@@ -296,9 +359,9 @@ const Reply: React.FC<IReplyProps> = observer(
                     return (
                         <>
                             <UserNameWithIcon
-                                pub={replyStore.reply.pub}
-                                imageData={replyStore.reply.imageData}
-                                name={replyStore.reply.displayName}
+                                pub={reply.pub}
+                                imageData={reply.imageData}
+                                name={reply.displayName}
                             />
                             <span
                                 className={'pl2 o-50 f6'}
@@ -306,13 +369,10 @@ const Reply: React.FC<IReplyProps> = observer(
                                     'YYYY-MM-DD HH:mm:ss'
                                 )}
                             >
-                                {replyStore.reply.edit && 'edited '}{' '}
+                                {reply.edit && 'edited '}{' '}
                                 {moment(reply.edit ? reply.editedAt : reply.createdAt).fromNow()}
                             </span>
-                            <Tips
-                                tokenImages={source.supportedTokensImages}
-                                tips={replyStore.reply.tips}
-                            />
+                            <Tips tokenImages={source.supportedTokensImages} tips={reply.tips} />
                         </>
                     )
                 },
@@ -348,10 +408,6 @@ const Reply: React.FC<IReplyProps> = observer(
             return () => {
                 clearTimeout(timeout)
             }
-        }, [])
-
-        const handleVote = useCallback((...props) => {
-            console.log(props)
         }, [])
 
         const hasReplyModelLoaded = useMemo(() => !!replyStore.replyModel, [replyStore.replyModel])
@@ -420,8 +476,8 @@ const Reply: React.FC<IReplyProps> = observer(
 
         return (
             <div
-                id={replyStore.reply.uuid}
-                data-post-uuid={replyStore.reply.uuid}
+                id={reply.uuid}
+                data-post-uuid={reply.uuid}
                 className={classNames([
                     'post-reply black mb2',
                     {
@@ -471,11 +527,11 @@ const Reply: React.FC<IReplyProps> = observer(
                         >
                             <VotingHandles
                                 horizontal={false}
-                                upVotes={replyStore.reply.upvotes}
-                                downVotes={replyStore.reply.downvotes}
-                                myVote={replyStore.reply.myVote}
-                                uuid={replyStore.reply.uuid}
-                                handler={handleVote}
+                                upVotes={replyStore.upvotes}
+                                downVotes={replyStore.downvotes}
+                                myVote={replyStore.myVoteValue}
+                                uuid={reply.uuid}
+                                handler={replyStore.handleVote}
                             />
                         </div>
 
@@ -486,7 +542,7 @@ const Reply: React.FC<IReplyProps> = observer(
                                 <div className={'db'}>
                                     {replyStore.collapsed && (
                                         <span className={'o-50 i f6 pl2 db'}>
-                                            ({replyStore.reply.replies.length} children)
+                                            ({reply.replies.length} children)
                                         </span>
                                     )}
                                 </div>
@@ -557,7 +613,7 @@ const Reply: React.FC<IReplyProps> = observer(
                     </div>
                     {replyStore.replyModel && (
                         <ReplyBox
-                            id={`${replyStore.reply.uuid}-reply`}
+                            id={`${reply.uuid}-reply`}
                             className={classNames([
                                 'pl4 pr2 pb4',
                                 {
@@ -565,7 +621,7 @@ const Reply: React.FC<IReplyProps> = observer(
                                 },
                             ])}
                             open={replyStore.replyModel.open}
-                            uid={replyStore.reply.uuid}
+                            uid={reply.uuid}
                             onContentChange={replyStore.replyModel.setReplyContent}
                             value={replyStore.replyModel.replyContent}
                             loading={replyStore.replyLoading}
@@ -574,9 +630,9 @@ const Reply: React.FC<IReplyProps> = observer(
                     )}
 
                     {!replyStore.collapsed &&
-                        replyStore.reply.replies &&
-                        replyStore.reply.replies.length > 0 &&
-                        replyStore.reply.replies.map(nestedReply => (
+                        reply.replies &&
+                        reply.replies.length > 0 &&
+                        reply.replies.map(nestedReply => (
                             <div
                                 key={nestedReply.uuid}
                                 onMouseLeave={() => replyStore.setHover(true)}
@@ -630,6 +686,7 @@ interface IRepliesProps {
     router: NextRouter
     supportedTokensImages: any
     replies: Post[]
+    activeThread: Thread
 }
 
 const Replies: React.FC<IRepliesProps> = observer(
@@ -642,10 +699,26 @@ const Replies: React.FC<IRepliesProps> = observer(
         uiStore,
         settingsStore,
         postsStore,
+        activeThread,
     }) => {
+        const repliesStore = useLocalStore(
+            source => ({
+                get replies() {
+                    if (source.activeThread && source.activeThread.openingPost.replies) {
+                        return source.activeThread.openingPost.replies as any
+                    }
+                    return source.replies
+                },
+            }),
+            {
+                replies,
+                activeThread,
+            }
+        )
+
         return (
             <div className={'card'}>
-                {replies.map(reply => (
+                {repliesStore.replies.map(reply => (
                     <Reply
                         router={router}
                         key={reply.uuid}
