@@ -1,7 +1,6 @@
 import { observable, set } from 'mobx'
 import { Post } from '@novuspherejs'
 import ecc from 'eosjs-ecc'
-import { getIdenticon } from '@utils'
 import { PostTips } from '@novuspherejs/discussions/post'
 
 class PostModel {

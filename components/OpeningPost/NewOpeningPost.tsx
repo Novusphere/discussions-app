@@ -24,12 +24,13 @@ import {
 import { NextRouter } from 'next/router'
 import { IStores } from '@stores'
 import { autorun, IReactionDisposer } from 'mobx'
-import { generateVoteObject, sleep, voteAsync } from '@utils'
+import { generateVoteObject, getIdenticon, sleep, voteAsync } from '@utils'
 
 interface INewOpeningPostOuterProps {
     router: NextRouter
     openingPost: Post
     activeThread: Thread
+    addReplies: (reply) => void
 }
 
 interface INewOpeningPostInnerProps {
@@ -362,6 +363,13 @@ class NewOpeningPost extends React.Component<
         )
     }
 
+    private onSubmit = async () => {
+        const reply = await this.props.postsStore.activeThread.openingPostReplyModel.onSubmit(this.props.postsStore.activeThread)
+        reply.imageData = getIdenticon(this.props.authStore.activePublicKey)
+        reply.myVote = [{ value: 1 }]
+        this.props.addReplies(reply)
+    }
+
     private renderOpeningPostReplyBox = () => {
         if (!this.props.postsStore.activeThread) {
             return <FontAwesomeIcon width={13} icon={faSpinner} spin />
@@ -380,7 +388,7 @@ class NewOpeningPost extends React.Component<
                 open={open}
                 uid={uuid}
                 onContentChange={setContent}
-                onSubmit={() => onSubmit(this.props.postsStore.activeThread)}
+                onSubmit={this.onSubmit}
                 loading={onSubmit['pending']}
                 value={content}
             />

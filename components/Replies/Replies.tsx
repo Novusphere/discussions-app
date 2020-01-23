@@ -119,13 +119,13 @@ const Reply: React.FC<IReplyProps> = observer(
                 get spam() {
                     let isBlockedByDelegation =
                         source.blockedByDelegation.has(replyStore.permaLinkURL) ||
-                        source.blockedByDelegation.has(reply.pub)
+                        source.blockedByDelegation.has(source.reply.pub)
 
                     return (
                         source.blockedPosts.has(replyStore.permaLinkURL) ||
-                        source.blockedUsers.has(reply.pub) ||
+                        source.blockedUsers.has(source.reply.pub) ||
                         isBlockedByDelegation ||
-                        (source.unsignedPostsIsSpam && !reply.pub)
+                        (source.unsignedPostsIsSpam && !source.reply.pub)
                     )
                 },
 
@@ -138,7 +138,7 @@ const Reply: React.FC<IReplyProps> = observer(
                 },
 
                 refreshVote() {
-                  replyStore.myVote = source.reply.myVote
+                    replyStore.myVote = source.reply.myVote
                 },
 
                 async copyAndScrollToPermalinkURL() {
@@ -217,12 +217,12 @@ const Reply: React.FC<IReplyProps> = observer(
                             if (type === 'downvote') {
                                 replyStore.upvotes -= 1
                                 replyStore.downvotes += 1
-                                replyStore.myVote = [{ value: -1}]
+                                replyStore.myVote = [{ value: -1 }]
                             }
 
                             if (type === 'upvote') {
                                 replyStore.upvotes -= 1
-                                replyStore.myVote = [{ value: 0}]
+                                replyStore.myVote = [{ value: 0 }]
                             }
                         }
 
@@ -231,13 +231,13 @@ const Reply: React.FC<IReplyProps> = observer(
                             // what type of vote are you doing
                             if (type === 'downvote') {
                                 replyStore.upvotes += 1
-                                replyStore.myVote = [{ value: 0}]
+                                replyStore.myVote = [{ value: 0 }]
                             }
 
                             if (type === 'upvote') {
                                 replyStore.upvotes += 1
                                 replyStore.downvotes -= 1
-                                replyStore.myVote = [{ value: 1}]
+                                replyStore.myVote = [{ value: 1 }]
                             }
                         }
 
@@ -245,12 +245,12 @@ const Reply: React.FC<IReplyProps> = observer(
                         if (myVoteValue === 0) {
                             if (type === 'downvote') {
                                 replyStore.downvotes += 1
-                                replyStore.myVote = [{ value: -1}]
+                                replyStore.myVote = [{ value: -1 }]
                             }
                             //
                             if (type === 'upvote') {
                                 replyStore.upvotes += 1
-                                replyStore.myVote = [{ value: 1}]
+                                replyStore.myVote = [{ value: 1 }]
                             }
                         }
 
@@ -737,15 +737,14 @@ const Replies: React.FC<IRepliesProps> = observer(
         const repliesStore = useLocalStore(
             source => ({
                 get replies() {
-                    if (source.activeThread && source.activeThread.openingPost.replies) {
-                        return source.activeThread.openingPost.replies as any
+                    if (activeThread && activeThread.openingPost.replies) {
+                        return activeThread.openingPost.replies as any
                     }
                     return source.replies
                 },
             }),
             {
                 replies,
-                activeThread,
             }
         )
 

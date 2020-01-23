@@ -127,11 +127,12 @@ class EditModel {
             attachment: getAttachmentValue(this.cached.content),
             upvotes: 0,
             downvotes: 0,
-            myVote: 0,
+            myVote: [],
             edit: undefined,
             transfers: undefined,
             vote: null,
             imageData: undefined,
+            pub: '',
         }
 
         if (!isEdit) {
@@ -144,7 +145,6 @@ class EditModel {
             reply = {
                 ...reply,
                 upvotes: 1,
-                myVote: 1,
             }
 
             if (postPriv) {

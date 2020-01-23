@@ -165,7 +165,7 @@ export class ReplyModel {
             },
         })
 
-        const reply = instance.createPostObject(false, postPriv)
+        let reply = instance.createPostObject(false, postPriv)
         reply.uidw = activeUidWalletKey
 
         try {
@@ -245,6 +245,8 @@ export class ReplyModel {
                             this.toggleOpen()
                         }
 
+                        reply = confirmedReply
+
                         this.clearContent()
                         this.uiStore.showToast('Your reply has been submitted!', 'success')
                     } catch (error) {
@@ -264,6 +266,8 @@ export class ReplyModel {
             } else {
                 this.uiStore.showToast('Failed to submit your reply', 'error')
             }
+
+            return reply
         } catch (error) {
             // this.uiStore.showToast(error.message, 'error')
             throw error

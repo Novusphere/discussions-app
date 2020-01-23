@@ -25,15 +25,57 @@ interface INewThreadProps {
 @inject('authStore', 'postsStore', 'settingsStore', 'userStore', 'uiStore', 'tagStore')
 @observer
 export class NewThread extends React.Component<INewThreadProps, any> {
+    state = {
+        replies: [],
+        activeThread: null,
+    }
+
+    componentDidUpdate(
+        prevProps: Readonly<INewThreadProps>,
+        prevState: Readonly<any>,
+        snapshot?: any
+    ): void {
+        if (prevState.activeThread !== this.props.postsStore.activeThreadSerialized) {
+            this.setState({
+                activeThread: this.props.postsStore.activeThreadSerialized,
+                // replies: this.props.postsStore.activeThreadSerialized.openingPost.replies,
+            })
+        }
+
+        // if (prevState.replies.length !== this.props.threadSerialized.openingPost.replies.length) {
+        //     this.setState(prevState => ({
+        //         replies: [...prevState.replies, ...this.props.threadSerialized.openingPost.replies],
+        //     }))
+        // }
+    }
+
     async componentDidMount() {
         if (this.props.postsStore.firstSplash) {
             await this.props.postsStore.getAndSetThread(this.props.id)
             this.props.postsStore.firstSplash = false
         }
+
+        this.setState({
+            replies: this.props.threadSerialized.openingPost.replies,
+        })
+    }
+
+    addReplies = reply => {
+        this.setState(prevState => ({
+            replies: [...prevState.replies, reply],
+            activeThread: {
+                ...prevState.activeThread,
+                openingPost: {
+                    ...prevState.activeThread.openingPost,
+                    replies: [...prevState.activeThread.openingPost.replies, reply],
+                },
+            },
+        }))
     }
 
     render() {
         const {
+            state: { activeThread, replies },
             props: {
                 router,
                 threadSerialized,
@@ -72,7 +114,8 @@ export class NewThread extends React.Component<INewThreadProps, any> {
                 <NewOpeningPost
                     router={router}
                     openingPost={threadSerialized.openingPost}
-                    activeThread={postsStore.activeThreadSerialized}
+                    activeThread={activeThread}
+                    addReplies={this.addReplies}
                 />
                 <Replies
                     authStore={authStore}
@@ -82,8 +125,8 @@ export class NewThread extends React.Component<INewThreadProps, any> {
                     settingsStore={settingsStore}
                     router={router}
                     supportedTokensImages={authStore.supportedTokensImages}
-                    replies={threadSerialized.openingPost.replies}
-                    activeThread={postsStore.activeThreadSerialized}
+                    replies={replies}
+                    activeThread={activeThread}
                 />
             </>
         )
