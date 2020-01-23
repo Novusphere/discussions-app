@@ -225,7 +225,7 @@ export class ThreadModel {
      * @param {number} myNewVote - +1 (upvote), 0 (neutral), -1 (downvote)
      * @return {void}
      */
-    @action vote = async (uuid: string, myNewVote: number) => {
+    @action vote = async (e: any, uuid: string, myNewVote: number) => {
         console.log(uuid, myNewVote)
         const type = myNewVote === 1 ? 'upvotes' : 'downvotes'
         const post = this.map[uuid]

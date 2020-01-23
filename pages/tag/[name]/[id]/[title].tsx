@@ -4,7 +4,7 @@ import { IStores } from '@stores'
 import Router, { NextRouter, withRouter } from 'next/router'
 import { Thread } from '@novuspherejs'
 import { NextSeo } from 'next-seo'
-import { getThreadUrl, removeMD, sleep } from '@utils'
+import { getThreadUrl, isServer, removeMD, sleep } from '@utils'
 import Head from 'next/head'
 import _ from 'lodash'
 import { NewThread } from '../../../../components/Thread/NewThread'
@@ -32,9 +32,7 @@ interface IEPageState {
 @inject('postsStore', 'tagStore', 'uiStore')
 @observer
 class E extends React.Component<IEPageProps, IEPageState> {
-    private rn: any = null
-
-    static async getInitialProps({ query, store, req }) {
+    static async getInitialProps({ query, store }) {
         const postsStore: IStores['postsStore'] = store.postsStore
         const thread = await postsStore.getAndSetThread(query.id)
 
@@ -60,7 +58,6 @@ class E extends React.Component<IEPageProps, IEPageState> {
 
     async componentDidMount(): Promise<void> {
         const hash = this.highglightActiveUuid()
-
         const { thread } = this.props
 
         if (thread) {

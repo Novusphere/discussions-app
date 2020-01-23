@@ -6,12 +6,12 @@ import classNames from 'classnames'
 
 import dynamic from 'next/dynamic'
 import { useState } from 'react'
-import { RichTextPreview } from '@components'
+import { RichTextPreview, RichTextEditor } from '@components'
 
 // @ts-ignore
-const Editor = dynamic(() => import('../Editor/Editor'), {
-    ssr: false,
-})
+// const Editor = dynamic(() => import('../Editor/Editor'), {
+//     ssr: false,
+// })
 
 interface IReplyProps {
     className?: string
@@ -39,6 +39,7 @@ const ReplyBox: React.FC<IReplyProps> = ({
     const [showPreview, setPreviewState] = useState(false)
     const [content, setContent] = useState(null)
 
+
     return (
         <div
             {...(id && { id })}
@@ -52,7 +53,7 @@ const ReplyBox: React.FC<IReplyProps> = ({
                 display: open ? 'block' : 'none',
             }}
         >
-            <Editor
+            <RichTextEditor
                 placeholder={'Enter your reply'}
                 className={'db f6'}
                 value={value}

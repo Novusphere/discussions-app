@@ -107,7 +107,7 @@ class NewOpeningPost extends React.Component<
     }
 
     // TODO: FIX THIS
-    private handleVoting = async (uuid, value) => {
+    private handleVoting = async (e, uuid, value) => {
         let type = 'neutral'
 
         switch (value) {
@@ -168,6 +168,8 @@ class NewOpeningPost extends React.Component<
             if (data.error) {
                 this.props.uiStore.showToast(`Failed to ${type.split('s')[0]} this post`, 'error')
             }
+
+            e.persist()
         } catch (error) {
             this.props.uiStore.showToast(error.message, 'error')
         }
@@ -339,7 +341,6 @@ class NewOpeningPost extends React.Component<
 
         const {
             postsStore: {
-                setCurrentReplyContent,
                 activeThread: { uuid, openingPostReplyModel },
             },
         } = this.props
@@ -347,19 +348,14 @@ class NewOpeningPost extends React.Component<
         const { onSubmit, content, open, setContent } = openingPostReplyModel
 
         return (
-            <div className={'mb3'}>
-                <ReplyBox
-                    open={open}
-                    uid={uuid}
-                    onContentChange={content => {
-                        setContent(content)
-                        setCurrentReplyContent(content)
-                    }}
-                    onSubmit={() => onSubmit(this.props.postsStore.activeThread)}
-                    loading={onSubmit['pending']}
-                    value={content}
-                />
-            </div>
+            <ReplyBox
+                open={open}
+                uid={uuid}
+                onContentChange={setContent}
+                onSubmit={() => onSubmit(this.props.postsStore.activeThread)}
+                loading={onSubmit['pending']}
+                value={content}
+            />
         )
     }
 
@@ -383,7 +379,9 @@ class NewOpeningPost extends React.Component<
         return (
             <>
                 {this.renderOpeningPost()}
-                {this.renderOpeningPostReplyBox()}
+                <div className={'mb3'} style={{ minHeight: '100px' }}>
+                    {this.renderOpeningPostReplyBox()}
+                </div>
                 {this.renderReplyCount()}
             </>
         )

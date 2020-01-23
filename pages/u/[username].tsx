@@ -34,10 +34,6 @@ class U extends React.Component<IUPageProps> {
         const [username, pub] = query.username.split('-')
         const icon = getIdenticon(pub)
 
-        if (!isServer) {
-            window.scrollTo(0, 0)
-        }
-
         postsStore.resetPositionAndPosts()
         await sleep(500)
         const posts = await postsStore.getPostsForKeys([pub])
@@ -56,6 +52,10 @@ class U extends React.Component<IUPageProps> {
             pub,
             data,
         }
+    }
+
+    componentDidMount(): void {
+        window.scrollTo(0, 0)
     }
 
     componentWillMount(): void {

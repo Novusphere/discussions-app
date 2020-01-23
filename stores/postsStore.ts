@@ -64,8 +64,6 @@ export default class PostsStore extends BaseStore {
     // all posts by filter
     @observable posts: Post[] = []
 
-    @observable currentReplyContent = ''
-
     @observable postsPosition = {
         items: 0,
         cursorId: undefined,
@@ -119,15 +117,6 @@ export default class PostsStore extends BaseStore {
             items: 0,
             cursorId: undefined,
         }
-    }
-
-    @action.bound
-    setCurrentReplyContent(content: string) {
-        this.currentReplyContent = content
-    }
-
-    @computed get hasReplyContent() {
-        return this.currentReplyContent !== ''
     }
 
     @task
@@ -277,16 +266,16 @@ export default class PostsStore extends BaseStore {
         )
     }
 
-    @action
-    public vote = async (uuid: string, value: number) => {
-        try {
-            if (this.authStore.hasAccount) {
-                await this.activeThread.vote(uuid, value)
-            }
-        } catch (error) {
-            throw error
-        }
-    }
+    // @action
+    // public vote = async (uuid: string, value: number) => {
+    //     try {
+    //         if (this.authStore.hasAccount) {
+    //             await this.activeThread.vote(uuid, value)
+    //         }
+    //     } catch (error) {
+    //         throw error
+    //     }
+    // }
 
     @action clearPreview = () => {
         this.preview = null

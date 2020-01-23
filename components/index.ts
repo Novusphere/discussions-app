@@ -12,7 +12,7 @@ export { default as AppModals } from './modal/modal-switcher'
 // @ts-ignore
 export { default as RichTextEditor } from './Editor/Editor'
 export { default as ReplyBox } from './ReplyBox/ReplyBox'
-export { default as ShowFullThread } from './Thread/Thread'
+// export { default as ShowFullThread } from './Thread/Thread'
 export { default as Collapse } from './Collapse/Collapse'
 export { default as GenerateBrainKey } from './GenerateBrainKey/GenerateBrainKey'
 export { default as TagPreview } from './TagPreview/TagPreview'

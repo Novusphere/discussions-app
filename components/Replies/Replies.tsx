@@ -196,7 +196,7 @@ const Reply: React.FC<IReplyProps> = observer(
                     replyStore.setBlockedStatus()
                 },
 
-                async handleVote(uuid: string, value: number) {
+                async handleVote(e: any, uuid: string, value: number) {
                     let type = 'neutral'
 
                     switch (value) {

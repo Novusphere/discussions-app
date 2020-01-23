@@ -9,7 +9,7 @@ interface IVoteProps {
     downVotes: number
     myVote: number
     className?: string
-    handler: (uuid: string, value: number) => void
+    handler: (e: any, uuid: string, value: number) => void
     color?: string
     horizontal?: boolean
 }
@@ -32,7 +32,10 @@ const VotingHandles: React.FC<IVoteProps> = ({
             })}
             {...props}
         >
-            <span onClick={() => handler(uuid, myVote === 0 ? 1 : 0)}>
+            <span onClick={(e) => {
+                e.preventDefault()
+                handler(e, uuid, myVote === 0 ? 1 : 0)
+            }}>
                 <FontAwesomeIcon
                     width={13}
                     icon={faArrowUp}
@@ -52,7 +55,10 @@ const VotingHandles: React.FC<IVoteProps> = ({
             >
                 {upVotes - downVotes}
             </span>
-            <span onClick={() => handler(uuid, myVote === 0 ? -1 : 0)}>
+            <span onClick={(e) => {
+                e.preventDefault()
+                handler(e, uuid, myVote === 0 ? -1 : 0)
+            }}>
                 <FontAwesomeIcon
                     width={13}
                     color={color ? color : '#b9b9b9'}
