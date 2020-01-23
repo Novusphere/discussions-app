@@ -1,7 +1,7 @@
 import { Post } from '@novuspherejs'
 import { action, computed, observable } from 'mobx'
 import { task } from 'mobx-task'
-import { sleep } from '@utils'
+import { getIdenticon, sleep } from '@utils'
 import { CreateForm } from '@components'
 import EditModel from '@models/editModel'
 
@@ -62,6 +62,7 @@ export class NewReplyModel {
     @action.bound
     async submitReply({
         postPriv,
+        activePublicKey,
         posterType,
         posterName,
         activeUidWalletKey,
@@ -84,6 +85,7 @@ export class NewReplyModel {
             })
 
             const reply = instance.createPostObject(false, postPriv)
+            reply.imageData = getIdenticon(activePublicKey)
             reply.uidw = activeUidWalletKey
 
             return reply
@@ -94,12 +96,34 @@ export class NewReplyModel {
 
     @task.resolved
     @action.bound
-    async saveEdits(form) {
+    async saveEdits({
+        form,
+        postPriv,
+        activePublicKey,
+        posterType,
+        posterName,
+        activeUidWalletKey,
+        supportedTokensForUnifiedWallet,
+    }) {
         try {
             const { content } = form.values()
             this.editingContent = content
-            this.toggleEditing()
-            return content
+
+            const instance = new EditModel({
+                content: this.editingContent,
+                posterName: posterName,
+                posterType: posterType,
+                postPriv: postPriv,
+                cached: {
+                    ...this.reply,
+                    content: this.editingContent,
+                },
+            })
+
+            const reply = instance.createPostObject(true)
+            reply.content = this.editingContent
+            reply.edit = true
+            return reply
         } catch (error) {
             throw error
         }

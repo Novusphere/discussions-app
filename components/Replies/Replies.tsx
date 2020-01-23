@@ -1,7 +1,7 @@
 import * as React from 'react'
 import { useCallback, useEffect, useMemo, useState } from 'react'
-import { Post } from '@novuspherejs'
-import { getPermaLink, sleep, useInterval } from '@utils'
+import { discussions, Post } from '@novuspherejs'
+import { generateUuid, getPermaLink, sleep, transformTipsToTransfers, useInterval } from '@utils'
 import classNames from 'classnames'
 import {
     Form,
@@ -15,13 +15,16 @@ import {
 import { NewReplyModel } from '@models/newReplyModel'
 import moment from 'moment'
 import { Sticky, StickyContainer } from 'react-sticky'
-import { Observer, useObserver } from 'mobx-react'
+import { Observer, useObserver, useLocalStore } from 'mobx-react'
 import { IStores } from '@stores'
 import { NextRouter } from 'next/router'
 import { ObservableMap } from 'mobx'
 import { faSpinner } from '@fortawesome/free-solid-svg-icons'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { task } from 'mobx-task'
+import { ModalOptions } from '@globals'
+import { useComputed } from 'mobx-react-lite'
+import PostModel from '@models/postModel'
 
 interface IReplyProps {
     router: NextRouter
@@ -41,6 +44,7 @@ interface IReplyProps {
     supportedTokensForUnifiedWallet: any[]
     showToast: (m: string, t: string) => void
     showModal: (modal: string) => void
+    hideModal: () => void
     clearWalletPrivateKey: () => void
     hasRenteredPassword: boolean
     temporaryWalletPrivateKey: string
@@ -66,45 +70,210 @@ const Reply: React.FC<IReplyProps> = ({
     supportedTokensForUnifiedWallet,
     showToast,
     showModal,
+    hideModal,
     clearWalletPrivateKey,
     hasRenteredPassword,
     temporaryWalletPrivateKey,
 }) => {
-    const [replyContent, setReplyContent] = useState(reply.content)
-    const [replyModel, setReplyModel] = useState<NewReplyModel>(null)
-    const [hover, setHover] = useState(false)
-    const [collapsed, setCollapse] = useState(false)
-    const [intervalDOM, setIntervalDOM] = useState(null)
-    const [replyLoading, setReplyLoading] = useState(false)
+    const replyStore = useLocalStore(
+        source => ({
+            replyContent: reply.content,
+            replyModel: null,
+            hover: false,
+            collapsed: false,
+            replyLoading: false,
+            editing: false,
+
+            get reply() {
+                return source.reply
+            },
+
+            setReplyContent(content) {
+                replyStore.replyContent = content
+            },
+            setReplyModel(model) {
+                replyStore.replyModel = model
+            },
+            setHover(status) {
+                replyStore.hover = status
+            },
+            setCollapse(status) {
+                replyStore.collapsed = status
+            },
+            setReplyLoading(status) {
+                replyStore.replyLoading = status
+            },
+            setEditingLoading(status) {
+                replyStore.editing = status
+            },
+
+            waitForUserInput(cb) {
+                showModal(ModalOptions.walletActionPasswordReentry)
+
+                const int = setInterval(() => {
+                    if (source.temporaryWalletPrivateKey) {
+                        clearInterval(int)
+                        return cb(source.temporaryWalletPrivateKey)
+                    }
+                }, 200)
+            },
+
+            async submitEdit() {
+                replyStore.setEditingLoading(true)
+                try {
+                    if (!source.hasAccount) {
+                        showToast('You must be logged in to edit', 'error')
+                        return
+                    }
+
+                    let editedReply: any = await replyStore.replyModel.saveEdits({
+                        form: replyStore.replyModel.editForm.form,
+                        postPriv: source.postPriv,
+                        activePublicKey: source.activePublicKey,
+                        posterType: source.posterType,
+                        posterName: source.posterName,
+                        activeUidWalletKey: source.activeUidWalletKey,
+                        supportedTokensForUnifiedWallet: source.supportedTokensForUnifiedWallet,
+                    })
+
+                    // submit the edit
+                    editedReply = {
+                        ...editedReply,
+                        uuid: generateUuid(),
+                    }
+
+                    const model = new PostModel(editedReply as any)
+                    const signedReply = model.sign(source.postPriv)
+                    const response = await discussions.post(signedReply as any)
+
+                    return new Promise(resolve => {
+                        const int = setInterval(async () => {
+                            const submitted = await discussions.wasEditSubmitted(
+                                reply.transaction,
+                                response.uuid
+                            )
+
+                            if (submitted) {
+                                clearInterval(int)
+
+                                replyStore.reply.content = response.content
+                                replyStore.reply.edit = true
+                                replyStore.reply.editedAt = new Date(Date.now())
+                                replyStore.reply.transaction = response.transaction
+                                replyStore.reply.pub = response.pub
+
+                                replyStore.setReplyContent(editedReply.content)
+                                replyStore.setEditingLoading(false)
+                                replyStore.replyModel.toggleEditing()
+
+                                showToast('Your post has been edited', 'success')
+
+                                return resolve(response)
+                            }
+                        }, 2000)
+                    })
+                } catch (error) {
+                    replyStore.setEditingLoading(false)
+                    showToast(error.message, 'error')
+                }
+            },
+
+            async submitReply(parentReply: Post) {
+                replyStore.setReplyLoading(true)
+                try {
+                    if (!source.hasAccount) {
+                        showToast('You must be logged in to comment', 'error')
+                        replyStore.setReplyLoading(false)
+                        return
+                    }
+                    // submit reply and update the child replies
+                    const reply = await replyStore.replyModel.submitReply({
+                        postPriv: source.postPriv,
+                        activePublicKey: source.activePublicKey,
+                        posterType: source.posterType,
+                        posterName: source.posterName,
+                        activeUidWalletKey: source.activeUidWalletKey,
+                        supportedTokensForUnifiedWallet: source.supportedTokensForUnifiedWallet,
+                    })
+
+                    if (reply.transfers) {
+                        replyStore.waitForUserInput(async temporaryWalletPrivateKey => {
+                            reply.transfers = transformTipsToTransfers(
+                                reply.transfers,
+                                parentReply.uidw,
+                                temporaryWalletPrivateKey,
+                                source.supportedTokensForUnifiedWallet
+                            )
+
+                            await replyStore.finisheSubmittingReply(reply)
+                        })
+                    } else {
+                        await replyStore.finisheSubmittingReply(reply)
+                        replyStore.setReplyLoading(false)
+                    }
+                } catch (error) {
+                    replyStore.setReplyLoading(false)
+                    showToast(error.message, 'error')
+                }
+            },
+
+            async finisheSubmittingReply(newReply: any) {
+                try {
+                    const model = new PostModel(newReply as any)
+                    const signedReply = model.sign(source.postPriv)
+                    const confirmedReply = await discussions.post(signedReply as any)
+
+                    replyStore.reply.replies.push(confirmedReply)
+                    replyStore.replyModel.clearReplyContent()
+                    replyStore.replyModel.toggleOpen()
+                } catch (error) {
+                    showToast(error.message, 'error')
+                }
+            },
+        }),
+        {
+            reply,
+            hasAccount,
+            activePublicKey,
+            isFollowing,
+            postPriv,
+            posterType,
+            posterName,
+            activeUidWalletKey,
+            supportedTokensForUnifiedWallet,
+            hasRenteredPassword,
+            temporaryWalletPrivateKey,
+        }
+    )
 
     useEffect(() => {
-        setReplyModel(new NewReplyModel(reply))
+        replyStore.setReplyModel(new NewReplyModel(reply))
     }, [])
 
     const handleVote = useCallback((...props) => {
         console.log(props)
     }, [])
 
-    const hasReplyModelLoaded = useMemo(() => !!replyModel, [replyModel])
+    const hasReplyModelLoaded = useMemo(() => !!replyStore.replyModel, [replyStore.replyModel])
 
     const onMouseEnter = useCallback(() => {
-        if (!replyModel.editing) {
-            setHover(true)
+        if (!replyStore.replyModel.editing) {
+            replyStore.setHover(true)
         }
-    }, [replyModel])
+    }, [replyStore.replyModel])
 
     const onMouseLeave = useCallback(() => {
-        if (!replyModel.editing) {
-            setHover(false)
+        if (!replyStore.replyModel.editing) {
+            replyStore.setHover(false)
         }
-    }, [replyModel])
+    }, [replyStore.replyModel])
 
     const renderCollapseElements = useCallback(() => {
-        if (collapsed) {
+        if (replyStore.collapsed) {
             return (
                 <span
                     className={'f6 pointer dim gray'}
-                    onClick={() => setCollapse(false)}
+                    onClick={() => replyStore.setCollapse(false)}
                     title={'Uncollapse comment'}
                 >
                     [+]
@@ -114,7 +283,7 @@ const Reply: React.FC<IReplyProps> = ({
         return (
             <span
                 className={'f6 pointer dim gray'}
-                onClick={() => setCollapse(true)}
+                onClick={() => replyStore.setCollapse(true)}
                 title={'Collapse comment'}
             >
                 [-]
@@ -126,9 +295,9 @@ const Reply: React.FC<IReplyProps> = ({
         return (
             <>
                 <UserNameWithIcon
-                    pub={reply.pub}
-                    imageData={reply.imageData}
-                    name={reply.displayName}
+                    pub={replyStore.reply.pub}
+                    imageData={replyStore.reply.imageData}
+                    name={replyStore.reply.displayName}
                 />
                 <span
                     className={'pl2 o-50 f6'}
@@ -136,10 +305,10 @@ const Reply: React.FC<IReplyProps> = ({
                         'YYYY-MM-DD HH:mm:ss'
                     )}
                 >
-                    {reply.edit && 'edited '}{' '}
+                    {replyStore.reply.edit && 'edited '}{' '}
                     {moment(reply.edit ? reply.editedAt : reply.createdAt).fromNow()}
                 </span>
-                <Tips tokenImages={supportedTokensImages} tips={reply.tips} />
+                <Tips tokenImages={supportedTokensImages} tips={replyStore.reply.tips} />
             </>
         )
     }, [])
@@ -166,14 +335,14 @@ const Reply: React.FC<IReplyProps> = ({
 
     const renderHoverElements = useCallback(
         isSticky => {
-            if (!hover || !hasReplyModelLoaded) {
+            if (!replyStore.hover || !hasReplyModelLoaded) {
                 return null
             }
 
             return (
                 <ReplyHoverElements
                     post={reply}
-                    replyModel={replyModel}
+                    replyModel={replyStore.replyModel}
                     getPermaLinkUrl={getPermaLinkUrl}
                     toggleFollowStatus={toggleFollowStatus}
                     toggleToggleBlock={toggleToggleBlock}
@@ -186,71 +355,13 @@ const Reply: React.FC<IReplyProps> = ({
                 />
             )
         },
-        [hover, hasReplyModelLoaded]
+        [replyStore.hover, hasReplyModelLoaded]
     )
-
-    const startTicking = useCallback(() => {
-        const int = setInterval(() => {
-            console.log('hey')
-        }, 200)
-
-        setIntervalDOM(int)
-    }, [])
-
-    const stopTicking = useCallback(() => {
-        console.log('cleared!')
-        setIntervalDOM(null)
-        clearInterval(intervalDOM)
-    }, [])
-
-    const onReplySubmit = useCallback(async () => {
-        setReplyLoading(true)
-        try {
-            if (!hasAccount) {
-                showToast('You must be logged in to comment', 'error')
-                return
-            }
-            // submit reply and update the child replies
-            const reply = await replyModel.submitReply({
-                postPriv,
-                posterType,
-                posterName,
-                activeUidWalletKey,
-                supportedTokensForUnifiedWallet,
-            })
-
-            if (reply.transfers) {
-                startTicking()
-                await sleep(1000)
-                stopTicking()
-            }
-
-            console.log(reply)
-            setReplyLoading(false)
-        } catch (error) {
-            setReplyLoading(false)
-            showToast(error.message, 'error')
-        }
-    }, [replyModel, hasAccount, replyLoading])
-
-    const onEditSave = useCallback(async () => {
-        try {
-            if (!hasAccount) {
-                showToast('You must be logged in to edit', 'error')
-                return
-            }
-            const editedContent = await replyModel.saveEdits(replyModel.editForm.form)
-            console.log(editedContent)
-            setReplyContent(editedContent)
-        } catch (error) {
-            showToast(error.message, 'error')
-        }
-    }, [replyModel, hasAccount])
 
     return useObserver(() => (
         <div
-            id={reply.uuid}
-            data-post-uuid={reply.uuid}
+            id={replyStore.reply.uuid}
+            data-post-uuid={replyStore.reply.uuid}
             className={classNames([
                 'post-reply black mb2',
                 {
@@ -273,7 +384,7 @@ const Reply: React.FC<IReplyProps> = ({
                                 }}
                             >
                                 <Observer>
-                                    {() => !collapsed && renderHoverElements(isSticky)}
+                                    {() => !replyStore.collapsed && renderHoverElements(isSticky)}
                                 </Observer>
                             </div>
                         )
@@ -281,27 +392,27 @@ const Reply: React.FC<IReplyProps> = ({
                 </Sticky>
                 <div
                     style={{
-                        height: !collapsed ? 'auto' : '50px',
+                        height: !replyStore.collapsed ? 'auto' : '50px',
                     }}
                     className={classNames([
                         'parent flex flex-row pa2',
                         {
-                            'post-content-hover': hover,
+                            'post-content-hover': replyStore.hover,
                         },
                     ])}
                 >
                     <div
                         style={{
-                            visibility: collapsed ? 'hidden' : 'visible',
+                            visibility: replyStore.collapsed ? 'hidden' : 'visible',
                         }}
                         className={'flex flex-column justify-start items-center mr2'}
                     >
                         <VotingHandles
                             horizontal={false}
-                            upVotes={reply.upvotes}
-                            downVotes={reply.downvotes}
-                            myVote={reply.myVote}
-                            uuid={reply.uuid}
+                            upVotes={replyStore.reply.upvotes}
+                            downVotes={replyStore.reply.downvotes}
+                            myVote={replyStore.reply.myVote}
+                            uuid={replyStore.reply.uuid}
                             handler={handleVote}
                         />
                     </div>
@@ -311,18 +422,18 @@ const Reply: React.FC<IReplyProps> = ({
                             <div className={'pr2'}>{renderCollapseElements()}</div>
                             {renderUserElements()}
                             <div className={'db'}>
-                                {collapsed && (
+                                {replyStore.collapsed && (
                                     <span className={'o-50 i f6 pl2 db'}>
-                                        ({reply.replies.length} children)
+                                        ({replyStore.reply.replies.length} children)
                                     </span>
                                 )}
                             </div>
                         </div>
 
-                        {replyModel && replyModel.editing && (
+                        {replyStore.replyModel && replyStore.replyModel.editing && (
                             <>
                                 <Form
-                                    form={replyModel.editForm}
+                                    form={replyStore.replyModel.editForm}
                                     fieldClassName={'pb0'}
                                     hideSubmitButton
                                     className={'w-100 mt3'}
@@ -333,17 +444,17 @@ const Reply: React.FC<IReplyProps> = ({
                                         className={
                                             'f6 link dim ph3 pv2 dib mr1 pointer white bg-red'
                                         }
-                                        onClick={replyModel.toggleEditing}
+                                        onClick={replyStore.replyModel.toggleEditing}
                                     >
                                         Cancel
                                     </button>
 
                                     <button
-                                        disabled={replyModel.saveEdits['pending']}
+                                        disabled={replyStore.editing}
                                         className={'f6 link dim ph3 pv2 dib pointer white bg-green'}
-                                        onClick={onEditSave}
+                                        onClick={replyStore.submitEdit}
                                     >
-                                        {replyModel.saveEdits['pending'] ? (
+                                        {replyStore.editing ? (
                                             <FontAwesomeIcon width={13} icon={faSpinner} spin />
                                         ) : (
                                             'Save Edit'
@@ -353,51 +464,58 @@ const Reply: React.FC<IReplyProps> = ({
                             </>
                         )}
 
-                        {!collapsed && (
+                        {!replyStore.collapsed && (
                             <RichTextPreview
                                 className={classNames([
                                     'f6 lh-copy reply-content mt2',
                                     {
-                                        dn: replyModel && replyModel.editing ? 'hidden' : 'visible',
-                                        dib: !replyModel || !replyModel.editing,
+                                        dn:
+                                            replyStore.replyModel && replyStore.replyModel.editing
+                                                ? 'hidden'
+                                                : 'visible',
+                                        dib:
+                                            !replyStore.replyModel ||
+                                            !replyStore.replyModel.editing,
                                     },
                                 ])}
                             >
-                                {replyContent}
+                                {replyStore.replyContent}
                             </RichTextPreview>
                         )}
                     </div>
                 </div>
-                {replyModel && (
+                {replyStore.replyModel && (
                     <ReplyBox
-                        id={`${reply.uuid}-reply`}
+                        id={`${replyStore.reply.uuid}-reply`}
                         className={classNames([
                             'pl4 pr2 pb4',
                             {
-                                'post-content-hover': hover,
+                                'post-content-hover': replyStore.hover,
                             },
                         ])}
-                        open={replyModel.open}
-                        uid={reply.uuid}
-                        onContentChange={replyModel.setReplyContent}
-                        value={replyModel.replyContent}
-                        loading={replyLoading}
-                        onSubmit={onReplySubmit}
+                        open={replyStore.replyModel.open}
+                        uid={replyStore.reply.uuid}
+                        onContentChange={replyStore.replyModel.setReplyContent}
+                        value={replyStore.replyModel.replyContent}
+                        loading={replyStore.replyLoading}
+                        onSubmit={() => replyStore.submitReply(reply)}
                     />
                 )}
 
-                {!collapsed &&
-                    reply.replies.map(reply => (
+                {!replyStore.collapsed &&
+                    replyStore.reply.replies &&
+                    replyStore.reply.replies.length > 0 &&
+                    replyStore.reply.replies.map(nestedReply => (
                         <div
-                            key={reply.uuid}
-                            onMouseLeave={() => setHover(true)}
-                            onMouseEnter={() => setHover(false)}
+                            key={nestedReply.uuid}
+                            onMouseLeave={() => replyStore.setHover(true)}
+                            onMouseEnter={() => replyStore.setHover(false)}
                         >
                             <Reply
                                 className={'ml3 child'}
                                 router={router}
                                 currentHighlightedPostUuid={currentHighlightedPostUuid}
-                                reply={reply}
+                                reply={nestedReply}
                                 supportedTokensImages={supportedTokensImages}
                                 toggleFollowStatus={toggleFollowStatus}
                                 blockedPosts={blockedPosts}
@@ -411,6 +529,7 @@ const Reply: React.FC<IReplyProps> = ({
                                 supportedTokensForUnifiedWallet={supportedTokensForUnifiedWallet}
                                 showToast={showToast}
                                 showModal={showModal}
+                                hideModal={hideModal}
                                 clearWalletPrivateKey={clearWalletPrivateKey}
                                 hasRenteredPassword={hasRenteredPassword}
                                 temporaryWalletPrivateKey={temporaryWalletPrivateKey}
@@ -450,6 +569,7 @@ const Replies: React.FC<IRepliesProps> = ({
                     reply={reply}
                     showToast={uiStore.showToast}
                     showModal={uiStore.showModal}
+                    hideModal={uiStore.hideModal}
                     currentHighlightedPostUuid={currentHighlightedPostUuid}
                     supportedTokensImages={supportedTokensImages}
                     toggleFollowStatus={userStore.toggleUserFollowing}

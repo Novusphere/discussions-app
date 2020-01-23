@@ -600,7 +600,6 @@ export default class SettingsStore extends BaseStore {
                             }
                         } catch (error) {
                             form.$('password').invalidate(error.message)
-                            this.authStore.setWalletPrivateKey('false')
                             return error
                         }
                     }

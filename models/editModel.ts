@@ -131,6 +131,7 @@ class EditModel {
             edit: undefined,
             transfers: undefined,
             vote: null,
+            imageData: undefined,
         }
 
         if (!isEdit) {

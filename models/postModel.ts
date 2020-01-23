@@ -19,7 +19,7 @@ class PostModel {
     @observable upvotes
     @observable downvotes
     @observable attachment
-    @observable replies
+    @observable replies = []
     @observable content
     @observable edit
     @observable tags

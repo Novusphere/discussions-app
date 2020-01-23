@@ -17,7 +17,7 @@ interface IReplyProps {
     className?: string
     uid: string // the uid of the post this component is active for
     onContentChange: (content: string) => void
-    onSubmit: (uid: string) => any
+    onSubmit: () => void
 
     value?: string
     loading: boolean
@@ -73,7 +73,7 @@ const ReplyBox: React.FC<IReplyProps> = ({
                 <button
                     disabled={loading}
                     className={'mt3 f6 link dim ph3 pv2 dib mr2 pointer white bg-green'}
-                    onClick={() => onSubmit(uid)}
+                    onClick={onSubmit}
                 >
                     {loading ? <FontAwesomeIcon width={13} icon={faSpinner} spin /> : 'Post reply'}
                 </button>
@@ -88,4 +88,4 @@ const ReplyBox: React.FC<IReplyProps> = ({
     )
 }
 
-export default observer(ReplyBox)
+export default ReplyBox
