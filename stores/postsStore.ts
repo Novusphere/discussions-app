@@ -205,6 +205,7 @@ export default class PostsStore extends BaseStore {
     @action.bound
     public async getAndSetThread(id: string): Promise<null | Thread> {
         try {
+            console.log(this.authStore.activePublicKey)
             const thread = await discussions.getThread(id, this.authStore.activePublicKey)
             if (!thread) return null
             this.activeThreadSerialized = thread

@@ -27,15 +27,15 @@ interface INewThreadProps {
 @observer
 export class NewThread extends React.Component<INewThreadProps, any> {
     async componentDidMount() {
-        autorun(() => {
-            if (
-                this.props.authStore.hasAccount &&
-                this.props.id &&
-                !this.props.postsStore.activeThreadSerialized
-            ) {
+        // autorun(() => {
+        //     if (
+        //         this.props.authStore.hasAccount &&
+        //         this.props.id &&
+        //         !this.props.postsStore.activeThreadSerialized
+        //     ) {
                 this.props.postsStore.getAndSetThread(this.props.id)
-            }
-        })
+            // }
+        // })
     }
 
     render() {

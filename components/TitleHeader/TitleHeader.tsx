@@ -32,9 +32,9 @@ class TitleHeader extends React.Component<ITitleHeaderProps, ITitleHeaderState> 
         search: '',
     }
 
-    componentDidMount(): void {
-        this.props.authStore.checkInitialConditions()
-    }
+    // componentDidMount(): void {
+    //     this.props.authStore.checkInitialConditions()
+    // }
 
     private renderUserSettings = () => {
         const {

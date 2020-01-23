@@ -100,15 +100,12 @@ const Reply: React.FC<IReplyProps> = observer(
                 editing: false,
                 hidden: false,
 
+                myVote: reply.myVote,
                 downvotes: reply.downvotes,
                 upvotes: reply.upvotes,
 
                 get reply() {
                     return source.reply
-                },
-
-                get myVote() {
-                    return source.reply.myVote
                 },
 
                 get myVoteValue() {
@@ -138,6 +135,10 @@ const Reply: React.FC<IReplyProps> = observer(
 
                 get permaLinkURL() {
                     return getPermaLink(router.asPath.split('#')[0], reply.uuid)
+                },
+
+                refreshVote() {
+                  replyStore.myVote = source.reply.myVote
                 },
 
                 async copyAndScrollToPermalinkURL() {
@@ -234,6 +235,7 @@ const Reply: React.FC<IReplyProps> = observer(
                         }
 
                         source.reply.myVote = [voteObject.data]
+                        replyStore.myVote = [voteObject.data]
 
                         const data = await voteAsync({
                             voter: '',
@@ -410,6 +412,7 @@ const Reply: React.FC<IReplyProps> = observer(
 
             const timeout = setTimeout(() => {
                 replyStore.setBlockedStatus()
+                replyStore.refreshVote()
             }, 500)
 
             return () => {
