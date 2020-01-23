@@ -9,6 +9,7 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { faChevronLeft } from '@fortawesome/free-solid-svg-icons'
 import Link from 'next/link'
 import { autorun } from 'mobx'
+import { sleep } from '@utils'
 
 interface INewThreadProps {
     id: string
@@ -33,7 +34,7 @@ export class NewThread extends React.Component<INewThreadProps, any> {
         //         this.props.id &&
         //         !this.props.postsStore.activeThreadSerialized
         //     ) {
-                this.props.postsStore.getAndSetThread(this.props.id)
+        await this.props.postsStore.getAndSetThread(this.props.id)
             // }
         // })
     }

@@ -228,21 +228,14 @@ export default class AuthStore extends BaseStore {
     @task
     @action.bound
     async checkInitialConditions() {
-        console.log('1')
         if (this.logOutTimestamp === AuthStore.LOG_OUT_USER_INTEGER || !this.hasAccount) {
-            console.log('2')
             return
         }
 
-        console.log('3')
-
         if (this.statusJson.bk && this.postPriv && this.displayName.bk) {
-            console.log('4')
             this.hasAccount = true
             this.logOutTimestamp = Date.now()
-            console.log('5')
             if (this.hasEOSWalletAccount) this.connectScatterWallet()
-            console.log('6')
         } else {
             this.hasAccount = false
         }

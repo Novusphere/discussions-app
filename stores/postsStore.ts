@@ -5,7 +5,7 @@ import { BaseStore, getOrCreateStore } from 'next-mobx-wrapper'
 import { CreateForm } from '@components'
 import { getTagStore } from '@stores/tagStore'
 import { getAuthStore, getUiStore, IStores } from '@stores'
-import { encodeId, generateUuid, generateVoteObject, getAttachmentValue, pushToThread } from '@utils'
+import { encodeId, generateUuid, generateVoteObject, getAttachmentValue, isServer, pushToThread } from '@utils'
 import { ThreadModel } from '@models/threadModel'
 import FeedModel from '@models/feedModel'
 import _ from 'lodash'
@@ -205,8 +205,14 @@ export default class PostsStore extends BaseStore {
     @action.bound
     public async getAndSetThread(id: string): Promise<null | Thread> {
         try {
-            console.log(this.authStore.activePublicKey)
-            const thread = await discussions.getThread(id, this.authStore.activePublicKey)
+            let key = this.authStore.activePublicKey
+
+            if (!key && !isServer) {
+                const auth = JSON.parse(window.localStorage.getItem('auth'))
+                key = auth.statusJson.bk.post
+            }
+
+            const thread = await discussions.getThread(id, key)
             if (!thread) return null
             this.activeThreadSerialized = thread
             this.activeThreadId = id
