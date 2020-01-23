@@ -321,41 +321,51 @@ export default class SettingsStore extends BaseStore {
     @task.resolved
     @action.bound
     async handleDepositSubmit() {
+        const { form } = this.depositsForm
+
+        if (!form.isValid) {
+            return
+        }
+
         try {
-            const { form } = this.depositsForm
-
-            if (form.isValid) {
-                if (!this.authStore.hasEOSWalletAccount) {
-                    this.uiStore.showToast('Please connect an EOS wallet to continue.', 'error')
-                    return
-                }
-
-                const { amount, memoId, token } = form.values()
-                const { label, value, contract, decimals, chain } = token
-
-                const transaction = {
-                    account: value,
-                    name: 'transfer',
-                    data: {
-                        from: this.authStore.displayName.scatter,
-                        to: contract,
-                        quantity: `${Number(amount).toFixed(decimals)} ${label}`,
-                        memo: memoId,
-                    },
-                }
-
-                const transaction_id = await eos.transact(transaction)
-                this.uiStore.showToast('Deposit successfully submitted!', 'success')
-                this.uiStore.showToast('Click here to view your transaction', 'info', () =>
-                    this.openTXInNewTab(transaction_id)
-                )
-
-                await sleep(2500)
-                await this.authStore.fetchBalanceForSelectedToken()
-                ;(form as any).clear()
+            if (!this.authStore.hasEOSWalletAccount) {
+                this.uiStore.showToast('Please connect an EOS wallet to continue.', 'error')
+                return
             }
+
+            const { amount, memoId, token } = form.values()
+            const { label, value, contract, decimals, chain } = token
+
+            const transaction = {
+                account: value,
+                name: 'transfer',
+                data: {
+                    from: this.authStore.displayName.scatter,
+                    to: contract,
+                    quantity: `${Number(amount).toFixed(decimals)} ${label}`,
+                    memo: memoId,
+                },
+            }
+
+            const transaction_id = await eos.transact(transaction)
+
+            // fixes https://github.com/Novusphere/discussions-app/issues/151
+            if (typeof transaction_id === 'undefined') {
+                this.uiStore.showToast('Please re-connect your EOS wallet and try again', 'error')
+                return
+            }
+
+            this.uiStore.showToast('Deposit successfully submitted!', 'success')
+            this.uiStore.showToast('Click here to view your transaction', 'info', () =>
+                this.openTXInNewTab(transaction_id)
+            )
+
+            await sleep(2500)
+            await this.authStore.fetchBalanceForSelectedToken()
+            ;(form as any).clear()
         } catch (error) {
-            this.uiStore.showToast('Deposit failed to submit', 'error')
+            let message = error.message || 'Deposit failed to submit'
+            this.uiStore.showToast(message, 'error')
             throw error
         }
     }
