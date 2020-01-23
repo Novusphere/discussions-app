@@ -57,6 +57,10 @@ export class NewThread extends React.Component<INewThreadProps, any> {
         }
     }
 
+    componentWillUnmount(): void {
+        this.props.postsStore.highlightPostUuid('')
+    }
+
     addReplies = reply => {
         this.setState(prevState => ({
             replies: [...prevState.replies, reply],
