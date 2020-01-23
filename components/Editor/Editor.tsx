@@ -166,7 +166,6 @@ class EditorComponent extends React.Component<IEditorProps> {
 
         return (
             <Editor
-                readOnly={true}
                 ref={this.ref}
                 key={'editor'}
                 debug={'error'}
