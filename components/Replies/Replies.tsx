@@ -105,6 +105,10 @@ const Reply: React.FC<IReplyProps> = observer(
                 downvotes: reply.downvotes,
                 upvotes: reply.upvotes,
 
+                get reply() {
+                    return source.reply
+                },
+
                 get myVoteValue() {
                     if (source.reply.myVote && source.reply.myVote.length) {
                         return source.reply.myVote[0].value
@@ -345,7 +349,7 @@ const Reply: React.FC<IReplyProps> = observer(
                         const signedReply = model.sign(source.postPriv)
                         const confirmedReply = await discussions.post(signedReply as any)
 
-                        reply.replies.push(confirmedReply)
+                        replyStore.reply.replies.push(confirmedReply)
                         replyStore.replyModel.clearReplyContent()
                         replyStore.replyModel.toggleOpen()
 
