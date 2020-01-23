@@ -232,18 +232,18 @@ const Reply: React.FC<IReplyProps> = observer(
 
                         replyStore.myVote = [voteObject.data]
 
-                        // const data = await voteAsync({
-                        //     voter: '',
-                        //     uuid,
-                        //     value,
-                        //     nonce: voteObject.nonce,
-                        //     pub: voteObject.pub,
-                        //     sig: voteObject.sig,
-                        // })
-                        //
-                        // if (data.error) {
-                        //     showToast(`Failed to ${type.split('s')[0]} this post`, 'error')
-                        // }
+                        const data = await voteAsync({
+                            voter: '',
+                            uuid,
+                            value,
+                            nonce: voteObject.nonce,
+                            pub: voteObject.pub,
+                            sig: voteObject.sig,
+                        })
+
+                        if (data.error) {
+                            showToast(`Failed to ${type.split('s')[0]} this post`, 'error')
+                        }
                     } catch (error) {
                         showToast(error.message, 'error')
                     }
@@ -347,6 +347,7 @@ const Reply: React.FC<IReplyProps> = observer(
                         const model = new PostModel(newReply as any)
                         const signedReply = model.sign(source.postPriv)
                         const confirmedReply = await discussions.post(signedReply as any)
+                        confirmedReply.myVote = [{ value: 1 }]
 
                         replyStore.reply.replies.push(confirmedReply)
                         replyStore.replyModel.clearReplyContent()
