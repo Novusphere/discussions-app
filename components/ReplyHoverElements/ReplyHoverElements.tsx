@@ -75,7 +75,7 @@ const ReplyHoverElements: React.FC<IReplyHoverElementsProps> = ({
             {post.pub && hasAccount && activePublicKey !== post.pub ? (
                 <span
                     title={isFollowing ? 'Unfollow user' : 'Follow user'}
-                    onClick={toggleFollowStatus}
+                    onClick={() => toggleFollowStatus()}
                 >
                     {isFollowing ? (
                         <FontAwesomeIcon icon={faUserMinus} className={'red'} />
