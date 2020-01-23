@@ -9,6 +9,7 @@ export interface INSDBSearchQuery {
     payload?: any
     count?: number
     limit?: number
+    key?: string
 }
 
 export class NSDB {

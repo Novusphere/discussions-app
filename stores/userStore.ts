@@ -35,7 +35,7 @@ export default class UserStore extends BaseStore {
                 const count = change.newValue[0] - change.newValue[1]
 
                 if (count > 0) {
-                    const thread = await discussions.getThread('3qk3dk57g39v1')
+                    const thread = await discussions.getThread(change.name)
                     const notificationModel = new NotificationModel({
                         type: 'watch',
                         post: {

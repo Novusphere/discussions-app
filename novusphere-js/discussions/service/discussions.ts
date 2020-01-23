@@ -345,7 +345,7 @@ export default class DiscussionsService {
         return op.totalReplies
     }
 
-    async getThread(_id: string, isServer = false, decoded = false): Promise<Thread | null> {
+    async getThread(_id: string, key?: string): Promise<Thread | null> {
         let dId = Post.decodeId(_id)
 
         const searchQuery = {
@@ -360,6 +360,10 @@ export default class DiscussionsService {
                     },
                 },
             ],
+        }
+
+        if (key) {
+            searchQuery['key'] = key
         }
 
         try {
@@ -379,6 +383,10 @@ export default class DiscussionsService {
                         },
                     },
                 ],
+            }
+
+            if (key) {
+                sq['key'] = key
             }
 
             do {

@@ -16,7 +16,6 @@ import { ThreadModel } from '@models/threadModel'
 import FeedModel from '@models/feedModel'
 import _ from 'lodash'
 import PostModel from '@models/postModel'
-import ecc from 'eosjs-ecc'
 
 export interface IAttachment {
     value: string
@@ -205,9 +204,10 @@ export default class PostsStore extends BaseStore {
 
     @task
     @action.bound
-    public async getAndSetThread(id: string, isServer = false): Promise<null | ThreadModel> {
+    public async getAndSetThread(id: string): Promise<null | ThreadModel> {
         try {
-            const thread = await discussions.getThread(id, isServer)
+            const { activePublicKey } = this.authStore
+            const thread = await discussions.getThread(id, activePublicKey)
             if (!thread) return null
             this.activeThread = new ThreadModel(thread)
             this.activeThreadId = id
@@ -301,7 +301,7 @@ export default class PostsStore extends BaseStore {
             }
 
             const value = 1
-            const { postPriv } = this.authStore
+            const { postPriv, activePublicKey } = this.authStore
             const { data: vote } = generateVoteObject({
                 uuid,
                 postPriv,
