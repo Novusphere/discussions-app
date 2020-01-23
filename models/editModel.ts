@@ -198,14 +198,16 @@ class EditModel {
 
             const model = new PostModel(reply as any)
             const signedReply = model.sign(this.postPriv)
-            const response = await discussions.post(signedReply as any)
+            const response = signedReply as any
+            // const response = await discussions.post(signedReply as any)
 
             return new Promise((resolve, reject) => {
                 const int = setInterval(async () => {
-                    const submitted = await discussions.wasEditSubmitted(
-                        this.cached.transaction,
-                        response.uuid
-                    )
+                    const submitted = true
+                    // const submitted = await discussions.wasEditSubmitted(
+                    //     this.cached.transaction,
+                    //     response.uuid
+                    // )
 
                     if (submitted) {
                         clearInterval(int)

@@ -108,6 +108,10 @@ const Reply: React.FC<IReplyProps> = observer(
                     return source.reply
                 },
 
+                get supportedTokensImages() {
+                    return source.supportedTokensImages
+                },
+
                 get myVoteValue() {
                     if (replyStore.myVote && replyStore.myVote.length) {
                         return replyStore.myVote[0].value
@@ -309,11 +313,11 @@ const Reply: React.FC<IReplyProps> = observer(
                                 if (submitted) {
                                     clearInterval(int)
 
-                                    reply.content = response.content
-                                    reply.edit = true
-                                    reply.editedAt = new Date(Date.now())
-                                    reply.transaction = response.transaction
-                                    reply.pub = response.pub
+                                    replyStore.reply.content = response.content
+                                    replyStore.reply.edit = true
+                                    replyStore.reply.editedAt = new Date(Date.now())
+                                    replyStore.reply.transaction = response.transaction
+                                    replyStore.reply.pub = response.pub
 
                                     replyStore.setReplyContent(editedReply.content)
                                     replyStore.setEditingLoading(false)
@@ -385,28 +389,6 @@ const Reply: React.FC<IReplyProps> = observer(
                     } catch (error) {
                         showToast(error.message, 'error')
                     }
-                },
-
-                get renderUserElements() {
-                    return (
-                        <>
-                            <UserNameWithIcon
-                                pub={reply.pub}
-                                imageData={reply.imageData}
-                                name={reply.displayName}
-                            />
-                            <span
-                                className={'pl2 o-50 f6'}
-                                title={moment(reply.edit ? reply.editedAt : reply.createdAt).format(
-                                    'YYYY-MM-DD HH:mm:ss'
-                                )}
-                            >
-                                {reply.edit && 'edited '}{' '}
-                                {moment(reply.edit ? reply.editedAt : reply.createdAt).fromNow()}
-                            </span>
-                            <Tips tokenImages={source.supportedTokensImages} tips={reply.tips} />
-                        </>
-                    )
                 },
             }),
             {
@@ -571,7 +553,30 @@ const Reply: React.FC<IReplyProps> = observer(
                         <div className={'flex flex-column w-100'}>
                             <div className={'flex flex-row items-center header pb0'}>
                                 <div className={'pr2'}>{renderCollapseElements()}</div>
-                                {replyStore.renderUserElements}
+                                <UserNameWithIcon
+                                    pub={replyStore.reply.pub}
+                                    imageData={replyStore.reply.imageData}
+                                    name={replyStore.reply.displayName}
+                                />
+                                <span
+                                    className={'pl2 o-50 f6'}
+                                    title={moment(
+                                        replyStore.reply.edit
+                                            ? replyStore.reply.editedAt
+                                            : replyStore.reply.createdAt
+                                    ).format('YYYY-MM-DD HH:mm:ss')}
+                                >
+                                    {replyStore.reply.edit && 'edited '}{' '}
+                                    {moment(
+                                        replyStore.reply.edit
+                                            ? replyStore.reply.editedAt
+                                            : replyStore.reply.createdAt
+                                    ).fromNow()}
+                                </span>
+                                <Tips
+                                    tokenImages={replyStore.supportedTokensImages}
+                                    tips={replyStore.reply.tips}
+                                />
                                 <div className={'db'}>
                                     {replyStore.collapsed && (
                                         <span className={'o-50 i f6 pl2 db'}>

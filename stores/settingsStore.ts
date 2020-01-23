@@ -93,6 +93,10 @@ export default class SettingsStore extends BaseStore {
             if (this.blurStates.withdrawing.finalAmount) {
                 setFormInputsForFeesAndAmounts(this.withdrawalForm, 'finalAmount', 'amount')
             }
+
+            if (this.authStore.uidWalletPubKey) {
+                this.depositsForm.form.$('memoId').set('value', this.authStore.uidWalletPubKey)
+            }
         })
     }
 
@@ -390,7 +394,6 @@ export default class SettingsStore extends BaseStore {
                 label: 'Memo ID',
                 rules: 'required',
                 disabled: true,
-                value: this.authStore.uidWalletPubKey,
                 type: 'hidden',
                 hideLabels: true,
             },
