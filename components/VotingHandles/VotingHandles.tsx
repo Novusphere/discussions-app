@@ -34,7 +34,7 @@ const VotingHandles: React.FC<IVoteProps> = ({
         >
             <span onClick={(e) => {
                 e.preventDefault()
-                handler(e, uuid, myVote === 0 ? 1 : 0)
+                handler(e, uuid, 1)
             }}>
                 <FontAwesomeIcon
                     width={13}
@@ -57,7 +57,7 @@ const VotingHandles: React.FC<IVoteProps> = ({
             </span>
             <span onClick={(e) => {
                 e.preventDefault()
-                handler(e, uuid, myVote === 0 ? -1 : 0)
+                handler(e, uuid, -1)
             }}>
                 <FontAwesomeIcon
                     width={13}

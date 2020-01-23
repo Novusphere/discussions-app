@@ -197,7 +197,7 @@ const Reply: React.FC<IReplyProps> = observer(
                 },
 
                 async handleVote(e: any, uuid: string, value: number) {
-                    let type = 'neutral'
+                    let type
 
                     switch (value) {
                         case 1:
@@ -209,38 +209,61 @@ const Reply: React.FC<IReplyProps> = observer(
                     }
 
                     try {
+                        const myVoteValue = replyStore.myVoteValue
+
+                        // check if your prev vote was positive
+                        if (myVoteValue === 1) {
+                            // what type of vote are you doing
+                            if (type === 'downvote') {
+                                replyStore.upvotes -= 1
+                                replyStore.downvotes += 1
+                                replyStore.myVote = [{ value: -1}]
+                            }
+
+                            if (type === 'upvote') {
+                                replyStore.upvotes -= 1
+                                replyStore.myVote = [{ value: 0}]
+                            }
+                        }
+
+                        // check if your prev vote was negative
+                        if (myVoteValue === -1) {
+                            // what type of vote are you doing
+                            if (type === 'downvote') {
+                                replyStore.upvotes += 1
+                                replyStore.myVote = [{ value: 0}]
+                            }
+
+                            if (type === 'upvote') {
+                                replyStore.upvotes += 1
+                                replyStore.downvotes -= 1
+                                replyStore.myVote = [{ value: 1}]
+                            }
+                        }
+
+                        // you never voted
+                        if (myVoteValue === 0) {
+                            if (type === 'downvote') {
+                                replyStore.downvotes += 1
+                                replyStore.myVote = [{ value: -1}]
+                            }
+                            //
+                            if (type === 'upvote') {
+                                replyStore.upvotes += 1
+                                replyStore.myVote = [{ value: 1}]
+                            }
+                        }
+
                         const voteObject = generateVoteObject({
                             uuid,
                             postPriv: source.postPriv,
-                            value,
+                            value: replyStore.myVoteValue,
                         })
-
-                        switch (type) {
-                            case 'neutral':
-                                if (replyStore.myVoteValue === 1) {
-                                    replyStore.downvotes += 1
-                                } else if (replyStore.myVoteValue === -1) {
-                                    replyStore.upvotes += 1
-                                }
-
-                                break
-                            case 'upvote':
-                                replyStore.upvotes += 1
-                                // replyStore.myVote = 1
-                                break
-                            case 'downvote':
-                                replyStore.downvotes += 1
-                                // replyStore.myVote = -1
-                                break
-                        }
-
-                        source.reply.myVote = [voteObject.data]
-                        replyStore.myVote = [voteObject.data]
 
                         const data = await voteAsync({
                             voter: '',
                             uuid,
-                            value,
+                            value: replyStore.myVoteValue,
                             nonce: voteObject.nonce,
                             pub: voteObject.pub,
                             sig: voteObject.sig,

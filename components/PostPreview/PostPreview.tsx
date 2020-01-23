@@ -61,7 +61,7 @@ const PostPreview: React.FC<IPostPreviewProps> = ({
         },
 
         async handleVote(e: any, uuid: string, value: number) {
-            let type = 'neutral'
+            let type
 
             switch (value) {
                 case 1:
@@ -73,38 +73,61 @@ const PostPreview: React.FC<IPostPreviewProps> = ({
             }
 
             try {
+                const myVoteValue = postStore.myVoteValue
+
+                // check if your prev vote was positive
+                if (myVoteValue === 1) {
+                    // what type of vote are you doing
+                    if (type === 'downvote') {
+                        postStore.upvotes -= 1
+                        postStore.downvotes += 1
+                        postStore.myVote = [{ value: -1}]
+                    }
+
+                    if (type === 'upvote') {
+                        postStore.upvotes -= 1
+                        postStore.myVote = [{ value: 0}]
+                    }
+                }
+
+                // check if your prev vote was negative
+                if (myVoteValue === -1) {
+                    // what type of vote are you doing
+                    if (type === 'downvote') {
+                        postStore.upvotes += 1
+                        postStore.myVote = [{ value: 0}]
+                    }
+
+                    if (type === 'upvote') {
+                        postStore.upvotes += 1
+                        postStore.downvotes -= 1
+                        postStore.myVote = [{ value: 1}]
+                    }
+                }
+
+                // you never voted
+                if (myVoteValue === 0) {
+                    if (type === 'downvote') {
+                        postStore.downvotes += 1
+                        postStore.myVote = [{ value: -1}]
+                    }
+                    //
+                    if (type === 'upvote') {
+                        postStore.upvotes += 1
+                        postStore.myVote = [{ value: 1}]
+                    }
+                }
+
                 const voteObject = generateVoteObject({
                     uuid,
                     postPriv: source.postPriv,
-                    value,
+                    value: postStore.myVoteValue,
                 })
-
-                switch (type) {
-                    case 'neutral':
-                        if (postStore.myVoteValue === 1) {
-                            postStore.downvotes += 1
-                        } else if (postStore.myVoteValue === -1) {
-                            postStore.upvotes += 1
-                        }
-
-                        break
-                    case 'upvote':
-                        postStore.upvotes += 1
-                        // postStore.myVote = 1
-                        break
-                    case 'downvote':
-                        postStore.downvotes += 1
-                        // postStore.myVote = -1
-                        break
-                }
-
-                source.post.myVote = [voteObject.data]
-                postStore.myVote = [voteObject.data]
 
                 const data = await voteAsync({
                     voter: '',
                     uuid,
-                    value,
+                    value: postStore.myVoteValue,
                     nonce: voteObject.nonce,
                     pub: voteObject.pub,
                     sig: voteObject.sig,

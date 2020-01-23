@@ -24,7 +24,7 @@ import {
 import { NextRouter } from 'next/router'
 import { IStores } from '@stores'
 import { autorun, IReactionDisposer } from 'mobx'
-import { generateVoteObject, voteAsync } from '@utils'
+import { generateVoteObject, sleep, voteAsync } from '@utils'
 
 interface INewOpeningPostOuterProps {
     router: NextRouter
@@ -106,9 +106,8 @@ class NewOpeningPost extends React.Component<
         this.disposer()
     }
 
-    // TODO: FIX THIS
     private handleVoting = async (e, uuid, value) => {
-        let type = 'neutral'
+        let type
 
         switch (value) {
             case 1:
@@ -120,46 +119,75 @@ class NewOpeningPost extends React.Component<
         }
 
         try {
+            const { myVoteValue } = this.state
+
+            // check if your prev vote was positive
+            if (myVoteValue === 1) {
+                // what type of vote are you doing
+                if (type === 'downvote') {
+                    this.setState(prevState => ({
+                        upvotes: prevState.upvotes - 1,
+                        downvotes: prevState.downvotes + 1,
+                        myVoteValue: -1,
+                    }))
+                }
+
+                if (type === 'upvote') {
+                    this.setState(prevState => ({
+                        upvotes: prevState.upvotes - 1,
+                        myVoteValue: 0,
+                    }))
+                }
+            }
+
+            // check if your prev vote was negative
+            if (myVoteValue === -1) {
+                // what type of vote are you doing
+                if (type === 'downvote') {
+                    this.setState(prevState => ({
+                        upvotes: prevState.upvotes + 1,
+                        myVoteValue: 0,
+                    }))
+                }
+
+                if (type === 'upvote') {
+                    this.setState(prevState => ({
+                        upvotes: prevState.upvotes + 1,
+                        downvotes: prevState.downvotes - 1,
+                        myVoteValue: 1,
+                    }))
+                }
+            }
+
+            // you never voted
+            if (myVoteValue === 0) {
+                if (type === 'downvote') {
+                    this.setState(prevState => ({
+                        downvotes: prevState.downvotes + 1,
+                        myVoteValue: -1,
+                    }))
+                }
+
+                if (type === 'upvote') {
+                    this.setState(prevState => ({
+                        myVoteValue: 1,
+                        upvotes: prevState.upvotes + 1,
+                    }))
+                }
+            }
+
+            await sleep(50)
+
             const voteObject = generateVoteObject({
                 uuid,
                 postPriv: this.props.authStore.postPriv,
-                value,
-            })
-
-            switch (type) {
-                case 'neutral':
-                    if (this.state.myVoteValue === 1) {
-                        this.setState(prevState => ({
-                            downvotes: prevState.downvotes + 1,
-                        }))
-                    } else if (this.state.myVoteValue === -1) {
-                        this.setState(prevState => ({
-                            upvotes: prevState.upvotes + 1,
-                        }))
-                    }
-
-                    break
-                case 'upvote':
-                    this.setState(prevState => ({
-                        upvotes: prevState.upvotes + 1,
-                    }))
-                    break
-                case 'downvote':
-                    this.setState(prevState => ({
-                        downvotes: prevState.downvotes + 1,
-                    }))
-                    break
-            }
-
-            this.setState({
-                myVote: [voteObject],
-                myVoteValue: value,
+                value: this.state.myVoteValue,
             })
 
             const data = await voteAsync({
                 voter: '',
                 uuid,
-                value,
+                value: this.state.myVoteValue,
                 nonce: voteObject.nonce,
                 pub: voteObject.pub,
                 sig: voteObject.sig,
