@@ -81,7 +81,7 @@ const ReplyBox: React.FC<IReplyProps> = ({
             </div>
 
             {showPreview && (
-                <div className={'flex flex-row mt3 card pa2'}>
+                <div className={'flex flex-row mt3 card pa2 reply-content'}>
                     <RichTextPreview className={'w-100'}>{content}</RichTextPreview>
                 </div>
             )}

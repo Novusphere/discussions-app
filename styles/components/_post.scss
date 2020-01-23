@@ -74,6 +74,12 @@
         color: #079E99 !important;
     }
 
+    blockquote {
+        @extend .ml2;
+        @extend .pl2;
+        border-left: 3px solid #dbdbdb;
+    }
+
 }
 
 .opening-post {

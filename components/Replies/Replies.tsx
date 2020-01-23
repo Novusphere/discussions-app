@@ -734,23 +734,24 @@ const Replies: React.FC<IRepliesProps> = observer(
         postsStore,
         activeThread,
     }) => {
-        const repliesStore = useLocalStore(
-            source => ({
-                get replies() {
-                    if (activeThread && activeThread.openingPost.replies) {
-                        return activeThread.openingPost.replies as any
-                    }
-                    return source.replies
-                },
-            }),
-            {
-                replies,
-            }
-        )
+        // const repliesStore = useLocalStore(
+        //     source => ({
+        //         get replies() {
+        //             if (activeThread && activeThread.openingPost.replies) {
+        //                 return activeThread.openingPost.replies as any
+        //             }
+        //             return []
+        //             return source.replies
+        //         },
+        //     }),
+        //     {
+        //         replies,
+        //     }
+        // )
 
         return (
             <div className={'card'}>
-                {repliesStore.replies.map(reply => (
+                {replies.map(reply => (
                     <Reply
                         router={router}
                         key={reply.uuid}

@@ -38,26 +38,23 @@ export class NewThread extends React.Component<INewThreadProps, any> {
         if (prevState.activeThread !== this.props.postsStore.activeThreadSerialized) {
             this.setState({
                 activeThread: this.props.postsStore.activeThreadSerialized,
-                // replies: this.props.postsStore.activeThreadSerialized.openingPost.replies,
             })
         }
-
-        // if (prevState.replies.length !== this.props.threadSerialized.openingPost.replies.length) {
-        //     this.setState(prevState => ({
-        //         replies: [...prevState.replies, ...this.props.threadSerialized.openingPost.replies],
-        //     }))
-        // }
     }
 
     async componentDidMount() {
-        if (this.props.postsStore.firstSplash) {
-            await this.props.postsStore.getAndSetThread(this.props.id)
-            this.props.postsStore.firstSplash = false
-        }
-
         this.setState({
             replies: this.props.threadSerialized.openingPost.replies,
         })
+
+        if (this.props.postsStore.firstSplash) {
+            await this.props.postsStore.getAndSetThread(this.props.id)
+            this.props.postsStore.firstSplash = false
+
+            this.setState({
+                replies: this.props.postsStore.activeThreadSerialized.openingPost.replies,
+            })
+        }
     }
 
     addReplies = reply => {
