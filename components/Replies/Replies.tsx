@@ -100,12 +100,15 @@ const Reply: React.FC<IReplyProps> = observer(
                 editing: false,
                 hidden: false,
 
-                myVote: reply.myVote,
                 downvotes: reply.downvotes,
                 upvotes: reply.upvotes,
 
                 get reply() {
                     return source.reply
+                },
+
+                get myVote() {
+                    return source.reply.myVote
                 },
 
                 get myVoteValue() {
@@ -230,7 +233,7 @@ const Reply: React.FC<IReplyProps> = observer(
                                 break
                         }
 
-                        replyStore.myVote = [voteObject.data]
+                        source.reply.myVote = [voteObject.data]
 
                         const data = await voteAsync({
                             voter: '',
