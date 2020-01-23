@@ -76,35 +76,35 @@ class NewOpeningPost extends React.Component<
     // TODO: FIX THIS
     private handleVoting = async (uuid, myNewVote) => {
         console.log('new vote: ', myNewVote)
-        const type = myNewVote === 1 ? 'upvotes' : 'downvotes'
-        let currentVote = this.state[type]
-
-        // if user has already voted
-        const { myVote: myPreviousVote, upvotes, downvotes } = this.state
-
-        if (myPreviousVote === 1 && myNewVote === 0) {
-            currentVote = upvotes - 1
-        } else if (myPreviousVote === -1 && myNewVote === 0) {
-            currentVote = downvotes + 1
-        } else {
-            currentVote = currentVote + myNewVote
-        }
-
-        try {
-            this.setState(
-                {
-                    myVote: myNewVote,
-                    [type]: currentVote,
-                },
-                () => {
-                    console.log(this.state)
-                }
-            )
-
-            // await thread.vote(uuid, myNewVote)
-        } catch (error) {
-            throw error
-        }
+        // const type = myNewVote === 1 ? 'upvotes' : 'downvotes'
+        // let currentVote = this.state[type]
+        //
+        // // if user has already voted
+        // const { myVote: myPreviousVote, upvotes, downvotes } = this.state
+        //
+        // if (myPreviousVote === 1 && myNewVote === 0) {
+        //     currentVote = upvotes - 1
+        // } else if (myPreviousVote === -1 && myNewVote === 0) {
+        //     currentVote = downvotes + 1
+        // } else {
+        //     currentVote = currentVote + myNewVote
+        // }
+        //
+        // try {
+        //     this.setState(
+        //         {
+        //             myVote: myNewVote,
+        //             [type]: currentVote,
+        //         },
+        //         () => {
+        //             console.log(this.state)
+        //         }
+        //     )
+        //
+        //     // await thread.vote(uuid, myNewVote)
+        // } catch (error) {
+        //     throw error
+        // }
     }
 
     private handleWatchPost = (id, replies) => {

@@ -91,6 +91,8 @@ export default class PostsStore extends BaseStore {
 
     @observable currentHighlightedPostUuid = ''
 
+    @observable firstSplash = true
+
     private readonly tagsStore: IStores['tagStore'] = getTagStore()
     private readonly uiStore: IStores['uiStore'] = getUiStore()
     private readonly authStore: IStores['authStore'] = getAuthStore()

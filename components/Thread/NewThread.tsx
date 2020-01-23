@@ -8,8 +8,6 @@ import { NextRouter, withRouter } from 'next/router'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { faChevronLeft } from '@fortawesome/free-solid-svg-icons'
 import Link from 'next/link'
-import { autorun } from 'mobx'
-import { sleep } from '@utils'
 
 interface INewThreadProps {
     id: string
@@ -28,15 +26,10 @@ interface INewThreadProps {
 @observer
 export class NewThread extends React.Component<INewThreadProps, any> {
     async componentDidMount() {
-        // autorun(() => {
-        //     if (
-        //         this.props.authStore.hasAccount &&
-        //         this.props.id &&
-        //         !this.props.postsStore.activeThreadSerialized
-        //     ) {
-        await this.props.postsStore.getAndSetThread(this.props.id)
-            // }
-        // })
+        if (this.props.postsStore.firstSplash) {
+            await this.props.postsStore.getAndSetThread(this.props.id)
+            this.props.postsStore.firstSplash = false
+        }
     }
 
     render() {
