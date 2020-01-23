@@ -5,7 +5,14 @@ import { BaseStore, getOrCreateStore } from 'next-mobx-wrapper'
 import { CreateForm } from '@components'
 import { getTagStore } from '@stores/tagStore'
 import { getAuthStore, getUiStore, IStores } from '@stores'
-import { encodeId, generateUuid, generateVoteObject, getAttachmentValue, isServer, pushToThread } from '@utils'
+import {
+    encodeId,
+    generateUuid,
+    generateVoteObject,
+    getAttachmentValue,
+    isServer,
+    pushToThread,
+} from '@utils'
 import { ThreadModel } from '@models/threadModel'
 import FeedModel from '@models/feedModel'
 import _ from 'lodash'
@@ -127,10 +134,20 @@ export default class PostsStore extends BaseStore {
     @action.bound
     async getPostsForSubs(subs = this.tagsStore.subSubscriptionStatus) {
         try {
+            let key = this.authStore.activePublicKey
+
+            if (!key && !isServer) {
+                const auth = JSON.parse(window.localStorage.getItem('auth'))
+                key = auth.statusJson.bk.post
+            }
+
+
             const { posts, cursorId } = await discussions.getPostsForSubs(
                 subs,
                 this.postsPosition.cursorId,
-                this.postsPosition.items
+                this.postsPosition.items,
+                0,
+                key,
             )
 
             this.posts = [...this.posts, ...posts]
@@ -172,10 +189,19 @@ export default class PostsStore extends BaseStore {
     @task
     getPostsByTag = async (tags: string[]) => {
         try {
+            let key = this.authStore.activePublicKey
+
+            if (!key && !isServer) {
+                const auth = JSON.parse(window.localStorage.getItem('auth'))
+                key = auth.statusJson.bk.post
+            }
+
             const { posts, cursorId } = await discussions.getPostsForTags(
                 tags,
                 this.postsPosition.cursorId,
-                this.postsPosition.items
+                this.postsPosition.items,
+                0,
+                key,
             )
 
             this.posts = [...this.posts, ...posts]
