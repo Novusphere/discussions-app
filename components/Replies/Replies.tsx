@@ -26,7 +26,6 @@ import PostModel from '@models/postModel'
 import copy from 'clipboard-copy'
 import { BlockedContentSetting } from '@stores/settingsStore'
 import { useComputed } from 'mobx-react-lite'
-import { ThreadModel } from '@models/threadModel'
 
 interface IReplyProps {
     router: NextRouter
@@ -110,8 +109,8 @@ const Reply: React.FC<IReplyProps> = observer(
                 },
 
                 get myVoteValue() {
-                    if (source.reply.myVote && source.reply.myVote.length) {
-                        return source.reply.myVote[0].value
+                    if (replyStore.myVote && replyStore.myVote.length) {
+                        return replyStore.myVote[0].value
                     }
 
                     return 0
@@ -233,18 +232,18 @@ const Reply: React.FC<IReplyProps> = observer(
 
                         replyStore.myVote = [voteObject.data]
 
-                        const data = await voteAsync({
-                            voter: '',
-                            uuid,
-                            value,
-                            nonce: voteObject.nonce,
-                            pub: voteObject.pub,
-                            sig: voteObject.sig,
-                        })
-
-                        if (data.error) {
-                            showToast(`Failed to ${type.split('s')[0]} this post`, 'error')
-                        }
+                        // const data = await voteAsync({
+                        //     voter: '',
+                        //     uuid,
+                        //     value,
+                        //     nonce: voteObject.nonce,
+                        //     pub: voteObject.pub,
+                        //     sig: voteObject.sig,
+                        // })
+                        //
+                        // if (data.error) {
+                        //     showToast(`Failed to ${type.split('s')[0]} this post`, 'error')
+                        // }
                     } catch (error) {
                         showToast(error.message, 'error')
                     }
