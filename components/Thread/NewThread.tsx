@@ -28,7 +28,7 @@ export class NewThread extends React.Component<INewThreadProps, any> {
                 userStore,
                 authStore,
                 uiStore,
-                postsStore: { currentHighlightedPostUuid },
+                postsStore: { currentHighlightedPostUuid, highlightPostUuid },
                 settingsStore: { blockedContentSetting },
             },
         } = this
@@ -44,6 +44,7 @@ export class NewThread extends React.Component<INewThreadProps, any> {
                     supportedTokensImages={authStore.supportedTokensImages}
                     replies={threadSerialized.openingPost.replies}
                     currentHighlightedPostUuid={currentHighlightedPostUuid}
+                    highlightPostUuid={highlightPostUuid}
                 />
             </>
         )

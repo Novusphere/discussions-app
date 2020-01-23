@@ -1,7 +1,7 @@
 import { Post } from '@novuspherejs'
 import { action, computed, observable } from 'mobx'
 import { task } from 'mobx-task'
-import { getIdenticon, sleep } from '@utils'
+import { generateUuid, getIdenticon, sleep } from '@utils'
 import { CreateForm } from '@components'
 import EditModel from '@models/editModel'
 
@@ -121,6 +121,7 @@ export class NewReplyModel {
             })
 
             const reply = instance.createPostObject(true)
+            reply.uuid = generateUuid()
             reply.content = this.editingContent
             reply.edit = true
             return reply

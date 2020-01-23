@@ -1,7 +1,7 @@
 import * as React from 'react'
-import { useCallback, useEffect, useMemo, useState } from 'react'
+import { useCallback, useEffect, useMemo } from 'react'
 import { discussions, Post } from '@novuspherejs'
-import { generateUuid, getPermaLink, sleep, transformTipsToTransfers, useInterval } from '@utils'
+import { getPermaLink, transformTipsToTransfers } from '@utils'
 import classNames from 'classnames'
 import {
     Form,
@@ -17,14 +17,13 @@ import moment from 'moment'
 import { Sticky, StickyContainer } from 'react-sticky'
 import { Observer, useObserver, useLocalStore } from 'mobx-react'
 import { IStores } from '@stores'
-import { NextRouter } from 'next/router'
+import Router, { NextRouter } from 'next/router'
 import { ObservableMap } from 'mobx'
 import { faSpinner } from '@fortawesome/free-solid-svg-icons'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
-import { task } from 'mobx-task'
 import { ModalOptions } from '@globals'
-import { useComputed } from 'mobx-react-lite'
 import PostModel from '@models/postModel'
+import copy from 'clipboard-copy'
 
 interface IReplyProps {
     router: NextRouter
@@ -33,6 +32,7 @@ interface IReplyProps {
     activePublicKey: string
     isFollowing: any
     currentHighlightedPostUuid: string
+    highlightPostUuid: (uuid: string) => void
     reply: Post
     blockedPosts: ObservableMap<string, string>
     toggleFollowStatus: (user, pub) => void
@@ -56,6 +56,7 @@ interface IReplyProps {
 const Reply: React.FC<IReplyProps> = ({
     reply,
     currentHighlightedPostUuid,
+    highlightPostUuid,
     supportedTokensImages,
     blockedPosts,
     router,
@@ -86,6 +87,19 @@ const Reply: React.FC<IReplyProps> = ({
 
             get reply() {
                 return source.reply
+            },
+
+            get permaLinkURL() {
+                return getPermaLink(router.asPath.split('#')[0], replyStore.reply.uuid)
+            },
+
+            async copyAndScrollToPermalinkURL() {
+                await copy(replyStore.permaLinkURL)
+                await Router.push('/tag/[name]/[id]/[title]', replyStore.permaLinkURL, {
+                    shallow: true,
+                })
+
+                highlightPostUuid(replyStore.reply.uuid)
             },
 
             setReplyContent(content) {
@@ -135,12 +149,6 @@ const Reply: React.FC<IReplyProps> = ({
                         activeUidWalletKey: source.activeUidWalletKey,
                         supportedTokensForUnifiedWallet: source.supportedTokensForUnifiedWallet,
                     })
-
-                    // submit the edit
-                    editedReply = {
-                        ...editedReply,
-                        uuid: generateUuid(),
-                    }
 
                     const model = new PostModel(editedReply as any)
                     const signedReply = model.sign(source.postPriv)
@@ -205,10 +213,10 @@ const Reply: React.FC<IReplyProps> = ({
                                 source.supportedTokensForUnifiedWallet
                             )
 
-                            await replyStore.finisheSubmittingReply(reply)
+                            await replyStore.finishSubmittingReply(reply)
                         })
                     } else {
-                        await replyStore.finisheSubmittingReply(reply)
+                        await replyStore.finishSubmittingReply(reply)
                         replyStore.setReplyLoading(false)
                     }
                 } catch (error) {
@@ -217,7 +225,7 @@ const Reply: React.FC<IReplyProps> = ({
                 }
             },
 
-            async finisheSubmittingReply(newReply: any) {
+            async finishSubmittingReply(newReply: any) {
                 try {
                     const model = new PostModel(newReply as any)
                     const signedReply = model.sign(source.postPriv)
@@ -226,6 +234,8 @@ const Reply: React.FC<IReplyProps> = ({
                     replyStore.reply.replies.push(confirmedReply)
                     replyStore.replyModel.clearReplyContent()
                     replyStore.replyModel.toggleOpen()
+
+                    showToast('Your reply was successfully submitted', 'success')
                 } catch (error) {
                     showToast(error.message, 'error')
                 }
@@ -313,10 +323,6 @@ const Reply: React.FC<IReplyProps> = ({
         )
     }, [])
 
-    const getPermaLinkUrl = useCallback(() => {
-        return getPermaLink(router.asPath.split('#')[0], reply.uuid)
-    }, [])
-
     const toggleFollowStatus = useCallback(() => {
         // return toggleFollowStatus(reply.displayName, reply.pub)
     }, [])
@@ -326,7 +332,7 @@ const Reply: React.FC<IReplyProps> = ({
     }, [])
 
     const isMarkedAsSpam = useMemo(() => {
-        return blockedPosts.has(getPermaLinkUrl())
+        return blockedPosts.has(replyStore.permaLinkURL)
     }, [])
 
     const setBlockedStatus = useCallback(() => {
@@ -343,7 +349,7 @@ const Reply: React.FC<IReplyProps> = ({
                 <ReplyHoverElements
                     post={reply}
                     replyModel={replyStore.replyModel}
-                    getPermaLinkUrl={getPermaLinkUrl}
+                    getPermaLinkUrl={replyStore.copyAndScrollToPermalinkURL}
                     toggleFollowStatus={toggleFollowStatus}
                     toggleToggleBlock={toggleToggleBlock}
                     hasAccount={hasAccount}
@@ -515,6 +521,7 @@ const Reply: React.FC<IReplyProps> = ({
                                 className={'ml3 child'}
                                 router={router}
                                 currentHighlightedPostUuid={currentHighlightedPostUuid}
+                                highlightPostUuid={highlightPostUuid}
                                 reply={nestedReply}
                                 supportedTokensImages={supportedTokensImages}
                                 toggleFollowStatus={toggleFollowStatus}
@@ -546,6 +553,7 @@ interface IRepliesProps {
     userStore: IStores['userStore']
     uiStore: IStores['uiStore']
     router: NextRouter
+    highlightPostUuid: (uuid: string) => void
     supportedTokensImages: any
     currentHighlightedPostUuid: string
     replies: Post[]
@@ -556,6 +564,7 @@ const Replies: React.FC<IRepliesProps> = ({
     userStore,
     replies,
     currentHighlightedPostUuid,
+    highlightPostUuid,
     supportedTokensImages,
     router,
     uiStore,
@@ -571,6 +580,7 @@ const Replies: React.FC<IRepliesProps> = ({
                     showModal={uiStore.showModal}
                     hideModal={uiStore.hideModal}
                     currentHighlightedPostUuid={currentHighlightedPostUuid}
+                    highlightPostUuid={highlightPostUuid}
                     supportedTokensImages={supportedTokensImages}
                     toggleFollowStatus={userStore.toggleUserFollowing}
                     blockedPosts={userStore.blockedPosts}
