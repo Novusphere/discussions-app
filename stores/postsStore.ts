@@ -123,20 +123,12 @@ export default class PostsStore extends BaseStore {
     @action.bound
     async getPostsForSubs(subs = this.tagsStore.subSubscriptionStatus) {
         try {
-            let key = this.authStore.activePublicKey
-
-            if (!key && !isServer) {
-                const auth = JSON.parse(window.localStorage.getItem('auth'))
-                key = auth.statusJson.bk.post
-            }
-
-
             const { posts, cursorId } = await discussions.getPostsForSubs(
                 subs,
                 this.postsPosition.cursorId,
                 this.postsPosition.items,
                 0,
-                key,
+                this.getKeyForAPICall
             )
 
             this.posts = [...this.posts, ...posts]
@@ -175,22 +167,30 @@ export default class PostsStore extends BaseStore {
         }
     }
 
+    get getKeyForAPICall() {
+        let key = this.authStore.activePublicKey
+
+        if (!key && !isServer) {
+            const auth = JSON.parse(window.localStorage.getItem('auth'))
+            if (auth) {
+                key = auth.statusJson.bk.post
+            } else {
+                key = ''
+            }
+        }
+
+        return key
+    }
+
     @task
     getPostsByTag = async (tags: string[]) => {
         try {
-            let key = this.authStore.activePublicKey
-
-            if (!key && !isServer) {
-                const auth = JSON.parse(window.localStorage.getItem('auth'))
-                key = auth.statusJson.bk.post
-            }
-
             const { posts, cursorId } = await discussions.getPostsForTags(
                 tags,
                 this.postsPosition.cursorId,
                 this.postsPosition.items,
                 0,
-                key,
+                this.getKeyForAPICall
             )
 
             this.posts = [...this.posts, ...posts]
@@ -222,14 +222,7 @@ export default class PostsStore extends BaseStore {
     @action.bound
     public async getAndSetThread(id: string): Promise<null | Thread> {
         try {
-            let key = this.authStore.activePublicKey
-
-            if (!key && !isServer) {
-                const auth = JSON.parse(window.localStorage.getItem('auth'))
-                key = auth.statusJson.bk.post
-            }
-
-            const thread = await discussions.getThread(id, key)
+            const thread = await discussions.getThread(id, this.getKeyForAPICall)
             if (!thread) return null
             this.activeThreadSerialized = thread
             this.activeThreadId = id
@@ -265,17 +258,6 @@ export default class PostsStore extends BaseStore {
             option => option.id
         )
     }
-
-    // @action
-    // public vote = async (uuid: string, value: number) => {
-    //     try {
-    //         if (this.authStore.hasAccount) {
-    //             await this.activeThread.vote(uuid, value)
-    //         }
-    //     } catch (error) {
-    //         throw error
-    //     }
-    // }
 
     @action clearPreview = () => {
         this.preview = null
