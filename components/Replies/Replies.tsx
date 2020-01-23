@@ -416,6 +416,8 @@ const Reply: React.FC<IReplyProps> = observer(
             [replyStore.hover, replyStore.isMarkedAsSpam]
         )
 
+        if (replyStore.hidden) return null
+
         return (
             <div
                 id={replyStore.reply.uuid}
