@@ -117,7 +117,7 @@ export class ThreadModel {
                     this.openingPost.title = cached.title
                     this.openingPost.content = cached.content
                     this.uiStore.showToast('There was an error editing your post', 'error')
-                    return
+                    return cached
                 }
 
                 set(this.openingPost, response)
@@ -126,6 +126,7 @@ export class ThreadModel {
                 this.uiStore.showToast('Your post has been edited!', 'success')
                 this.toggleEditing()
 
+                return response
             } catch (error) {
                 console.error(error)
                 this.openingPost.title = cached.title
@@ -135,7 +136,7 @@ export class ThreadModel {
         }
     }
 
-    get editForm() {
+    @computed get editForm() {
         return new CreateForm({}, [
             {
                 name: 'title',
@@ -149,28 +150,6 @@ export class ThreadModel {
                 value: this.openingPost.content,
                 hideLabels: true,
                 type: 'richtext',
-            },
-            {
-                name: 'buttons',
-                type: 'button',
-                hideLabels: true,
-                extra: {
-                    options: [
-                        {
-                            value: 'Cancel',
-                            className: 'white bg-red',
-                            title: 'Cancel changes to your post',
-                            onClick: () => {
-                                this.editing = false
-                            },
-                        },
-                        {
-                            value: 'Save',
-                            title: 'Save changes to your post',
-                            onClick: this.saveEdits,
-                        },
-                    ],
-                },
             },
         ])
     }

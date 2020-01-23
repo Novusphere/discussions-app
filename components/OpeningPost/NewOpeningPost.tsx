@@ -48,6 +48,7 @@ interface INewOpeningPostState {
     upvotes: number
     downvotes: number
     threadEditing: boolean
+    openingPost: any
 }
 
 @inject('authStore', 'uiStore', 'userStore', 'tagStore', 'postsStore', 'settingsStore')
@@ -62,6 +63,7 @@ class NewOpeningPost extends React.Component<
         super(props)
 
         this.state = {
+            openingPost: props.openingPost,
             myVote: props.openingPost.myVote,
             myVoteValue:
                 props.openingPost.myVote && props.openingPost.myVote.length > 0
@@ -105,6 +107,21 @@ class NewOpeningPost extends React.Component<
 
     componentWillUnmount(): void {
         this.disposer()
+    }
+
+    private submitEdit = async () => {
+        try {
+            const response = await this.props.postsStore.activeThread.saveEdits(
+                this.props.postsStore.activeThread.editForm.form
+            )
+            response.imageData = getIdenticon(this.props.authStore.activePublicKey)
+
+            this.setState({
+                openingPost: response,
+            })
+        } catch (error) {
+            return
+        }
     }
 
     private handleVoting = async (e, uuid, value) => {
@@ -226,10 +243,9 @@ class NewOpeningPost extends React.Component<
     }
 
     private renderOpeningPost = () => {
-        const { myVote, myVoteValue, upvotes, downvotes } = this.state
+        const { myVote, myVoteValue, upvotes, downvotes, openingPost } = this.state
         const {
             router,
-            openingPost,
             authStore: { supportedTokensImages },
             postsStore: { activeThread },
             userStore: { toggleBlockPost, isWatchingThread, blockedPosts },
@@ -283,7 +299,31 @@ class NewOpeningPost extends React.Component<
                         )}
 
                         {activeThread && activeThread.editing ? (
-                            <Form form={activeThread.editForm} hideSubmitButton />
+                            <>
+                                <Form form={activeThread.editForm} hideSubmitButton />
+                                <div className={'flex flex-row items-center justify-start pb3'}>
+                                    <button
+                                        className={
+                                            'f6 link dim ph3 pv2 dib mr1 pointer white bg-red'
+                                        }
+                                        onClick={() => activeThread.toggleEditing()}
+                                    >
+                                        Cancel
+                                    </button>
+
+                                    <button
+                                        disabled={activeThread.saveEdits['pending']}
+                                        className={'f6 link dim ph3 pv2 dib pointer white bg-green'}
+                                        onClick={this.submitEdit}
+                                    >
+                                        {activeThread.saveEdits['pending'] ? (
+                                            <FontAwesomeIcon width={13} icon={faSpinner} spin />
+                                        ) : (
+                                            'Save Edit'
+                                        )}
+                                    </button>
+                                </div>
+                            </>
                         ) : (
                             <RichTextPreview className={'black f6 lh-copy overflow-break-word'}>
                                 {openingPost.content}
@@ -364,7 +404,9 @@ class NewOpeningPost extends React.Component<
     }
 
     private onSubmit = async () => {
-        const reply = await this.props.postsStore.activeThread.openingPostReplyModel.onSubmit(this.props.postsStore.activeThread)
+        const reply = await this.props.postsStore.activeThread.openingPostReplyModel.onSubmit(
+            this.props.postsStore.activeThread
+        )
         reply.imageData = getIdenticon(this.props.authStore.activePublicKey)
         reply.myVote = [{ value: 1 }]
         this.props.addReplies(reply)
