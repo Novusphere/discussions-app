@@ -1,7 +1,7 @@
 import * as React from 'react'
-import { useCallback, useEffect, useLayoutEffect, useMemo, useState } from 'react'
+import { useCallback, useEffect, useMemo, useState } from 'react'
 import { Post } from '@novuspherejs'
-import { getPermaLink } from '@utils'
+import { getPermaLink, sleep, useInterval } from '@utils'
 import classNames from 'classnames'
 import {
     Form,
@@ -16,7 +16,7 @@ import { NewReplyModel } from '@models/newReplyModel'
 import moment from 'moment'
 import { Sticky, StickyContainer } from 'react-sticky'
 import { Observer, useObserver } from 'mobx-react'
-import { getAuthStore, getUserStore, IStores } from '@stores'
+import { IStores } from '@stores'
 import { NextRouter } from 'next/router'
 import { ObservableMap } from 'mobx'
 import { faSpinner } from '@fortawesome/free-solid-svg-icons'
@@ -40,6 +40,10 @@ interface IReplyProps {
     activeUidWalletKey: string
     supportedTokensForUnifiedWallet: any[]
     showToast: (m: string, t: string) => void
+    showModal: (modal: string) => void
+    clearWalletPrivateKey: () => void
+    hasRenteredPassword: boolean
+    temporaryWalletPrivateKey: string
 }
 
 // TODO: Implement blocked posts statuses
@@ -61,11 +65,17 @@ const Reply: React.FC<IReplyProps> = ({
     activeUidWalletKey,
     supportedTokensForUnifiedWallet,
     showToast,
+    showModal,
+    clearWalletPrivateKey,
+    hasRenteredPassword,
+    temporaryWalletPrivateKey,
 }) => {
     const [replyContent, setReplyContent] = useState(reply.content)
     const [replyModel, setReplyModel] = useState<NewReplyModel>(null)
     const [hover, setHover] = useState(false)
     const [collapsed, setCollapse] = useState(false)
+    const [intervalDOM, setIntervalDOM] = useState(null)
+    const [replyLoading, setReplyLoading] = useState(false)
 
     useEffect(() => {
         setReplyModel(new NewReplyModel(reply))
@@ -179,18 +189,49 @@ const Reply: React.FC<IReplyProps> = ({
         [hover, hasReplyModelLoaded]
     )
 
+    const startTicking = useCallback(() => {
+        const int = setInterval(() => {
+            console.log('hey')
+        }, 200)
+
+        setIntervalDOM(int)
+    }, [])
+
+    const stopTicking = useCallback(() => {
+        console.log('cleared!')
+        setIntervalDOM(null)
+        clearInterval(intervalDOM)
+    }, [])
+
     const onReplySubmit = useCallback(async () => {
+        setReplyLoading(true)
         try {
             if (!hasAccount) {
                 showToast('You must be logged in to comment', 'error')
                 return
             }
             // submit reply and update the child replies
-            const reply = await replyModel.submitReply()
+            const reply = await replyModel.submitReply({
+                postPriv,
+                posterType,
+                posterName,
+                activeUidWalletKey,
+                supportedTokensForUnifiedWallet,
+            })
+
+            if (reply.transfers) {
+                startTicking()
+                await sleep(1000)
+                stopTicking()
+            }
+
+            console.log(reply)
+            setReplyLoading(false)
         } catch (error) {
+            setReplyLoading(false)
             showToast(error.message, 'error')
         }
-    }, [replyModel, hasAccount])
+    }, [replyModel, hasAccount, replyLoading])
 
     const onEditSave = useCallback(async () => {
         try {
@@ -340,7 +381,7 @@ const Reply: React.FC<IReplyProps> = ({
                         uid={reply.uuid}
                         onContentChange={replyModel.setReplyContent}
                         value={replyModel.replyContent}
-                        loading={replyModel.submitReply['pending']}
+                        loading={replyLoading}
                         onSubmit={onReplySubmit}
                     />
                 )}
@@ -369,6 +410,10 @@ const Reply: React.FC<IReplyProps> = ({
                                 activeUidWalletKey={activeUidWalletKey}
                                 supportedTokensForUnifiedWallet={supportedTokensForUnifiedWallet}
                                 showToast={showToast}
+                                showModal={showModal}
+                                clearWalletPrivateKey={clearWalletPrivateKey}
+                                hasRenteredPassword={hasRenteredPassword}
+                                temporaryWalletPrivateKey={temporaryWalletPrivateKey}
                             />
                         </div>
                     ))}
@@ -404,6 +449,7 @@ const Replies: React.FC<IRepliesProps> = ({
                     key={reply.uuid}
                     reply={reply}
                     showToast={uiStore.showToast}
+                    showModal={uiStore.showModal}
                     currentHighlightedPostUuid={currentHighlightedPostUuid}
                     supportedTokensImages={supportedTokensImages}
                     toggleFollowStatus={userStore.toggleUserFollowing}
@@ -416,6 +462,9 @@ const Replies: React.FC<IRepliesProps> = ({
                     posterName={authStore.posterName}
                     activeUidWalletKey={authStore.activeUidWalletKey}
                     supportedTokensForUnifiedWallet={authStore.supportedTokensForUnifiedWallet}
+                    clearWalletPrivateKey={authStore.clearWalletPrivateKey}
+                    hasRenteredPassword={authStore.hasRenteredPassword}
+                    temporaryWalletPrivateKey={authStore.temporaryWalletPrivateKey}
                 />
             ))}
         </div>

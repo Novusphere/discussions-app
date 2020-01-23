@@ -4,6 +4,7 @@ import { IPost } from '@stores/postsStore'
 import _ from 'lodash'
 import axios from 'axios'
 import ecc from 'eosjs-ecc'
+import { useEffect, useRef } from 'react'
 
 const removeMd = require('remove-markdown')
 
@@ -725,4 +726,26 @@ export const generateVoteObject = ({ uuid, postPriv, value }) => {
             }),
         },
     }
+}
+
+export const useInterval = (callback, delay) => {
+    const savedCallback = useRef()
+
+    // Remember the latest callback.
+    useEffect(() => {
+        savedCallback.current = callback
+    }, [callback])
+
+    // Set up the interval.
+    useEffect(() => {
+        const tick = () => {
+            // @ts-ignore
+            savedCallback.current()
+        }
+
+        if (delay !== null) {
+            let id = setInterval(tick, delay)
+            return () => clearInterval(id)
+        }
+    }, [delay])
 }
