@@ -6,8 +6,8 @@ import { Tab, Tabs, TabList, TabPanel } from 'react-tabs'
 import { faMinusCircle } from '@fortawesome/free-solid-svg-icons'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { computed } from 'mobx'
-import { getIdenticon, isServer, sleep, trimAddress } from '@utils'
-import { CopyToClipboard, InfiniteScrollFeed, PostPreview, TagDropdown } from '@components'
+import { getIdenticon, } from '@utils'
+import { CopyToClipboard, InfiniteScrollFeed, TagDropdown } from '@components'
 
 interface IUPageProps {
     userStore: IStores['userStore']
@@ -35,7 +35,6 @@ class U extends React.Component<IUPageProps> {
         const icon = getIdenticon(pub)
 
         postsStore.resetPositionAndPosts()
-        await sleep(500)
         const posts = await postsStore.getPostsForKeys([pub])
 
         let uidw
@@ -55,6 +54,7 @@ class U extends React.Component<IUPageProps> {
     }
 
     componentDidMount(): void {
+        this.props.postsStore.getPostsForKeys([this.props.pub])
         window.scrollTo(0, 0)
     }
 
@@ -188,7 +188,7 @@ class U extends React.Component<IUPageProps> {
                             <li className={'f6 mt2'}>
                                 <TagDropdown
                                     className={'f6'}
-                                    formatCreateLabel={inputValue => `Choose a tag`}
+                                    formatCreateLabel={() => `Choose a tag`}
                                     onChange={setActiveDelegatedTag}
                                     value={activeDelegatedTag}
                                     options={[
