@@ -161,8 +161,9 @@ export default class PostsStore extends BaseStore {
                 cursorId,
             }
 
-            return this.posts
+            return posts
         } catch (error) {
+            console.log(error)
             return error
         }
     }

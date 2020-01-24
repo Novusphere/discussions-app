@@ -54,14 +54,10 @@ class U extends React.Component<IUPageProps> {
     }
 
     componentDidMount(): void {
-        this.props.postsStore.getPostsForKeys([this.props.pub])
         window.scrollTo(0, 0)
-    }
-
-    componentWillMount(): void {
-        this.props.tagStore.destroyActiveTag()
-        this.props.uiStore.toggleSidebarStatus(false)
-        this.props.uiStore.toggleBannerStatus(true)
+            this.props.tagStore.destroyActiveTag()
+            this.props.uiStore.toggleSidebarStatus(false)
+            this.props.uiStore.toggleBannerStatus(true)
     }
 
     @computed get isSameUser() {
@@ -223,12 +219,11 @@ class U extends React.Component<IUPageProps> {
     }
 
     private renderUsersPosts = () => {
-        const { pub } = this.props
+        const { pub, posts } = this.props
 
         const {
             getPostsForKeys,
             postsPosition: { cursorId, items },
-            posts,
         } = this.props.postsStore
 
         return (
