@@ -25,9 +25,13 @@ interface INewThreadProps {
 @inject('authStore', 'postsStore', 'settingsStore', 'userStore', 'uiStore', 'tagStore')
 @observer
 export class NewThread extends React.Component<INewThreadProps, any> {
-    state = {
-        replies: [],
-        activeThread: null,
+    constructor(props) {
+        super(props)
+
+        this.state = {
+            replies: props.threadSerialized.openingPost.replies,
+            activeThread: null,
+        }
     }
 
     componentDidUpdate(
