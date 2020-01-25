@@ -1,59 +1,89 @@
 import * as React from 'react'
-import { inject, useObserver } from 'mobx-react'
+import { inject, observer } from 'mobx-react'
 import { IStores } from '@stores'
 import { Form, TagDropdown } from '@components'
 import NewPostPreview from './new-post-preview/new-post-preview'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { faSpinner } from '@fortawesome/free-solid-svg-icons'
-import { useCallback, useEffect, useState } from 'react'
 import { sanityCheckTag } from '@utils'
 
-const NewPage = ({ postsStore }) => {
-    const [form, setForm] = useState(postsStore.newPostForm)
-    const { subFields, newPostData } = postsStore
+interface INewPageProps {
+    postsStore: IStores['postsStore']
+    uiStore: IStores['uiStore']
+}
 
-    useEffect(() => {
-        return () => {
-            postsStore.clearPreview()
+interface INewPageState {
+    form: any
+}
+
+@inject('postsStore', 'uiStore')
+@observer
+class NewPage extends React.Component<INewPageProps, INewPageState> {
+    constructor(props) {
+        super(props)
+
+        this.state = {
+            form: props.postsStore.newPostForm,
         }
-    }, [])
+    }
 
-    const onChange = useCallback(
-        option => {
-            if (!form) return
+    componentDidMount(): void {
+        this.props.uiStore.toggleSidebarStatus(false)
+    }
 
-            const cached = {
-                title: form.form.$('title').value || '',
-                content: form.form.$('content').value || '',
-            }
+    private onChange = option => {
+        const {
+            postsStore: { newPostData, newPostForm },
+        } = this.props
+        const { form } = this.state
 
-            postsStore.newPostData.sub = {
-                label: `#${sanityCheckTag(option.label)}`,
-                value: sanityCheckTag(option.value),
-            }
+        if (!form) return
 
-            // set form again
-            const _form = postsStore.newPostForm
-            _form.form.$('title').set('value', cached.title)
-            _form.form.$('content').set('value', cached.content)
+        const cached = {
+            title: form.form.$('title').value || '',
+            content: form.form.$('content').value || '',
+        }
 
-            setForm(_form)
-        },
-        [form]
-    )
+        newPostData.sub = {
+            label: `#${sanityCheckTag(option.label)}`,
+            value: sanityCheckTag(option.value),
+        }
 
-    return useObserver(() => {
+        // set form again
+        const _form = newPostForm
+        _form.form.$('title').set('value', cached.title)
+        _form.form.$('content').set('value', cached.content)
+
+        this.setState({
+            form: _form,
+        })
+    }
+
+    render() {
+        const {
+            postsStore: { subFields, newPostData },
+        } = this.props
+        const { form } = this.state
+
         if (!form) return <FontAwesomeIcon width={13} icon={faSpinner} spin />
+
         return (
             <>
                 <div className={'flex flex-row items-center mb3'}>
                     <span className={'w-20 black f4 b'}>Create a post in</span>
                     <TagDropdown
-                        formatCreateLabel={inputValue => `Make a new post in #${inputValue}`}
-                        onChange={onChange}
+                        formatCreateLabel={inputValue =>
+                            `Make a new post in #${
+                                inputValue.indexOf('#') !== -1
+                                    ? inputValue.split('#')[1]
+                                    : inputValue
+                            }`
+                        }
+                        onChange={this.onChange}
                         className={'w-80'}
                         value={newPostData.sub}
                         options={subFields.extra.options}
+                        placeholder={'Select or type tag name...'}
                     />
                 </div>
                 <div className={'card pa4'}>
@@ -64,17 +94,7 @@ const NewPage = ({ postsStore }) => {
                 </div>
             </>
         )
-    })
-}
-;(NewPage as any).getInitialProps = async ({ store }) => {
-    const uiStore: IStores['uiStore'] = store.uiStore
-    const tagStore: IStores['tagStore'] = store.tagStore
-
-    uiStore.toggleBannerStatus(true)
-    uiStore.toggleSidebarStatus(false)
-    tagStore.destroyActiveTag()
-
-    return {}
+    }
 }
 
 export default inject('postsStore')(NewPage)

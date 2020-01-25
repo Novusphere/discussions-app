@@ -9,8 +9,9 @@ import { IStores } from '@stores'
 
 import './style.scss'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
-import { faPlus } from '@fortawesome/free-solid-svg-icons'
+import { faPlus, faSpinner } from '@fortawesome/free-solid-svg-icons'
 import { sanityCheckTag } from '@utils'
+import _ from 'lodash'
 
 interface ITagListOuterProps {
     className: string
@@ -21,6 +22,7 @@ interface ITagListInnerProps {
     tagStore: IStores['tagStore']
     postsStore: IStores['postsStore']
     authStore: IStores['authStore']
+    settingsStore: IStores['settingsStore']
 }
 
 interface ITagListState {
@@ -29,7 +31,7 @@ interface ITagListState {
 }
 
 @(withRouter as any)
-@inject('tagStore', 'postsStore', 'authStore')
+@inject('tagStore', 'postsStore', 'authStore', 'settingsStore')
 @observer
 class SideBar extends React.Component<ITagListOuterProps & ITagListInnerProps, ITagListState> {
     private sidebarContainer = React.createRef<HTMLUListElement>()
@@ -166,7 +168,7 @@ class SideBar extends React.Component<ITagListOuterProps & ITagListInnerProps, I
             <Link href={url} as={tag.url}>
                 <a className={'db black pointer pb1 no-underline'}>
                     <FontAwesomeIcon width={13} icon={tag.icon} className={'mr2'} />
-                    {tag.name}
+                    {_.startCase(tag.name)}
                 </a>
             </Link>
         )
@@ -188,16 +190,125 @@ class SideBar extends React.Component<ITagListOuterProps & ITagListInnerProps, I
         })
     }
 
-    render() {
+    private renderTags = () => {
         const {
-            className,
             router,
+            settingsStore: { loadSettings },
             tagStore: {
-                tags,
+                tagGroup,
                 subscribedSubsAsModels,
                 subSubscriptionStatus,
                 toggleTagSubscribe,
             },
+        } = this.props
+
+        if (loadSettings['pending']) {
+            return (
+                <div
+                    className={'flex flex-row items-center justify-center'}
+                    style={{ height: '200px' }}
+                >
+                    <FontAwesomeIcon icon={faSpinner} spin />
+                </div>
+            )
+        }
+
+        return (
+            <>
+                <div className={'divider-line mv2'} />
+
+                {[...tagGroup.entries()].map(([name, tags]) => {
+                    const _name = name.toLowerCase()
+                    const as = `/tags/${tags.join(',')}`
+                    return (
+                        <li
+                            className={classNames([
+                                'ph3 pv1',
+                                {
+                                    dim: router.asPath !== as,
+                                    'sidebar-link-active': router.asPath === as,
+                                },
+                            ])}
+                            key={_name}
+                        >
+                            <Link href={`/tags/[tags]`} as={as} shallow={true}>
+                                <a className={'db black pointer mb1 pv1 no-underline'}>{name}</a>
+                            </Link>
+                        </li>
+                    )
+                })}
+
+                {this.props.authStore.hasAccount && (
+                    <div className={'field-container mb2 relative flex-auto flex items-center mt3'}>
+                        <input
+                            value={this.state.tag}
+                            onChange={this.handleAddTagChange}
+                            className={'w-100 tag-search pl4 f6'}
+                            placeholder={'Add a tag to subscribe'}
+                        />
+                        <span
+                            onClick={this.handleAddTag}
+                            className={'absolute plus-icon ml2 pl1 dim pointer'}
+                        >
+                            <FontAwesomeIcon width={13} icon={faPlus} title={'Click to add tag'} />
+                        </span>
+                    </div>
+                )}
+                {subscribedSubsAsModels
+                    .filter(tag => !tag.root)
+                    .map((tag, index) => (
+                        <li
+                            key={tag.id}
+                            className={classNames([
+                                'ph3',
+                                {
+                                    dim: router.query.name !== tag.name,
+                                    'sidebar-link-active': router.query.name === tag.name,
+                                },
+                            ])}
+                        >
+                            <Tooltip
+                                disabled={this.state.isScrolling}
+                                animateFill={false}
+                                interactive
+                                html={
+                                    <TagPreview
+                                        tag={tag}
+                                        isSubscribed={
+                                            subSubscriptionStatus.indexOf(tag.name) !== -1
+                                        }
+                                        toggleSubscribe={toggleTagSubscribe}
+                                    />
+                                }
+                                position={'left-end'}
+                                unmountHTMLWhenHide={false}
+                                offset={150}
+                                stickyDuration={0}
+                                sticky={true}
+                                duration={0}
+                                animation={'fade'}
+                                className={'interactive-hover'}
+                                distance={350}
+                                trigger={'mouseenter focus'}
+                            >
+                                <Link href={`/tag/[name]`} as={`/tag/${tag.name}`}>
+                                    <a className={'flex items-center mb1 pv1 pointer'}>
+                                        {this.renderTagLi(tag)}
+                                    </a>
+                                </Link>
+                            </Tooltip>
+                        </li>
+                    ))}
+            </>
+        )
+    }
+
+    render() {
+        const {
+            className,
+            router,
+            settingsStore: { loadSettings },
+            tagStore: { tags, subscribedSubsAsModels, subSubscriptionStatus, toggleTagSubscribe },
         } = this.props
 
         return (
@@ -220,72 +331,7 @@ class SideBar extends React.Component<ITagListOuterProps & ITagListInnerProps, I
                                 {this.renderTopLevelTags(tag)}
                             </li>
                         ))}
-                    {!this.props.authStore.hasAccount && <div className={'divider-line mb2'} />}
-                    {this.props.authStore.hasAccount && (
-                        <div className={'field-container mb2 relative flex-auto flex items-center'}>
-                            <input
-                                value={this.state.tag}
-                                onChange={this.handleAddTagChange}
-                                className={'w-100 tag-search pl4 f6'}
-                                placeholder={'Add a tag to subscribe'}
-                            />
-                            <span
-                                onClick={this.handleAddTag}
-                                className={'absolute plus-icon ml2 pl1 dim pointer'}
-                            >
-                                <FontAwesomeIcon
-                                    width={13}
-                                    icon={faPlus}
-                                    title={'Click to add tag'}
-                                />
-                            </span>
-                        </div>
-                    )}
-                    {subscribedSubsAsModels
-                        .filter(tag => !tag.root)
-                        .map((tag, index) => (
-                            <li
-                                key={tag.id}
-                                className={classNames([
-                                    'ph3',
-                                    {
-                                        dim: router.query.name !== tag.name,
-                                        'sidebar-link-active': router.query.name === tag.name,
-                                    },
-                                ])}
-                            >
-                                <Tooltip
-                                    disabled={this.state.isScrolling}
-                                    animateFill={false}
-                                    interactive
-                                    html={
-                                        <TagPreview
-                                            tag={tag}
-                                            isSubscribed={
-                                                subSubscriptionStatus.indexOf(tag.name) !== -1
-                                            }
-                                            toggleSubscribe={toggleTagSubscribe}
-                                        />
-                                    }
-                                    position={'left-end'}
-                                    unmountHTMLWhenHide={false}
-                                    offset={150}
-                                    stickyDuration={0}
-                                    sticky={true}
-                                    duration={0}
-                                    animation={'fade'}
-                                    className={'interactive-hover'}
-                                    distance={350}
-                                    trigger={'mouseenter focus'}
-                                >
-                                    <Link href={`/tag/[name]`} as={`/tag/${tag.name}`}>
-                                        <a className={'flex items-center pb1 pointer'}>
-                                            {this.renderTagLi(tag)}
-                                        </a>
-                                    </Link>
-                                </Tooltip>
-                            </li>
-                        ))}
+                    {this.renderTags()}
                 </ul>
             </div>
         )

@@ -123,6 +123,8 @@ export default class PostsStore extends BaseStore {
     @action.bound
     async getPostsForSubs(subs = this.tagsStore.subSubscriptionStatus) {
         try {
+            if (!subs.length) subs = ['all']
+
             const { posts, cursorId } = await discussions.getPostsForSubs(
                 subs,
                 this.postsPosition.cursorId,

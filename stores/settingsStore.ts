@@ -1,14 +1,15 @@
 import { BaseStore, getOrCreateStore } from 'next-mobx-wrapper'
-import { action, autorun, computed, observable } from 'mobx'
+import { action, autorun, computed, observable, when } from 'mobx'
 import { persist } from 'mobx-persist'
 import { CreateForm } from '@components'
 import { task } from 'mobx-task'
 import axios from 'axios'
-import { getAuthStore, getUiStore, IStores } from '@stores/index'
-import { checkIfNameIsValid, sleep, submitRelayAsync } from '@utils'
-import { discussions, eos } from '@novuspherejs'
+import { getAuthStore, getTagStore, getUiStore, getUserStore, IStores } from '@stores/index'
+import { checkIfNameIsValid, isDev, isServer, sleep, submitRelayAsync } from '@utils'
+import { discussions, eos, nsdb } from '@novuspherejs'
 import ecc from 'eosjs-ecc'
 import { ModalOptions } from '@globals'
+import _ from 'lodash'
 
 const fileDownload = require('js-file-download')
 
@@ -48,9 +49,19 @@ export default class SettingsStore extends BaseStore {
 
     private readonly authStore: IStores['authStore'] = getAuthStore()
     private readonly uiStore: IStores['uiStore'] = getUiStore()
+    private readonly tagStore: IStores['tagStore'] = getTagStore()
+    private readonly userStore: IStores['userStore'] = getUserStore()
 
     constructor() {
         super()
+
+        // load settings
+        when(
+            () => !this.uiStore.isServer,
+            () => {
+                this.loadSettings()
+            }
+        )
 
         autorun(() => {
             if (!this.authStore.selectedToken) return
@@ -98,6 +109,43 @@ export default class SettingsStore extends BaseStore {
                 this.depositsForm.form.$('memoId').set('value', this.authStore.uidWalletPubKey)
             }
         })
+    }
+
+    @task
+    @action.bound
+    async loadSettings() {
+        const { data: setting } = await axios.get(`${nsdb.api}/discussions/site`)
+        let host = window.location.host.toLowerCase()
+
+        if (isDev) host = 'discussions.app'
+        const settings = setting[host]
+        const tagGroups = settings['defaultTagsGroups']
+        const moderators = settings['defaultModerators']
+
+        this.uiStore.banners = settings['bannerImages']
+
+        if (moderators.length) {
+            _.forEach(moderators, moderator => {
+                const [tag] = Object.keys(moderator)
+                const tagModerators = moderator[tag]
+
+                _.forEach(tagModerators, tagModerator => {
+                    const [accountName, publicKey] = tagModerator.split('-')
+                    this.userStore.setModerationMemberByTag(
+                        `${accountName}:${publicKey}`,
+                        tag,
+                        true
+                    )
+                })
+            })
+        }
+
+        if (tagGroups.length > 0) {
+            _.forEach(tagGroups, group => {
+                const [key] = Object.keys(group)
+                this.tagStore.setTagGroup(key, group[key])
+            })
+        }
     }
 
     @action.bound

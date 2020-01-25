@@ -137,23 +137,26 @@ export default class UserStore extends BaseStore {
     }
 
     @action.bound
-    private async setAndUpdateDelegatedPosts(mergedName: string, tagName: string) {
-        console.log({
-            mergedName,
-            tagName,
-        })
-
-        if (!tagName || tagName === '') {
-            this.uiStore.showToast(
-                'An empty tag string is not valid. Set this user as a global mod by setting the tag to be "all".',
-                'error'
-            )
-            return
+    private async setAndUpdateDelegatedPosts(
+        mergedName: string,
+        tagName: string,
+        suppressAlert = false
+    ) {
+        if (!suppressAlert) {
+            if (!tagName || tagName === '') {
+                this.uiStore.showToast(
+                    'An empty tag string is not valid. Set this user as a global mod by setting the tag to be "all".',
+                    'error'
+                )
+                return
+            }
         }
 
         this.delegated.set(mergedName, tagName)
 
-        this.uiStore.showToast('Added user as a moderator', 'success')
+        if (!suppressAlert) {
+            this.uiStore.showToast('Added user as a moderator', 'success')
+        }
 
         try {
             return await this.updateFromActiveDelegatedMembers()
@@ -166,7 +169,8 @@ export default class UserStore extends BaseStore {
     @action.bound
     async setModerationMemberByTag(
         accountNameWithPubKey: string,
-        tagName = this.activeDelegatedTag.value
+        tagName = this.activeDelegatedTag.value,
+        suppressAlert = false
     ) {
         const mergedName = `${accountNameWithPubKey}:${tagName}`
 
@@ -175,10 +179,10 @@ export default class UserStore extends BaseStore {
                 if (this.delegated.get(mergedName) === tagName) {
                     this.delegated.delete(mergedName)
                 } else {
-                    await this.setAndUpdateDelegatedPosts(mergedName, tagName)
+                    await this.setAndUpdateDelegatedPosts(mergedName, tagName, suppressAlert)
                 }
             } else {
-                await this.setAndUpdateDelegatedPosts(mergedName, tagName)
+                await this.setAndUpdateDelegatedPosts(mergedName, tagName, suppressAlert)
             }
         } catch (error) {
             return error

@@ -14,10 +14,12 @@ export default class TagStore extends BaseStore {
     private readonly uiStore: IStores['uiStore'] = getUiStore()
 
     @observable activeTag: TagModel = null
-    @observable tags = observable.map<string, TagModel>()
+    tags = observable.map<string, TagModel>()
+    tagGroup = observable.map<string, string[]>()
 
     @persist('list')
-    @observable subSubscriptionStatus: string[] = []
+    @observable
+    subSubscriptionStatus: string[] = []
 
     constructor() {
         super()
@@ -29,7 +31,14 @@ export default class TagStore extends BaseStore {
         this.initializeDefaultSubs()
 
         // subscribe everyone to default
-        this.subscribeToDefaultSubs()
+        // this.subscribeToDefaultSubs()
+    }
+
+    @action.bound
+    setTagGroup(groupName: string, tags: string[]) {
+        if (!this.tagGroup.has(groupName)) {
+            this.tagGroup.set(groupName, tags)
+        }
     }
 
     @action.bound
@@ -62,7 +71,9 @@ export default class TagStore extends BaseStore {
     @computed get subscribedSubsAsModels() {
         const subs = []
 
-        if (!this.tags) { return [] }
+        if (!this.tags) {
+            return []
+        }
 
         this.subSubscriptionStatus.forEach(subName => {
             if (this.tags.has(subName)) {
@@ -82,7 +93,6 @@ export default class TagStore extends BaseStore {
             this.subSubscriptionStatus.unshift(tagName)
             this.uiStore.showToast(`You have subbed to ${tagName}`, 'success')
             if (cb) cb()
-
         }
     }
 
