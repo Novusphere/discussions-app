@@ -12,7 +12,7 @@ export { default as AppModals } from './modal/modal-switcher'
 // @ts-ignore
 export { default as RichTextEditor } from './Editor/Editor'
 export { default as ReplyBox } from './ReplyBox/ReplyBox'
-export { default as ShowFullThread } from './Thread/Thread'
+// export { default as ShowFullThread } from './Thread/Thread'
 export { default as Collapse } from './Collapse/Collapse'
 export { default as GenerateBrainKey } from './GenerateBrainKey/GenerateBrainKey'
 export { default as TagPreview } from './TagPreview/TagPreview'
@@ -33,6 +33,7 @@ export { default as ChooseAccountName } from './modal/sign-up/choose-account-nam
 export { default as SectionHeader } from './modal/sign-up/header'
 export { default as GenerateKey } from './modal/sign-up/generate-key'
 export { default as VerifyKey } from './modal/sign-up/verification'
+export { default as Replies } from './Replies/Replies'
 
 // modals
 export { default as PostWarningCloseModal } from './modal/post-warning-close/post-warning-close'

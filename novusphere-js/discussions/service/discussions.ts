@@ -309,7 +309,6 @@ export default class DiscussionsService {
             }
 
             console.log('transaction set: !', p.transaction)
-            p.myVote = 1
             return {
                 ...p,
                 metadata,
@@ -345,10 +344,11 @@ export default class DiscussionsService {
         return op.totalReplies
     }
 
-    async getThread(_id: string, key?: string): Promise<Thread | null> {
+    async getThread(_id: string, pubKey: string): Promise<Thread | null> {
         let dId = Post.decodeId(_id)
 
         const searchQuery = {
+            key: pubKey,
             pipeline: [
                 {
                     $match: {
@@ -375,6 +375,7 @@ export default class DiscussionsService {
             let op = Post.fromDbObject(sq.payload[0])
 
             sq = {
+                key: pubKey,
                 pipeline: [
                     {
                         $match: {
@@ -408,7 +409,8 @@ export default class DiscussionsService {
         subs: string[],
         cursorId = undefined,
         count = 0,
-        limit = 5
+        limit = 20,
+        key = '',
     ): Promise<{
         posts: Post[]
         cursorId: number
@@ -419,6 +421,7 @@ export default class DiscussionsService {
         }
 
         const query = await nsdb.search({
+            key,
             cursorId,
             count,
             limit,
@@ -485,6 +488,7 @@ export default class DiscussionsService {
         cursorId = undefined,
         count = 0,
         limit = 5,
+        key = '',
         threadOnly = true
     ): Promise<{
         posts: Post[]
@@ -498,6 +502,7 @@ export default class DiscussionsService {
 
         try {
             const query = await nsdb.search({
+                key,
                 cursorId,
                 count,
                 limit,

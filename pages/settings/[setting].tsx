@@ -365,7 +365,7 @@ class Settings extends React.Component<ISettings, ISettingsState> {
         this.setLinkAsActive(`${this.state.activeSidebar}?side=${index}`)
     }
 
-    private renderTokens = () => {
+    private renderWallets = () => {
         const { activeIndex } = this.state.tokens
         const { selectedToken, hasAccount } = this.props.authStore
         const {
@@ -576,7 +576,7 @@ class Settings extends React.Component<ISettings, ISettingsState> {
             case 'airdrop':
                 return this.renderAirdrop()
             case 'wallet':
-                return this.renderTokens()
+                return this.renderWallets()
             case 'blocked':
                 return this.renderBlocked()
         }

@@ -1,5 +1,5 @@
 import { action, computed, observable } from 'mobx'
-import { discussions, Post } from '@novuspherejs'
+import { discussions, Post, Thread } from '@novuspherejs'
 import { task } from 'mobx-task'
 import { BaseStore, getOrCreateStore } from 'next-mobx-wrapper'
 import { CreateForm } from '@components'
@@ -10,6 +10,7 @@ import {
     generateUuid,
     generateVoteObject,
     getAttachmentValue,
+    isServer,
     pushToThread,
 } from '@utils'
 import { ThreadModel } from '@models/threadModel'
@@ -63,8 +64,6 @@ export default class PostsStore extends BaseStore {
     // all posts by filter
     @observable posts: Post[] = []
 
-    @observable currentReplyContent = ''
-
     @observable postsPosition = {
         items: 0,
         cursorId: undefined,
@@ -92,13 +91,20 @@ export default class PostsStore extends BaseStore {
      */
     @observable openingPostReplyContent = ''
 
+    @observable activeThreadSerialized: Thread
     @observable activeThread: ThreadModel
 
     @observable currentHighlightedPostUuid = ''
 
+    @observable firstSplash = true
+
     private readonly tagsStore: IStores['tagStore'] = getTagStore()
     private readonly uiStore: IStores['uiStore'] = getUiStore()
     private readonly authStore: IStores['authStore'] = getAuthStore()
+
+    constructor() {
+        super()
+    }
 
     @action.bound
     highlightPostUuid(uuid: string) {
@@ -113,15 +119,6 @@ export default class PostsStore extends BaseStore {
         }
     }
 
-    @action.bound
-    setCurrentReplyContent(content: string) {
-        this.currentReplyContent = content
-    }
-
-    @computed get hasReplyContent() {
-        return this.currentReplyContent !== ''
-    }
-
     @task
     @action.bound
     async getPostsForSubs(subs = this.tagsStore.subSubscriptionStatus) {
@@ -131,7 +128,9 @@ export default class PostsStore extends BaseStore {
             const { posts, cursorId } = await discussions.getPostsForSubs(
                 subs,
                 this.postsPosition.cursorId,
-                this.postsPosition.items
+                this.postsPosition.items,
+                0,
+                this.getKeyForAPICall
             )
 
             this.posts = [...this.posts, ...posts]
@@ -164,10 +163,26 @@ export default class PostsStore extends BaseStore {
                 cursorId,
             }
 
-            return this.posts
+            return posts
         } catch (error) {
+            console.log(error)
             return error
         }
+    }
+
+    get getKeyForAPICall() {
+        let key = this.authStore.activePublicKey
+
+        if (!key && !isServer) {
+            const auth = JSON.parse(window.localStorage.getItem('auth'))
+            if (auth) {
+                key = auth.statusJson.bk.post
+            } else {
+                key = ''
+            }
+        }
+
+        return key
     }
 
     @task
@@ -176,7 +191,9 @@ export default class PostsStore extends BaseStore {
             const { posts, cursorId } = await discussions.getPostsForTags(
                 tags,
                 this.postsPosition.cursorId,
-                this.postsPosition.items
+                this.postsPosition.items,
+                0,
+                this.getKeyForAPICall
             )
 
             this.posts = [...this.posts, ...posts]
@@ -206,14 +223,14 @@ export default class PostsStore extends BaseStore {
 
     @task
     @action.bound
-    public async getAndSetThread(id: string): Promise<null | ThreadModel> {
+    public async getAndSetThread(id: string): Promise<null | Thread> {
         try {
-            const { activePublicKey } = this.authStore
-            const thread = await discussions.getThread(id, activePublicKey)
+            const thread = await discussions.getThread(id, this.getKeyForAPICall)
             if (!thread) return null
-            this.activeThread = new ThreadModel(thread)
+            this.activeThreadSerialized = thread
             this.activeThreadId = id
-            return Promise.resolve(this.activeThread)
+            this.activeThread = new ThreadModel(thread)
+            return thread
         } catch (error) {
             throw error
         }
@@ -243,17 +260,6 @@ export default class PostsStore extends BaseStore {
             }),
             option => option.id
         )
-    }
-
-    @action
-    public vote = async (uuid: string, value: number) => {
-        try {
-            if (this.authStore.hasAccount) {
-                await this.activeThread.vote(uuid, value)
-            }
-        } catch (error) {
-            throw error
-        }
     }
 
     @action clearPreview = () => {
@@ -347,7 +353,7 @@ export default class PostsStore extends BaseStore {
                 if (isPostValid) {
                     const int = setInterval(async () => {
                         const id = encodeId(submittedPost)
-                        const getThread = await discussions.getThread(id)
+                        const getThread = await discussions.getThread(id, activePublicKey)
 
                         if (getThread) {
                             if (int) {

@@ -1,6 +1,7 @@
 //@ts-ignore
 import ecc from 'eosjs-ecc'
 import { Attachment } from './attachment'
+import { getIdenticon } from '@utils'
 const BigInt = require('big-integer')
 const TIME_ENCODE_GENESIS = 1483246800000 // 2017-1-1
 
@@ -43,6 +44,8 @@ export class Post {
     uidw: string
     tips: PostTips
 
+    imageData: string
+
     transfers: any[]
 
     // Discussion ID Post Data
@@ -64,7 +67,7 @@ export class Post {
     depth: number // only used if Thread object created with
 
     // Aggregate Data
-    myVote: number
+    myVote: { value: number }[]
 
     hasAttachment(): boolean {
         return (
@@ -120,7 +123,7 @@ export class Post {
         this.upvotes = 0
         this.downvotes = 0
         this.depth = 0
-        this.myVote = 0
+        this.myVote = []
     }
 
     static fromDbObject(o: any): Post {
@@ -139,6 +142,7 @@ export class Post {
         p.sub = o.sub
         p.tags = o.tags
         p.mentions = o.mentions
+        p.imageData = getIdenticon(o.pub)
         if (o.edit) {
             p.edit = true
             p.editUuid = o.edit
@@ -155,9 +159,7 @@ export class Post {
         p.upvotes = o.upvotes
         p.downvotes = o.downvotes
         p.uidw = o.uidw || null
-        if (o.myVote && o.myVote.length > 0) {
-            p.myVote = o.myVote[0].value
-        }
+        p.myVote = o.myVote
         p.tips = o.tips.length
             ? o.tips.reduce((acc, curr) => {
                   const [amount, symbol] = curr.data.amount.split(' ')

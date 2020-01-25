@@ -29,7 +29,7 @@ interface IReplies {
     post: PostModel
     className?: string
     getModel: (post: PostModel) => ReplyModel
-    voteHandler: (uuid: string, value: number) => void
+    voteHandler: (e: any, uuid: string, value: number) => void
     getRepliesFromMap: (uid: string) => PostModel[]
     toggleUserFollowing: (user: string, pub: string) => void
     highlightPostUuid: (uuid: string) => void

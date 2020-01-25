@@ -1,7 +1,6 @@
 import { observable, set } from 'mobx'
 import { Post } from '@novuspherejs'
 import ecc from 'eosjs-ecc'
-import { getIdenticon } from '@utils'
 import { PostTips } from '@novuspherejs/discussions/post'
 
 class PostModel {
@@ -19,7 +18,7 @@ class PostModel {
     @observable upvotes
     @observable downvotes
     @observable attachment
-    @observable replies
+    @observable replies = []
     @observable content
     @observable edit
     @observable tags
@@ -37,19 +36,10 @@ class PostModel {
     @observable posterName
 
     @observable blockedId
-
     @observable transfers
 
     constructor(post: Post) {
         set(this, post)
-
-        let imageData = getIdenticon()
-
-        if (this.pub) {
-            imageData = getIdenticon(this.pub)
-        }
-
-        this.imageData = imageData
 
         if (this.displayName) {
             this.posterName = this.displayName

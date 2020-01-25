@@ -4,11 +4,11 @@ import { RichTextPreview, Tips, UserNameWithIcon, VotingHandles } from '@compone
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { faComment } from '@fortawesome/free-solid-svg-icons'
 import { TagModel } from '@models/tagModel'
-import { observer } from 'mobx-react'
+import { observer, useLocalStore } from 'mobx-react'
 import FeedModel from '@models/feedModel'
 import Link from 'next/link'
 import { useEffect, useState } from 'react'
-import { getThreadUrl } from '@utils'
+import { generateVoteObject, getThreadUrl, voteAsync } from '@utils'
 import { Post } from '@novuspherejs'
 import { BlockedContentSetting } from '@stores/settingsStore'
 import { ObservableMap } from 'mobx'
@@ -25,6 +25,8 @@ interface IPostPreviewProps {
     blockedUsers: ObservableMap<string, string>
     blockedByDelegation: ObservableMap<string, string>
     unsignedPostsIsSpam: boolean
+    postPriv: string
+    showToast: (m: string, t: string) => void
 }
 
 const PostPreview: React.FC<IPostPreviewProps> = ({
@@ -39,14 +41,116 @@ const PostPreview: React.FC<IPostPreviewProps> = ({
     blockedUsers,
     blockedByDelegation,
     unsignedPostsIsSpam,
+    postPriv,
+    showToast,
 }) => {
     const [url, setUrl] = useState('')
-    const [postModel, setPostModel] = useState(null)
+
+    const postStore = useLocalStore(
+        source => ({
+            myVote: post.myVote,
+            downvotes: post.downvotes,
+            upvotes: post.upvotes,
+
+            get myVoteValue() {
+                if (postStore.myVote && postStore.myVote.length) {
+                    return postStore.myVote[0].value
+                }
+
+                return 0
+            },
+
+            async handleVote(e: any, uuid: string, value: number) {
+                let type
+
+                switch (value) {
+                    case 1:
+                        type = 'upvote'
+                        break
+                    case -1:
+                        type = 'downvote'
+                        break
+                }
+
+                try {
+                    const myVoteValue = postStore.myVoteValue
+
+                    // check if your prev vote was positive
+                    if (myVoteValue === 1) {
+                        // what type of vote are you doing
+                        if (type === 'downvote') {
+                            postStore.upvotes -= 1
+                            postStore.downvotes += 1
+                            postStore.myVote = [{ value: -1 }]
+                        }
+
+                        if (type === 'upvote') {
+                            postStore.upvotes -= 1
+                            postStore.myVote = [{ value: 0 }]
+                        }
+                    }
+
+                    // check if your prev vote was negative
+                    if (myVoteValue === -1) {
+                        // what type of vote are you doing
+                        if (type === 'downvote') {
+                            postStore.upvotes += 1
+                            postStore.myVote = [{ value: 0 }]
+                        }
+
+                        if (type === 'upvote') {
+                            postStore.upvotes += 1
+                            postStore.downvotes -= 1
+                            postStore.myVote = [{ value: 1 }]
+                        }
+                    }
+
+                    // you never voted
+                    if (myVoteValue === 0) {
+                        if (type === 'downvote') {
+                            postStore.downvotes += 1
+                            postStore.myVote = [{ value: -1 }]
+                        }
+                        //
+                        if (type === 'upvote') {
+                            postStore.upvotes += 1
+                            postStore.myVote = [{ value: 1 }]
+                        }
+                    }
+
+                    const voteObject = generateVoteObject({
+                        uuid,
+                        postPriv: source.postPriv,
+                        value: postStore.myVoteValue,
+                    })
+
+                    const data = await voteAsync({
+                        voter: '',
+                        uuid,
+                        value: postStore.myVoteValue,
+                        nonce: voteObject.nonce,
+                        pub: voteObject.pub,
+                        sig: voteObject.sig,
+                    })
+
+                    if (data.error) {
+                        showToast(`Failed to ${type.split('s')[0]} this post`, 'error')
+                    }
+                } catch (error) {
+                    showToast(error.message, 'error')
+                }
+            },
+        }),
+        {
+            post,
+            postPriv,
+        }
+    )
 
     useEffect(() => {
-        function makePostIntoFeedModel() {
-            setPostModel(new FeedModel(post))
-        }
+        // function makePostIntoFeedModel() {
+        //     setPostModel(new FeedModel(post))
+        // }
 
         async function getUrl() {
             let uuid = undefined
@@ -58,7 +162,7 @@ const PostPreview: React.FC<IPostPreviewProps> = ({
             setUrl(await getThreadUrl(post, uuid))
         }
 
-        makePostIntoFeedModel()
+        // makePostIntoFeedModel()
         getUrl()
     }, [])
 
@@ -93,13 +197,13 @@ const PostPreview: React.FC<IPostPreviewProps> = ({
                 >
                     {disableVoteHandler || isSpam
                         ? null
-                        : postModel && (
+                        : post && (
                               <VotingHandles
-                                  upVotes={postModel.upvotes}
-                                  downVotes={postModel.downvotes}
-                                  myVote={postModel.myVote}
-                                  handler={postModel.vote}
-                                  uuid={postModel.uuid}
+                                  upVotes={postStore.upvotes}
+                                  downVotes={postStore.downvotes}
+                                  myVote={postStore.myVoteValue}
+                                  uuid={post.uuid}
+                                  handler={postStore.handleVote}
                               />
                           )}
                 </div>
@@ -121,17 +225,15 @@ const PostPreview: React.FC<IPostPreviewProps> = ({
                                         )}
                                         <span className={'b ttu'}>{post.sub}</span>
                                         <span className={'ph1 b'}>&#183;</span>
-                                        {postModel && (
-                                            <UserNameWithIcon
-                                                imageData={postModel.imageData}
-                                                pub={postModel.pub}
-                                                name={postModel.posterName}
-                                                imageSize={20}
-                                            />
-                                        )}
+                                        <UserNameWithIcon
+                                            imageData={post.imageData}
+                                            pub={post.pub}
+                                            name={post.displayName}
+                                            imageSize={20}
+                                        />
                                         <span className={'ph1 b'}>&#183;</span>
                                         <span
-                                            className={'o-50 pl2'}
+                                            className={'o-50'}
                                             title={moment(post.createdAt)
                                                 .toDate()
                                                 .toLocaleString()}
@@ -140,7 +242,7 @@ const PostPreview: React.FC<IPostPreviewProps> = ({
                                         </span>
                                         <Tips tokenImages={tokenImages} tips={post.tips} />
                                     </div>
-                                    <div className={'flex justify-between items-center pt1'}>
+                                    <div className={'flex justify-between items-center pt1 mv2'}>
                                         <span className={'black f3 b lh-title'}>{post.title}</span>
                                     </div>
 

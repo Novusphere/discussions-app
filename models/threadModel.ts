@@ -8,7 +8,6 @@ import { CreateForm } from '@components'
 import { getAuthStore, getUiStore, IStores } from '@stores'
 import { task } from 'mobx-task'
 import EditModel from '@models/editModel'
-import ecc from 'eosjs-ecc'
 import { generateVoteObject, voteAsync } from '@utils'
 
 export class ThreadModel {
@@ -18,7 +17,6 @@ export class ThreadModel {
     @observable public title: string
     @observable public sub: string
 
-    @observable public replies: PostModel[]
     @observable openingPostReplies: PostModel[] = []
 
     @observable editing = false
@@ -119,7 +117,7 @@ export class ThreadModel {
                     this.openingPost.title = cached.title
                     this.openingPost.content = cached.content
                     this.uiStore.showToast('There was an error editing your post', 'error')
-                    return
+                    return cached
                 }
 
                 set(this.openingPost, response)
@@ -127,6 +125,8 @@ export class ThreadModel {
                 this.openingPost.editedAt = new Date(Date.now())
                 this.uiStore.showToast('Your post has been edited!', 'success')
                 this.toggleEditing()
+
+                return response
             } catch (error) {
                 console.error(error)
                 this.openingPost.title = cached.title
@@ -136,7 +136,7 @@ export class ThreadModel {
         }
     }
 
-    get editForm() {
+    @computed get editForm() {
         return new CreateForm({}, [
             {
                 name: 'title',
@@ -150,28 +150,6 @@ export class ThreadModel {
                 value: this.openingPost.content,
                 hideLabels: true,
                 type: 'richtext',
-            },
-            {
-                name: 'buttons',
-                type: 'button',
-                hideLabels: true,
-                extra: {
-                    options: [
-                        {
-                            value: 'Cancel',
-                            className: 'white bg-red',
-                            title: 'Cancel changes to your post',
-                            onClick: () => {
-                                this.editing = false
-                            },
-                        },
-                        {
-                            value: 'Save',
-                            title: 'Save changes to your post',
-                            onClick: this.saveEdits,
-                        },
-                    ],
-                },
             },
         ])
     }
@@ -226,43 +204,43 @@ export class ThreadModel {
      * @param {number} myNewVote - +1 (upvote), 0 (neutral), -1 (downvote)
      * @return {void}
      */
-    @action vote = async (uuid: string, myNewVote: number) => {
+    @action vote = async (e: any, uuid: string, myNewVote: number) => {
         console.log(uuid, myNewVote)
         const type = myNewVote === 1 ? 'upvotes' : 'downvotes'
         const post = this.map[uuid]
         const updatedVote = post[type] + myNewVote
 
-        const internallyUpdateVote = _myNewVote => {
-            // opening post
-            if (uuid === this.uuid) {
-                if (this.openingPost['myVote'] === 0) {
-                    this.openingPost[type] = updatedVote
-                    this.openingPost['myVote'] = _myNewVote
-                } else if (this.openingPost['myVote'] === 1) {
-                    this.openingPost['upvotes'] = this.openingPost['upvotes'] - 1
-                    this.openingPost['myVote'] = 0
-                } else if (this.openingPost['myVote'] === -1) {
-                    this.openingPost['downvotes'] = this.openingPost['downvotes'] + 1
-                    this.openingPost['myVote'] = 0
-                }
-            }
-
-            if (this.map) {
-                if (this.map[uuid].myVote === 0) {
-                    this.map[uuid][type] = updatedVote
-                    this.map[uuid].myVote = _myNewVote
-                } else if (this.map[uuid].myVote === 1) {
-                    this.map[uuid]['upvotes'] = this.map[uuid]['upvotes'] - 1
-                    this.map[uuid].myVote = 0
-                } else if (this.map[uuid].myVote === -1) {
-                    this.map[uuid]['downvotes'] = this.map[uuid]['downvotes'] + 1
-                    this.map[uuid].myVote = 0
-                }
-            }
-        }
+        // const internallyUpdateVote = _myNewVote => {
+        //     // opening post
+        //     if (uuid === this.uuid) {
+        //         if (this.openingPost['myVote'] === 0) {
+        //             this.openingPost[type] = updatedVote
+        //             this.openingPost['myVote'] = _myNewVote
+        //         } else if (this.openingPost['myVote'] === 1) {
+        //             this.openingPost['upvotes'] = this.openingPost['upvotes'] - 1
+        //             this.openingPost['myVote'] = 0
+        //         } else if (this.openingPost['myVote'] === -1) {
+        //             this.openingPost['downvotes'] = this.openingPost['downvotes'] + 1
+        //             this.openingPost['myVote'] = 0
+        //         }
+        //     }
+        //
+        //     if (this.map) {
+        //         if (this.map[uuid].myVote === 0) {
+        //             this.map[uuid][type] = updatedVote
+        //             this.map[uuid].myVote = _myNewVote
+        //         } else if (this.map[uuid].myVote === 1) {
+        //             this.map[uuid]['upvotes'] = this.map[uuid]['upvotes'] - 1
+        //             this.map[uuid].myVote = 0
+        //         } else if (this.map[uuid].myVote === -1) {
+        //             this.map[uuid]['downvotes'] = this.map[uuid]['downvotes'] + 1
+        //             this.map[uuid].myVote = 0
+        //         }
+        //     }
+        // }
 
         try {
-            internallyUpdateVote(myNewVote)
+            // internallyUpdateVote(myNewVote)
 
             const { postPriv } = this.authStore
             const value = myNewVote
@@ -283,14 +261,20 @@ export class ThreadModel {
             })
 
             if (data.error) {
-                internallyUpdateVote(post[type])
+                // internallyUpdateVote(post[type])
                 this.uiStore.showToast(`Failed to ${type.split('s')[0]} this post`, 'error')
-                return
+            }
+
+            return {
+                myVote: myNewVote,
+                downvotes: post.downvotes,
+                upvotes: post.upvotes,
+                type: type,
             }
 
         } catch (error) {
             console.log(error)
-            internallyUpdateVote(post[type])
+            // internallyUpdateVote(post[type])
             throw error
         }
     }

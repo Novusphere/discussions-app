@@ -6,7 +6,7 @@ import { CreateForm } from '@components'
 import { task } from 'mobx-task'
 import { discussions, eos, init, nsdb } from '@novuspherejs'
 import { getUiStore, IStores } from '@stores/index'
-import { bkToStatusJson, sleep } from '@utils'
+import { bkToStatusJson, isServer, sleep } from '@utils'
 import { ApiGetUnifiedId } from '../interfaces/ApiGet-UnifiedId'
 
 export default class AuthStore extends BaseStore {
@@ -72,11 +72,17 @@ export default class AuthStore extends BaseStore {
     constructor() {
         super()
 
-        autorun(() => {
+        if (!isServer) {
+            this.checkInitialConditions()
+        }
+
+        const rn = autorun(() => {
             if (this.uidWalletPubKey && this.selectedToken) {
                 this.fetchBalanceForSelectedToken()
             }
         })
+
+        rn()
 
         nsdb.getSupportedTokensForUnifiedWallet().then(async data => {
             this.setDepositTokenOptions(data)
@@ -222,19 +228,14 @@ export default class AuthStore extends BaseStore {
     @task
     @action.bound
     async checkInitialConditions() {
-        await sleep(100)
-
         if (this.logOutTimestamp === AuthStore.LOG_OUT_USER_INTEGER || !this.hasAccount) {
             return
         }
 
-        if (this.activeDisplayName && this.postPriv) {
-            if (this.statusJson.bk && this.postPriv && this.displayName.bk) {
-                this.hasAccount = true
-                this.logOutTimestamp = Date.now()
-
-                if (this.hasEOSWalletAccount) this.connectScatterWallet()
-            }
+        if (this.statusJson.bk && this.postPriv && this.displayName.bk) {
+            this.hasAccount = true
+            this.logOutTimestamp = Date.now()
+            if (this.hasEOSWalletAccount) this.connectScatterWallet()
         } else {
             this.hasAccount = false
         }

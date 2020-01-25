@@ -12,13 +12,16 @@ import {
     faUserPlus,
 } from '@fortawesome/free-solid-svg-icons'
 import { openInNewTab } from '@utils'
-import PostModel from '@models/postModel'
 import { ReplyModel } from '@models/replyModel'
 import classNames from 'classnames'
+import { Post } from '@novuspherejs'
+import PostModel from '@models/postModel'
+import { NewReplyModel } from '@models/newReplyModel'
+import { useObserver } from 'mobx-react-lite'
 
 interface IReplyHoverElementsProps {
-    post: PostModel
-    replyModel: ReplyModel
+    post: Post | PostModel
+    replyModel: ReplyModel | NewReplyModel
     hasAccount: boolean
     activePublicKey: string
     isFollowing: boolean
@@ -43,7 +46,7 @@ const ReplyHoverElements: React.FC<IReplyHoverElementsProps> = ({
     isMarkedAsSpam,
     onMarkSpamComplete,
 }) => {
-    return (
+    return useObserver(() => (
         <div
             className={classNames([
                 'hover-elements disable-user-select',
@@ -55,7 +58,7 @@ const ReplyHoverElements: React.FC<IReplyHoverElementsProps> = ({
             <span onClick={replyModel.toggleOpen} title={'Reply to post'}>
                 <FontAwesomeIcon icon={faReply} />
             </span>
-            {replyModel.canEditPost && (
+            {activePublicKey === post.pub && (
                 <span title={'Edit post'} onClick={() => replyModel.toggleEditing()}>
                     <FontAwesomeIcon icon={faPen} />
                 </span>
@@ -72,7 +75,7 @@ const ReplyHoverElements: React.FC<IReplyHoverElementsProps> = ({
             {post.pub && hasAccount && activePublicKey !== post.pub ? (
                 <span
                     title={isFollowing ? 'Unfollow user' : 'Follow user'}
-                    onClick={toggleFollowStatus}
+                    onClick={() => toggleFollowStatus()}
                 >
                     {isFollowing ? (
                         <FontAwesomeIcon icon={faUserMinus} className={'red'} />
@@ -96,7 +99,7 @@ const ReplyHoverElements: React.FC<IReplyHoverElementsProps> = ({
                 />
             </span>
         </div>
-    )
+    ))
 }
 
 export default ReplyHoverElements

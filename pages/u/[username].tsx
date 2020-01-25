@@ -6,8 +6,8 @@ import { Tab, Tabs, TabList, TabPanel } from 'react-tabs'
 import { faMinusCircle } from '@fortawesome/free-solid-svg-icons'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { computed } from 'mobx'
-import { getIdenticon, isServer, sleep, trimAddress } from '@utils'
-import { CopyToClipboard, InfiniteScrollFeed, PostPreview, TagDropdown } from '@components'
+import { getIdenticon, } from '@utils'
+import { CopyToClipboard, InfiniteScrollFeed, TagDropdown } from '@components'
 
 interface IUPageProps {
     userStore: IStores['userStore']
@@ -34,12 +34,7 @@ class U extends React.Component<IUPageProps> {
         const [username, pub] = query.username.split('-')
         const icon = getIdenticon(pub)
 
-        if (!isServer) {
-            window.scrollTo(0, 0)
-        }
-
         postsStore.resetPositionAndPosts()
-        await sleep(500)
         const posts = await postsStore.getPostsForKeys([pub])
 
         let uidw
@@ -58,10 +53,11 @@ class U extends React.Component<IUPageProps> {
         }
     }
 
-    componentWillMount(): void {
-        this.props.tagStore.destroyActiveTag()
-        this.props.uiStore.toggleSidebarStatus(false)
-        this.props.uiStore.toggleBannerStatus(true)
+    componentDidMount(): void {
+        window.scrollTo(0, 0)
+            this.props.tagStore.destroyActiveTag()
+            this.props.uiStore.toggleSidebarStatus(false)
+            this.props.uiStore.toggleBannerStatus(true)
     }
 
     @computed get isSameUser() {
@@ -188,7 +184,7 @@ class U extends React.Component<IUPageProps> {
                             <li className={'f6 mt2'}>
                                 <TagDropdown
                                     className={'f6'}
-                                    formatCreateLabel={inputValue => `Choose a tag`}
+                                    formatCreateLabel={() => `Choose a tag`}
                                     onChange={setActiveDelegatedTag}
                                     value={activeDelegatedTag}
                                     options={[
@@ -223,12 +219,11 @@ class U extends React.Component<IUPageProps> {
     }
 
     private renderUsersPosts = () => {
-        const { pub } = this.props
+        const { pub, posts } = this.props
 
         const {
             getPostsForKeys,
             postsPosition: { cursorId, items },
-            posts,
         } = this.props.postsStore
 
         return (

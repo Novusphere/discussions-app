@@ -6,18 +6,18 @@ import classNames from 'classnames'
 
 import dynamic from 'next/dynamic'
 import { useState } from 'react'
-import { RichTextPreview } from '@components'
+import { RichTextPreview, RichTextEditor } from '@components'
 
 // @ts-ignore
-const Editor = dynamic(() => import('../Editor/Editor'), {
-    ssr: false,
-})
+// const Editor = dynamic(() => import('../Editor/Editor'), {
+//     ssr: false,
+// })
 
 interface IReplyProps {
     className?: string
     uid: string // the uid of the post this component is active for
     onContentChange: (content: string) => void
-    onSubmit: (uid: string) => any
+    onSubmit: () => void
 
     value?: string
     loading: boolean
@@ -39,6 +39,7 @@ const ReplyBox: React.FC<IReplyProps> = ({
     const [showPreview, setPreviewState] = useState(false)
     const [content, setContent] = useState(null)
 
+
     return (
         <div
             {...(id && { id })}
@@ -52,7 +53,7 @@ const ReplyBox: React.FC<IReplyProps> = ({
                 display: open ? 'block' : 'none',
             }}
         >
-            <Editor
+            <RichTextEditor
                 placeholder={'Enter your reply'}
                 className={'db f6'}
                 value={value}
@@ -73,18 +74,14 @@ const ReplyBox: React.FC<IReplyProps> = ({
                 <button
                     disabled={loading}
                     className={'mt3 f6 link dim ph3 pv2 dib mr2 pointer white bg-green'}
-                    onClick={() => {
-                        onSubmit(uid).catch(err => {
-                            console.error(err)
-                        })
-                    }}
+                    onClick={onSubmit}
                 >
                     {loading ? <FontAwesomeIcon width={13} icon={faSpinner} spin /> : 'Post reply'}
                 </button>
             </div>
 
             {showPreview && (
-                <div className={'flex flex-row mt3 card pa2'}>
+                <div className={'flex flex-row mt3 card pa2 reply-content'}>
                     <RichTextPreview className={'w-100'}>{content}</RichTextPreview>
                 </div>
             )}
@@ -92,4 +89,4 @@ const ReplyBox: React.FC<IReplyProps> = ({
     )
 }
 
-export default observer(ReplyBox)
+export default ReplyBox

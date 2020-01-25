@@ -1,19 +1,18 @@
 import * as React from 'react'
 import { PostTips } from '@novuspherejs/discussions/post'
+import { observer } from 'mobx-react'
 
 interface ITipProps {
     tips: PostTips | null
     tokenImages: any
 }
 
-export default ({ tips, tokenImages }: ITipProps)=> {
+export default observer(({ tips, tokenImages }: ITipProps) => {
     if (!tips || !tokenImages) return null
 
     return Object.keys(tips).map(symbol => {
-        const tokenImageSymbol = tokenImages[symbol]
-
-        if (!tokenImageSymbol) return null
-
+        let tokenImageSymbol = tokenImages[symbol]
+        if (!tokenImageSymbol) tokenImageSymbol = ['https://cdn.novusphere.io/static/atmos.svg', 3]
         const [img, precision] = tokenImageSymbol
 
         return (
@@ -23,4 +22,4 @@ export default ({ tips, tokenImages }: ITipProps)=> {
             </span>
         )
     }) as any
-}
+})

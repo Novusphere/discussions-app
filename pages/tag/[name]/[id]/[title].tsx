@@ -1,13 +1,13 @@
 import * as React from 'react'
 import { inject, observer } from 'mobx-react'
 import { IStores } from '@stores'
-import { ShowFullThread } from '@components'
 import Router, { NextRouter, withRouter } from 'next/router'
 import { Thread } from '@novuspherejs'
 import { NextSeo } from 'next-seo'
-import { getThreadUrl, removeMD } from '@utils'
+import { getThreadUrl, isServer, removeMD, sleep } from '@utils'
 import Head from 'next/head'
 import _ from 'lodash'
+import { NewThread } from '../../../../components/Thread/NewThread'
 
 interface IEPageProps {
     router: NextRouter
@@ -32,9 +32,7 @@ interface IEPageState {
 @inject('postsStore', 'tagStore', 'uiStore')
 @observer
 class E extends React.Component<IEPageProps, IEPageState> {
-    private rn: any = null
-
-    static async getInitialProps({ query, store, req }) {
+    static async getInitialProps({ query, store }) {
         const postsStore: IStores['postsStore'] = store.postsStore
         const thread = await postsStore.getAndSetThread(query.id)
 
@@ -60,7 +58,6 @@ class E extends React.Component<IEPageProps, IEPageState> {
 
     async componentDidMount(): Promise<void> {
         const hash = this.highglightActiveUuid()
-
         const { thread } = this.props
 
         if (thread) {
@@ -113,7 +110,8 @@ class E extends React.Component<IEPageProps, IEPageState> {
                         ],
                     }}
                 />
-                <ShowFullThread thread={thread} />
+                <NewThread threadSerialized={thread} id={query.id} />
+                {/*<ShowFullThread thread={thread} />*/}
             </>
         )
     }

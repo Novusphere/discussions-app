@@ -4,6 +4,7 @@ import { IStores } from '@stores'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { faSpinner } from '@fortawesome/free-solid-svg-icons'
 import sanitizeHTML from 'sanitize-html'
+import dynamic from 'next/dynamic'
 
 interface IEditorProps {
     postsStore?: IStores['postsStore']
@@ -74,34 +75,6 @@ class EditorComponent extends React.Component<IEditorProps> {
         this.quillBase.Quill.register('modules/magicUrl', MagicUrl)
 
         this.modules = {
-            // 'eos-tip': {
-            //     fixMentionsToQuill: true,
-            //     tippableList: async (searchTerm, renderList) => {
-            //         const values = this.props.postsStore.getPossibleUsersToTag
-            //
-            //         if (searchTerm.length === 0) {
-            //             renderList(values, searchTerm)
-            //         }
-            //         else {
-            //             const matches = []
-            //             for (let i = 0; i < values.length; i++) {
-            //                 if (~values[i].value.toLowerCase().indexOf(searchTerm.toLowerCase())) {
-            //                     matches.push(values[i])
-            //                 }
-            //             }
-            //             renderList(matches, searchTerm)
-            //         }
-            //     },
-            //     renderItem: item => {
-            //         const image = `<img width=20 height=20 src="${item.icon}" class="mention-list-icon" />`
-            //         return `<span class="mention-list-item" title={${item.id}}>${image} <span>${item.value}</span></span>`
-            //     },
-            //     onSelect: (item, insertItem) => {
-            //         item.value = `<a href=https://beta.discussions.app/u/${item.value}-${item.id}-${item.uidw}>@${item.value}</a>`
-            //         item.denotationChar = ''
-            //         return insertItem(item)
-            //     },
-            // },
             mention: {
                 fixMentionsToQuill: true,
                 mentionDenotationChars: ['@'],
@@ -144,7 +117,7 @@ class EditorComponent extends React.Component<IEditorProps> {
             loaded: true,
         })
 
-        if (this.props.value) {
+        if (this.props.value && this.props.value.length) {
             this.updateContentByRef(this.showdownService.makeHtml(this.props.value))
         }
 
@@ -161,7 +134,7 @@ class EditorComponent extends React.Component<IEditorProps> {
     }
 
     componentWillReceiveProps(nextProps: Readonly<IEditorProps>, nextContext: any): void {
-        if (nextProps.value === '') {
+        if (this.props.value.length > 0 && nextProps.value === '') {
             this.updateContentByRef('')
         }
 
@@ -205,7 +178,6 @@ class EditorComponent extends React.Component<IEditorProps> {
                 modules={{
                     autoformat: this.modules.autoformat,
                     mention: this.modules.mention,
-                    // 'eos-tip': this.modules['eos-tip'],
                     magicUrl: true,
                     toolbar: [
                         [{ header: 1 }, { header: 2 }], // custom button values
@@ -218,4 +190,7 @@ class EditorComponent extends React.Component<IEditorProps> {
     }
 }
 
-export default EditorComponent
+export default dynamic(() => Promise.resolve(EditorComponent), {
+    ssr: false,
+    loading: () => <FontAwesomeIcon width={13} icon={faSpinner} spin />,
+})

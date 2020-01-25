@@ -2,7 +2,6 @@ import * as React from 'react'
 import { observer, inject } from 'mobx-react'
 import { InfiniteScrollFeed } from '@components'
 import { IStores } from '@stores'
-import { sleep } from '@utils'
 
 interface IIndexPage {
     postsStore: IStores['postsStore']
@@ -18,7 +17,6 @@ class Index extends React.Component<IIndexPage> {
         this.props.tagStore.destroyActiveTag()
         this.props.uiStore.toggleSidebarStatus(true)
         this.props.uiStore.toggleBannerStatus(true)
-        await sleep(500)
         await this.props.postsStore.getPostsForSubs()
     }
 

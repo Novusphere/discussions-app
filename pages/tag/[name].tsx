@@ -13,7 +13,6 @@ interface ITagProps {
     tagModel: TagModel
 
     tag: undefined | string
-    posts: Post[]
 }
 
 // TODO: Merge logic between e/page and tag/page. Right now it's separated.
@@ -31,11 +30,8 @@ class Tag extends React.Component<ITagProps, ITagPageState> {
         tagStore.setActiveTag(tag)
         postsStore.resetPositionAndPosts()
 
-        const posts = await postsStore.getPostsByTag([tag])
-
         return {
             tag,
-            posts,
         }
     }
 
@@ -47,6 +43,8 @@ class Tag extends React.Component<ITagProps, ITagPageState> {
 
     componentDidMount(): void {
         window.scrollTo(0, 0)
+
+        this.props.postsStore.getPostsByTag([this.props.tag])
     }
 
     public render() {

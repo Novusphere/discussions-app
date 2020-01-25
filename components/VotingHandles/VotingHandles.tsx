@@ -1,7 +1,6 @@
 import * as React from 'react'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { faArrowUp, faArrowDown } from '@fortawesome/free-solid-svg-icons'
-import { observer } from 'mobx-react'
 import classNames from 'classnames'
 
 interface IVoteProps {
@@ -10,7 +9,7 @@ interface IVoteProps {
     downVotes: number
     myVote: number
     className?: string
-    handler: (uuid: string, value: number) => void
+    handler: (e: any, uuid: string, value: number) => void
     color?: string
     horizontal?: boolean
 }
@@ -24,49 +23,57 @@ const VotingHandles: React.FC<IVoteProps> = ({
     color,
     horizontal,
     ...props
-}) => (
-    <span
-        className={classNames(['black f6 vote flex items-center disable-user-select ph1'], {
-            'flex-row': horizontal,
-            'flex-column': !horizontal,
-        })}
-        {...props}
-    >
-        <span onClick={async () => await handler(uuid, 1)}>
-            <FontAwesomeIcon
-                width={13}
-                icon={faArrowUp}
-                color={color ? color : '#b9b9b9'}
-                className={classNames([
-                    'pointer disable-user-select',
-                    {
-                        'o-50 dim': myVote !== 1,
-                        orange: myVote === 1,
-                    },
-                ])}
-            />
-        </span>
+}) => {
+    return (
         <span
-            className={classNames(['f6 disable-user-select ph1'])}
-            style={{ color: color ? color : '#b9b9b9', whiteSpace: 'pre' }}
+            className={classNames(['black f6 vote flex items-center disable-user-select ph1'], {
+                'flex-row': horizontal,
+                'flex-column': !horizontal,
+            })}
+            {...props}
         >
-            {upVotes - downVotes}
+            <span onClick={(e) => {
+                e.preventDefault()
+                handler(e, uuid, 1)
+            }}>
+                <FontAwesomeIcon
+                    width={13}
+                    icon={faArrowUp}
+                    color={color ? color : '#b9b9b9'}
+                    className={classNames([
+                        'pointer disable-user-select',
+                        {
+                            'o-50 dim': myVote !== 1,
+                            orange: myVote === 1,
+                        },
+                    ])}
+                />
+            </span>
+            <span
+                className={classNames(['f6 disable-user-select ph1'])}
+                style={{ color: color ? color : '#b9b9b9', whiteSpace: 'pre' }}
+            >
+                {upVotes - downVotes}
+            </span>
+            <span onClick={(e) => {
+                e.preventDefault()
+                handler(e, uuid, -1)
+            }}>
+                <FontAwesomeIcon
+                    width={13}
+                    color={color ? color : '#b9b9b9'}
+                    icon={faArrowDown}
+                    className={classNames([
+                        'pointer disable-user-select',
+                        {
+                            'o-50 dim': myVote !== -1,
+                            blue: myVote === -1,
+                        },
+                    ])}
+                />
+            </span>
         </span>
-        <span onClick={async () => await handler(uuid, -1)}>
-            <FontAwesomeIcon
-                width={13}
-                color={color ? color : '#b9b9b9'}
-                icon={faArrowDown}
-                className={classNames([
-                    'pointer disable-user-select',
-                    {
-                        'o-50 dim': myVote !== -1,
-                        blue: myVote === -1,
-                    },
-                ])}
-            />
-        </span>
-    </span>
-)
+    )
+}
 
-export default observer(VotingHandles)
+export default VotingHandles
