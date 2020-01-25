@@ -589,6 +589,12 @@ export const getHost = url => {
 
 export const checkIfNameIsValid = async (accountName: string): Promise<boolean> => {
     try {
+        const isPublicKey = ecc.isValidPublic(accountName)
+
+        if (isPublicKey) {
+            return isPublicKey
+        }
+
         const { data } = await axios.post(
             'https://eos.eoscafeblock.com/v1/chain/get_table_by_scope',
             {

@@ -170,58 +170,69 @@ export default class SettingsStore extends BaseStore {
     @task.resolved
     @action.bound
     async getValues(form: any) {
-        if (form.hasError) return
+        try {
+            if (form.hasError) return
 
-        const values = form.values()
-        values.accountNames = this.recipients
+            const values = form.values()
+            values.accountNames = this.recipients
 
-        // validate account names
-        const invalidNames = []
+            // validate account names
+            const invalidNames = []
 
-        await values.accountNames.map(async accountName => {
-            await sleep(100)
-            const isValidAccountName = await checkIfNameIsValid(accountName)
-            if (!isValidAccountName) invalidNames.push(accountName)
-        })
+            await values.accountNames.map(async accountName => {
+                try {
+                    await sleep(100)
+                    const isValidAccountName = await checkIfNameIsValid(accountName)
+                    if (!isValidAccountName) invalidNames.push(accountName)
+                } catch (error) {
+                    return error
+                }
+            })
 
-        await sleep(100 * this.recipientCount)
+            await sleep(100 * this.recipientCount)
 
-        if (invalidNames.length) {
-            form.$('accountNames').invalidate(
-                `The names: ${invalidNames.join(
-                    ','
-                )} are invalid. Ensure you are entering valid EOS usernames.`
-            )
+            if (invalidNames.length) {
+                form.$('accountNames').invalidate(
+                    `The names: ${invalidNames.join(
+                        ','
+                    )} are invalid. Ensure you are entering valid EOS usernames.`
+                )
 
-            return
+                return
+            }
+
+            await sleep(500)
+
+            const precision = await eos.getTokenPrecision(values.token.value, values.token.name)
+            const amount: string = values.amount
+
+            values.amount = Number(amount).toFixed(precision)
+            values.actor = this.authStore.activeDisplayName
+
+            return values
+        } catch (error) {
+            return error
         }
-
-        await sleep(500)
-
-        const precision = await eos.getTokenPrecision(values.token.value, values.token.name)
-        const amount: string = values.amount
-
-        values.amount = Number(amount).toFixed(precision)
-        values.actor = this.authStore.activeDisplayName
-
-        return values
     }
 
     @task.resolved
     @action.bound
     async handleDownloadAirDropSubmit(form) {
-        const values = await this.getValues(form)
-
-        if (values) {
-            try {
-                const { data } = await axios.get('/api/writeFile', {
-                    params: values,
-                })
-
-                fileDownload(JSON.stringify(data), 'airdrop.json')
-            } catch (error) {
-                return error
+        try {
+            const values = await this.getValues(form)
+            if (values) {
+                console.log(values)
+                console.log(this.tokens)
+                console.log(this.authStore.supportedTokensForUnifiedWallet)
+                // const { data } = await axios.get('/api/writeFile', {
+                //     params: values,
+                // })
+                //
+                // fileDownload(JSON.stringify(data), 'airdrop.json')
             }
+        } catch (error) {
+            this.errorMessage = error.message
+            return error
         }
     }
 
@@ -232,13 +243,15 @@ export default class SettingsStore extends BaseStore {
             const values = await this.getValues(form)
             const actions = []
 
-            // logout user
-            // https://github.com/Novusphere/discussions-app/issues/102
-            await eos.logout()
+            if (!this.authStore.hasEOSWalletAccount) {
+                // logout user
+                // https://github.com/Novusphere/discussions-app/issues/102
+                await eos.logout()
 
-            // scatter detection
-            await eos.detectWallet()
-            await eos.login()
+                // scatter detection
+                await eos.detectWallet()
+                await eos.login()
+            }
 
             if (typeof eos.auth !== 'undefined') {
                 this.recipients.map(async recipient => {
@@ -254,7 +267,9 @@ export default class SettingsStore extends BaseStore {
                     })
                 })
 
-                this.thresholdTxID = await eos.transact(actions)
+                console.log(actions)
+
+                // this.thresholdTxID = await eos.transact(actions)
             } else {
                 this.uiStore.showToast('Failed to detect EOS Wallet', 'error')
             }
