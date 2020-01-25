@@ -1,8 +1,8 @@
 import _ from 'lodash'
 
 export default async (req, res) => {
-    const { token, amount, memoId, actor } = req.query
-    const accountNames = req.query['accountNames[]']
+    let { token, amount, memoId, actor, p2k } = req.query
+    let accountNames = req.query['accountNames[]']
 
     if (
         _.isUndefined(req.query) ||
@@ -21,19 +21,43 @@ export default async (req, res) => {
     res.setHeader('Content-type', 'text/plain')
     res.charset = 'UTF-8'
 
-    res.write(
-        JSON.stringify({
-            rpc: 'https://eos.greymass.com',
-            authorization: {
-                actor: actor,
-                permission: 'active',
-            },
-            contract: parsedToken.value,
-            quantity: `${amount} ${parsedToken.symbol}`,
-            memo: memoId || '',
-            transfer: accountNames,
-        })
-    )
+    if (!Array.isArray(accountNames)) {
+        accountNames = [accountNames]
+    }
+
+    if (!_.isUndefined(p2k)) {
+        p2k = JSON.parse(p2k)
+
+
+        // handle as a deposit
+        res.write(
+            JSON.stringify({
+                rpc: 'https://eos.greymass.com',
+                authorization: {
+                    actor: actor,
+                    permission: 'active',
+                },
+                contract: p2k.value,
+                quantity: `${amount} ${parsedToken.symbol}`,
+                memo: memoId || '',
+                transfer: accountNames,
+            })
+        )
+    } else {
+        res.write(
+            JSON.stringify({
+                rpc: 'https://eos.greymass.com',
+                authorization: {
+                    actor: actor,
+                    permission: 'active',
+                },
+                contract: parsedToken.value,
+                quantity: `${amount} ${parsedToken.symbol}`,
+                memo: memoId || '',
+                transfer: accountNames,
+            })
+        )
+    }
 
     res.end()
 }

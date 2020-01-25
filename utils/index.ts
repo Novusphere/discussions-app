@@ -587,8 +587,20 @@ export const getHost = url => {
     return parser.host.toLowerCase()
 }
 
-export const checkIfNameIsValid = async (accountName: string): Promise<boolean> => {
+/**
+ *
+ * @param accountName
+ * @returns {boolean} - if account name is valid/invalid
+ * @returns {boolean[]} - if account name is a public key and valid/invalid
+ */
+export const checkIfNameIsValid = async (accountName: string): Promise<boolean | boolean[]> => {
     try {
+        const isPublicKey = ecc.isValidPublic(accountName)
+
+        if (isPublicKey) {
+            return [isPublicKey, isPublicKey]
+        }
+
         const { data } = await axios.post(
             'https://eos.eoscafeblock.com/v1/chain/get_table_by_scope',
             {

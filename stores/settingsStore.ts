@@ -218,58 +218,90 @@ export default class SettingsStore extends BaseStore {
     @task.resolved
     @action.bound
     async getValues(form: any) {
-        if (form.hasError) return
+        try {
+            if (form.hasError) return
 
-        const values = form.values()
-        values.accountNames = this.recipients
+            const values = form.values()
+            values.accountNames = this.recipients
 
-        // validate account names
-        const invalidNames = []
+            // validate account names
+            const invalidNames = []
 
-        await values.accountNames.map(async accountName => {
-            await sleep(100)
-            const isValidAccountName = await checkIfNameIsValid(accountName)
-            if (!isValidAccountName) invalidNames.push(accountName)
-        })
+            let triggerP2k = false
 
-        await sleep(100 * this.recipientCount)
+            await values.accountNames.map(async accountName => {
+                try {
+                    await sleep(100)
+                    const isValidAccountName = await checkIfNameIsValid(accountName)
 
-        if (invalidNames.length) {
-            form.$('accountNames').invalidate(
-                `The names: ${invalidNames.join(
-                    ','
-                )} are invalid. Ensure you are entering valid EOS usernames.`
-            )
+                    if (Array.isArray(isValidAccountName)) {
+                        triggerP2k = true
+                        return
+                    }
 
-            return
+                    if (!isValidAccountName) invalidNames.push(accountName)
+                } catch (error) {
+                    return error
+                }
+            })
+
+            await sleep(100 * this.recipientCount)
+
+            if (invalidNames.length) {
+                form.$('accountNames').invalidate(
+                    `The names: ${invalidNames.join(
+                        ','
+                    )} are invalid. Ensure you are entering valid EOS usernames.`
+                )
+
+                return
+            }
+
+            await sleep(500)
+
+            const precision = await eos.getTokenPrecision(values.token.value, values.token.name)
+            const amount: string = values.amount
+
+            values.amount = Number(amount).toFixed(precision)
+            values.actor = this.authStore.activeDisplayName
+
+            if (triggerP2k) {
+                const token = this.authStore.supportedTokensForUnifiedWallet.find(
+                    q => q.label === values.token.symbol
+                )
+
+                console.log(!!token)
+
+                if (!token) {
+                    throw new Error(
+                        `Token ${values.token.symbol} does not support public key transfers!`
+                    )
+                }
+
+                values.p2k = token
+            }
+
+            return values
+        } catch (error) {
+            throw error
         }
-
-        await sleep(500)
-
-        const precision = await eos.getTokenPrecision(values.token.value, values.token.name)
-        const amount: string = values.amount
-
-        values.amount = Number(amount).toFixed(precision)
-        values.actor = this.authStore.activeDisplayName
-
-        return values
     }
 
     @task.resolved
     @action.bound
     async handleDownloadAirDropSubmit(form) {
-        const values = await this.getValues(form)
-
-        if (values) {
-            try {
+        try {
+            const values = await this.getValues(form)
+            if (values) {
                 const { data } = await axios.get('/api/writeFile', {
                     params: values,
                 })
 
                 fileDownload(JSON.stringify(data), 'airdrop.json')
-            } catch (error) {
-                return error
             }
+        } catch (error) {
+            this.errorMessage = error.message
+            return error
         }
     }
 
@@ -280,26 +312,43 @@ export default class SettingsStore extends BaseStore {
             const values = await this.getValues(form)
             const actions = []
 
-            // logout user
-            // https://github.com/Novusphere/discussions-app/issues/102
-            await eos.logout()
+            if (!this.authStore.hasEOSWalletAccount) {
+                // logout user
+                // https://github.com/Novusphere/discussions-app/issues/102
+                await eos.logout()
 
-            // scatter detection
-            await eos.detectWallet()
-            await eos.login()
+                // scatter detection
+                await eos.detectWallet()
+                await eos.login()
+            }
 
             if (typeof eos.auth !== 'undefined') {
                 this.recipients.map(async recipient => {
-                    actions.push({
-                        account: values.token.value,
-                        name: 'transfer',
-                        data: {
-                            from: eos.auth.accountName,
-                            to: recipient,
-                            quantity: `${values.amount} ${values.token.symbol}`,
-                            memo: values.memoId,
-                        },
-                    })
+                    const isPublicKey = ecc.isValidPublic(recipient)
+
+                    if (values.hasOwnProperty('p2k') && isPublicKey) {
+                        actions.push({
+                            account: values.token.value,
+                            name: 'transfer',
+                            data: {
+                                from: eos.auth.accountName,
+                                to: values.p2k.contract,
+                                quantity: `${values.amount} ${values.token.symbol}`,
+                                memo: recipient,
+                            },
+                        })
+                    } else {
+                        actions.push({
+                            account: values.token.value,
+                            name: 'transfer',
+                            data: {
+                                from: eos.auth.accountName,
+                                to: recipient,
+                                quantity: `${values.amount} ${values.token.symbol}`,
+                                memo: values.memoId,
+                            },
+                        })
+                    }
                 })
 
                 this.thresholdTxID = await eos.transact(actions)

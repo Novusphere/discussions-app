@@ -71,6 +71,10 @@ class Settings extends React.Component<ISettings, ISettingsState> {
         }
     }
 
+    componentDidMount(): void {
+        this.props.uiStore.toggleSidebarStatus(false)
+    }
+
     componentDidUpdate(
         prevProps: Readonly<ISettings>,
         prevState: Readonly<ISettingsState>,
