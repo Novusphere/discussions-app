@@ -219,19 +219,20 @@ class SideBar extends React.Component<ITagListOuterProps & ITagListInnerProps, I
 
                 {[...tagGroup.entries()].map(([name, tags]) => {
                     const _name = name.toLowerCase()
+                    const as = `/tags/${tags.join(',')}`
                     return (
                         <li
                             className={classNames([
                                 'ph3 pv1',
                                 {
-                                    dim: router.asPath !== _name,
-                                    'sidebar-link-active': router.asPath === _name,
+                                    dim: router.asPath !== as,
+                                    'sidebar-link-active': router.asPath === as,
                                 },
                             ])}
                             key={_name}
                         >
-                            <Link href={`/tags/[tags]`} as={`/tags/${tags.join(',')}`} shallow={true}>
-                                <a className={'db black pointer pb1 no-underline'}>{name}</a>
+                            <Link href={`/tags/[tags]`} as={as} shallow={true}>
+                                <a className={'db black pointer mb1 pv1 no-underline'}>{name}</a>
                             </Link>
                         </li>
                     )
@@ -291,7 +292,7 @@ class SideBar extends React.Component<ITagListOuterProps & ITagListInnerProps, I
                                 trigger={'mouseenter focus'}
                             >
                                 <Link href={`/tag/[name]`} as={`/tag/${tag.name}`}>
-                                    <a className={'flex items-center pb1 pointer'}>
+                                    <a className={'flex items-center mb1 pv1 pointer'}>
                                         {this.renderTagLi(tag)}
                                     </a>
                                 </Link>
