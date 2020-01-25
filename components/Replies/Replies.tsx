@@ -146,8 +146,9 @@ const Reply: React.FC<IReplyProps> = observer(
                 },
 
                 async copyAndScrollToPermalinkURL() {
-                    await copy(replyStore.permaLinkURL)
-                    await Router.push('/tag/[name]/[id]/[title]', replyStore.permaLinkURL, {
+                    const url = `${window.location.origin}${replyStore.permaLinkURL}`
+                    await copy(url)
+                    await Router.push('/tag/[name]/[id]/[title]', url, {
                         shallow: true,
                     })
 

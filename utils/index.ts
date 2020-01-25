@@ -47,10 +47,6 @@ export const removeMD = (md: string) => {
     return removeMd(md)
 }
 
-export const getBaseUrl = () => {
-    return window.location.origin
-}
-
 export const getPermaLink = (path: string, uuid: string) => {
     return `${path}#${uuid}`
 }
