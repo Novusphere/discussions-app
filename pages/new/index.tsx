@@ -1,5 +1,5 @@
 import * as React from 'react'
-import { inject, observer, useObserver } from 'mobx-react'
+import { inject, observer } from 'mobx-react'
 import { IStores } from '@stores'
 import { Form, TagDropdown } from '@components'
 import NewPostPreview from './new-post-preview/new-post-preview'
