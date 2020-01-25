@@ -15,6 +15,7 @@ class CreateForm {
     form: IForm['form']
     fields: MappedFields[]
     onSubmit: IForm['form']['onSubmit']
+    onError: IForm['form']['onError']
     validate: IForm['form']['validate']
     onClear: IForm['onClear']
     types: IForm['types']

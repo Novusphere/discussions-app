@@ -371,6 +371,7 @@ const Reply: React.FC<IReplyProps> = observer(
                     } catch (error) {
                         replyStore.setReplyLoading(false)
                         showToast(error.message, 'error')
+                        return error
                     }
                 },
 
@@ -387,7 +388,9 @@ const Reply: React.FC<IReplyProps> = observer(
 
                         showToast('Your reply was successfully submitted', 'success')
                     } catch (error) {
+                        replyStore.setReplyLoading(false)
                         showToast(error.message, 'error')
+                        return error
                     }
                 },
             }),

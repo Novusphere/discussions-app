@@ -679,6 +679,10 @@ export default class SettingsStore extends BaseStore {
     @computed get passwordReEntryForm() {
         return new CreateForm(
             {
+                onError: (form, message) => {
+                  this.uiStore.hideModal()
+                  this.uiStore.showToast(message, 'error')
+                },
                 onSubmit: async form => {
                     if (form.isValid) {
                         this.authStore.hasRenteredPassword = true

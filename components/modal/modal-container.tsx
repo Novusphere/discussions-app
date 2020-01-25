@@ -30,10 +30,13 @@ class ModalContainer extends React.Component<IModalContainerProps> {
                 <Observer>
                     {() =>
                         (this.props.children as any)({
-                            CloseButton: () => (
+                            CloseButton: ({ onClick }) => (
                                 <button
                                     className="f6 link dim ph3 pv2 dib white bg-gray white mr2 pointer"
-                                    onClick={() => hideModal()}
+                                    onClick={() => {
+                                        if (typeof onClick !== 'undefined') onClick()
+                                        else hideModal()
+                                    }}
                                 >
                                     Close
                                 </button>

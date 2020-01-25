@@ -21,6 +21,7 @@ declare interface IForm {
         fields: any[]
         validate?: any
         onSubmit: (event?: FormEvent<HTMLFormElement>) => void
+        onError: (event?: FormEvent<HTMLFormElement>, message?: string) => void
         select: (key: string) => any
         $: (key: string) => Form$
         size: number
