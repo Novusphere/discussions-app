@@ -351,9 +351,7 @@ export default class SettingsStore extends BaseStore {
                     }
                 })
 
-                console.log(actions)
-
-                // this.thresholdTxID = await eos.transact(actions)
+                this.thresholdTxID = await eos.transact(actions)
             } else {
                 this.uiStore.showToast('Failed to detect EOS Wallet', 'error')
             }
