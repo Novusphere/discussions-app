@@ -11,7 +11,9 @@ export default class UiStore extends BaseStore {
     @observable showBanner = true
 
     @observable currentIndex = 0
-    @observable banners = []
+    @observable banners = [
+        '/static/banners/default.png'
+    ]
 
     @observable isServer = true
 
