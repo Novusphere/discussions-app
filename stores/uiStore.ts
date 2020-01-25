@@ -1,6 +1,7 @@
 import { action, computed, observable } from 'mobx'
 import { BaseStore, getOrCreateStore } from 'next-mobx-wrapper'
 import { toast } from 'react-toastify'
+import { Router } from 'next/router'
 
 export default class UiStore extends BaseStore {
     @observable activeBanner = '/static/banners/default.png'
@@ -8,6 +9,28 @@ export default class UiStore extends BaseStore {
 
     @observable showSidebar = true
     @observable showBanner = true
+
+    @observable currentIndex = 0
+    @observable banners = []
+
+    @observable isServer = true
+
+    constructor() {
+        super()
+
+        Router.events.on('routeChangeStart', url => {
+            if (url.indexOf('tag') === -1) {
+                let index = this.currentIndex + 1
+
+                if (typeof this.banners[index] === 'undefined') {
+                    index = 0
+                }
+
+                this.activeBanner = this.banners[index]
+                this.currentIndex = index
+            }
+        })
+    }
 
     @action.bound
     toggleSidebarStatus(status: boolean) {

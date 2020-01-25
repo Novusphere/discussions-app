@@ -49,7 +49,10 @@ class DiscussionApp extends App {
                 userStore,
                 notificationsStore,
                 tagStore,
+                uiStore,
             } = this.props.store
+
+            uiStore.isServer = false
 
             const stores = {
                 auth: authStore,

@@ -408,7 +408,7 @@ export default class DiscussionsService {
         subs: string[],
         cursorId = undefined,
         count = 0,
-        limit = 20
+        limit = 5
     ): Promise<{
         posts: Post[]
         cursorId: number
