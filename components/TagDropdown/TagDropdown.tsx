@@ -12,6 +12,7 @@ interface ITagDropdownProps {
     classNamePrefix?: string
     value: { value: string, label: string }
     options: any[]
+    placeholder?: string
 }
 
 const TagDropdown: React.FC<ITagDropdownProps> = ({
@@ -21,6 +22,7 @@ const TagDropdown: React.FC<ITagDropdownProps> = ({
     classNamePrefix = 'rs',
     value,
     options,
+    ...props
 }) => {
     return useObserver(() => (
         <Creatable
@@ -35,6 +37,7 @@ const TagDropdown: React.FC<ITagDropdownProps> = ({
             classNamePrefix={classNamePrefix}
             value={value}
             options={options}
+            {...props}
         />
     ))
 }
