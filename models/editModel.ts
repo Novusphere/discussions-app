@@ -1,5 +1,5 @@
 import { action, computed, observable, set } from 'mobx'
-import { generateUuid, generateVoteObject, getAttachmentValue } from '@utils'
+import { escapeRegExp, generateUuid, generateVoteObject, getAttachmentValue } from '@utils'
 import PostModel from '@models/postModel'
 import { discussions } from '@novuspherejs'
 const matchAll = require('string.prototype.matchall')
@@ -46,7 +46,10 @@ class EditModel {
         // this is a fix for removing zero-width characters from a js string
         const _content = content.replace(/[\u200B-\u200D\uFEFF]/g, '')
         const regex = new RegExp(
-            `\\(https\\:\\/\\/beta\\.discussions\\.app\\/tag\\/tip\\)\\s(?<amount>[0-9\\.]+)\\s(?<symbol>${tokens})(?:\\s\\[(?<username>.*?)\\]\\((?<url>.*?)\\))?`,
+            `(${escapeRegExp(window.location.origin).replace(
+                '/',
+                '\/'
+            )})\/tag\\/tip\\)\\s(?<amount>[0-9\\.]+)\\s(?<symbol>${tokens})(?:\\s\\[(?<username>.*?)\\]\\((?<url>.*?)\\))?`,
             'gim'
         )
 

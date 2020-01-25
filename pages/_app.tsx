@@ -80,7 +80,7 @@ class DiscussionApp extends App {
                         openGraph={{
                             type: 'website',
                             locale: 'en_US',
-                            url: 'https://www.beta.discussions.app/',
+                            url: 'https://www.discussions.app/',
                             site_name: 'Discussions App',
                             images: [
                                 {

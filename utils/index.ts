@@ -761,3 +761,7 @@ export const useInterval = (callback, delay) => {
         }
     }, [delay])
 }
+
+export const escapeRegExp = (string) => {
+    return string.replace(/[|\\{}()[\]^$+*?.-]/g, '\\$&'); // $& means the whole matched string
+}
