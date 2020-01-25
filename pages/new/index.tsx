@@ -72,12 +72,18 @@ class NewPage extends React.Component<INewPageProps, INewPageState> {
                 <div className={'flex flex-row items-center mb3'}>
                     <span className={'w-20 black f4 b'}>Create a post in</span>
                     <TagDropdown
-                        formatCreateLabel={inputValue => `Make a new post in #${inputValue}`}
+                        formatCreateLabel={inputValue =>
+                            `Make a new post in #${
+                                inputValue.indexOf('#') !== -1
+                                    ? inputValue.split('#')[1]
+                                    : inputValue
+                            }`
+                        }
                         onChange={this.onChange}
                         className={'w-80'}
                         value={newPostData.sub}
                         options={subFields.extra.options}
-                        placeholder={'Enter a tag name or pick from one your subscribed below'}
+                        placeholder={'Select or type tag name...'}
                     />
                 </div>
                 <div className={'card pa4'}>
