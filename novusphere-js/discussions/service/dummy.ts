@@ -2402,20 +2402,4 @@ export default class DummyService {
       ]
     }
   }
-
-  async getUser(_username: string) {
-     return {
-       comments: [], // comment interface
-       threads: [], // Post[]
-       blogs: [], // what is this meant for?
-       followers: 50,
-       balances: [
-         {
-           token: 'ATMOS',
-           amount: 100
-         }
-       ],
-       lastActivity: Date.now()
-     }
-  }
 }

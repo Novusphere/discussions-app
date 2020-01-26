@@ -344,6 +344,15 @@ export default class DiscussionsService {
         return op.totalReplies
     }
 
+    async getUser(pub: string): Promise<{ count: number; pub: string }> {
+        try {
+            const { data } = await axios.get(`${nsdb.api}/discussions/site/profile/${pub}`)
+            return data
+        } catch (error) {
+            return { count: 0, pub }
+        }
+    }
+
     async getThread(_id: string, pubKey: string, key = ''): Promise<Thread | null> {
         let dId = Post.decodeId(_id)
 
@@ -410,7 +419,7 @@ export default class DiscussionsService {
         cursorId = undefined,
         count = 0,
         limit = 20,
-        key = '',
+        key = ''
     ): Promise<{
         posts: Post[]
         cursorId: number

@@ -1,5 +1,5 @@
 import * as React from 'react'
-import { dummy, Post } from '@novuspherejs'
+import { discussions, dummy, Post } from '@novuspherejs'
 import { IStores } from '@stores'
 import { inject, observer } from 'mobx-react'
 import { Tab, Tabs, TabList, TabPanel } from 'react-tabs'
@@ -16,7 +16,7 @@ interface IUPageProps {
     tagStore: IStores['tagStore']
     uiStore: IStores['uiStore']
 
-    data: any
+    followers: number
 
     username: string
     uidw: string
@@ -30,8 +30,9 @@ interface IUPageProps {
 class U extends React.Component<IUPageProps> {
     static async getInitialProps({ query, store }) {
         const postsStore: IStores['postsStore'] = store.postsStore
-        const data = await dummy.getUser(query.username)
         const [username, pub] = query.username.split('-')
+        const data = await discussions.getUser(pub)
+        const followers = data.count
         const icon = getIdenticon(pub)
 
         postsStore.resetPositionAndPosts()
@@ -49,7 +50,7 @@ class U extends React.Component<IUPageProps> {
             icon,
             username,
             pub,
-            data,
+            followers,
         }
     }
 
@@ -120,6 +121,7 @@ class U extends React.Component<IUPageProps> {
             username,
             pub,
             uidw,
+            followers,
             postsStore: { getPlausibleTagOptions },
             userStore: {
                 delegated,
@@ -142,7 +144,7 @@ class U extends React.Component<IUPageProps> {
                     />
                     <div className={'flex flex-column items-start justify-center'}>
                         <span className={'b black f5 mb2'}>{username}</span>
-                        <span className={'b f6 mb2'}>192 Followers</span>
+                        <span className={'b f6 mb2'}>{followers} Followers</span>
                         {!this.isSameUser && (
                             <button
                                 title={isFollowingUser(pub) ? 'Unfollow user' : 'Follow user'}
