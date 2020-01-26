@@ -52,9 +52,6 @@ class EditorComponent extends React.Component<IEditorProps> {
         const Autoformat = autoformat.default
         const Hashtag = autoformat.Hashtag
 
-        const eosTip = await import('@modules/eos-tip/src/eos.tip.js')
-        const EosTip = eosTip.default
-
         const blockEmbedLink = await import('quill-magic-url')
         const MagicUrl = blockEmbedLink.default
 
