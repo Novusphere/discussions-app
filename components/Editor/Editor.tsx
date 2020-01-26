@@ -5,6 +5,8 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { faSpinner } from '@fortawesome/free-solid-svg-icons'
 import sanitizeHTML from 'sanitize-html'
 import dynamic from 'next/dynamic'
+import axios from 'axios'
+import { nsdb } from '@novuspherejs'
 
 interface IEditorProps {
     postsStore?: IStores['postsStore']
@@ -164,6 +166,43 @@ class EditorComponent extends React.Component<IEditorProps> {
         )
     }
 
+    private handleImageUpload = async () => {
+        const input = document.createElement('input')
+
+        input.setAttribute('type', 'file')
+        input.click()
+
+        // Once file is selected.
+        input.onchange = async () => {
+            const file = input.files[0]
+
+            // Validate file type is an image.
+            if (/^image\//.test(file.type)) {
+                // Create form.
+                const formData = new FormData()
+                formData.append('image', file)
+
+                // Upload image to AWS via app route handler.
+                const { data } = await axios.post(`${nsdb.api}/discussions/upload`, formData, {
+                    headers: {
+                        'Content-Type': 'multipart/form-data',
+                    },
+                })
+
+                const ref = this.ref.current.getEditor()
+
+                // Get the current cursor position.
+                const range = ref.getSelection()
+                const url = `${nsdb.api}/discussions/upload/image/${data.filename}`
+
+                ref.insertText(range.index, url)
+
+                // Move the cursor past the image.
+                ref.setSelection(range.index + url.length)
+            }
+        }
+    }
+
     public render(): React.ReactNode {
         if (!this.state.loaded) {
             return <FontAwesomeIcon width={13} icon={faSpinner} spin />
@@ -187,11 +226,16 @@ class EditorComponent extends React.Component<IEditorProps> {
                     autoformat: this.modules.autoformat,
                     mention: this.modules.mention,
                     magicUrl: true,
-                    toolbar: [
-                        [{ header: 1 }, { header: 2 }], // custom button values
-                        [{ list: 'ordered' }, { list: 'bullet' }],
-                        ['bold', 'italic', 'blockquote', 'link', 'image'],
-                    ],
+                    toolbar: {
+                        container: [
+                            [{ header: 1 }, { header: 2 }], // custom button values
+                            [{ list: 'ordered' }, { list: 'bullet' }],
+                            ['bold', 'italic', 'blockquote', 'link', 'image'],
+                        ],
+                        handlers: {
+                            image: this.handleImageUpload,
+                        },
+                    },
                 }}
             />
         )

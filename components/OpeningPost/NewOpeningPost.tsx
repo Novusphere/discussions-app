@@ -407,6 +407,7 @@ class NewOpeningPost extends React.Component<
         const reply = await this.props.postsStore.activeThread.openingPostReplyModel.onSubmit(
             this.props.postsStore.activeThread
         )
+
         reply.imageData = getIdenticon(this.props.authStore.activePublicKey)
         reply.myVote = [{ value: 1 }]
         this.props.addReplies(reply)
