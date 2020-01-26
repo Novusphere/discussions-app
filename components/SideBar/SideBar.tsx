@@ -195,8 +195,8 @@ class SideBar extends React.Component<ITagListOuterProps & ITagListInnerProps, I
             router,
             settingsStore: { loadSettings },
             tagStore: {
+                tagModelFromObservables,
                 tagGroup,
-                subscribedSubsAsModels,
                 subSubscriptionStatus,
                 toggleTagSubscribe,
             },
@@ -254,16 +254,16 @@ class SideBar extends React.Component<ITagListOuterProps & ITagListInnerProps, I
                         </span>
                     </div>
                 )}
-                {subscribedSubsAsModels
-                    .filter(tag => !tag.root)
-                    .map((tag, index) => (
+                {subSubscriptionStatus.map(tag => {
+                    const model = tagModelFromObservables(tag)
+                    return (
                         <li
-                            key={tag.id}
+                            key={model.id}
                             className={classNames([
                                 'ph3',
                                 {
-                                    dim: router.query.name !== tag.name,
-                                    'sidebar-link-active': router.query.name === tag.name,
+                                    dim: router.query.name !== model.name,
+                                    'sidebar-link-active': router.query.name === model.name,
                                 },
                             ])}
                         >
@@ -273,9 +273,9 @@ class SideBar extends React.Component<ITagListOuterProps & ITagListInnerProps, I
                                 interactive
                                 html={
                                     <TagPreview
-                                        tag={tag}
+                                        tag={model}
                                         isSubscribed={
-                                            subSubscriptionStatus.indexOf(tag.name) !== -1
+                                            subSubscriptionStatus.indexOf(model.name) !== -1
                                         }
                                         toggleSubscribe={toggleTagSubscribe}
                                     />
@@ -291,14 +291,15 @@ class SideBar extends React.Component<ITagListOuterProps & ITagListInnerProps, I
                                 distance={350}
                                 trigger={'mouseenter focus'}
                             >
-                                <Link href={`/tag/[name]`} as={`/tag/${tag.name}`}>
+                                <Link href={`/tag/[name]`} as={`/tag/${model.name}`}>
                                     <a className={'flex items-center mb1 pv1 pointer'}>
-                                        {this.renderTagLi(tag)}
+                                        {this.renderTagLi(model)}
                                     </a>
                                 </Link>
                             </Tooltip>
                         </li>
-                    ))}
+                    )
+                })}
             </>
         )
     }
@@ -308,7 +309,7 @@ class SideBar extends React.Component<ITagListOuterProps & ITagListInnerProps, I
             className,
             router,
             settingsStore: { loadSettings },
-            tagStore: { tags, subscribedSubsAsModels, subSubscriptionStatus, toggleTagSubscribe },
+            tagStore: { tags, subSubscriptionStatus, toggleTagSubscribe },
         } = this.props
 
         return (

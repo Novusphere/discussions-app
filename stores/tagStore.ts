@@ -6,6 +6,7 @@ import { persist } from 'mobx-persist'
 import { defaultSubs } from '@utils'
 import { getUiStore, IStores } from '@stores/index'
 import { faHome, faListAlt, faNewspaper } from '@fortawesome/free-solid-svg-icons'
+import { computedFn } from 'mobx-utils'
 
 export default class TagStore extends BaseStore {
     // the amount of subs that are base
@@ -28,7 +29,7 @@ export default class TagStore extends BaseStore {
         this.setTopLevelTags()
 
         // hard code tags
-        this.initializeDefaultSubs()
+        // this.initializeDefaultSubs()
 
         // subscribe everyone to default
         // this.subscribeToDefaultSubs()
@@ -68,24 +69,43 @@ export default class TagStore extends BaseStore {
         })
     }
 
-    @computed get subscribedSubsAsModels() {
-        const subs = []
-
-        if (!this.tags) {
-            return []
+    tagModelFromObservables = computedFn(name => {
+        console.log({
+            name,
+            size: this.tags.size,
+            tags: this.tags.toJSON(),
+            model: this.tags.get(name),
+        })
+        if (this.tags.has(name)) {
+            return this.tags.get(name)
         }
 
-        this.subSubscriptionStatus.forEach(subName => {
-            if (this.tags.has(subName)) {
-                subs.push(this.tags.get(subName))
-            } else {
-                const model = this.getGenericTag(subName)
-                subs.push(model)
-            }
-        })
+        return this.getGenericTag(name)
+    })
 
-        return subs
-    }
+    // @computed get subscribedSubsAsModels() {
+    //     const subs = []
+    //
+    //     if (!this.tags) {
+    //         return []
+    //     }
+    //
+    //     this.subSubscriptionStatus.forEach(subName => {
+    //         console.log(subName)
+    //         console.log(this.tagInfoFromDB.get(subName))
+    //
+    //         if (this.tagInfoFromDB.has(subName)) {
+    //             subs.push(this.tagInfoFromDB.get(subName))
+    //         } else if (this.tags.has(subName)) {
+    //             subs.push(this.tags.get(subName))
+    //         } else {
+    //             const model = this.getGenericTag(subName)
+    //             subs.push(model)
+    //         }
+    //     })
+    //
+    //     return subs
+    // }
 
     @action.bound
     addTag(tagName: string, cb?: any) {
@@ -114,6 +134,8 @@ export default class TagStore extends BaseStore {
     public setActiveTag(tagName: string): TagModel {
         if (!this.tags.has(tagName)) {
             this.activeTag = this.getGenericTag(tagName)
+        } else if (this.tags.has(tagName)) {
+            this.activeTag = this.tags.get(tagName)
         } else {
             if (defaultSubs.some(defaultSub => defaultSub.name === tagName)) {
                 let tagModel

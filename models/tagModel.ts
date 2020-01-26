@@ -13,8 +13,6 @@ export class TagModel extends BaseModel {
     @observable root = false
     @observable url = ''
 
-    // TODO: Real-data
-
     @observable memberCount = 5000
     @observable tagDescription = `Here is some intro text about this community. Lorem ipsum.`
 
@@ -24,6 +22,10 @@ export class TagModel extends BaseModel {
         this.name = tag.name
         this.url = tag.url
         this.icon = tag.logo
+
+        if (tag.tagDescription) {
+            this.tagDescription = tag.tagDescription
+        }
 
         if (opts && opts.url) {
             this.url = opts.url

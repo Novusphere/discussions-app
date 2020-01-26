@@ -10,6 +10,7 @@ import { discussions, eos, nsdb } from '@novuspherejs'
 import ecc from 'eosjs-ecc'
 import { ModalOptions } from '@globals'
 import _ from 'lodash'
+import { TagModel } from '@models/tagModel'
 
 const fileDownload = require('js-file-download')
 
@@ -119,6 +120,7 @@ export default class SettingsStore extends BaseStore {
 
         if (isDev) host = 'discussions.app'
         const settings = setting[host]
+        const tags = settings['tags']
         const tagGroups = settings['defaultTagsGroups']
         const moderators = settings['defaultModerators']
 
@@ -144,6 +146,19 @@ export default class SettingsStore extends BaseStore {
             _.forEach(tagGroups, group => {
                 const [key] = Object.keys(group)
                 this.tagStore.setTagGroup(key, group[key])
+            })
+        }
+
+        if (tags) {
+            _.forEach(tags, (tag, name) => {
+                console.log('setting name', name)
+                const model = new TagModel({
+                    name: name,
+                    logo: tag.icon,
+                    tagDescription: tag.desc,
+                })
+                console.log('made model', model)
+                this.tagStore.tags.set(name, model)
             })
         }
     }
@@ -680,8 +695,8 @@ export default class SettingsStore extends BaseStore {
         return new CreateForm(
             {
                 onError: (form, message) => {
-                  this.uiStore.hideModal()
-                  this.uiStore.showToast(message, 'error')
+                    this.uiStore.hideModal()
+                    this.uiStore.showToast(message, 'error')
                 },
                 onSubmit: async form => {
                     if (form.isValid) {
