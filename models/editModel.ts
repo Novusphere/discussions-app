@@ -45,7 +45,10 @@ class EditModel {
 
         // this is a fix for removing zero-width characters from a js string
         const _content = content.replace(/[\u200B-\u200D\uFEFF]/g, '')
-        const regex = new RegExp(`\[#tip\](.*?)\\s(?<amount>[0-9\.]+)\\s(?<symbol>${tokens})(?:\\s\\[\\@(?<username>.*?)\\]\\((?<url>.*?)\\))?`, 'gim')
+        const regex = new RegExp(
+            `\[#tip\](.*?)\\s(?<amount>[0-9\.]+)\\s(?<symbol>${tokens})(?:\\s\\[\\@(?<username>.*?)\\]\\((?<url>.*?)\\))?`,
+            'gim'
+        )
 
         let results = matchAll(_content, regex)
         let tips = []
@@ -151,6 +154,12 @@ class EditModel {
                     value: value,
                 }).data
             }
+
+            let tips = this.inlineTips
+
+            if (tips && tips.length) {
+                reply.transfers = tips
+            }
         }
 
         const posterName = this.posterName
@@ -170,12 +179,6 @@ class EditModel {
         if (tags && tags.length) {
             tags = tags.map(tag => tag.replace('#', ''))
             reply.tags = [...reply.tags, ...tags]
-        }
-
-        let tips = this.inlineTips
-
-        if (tips && tips.length) {
-            reply.transfers = tips
         }
 
         return reply

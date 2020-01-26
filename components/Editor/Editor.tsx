@@ -157,7 +157,10 @@ class EditorComponent extends React.Component<IEditorProps> {
         // https://github.com/Novusphere/discussions-app/issues/169
         // this might have to be re-visited
         this.props.onChange(
-            markdown.replace(/[\u200B-\u200D\uFEFF]/g, '').replace('#tip[]', '[#tip]')
+            markdown
+                .replace(/[\u200B-\u200D\uFEFF]/g, '')
+                .replace('#tip[]', '[#tip]')
+                .replace('[](https://discussions.app/tag/tip)', '')
         )
     }
 
