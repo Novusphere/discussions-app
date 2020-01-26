@@ -146,9 +146,9 @@ class SideBar extends React.Component<ITagListOuterProps & ITagListInnerProps, I
                         <span className={'b black f6'}>#{activeTag.name}</span>
                     </span>
 
-                    <span className={'flex row fa5 mt2 f5'}>{activeTag.memberCount} Members</span>
+                    {activeTag.memberCount !== undefined && <span className={'flex row fa5 mt2 f5'}>{activeTag.memberCount} Members</span>}
 
-                    <span className={'flex row black mt2 f6'}>{activeTag.tagDescription}</span>
+                    {activeTag.tagDescription !== undefined && <span className={'flex row black mt2 f6'}>{activeTag.tagDescription}</span>}
 
                     <div className={'flex flex-column items-center justify-center mt3'}>
                         <button

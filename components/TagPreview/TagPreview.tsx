@@ -26,9 +26,9 @@ const TagPreview: React.FC<ITagPreviewProps> = ({ tag, isSubscribed, toggleSubsc
                     </a>
                 </Link>
 
-                {tag.tagDescription.length > 0 && <span className={'flex row black mt2 f6 tl'}>{tag.tagDescription}</span>}
+                {tag.tagDescription !== undefined && <span className={'flex row black mt2 f6 tl'}>{tag.tagDescription}</span>}
 
-                {typeof tag.memberCount !== 'undefined' && <span className={'flex row fa5 mt2 f5'}>{tag.memberCount} Members</span>}
+                {tag.memberCount !== undefined && <span className={'flex row fa5 mt2 f5'}>{tag.memberCount} Members</span>}
                 <div className={'flex flex-column items-center justify-center mt3'}>
                     <button className={'w-100 mb2'} onClick={() => toggleSubscribe(tag.name)}>
                         {isSubscribed ? 'Unsubscribe' : 'Subscribe'}

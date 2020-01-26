@@ -153,7 +153,12 @@ class EditorComponent extends React.Component<IEditorProps> {
             },
         })
         const markdown = this.turndownService.turndown(clean)
-        this.props.onChange(markdown)
+
+        // https://github.com/Novusphere/discussions-app/issues/169
+        // this might have to be re-visited
+        this.props.onChange(
+            markdown.replace(/[\u200B-\u200D\uFEFF]/g, '').replace('#tip[]', '[#tip]')
+        )
     }
 
     public render(): React.ReactNode {

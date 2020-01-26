@@ -13,7 +13,7 @@ export class TagModel extends BaseModel {
     @observable url = ''
 
     @observable memberCount = undefined
-    @observable tagDescription = ``
+    @observable tagDescription = undefined
 
     constructor(tag, opts?: TagOptions) {
         super()
