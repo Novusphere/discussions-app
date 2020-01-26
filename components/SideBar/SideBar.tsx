@@ -113,7 +113,25 @@ class SideBar extends React.Component<ITagListOuterProps & ITagListInnerProps, I
     }
 
     private renderActiveTag = () => {
-        const { activeTag, toggleTagSubscribe, subSubscriptionStatus } = this.props.tagStore
+        const { loadSettings } = this.props.settingsStore
+        const {
+            toggleTagSubscribe,
+            subSubscriptionStatus,
+            tagModelFromObservables,
+            activeSlug,
+        } = this.props.tagStore
+        const activeTag = tagModelFromObservables(activeSlug)
+
+        if (loadSettings['pending']) {
+            return (
+                <div
+                    className={'card flex flex-row items-center justify-center'}
+                    style={{ height: '230px' }}
+                >
+                    <FontAwesomeIcon icon={faSpinner} spin />
+                </div>
+            )
+        }
 
         if (activeTag) {
             const isSubbed = subSubscriptionStatus.indexOf(activeTag.name) !== -1
@@ -291,7 +309,11 @@ class SideBar extends React.Component<ITagListOuterProps & ITagListInnerProps, I
                                 distance={350}
                                 trigger={'mouseenter focus'}
                             >
-                                <Link href={`/tag/[name]`} as={`/tag/${model.name}`}>
+                                <Link
+                                    href={`/tag/[name]`}
+                                    as={`/tag/${model.name}`}
+                                    shallow={false}
+                                >
                                     <a className={'flex items-center mb1 pv1 pointer'}>
                                         {this.renderTagLi(model)}
                                     </a>

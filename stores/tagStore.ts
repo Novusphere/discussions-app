@@ -15,6 +15,7 @@ export default class TagStore extends BaseStore {
     private readonly uiStore: IStores['uiStore'] = getUiStore()
 
     @observable activeTag: TagModel = null
+    @observable activeSlug = ''
     tags = observable.map<string, TagModel>()
     tagGroup = observable.map<string, string[]>()
 
@@ -70,42 +71,14 @@ export default class TagStore extends BaseStore {
     }
 
     tagModelFromObservables = computedFn(name => {
-        console.log({
-            name,
-            size: this.tags.size,
-            tags: this.tags.toJSON(),
-            model: this.tags.get(name),
-        })
+        if (name === '') return null
+
         if (this.tags.has(name)) {
             return this.tags.get(name)
         }
 
         return this.getGenericTag(name)
     })
-
-    // @computed get subscribedSubsAsModels() {
-    //     const subs = []
-    //
-    //     if (!this.tags) {
-    //         return []
-    //     }
-    //
-    //     this.subSubscriptionStatus.forEach(subName => {
-    //         console.log(subName)
-    //         console.log(this.tagInfoFromDB.get(subName))
-    //
-    //         if (this.tagInfoFromDB.has(subName)) {
-    //             subs.push(this.tagInfoFromDB.get(subName))
-    //         } else if (this.tags.has(subName)) {
-    //             subs.push(this.tags.get(subName))
-    //         } else {
-    //             const model = this.getGenericTag(subName)
-    //             subs.push(model)
-    //         }
-    //     })
-    //
-    //     return subs
-    // }
 
     @action.bound
     addTag(tagName: string, cb?: any) {
@@ -128,31 +101,48 @@ export default class TagStore extends BaseStore {
     @action.bound
     public destroyActiveTag() {
         this.activeTag = null
+        this.activeSlug = ''
     }
 
-    @task
+    @action.bound
+    setActiveSlug(slug: string) {
+        this.activeSlug = slug
+    }
+
+    @action.bound
     public setActiveTag(tagName: string): TagModel {
-        if (!this.tags.has(tagName)) {
-            this.activeTag = this.getGenericTag(tagName)
-        } else if (this.tags.has(tagName)) {
-            this.activeTag = this.tags.get(tagName)
+        let model = null
+
+        if (this.tags.has(tagName)) {
+            model = this.tags.get(tagName)
         } else {
-            if (defaultSubs.some(defaultSub => defaultSub.name === tagName)) {
-                let tagModel
-
-                if (!this.tags.get(tagName)) {
-                    tagModel = new TagModel(tagName)
-                    this.tags.set(tagName, tagModel)
-                } else {
-                    tagModel = this.tags.get(tagName)
-                }
-
-                this.activeTag = tagModel
-                return tagModel
-            }
+            model = this.getGenericTag(tagName)
         }
 
-        return null
+        this.activeTag = model
+
+        return model
+        // if (!this.tags.has(tagName)) {
+        //     this.activeTag = this.getGenericTag(tagName)
+        // } else if (this.tags.has(tagName)) {
+        //     this.activeTag = this.tags.get(tagName)
+        // } else {
+        //     if (defaultSubs.some(defaultSub => defaultSub.name === tagName)) {
+        //         let tagModel
+        //
+        //         if (!this.tags.get(tagName)) {
+        //             tagModel = new TagModel(tagName)
+        //             this.tags.set(tagName, tagModel)
+        //         } else {
+        //             tagModel = this.tags.get(tagName)
+        //         }
+        //
+        //         this.activeTag = tagModel
+        //         return tagModel
+        //     }
+        // }
+        //
+        // return null
     }
 
     private setTopLevelTags = () => {

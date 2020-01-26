@@ -44,6 +44,7 @@ class E extends React.Component<IEPageProps, IEPageState> {
 
     componentWillMount(): void {
         this.props.tagStore.setActiveTag(this.props.query.name)
+        this.props.tagStore.setActiveSlug(this.props.query.name)
         this.props.uiStore.toggleBannerStatus(true)
         this.props.uiStore.toggleSidebarStatus(true)
     }

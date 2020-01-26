@@ -22,13 +22,20 @@ interface ITagPageState {}
 @inject('tagStore', 'postsStore', 'uiStore')
 @observer
 class Tag extends React.Component<ITagProps, ITagPageState> {
+    state = {
+        isFirstRender: false,
+    }
+
     static async getInitialProps({ query, store }) {
         const postsStore: IStores['postsStore'] = store.postsStore
         const tagStore: IStores['tagStore'] = store.tagStore
         const tag = query.name
 
         tagStore.setActiveTag(tag)
+        tagStore.setActiveSlug(tag)
         postsStore.resetPositionAndPosts()
+
+        postsStore.getPostsByTag([tag])
 
         return {
             tag,
@@ -36,15 +43,24 @@ class Tag extends React.Component<ITagProps, ITagPageState> {
     }
 
     componentWillMount(): void {
-        this.props.tagStore.setActiveTag(this.props.tag)
         this.props.uiStore.toggleBannerStatus(true)
         this.props.uiStore.toggleSidebarStatus(true)
     }
 
     componentDidMount(): void {
         window.scrollTo(0, 0)
+        if (!this.state.isFirstRender) {
+            this.props.tagStore.setActiveTag(this.props.tag)
+            this.props.tagStore.setActiveSlug(this.props.tag)
+            this.props.postsStore.getPostsByTag([this.props.tag])
+            this.setState({
+                isFirstRender: true,
+            })
+        }
+    }
 
-        this.props.postsStore.getPostsByTag([this.props.tag])
+    componentWillUnmount(): void {
+        this.props.tagStore.destroyActiveTag()
     }
 
     public render() {
@@ -55,7 +71,6 @@ class Tag extends React.Component<ITagProps, ITagPageState> {
                 tag,
             },
         } = this
-
 
         return (
             <>

@@ -9,12 +9,11 @@ interface TagOptions {
 export class TagModel extends BaseModel {
     @observable name = ''
     @observable icon = ''
-    @observable active = false
     @observable root = false
     @observable url = ''
 
-    @observable memberCount = 5000
-    @observable tagDescription = `Here is some intro text about this community. Lorem ipsum.`
+    @observable memberCount = undefined
+    @observable tagDescription = ``
 
     constructor(tag, opts?: TagOptions) {
         super()
@@ -23,8 +22,12 @@ export class TagModel extends BaseModel {
         this.url = tag.url
         this.icon = tag.logo
 
-        if (tag.tagDescription) {
+        if (tag.hasOwnProperty('tagDescription')) {
             this.tagDescription = tag.tagDescription
+        }
+
+        if (tag.hasOwnProperty('memberCount')) {
+            this.memberCount = tag.memberCount
         }
 
         if (opts && opts.url) {
@@ -36,9 +39,5 @@ export class TagModel extends BaseModel {
                 this[opt] = opts[opt]
             })
         }
-    }
-
-    @action setActive = () => {
-        this.active = !this.active
     }
 }

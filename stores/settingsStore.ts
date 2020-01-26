@@ -150,16 +150,20 @@ export default class SettingsStore extends BaseStore {
         }
 
         if (tags) {
-            _.forEach(tags, (tag, name) => {
-                console.log('setting name', name)
-                const model = new TagModel({
-                    name: name,
-                    logo: tag.icon,
-                    tagDescription: tag.desc,
+            await Promise.all(
+                _.map(tags, async (tag, name) => {
+                    const { data: members } = await axios.get(
+                        `${nsdb.api}/discussions/site/members/${name}`
+                    )
+                    const model = new TagModel({
+                        name: name,
+                        logo: tag.icon,
+                        tagDescription: tag.desc,
+                        memberCount: members.count,
+                    })
+                    this.tagStore.tags.set(name, model)
                 })
-                console.log('made model', model)
-                this.tagStore.tags.set(name, model)
-            })
+            )
         }
     }
 
