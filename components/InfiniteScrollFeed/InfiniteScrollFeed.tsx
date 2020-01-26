@@ -61,7 +61,7 @@ class InfiniteScrollFeed extends React.Component<
             withAnchorUid,
             children,
             uiStore,
-            tagStore: { tags },
+            tagStore: { tagModelFromObservables },
             authStore: { supportedTokensImages, postPriv },
             settingsStore: { blockedContentSetting, unsignedPostsIsSpam },
             userStore: { blockedPosts, blockedUsers, blockedByDelegation },
@@ -82,11 +82,7 @@ class InfiniteScrollFeed extends React.Component<
                                   post={post as any}
                                   tokenImages={supportedTokensImages}
                                   key={post.uuid}
-                                  tag={
-                                      typeof tagModel !== 'undefined'
-                                          ? tagModel
-                                          : tags.get(post.sub)
-                                  }
+                                  tag={tagModelFromObservables(post.sub)}
                                   showToast={uiStore.showToast}
                                   postPriv={postPriv}
                                   voteHandler={post.vote}

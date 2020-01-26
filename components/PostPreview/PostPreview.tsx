@@ -209,7 +209,7 @@ const PostPreview: React.FC<IPostPreviewProps> = ({
                               )}
                     </div>
 
-                    <span className={'no-style w-100'}>
+                    <div className={'no-style w-100'}>
                         <div className={'flex flex-column post-content w-100'}>
                             {shouldBeCollapsed && (
                                 <span className={'silver'}>This post was marked as spam.</span>
@@ -219,32 +219,34 @@ const PostPreview: React.FC<IPostPreviewProps> = ({
                                     <div className={'db'}>
                                         <div
                                             className={
-                                                'flex f6 lh-copy black items-center flex-wrap'
+                                                'flex flex-row f6 lh-copy black items-center flex-wrap justify-between'
                                             }
                                         >
-                                            {tag && (
-                                                <img
-                                                    src={tag.icon}
-                                                    title={`${tag.name} icon`}
-                                                    className={'tag-image'}
+                                            <span className={'flex flex-row items-center'}>
+                                                {tag && (
+                                                    <img
+                                                        src={tag.icon}
+                                                        title={`${tag.name} icon`}
+                                                        className={'tag-image'}
+                                                    />
+                                                )}
+                                                <span className={'b ttu'}>{post.sub}</span>
+                                                <span className={'ph1 b'}>&#183;</span>
+                                                <UserNameWithIcon
+                                                    imageData={post.imageData}
+                                                    pub={post.pub}
+                                                    name={post.displayName}
+                                                    imageSize={20}
                                                 />
-                                            )}
-                                            <span className={'b ttu'}>{post.sub}</span>
-                                            <span className={'ph1 b'}>&#183;</span>
-                                            <UserNameWithIcon
-                                                imageData={post.imageData}
-                                                pub={post.pub}
-                                                name={post.displayName}
-                                                imageSize={20}
-                                            />
-                                            <span className={'ph1 b'}>&#183;</span>
-                                            <span
-                                                className={'o-50'}
-                                                title={moment(post.createdAt)
-                                                    .toDate()
-                                                    .toLocaleString()}
-                                            >
-                                                {moment(post.createdAt).fromNow()}
+                                                <span className={'ph1 b'}>&#183;</span>
+                                                <span
+                                                    className={'o-50'}
+                                                    title={moment(post.createdAt)
+                                                        .toDate()
+                                                        .toLocaleString()}
+                                                >
+                                                    {moment(post.createdAt).fromNow()}
+                                                </span>
                                             </span>
                                             <Tips tokenImages={tokenImages} tips={post.tips} />
                                         </div>
@@ -281,7 +283,7 @@ const PostPreview: React.FC<IPostPreviewProps> = ({
                                 </>
                             )}
                         </div>
-                    </span>
+                    </div>
                 </div>
             </a>
         </Link>

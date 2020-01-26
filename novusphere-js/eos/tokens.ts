@@ -15,8 +15,7 @@ export interface IAccountBalance {
 
 export async function getTokens() : Promise<IToken[]> {
     const TOKEN_ENDPOINTS = [
-        "https://raw.githubusercontent.com/eoscafe/eos-airdrops/master/tokens.json",
-        "https://raw.githubusercontent.com/Novusphere/eos-forum-settings/master/tokens.json"
+       "http://atmosdb.novusphere.io/discussions/site/tokens"
     ];
     
     let tokens : IToken[] = [];

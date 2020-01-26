@@ -258,35 +258,41 @@ class NewOpeningPost extends React.Component<
             <div data-post-uuid={openingPost.uuid}>
                 <div className={'opening-post card'}>
                     <div className={'post-content'}>
-                        <div className={'flex items-center pb2'}>
-                            <Link href={`/tag/[name]`} as={`/tag/${openingPost.sub}`}>
-                                <a>
-                                    <span className={'b'}>{openingPost.sub}</span>
-                                </a>
-                            </Link>
-                            <span className={'ph1 b'}>&#183;</span>
-                            <UserNameWithIcon
-                                pub={openingPost.pub}
-                                imageData={openingPost.imageData}
-                                name={openingPost.displayName}
-                                imageSize={20}
-                            />
-                            <span className={'ph1 b'}>&#183;</span>
-                            <span
-                                title={moment(
-                                    openingPost.edit ? openingPost.editedAt : openingPost.createdAt
-                                ).format('YYYY-MM-DD HH:mm:ss')}
-                            >
-                                {openingPost.edit && 'edited '}{' '}
-                                {moment(
-                                    openingPost.edit ? openingPost.editedAt : openingPost.createdAt
-                                ).fromNow()}
-                            </span>
+                        <div className={'flex flex-row justify-between'}>
+                            <div className={'flex flex-row items-center'}>
+                                <Link href={`/tag/[name]`} as={`/tag/${openingPost.sub}`}>
+                                    <a>
+                                        <span className={'b'}>{openingPost.sub}</span>
+                                    </a>
+                                </Link>
+                                <span className={'ph1 b'}>&#183;</span>
+                                <UserNameWithIcon
+                                    pub={openingPost.pub}
+                                    imageData={openingPost.imageData}
+                                    name={openingPost.displayName}
+                                    imageSize={20}
+                                />
+                                <span className={'ph1 b'}>&#183;</span>
+                                <span
+                                    title={moment(
+                                        openingPost.edit
+                                            ? openingPost.editedAt
+                                            : openingPost.createdAt
+                                    ).format('YYYY-MM-DD HH:mm:ss')}
+                                >
+                                    {openingPost.edit && 'edited '}{' '}
+                                    {moment(
+                                        openingPost.edit
+                                            ? openingPost.editedAt
+                                            : openingPost.createdAt
+                                    ).fromNow()}
+                                </span>
+                            </div>
                             <Tips tokenImages={supportedTokensImages} tips={openingPost.tips} />
                         </div>
 
                         {!this.state.threadEditing && (
-                            <div className={'flex justify-between items-center pb1'}>
+                            <div className={'flex justify-between items-center mv3'}>
                                 <span className={'black f4 b'}>{openingPost.title}</span>
                                 <VotingHandles
                                     uuid={openingPost.uuid}
