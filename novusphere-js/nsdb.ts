@@ -66,7 +66,7 @@ export class NSDB {
     }
 
     async cors(url: string) {
-        const request = await axios.get(`https://db.novusphere.io/service/cors/?${url}`)
+        const request = await axios.get(`https://atmosdb.novusphere.io/cors?${url}`)
         const result = request.data
         return result
     }
