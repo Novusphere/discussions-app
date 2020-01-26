@@ -181,68 +181,76 @@ const PostPreview: React.FC<IPostPreviewProps> = ({
     }
 
     return (
-        <div
-            className={'post-preview'}
-            data-url={url}
-            style={{
-                opacity: isSpam && blockedContentSetting === 'collapsed' ? 0.5 : 1,
-            }}
-        >
-            <div className={'flex flex-auto'}>
-                <div
-                    className={
-                        'bg-light-gray flex tc justify-center ph2 pv4 relative z-2 flex-auto'
-                    }
-                    style={{ width: '40px' }}
-                >
-                    {disableVoteHandler || isSpam
-                        ? null
-                        : post && (
-                              <VotingHandles
-                                  upVotes={postStore.upvotes}
-                                  downVotes={postStore.downvotes}
-                                  myVote={postStore.myVoteValue}
-                                  uuid={post.uuid}
-                                  handler={postStore.handleVote}
-                              />
-                          )}
-                </div>
-                <Link href={'/tag/[name]/[id]/[title]'} as={url}>
-                    <a className={'no-style w-100'}>
+        <Link href={'/tag/[name]/[id]/[title]'} as={url} passHref={true}>
+            <a
+                className={'post-preview'}
+                data-url={url}
+                style={{
+                    opacity: isSpam && blockedContentSetting === 'collapsed' ? 0.5 : 1,
+                }}
+            >
+                <div className={'flex flex-auto'}>
+                    <div
+                        className={
+                            'bg-light-gray flex tc justify-center ph2 pv4 relative z-2 flex-auto'
+                        }
+                        style={{ width: '40px' }}
+                    >
+                        {disableVoteHandler || isSpam
+                            ? null
+                            : post && (
+                                  <VotingHandles
+                                      upVotes={postStore.upvotes}
+                                      downVotes={postStore.downvotes}
+                                      myVote={postStore.myVoteValue}
+                                      uuid={post.uuid}
+                                      handler={postStore.handleVote}
+                                  />
+                              )}
+                    </div>
+
+                    <span className={'no-style w-100'}>
                         <div className={'flex flex-column post-content w-100'}>
                             {shouldBeCollapsed && (
                                 <span className={'silver'}>This post was marked as spam.</span>
                             )}
                             {!shouldBeCollapsed && (
                                 <>
-                                    <div className={'flex f6 lh-copy black items-center'}>
-                                        {tag && (
-                                            <img
-                                                src={tag.icon}
-                                                title={`${tag.name} icon`}
-                                                className={'tag-image'}
-                                            />
-                                        )}
-                                        <span className={'b ttu'}>{post.sub}</span>
-                                        <span className={'ph1 b'}>&#183;</span>
-                                        <UserNameWithIcon
-                                            imageData={post.imageData}
-                                            pub={post.pub}
-                                            name={post.displayName}
-                                            imageSize={20}
-                                        />
-                                        <span className={'ph1 b'}>&#183;</span>
-                                        <span
-                                            className={'o-50'}
-                                            title={moment(post.createdAt)
-                                                .toDate()
-                                                .toLocaleString()}
+                                    <div className={'db'}>
+                                        <div
+                                            className={
+                                                'flex f6 lh-copy black items-center flex-wrap'
+                                            }
                                         >
-                                            {moment(post.createdAt).fromNow()}
-                                        </span>
-                                        <Tips tokenImages={tokenImages} tips={post.tips} />
+                                            {tag && (
+                                                <img
+                                                    src={tag.icon}
+                                                    title={`${tag.name} icon`}
+                                                    className={'tag-image'}
+                                                />
+                                            )}
+                                            <span className={'b ttu'}>{post.sub}</span>
+                                            <span className={'ph1 b'}>&#183;</span>
+                                            <UserNameWithIcon
+                                                imageData={post.imageData}
+                                                pub={post.pub}
+                                                name={post.displayName}
+                                                imageSize={20}
+                                            />
+                                            <span className={'ph1 b'}>&#183;</span>
+                                            <span
+                                                className={'o-50'}
+                                                title={moment(post.createdAt)
+                                                    .toDate()
+                                                    .toLocaleString()}
+                                            >
+                                                {moment(post.createdAt).fromNow()}
+                                            </span>
+                                            <Tips tokenImages={tokenImages} tips={post.tips} />
+                                        </div>
                                     </div>
-                                    <div className={'flex justify-between items-center pt1 mv2'}>
+
+                                    <div className={'db pt1 mv2'}>
                                         <span className={'black f3 b lh-title'}>{post.title}</span>
                                     </div>
 
@@ -273,10 +281,10 @@ const PostPreview: React.FC<IPostPreviewProps> = ({
                                 </>
                             )}
                         </div>
-                    </a>
-                </Link>
-            </div>
-        </div>
+                    </span>
+                </div>
+            </a>
+        </Link>
     )
 }
 
