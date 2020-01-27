@@ -50,9 +50,9 @@ export default class SyncStore extends BaseStore {
                             this.syncFollowerListWitHDB(data.following)
                         }
 
-                        if (!_.isUndefined(data.pinnedPosts)) {
-                            this.syncPinnedPostsWithDB(data.pinnedPosts)
-                        }
+                        // if (!_.isUndefined(data.pinnedPosts)) {
+                        //     this.syncPinnedPostsWithDB(data.pinnedPosts)
+                        // }
 
                         if (!_.isUndefined(data.watching)) {
                             this.syncWatchingListWithDB(data.watching)
@@ -74,58 +74,68 @@ export default class SyncStore extends BaseStore {
             }
         )
 
-        // sync tag subs
-        reaction(
-            () => this.tagStore.subSubscriptionStatus.length,
-            () => {
-                this.saveDataWithSyncedData({
-                    tags: this.tagStore.subSubscriptionStatus,
-                })
-            }
-        )
-
-        reaction(
-            () => this.notificationsStore.lastCheckedNotifications,
-            lastCheckedNotifications => {
-                this.saveDataWithSyncedData({
-                    lastCheckedNotifications,
-                })
-            }
-        )
-
-        observe(this.userStore.following, change => {
-            const obj: { [key: string]: string } = change.object.toJSON()
-            const mapped = _.map(obj, (name, pub) => {
-                return {
-                    pub,
-                    name,
-                }
-            })
-            this.saveDataWithSyncedData({
-                following: mapped,
-            })
-        })
-
-        observe(this.userStore.watching, change => {
-            this.saveDataWithSyncedData({
-                watching: change.object.toJSON(),
-            })
-        })
-
-        when(
-            () => this.authStore.uidWalletPubKey.length > 0,
-            () => {
-                this.saveDataWithSyncedData({
-                    uidw: this.authStore.activeUidWalletKey,
-                })
-            }
-        )
+        // // sync tag subs
+        // reaction(
+        //     () => this.tagStore.subSubscriptionStatus.length,
+        //     () => {
+        //         this.saveDataWithSyncedData({
+        //             tags: this.tagStore.subSubscriptionStatus,
+        //         })
+        //     }
+        // )
+        //
+        // reaction(
+        //     () => this.notificationsStore.lastCheckedNotifications,
+        //     lastCheckedNotifications => {
+        //         this.saveDataWithSyncedData({
+        //             lastCheckedNotifications,
+        //         })
+        //     }
+        // )
+        //
+        // observe(this.userStore.following, change => {
+        //     const obj: { [key: string]: string } = change.object.toJSON()
+        //     const mapped = _.map(obj, (name, pub) => {
+        //         return {
+        //             pub,
+        //             name,
+        //         }
+        //     })
+        //     this.saveDataWithSyncedData({
+        //         following: mapped,
+        //     })
+        // })
+        //
+        // observe(this.userStore.watching, change => {
+        //     this.saveDataWithSyncedData({
+        //         watching: change.object.toJSON(),
+        //     })
+        // })
+        //
+        // when(
+        //     () => this.authStore.uidWalletPubKey.length > 0,
+        //     () => {
+        //         this.saveDataWithSyncedData({
+        //             uidw: this.authStore.activeUidWalletKey,
+        //         })
+        //     }
+        // )
 
         autorun(() => {
             const { blockedContentSetting, unsignedPostsIsSpam } = this.settingsStore
-            const { blockedUsers, blockedPosts, pinnedPosts } = this.userStore
+            const { activeUidWalletKey } = this.authStore
+            const { blockedUsers, blockedPosts, pinnedPosts, following, watching } = this.userStore
+            const { subSubscriptionStatus } = this.tagStore
+            const { lastCheckedNotifications } = this.notificationsStore
 
-            if (blockedUsers || blockedPosts || blockedContentSetting || pinnedPosts) {
+            if (
+                blockedUsers ||
+                blockedPosts ||
+                blockedContentSetting ||
+                pinnedPosts ||
+                subSubscriptionStatus ||
+                activeUidWalletKey
+            ) {
                 const moderation = {
                     blockedUsers: null,
                     blockedPosts: null,
@@ -133,12 +143,14 @@ export default class SyncStore extends BaseStore {
                     pinnedPosts: null,
                 }
 
+                // deal with blocked users
                 const blockedUsersToSync = []
 
                 blockedUsers.forEach((name, pub) => {
                     blockedUsersToSync.push(`${name}:${pub}`)
                 })
 
+                // deal with blocked posts
                 const blockedPostsToSync = {}
 
                 blockedPosts.forEach((timestamp, uuid) => {
@@ -148,6 +160,7 @@ export default class SyncStore extends BaseStore {
                     })
                 })
 
+                // deal with pinned posts
                 const pinnedPostsToSync = {}
 
                 _.forEach([...pinnedPosts.entries()], ([asPathURL, name]) => {
@@ -158,6 +171,14 @@ export default class SyncStore extends BaseStore {
                         Object.assign(pinnedPostsToSync, {
                             [name]: [asPathURL],
                         })
+                    }
+                })
+
+                // deal with following
+                const followingUsersToSync = _.map(following.toJSON(), (name, pub) => {
+                    return {
+                        pub,
+                        name,
                     }
                 })
 
@@ -176,6 +197,11 @@ export default class SyncStore extends BaseStore {
                 })
 
                 this.saveDataWithSyncedData({
+                    lastCheckedNotifications,
+                    uidw: activeUidWalletKey,
+                    watching: watching.toJSON(),
+                    tags: subSubscriptionStatus,
+                    following: followingUsersToSync,
                     moderation: moderation,
                 })
             }
@@ -228,6 +254,10 @@ export default class SyncStore extends BaseStore {
 
         if (moderation.hasOwnProperty('unsignedPostsIsSpam')) {
             this.settingsStore.setUnsignedPostsAsSpamSetting(moderation.unsignedPostsIsSpam)
+        }
+
+        if (moderation.hasOwnProperty('pinnedPosts')) {
+            this.syncPinnedPostsWithDB(moderation.pinnedPosts)
         }
 
         if (moderation.hasOwnProperty('blockedUsers')) {
