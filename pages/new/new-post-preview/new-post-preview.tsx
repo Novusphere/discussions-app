@@ -1,8 +1,8 @@
 import * as React from 'react'
 import { inject, observer } from 'mobx-react'
 import { IStores } from '@stores'
-import { OpeningPost } from '@components'
 import PostModel from '@models/postModel'
+import {OpeningPost} from '@components'
 
 interface IPostPreviewProps {
     postsStore: IStores['postsStore']

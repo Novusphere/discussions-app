@@ -190,6 +190,7 @@ export default class PostsStore extends BaseStore {
 
     get pinnedPosts() {
         const user = JSON.parse(window.localStorage.getItem('user'))
+        if (!user) return null
         if (user.hasOwnProperty('pinnedPosts')) {
             return user['pinnedPosts']
         }
@@ -210,7 +211,7 @@ export default class PostsStore extends BaseStore {
             let pinnedPosts = []
 
             // get pinned posts to put at the front
-            if (this.pinnedPosts) {
+            if (this.pinnedPosts && Object.keys(this.pinnedPosts).length > 0) {
                 await Promise.all(
                     _.map(this.pinnedPosts, async (name, url) => {
                         if (tags[0] === name) {
