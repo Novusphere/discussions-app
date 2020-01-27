@@ -26,6 +26,7 @@ interface IUPageProps {
 }
 
 interface IUIPageState {
+    followers: number
     posts: any[]
     isFirstRender: boolean
 }
@@ -37,6 +38,7 @@ class U extends React.Component<IUPageProps, IUIPageState> {
         super(props)
 
         this.state = {
+            followers: props.followers,
             posts: props.posts,
             isFirstRender: false,
         }
@@ -92,6 +94,10 @@ class U extends React.Component<IUPageProps, IUIPageState> {
             this.props.uiStore.showToast('You must be logged in follow users', 'error')
             return
         }
+
+        this.setState(prevState => ({
+            followers: prevState.followers + 1,
+        }))
 
         this.props.userStore.toggleUserFollowing(user, pub)
     }
@@ -166,7 +172,7 @@ class U extends React.Component<IUPageProps, IUIPageState> {
                     />
                     <div className={'flex flex-column items-start justify-center'}>
                         <span className={'b black f5 mb2'}>{username}</span>
-                        <span className={'b f6 mb2'}>{followers} Followers</span>
+                        <span className={'b f6 mb2'}>{this.state.followers} Followers</span>
                         {!this.isSameUser && (
                             <button
                                 title={isFollowingUser(pub) ? 'Unfollow user' : 'Follow user'}
@@ -244,7 +250,7 @@ class U extends React.Component<IUPageProps, IUIPageState> {
 
     private renderUsersPosts = () => {
         const { posts } = this.state
-        const { pub, } = this.props
+        const { pub } = this.props
 
         const {
             getPostsForKeys,

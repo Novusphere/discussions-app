@@ -220,7 +220,7 @@ export default class SyncStore extends BaseStore {
 
     @action.bound
     syncPinnedPostsWithDB(posts: any) {
-       return this.userStore.setPinnedPosts(posts)
+        return this.userStore.setPinnedPosts(posts)
     }
 
     @action.bound
