@@ -36,6 +36,9 @@ class Tag extends React.Component<ITagProps, ITagPageState> {
         tagStore.setActiveSlug(tag)
         postsStore.resetPositionAndPosts()
 
+        // keep this when cycling between tags
+        postsStore.getPostsByTag([tag], true)
+
         return {
             tag,
         }
