@@ -10,16 +10,20 @@ import { tweetCurrentPage } from '@utils'
 
 interface ISharePostProps {
     toggleAddAsModerator: () => void
-    toggleBlockPost: (uuid: string) => void
+    toggleBlockPost: (asPathURL: string) => void
+    togglePinPost: (tagName: string, asPathURL: string) => void
     isBlockedPost: boolean
-    id: string
+    asPathURL: string
+    activeSlug: string
 }
 
 const SharePost: React.FC<ISharePostProps> = ({
     toggleBlockPost,
-    id,
+    togglePinPost,
+    asPathURL,
     toggleAddAsModerator,
     isBlockedPost,
+    activeSlug,
 }) => {
     const [inProp, setInProp] = useState(false)
 
@@ -46,13 +50,20 @@ const SharePost: React.FC<ISharePostProps> = ({
                 <div>
                     <span
                         className={'pr3 f6 b0b0b0 dim pointer'}
-                        onClick={() => toggleBlockPost(id)}
+                        onClick={() => toggleBlockPost(asPathURL)}
                     >
                         {isBlockedPost ? 'unmark as spam' : 'mark as spam'}
                     </span>
 
                     <span className={'pr3 f6 b0b0b0 dim pointer'} onClick={toggleAddAsModerator}>
                         set as moderator
+                    </span>
+
+                    <span
+                        className={'pr3 f6 b0b0b0 dim pointer'}
+                        onClick={() => togglePinPost(activeSlug, asPathURL)}
+                    >
+                        pin thread
                     </span>
 
                     <span

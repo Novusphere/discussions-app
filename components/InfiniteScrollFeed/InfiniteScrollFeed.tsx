@@ -81,7 +81,7 @@ class InfiniteScrollFeed extends React.Component<
                               <PostPreview
                                   post={post as any}
                                   tokenImages={supportedTokensImages}
-                                  key={post.uuid}
+                                  key={`${post.uuid}-${post.pinned}`}
                                   tag={tagModelFromObservables(post.sub)}
                                   showToast={uiStore.showToast}
                                   postPriv={postPriv}

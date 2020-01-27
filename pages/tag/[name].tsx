@@ -35,7 +35,7 @@ class Tag extends React.Component<ITagProps, ITagPageState> {
         tagStore.setActiveSlug(tag)
         postsStore.resetPositionAndPosts()
 
-        postsStore.getPostsByTag([tag])
+        postsStore.getPostsByTag([tag], true)
 
         return {
             tag,
@@ -52,7 +52,7 @@ class Tag extends React.Component<ITagProps, ITagPageState> {
         if (!this.state.isFirstRender) {
             this.props.tagStore.setActiveTag(this.props.tag)
             this.props.tagStore.setActiveSlug(this.props.tag)
-            this.props.postsStore.getPostsByTag([this.props.tag])
+            this.props.postsStore.getPostsByTag([this.props.tag], true)
             this.setState({
                 isFirstRender: true,
             })

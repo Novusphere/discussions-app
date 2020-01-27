@@ -46,6 +46,10 @@ export default class SyncStore extends BaseStore {
                             this.syncFollowerListWitHDB(data.following)
                         }
 
+                        if (!_.isUndefined(data.pinnedPosts)) {
+                            this.syncPinnedPostsWithDB(data.pinnedPosts)
+                        }
+
                         if (!_.isUndefined(data.watching)) {
                             this.syncWatchingListWithDB(data.watching)
                         }
@@ -103,6 +107,26 @@ export default class SyncStore extends BaseStore {
         observe(this.userStore.watching, change => {
             this.saveDataWithSyncedData({
                 watching: change.object.toJSON(),
+            })
+        })
+
+        observe(this.userStore.pinnedPosts, change => {
+            const obj: { [key: string]: string } = change.object.toJSON()
+            const toSync = {}
+
+            _.forEach(obj, (name, asPathURL) => {
+                if (toSync[name]) {
+                    const posts = toSync[name]
+                    toSync[name] = [...posts, asPathURL]
+                } else {
+                    Object.assign(toSync, {
+                        [name]: [asPathURL],
+                    })
+                }
+            })
+
+            this.saveDataWithSyncedData({
+                pinnedPosts: toSync,
             })
         })
 
@@ -180,7 +204,7 @@ export default class SyncStore extends BaseStore {
     syncFollowerListWitHDB(following: any) {
         const obj = {}
 
-        _.forEach(following, (user) => {
+        _.forEach(following, user => {
             Object.assign(obj, {
                 [user.pub]: user.name,
             })
@@ -192,6 +216,21 @@ export default class SyncStore extends BaseStore {
     @action.bound
     syncWatchingListWithDB(watching: any) {
         this.userStore.watching.replace(watching)
+    }
+
+    @action.bound
+    syncPinnedPostsWithDB(posts: any) {
+        const obj = {}
+
+        _.forEach(posts, (urls, name) => {
+            _.forEach(urls, url => {
+                Object.assign(obj, {
+                    [url]: name,
+                })
+            })
+        })
+
+        this.userStore.pinnedPosts.replace(obj)
     }
 
     @action.bound

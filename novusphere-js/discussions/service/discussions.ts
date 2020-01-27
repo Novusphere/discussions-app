@@ -353,7 +353,7 @@ export default class DiscussionsService {
         }
     }
 
-    async getThread(_id: string, key = ''): Promise<Thread | null> {
+    private convertEncodedThreadIdIntoQuery = (_id: string, key = '') => {
         let dId = Post.decodeId(_id)
 
         const searchQuery = {
@@ -371,7 +371,13 @@ export default class DiscussionsService {
             ],
         }
 
+        return searchQuery
+    }
+
+    async getThread(_id: string, key = ''): Promise<Thread | null> {
         try {
+            const searchQuery = this.convertEncodedThreadIdIntoQuery(_id, key)
+
             let sq = await nsdb.search(searchQuery)
 
             if (sq.payload.length == 0) return null
@@ -402,6 +408,24 @@ export default class DiscussionsService {
             return thread
         } catch (error) {
             console.error('getThreadAsync error', error)
+            throw error
+        }
+    }
+
+    /**
+     * Returns a post object given a URL
+     * @param url - i.e. /tag/blockchainnormies/2m9sh509np65m/blockchain_for_normies_beta_newsletter
+     * @param key - the active public key
+     * @returns Post
+     */
+    async getPostsByAsPathURL(url: string, key = ''): Promise<Post> {
+        try {
+            const [, , , id] = url.split('/')
+            const searchQuery = this.convertEncodedThreadIdIntoQuery(id, key)
+            let sq = await nsdb.search(searchQuery)
+            if (sq.payload.length == 0) return null
+            return Post.fromDbObject(sq.payload[0])
+        } catch (error) {
             throw error
         }
     }
@@ -454,7 +478,7 @@ export default class DiscussionsService {
         cursorId = undefined,
         count = 0,
         limit = 20,
-        key = '',
+        key = ''
     ): Promise<{
         posts: Post[]
         cursorId: number

@@ -43,11 +43,10 @@ class E extends React.Component<IEPageProps, IEPageState> {
     }
 
     componentWillMount(): void {
-        this.props.tagStore.setActiveTag(this.props.query.name)
-        this.props.tagStore.setActiveSlug(this.props.query.name)
         this.props.uiStore.toggleBannerStatus(true)
         this.props.uiStore.toggleSidebarStatus(true)
     }
+
 
     private highglightActiveUuid = () => {
         const [, hash] = this.props.router.asPath.split('#')
@@ -58,6 +57,9 @@ class E extends React.Component<IEPageProps, IEPageState> {
     }
 
     async componentDidMount(): Promise<void> {
+        this.props.tagStore.setActiveTag(this.props.query.name)
+        this.props.tagStore.setActiveSlug(this.props.query.name)
+
         const hash = this.highglightActiveUuid()
         const { thread } = this.props
 

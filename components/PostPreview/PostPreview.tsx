@@ -2,10 +2,10 @@ import * as React from 'react'
 import moment from 'moment'
 import { RichTextPreview, Tips, UserNameWithIcon, VotingHandles } from '@components'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
-import { faComment } from '@fortawesome/free-solid-svg-icons'
+import { faComment, faStar } from '@fortawesome/free-solid-svg-icons'
 import { TagModel } from '@models/tagModel'
 import { observer, useLocalStore } from 'mobx-react'
-import FeedModel from '@models/feedModel'
+import classNames from 'classnames'
 import Link from 'next/link'
 import { useEffect, useState } from 'react'
 import { generateVoteObject, getThreadUrl, voteAsync } from '@utils'
@@ -183,7 +183,12 @@ const PostPreview: React.FC<IPostPreviewProps> = ({
     return (
         <Link href={'/tag/[name]/[id]/[title]'} as={url} passHref={true}>
             <a
-                className={'post-preview'}
+                className={classNames([
+                    'post-preview',
+                    {
+                        'pinned-post': post.pinned,
+                    },
+                ])}
                 data-url={url}
                 style={{
                     opacity: isSpam && blockedContentSetting === 'collapsed' ? 0.5 : 1,
@@ -191,9 +196,9 @@ const PostPreview: React.FC<IPostPreviewProps> = ({
             >
                 <div className={'flex flex-auto'}>
                     <div
-                        className={
-                            'bg-light-gray flex tc justify-center ph2 pv4 relative z-2 flex-auto'
-                        }
+                        className={classNames([
+                            'bg-light-gray flex tc justify-center ph2 pv4 relative z-2 flex-auto',
+                        ])}
                         style={{ width: '40px' }}
                     >
                         {disableVoteHandler || isSpam
@@ -217,6 +222,12 @@ const PostPreview: React.FC<IPostPreviewProps> = ({
                             {!shouldBeCollapsed && (
                                 <>
                                     <div className={'db'}>
+                                        {post.pinned && (
+                                            <span className={'f6 b red mb2 flex flex-row items-center'}>
+                                                <FontAwesomeIcon icon={faStar} className={'mr2'} />
+                                                PINNED
+                                            </span>
+                                        )}
                                         <div
                                             className={
                                                 'flex flex-row f6 lh-copy black items-center flex-wrap justify-between'

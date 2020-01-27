@@ -69,6 +69,8 @@ export class Post {
     // Aggregate Data
     myVote: { value: number }[]
 
+    pinned = false
+
     hasAttachment(): boolean {
         return (
             this.attachment.value != '' &&

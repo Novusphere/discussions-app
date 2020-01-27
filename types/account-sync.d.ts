@@ -16,6 +16,7 @@ export interface IAccountSync {
             blockedPosts: { [yyyymm: number]: string[] }
         },
         uidw: string
+        pinnedPosts: any
     }
     pub: string
     time: number

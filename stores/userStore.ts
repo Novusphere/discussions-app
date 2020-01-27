@@ -10,13 +10,13 @@ import { task } from 'mobx-task'
 import axios from 'axios'
 
 export default class UserStore extends BaseStore {
-    @persist('map') @observable following = observable.map<string, string>()
-    @persist('map') @observable watching = observable.map<string, [number, number]>() // [currentCount, prevCount]
-    @persist('map') @observable blockedUsers = observable.map<string, string>() // [pubKey, displayName]
-    @persist('map') @observable blockedPosts = observable.map<string, string>() // [asPathURL, yyyydd]
-    @persist('map') @observable delegated = observable.map<string, string>() // [name:pubKey:tagName, tagName]
+    @persist('map') following = observable.map<string, string>()
+    @persist('map') watching = observable.map<string, [number, number]>() // [currentCount, prevCount]
+    @persist('map') blockedUsers = observable.map<string, string>() // [pubKey, displayName]
+    @persist('map') blockedPosts = observable.map<string, string>() // [asPathURL, yyyydd]
+    @persist('map') delegated = observable.map<string, string>() // [name:pubKey:tagName, tagName]
+    @persist('map') pinnedPosts = observable.map<string, string>() // [asPathURL, tagName]
 
-    @observable
     blockedByDelegation = observable.map<string, string>() // either blockedUsers or blockedPosts
 
     @persist('object')
@@ -285,6 +285,17 @@ export default class UserStore extends BaseStore {
             const dateStamp = `${date.getFullYear()}${date.getMonth()}`
             this.blockedPosts.set(asPathURL, dateStamp)
             this.uiStore.showToast('This post has been marked as spam!', 'success')
+        }
+    }
+
+    @action.bound
+    togglePinPost(tagName: string, asPathURL: string) {
+        if (this.pinnedPosts.has(asPathURL)) {
+            this.uiStore.showToast('This post has been unpinned!', 'success')
+            this.pinnedPosts.delete(asPathURL)
+        } else {
+            this.pinnedPosts.set(asPathURL, tagName)
+            this.uiStore.showToast('This post has been pinned!', 'success')
         }
     }
 }

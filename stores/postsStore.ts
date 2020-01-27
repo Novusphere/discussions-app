@@ -4,7 +4,7 @@ import { task } from 'mobx-task'
 import { BaseStore, getOrCreateStore } from 'next-mobx-wrapper'
 import { CreateForm } from '@components'
 import { getTagStore } from '@stores/tagStore'
-import { getAuthStore, getUiStore, IStores } from '@stores'
+import { getAuthStore, getUiStore, getUserStore, IStores } from '@stores'
 import {
     encodeId,
     generateUuid,
@@ -101,6 +101,7 @@ export default class PostsStore extends BaseStore {
     private readonly tagsStore: IStores['tagStore'] = getTagStore()
     private readonly uiStore: IStores['uiStore'] = getUiStore()
     private readonly authStore: IStores['authStore'] = getAuthStore()
+    private readonly userStore: IStores['userStore'] = getUserStore()
 
     constructor() {
         super()
@@ -187,8 +188,16 @@ export default class PostsStore extends BaseStore {
         return key
     }
 
+    get pinnedPosts() {
+        const user = JSON.parse(window.localStorage.getItem('user'))
+        if (user.hasOwnProperty('pinnedPosts')) {
+            return user['pinnedPosts']
+        }
+        return null
+    }
+
     @task
-    getPostsByTag = async (tags: string[]) => {
+    getPostsByTag = async (tags: string[], fresh = false) => {
         try {
             const { posts, cursorId } = await discussions.getPostsForTags(
                 tags,
@@ -198,7 +207,30 @@ export default class PostsStore extends BaseStore {
                 this.getKeyForAPICall
             )
 
-            this.posts = [...this.posts, ...posts]
+            let pinnedPosts = []
+
+            // get pinned posts to put at the front
+            if (this.pinnedPosts) {
+                await Promise.all(
+                    _.map(this.pinnedPosts, async (name, url) => {
+                        if (tags[0] === name) {
+                            const post = await discussions.getPostsByAsPathURL(
+                                url,
+                                this.getKeyForAPICall
+                            )
+                            post.pinned = true
+                            pinnedPosts.push(post)
+                        }
+                    })
+                )
+            }
+
+            if (fresh) {
+                this.posts = [...pinnedPosts, ...posts]
+            } else {
+                this.posts = [...pinnedPosts, ...this.posts, ...posts]
+            }
+
             this.postsPosition = {
                 items: this.posts.length,
                 cursorId: cursorId,
