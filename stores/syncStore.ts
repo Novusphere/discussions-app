@@ -110,26 +110,6 @@ export default class SyncStore extends BaseStore {
             })
         })
 
-        observe(this.userStore.pinnedPosts, change => {
-            const obj: { [key: string]: string } = change.object.toJSON()
-            const toSync = {}
-
-            _.forEach(obj, (name, asPathURL) => {
-                if (toSync[name]) {
-                    const posts = toSync[name]
-                    toSync[name] = [...posts, asPathURL]
-                } else {
-                    Object.assign(toSync, {
-                        [name]: [asPathURL],
-                    })
-                }
-            })
-
-            this.saveDataWithSyncedData({
-                pinnedPosts: toSync,
-            })
-        })
-
         when(
             () => this.authStore.uidWalletPubKey.length > 0,
             () => {
@@ -141,9 +121,9 @@ export default class SyncStore extends BaseStore {
 
         autorun(() => {
             const { blockedContentSetting, unsignedPostsIsSpam } = this.settingsStore
-            const { blockedUsers, blockedPosts } = this.userStore
+            const { blockedUsers, blockedPosts, pinnedPosts } = this.userStore
 
-            if (blockedUsers || blockedPosts || blockedContentSetting) {
+            if (blockedUsers || blockedPosts || blockedContentSetting || pinnedPosts) {
                 const moderation = {
                     blockedUsers: null,
                     blockedPosts: null,
@@ -165,6 +145,19 @@ export default class SyncStore extends BaseStore {
                     })
                 })
 
+                const pinnedPostsToSync = {}
+
+                _.forEach(pinnedPosts, (name, asPathURL) => {
+                    if (pinnedPostsToSync[name]) {
+                        const posts = pinnedPostsToSync[name]
+                        pinnedPostsToSync[name] = [...posts, asPathURL]
+                    } else {
+                        Object.assign(pinnedPostsToSync, {
+                            [name]: [asPathURL],
+                        })
+                    }
+                })
+
                 Object.assign(moderation, {
                     blockedUsers: {
                         ...moderation.blockedUsers,
@@ -176,6 +169,7 @@ export default class SyncStore extends BaseStore {
                     },
                     blockedContentSetting: blockedContentSetting,
                     unsignedPostsIsSpam: unsignedPostsIsSpam,
+                    pinnedPosts: pinnedPostsToSync,
                 })
 
                 this.saveDataWithSyncedData({

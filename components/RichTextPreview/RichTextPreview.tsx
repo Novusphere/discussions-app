@@ -80,7 +80,7 @@ const RtLink: any = ({ children, href, index }) => {
                 ):
                     embed = `<img src="${href}" alt="Viewing image" />`
                     break
-                case /t.me/.test(href):
+                case /t.me\/([a-z0-9]+)\/([a-z0-9])+/.test(href):
                     const [, ids] = href.split('t.me/')
                     if (ids) {
                         embed = `<span data-telegram-rn="${generateUuid()}" data-telegram-post="${ids}" data-width="100%"></span>`
