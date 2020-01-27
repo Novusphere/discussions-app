@@ -384,20 +384,21 @@ export default class PostsStore extends BaseStore {
 
             return new Promise((resolve, reject) => {
                 if (isPostValid) {
-                    const int = setInterval(async () => {
-                        const id = encodeId(submittedPost)
-                        const getThread = await discussions.getThread(id, activePublicKey)
+                    const id = encodeId(submittedPost)
 
+                    const int = setInterval(async () => {
+                        const getThread = await discussions.getThread(id, activePublicKey)
                         if (getThread) {
                             if (int) {
                                 clearInterval(int)
+                                const newId = encodeId(getThread.openingPost as any)
+                                this.userStore.toggleThreadWatch(newId, 0, true)
                                 this.posting = false
+                                await pushToThread(submittedPost)
+                                this.uiStore.showToast('Your post has been created!', 'success')
+                                this.clearPreview()
                                 resolve()
                             }
-
-                            await pushToThread(submittedPost)
-                            this.uiStore.showToast('Your post has been created!', 'success')
-                            this.clearPreview()
                         }
                     }, 2000)
                 } else {

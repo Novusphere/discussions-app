@@ -240,18 +240,18 @@ export default class UserStore extends BaseStore {
     }
 
     @action.bound
-    toggleThreadWatch(id: string, count: number) {
+    toggleThreadWatch(id: string, count: number, suppressToast = false) {
         if (this.watching.has(id)) {
             this.watching.delete(id)
-            this.uiStore.showToast('You are no longer watching this thread', 'info')
+            if (!suppressToast) this.uiStore.showToast('You are no longer watching this thread', 'info')
             return
         }
 
         if (this.watching.size <= 4) {
             this.watching.set(id, [count, count])
-            this.uiStore.showToast('Success! You are watching this thread', 'success')
+            if (!suppressToast) this.uiStore.showToast('Success! You are watching this thread', 'success')
         } else {
-            this.uiStore.showToast('You can only watch a maximum of 5 threads', 'info')
+            if (!suppressToast) this.uiStore.showToast('You can only watch a maximum of 5 threads', 'info')
         }
     }
 

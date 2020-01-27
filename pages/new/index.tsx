@@ -50,8 +50,6 @@ class NewPage extends React.Component<INewPageProps, INewPageState> {
             value: sanityCheckTag(option.value),
         }
 
-        console.log(JSON.stringify(this.props.postsStore.newPostTag))
-
         // set form again
         const _form = newPostForm
         _form.form.$('title').set('value', cached.title)
