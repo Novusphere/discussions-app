@@ -116,6 +116,7 @@ export default class PostsStore extends BaseStore {
             items: 0,
             cursorId: undefined,
         }
+        return this.postsPosition
     }
 
     @task
@@ -218,7 +219,7 @@ export default class PostsStore extends BaseStore {
             let pinnedPosts = []
 
             // get pinned posts to put at the front
-            if (this.pinnedPosts && Object.keys(this.pinnedPosts).length > 0) {
+            if (!this.postsPosition.cursorId && this.pinnedPosts && Object.keys(this.pinnedPosts).length > 0) {
                 await Promise.all(
                     _.map(this.pinnedPosts, async (name, url) => {
                         if (tags[0] === name) {
@@ -227,6 +228,7 @@ export default class PostsStore extends BaseStore {
                                 this.getKeyForAPICall
                             )
                             post.pinned = true
+                            // this.posts.push(post)
                             pinnedPosts.push(post)
                         }
                     })

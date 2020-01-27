@@ -97,7 +97,7 @@ export class NewThread extends React.Component<INewThreadProps, any> {
 
         return (
             <>
-                <Link href={`/tag/[name]`} as={`/tag/${threadSerialized.openingPost.sub}`}>
+                <Link href={`/tag/[name]`} as={`/tag/${threadSerialized.openingPost.sub}`} shallow>
                     <a>
                         <button
                             className={'tl flex items-center mb2'}

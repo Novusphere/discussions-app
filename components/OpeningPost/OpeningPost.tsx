@@ -64,7 +64,7 @@ const OpeningPost: React.FC<IOpeningPostProps> = ({
         <div data-post-uuid={openingPost.uuid}>
             {typeof isPreview === 'undefined' && (
                 <div className={'pb2'}>
-                    <Link href={`/tag/[name]`} as={`/tag/${openingPost.sub}`}>
+                    <Link href={`/tag/[name]`} as={`/tag/${openingPost.sub}`} shallow>
                         <a>
                             <button
                                 className={'tl flex items-center'}

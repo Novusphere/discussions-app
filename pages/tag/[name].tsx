@@ -5,7 +5,6 @@ import { InfiniteScrollFeed } from '@components'
 import { TagModel } from '@models/tagModel'
 import Head from 'next/head'
 import { Post } from '@novuspherejs'
-import { sleep } from '@utils'
 
 interface ITagProps {
     tagStore: IStores['tagStore']
@@ -36,7 +35,6 @@ class Tag extends React.Component<ITagProps, ITagPageState> {
         tagStore.setActiveSlug(tag)
         postsStore.resetPositionAndPosts()
 
-        // keep this when cycling between tags
         postsStore.getPostsByTag([tag], true)
 
         return {
@@ -49,17 +47,12 @@ class Tag extends React.Component<ITagProps, ITagPageState> {
         this.props.uiStore.toggleSidebarStatus(true)
     }
 
-    async componentDidMount(): Promise<void> {
+    componentDidMount(): void {
         window.scrollTo(0, 0)
-        this.props.postsStore.resetPositionAndPosts()
-
         if (!this.state.isFirstRender) {
             this.props.tagStore.setActiveTag(this.props.tag)
             this.props.tagStore.setActiveSlug(this.props.tag)
-
-            await sleep(500)
-            await this.props.postsStore.getPostsByTag([this.props.tag], true)
-
+            this.props.postsStore.getPostsByTag([this.props.tag], true)
             this.setState({
                 isFirstRender: true,
             })
