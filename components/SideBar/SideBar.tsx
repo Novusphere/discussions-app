@@ -45,11 +45,10 @@ class SideBar extends React.Component<ITagListOuterProps & ITagListInnerProps, I
     private createPost = () => {
         const {
             tagStore: { activeTag },
-            postsStore: { newPostData },
             router,
         } = this.props
 
-        newPostData.sub = {
+        this.props.postsStore.newPostTag = {
             value: activeTag.name,
             label: activeTag.name,
         }
@@ -146,9 +145,15 @@ class SideBar extends React.Component<ITagListOuterProps & ITagListInnerProps, I
                         <span className={'b black f6'}>#{activeTag.name}</span>
                     </span>
 
-                    {activeTag.memberCount !== undefined && <span className={'flex row fa5 mt2 f5'}>{activeTag.memberCount} Members</span>}
+                    {activeTag.memberCount !== undefined && (
+                        <span className={'flex row fa5 mt2 f5'}>
+                            {activeTag.memberCount} Members
+                        </span>
+                    )}
 
-                    {activeTag.tagDescription !== undefined && <span className={'flex row black mt2 f6'}>{activeTag.tagDescription}</span>}
+                    {activeTag.tagDescription !== undefined && (
+                        <span className={'flex row black mt2 f6'}>{activeTag.tagDescription}</span>
+                    )}
 
                     <div className={'flex flex-column items-center justify-center mt3'}>
                         <button

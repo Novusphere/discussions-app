@@ -6,6 +6,7 @@ import NewPostPreview from './new-post-preview/new-post-preview'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { faSpinner } from '@fortawesome/free-solid-svg-icons'
 import { sanityCheckTag } from '@utils'
+import classNames from 'classnames'
 
 interface INewPageProps {
     postsStore: IStores['postsStore']
@@ -33,7 +34,7 @@ class NewPage extends React.Component<INewPageProps, INewPageState> {
 
     private onChange = option => {
         const {
-            postsStore: { newPostData, newPostForm },
+            postsStore: { newPostForm },
         } = this.props
         const { form } = this.state
 
@@ -44,10 +45,12 @@ class NewPage extends React.Component<INewPageProps, INewPageState> {
             content: form.form.$('content').value || '',
         }
 
-        newPostData.sub = {
+        this.props.postsStore.newPostTag = {
             label: `#${sanityCheckTag(option.label)}`,
             value: sanityCheckTag(option.value),
         }
+
+        console.log(JSON.stringify(this.props.postsStore.newPostTag))
 
         // set form again
         const _form = newPostForm
@@ -61,7 +64,7 @@ class NewPage extends React.Component<INewPageProps, INewPageState> {
 
     render() {
         const {
-            postsStore: { subFields, newPostData },
+            postsStore: { subFields, newPostTag },
         } = this.props
         const { form } = this.state
 
@@ -81,12 +84,20 @@ class NewPage extends React.Component<INewPageProps, INewPageState> {
                         }
                         onChange={this.onChange}
                         className={'w-80'}
-                        value={newPostData.sub}
+                        value={newPostTag}
                         options={subFields.extra.options}
                         placeholder={'Select or type tag name...'}
                     />
                 </div>
-                <div className={'card pa4'}>
+                <div
+                    className={classNames([
+                        'card pa4',
+                        {
+                            'o-50': !newPostTag.value,
+                            'o-100': newPostTag.value,
+                        },
+                    ])}
+                >
                     <Form form={form} hideSubmitButton />
                     <div className={'pv3'}>
                         <NewPostPreview />

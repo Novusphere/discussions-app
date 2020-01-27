@@ -74,9 +74,7 @@ export default class PostsStore extends BaseStore {
     @observable activeThreadId = ''
 
     // when creating a new post
-    @observable newPostData = {
-        sub: null, // { value: '', label: '' }
-    }
+    @observable newPostTag = { value: '', label: '' }
 
     @observable posting = false // for spinner
 
@@ -328,7 +326,7 @@ export default class PostsStore extends BaseStore {
     @action.bound
     async handleSubmit(form) {
         this.posting = true
-        if (!form.hasError && this.newPostData.sub.value) {
+        if (!form.hasError && this.newPostTag.value) {
             this.posting = true
             const post = form.values()
             const uuid = generateUuid()
@@ -336,7 +334,7 @@ export default class PostsStore extends BaseStore {
             const uidw = this.authStore.activeUidWalletKey
 
             let inlineTags = post.content.match(/#([^\s.,;:!?]+)/gi)
-            let tags = [this.newPostData.sub.value]
+            let tags = [this.newPostTag.value]
 
             if (inlineTags && inlineTags.length) {
                 inlineTags = inlineTags.map(tag => tag.replace('#', ''))
@@ -356,7 +354,7 @@ export default class PostsStore extends BaseStore {
                 displayName: null,
                 title: post.title,
                 content: post.content,
-                sub: this.newPostData.sub.value,
+                sub: this.newPostTag.value,
                 chain: 'eos',
                 mentions: [],
                 tags: tags,
@@ -420,7 +418,6 @@ export default class PostsStore extends BaseStore {
                 label: `Title`,
                 placeholder: 'Enter a post title',
                 rules: 'required|string|min:5|max:300',
-                disabled: !this.newPostData.sub,
                 hideLabels: true,
                 autoComplete: 'off',
             },
@@ -429,7 +426,6 @@ export default class PostsStore extends BaseStore {
                 label: 'Content',
                 hideLabels: true,
                 placeholder: 'Enter your content',
-                disabled: !this.newPostData.sub,
                 type: 'richtext',
                 rules: 'required',
                 autoComplete: 'off',
@@ -444,17 +440,17 @@ export default class PostsStore extends BaseStore {
                             value: 'Preview',
                             className: 'white bg-gray',
                             title: 'Preview the post before submitting',
-                            disabled: !this.newPostData.sub,
+                            disabled: !this.newPostTag,
                             onClick: form => {
                                 if (!form.hasError) {
                                     this.preview = form.values()
-                                    this.preview.sub = this.newPostData.sub
+                                    this.preview.sub = this.newPostTag
                                 }
                             },
                         },
                         {
                             value: 'Post',
-                            disabled: !this.authStore.hasAccount || !this.newPostData.sub,
+                            disabled: !this.authStore.hasAccount || !this.newPostTag,
                             title: !this.authStore.hasAccount
                                 ? 'You need to be logged in to post'
                                 : 'Post as ' + this.authStore.posterName,
