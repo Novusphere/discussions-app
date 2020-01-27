@@ -27,42 +27,44 @@ export default class SyncStore extends BaseStore {
 
         reaction(
             () => this.authStore.hasAccount,
-            async () => {
-                const accountData = await this.getAccountWithPrivateKey(
-                    this.authStore.activePrivateKey
-                )
+            async hasAccount => {
+                if (hasAccount) {
+                    const accountData = await this.getAccountWithPrivateKey(
+                        this.authStore.activePrivateKey
+                    )
 
-                if (accountData) {
-                    const data = accountData['data']
+                    if (accountData) {
+                        const data = accountData['data']
 
-                    this.syncedData = data
+                        this.syncedData = data
 
-                    if (!_.isUndefined(data.tags)) {
-                        this.syncSubscribedTagsWithDB(data.tags)
+                        if (!_.isUndefined(data.tags)) {
+                            this.syncSubscribedTagsWithDB(data.tags)
+                        }
+
+                        if (!_.isUndefined(data.following)) {
+                            this.syncFollowerListWitHDB(data.following)
+                        }
+
+                        if (!_.isUndefined(data.watching)) {
+                            this.syncWatchingListWithDB(data.watching)
+                        }
+
+                        if (!_.isUndefined(data.lastCheckedNotifications)) {
+                            this.syncNotificationTimeWithDB(data.lastCheckedNotifications)
+                        }
+
+                        if (!_.isUndefined(data.moderation)) {
+                            this.syncModerationListWithDB(data.moderation)
+                        }
+
+                        if (!_.isUndefined(data.uidw)) {
+                            this.syncUIDWWithDB(data.uidw)
+                        }
                     }
 
-                    if (!_.isUndefined(data.following)) {
-                        this.syncFollowerListWitHDB(data.following)
-                    }
-
-                    if (!_.isUndefined(data.watching)) {
-                        this.syncWatchingListWithDB(data.watching)
-                    }
-
-                    if (!_.isUndefined(data.lastCheckedNotifications)) {
-                        this.syncNotificationTimeWithDB(data.lastCheckedNotifications)
-                    }
-
-                    if (!_.isUndefined(data.moderation)) {
-                        this.syncModerationListWithDB(data.moderation)
-                    }
-
-                    if (!_.isUndefined(data.uidw)) {
-                        this.syncUIDWWithDB(data.uidw)
-                    }
+                    this.userStore.updateFromActiveDelegatedMembers()
                 }
-
-                this.userStore.updateFromActiveDelegatedMembers()
             }
         )
 

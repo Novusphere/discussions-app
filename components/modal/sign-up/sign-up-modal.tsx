@@ -37,10 +37,17 @@ class SignUpModal extends React.Component<ISignInModalProps, ISignInModalState> 
                             'Next',
                             'bg-green',
                             e => {
-                                signUpForm.onSubmit(e)
-                                goNext()
+                                signUpForm.form
+                                    .validate({ showErrors: true })
+                                    .then(({ isValid }) => {
+                                        console.log(isValid)
+                                        if (isValid) {
+                                            signUpForm.onSubmit(e)
+                                            goNext()
+                                        }
+                                    })
                             },
-                            signUpForm.Form ? signUpForm.Form.hasError : false,
+                            signUpForm.Form ? signUpForm.Form.hasError : false
                         )}
                     </>
                 )

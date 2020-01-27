@@ -51,7 +51,7 @@ export default class SignUpStore extends BaseStore {
                     type: 'text',
                     value: this.signUpObject.displayName,
                     placeholder: 'Your display name',
-                    rules: 'required|string|between:3,25',
+                    rules: 'required|alpha_with_underscore|between:3,25',
                 },
                 {
                     name: 'password',

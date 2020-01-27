@@ -27,8 +27,6 @@ const RtLink: any = ({ children, href, index }) => {
         async function getOEMBED() {
             let embed
 
-            console.log(href)
-
             switch (true) {
                 case /https?:\/\/(www\.)?(facebook|fb).(com|me)\/.+/.test(href):
                     embed = `<div class="fb-post" data-href="${href}"></div>`
