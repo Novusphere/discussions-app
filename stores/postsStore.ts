@@ -199,7 +199,6 @@ export default class PostsStore extends BaseStore {
             if (user.hasOwnProperty('pinnedByDelegation')) {
                 _.merge(posts, user['pinnedByDelegation'])
             }
-
         }
 
         return posts

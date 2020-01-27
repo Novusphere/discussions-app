@@ -290,8 +290,6 @@ export default class SettingsStore extends BaseStore {
                     q => q.label === values.token.symbol
                 )
 
-                console.log(!!token)
-
                 if (!token) {
                     throw new Error(
                         `Token ${values.token.symbol} does not support public key transfers!`

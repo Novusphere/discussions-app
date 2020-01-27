@@ -1,7 +1,6 @@
-import { action, computed, observable } from 'mobx'
+import { action, observable } from 'mobx'
 import { TagModel } from '@models/tagModel'
 import { BaseStore, getOrCreateStore } from 'next-mobx-wrapper'
-import { task } from 'mobx-task'
 import { persist } from 'mobx-persist'
 import { defaultSubs } from '@utils'
 import { getUiStore, IStores } from '@stores/index'
@@ -16,12 +15,15 @@ export default class TagStore extends BaseStore {
 
     @observable activeTag: TagModel = null
     @observable activeSlug = ''
+
     tags = observable.map<string, TagModel>()
     tagGroup = observable.map<string, string[]>()
 
     @persist('list')
     @observable
-    subSubscriptionStatus: string[] = []
+    subSubscriptionStatus = []
+
+    @observable requiresSync = false
 
     constructor() {
         super()
@@ -83,19 +85,23 @@ export default class TagStore extends BaseStore {
     @action.bound
     addTag(tagName: string, cb?: any) {
         if (this.subSubscriptionStatus.indexOf(tagName) === -1) {
+            this.requiresSync = true
             this.subSubscriptionStatus.unshift(tagName)
             this.uiStore.showToast(`You have subbed to ${tagName}`, 'success')
+            this.requiresSync = false
             if (cb) cb()
         }
     }
 
     @action.bound
     public toggleTagSubscribe(tag: string) {
+        this.requiresSync = true
         if (this.subSubscriptionStatus.indexOf(tag) !== -1) {
             this.subSubscriptionStatus.splice(this.subSubscriptionStatus.indexOf(tag), 1)
         } else {
             this.subSubscriptionStatus.unshift(tag)
         }
+        this.requiresSync = false
     }
 
     @action.bound

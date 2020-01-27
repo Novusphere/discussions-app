@@ -7,6 +7,7 @@ import {
     getNotificationsStore,
     getSettingsStore,
     getTagStore,
+    getUiStore,
     getUserStore,
     IStores,
 } from '@stores/index'
@@ -17,6 +18,7 @@ export default class SyncStore extends BaseStore {
     private readonly authStore: IStores['authStore'] = getAuthStore()
     private readonly tagStore: IStores['tagStore'] = getTagStore()
     private readonly userStore: IStores['userStore'] = getUserStore()
+    private readonly uiStore: IStores['uiStore'] = getUiStore()
     private readonly notificationsStore: IStores['notificationsStore'] = getNotificationsStore()
     private readonly settingsStore: IStores['settingsStore'] = getSettingsStore()
 
@@ -29,18 +31,15 @@ export default class SyncStore extends BaseStore {
             this.userStore.updateFromActiveDelegatedMembers()
         }, 30000)
 
-        reaction(
-            () => this.authStore.hasAccount,
-            async hasAccount => {
-                if (hasAccount) {
+        autorun(async () => {
+            if (!this.uiStore.isServer) {
+                if (this.authStore.hasAccount) {
                     const accountData = await this.getAccountWithPrivateKey(
                         this.authStore.activePrivateKey
                     )
 
                     if (accountData) {
                         const data = accountData['data']
-
-                        this.syncedData = data
 
                         if (!_.isUndefined(data.tags)) {
                             this.syncSubscribedTagsWithDB(data.tags)
@@ -49,10 +48,6 @@ export default class SyncStore extends BaseStore {
                         if (!_.isUndefined(data.following)) {
                             this.syncFollowerListWitHDB(data.following)
                         }
-
-                        // if (!_.isUndefined(data.pinnedPosts)) {
-                        //     this.syncPinnedPostsWithDB(data.pinnedPosts)
-                        // }
 
                         if (!_.isUndefined(data.watching)) {
                             this.syncWatchingListWithDB(data.watching)
@@ -69,72 +64,29 @@ export default class SyncStore extends BaseStore {
                         if (!_.isUndefined(data.uidw)) {
                             this.syncUIDWWithDB(data.uidw)
                         }
+
+                        this.syncedData = data
                     }
                 }
             }
-        )
-
-        // // sync tag subs
-        // reaction(
-        //     () => this.tagStore.subSubscriptionStatus.length,
-        //     () => {
-        //         this.saveDataWithSyncedData({
-        //             tags: this.tagStore.subSubscriptionStatus,
-        //         })
-        //     }
-        // )
-        //
-        // reaction(
-        //     () => this.notificationsStore.lastCheckedNotifications,
-        //     lastCheckedNotifications => {
-        //         this.saveDataWithSyncedData({
-        //             lastCheckedNotifications,
-        //         })
-        //     }
-        // )
-        //
-        // observe(this.userStore.following, change => {
-        //     const obj: { [key: string]: string } = change.object.toJSON()
-        //     const mapped = _.map(obj, (name, pub) => {
-        //         return {
-        //             pub,
-        //             name,
-        //         }
-        //     })
-        //     this.saveDataWithSyncedData({
-        //         following: mapped,
-        //     })
-        // })
-        //
-        // observe(this.userStore.watching, change => {
-        //     this.saveDataWithSyncedData({
-        //         watching: change.object.toJSON(),
-        //     })
-        // })
-        //
-        // when(
-        //     () => this.authStore.uidWalletPubKey.length > 0,
-        //     () => {
-        //         this.saveDataWithSyncedData({
-        //             uidw: this.authStore.activeUidWalletKey,
-        //         })
-        //     }
-        // )
+        })
 
         autorun(() => {
             const { blockedContentSetting, unsignedPostsIsSpam } = this.settingsStore
             const { activeUidWalletKey } = this.authStore
             const { blockedUsers, blockedPosts, pinnedPosts, following, watching } = this.userStore
-            const { subSubscriptionStatus } = this.tagStore
+            const { subSubscriptionStatus, requiresSync } = this.tagStore
             const { lastCheckedNotifications } = this.notificationsStore
 
             if (
-                blockedUsers ||
-                blockedPosts ||
-                blockedContentSetting ||
-                pinnedPosts ||
-                subSubscriptionStatus ||
-                activeUidWalletKey
+                this.syncedData &&
+                (blockedUsers ||
+                    blockedPosts ||
+                    blockedContentSetting ||
+                    pinnedPosts ||
+                    subSubscriptionStatus ||
+                    activeUidWalletKey ||
+                    requiresSync === true)
             ) {
                 const moderation = {
                     blockedUsers: null,
