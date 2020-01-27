@@ -110,15 +110,11 @@ export default class UserStore extends BaseStore {
     async setPinnedPosts(posts: any[]) {
         const obj = {}
 
-        _.forEach(posts, (urls, name) => {
+        _.forEach(posts, (urls, name: string) => {
             _.forEach(urls, url => {
-                Object.assign(obj, {
-                    [url]: name,
-                })
+                this.pinnedPosts.set(url, name)
             })
         })
-
-        this.pinnedPosts.replace(obj)
     }
 
     @action.bound
@@ -133,7 +129,12 @@ export default class UserStore extends BaseStore {
 
                     if (data.hasOwnProperty('moderation')) {
                         const blockedPosts = data['moderation']['blockedPosts']
+                        const pinnedPosts = data['moderation']['pinnedPosts']
                         const blockedPostsKeys = Object.keys(blockedPosts)
+
+                        if (pinnedPosts) {
+                            this.setPinnedPosts(pinnedPosts)
+                        }
 
                         if (blockedPostsKeys.length) {
                             blockedPostsKeys.forEach(datestamp => {
@@ -146,10 +147,6 @@ export default class UserStore extends BaseStore {
                                 }
                             })
                         }
-                    }
-
-                    if (data.hasOwnProperty('pinnedPosts')) {
-                        this.setPinnedPosts(data['pinnedPosts'])
                     }
                 })
             )
