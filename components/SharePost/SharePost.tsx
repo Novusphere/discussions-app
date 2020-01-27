@@ -7,12 +7,14 @@ import { faShare } from '@fortawesome/free-solid-svg-icons'
 import copy from 'clipboard-copy'
 import { CSSTransition } from 'react-transition-group'
 import { tweetCurrentPage } from '@utils'
+import classNames from 'classnames'
 
 interface ISharePostProps {
     toggleAddAsModerator: () => void
     toggleBlockPost: (asPathURL: string) => void
     togglePinPost: (tagName: string, asPathURL: string) => void
     isBlockedPost: boolean
+    isPinnedPost: boolean
     asPathURL: string
     activeSlug: string
 }
@@ -23,6 +25,7 @@ const SharePost: React.FC<ISharePostProps> = ({
     asPathURL,
     toggleAddAsModerator,
     isBlockedPost,
+    isPinnedPost,
     activeSlug,
 }) => {
     const [inProp, setInProp] = useState(false)
@@ -49,25 +52,30 @@ const SharePost: React.FC<ISharePostProps> = ({
             <CSSTransition unmountOnExit in={inProp} timeout={200} classNames={'slide'}>
                 <div>
                     <span
-                        className={'pr3 f6 b0b0b0 dim pointer'}
+                        className={'pr3 f6 moon-gray dim pointer'}
                         onClick={() => toggleBlockPost(asPathURL)}
                     >
                         {isBlockedPost ? 'unmark as spam' : 'mark as spam'}
                     </span>
 
-                    <span className={'pr3 f6 b0b0b0 dim pointer'} onClick={toggleAddAsModerator}>
+                    <span className={'pr3 f6 moon-gray dim pointer'} onClick={toggleAddAsModerator}>
                         set as moderator
                     </span>
 
                     <span
-                        className={'pr3 f6 b0b0b0 dim pointer'}
+                        className={classNames([
+                            'pr3 f6 moon-gray dim pointer',
+                            {
+                                red: isPinnedPost,
+                            },
+                        ])}
                         onClick={() => togglePinPost(activeSlug, asPathURL)}
                     >
-                        pin thread
+                        {isPinnedPost ? 'unpin thread' : 'pin thread'}
                     </span>
 
                     <span
-                        className={'pr3 f6 b0b0b0 dim pointer'}
+                        className={'pr3 f6 moon-gray dim pointer'}
                         title={'Copy URL to clipboard'}
                         onClick={() => copy(window.location.href.split('#')[0])}
                     >
@@ -75,7 +83,7 @@ const SharePost: React.FC<ISharePostProps> = ({
                     </span>
 
                     <span
-                        className={'pr3 f6 b0b0b0 dim pointer'}
+                        className={'pr3 f6 moon-gray dim pointer'}
                         onClick={tweetCurrentPage}
                         title={'Share to Twitter'}
                     >

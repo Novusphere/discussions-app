@@ -249,7 +249,7 @@ class NewOpeningPost extends React.Component<
             authStore: { supportedTokensImages },
             postsStore: { activeThread },
             tagStore: { activeSlug },
-            userStore: { toggleBlockPost, togglePinPost, isWatchingThread, blockedPosts },
+            userStore: { toggleBlockPost, togglePinPost, pinnedPosts, isWatchingThread, blockedPosts },
         } = this.props
 
         const id = router.query.id as string
@@ -397,6 +397,7 @@ class NewOpeningPost extends React.Component<
 
                                     <SharePost
                                         isBlockedPost={blockedPosts.has(asPath)}
+                                        isPinnedPost={pinnedPosts.has(asPath)}
                                         toggleBlockPost={toggleBlockPost}
                                         togglePinPost={togglePinPost}
                                         toggleAddAsModerator={this.addAsModerator}
