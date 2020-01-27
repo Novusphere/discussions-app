@@ -220,17 +220,7 @@ export default class SyncStore extends BaseStore {
 
     @action.bound
     syncPinnedPostsWithDB(posts: any) {
-        const obj = {}
-
-        _.forEach(posts, (urls, name) => {
-            _.forEach(urls, url => {
-                Object.assign(obj, {
-                    [url]: name,
-                })
-            })
-        })
-
-        this.userStore.pinnedPosts.replace(obj)
+       return this.userStore.setPinnedPosts(posts)
     }
 
     @action.bound

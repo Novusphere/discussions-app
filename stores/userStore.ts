@@ -8,6 +8,7 @@ import NotificationModel from '@models/notificationModel'
 import { checkIfNameIsValid, sleep } from '@utils'
 import { task } from 'mobx-task'
 import axios from 'axios'
+import _ from 'lodash'
 
 export default class UserStore extends BaseStore {
     @persist('map') following = observable.map<string, string>()
@@ -106,6 +107,21 @@ export default class UserStore extends BaseStore {
     }
 
     @action.bound
+    async setPinnedPosts(posts: any[]) {
+        const obj = {}
+
+        _.forEach(posts, (urls, name) => {
+            _.forEach(urls, url => {
+                Object.assign(obj, {
+                    [url]: name,
+                })
+            })
+        })
+
+        this.pinnedPosts.replace(obj)
+    }
+
+    @action.bound
     async updateFromActiveDelegatedMembers() {
         try {
             return await Array.from(this.delegated.keys()).map(async delegatedMember => {
@@ -129,6 +145,10 @@ export default class UserStore extends BaseStore {
                             }
                         })
                     }
+                }
+
+                if (data.hasOwnProperty('pinnedPosts')) {
+                    this.setPinnedPosts(data['pinnedPosts'])
                 }
             })
         } catch (error) {
