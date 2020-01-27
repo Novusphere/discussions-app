@@ -19,6 +19,7 @@ export default class UserStore extends BaseStore {
     @persist('map') pinnedPosts = observable.map<string, string>() // [asPathURL, tagName]
 
     blockedByDelegation = observable.map<string, string>() // either blockedUsers or blockedPosts
+    @persist('map') pinnedByDelegation = observable.map<string, string>() // [asPathURL, tagName]
 
     @persist('object')
     @observable
@@ -107,14 +108,22 @@ export default class UserStore extends BaseStore {
     }
 
     @action.bound
-    async setPinnedPosts(posts: any[]) {
+    async setPinnedPosts(posts: any[], delegated = false) {
         const obj = {}
 
         _.forEach(posts, (urls, name: string) => {
             _.forEach(urls, url => {
-                this.pinnedPosts.set(url, name)
+                Object.assign(obj, {
+                    [url]: name,
+                })
             })
         })
+
+        if (delegated) {
+            this.pinnedByDelegation.replace(obj)
+        } else {
+            this.pinnedPosts.replace(obj)
+        }
     }
 
     @action.bound
@@ -133,7 +142,7 @@ export default class UserStore extends BaseStore {
                         const blockedPostsKeys = Object.keys(blockedPosts)
 
                         if (pinnedPosts) {
-                            this.setPinnedPosts(pinnedPosts)
+                            this.setPinnedPosts(pinnedPosts, true)
                         }
 
                         if (blockedPostsKeys.length) {
@@ -190,7 +199,7 @@ export default class UserStore extends BaseStore {
         accountNameWithPubKey: string,
         tagName = this.activeDelegatedTag.value,
         suppressAlert = false,
-        override = false,
+        override = false
     ) {
         const mergedName = `${accountNameWithPubKey}:${tagName}`
 

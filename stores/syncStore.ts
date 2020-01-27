@@ -25,6 +25,10 @@ export default class SyncStore extends BaseStore {
     constructor() {
         super()
 
+        setInterval(() => {
+            this.userStore.updateFromActiveDelegatedMembers()
+        }, 30000)
+
         reaction(
             () => this.authStore.hasAccount,
             async hasAccount => {
@@ -66,8 +70,6 @@ export default class SyncStore extends BaseStore {
                             this.syncUIDWWithDB(data.uidw)
                         }
                     }
-
-                    this.userStore.updateFromActiveDelegatedMembers()
                 }
             }
         )

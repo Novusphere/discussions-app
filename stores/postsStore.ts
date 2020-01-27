@@ -186,13 +186,23 @@ export default class PostsStore extends BaseStore {
         return key
     }
 
-    get pinnedPosts() {
+    @computed get pinnedPosts() {
+        let posts = {}
+
         const user = JSON.parse(window.localStorage.getItem('user'))
-        if (!user) return null
-        if (user.hasOwnProperty('pinnedPosts')) {
-            return user['pinnedPosts']
+
+        if (user) {
+            if (user.hasOwnProperty('pinnedPosts')) {
+                _.merge(posts, user['pinnedPosts'])
+            }
+
+            if (user.hasOwnProperty('pinnedByDelegation')) {
+                _.merge(posts, user['pinnedByDelegation'])
+            }
+
         }
-        return null
+
+        return posts
     }
 
     @task
