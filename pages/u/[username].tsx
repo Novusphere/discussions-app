@@ -6,7 +6,7 @@ import { Tab, Tabs, TabList, TabPanel } from 'react-tabs'
 import { faMinusCircle } from '@fortawesome/free-solid-svg-icons'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { computed } from 'mobx'
-import { getIdenticon, } from '@utils'
+import { getIdenticon } from '@utils'
 import { CopyToClipboard, InfiniteScrollFeed, TagDropdown } from '@components'
 
 interface IUPageProps {
@@ -25,9 +25,23 @@ interface IUPageProps {
     posts: Post[]
 }
 
+interface IUIPageState {
+    posts: any[]
+    isFirstRender: boolean
+}
+
 @inject('userStore', 'authStore', 'postsStore', 'tagStore', 'uiStore')
 @observer
-class U extends React.Component<IUPageProps> {
+class U extends React.Component<IUPageProps, IUIPageState> {
+    constructor(props) {
+        super(props)
+
+        this.state = {
+            posts: props.posts,
+            isFirstRender: false,
+        }
+    }
+
     static async getInitialProps({ query, store }) {
         const postsStore: IStores['postsStore'] = store.postsStore
         const [username, pub] = query.username.split('-')
@@ -54,11 +68,19 @@ class U extends React.Component<IUPageProps> {
         }
     }
 
-    componentDidMount(): void {
+    async componentDidMount(): Promise<void> {
         window.scrollTo(0, 0)
-            this.props.tagStore.destroyActiveTag()
-            this.props.uiStore.toggleSidebarStatus(false)
-            this.props.uiStore.toggleBannerStatus(true)
+        this.props.tagStore.destroyActiveTag()
+        this.props.uiStore.toggleSidebarStatus(false)
+        this.props.uiStore.toggleBannerStatus(true)
+
+        if (!this.state.isFirstRender) {
+            const posts = await this.props.postsStore.getPostsForKeys([this.props.pub])
+            this.setState({
+                isFirstRender: true,
+                posts,
+            })
+        }
     }
 
     @computed get isSameUser() {
@@ -221,7 +243,8 @@ class U extends React.Component<IUPageProps> {
     }
 
     private renderUsersPosts = () => {
-        const { pub, posts } = this.props
+        const { posts } = this.state
+        const { pub, } = this.props
 
         const {
             getPostsForKeys,

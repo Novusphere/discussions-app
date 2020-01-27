@@ -353,11 +353,11 @@ export default class DiscussionsService {
         }
     }
 
-    async getThread(_id: string, pubKey: string, key = ''): Promise<Thread | null> {
+    async getThread(_id: string, key = ''): Promise<Thread | null> {
         let dId = Post.decodeId(_id)
 
         const searchQuery = {
-            key: pubKey,
+            key: key,
             pipeline: [
                 {
                     $match: {
@@ -371,10 +371,6 @@ export default class DiscussionsService {
             ],
         }
 
-        if (key) {
-            searchQuery['key'] = key
-        }
-
         try {
             let sq = await nsdb.search(searchQuery)
 
@@ -384,7 +380,7 @@ export default class DiscussionsService {
             let op = Post.fromDbObject(sq.payload[0])
 
             sq = {
-                key: pubKey,
+                key: key,
                 pipeline: [
                     {
                         $match: {
@@ -393,10 +389,6 @@ export default class DiscussionsService {
                         },
                     },
                 ],
-            }
-
-            if (key) {
-                sq['key'] = key
             }
 
             do {
@@ -461,12 +453,14 @@ export default class DiscussionsService {
         keys: string[],
         cursorId = undefined,
         count = 0,
-        limit = 20
+        limit = 20,
+        key = '',
     ): Promise<{
         posts: Post[]
         cursorId: number
     }> {
         const query = await nsdb.search({
+            key,
             cursorId,
             count,
             limit,

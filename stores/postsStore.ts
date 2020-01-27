@@ -129,7 +129,7 @@ export default class PostsStore extends BaseStore {
                 subs,
                 this.postsPosition.cursorId,
                 this.postsPosition.items,
-                0,
+                20,
                 this.getKeyForAPICall
             )
 
@@ -153,7 +153,9 @@ export default class PostsStore extends BaseStore {
             const { posts, cursorId } = await discussions.getPostsForKeys(
                 keys,
                 this.postsPosition.cursorId,
-                this.postsPosition.items
+                this.postsPosition.items,
+                20,
+                this.getKeyForAPICall
             )
 
             this.posts = [...this.posts, ...posts]
@@ -192,7 +194,7 @@ export default class PostsStore extends BaseStore {
                 tags,
                 this.postsPosition.cursorId,
                 this.postsPosition.items,
-                0,
+                20,
                 this.getKeyForAPICall
             )
 
