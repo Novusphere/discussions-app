@@ -88,8 +88,15 @@ export default class SyncStore extends BaseStore {
         )
 
         observe(this.userStore.following, change => {
+            const obj: { [key: string]: string } = change.object.toJSON()
+            const mapped = _.map(obj, (name, pub) => {
+                return {
+                    pub,
+                    name,
+                }
+            })
             this.saveDataWithSyncedData({
-                following: change.object.toJSON(),
+                following: mapped,
             })
         })
 
@@ -171,7 +178,15 @@ export default class SyncStore extends BaseStore {
 
     @action.bound
     syncFollowerListWitHDB(following: any) {
-        this.userStore.following.replace(following)
+        const obj = {}
+
+        _.forEach(following, (user) => {
+            Object.assign(obj, {
+                [user.pub]: user.name,
+            })
+        })
+
+        this.userStore.following.replace(obj)
     }
 
     @action.bound
