@@ -124,33 +124,35 @@ export default class UserStore extends BaseStore {
     @action.bound
     async updateFromActiveDelegatedMembers() {
         try {
-            return await Array.from(this.delegated.keys()).map(async delegatedMember => {
-                const [, key] = delegatedMember.split(':')
-                const { data } = await axios.get(
-                    `https://atmosdb.novusphere.io/discussions/moderation/${key}`
-                )
+            return await Promise.all(
+                [...this.delegated.keys()].map(async delegatedMember => {
+                    const [, key] = delegatedMember.split(':')
+                    const { data } = await axios.get(
+                        `https://atmosdb.novusphere.io/discussions/moderation/${key}`
+                    )
 
-                if (data.hasOwnProperty('moderation')) {
-                    const blockedPosts = data['moderation']['blockedPosts']
-                    const blockedPostsKeys = Object.keys(blockedPosts)
+                    if (data.hasOwnProperty('moderation')) {
+                        const blockedPosts = data['moderation']['blockedPosts']
+                        const blockedPostsKeys = Object.keys(blockedPosts)
 
-                    if (blockedPostsKeys.length) {
-                        blockedPostsKeys.forEach(datestamp => {
-                            const blockedPostForDateStamp: string[] = blockedPosts[datestamp]
-                            if (blockedPostForDateStamp.length) {
-                                blockedPostForDateStamp.forEach(blockedPost => {
-                                    if (this.blockedByDelegation)
-                                        this.blockedByDelegation.set(blockedPost, datestamp)
-                                })
-                            }
-                        })
+                        if (blockedPostsKeys.length) {
+                            blockedPostsKeys.forEach(datestamp => {
+                                const blockedPostForDateStamp: string[] = blockedPosts[datestamp]
+                                if (blockedPostForDateStamp.length) {
+                                    blockedPostForDateStamp.forEach(blockedPost => {
+                                        if (this.blockedByDelegation)
+                                            this.blockedByDelegation.set(blockedPost, datestamp)
+                                    })
+                                }
+                            })
+                        }
                     }
-                }
 
-                if (data.hasOwnProperty('pinnedPosts')) {
-                    this.setPinnedPosts(data['pinnedPosts'])
-                }
-            })
+                    if (data.hasOwnProperty('pinnedPosts')) {
+                        this.setPinnedPosts(data['pinnedPosts'])
+                    }
+                })
+            )
         } catch (error) {
             throw error
         }
@@ -263,15 +265,18 @@ export default class UserStore extends BaseStore {
     toggleThreadWatch(id: string, count: number, suppressToast = false) {
         if (this.watching.has(id)) {
             this.watching.delete(id)
-            if (!suppressToast) this.uiStore.showToast('You are no longer watching this thread', 'info')
+            if (!suppressToast)
+                this.uiStore.showToast('You are no longer watching this thread', 'info')
             return
         }
 
         if (this.watching.size <= 4) {
             this.watching.set(id, [count, count])
-            if (!suppressToast) this.uiStore.showToast('Success! You are watching this thread', 'success')
+            if (!suppressToast)
+                this.uiStore.showToast('Success! You are watching this thread', 'success')
         } else {
-            if (!suppressToast) this.uiStore.showToast('You can only watch a maximum of 5 threads', 'info')
+            if (!suppressToast)
+                this.uiStore.showToast('You can only watch a maximum of 5 threads', 'info')
         }
     }
 
