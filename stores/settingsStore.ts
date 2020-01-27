@@ -136,7 +136,8 @@ export default class SettingsStore extends BaseStore {
                     this.userStore.setModerationMemberByTag(
                         `${accountName}:${publicKey}`,
                         tag,
-                        true
+                        true,
+                        true,
                     )
                 })
             })

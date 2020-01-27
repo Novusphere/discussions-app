@@ -192,11 +192,16 @@ export default class UserStore extends BaseStore {
     async setModerationMemberByTag(
         accountNameWithPubKey: string,
         tagName = this.activeDelegatedTag.value,
-        suppressAlert = false
+        suppressAlert = false,
+        override = false,
     ) {
         const mergedName = `${accountNameWithPubKey}:${tagName}`
 
         try {
+            if (override) {
+                return await this.setAndUpdateDelegatedPosts(mergedName, tagName, suppressAlert)
+            }
+
             if (this.delegated.has(mergedName)) {
                 if (this.delegated.get(mergedName) === tagName) {
                     this.delegated.delete(mergedName)
