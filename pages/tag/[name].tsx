@@ -51,6 +51,8 @@ class Tag extends React.Component<ITagProps, ITagPageState> {
 
     async componentDidMount(): Promise<void> {
         window.scrollTo(0, 0)
+        this.props.postsStore.resetPositionAndPosts()
+
         if (!this.state.isFirstRender) {
             this.props.tagStore.setActiveTag(this.props.tag)
             this.props.tagStore.setActiveSlug(this.props.tag)
