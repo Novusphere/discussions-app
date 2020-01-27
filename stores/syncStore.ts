@@ -128,6 +128,7 @@ export default class SyncStore extends BaseStore {
                     blockedUsers: null,
                     blockedPosts: null,
                     blockedContentSetting: '',
+                    pinnedPosts: null,
                 }
 
                 const blockedUsersToSync = []
@@ -147,7 +148,7 @@ export default class SyncStore extends BaseStore {
 
                 const pinnedPostsToSync = {}
 
-                _.forEach(pinnedPosts, (name, asPathURL) => {
+                _.forEach([...pinnedPosts.entries()], ([asPathURL, name]) => {
                     if (pinnedPostsToSync[name]) {
                         const posts = pinnedPostsToSync[name]
                         pinnedPostsToSync[name] = [...posts, asPathURL]
