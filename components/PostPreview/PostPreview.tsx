@@ -1,6 +1,6 @@
 import * as React from 'react'
 import moment from 'moment'
-import { RichTextPreview, Tips, UserNameWithIcon, VotingHandles } from '@components'
+import { RichTextPreview, Share, Tips, UserNameWithIcon, VotingHandles } from '@components'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { faComment, faStar } from '@fortawesome/free-solid-svg-icons'
 import { TagModel } from '@models/tagModel'
@@ -12,6 +12,7 @@ import { generateVoteObject, getThreadUrl, voteAsync } from '@utils'
 import { Post } from '@novuspherejs'
 import { BlockedContentSetting } from '@stores/settingsStore'
 import { ObservableMap } from 'mobx'
+import { Tooltip } from 'react-tippy'
 
 interface IPostPreviewProps {
     post: Post
@@ -27,6 +28,7 @@ interface IPostPreviewProps {
     unsignedPostsIsSpam: boolean
     postPriv: string
     showToast: (m: string, t: string) => void
+    toggleBlockPost: (url) => void
 }
 
 const PostPreview: React.FC<IPostPreviewProps> = ({
@@ -43,6 +45,7 @@ const PostPreview: React.FC<IPostPreviewProps> = ({
     unsignedPostsIsSpam,
     postPriv,
     showToast,
+    toggleBlockPost,
 }) => {
     const [url, setUrl] = useState('')
 
@@ -223,7 +226,11 @@ const PostPreview: React.FC<IPostPreviewProps> = ({
                                 <>
                                     <div className={'db'}>
                                         {post.pinned && (
-                                            <span className={'f6 b red mb2 flex flex-row items-center'}>
+                                            <span
+                                                className={
+                                                    'f6 b red mb2 flex flex-row items-center'
+                                                }
+                                            >
                                                 <FontAwesomeIcon icon={faStar} className={'mr2'} />
                                                 PINNED
                                             </span>
@@ -285,9 +292,31 @@ const PostPreview: React.FC<IPostPreviewProps> = ({
                                                 </a>
                                             </Link>
                                         </object>
-                                        <span className={'o-80 f6 ml2 dim pointer'}>share</span>
+                                        <Tooltip
+                                            animateFill={false}
+                                            interactive
+                                            html={<Share url={url} />}
+                                            trigger={'click'}
+                                            position={'bottom'}
+                                            duration={225}
+                                        >
+                                            <span
+                                                className={'o-80 f6 ml2 dim pointer'}
+                                                onClick={e => {
+                                                    e.preventDefault()
+                                                }}
+                                            >
+                                                share
+                                            </span>
+                                        </Tooltip>
                                         <span className={'o-80 f6 ml2 dim pointer'}>reply</span>
-                                        <span className={'o-80 f6 ml2 dim pointer'}>
+                                        <span
+                                            className={'o-80 f6 ml2 dim pointer'}
+                                            onClick={e => {
+                                                e.preventDefault()
+                                                toggleBlockPost(url)
+                                            }}
+                                        >
                                             mark as spam
                                         </span>
                                     </div>

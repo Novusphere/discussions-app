@@ -467,7 +467,7 @@ class Settings extends React.Component<ISettings, ISettingsState> {
         const { blockedPosts, blockedUsers } = this.props.userStore
         const { blockedSettingForm } = this.props.settingsStore
 
-        const { tags } = this.props.tagStore
+        const { tagModelFromObservables } = this.props.tagStore
         const blockedPostsAsArray = Array.from(blockedPosts.keys())
         const blockedUsersAsArray = Array.from(blockedUsers.keys())
 
@@ -544,7 +544,7 @@ class Settings extends React.Component<ISettings, ISettingsState> {
                                             <a className={'flex flex-row items-center'}>
                                                 <img
                                                     className={'tag-icon pr2'}
-                                                    src={tags.get(url.split('/')[2]).icon}
+                                                    src={tagModelFromObservables(url.split('/')[2]).icon}
                                                 />
                                                 <span>{url}</span>
                                             </a>
