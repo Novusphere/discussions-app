@@ -107,7 +107,7 @@ class Settings extends React.Component<ISettings, ISettingsState> {
     }
 
     private renderSidebarContent = () => {
-        const { balances, refreshAllBalances } = this.props.authStore
+        const { balances, refreshAllBalances, hasAccount } = this.props.authStore
 
         return (
             <>
@@ -144,32 +144,39 @@ class Settings extends React.Component<ISettings, ISettingsState> {
                         </li>
                     ))}
                 </ul>
-                <span className={'b black f5 flex flex-row justify-between'}>
-                    <span>Balances</span>
-                    {refreshAllBalances['pending'] && (
-                        <FontAwesomeIcon width={13} icon={faSpinner} spin />
-                    )}
-                    {!refreshAllBalances['pending'] && (
-                        <span
-                            className={'pointer dim'}
-                            title={'Refresh'}
-                            onClick={refreshAllBalances}
-                        >
-                            <FontAwesomeIcon icon={faSyncAlt} width={13} />
+                {hasAccount && (
+                    <>
+                        <span className={'b black f5 flex flex-row justify-between'}>
+                            <span>Balances</span>
+                            {refreshAllBalances['pending'] && (
+                                <FontAwesomeIcon width={13} icon={faSpinner} spin />
+                            )}
+                            {!refreshAllBalances['pending'] && (
+                                <span
+                                    className={'pointer dim'}
+                                    title={'Refresh'}
+                                    onClick={refreshAllBalances}
+                                >
+                                    <FontAwesomeIcon icon={faSyncAlt} width={13} />
+                                </span>
+                            )}
                         </span>
-                    )}
-                </span>
-                <ul className={'list mv3'}>
-                    {Array.from(balances).length === 0 && (
-                        <span className={'moon-gray f6 i'}>You have no balances.</span>
-                    )}
-                    {Array.from(balances).map(([symbol, amount]) => (
-                        <div key={symbol} className={'mt3 f6 flex flex-row justify-between ph3 pv2'}>
-                            <span>{symbol}</span>
-                            <span>{amount}</span>
-                        </div>
-                    ))}
-                </ul>
+                        <ul className={'list mv3'}>
+                            {Array.from(balances).length === 0 && (
+                                <span className={'moon-gray f6 i'}>You have no balances.</span>
+                            )}
+                            {Array.from(balances).map(([symbol, amount]) => (
+                                <div
+                                    key={symbol}
+                                    className={'mt3 f6 flex flex-row justify-between ph3 pv2'}
+                                >
+                                    <span>{symbol}</span>
+                                    <span>{amount}</span>
+                                </div>
+                            ))}
+                        </ul>
+                    </>
+                )}
             </>
         )
     }
@@ -240,6 +247,10 @@ class Settings extends React.Component<ISettings, ISettingsState> {
             setActiveDelegatedTag,
             setModerationMemberByTag,
         } = this.props.userStore
+
+        const { hasAccount } = this.props.authStore
+
+        if (!hasAccount) return <div className={'db'}>Please login to continue.</div>
 
         return (
             <>
@@ -544,7 +555,10 @@ class Settings extends React.Component<ISettings, ISettingsState> {
                                             <a className={'flex flex-row items-center'}>
                                                 <img
                                                     className={'tag-icon pr2'}
-                                                    src={tagModelFromObservables(url.split('/')[2]).icon}
+                                                    src={
+                                                        tagModelFromObservables(url.split('/')[2])
+                                                            .icon
+                                                    }
                                                 />
                                                 <span>{url}</span>
                                             </a>

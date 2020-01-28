@@ -150,6 +150,7 @@ class U extends React.Component<IUPageProps, IUIPageState> {
             uidw,
             followers,
             postsStore: { getPlausibleTagOptions },
+            authStore: { hasAccount },
             userStore: {
                 delegated,
                 isFollowingUser,
@@ -172,7 +173,7 @@ class U extends React.Component<IUPageProps, IUIPageState> {
                     <div className={'flex flex-column items-start justify-center'}>
                         <span className={'b black f5 mb2'}>{username}</span>
                         <span className={'b f6 mb2'}>{this.state.followers} Followers</span>
-                        {!this.isSameUser && (
+                        {!this.isSameUser && hasAccount && (
                             <button
                                 title={isFollowingUser(pub) ? 'Unfollow user' : 'Follow user'}
                                 className={'button-outline'}
@@ -192,7 +193,7 @@ class U extends React.Component<IUPageProps, IUIPageState> {
                         </li>
                     </ul>
                 </div>
-                {!this.isSameUser && (
+                {!this.isSameUser && hasAccount && (
                     <div className={'mt4 flex flex-column'}>
                         <span className={'small-title mb2'}>Options</span>
 

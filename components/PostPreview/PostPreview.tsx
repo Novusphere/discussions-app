@@ -29,6 +29,7 @@ interface IPostPreviewProps {
     postPriv: string
     showToast: (m: string, t: string) => void
     toggleBlockPost: (url) => void
+    hasAccount: boolean
 }
 
 const PostPreview: React.FC<IPostPreviewProps> = ({
@@ -46,6 +47,7 @@ const PostPreview: React.FC<IPostPreviewProps> = ({
     postPriv,
     showToast,
     toggleBlockPost,
+    hasAccount,
 }) => {
     const [url, setUrl] = useState('')
 
@@ -64,6 +66,10 @@ const PostPreview: React.FC<IPostPreviewProps> = ({
             },
 
             async handleVote(e: any, uuid: string, value: number) {
+                if (!hasAccount) {
+                    return showToast('Please log in to vote', 'error')
+                }
+
                 let type
 
                 switch (value) {

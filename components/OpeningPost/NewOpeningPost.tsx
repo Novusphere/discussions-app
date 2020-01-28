@@ -125,6 +125,10 @@ class NewOpeningPost extends React.Component<
     }
 
     private handleVoting = async (e, uuid, value) => {
+        if (!this.props.authStore.hasAccount) {
+            return this.props.uiStore.showToast('Please log in to vote', 'error')
+        }
+
         let type
 
         switch (value) {
