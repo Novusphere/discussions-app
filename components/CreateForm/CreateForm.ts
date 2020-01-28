@@ -11,7 +11,7 @@ interface MappedFields {
 
 const rules = {
     alpha_with_underscore: {
-        function: value => value.match(/^[\d]*[a-z_][a-z\d_]*$/),
+        function: value => value.match(/^[\d]*[a-z_][a-z\d_]*$/i),
         message: 'The :attribute field must contain only letters, numbers or underscores.',
     },
 }
