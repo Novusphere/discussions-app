@@ -27,7 +27,6 @@ interface IUPageProps {
 
 interface IUIPageState {
     followers: number
-    posts: any[]
     isFirstRender: boolean
 }
 
@@ -39,7 +38,6 @@ class U extends React.Component<IUPageProps, IUIPageState> {
 
         this.state = {
             followers: props.followers,
-            posts: props.posts,
             isFirstRender: false,
         }
     }
@@ -77,10 +75,9 @@ class U extends React.Component<IUPageProps, IUIPageState> {
         this.props.uiStore.toggleBannerStatus(true)
 
         if (!this.state.isFirstRender) {
-            const posts = await this.props.postsStore.getPostsForKeys([this.props.pub])
+            await this.props.postsStore.getPostsForKeys([this.props.pub])
             this.setState({
                 isFirstRender: true,
-                posts,
             })
         }
     }
@@ -249,8 +246,7 @@ class U extends React.Component<IUPageProps, IUIPageState> {
     }
 
     private renderUsersPosts = () => {
-        const { posts } = this.state
-        const { pub } = this.props
+        const { pub, posts } = this.props
 
         const {
             getPostsForKeys,
