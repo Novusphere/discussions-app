@@ -8,6 +8,7 @@ import classNames from 'classnames'
 import { generateUuid, INDEXER_NAME, LINK_LIMIT } from '@utils'
 import { useRef } from 'react'
 import { useCallback } from 'react'
+import { LazyLoadImage } from 'react-lazy-load-image-component'
 
 interface IRtPreviewProps {
     className?: string
@@ -78,7 +79,8 @@ const RtLink: any = ({ children, href, index }) => {
                 case /(.|)http[s]?:\/\/(\w|[:\/.%-])+\.(png|jpg|jpeg|gif)(\?(\w|[:\/.%-])+)?(.|)/.test(
                     href
                 ):
-                    embed = `<img src="${href}" alt="Viewing image" />`
+                    // embed = `<img src="${href}" alt="Viewing image" />`
+                    embed = <LazyLoadImage alt={'Viewing image'} src={href} effect="blur" />
                     break
                 case /t.me\/([a-z0-9]+)\/([a-z0-9])+/.test(href):
                     const [, ids] = href.split('t.me/')
@@ -143,6 +145,10 @@ const RtLink: any = ({ children, href, index }) => {
                 <object>{children}</object>
             </a>
         )
+    }
+
+    if (getEmbed.hasOwnProperty('$$typeof')) {
+        return getEmbed
     }
 
     return (

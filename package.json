@@ -50,6 +50,7 @@
         "react-collapse": "4.0.3",
         "react-dom": "16.8.6",
         "react-infinite-scroll-component": "^4.5.3",
+        "react-lazy-load-image-component": "^1.4.1",
         "react-markdown": "^4.2.2",
         "react-modal": "3.8.2",
         "react-motion": "0.5.2",
