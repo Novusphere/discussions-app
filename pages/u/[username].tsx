@@ -45,8 +45,6 @@ class U extends React.Component<IUPageProps, IUIPageState> {
     static async getInitialProps({ query, store }) {
         const postsStore: IStores['postsStore'] = store.postsStore
         const [username, pub] = query.username.split('-')
-        const data = await discussions.getUser(pub)
-        const followers = data.count
         const icon = getIdenticon(pub)
 
         postsStore.resetPositionAndPosts()
@@ -64,11 +62,29 @@ class U extends React.Component<IUPageProps, IUIPageState> {
             icon,
             username,
             pub,
-            followers,
         }
     }
 
+    componentDidUpdate(
+        prevProps: Readonly<IUPageProps>,
+        prevState: Readonly<IUIPageState>,
+        snapshot?: any
+    ): void {
+        if (prevProps.pub !== this.props.pub) {
+            this.getFollowers()
+        }
+    }
+
+    private getFollowers = async () => {
+        const data = await discussions.getUser(this.props.pub)
+        console.log(data)
+        this.setState({
+            followers: data.count,
+        })
+    }
+
     async componentDidMount(): Promise<void> {
+        this.getFollowers()
         window.scrollTo(0, 0)
         this.props.tagStore.destroyActiveTag()
         this.props.uiStore.toggleSidebarStatus(false)
@@ -92,15 +108,26 @@ class U extends React.Component<IUPageProps, IUIPageState> {
             return
         }
 
-        if (!this.isSameUser) {
-            this.setState(prevState => ({
-                followers: !this.props.userStore.isFollowingUser(pub)
-                    ? prevState.followers - 1
-                    : prevState.followers + 1,
-            }))
-        }
-
         this.props.userStore.toggleUserFollowing(user, pub)
+
+        if (!this.isSameUser) {
+            let currentFollowers = this.state.followers
+            const following = this.props.userStore.isFollowingUser(pub)
+
+            if (!following) {
+                if (currentFollowers - 1 < 0) {
+                    currentFollowers = 0
+                } else {
+                    currentFollowers = currentFollowers - 1
+                }
+            } else {
+                currentFollowers = currentFollowers + 1
+            }
+
+            this.setState({
+                followers: currentFollowers,
+            })
+        }
     }
 
     private handleUserBlock = (user, pub) => {
@@ -145,12 +172,13 @@ class U extends React.Component<IUPageProps, IUIPageState> {
     }
 
     private renderSidebarContent = () => {
+        const { followers } = this.state
+
         const {
             icon,
             username,
             pub,
             uidw,
-            followers,
             postsStore: { getPlausibleTagOptions },
             authStore: { hasAccount },
             userStore: {
@@ -174,7 +202,7 @@ class U extends React.Component<IUPageProps, IUIPageState> {
                     />
                     <div className={'flex flex-column items-start justify-center'}>
                         <span className={'b black f5 mb2'}>{username}</span>
-                        <span className={'b f6 mb2'}>{this.state.followers} Followers</span>
+                        <span className={'b f6 mb2'}>{followers} Followers</span>
                         {!this.isSameUser && hasAccount && (
                             <button
                                 title={isFollowingUser(pub) ? 'Unfollow user' : 'Follow user'}
