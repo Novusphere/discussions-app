@@ -1,6 +1,6 @@
 import { BaseStore, getOrCreateStore } from 'next-mobx-wrapper'
 import { task } from 'mobx-task'
-import { action, autorun, observable, observe, reaction, when } from 'mobx'
+import { action, autorun, observable, when } from 'mobx'
 import { nsdb } from '@novuspherejs'
 import {
     getAuthStore,
@@ -31,131 +31,141 @@ export default class SyncStore extends BaseStore {
             this.userStore.updateFromActiveDelegatedMembers()
         }, 30000)
 
-        autorun(async () => {
-            if (!this.uiStore.isServer) {
-                if (this.authStore.hasAccount) {
-                    const accountData = await this.getAccountWithPrivateKey(
-                        this.authStore.activePrivateKey
-                    )
+        autorun(async reaction => {
+            if (!this.uiStore.isServer && this.authStore.hasAccount) {
+                const accountData = await this.getAccountWithPrivateKey(
+                    this.authStore.activePrivateKey
+                )
 
-                    if (accountData) {
-                        const data = accountData['data']
+                console.log('syncing account data from server')
 
-                        if (!_.isUndefined(data.tags)) {
-                            this.syncSubscribedTagsWithDB(data.tags)
-                        }
+                if (accountData) {
+                    const data = accountData['data']
 
-                        if (!_.isUndefined(data.following)) {
-                            this.syncFollowerListWitHDB(data.following)
-                        }
-
-                        if (!_.isUndefined(data.watching)) {
-                            this.syncWatchingListWithDB(data.watching)
-                        }
-
-                        if (!_.isUndefined(data.lastCheckedNotifications)) {
-                            this.syncNotificationTimeWithDB(data.lastCheckedNotifications)
-                        }
-
-                        if (!_.isUndefined(data.moderation)) {
-                            this.syncModerationListWithDB(data.moderation)
-                        }
-
-                        if (!_.isUndefined(data.uidw)) {
-                            this.syncUIDWWithDB(data.uidw)
-                        }
-
-                        this.syncedData = data
+                    if (!_.isUndefined(data.tags)) {
+                        this.syncSubscribedTagsWithDB(data.tags)
                     }
+
+                    if (!_.isUndefined(data.following)) {
+                        this.syncFollowerListWitHDB(data.following)
+                    }
+
+                    if (!_.isUndefined(data.watching)) {
+                        this.syncWatchingListWithDB(data.watching)
+                    }
+
+                    if (!_.isUndefined(data.lastCheckedNotifications)) {
+                        this.syncNotificationTimeWithDB(data.lastCheckedNotifications)
+                    }
+
+                    if (!_.isUndefined(data.moderation)) {
+                        this.syncModerationListWithDB(data.moderation)
+                    }
+
+                    if (!_.isUndefined(data.uidw)) {
+                        this.syncUIDWWithDB(data.uidw)
+                    }
+
+                    this.syncedData = data
                 }
             }
         })
 
-        autorun(() => {
-            const { blockedContentSetting, unsignedPostsIsSpam } = this.settingsStore
-            const { activeUidWalletKey } = this.authStore
-            const { blockedUsers, blockedPosts, pinnedPosts, following, watching } = this.userStore
-            const { subSubscriptionStatus, requiresSync } = this.tagStore
-            const { lastCheckedNotifications } = this.notificationsStore
+        autorun(reaction => {
+            if (!this.uiStore.isServer && this.authStore.hasAccount) {
+                const { blockedContentSetting, unsignedPostsIsSpam } = this.settingsStore
+                const { activeUidWalletKey } = this.authStore
+                const {
+                    blockedUsers,
+                    blockedPosts,
+                    pinnedPosts,
+                    following,
+                    watching,
+                } = this.userStore
+                const { subSubscriptionStatus, requiresSync } = this.tagStore
+                const { lastCheckedNotifications } = this.notificationsStore
 
-            if (
-                this.syncedData &&
-                (blockedUsers ||
-                    blockedPosts ||
-                    blockedContentSetting ||
-                    pinnedPosts ||
-                    subSubscriptionStatus ||
-                    activeUidWalletKey ||
-                    requiresSync === true)
-            ) {
-                const moderation = {
-                    blockedUsers: null,
-                    blockedPosts: null,
-                    blockedContentSetting: '',
-                    pinnedPosts: null,
-                }
+                if (
+                    this.syncedData &&
+                    (blockedUsers ||
+                        blockedPosts ||
+                        blockedContentSetting ||
+                        pinnedPosts ||
+                        subSubscriptionStatus ||
+                        activeUidWalletKey ||
+                        requiresSync === true)
+                ) {
+                    const moderation = {
+                        blockedUsers: null,
+                        blockedPosts: null,
+                        blockedContentSetting: '',
+                        pinnedPosts: null,
+                    }
 
-                // deal with blocked users
-                const blockedUsersToSync = []
+                    // deal with blocked users
+                    const blockedUsersToSync = []
 
-                blockedUsers.forEach((name, pub) => {
-                    blockedUsersToSync.push(`${name}:${pub}`)
-                })
-
-                // deal with blocked posts
-                const blockedPostsToSync = {}
-
-                blockedPosts.forEach((timestamp, uuid) => {
-                    const prev = blockedPostsToSync[timestamp] || []
-                    Object.assign(blockedPostsToSync, {
-                        [timestamp]: [...prev, uuid],
+                    blockedUsers.forEach((name, pub) => {
+                        blockedUsersToSync.push(`${name}:${pub}`)
                     })
-                })
 
-                // deal with pinned posts
-                const pinnedPostsToSync = {}
+                    // deal with blocked posts
+                    const blockedPostsToSync = {}
 
-                _.forEach([...pinnedPosts.entries()], ([asPathURL, name]) => {
-                    if (pinnedPostsToSync[name]) {
-                        const posts = pinnedPostsToSync[name]
-                        pinnedPostsToSync[name] = [...posts, asPathURL]
-                    } else {
-                        Object.assign(pinnedPostsToSync, {
-                            [name]: [asPathURL],
+                    blockedPosts.forEach((timestamp, uuid) => {
+                        const prev = blockedPostsToSync[timestamp] || []
+                        Object.assign(blockedPostsToSync, {
+                            [timestamp]: [...prev, uuid],
                         })
-                    }
-                })
+                    })
 
-                // deal with following
-                const followingUsersToSync = _.map(following.toJSON(), (name, pub) => {
-                    return {
-                        pub,
-                        name,
-                    }
-                })
+                    // deal with pinned posts
+                    const pinnedPostsToSync = {}
 
-                Object.assign(moderation, {
-                    blockedUsers: {
-                        ...moderation.blockedUsers,
-                        ...blockedUsersToSync,
-                    },
-                    blockedPosts: {
-                        ...moderation.blockedPosts,
-                        ...blockedPostsToSync,
-                    },
-                    blockedContentSetting: blockedContentSetting,
-                    unsignedPostsIsSpam: unsignedPostsIsSpam,
-                    pinnedPosts: pinnedPostsToSync,
-                })
+                    _.forEach([...pinnedPosts.entries()], ([asPathURL, name]) => {
+                        if (pinnedPostsToSync[name]) {
+                            const posts = pinnedPostsToSync[name]
+                            pinnedPostsToSync[name] = [...posts, asPathURL]
+                        } else {
+                            Object.assign(pinnedPostsToSync, {
+                                [name]: [asPathURL],
+                            })
+                        }
+                    })
 
-                this.saveDataWithSyncedData({
-                    lastCheckedNotifications,
-                    uidw: activeUidWalletKey,
-                    watching: watching.toJSON(),
-                    tags: subSubscriptionStatus,
-                    following: followingUsersToSync,
-                    moderation: moderation,
-                })
+                    // deal with following
+                    const followingUsersToSync = _.map(following.toJSON(), (name, pub) => {
+                        return {
+                            pub,
+                            name,
+                        }
+                    })
+
+                    Object.assign(moderation, {
+                        blockedUsers: {
+                            ...moderation.blockedUsers,
+                            ...blockedUsersToSync,
+                        },
+                        blockedPosts: {
+                            ...moderation.blockedPosts,
+                            ...blockedPostsToSync,
+                        },
+                        blockedContentSetting: blockedContentSetting,
+                        unsignedPostsIsSpam: unsignedPostsIsSpam,
+                        pinnedPosts: pinnedPostsToSync,
+                    })
+
+                    console.log('sending account data to sync')
+
+                    this.saveDataWithSyncedData({
+                        lastCheckedNotifications,
+                        uidw: activeUidWalletKey,
+                        watching: watching.toJSON(),
+                        tags: subSubscriptionStatus,
+                        following: followingUsersToSync,
+                        moderation: moderation,
+                    })
+                }
             }
         })
     }

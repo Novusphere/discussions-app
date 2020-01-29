@@ -23,7 +23,7 @@ import {
 } from '@fortawesome/free-solid-svg-icons'
 import { NextRouter } from 'next/router'
 import { IStores } from '@stores'
-import { autorun, IReactionDisposer } from 'mobx'
+import { autorun } from 'mobx'
 import { generateVoteObject, getIdenticon, sleep, voteAsync } from '@utils'
 
 interface INewOpeningPostOuterProps {
@@ -47,7 +47,6 @@ interface INewOpeningPostState {
     myVoteValue: number
     upvotes: number
     downvotes: number
-    threadEditing: boolean
     openingPost: any
 }
 
@@ -57,8 +56,6 @@ class NewOpeningPost extends React.Component<
     INewOpeningPostOuterProps & INewOpeningPostInnerProps,
     INewOpeningPostState
 > {
-    private disposer: IReactionDisposer = null
-
     constructor(props) {
         super(props)
 
@@ -71,8 +68,6 @@ class NewOpeningPost extends React.Component<
                     : 0,
             upvotes: props.openingPost.upvotes,
             downvotes: props.openingPost.downvotes,
-
-            threadEditing: false,
         }
     }
 
@@ -93,20 +88,6 @@ class NewOpeningPost extends React.Component<
                 downvotes: this.props.activeThread.openingPost.downvotes,
             })
         }
-    }
-
-    componentDidMount(): void {
-        this.disposer = autorun(() => {
-            if (this.props.postsStore.activeThread) {
-                this.setState({
-                    threadEditing: this.props.postsStore.activeThread.editing,
-                })
-            }
-        })
-    }
-
-    componentWillUnmount(): void {
-        this.disposer()
     }
 
     private submitEdit = async () => {
@@ -253,7 +234,13 @@ class NewOpeningPost extends React.Component<
             authStore: { supportedTokensImages },
             postsStore: { activeThread },
             tagStore: { activeSlug },
-            userStore: { toggleBlockPost, togglePinPost, pinnedPosts, isWatchingThread, blockedPosts },
+            userStore: {
+                toggleBlockPost,
+                togglePinPost,
+                pinnedPosts,
+                isWatchingThread,
+                blockedPosts,
+            },
         } = this.props
 
         const id = router.query.id as string
@@ -296,9 +283,17 @@ class NewOpeningPost extends React.Component<
                             <Tips tokenImages={supportedTokensImages} tips={openingPost.tips} />
                         </div>
 
-                        {!this.state.threadEditing && (
-                            <div className={'flex justify-between items-center mv3'}>
-                                <span className={'black f4 b'}>{openingPost.title}</span>
+                        <div className={'flex justify-between items-center mv3'}>
+                            <span
+                                className={'black f4 b'}
+                                style={{
+                                    visibility:
+                                        activeThread && activeThread.editing ? 'hidden' : 'visible',
+                                }}
+                            >
+                                {openingPost.title}
+                            </span>
+                            {activeThread && !activeThread.editing && (
                                 <VotingHandles
                                     uuid={openingPost.uuid}
                                     myVote={myVoteValue}
@@ -306,8 +301,8 @@ class NewOpeningPost extends React.Component<
                                     downVotes={downvotes}
                                     handler={this.handleVoting}
                                 />
-                            </div>
-                        )}
+                            )}
+                        </div>
 
                         {activeThread && activeThread.editing ? (
                             <>

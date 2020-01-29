@@ -65,49 +65,49 @@ export default class SettingsStore extends BaseStore {
         )
 
         autorun(() => {
-            if (!this.authStore.selectedToken) return
+            if (this.authStore.selectedToken) {
+                const setFormInputsForFeesAndAmounts = (
+                    { form },
+                    initial = 'amount',
+                    final = 'finalAmount'
+                ) => {
+                    const {
+                        fee: { percent, flat },
+                        decimals,
+                    } = this.authStore.selectedToken
 
-            const setFormInputsForFeesAndAmounts = (
-                { form },
-                initial = 'amount',
-                final = 'finalAmount'
-            ) => {
-                const {
-                    fee: { percent, flat },
-                    decimals,
-                } = this.authStore.selectedToken
+                    let formValue = form.$(initial).value
+                    let _value = Number(formValue)
 
-                let formValue = form.$(initial).value
-                let _value = Number(formValue)
+                    if (isNaN(_value)) {
+                        _value = 0
+                    }
 
-                if (isNaN(_value)) {
-                    _value = 0
+                    const fee = _value * percent + flat
+                    form.$('fee').set('value', fee.toFixed(decimals))
+                    const finalValue = final === 'amount' ? _value - fee : _value + fee
+                    form.$(final).set('value', finalValue.toFixed(decimals))
                 }
 
-                const fee = _value * percent + flat
-                form.$('fee').set('value', fee.toFixed(decimals))
-                const finalValue = final === 'amount' ? _value - fee : _value + fee
-                form.$(final).set('value', finalValue.toFixed(decimals))
-            }
+                if (this.blurStates.transferring.amount) {
+                    setFormInputsForFeesAndAmounts(this.transferForm)
+                }
 
-            if (this.blurStates.transferring.amount) {
-                setFormInputsForFeesAndAmounts(this.transferForm)
-            }
+                if (this.blurStates.transferring.finalAmount) {
+                    setFormInputsForFeesAndAmounts(this.transferForm, 'finalAmount', 'amount')
+                }
 
-            if (this.blurStates.transferring.finalAmount) {
-                setFormInputsForFeesAndAmounts(this.transferForm, 'finalAmount', 'amount')
-            }
+                if (this.blurStates.withdrawing.amount) {
+                    setFormInputsForFeesAndAmounts(this.withdrawalForm)
+                }
 
-            if (this.blurStates.withdrawing.amount) {
-                setFormInputsForFeesAndAmounts(this.withdrawalForm)
-            }
+                if (this.blurStates.withdrawing.finalAmount) {
+                    setFormInputsForFeesAndAmounts(this.withdrawalForm, 'finalAmount', 'amount')
+                }
 
-            if (this.blurStates.withdrawing.finalAmount) {
-                setFormInputsForFeesAndAmounts(this.withdrawalForm, 'finalAmount', 'amount')
-            }
-
-            if (this.authStore.uidWalletPubKey) {
-                this.depositsForm.form.$('memoId').set('value', this.authStore.uidWalletPubKey)
+                if (this.authStore.uidWalletPubKey) {
+                    this.depositsForm.form.$('memoId').set('value', this.authStore.uidWalletPubKey)
+                }
             }
         })
     }
@@ -137,7 +137,7 @@ export default class SettingsStore extends BaseStore {
                         `${accountName}:${publicKey}`,
                         tag,
                         true,
-                        true,
+                        true
                     )
                 })
             })

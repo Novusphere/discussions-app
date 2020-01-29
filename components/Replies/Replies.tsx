@@ -202,7 +202,7 @@ const Reply: React.FC<IReplyProps> = observer(
                 },
 
                 async handleVote(e: any, uuid: string, value: number) {
-                    if (!hasAccount) {
+                    if (!source.hasAccount) {
                         return showToast('Please log in to vote', 'error')
                     }
 

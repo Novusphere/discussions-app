@@ -72,7 +72,7 @@ export default class TagStore extends BaseStore {
         })
     }
 
-    tagModelFromObservables = computedFn(name => {
+    tagModelFromObservables = (name) => {
         if (name === '') return null
 
         if (this.tags.has(name)) {
@@ -80,7 +80,7 @@ export default class TagStore extends BaseStore {
         }
 
         return this.getGenericTag(name)
-    })
+    }
 
     @action.bound
     addTag(tagName: string, cb?: any) {

@@ -63,6 +63,7 @@ export default class NotificationsStore extends BaseStore {
 
     public startNotificationInterval = () => {
         this.notificationIntervalHandler = setInterval(() => {
+            console.log('fetching notifications')
             this.fetchNotificationsAsTray()
             this.authStore.fetchBalanceForSelectedToken()
             this.pingTheseMethods.forEach(method => method.call())
