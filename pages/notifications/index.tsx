@@ -8,21 +8,17 @@ import Link from 'next/link'
 
 interface INotificationsProps {
     notificationsStore: IStores['notificationsStore']
+    uiStore: IStores['uiStore']
     tagStore: IStores['tagStore']
 }
 
 @inject('notificationsStore', 'tagStore')
 @observer
 class Notifications extends React.Component<INotificationsProps> {
-    static async getInitialProps({ store }) {
-        const uiStore: IStores['uiStore'] = store.uiStore
-        const tagStore: IStores['tagStore'] = store.tagStore
-        uiStore.toggleSidebarStatus(true)
-        tagStore.destroyActiveTag()
-        return {}
-    }
-
     async componentDidMount(): Promise<void> {
+        this.props.uiStore.toggleSidebarStatus(true)
+        this.props.tagStore.destroyActiveTag()
+
         const {
             setTimeStamp,
             resetUnreadCount,

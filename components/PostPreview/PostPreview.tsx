@@ -157,10 +157,6 @@ const PostPreview: React.FC<IPostPreviewProps> = ({
     )
 
     useEffect(() => {
-        // function makePostIntoFeedModel() {
-        //     setPostModel(new FeedModel(post))
-        // }
-
         async function getUrl() {
             let uuid = undefined
 
@@ -168,11 +164,18 @@ const PostPreview: React.FC<IPostPreviewProps> = ({
                 uuid = notificationUuid
             }
 
-            setUrl(await getThreadUrl(post, uuid))
+            return await getThreadUrl(post, uuid)
         }
 
-        // makePostIntoFeedModel()
-        getUrl()
+        let notDone = true
+
+        getUrl().then(result => {
+            if (notDone) {
+                setUrl(result)
+            }
+        })
+
+        return () => (notDone = false)
     }, [])
 
     const isSpam =

@@ -91,7 +91,13 @@ const RtLink: any = ({ children, href, index }) => {
                     break
             }
 
-            if (embed) {
+            return embed
+        }
+
+        let notDone = true
+
+        getOEMBED().then(embed => {
+            if (notDone && embed) {
                 if (embed['html']) {
                     setEmbed(embed['html'])
                 } else if (embed['body']) {
@@ -100,9 +106,9 @@ const RtLink: any = ({ children, href, index }) => {
                     setEmbed(embed)
                 }
             }
-        }
+        })
 
-        getOEMBED()
+        return () => (notDone = false)
     }, [])
 
     useEffect(() => {

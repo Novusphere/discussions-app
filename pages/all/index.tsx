@@ -7,30 +7,24 @@ import { sleep } from '@utils'
 
 interface IAllProps {
     postsStore: IStores['postsStore']
+    uiStore: IStores['uiStore']
+    tagStore: IStores['tagStore']
     posts: Post[]
     cursorId: number
 }
 
 interface IAllState {}
 
-@inject('postsStore')
+@inject('postsStore', 'uiStore', 'tagStore')
 @observer
 class All extends React.Component<IAllProps, IAllState> {
-    static async getInitialProps({ store, res }) {
-        const uiStore: IStores['uiStore'] = store.uiStore
-        const postsStore: IStores['postsStore'] = store.postsStore
-        const tagStore: IStores['tagStore'] = store.tagStore
-
-        postsStore.resetPositionAndPosts()
-
-        uiStore.toggleSidebarStatus(true)
-        uiStore.toggleBannerStatus(true)
-        tagStore.destroyActiveTag()
-
-        return {}
-    }
-
     async componentDidMount(): Promise<void> {
+        this.props.postsStore.resetPositionAndPosts()
+
+        this.props.uiStore.toggleSidebarStatus(true)
+        this.props.uiStore.toggleBannerStatus(true)
+        this.props.tagStore.destroyActiveTag()
+
         await sleep(500)
         await this.props.postsStore.getPostsForSubs(['all'])
     }

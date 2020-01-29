@@ -11,9 +11,7 @@ export default class UiStore extends BaseStore {
     @observable showBanner = true
 
     @observable currentIndex = 0
-    @observable banners = [
-        '/static/banners/default.png'
-    ]
+    @observable banners = ['/static/banners/default.png']
 
     @observable isServer = true
 
@@ -22,10 +20,13 @@ export default class UiStore extends BaseStore {
 
         Router.events.on('routeChangeStart', url => {
             if (url.indexOf('tag') === -1) {
-                let index = this.currentIndex + 1
+                let index = this.currentIndex
 
-                if (typeof this.banners[index] === 'undefined') {
-                    index = 0
+                if (
+                    this.banners.length - 1 > index &&
+                    typeof this.banners[index + 1] !== 'undefined'
+                ) {
+                    index = index + 1
                 }
 
                 this.activeBanner = this.banners[index]
