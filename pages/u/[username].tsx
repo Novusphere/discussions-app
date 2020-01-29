@@ -92,11 +92,13 @@ class U extends React.Component<IUPageProps, IUIPageState> {
             return
         }
 
-        this.setState(prevState => ({
-            followers: !this.props.userStore.isFollowingUser(pub)
-                ? prevState.followers - 1
-                : prevState.followers + 1,
-        }))
+        if (!this.isSameUser) {
+            this.setState(prevState => ({
+                followers: !this.props.userStore.isFollowingUser(pub)
+                    ? prevState.followers - 1
+                    : prevState.followers + 1,
+            }))
+        }
 
         this.props.userStore.toggleUserFollowing(user, pub)
     }
