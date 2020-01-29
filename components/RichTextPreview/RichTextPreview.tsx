@@ -74,7 +74,7 @@ const RtLink: any = ({ children, href, index }) => {
                 ):
                     embed = await nsdb.cors(`https://api.instagram.com/oembed/?url=${href}`)
                     break
-                case /https?:\/\/(www.)?tradingview.com\//.test(href):
+                case /https?:\/\/(www.)?tradingview.com\/x\//.test(href):
                 case /(.|)http[s]?:\/\/(\w|[:\/.%-])+\.(png|jpg|jpeg|gif)(\?(\w|[:\/.%-])+)?(.|)/.test(
                     href
                 ):
@@ -134,7 +134,7 @@ const RtLink: any = ({ children, href, index }) => {
     if (!getEmbed || index > LINK_LIMIT) {
         return (
             <a data-indexer-set="true" data-index={index} href={_href} title={`Open ${href}`}>
-                {children}
+                <object>{children}</object>
             </a>
         )
     }
@@ -211,11 +211,10 @@ const RichTextPreview: React.FC<IRtPreviewProps> = ({ children, className }) => 
         >
             <Markdown
                 options={{
-                    createElement(type, props, children) {
-                        if (type === 'a') {
-                            return React.createElement(RtLinkCount, { ...props }, children)
-                        }
-                        return React.createElement(type, props, children)
+                    overrides: {
+                        a: {
+                            component: RtLinkCount,
+                        },
                     },
                 }}
             >
