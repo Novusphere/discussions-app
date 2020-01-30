@@ -76,27 +76,29 @@ class InfiniteScrollFeed extends React.Component<
                 endMessage={this.renderEndMessage()}
             >
                 {!children
-                    ? posts.map(post => {
-                          return (
-                              <PostPreview
-                                  post={post as any}
-                                  tokenImages={supportedTokensImages}
-                                  key={`${post.uuid}-${post.pinned}`}
-                                  tag={tagModelFromObservables(post.sub)}
-                                  showToast={uiStore.showToast}
-                                  hasAccount={hasAccount}
-                                  postPriv={postPriv}
-                                  voteHandler={post.vote}
-                                  blockedContentSetting={blockedContentSetting}
-                                  blockedPosts={blockedPosts}
-                                  blockedUsers={blockedUsers}
-                                  blockedByDelegation={blockedByDelegation}
-                                  unsignedPostsIsSpam={unsignedPostsIsSpam}
-                                  toggleBlockPost={toggleBlockPost}
-                                  {...(withAnchorUid && { notificationUuid: post.uuid })}
-                              />
-                          )
-                      })
+                    ? posts
+                          .filter(post => post.transaction)
+                          .map(post => {
+                              return (
+                                  <PostPreview
+                                      post={post as any}
+                                      tokenImages={supportedTokensImages}
+                                      key={`${post.uuid}-${post.pinned}`}
+                                      tag={tagModelFromObservables(post.sub)}
+                                      showToast={uiStore.showToast}
+                                      hasAccount={hasAccount}
+                                      postPriv={postPriv}
+                                      voteHandler={post.vote}
+                                      blockedContentSetting={blockedContentSetting}
+                                      blockedPosts={blockedPosts}
+                                      blockedUsers={blockedUsers}
+                                      blockedByDelegation={blockedByDelegation}
+                                      unsignedPostsIsSpam={unsignedPostsIsSpam}
+                                      toggleBlockPost={toggleBlockPost}
+                                      {...(withAnchorUid && { notificationUuid: post.uuid })}
+                                  />
+                              )
+                          })
                     : children}
             </InfiniteScroll>
         )

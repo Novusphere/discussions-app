@@ -5,7 +5,7 @@ import './style.scss'
 import { useEffect, useState } from 'react'
 import { nsdb } from '@novuspherejs'
 import classNames from 'classnames'
-import { generateUuid, INDEXER_NAME, LINK_LIMIT } from '@utils'
+import { generateUuid, INDEXER_NAME, LINK_LIMIT, openInNewTab } from '@utils'
 import { useRef } from 'react'
 import { useCallback } from 'react'
 import { LazyLoadImage } from 'react-lazy-load-image-component'
@@ -80,7 +80,13 @@ const RtLink: any = ({ children, href, index }) => {
                     href
                 ):
                     // embed = `<img src="${href}" alt="Viewing image" />`
-                    embed = <LazyLoadImage alt={'Viewing image'} src={href} effect="blur" />
+                    embed = {
+                        html: (
+                            <span className={'pointer'} onClick={() => openInNewTab(href)} title={'Open image in new tab'}>
+                                <LazyLoadImage alt={'Viewing image'} src={href} effect="blur" />
+                            </span>
+                        ),
+                    }
                     break
                 case /t.me\/([a-z0-9]+)\/([a-z0-9])+/.test(href):
                     const [, ids] = href.split('t.me/')
