@@ -27,13 +27,16 @@ class EditModel {
     }
 
     public static matchContentForTags(content: string) {
-        let match = content.match(/(\s|^)\#\w\w+\b/gim)
+        let results = matchAll(content, /\[\#([a-zA-Z0-9]*)\]/gim)
 
-        if (match) {
-            return match.map(s => s.trim())
+        let tags = []
+
+        for (let result of results) {
+            const [, tag] = result
+            tags.push(tag)
         }
 
-        return []
+        return tags
     }
 
     public static matchTipForTags(content: string) {
