@@ -279,6 +279,7 @@ class SideBar extends React.Component<ITagListOuterProps & ITagListInnerProps, I
                 )}
                 {subSubscriptionStatus.map(tag => {
                     const model = tagModelFromObservables(tag)
+                    if (!model) return null
                     return (
                         <li
                             key={model.id}
