@@ -84,6 +84,7 @@ export const openInNewTab = (url: string) => {
 }
 
 export const encodeId = (post: IPost) => {
+    if (!post) return ''
     return Post.encodeId(post.transaction, new Date(post.createdAt))
 }
 
@@ -98,6 +99,7 @@ export const getThreadUrl = async (post, permalinkUuid?: string) => {
     // if a post is a comment not a opening post
     if (post.title === '') {
         const thread = await discussions.getThread(id, '')
+        if (!thread || !thread.openingPost) return ''
         const newId = encodeId(thread.openingPost as any)
         url = `/tag/${thread.openingPost.sub}/${newId}/${getThreadTitle(thread)}`
     } else {

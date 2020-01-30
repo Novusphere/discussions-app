@@ -111,7 +111,7 @@ class EditModel {
     }
 
     @action.bound
-    public createPostObject(isEdit = false, postPriv = '') {
+    public createPostObject(isEdit = false, postPriv = '', skipId = false) {
         let reply = {
             poster: null,
             displayName: null,
@@ -140,8 +140,11 @@ class EditModel {
 
         if (!isEdit) {
             const generatedUuid = generateUuid()
-            reply.id = generatedUuid
-            reply.uuid = generatedUuid
+
+            if (!skipId) {
+                reply.id = generatedUuid
+                reply.uuid = generatedUuid
+            }
 
             const value = 1
 

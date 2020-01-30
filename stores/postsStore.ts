@@ -17,6 +17,7 @@ import { ThreadModel } from '@models/threadModel'
 import FeedModel from '@models/feedModel'
 import _ from 'lodash'
 import PostModel from '@models/postModel'
+import EditModel from '@models/editModel'
 
 export interface IAttachment {
     value: string
@@ -219,7 +220,11 @@ export default class PostsStore extends BaseStore {
             let pinnedPosts = []
 
             // get pinned posts to put at the front
-            if (!this.postsPosition.cursorId && this.pinnedPosts && Object.keys(this.pinnedPosts).length > 0) {
+            if (
+                !this.postsPosition.cursorId &&
+                this.pinnedPosts &&
+                Object.keys(this.pinnedPosts).length > 0
+            ) {
                 await Promise.all(
                     _.map(this.pinnedPosts, async (name, url) => {
                         if (tags[0] === name) {
@@ -341,19 +346,20 @@ export default class PostsStore extends BaseStore {
             this.posting = true
             const post = form.values()
             const uuid = generateUuid()
-            const posterName = this.authStore.posterName
-            const uidw = this.authStore.activeUidWalletKey
+            const {
+                postPriv,
+                activePublicKey,
+                displayName,
+                activeUidWalletKey,
+                posterName,
+                posterType,
+            } = this.authStore
 
-            let inlineTags = post.content.match(/#([^\s.,;:!?]+)/gi)
-            let tags = [this.newPostTag.value]
+            const uidw = activeUidWalletKey
 
-            if (inlineTags && inlineTags.length) {
-                inlineTags = inlineTags.map(tag => tag.replace('#', ''))
-                tags = [...tags, ...inlineTags]
-            }
+            let tags = EditModel.matchContentForTags(post.content)
 
             const value = 1
-            const { postPriv, activePublicKey } = this.authStore
             const { data: vote } = generateVoteObject({
                 uuid,
                 postPriv,
@@ -378,18 +384,18 @@ export default class PostsStore extends BaseStore {
                 vote: vote,
             }
 
-            if (posterName === this.authStore.displayName.bk) {
+            if (posterName === displayName.bk) {
                 newPost.poster = undefined
                 newPost.displayName = posterName
             }
 
-            if (posterName === this.authStore.displayName.scatter) {
+            if (posterName === displayName.scatter) {
                 newPost.poster = posterName
                 newPost.displayName = posterName
             }
 
             const model = new PostModel(newPost as any)
-            const signedReply = model.sign(this.authStore.postPriv)
+            const signedReply = model.sign(postPriv)
             const submittedPost = await discussions.post(signedReply as any)
             const isPostValid = discussions.checkIfPostIsValid(submittedPost)
 
