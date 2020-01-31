@@ -99,7 +99,7 @@ class EditorComponent extends React.Component<IEditorProps> {
                     return `<span class="mention-list-item" title={${item.id}}>${image} <span>${item.value}</span></span>`
                 },
                 onSelect: (item, insertItem) => {
-                    item.value = `<a href=${window.location.origin}/u/${item.value}-${item.id}>@${item.value}</a>`
+                    item.value = `<a href=/u/${item.value}-${item.id}>@${item.value}</a>`
                     item.denotationChar = ''
                     return insertItem(item)
                 },
