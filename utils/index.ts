@@ -593,6 +593,8 @@ export const getHost = url => {
  */
 export const checkIfNameIsValid = async (accountName: string): Promise<boolean | boolean[]> => {
     try {
+        console.log('validating ', accountName)
+
         const isPublicKey = ecc.isValidPublic(accountName)
 
         if (isPublicKey) {

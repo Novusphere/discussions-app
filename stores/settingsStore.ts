@@ -249,23 +249,31 @@ export default class SettingsStore extends BaseStore {
 
             let triggerP2k = false
 
-            await values.accountNames.map(async accountName => {
-                try {
-                    await sleep(100)
-                    const isValidAccountName = await checkIfNameIsValid(accountName)
+            await Promise.all(
+                values.accountNames.map(async accountName => {
+                    try {
+                        await sleep(100)
+                        const isValidAccountName = await checkIfNameIsValid(accountName)
 
-                    if (Array.isArray(isValidAccountName)) {
-                        triggerP2k = true
-                        return
+                        console.log('status: ', isValidAccountName)
+
+                        if (Array.isArray(isValidAccountName)) {
+                            triggerP2k = true
+                            return
+                        }
+
+                        if (!isValidAccountName) invalidNames.push(accountName)
+
+                        return Promise.resolve(isValidAccountName)
+                    } catch (error) {
+                        return Promise.reject(error)
                     }
-
-                    if (!isValidAccountName) invalidNames.push(accountName)
-                } catch (error) {
-                    return error
-                }
-            })
+                })
+            )
 
             await sleep(100 * this.recipientCount)
+
+            console.log('invalid names: ', invalidNames)
 
             if (invalidNames.length) {
                 form.$('accountNames').invalidate(
