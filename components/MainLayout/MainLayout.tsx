@@ -86,7 +86,18 @@ class MainLayout extends React.Component<IMainLayoutProps> {
                                     open source
                                 </a>
                                 .
-                                <br /><br />
+                                <br />
+                                <br />
+                                <a
+                                    href={
+                                        'https://docs.google.com/document/d/e/2PACX-1vRSHTH1e3eR1IPumj9H63XAP3_QT0kQOd5v2f_9um_3hPHi1PBJaH-XQhoguSBrXv_YdHd4s1BryVhc/pub'
+                                    }
+                                    target={'_blank'}
+                                >
+                                    Privacy Policy
+                                </a>
+                                <br />
+                                <br />
                                 The developers of this software take no responsibility for the
                                 content displayed.
                                 <br />
