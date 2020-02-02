@@ -4,17 +4,29 @@ import { Provider } from 'mobx-react'
 import { fetchInitialStoreState, RootStore, RootStoreContext } from '@stores'
 import { Layout } from '@components'
 import { parseCookies } from 'nookies'
+import { create } from 'mobx-persist'
+
+const rootStore = new RootStore()
+
+export const hydrate = storage =>
+    create({
+        storage: storage,
+        jsonify: true,
+    })
 
 class DiscussionsApp extends App<any> {
     state = {
-        store: new RootStore(),
+        store: rootStore,
     }
 
     // Fetching serialized(JSON) store state
     static async getInitialProps(appContext) {
-        const appProps = await App.getInitialProps(appContext)
         const cookies = parseCookies(appContext.ctx)
         const data = await fetchInitialStoreState(cookies)
+
+        appContext.ctx.store = rootStore.hydrate(data as any)
+
+        const appProps = await App.getInitialProps(appContext)
 
         return {
             ...appProps,
@@ -26,6 +38,17 @@ class DiscussionsApp extends App<any> {
     static getDerivedStateFromProps(props, state) {
         state.store.hydrate(props.data)
         return state
+    }
+
+    componentDidMount(): void {
+        const stores = {
+            userStore: this.state.store.userStore,
+            settingsStore: this.state.store.settingStore,
+        }
+
+        Object.keys(stores).forEach(store => {
+            hydrate(localStorage)(store, stores[store])
+        })
     }
 
     render() {

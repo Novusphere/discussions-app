@@ -1,24 +1,56 @@
 .header {
-  position: fixed;
-  z-index: 1;
-  width: 100%;
-  display: flex;
-  flex-direction: row;
-  align-items: center;
-  justify-content: space-between;
+    position: fixed;
+    z-index: 5;
+    width: 100%;
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: space-between;
 }
 
 .content {
-  margin-top: 75px;
+    margin-top: 75px;
 }
 
 .footer {
-  text-align: center;
+    text-align: center;
 }
 
 .headerIntractable {
-  display: flex;
-  align-items: center;
-  justify-content: flex-end;
-  flex-direction: row;
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    flex-direction: row;
+}
+
+.container {
+    width: 100%;
+    padding-right: 15px;
+    padding-left: 15px;
+    margin-right: auto;
+    margin-left: auto;
+}
+
+@media (min-width: 576px) {
+    .container {
+        max-width: 540px;
+    }
+}
+
+@media (min-width: 768px) {
+    .container {
+        max-width: 720px;
+    }
+}
+
+@media (min-width: 992px) {
+    .container {
+        max-width: 960px;
+    }
+}
+
+@media (min-width: 1200px) {
+    .container {
+        max-width: 1140px;
+    }
 }

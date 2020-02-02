@@ -16,6 +16,9 @@ export class AuthStore {
     postPriv = ''
 
     @observable
+    postPub = ''
+
+    @observable
     hasAccount = false
 
     @observable
