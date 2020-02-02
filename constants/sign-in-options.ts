@@ -1,8 +1,8 @@
-import { SignInMethods } from '@globals'
+import { SIGN_IN_OPTIONS } from '@globals'
 
 export const SignInOptions = [
     {
-        name: SignInMethods.brainKey,
+        name: SIGN_IN_OPTIONS.brainKey,
         icon: '/static/wallets/brain-key.jpg',
     }
 ]

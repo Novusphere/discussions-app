@@ -32,7 +32,7 @@ class DiscussionsApp extends App<any> {
         const { Component, pageProps, data } = this.props
         return (
             <Provider {...this.state.store}>
-                <RootStoreContext.Provider value={data}>
+                <RootStoreContext.Provider value={this.state.store}>
                     <Layout>
                         <Component {...pageProps} />
                     </Layout>

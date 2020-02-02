@@ -6,6 +6,7 @@ export default class MyDocument extends Document {
         return (
             <Html>
                 <Head>
+                    <link rel="stylesheet" href="https://unpkg.com/tachyons@4.10.0/css/tachyons.min.css"/>
                     <link
                         rel="apple-touch-icon"
                         sizes="180x180"
