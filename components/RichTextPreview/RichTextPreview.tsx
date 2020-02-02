@@ -5,9 +5,7 @@ import './style.scss'
 import { useEffect, useState } from 'react'
 import { nsdb } from '@novuspherejs'
 import classNames from 'classnames'
-import { generateUuid, INDEXER_NAME, LINK_LIMIT, openInNewTab } from '@utils'
-import { useRef } from 'react'
-import { useCallback } from 'react'
+import { generateUuid, LINK_LIMIT, openInNewTab } from '@utils'
 import { LazyLoadImage } from 'react-lazy-load-image-component'
 
 interface IRtPreviewProps {
@@ -16,13 +14,6 @@ interface IRtPreviewProps {
 
 const RtLink: any = ({ children, href, index }) => {
     const [getEmbed, setEmbed] = useState(null)
-
-    let _href = href
-
-    if (href.indexOf(INDEXER_NAME) !== -1) {
-        const [_splt_href] = href.split(INDEXER_NAME)
-        _href = _splt_href
-    }
 
     useEffect(() => {
         async function getOEMBED() {
@@ -82,7 +73,11 @@ const RtLink: any = ({ children, href, index }) => {
                     // embed = `<img src="${href}" alt="Viewing image" />`
                     embed = {
                         html: (
-                            <span className={'pointer'} onClick={() => openInNewTab(href)} title={'Open image in new tab'}>
+                            <span
+                                className={'pointer'}
+                                onClick={() => openInNewTab(href)}
+                                title={'Open image in new tab'}
+                            >
                                 <LazyLoadImage alt={'Viewing image'} src={href} effect="blur" />
                             </span>
                         ),
@@ -116,10 +111,8 @@ const RtLink: any = ({ children, href, index }) => {
             }
         })
 
-        return () => (notDone = false)
-    }, [])
+        let timeout = null
 
-    useEffect(() => {
         async function refreshIFrames() {
             if (href.match(/facebook|fb.me/)) {
                 if ((window as any).FB) {
@@ -136,18 +129,26 @@ const RtLink: any = ({ children, href, index }) => {
             } else if (href.match(/t.me/)) {
                 // @ts-ignore
                 const tl = await import('/static/telegram.js')
-                setTimeout(() => {
+
+                timeout = setTimeout(() => {
                     tl.default(window)
                 }, 0)
             }
         }
 
         refreshIFrames()
-    }, [getEmbed])
+
+        return () => {
+            if (timeout) {
+                clearTimeout(timeout)
+            }
+            notDone = false
+        }
+    }, [])
 
     if (!getEmbed || index > LINK_LIMIT) {
         return (
-            <a data-indexer-set="true" data-index={index} href={_href} title={`Open ${href}`}>
+            <a data-indexer-set="true" data-index={index} href={href} title={`Open ${href}`}>
                 <object>{children}</object>
             </a>
         )
@@ -167,59 +168,59 @@ const RtLink: any = ({ children, href, index }) => {
 }
 
 const RtLinkCount = ({ href, children }) => {
-    const ref = useRef(null)
-    const [_href, _setHref] = useState(href)
-    const [_index, _setIndex] = useState(1)
-
-    useEffect(() => {
-        const timer = setTimeout(() => {
-            if (ref.current) {
-                const url = ref.current.childNodes[0].getAttribute('href')
-                if (url) {
-                    const split = url.split(INDEXER_NAME)
-
-                    if (split) {
-                        _setIndex(split[1])
-                        _setHref(split[0])
-                    }
-                }
-            }
-        }, 0)
-        return () => clearTimeout(timer)
-    }, [])
-
-    return (
-        <span ref={ref}>
-            <RtLink children={children} href={_href} index={_index} />
-        </span>
-    )
+    return <RtLink children={children} href={href} />
+    // const ref = useRef(null)
+    // const [_href, _setHref] = useState(href)
+    // const [_index, _setIndex] = useState(1)
+    //
+    // useEffect(() => {
+    //     const timer = setTimeout(() => {
+    //         if (ref.current) {
+    //             const url = ref.current.childNodes[0].getAttribute('href')
+    //             if (url) {
+    //                 const split = url.split(INDEXER_NAME)
+    //
+    //                 if (split) {
+    //                     _setIndex(split[1])
+    //                     _setHref(split[0])
+    //                 }
+    //             }
+    //         }
+    //     }, 0)
+    //     return () => clearTimeout(timer)
+    // }, [])
+    //
+    // return (
+    //     <span ref={ref}>
+    //         <RtLink children={children} href={_href} index={_index} />
+    //     </span>
+    // )
 }
 
 const RichTextPreview: React.FC<IRtPreviewProps> = ({ children, className }) => {
-    if (!children) return null
-
-    const ref = useRef(null)
-    const setRef = useCallback(node => {
-        if (node) {
-            const linkNodes: HTMLCollection = node.childNodes[0].getElementsByTagName('a')
-            if (linkNodes.length) {
-                Array.from(linkNodes).forEach((item, index) => {
-                    if (!item.getAttribute('data-indexer')) {
-                        item.setAttribute(
-                            'href',
-                            `${item.getAttribute('href')}/${INDEXER_NAME}${index + 1}`
-                        )
-                    }
-                })
-            }
-        }
-
-        ref.current = node
-    }, [])
+    // if (!children) return null
+    //
+    // const ref = useRef(null)
+    // const setRef = useCallback(node => {
+    //     if (node) {
+    //         const linkNodes: HTMLCollection = node.childNodes[0].getElementsByTagName('a')
+    //         if (linkNodes.length) {
+    //             Array.from(linkNodes).forEach((item, index) => {
+    //                 if (!item.getAttribute('data-indexer')) {
+    //                     item.setAttribute(
+    //                         'href',
+    //                         `${item.getAttribute('href')}/${INDEXER_NAME}${index + 1}`
+    //                     )
+    //                 }
+    //             })
+    //         }
+    //     }
+    //
+    //     ref.current = node
+    // }, [])
 
     return (
         <object
-            ref={setRef}
             className={classNames('pt0 pb3', [
                 {
                     'black lh-copy measure-wide pt0 post-preview-content content-fade overflow-break-word': !className,
