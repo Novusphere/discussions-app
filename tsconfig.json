@@ -23,10 +23,11 @@
             "@constants/*": ["./constants/*"],
             "@novuspherejs": ["./novusphere-js/index"],
             "@novuspherejs/*": ["./novusphere-js/*"],
+            "@stores": ["./stores/index"],
             "@stores/*": ["./stores/*"],
             "@modules/*": ["./modules/*"],
-            "@stores": ["./stores/index"],
             "@styles/*": ["./styles/*"],
+            "@assets/*": ["./assets/*"],
             "@utils": ["./utils/index"],
             "@router": ["./routes.ts"],
             "@globals": ["./constants/globals.ts"]

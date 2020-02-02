@@ -1,10 +1,10 @@
 import Router from 'next/router'
 import { discussions, eos, nsdb, Post } from '@novuspherejs'
-import { IPost } from '@stores/postsStore'
 import _ from 'lodash'
 import axios from 'axios'
 import ecc from 'eosjs-ecc'
 import { useEffect, useRef } from 'react'
+import cookie from 'cookie'
 
 const removeMd = require('remove-markdown')
 
@@ -19,6 +19,10 @@ export const isDev = process.env.NODE_ENV === 'development'
 export const isServer = typeof window === 'undefined'
 export const sleep = milliseconds => {
     return new Promise(resolve => setTimeout(resolve, milliseconds))
+}
+
+export const parseCookies = req => {
+    return cookie.parse(req ? req.headers.cookie || "" : document.cookie)
 }
 
 export const sanityCheckTag = (tagName: string) => {
@@ -83,7 +87,7 @@ export const openInNewTab = (url: string) => {
     return win.focus()
 }
 
-export const encodeId = (post: IPost) => {
+export const encodeId = (post: Post) => {
     if (!post) return ''
     return Post.encodeId(post.transaction, new Date(post.createdAt))
 }

@@ -1,110 +1,44 @@
 import App from 'next/app'
 import React from 'react'
-import * as Stores from '@stores'
-import { Provider, useStaticRendering } from 'mobx-react'
-import { MainLayout } from '@components'
-import { withMobx } from 'next-mobx-wrapper'
-import { isServer, pageview } from '@utils'
-import { create } from 'mobx-persist'
-import { toast } from 'react-toastify'
-import { DefaultSeo } from 'next-seo'
-import Router from 'next/router'
+import { Provider } from 'mobx-react'
+import { fetchInitialStoreState, RootStore, RootStoreContext } from '@stores'
+import { Layout } from '@components'
+import { parseCookies } from 'nookies'
 
-import '../styles/style.scss'
-import { eos } from '@novuspherejs'
+class DiscussionsApp extends App<any> {
+    state = {
+        store: new RootStore(),
+    }
 
-// configure({ enforceActions: 'observed' })
-useStaticRendering(isServer) // NOT `true` value
-toast.configure()
+    // Fetching serialized(JSON) store state
+    static async getInitialProps(appContext) {
+        const appProps = await App.getInitialProps(appContext)
+        const cookies = parseCookies(appContext.ctx)
+        const data = await fetchInitialStoreState(cookies)
 
-Router.events.on('routeChangeComplete', url => pageview(url))
-
-export const hydrate = storage =>
-    create({
-        storage: storage,
-        jsonify: true,
-    })
-
-class DiscussionApp extends App {
-    public props: any
-
-    /**
-     * Hydrate the store for LS here
-     * Due to SSR, we have to execute this part
-     * on the client.
-     */
-    async componentDidMount(): Promise<void> {
-        if (!isServer) {
-            await eos.initializeTokens()
-            await eos.init({
-                host: 'nodes.get-scatter.com',
-                port: 443,
-                protocol: 'https',
-                chainId: 'aca376f206b8fc25a6ed44dbdc66547c36c6c33e3a119ffbeaef943642f0e906',
-            })
-
-            const {
-                authStore,
-                settingsStore,
-                userStore,
-                notificationsStore,
-                tagStore,
-                uiStore,
-            } = this.props.store
-
-            uiStore.isServer = false
-
-            const stores = {
-                auth: authStore,
-                settings: settingsStore,
-                user: userStore,
-                notifications: notificationsStore,
-                tags: tagStore,
-            }
-
-            Object.keys(stores).forEach(store => {
-                hydrate(localStorage)(store, stores[store])
-            })
-
-            settingsStore.setTokens(eos.tokens)
+        return {
+            ...appProps,
+            data,
         }
     }
 
-    public render() {
-        const { Component, pageProps, store } = (this as any).props
+    // Hydrate serialized state to store
+    static getDerivedStateFromProps(props, state) {
+        state.store.hydrate(props.data)
+        return state
+    }
 
+    render() {
+        const { Component, pageProps, data } = this.props
         return (
-            <Provider {...store}>
-                <MainLayout>
-                    <DefaultSeo
-                        openGraph={{
-                            type: 'website',
-                            locale: 'en_US',
-                            url: 'https://www.discussions.app/',
-                            site_name: 'Discussions App',
-                            images: [
-                                {
-                                    url: store.tagStore.activeTag
-                                        ? store.tagStore.activeTag.icon
-                                        : 'https://cdn.novusphere.io/static/atmos2.png',
-                                    width: 250,
-                                    height: 250,
-                                    alt: store.tagStore.activeTag
-                                        ? store.tagStore.activeTag.name
-                                        : 'Discussions App',
-                                },
-                            ],
-                        }}
-                        twitter={{
-                            site: '@thenovusphere',
-                            cardType: 'summary',
-                        }}
-                    />
-                    <Component {...pageProps} />
-                </MainLayout>
+            <Provider {...this.state.store}>
+                <RootStoreContext.Provider value={data}>
+                    <Layout>
+                        <Component {...pageProps} />
+                    </Layout>
+                </RootStoreContext.Provider>
             </Provider>
         )
     }
 }
-
-export default withMobx(Stores)(DiscussionApp)
+export default DiscussionsApp

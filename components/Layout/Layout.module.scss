@@ -1,0 +1,24 @@
+.header {
+  position: fixed;
+  z-index: 1;
+  width: 100%;
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.content {
+  margin-top: 75px;
+}
+
+.footer {
+  text-align: center;
+}
+
+.headerIntractable {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  flex-direction: row;
+}
