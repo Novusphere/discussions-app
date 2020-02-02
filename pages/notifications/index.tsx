@@ -12,7 +12,7 @@ interface INotificationsProps {
     tagStore: IStores['tagStore']
 }
 
-@inject('notificationsStore', 'tagStore')
+@inject('notificationsStore', 'tagStore', 'uiStore')
 @observer
 class Notifications extends React.Component<INotificationsProps> {
     async componentDidMount(): Promise<void> {
