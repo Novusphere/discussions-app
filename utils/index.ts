@@ -12,6 +12,7 @@ const pjson = require('../package.json')
 const uuid = require('uuidv4')
 
 export * from './useScrollPosition'
+export * from './wrapper'
 
 export const INDEXER_NAME = '__LINKINDEXER__'
 export const LINK_LIMIT = 1000

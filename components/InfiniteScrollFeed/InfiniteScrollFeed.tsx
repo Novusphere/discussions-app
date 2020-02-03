@@ -80,4 +80,4 @@ const InfiniteScrollFeed: FunctionComponent<IInfiniteScrollFeedProps> = ({
 
 InfiniteScrollFeed.defaultProps = {}
 
-export default InfiniteScrollFeed
+export default observer(InfiniteScrollFeed)

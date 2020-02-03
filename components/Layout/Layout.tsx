@@ -13,6 +13,7 @@ import {
 import { RootStoreContext } from '@stores'
 import { useObserver } from 'mobx-react-lite'
 import cx from 'classnames'
+import Link from 'next/link'
 
 const { Header, Footer, Content } = AntdLayout
 
@@ -23,9 +24,9 @@ const Layout: FunctionComponent<ILayoutProps> = ({ children }) => {
 
     return (
         <ConfigProvider>
-            <AntdLayout className={'container'}>
+            <AntdLayout>
                 <Modals />
-                <Header className={cx([styles.header, 'bb b--light-gray'])}>
+                <Header className={cx([styles.header, 'container bb b--light-gray'])}>
                     <div className={cx([styles.container, 'center flex flex-row items-center'])}>
                         <HeaderLogo />
                         <HeaderSearch />
@@ -34,7 +35,7 @@ const Layout: FunctionComponent<ILayoutProps> = ({ children }) => {
                                 <div className={styles.headerIntractable}>
                                     <HeaderNotifications />
                                     <HeaderNewPost />
-                                    <HeaderUserBar />
+                                    <HeaderUserBar icon={store.authStore.postPub} />
                                 </div>
                             ) : (
                                 <HeaderLoggedOut />
@@ -42,16 +43,31 @@ const Layout: FunctionComponent<ILayoutProps> = ({ children }) => {
                         )}
                     </div>
                 </Header>
+                <span className={styles.banner}>
+                    <img
+                        src={store.uiStore.activeBanner}
+                        title={'Active banner'}
+                        alt={'Active banner image'}
+                    />
+                </span>
                 <div className={cx([styles.content, styles.container, 'center flex pv3'])}>
                     <div className={'fl w-30'}>
                         <Menu mode={'vertical'} defaultSelectedKeys={['1']}>
                             <Menu.Item key="1">
-                                <Icon type="home" />
-                                Home
+                                <Link href={'/'} as={'/'}>
+                                    <a>
+                                        <Icon type="home" />
+                                        Home
+                                    </a>
+                                </Link>
                             </Menu.Item>
                             <Menu.Item key="2">
-                                <Icon type="team" />
-                                Feed
+                                <Link href={'/feed'} as={'/feed'}>
+                                    <a>
+                                        <Icon type="team" />
+                                        Feed
+                                    </a>
+                                </Link>
                             </Menu.Item>
                             <Menu.Item key="3">
                                 <Icon type="read" />

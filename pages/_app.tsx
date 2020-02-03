@@ -26,7 +26,22 @@ class DiscussionsApp extends App<any> {
 
         appContext.ctx.store = rootStore.hydrate(data as any)
 
-        const appProps = await App.getInitialProps(appContext)
+        const appProps: any = await App.getInitialProps(appContext)
+
+        // overwrite some props before parsing serialized store
+        if (appProps.pageProps.hasOwnProperty('position')) {
+            data.postsStore = {
+                ...data.postsStore,
+                postsPosition: appProps.pageProps.position,
+            }
+        }
+
+        if (appProps.pageProps.hasOwnProperty('posts')) {
+            data.postsStore = {
+                ...data.postsStore,
+                posts: appProps.pageProps.posts,
+            }
+        }
 
         return {
             ...appProps,

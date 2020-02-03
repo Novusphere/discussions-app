@@ -8,8 +8,21 @@
     justify-content: space-between;
 }
 
+.banner {
+    margin-top: 55px;
+    width: 100vw;
+    height: 75px;
+    background: #101011;
+
+    img {
+        width: 100%;
+        object-fit: contain;
+        height: 75px;
+    }
+}
+
 .content {
-    margin-top: 75px;
+    margin-top: 5px;
 }
 
 .footer {

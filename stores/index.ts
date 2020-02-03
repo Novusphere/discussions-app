@@ -54,6 +54,7 @@ export async function fetchInitialStoreState(cookies) {
             hasEOSWallet: cookies.hasEOSWallet ? JSON.parse(cookies.hasEOSWallet) : false,
             preferredSignInMethod: cookies.preferredSignInMethod || SIGN_IN_OPTIONS.brainKey,
         },
+        postsStore: {},
     }
 }
 

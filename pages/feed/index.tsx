@@ -5,23 +5,23 @@ import { InfiniteScrollFeed } from '@components'
 import { observer } from 'mobx-react-lite'
 import nookies from 'nookies'
 
-const IndexPage: NextPage<any> = ({ key }) => {
+const FeedPage: NextPage<any> = ({ key }) => {
     const store = useContext(RootStoreContext)
 
     return (
         <InfiniteScrollFeed
             dataLength={store.postsStore.postsPosition.items}
             hasMore={store.postsStore.postsPosition.cursorId !== 0}
-            next={() => store.postsStore.fetchPostsForTag(key)}
+            next={() => store.postsStore.getPostsForKeys(key)}
             posts={store.postsStore.posts}
         />
     )
 }
 
-IndexPage.getInitialProps = async function(ctx: any) {
+FeedPage.getInitialProps = async function(ctx: any) {
     const key = nookies.get(ctx).postPub
     ctx.store.postsStore.resetPostsAndPosition()
-    const { posts, position } = await ctx.store.postsStore.fetchPostsForTag(key)
+    const { posts, position } = await ctx.store.postsStore.getPostsForKeys(key)
     return {
         key,
         posts,
@@ -29,4 +29,4 @@ IndexPage.getInitialProps = async function(ctx: any) {
     }
 }
 
-export default observer(IndexPage)
+export default observer(FeedPage)

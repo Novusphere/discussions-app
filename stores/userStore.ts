@@ -1,6 +1,7 @@
 import { persist } from 'mobx-persist'
-import { observable } from 'mobx'
+import { action, observable } from 'mobx'
 import { RootStore } from '@stores/index'
+import { task } from 'mobx-task'
 
 export class UserStore {
     @persist('map') following = observable.map<string, string>()
@@ -11,11 +12,11 @@ export class UserStore {
     @persist('map') pinnedPosts = observable.map<string, string>() // [asPathURL, tagName]
 
     blockedByDelegation = observable.map<string, string>() // either blockedUsers or blockedPosts
-    @persist('map') pinnedByDelegation = observable.map<string, string>() // [asPathURL, tagName]
 
-    @persist('object')
-    @observable
-    activeDelegatedTag = { value: '', label: '' }
+    @persist('map') pinnedByDelegation = observable.map<string, string>() // [asPathURL, tagName]
+    @persist('object') @observable activeDelegatedTag = { value: '', label: '' }
+
+    @observable followingKeys = []
 
     constructor(rootStore: RootStore) {}
 }

@@ -2,10 +2,13 @@ import React, { FunctionComponent, useCallback, useState } from 'react'
 import { Avatar, Menu, Dropdown, Icon } from 'antd'
 
 import styles from './HeaderUserBar.module.scss'
+import { getIdenticon } from '@utils'
 
-interface IHeaderUserBarProps {}
+interface IHeaderUserBarProps {
+    icon: string
+}
 
-const HeaderUserBar: FunctionComponent<IHeaderUserBarProps> = () => {
+const HeaderUserBar: FunctionComponent<IHeaderUserBarProps> = ({ icon }) => {
     const [visible, setVisible] = useState(false)
 
     const visibleChange = useCallback(() => {
@@ -43,12 +46,14 @@ const HeaderUserBar: FunctionComponent<IHeaderUserBarProps> = () => {
             <a href={'#'} className={styles.userLink}>
                 shovel12
                 <Icon type="down" style={{ marginLeft: 5 }} />
-                <Avatar size={'default'} icon={'user'} className={styles.avatar} />
+                <Avatar src={getIdenticon(icon)} size={'default'} icon={'user'} className={styles.avatar} />
             </a>
         </Dropdown>
     )
 }
 
-HeaderUserBar.defaultProps = {}
+HeaderUserBar.defaultProps = {
+    icon: null,
+}
 
 export default HeaderUserBar

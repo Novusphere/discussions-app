@@ -11,13 +11,13 @@ const HeaderLoggedOut: FunctionComponent<IHeaderLoggedOutProps> = () => {
     return (
         <>
             <Button
-                size={'large'}
+                size={'default'}
                 style={{ marginRight: 10 }}
                 onClick={() => store.uiStore.setActiveModal(MODAL_OPTIONS.signIn)}
             >
                 Login
             </Button>
-            <Button size={'large'} type={'primary'}>
+            <Button size={'default'} type={'primary'}>
                 Signup
             </Button>
         </>
