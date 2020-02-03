@@ -8,6 +8,7 @@ import { nsdb } from '@novuspherejs'
 import { generateUuid, LINK_LIMIT, openInNewTab } from '@utils'
 
 interface IRichTextPreviewProps {
+    hideFade?: boolean
     className?: string
 }
 
@@ -166,12 +167,16 @@ const RtLink: FunctionComponent<any> = ({ children, href, index }) => {
     )
 }
 
-const RichTextPreview: FunctionComponent<IRichTextPreviewProps> = ({ children, className }) => {
+const RichTextPreview: FunctionComponent<IRichTextPreviewProps> = ({
+    hideFade,
+    children,
+    className,
+}) => {
     return (
-        <object
+        <div
             className={cx('pt0 pb3', [
-                styles.contentFade,
                 {
+                    [styles.contentFade]: !hideFade,
                     'black lh-copy measure-wide pt0 overflow-break-word': !className,
                     [className]: !!className,
                 },
@@ -188,10 +193,12 @@ const RichTextPreview: FunctionComponent<IRichTextPreviewProps> = ({ children, c
             >
                 {children}
             </Markdown>
-        </object>
+        </div>
     )
 }
 
-RichTextPreview.defaultProps = {}
+RichTextPreview.defaultProps = {
+    hideFade: false,
+}
 
 export default RichTextPreview

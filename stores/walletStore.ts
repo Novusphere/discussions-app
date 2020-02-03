@@ -43,6 +43,8 @@ export class WalletStore {
             ) {
                 let logo
 
+                if (!eos.tokens) return
+
                 const tokenFromList = eos.tokens.find(t => t.name === token.symbol)
 
                 if (tokenFromList) {

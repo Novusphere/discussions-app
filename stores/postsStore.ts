@@ -1,6 +1,6 @@
 import { computed, observable } from 'mobx'
 import { RootStore } from '@stores/index'
-import { discussions, Post } from '@novuspherejs'
+import { discussions, Post, Thread } from '@novuspherejs'
 import _ from 'lodash'
 import { parseCookies } from 'nookies'
 
@@ -30,24 +30,6 @@ export class PostsStore {
         }
     }
 
-    // @computed get pinnedPosts() {
-    //     let posts = {}
-    //
-    //     const cookies = parseCookies()
-    //
-    //     console.log(cookies)
-    //
-    //     // if (this.userStore.hasOwnProperty('pinnedPosts')) {
-    //     //     _.merge(posts, this.userStore['pinnedPosts'])
-    //     // }
-    //     //
-    //     // if (this.userStore.hasOwnProperty('pinnedByDelegation')) {
-    //     //     _.merge(posts, this.userStore['pinnedByDelegation'])
-    //     // }
-    //
-    //     return posts
-    // }
-
     /**
      * For fetching posts inside a tag, home page or all.
      * @param key
@@ -69,12 +51,11 @@ export class PostsStore {
             let pinnedPosts = []
 
             // get pinned posts to put at the front
-            if (
-                !this.postsPosition.cursorId &&
-                pinnedPostsBuffer
-            ) {
+            if (!this.postsPosition.cursorId && pinnedPostsBuffer) {
                 // convert b64 back to obj
-                const pinnedPostsAsObj = JSON.parse(Buffer.from(pinnedPostsBuffer, 'base64').toString('ascii'))
+                const pinnedPostsAsObj = JSON.parse(
+                    Buffer.from(pinnedPostsBuffer, 'base64').toString('ascii')
+                )
 
                 await Promise.all(
                     _.map(pinnedPostsAsObj, async (name, url: string) => {
@@ -132,6 +113,14 @@ export class PostsStore {
             }
         } catch (error) {
             return error
+        }
+    }
+
+    getThreadById = async (id: string, key = ''): Promise<Thread> => {
+        try {
+            return await discussions.getThread(id, key)
+        } catch (error) {
+            throw error
         }
     }
 }

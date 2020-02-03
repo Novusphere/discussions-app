@@ -33,34 +33,42 @@ const VotingHandles: React.FC<IVoteProps> = ({
             {...props}
         >
             <span
+                className={'silver'}
                 onClick={e => {
                     e.preventDefault()
                     handler(e, uuid, 1)
                 }}
             >
                 <Icon
+                    className={'pointer hover-orange'}
                     type="caret-up"
                     style={{
-                        color: myVote === 1 ? '#FF6300' : '#b9b9b9',
+                        color: myVote === 1 ? '#FF6300' : 'none',
                     }}
                 />
             </span>
             <span
-                className={classNames(['f6 disable-user-select ph1'])}
-                style={{ color: color ? color : '#b9b9b9', whiteSpace: 'pre' }}
+                className={classNames(['f6 disable-user-select ph1 silver'])}
+                style={{
+                    whiteSpace: 'pre',
+                    color: myVote === 1 ? '#FF6300' : 'none',
+                }}
+                // style={{ color: color ? color : '#b9b9b9', whiteSpace: 'pre' }}
             >
                 {upVotes - downVotes}
             </span>
             <span
+                className={'silver'}
                 onClick={e => {
                     e.preventDefault()
                     handler(e, uuid, -1)
                 }}
             >
                 <Icon
+                    className={'link pointer hover-blue'}
                     type="caret-down"
                     style={{
-                        color: myVote === -1 ? '#00449E' : '#b9b9b9',
+                        color: myVote === -1 ? '#00449E' : 'none',
                     }}
                 />
             </span>

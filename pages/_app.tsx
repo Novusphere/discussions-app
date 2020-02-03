@@ -8,6 +8,7 @@ import { create } from 'mobx-persist'
 import { SIGN_IN_OPTIONS } from '@globals'
 import { eos } from '@novuspherejs';
 
+import '../assets/main.scss'
 
 class DiscussionsApp extends App<any> {
     // state = {

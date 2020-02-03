@@ -1,5 +1,15 @@
 import React, { FunctionComponent, useContext } from 'react'
-import { Layout as AntdLayout, Icon, Skeleton, Input, Divider, Popover, Button } from 'antd'
+import {
+    Layout as AntdLayout,
+    Icon,
+    Skeleton,
+    Input,
+    Divider,
+    Popover,
+    Button,
+    message,
+    notification,
+} from 'antd'
 import styles from './Layout.module.scss'
 import {
     HeaderLoggedOut,
@@ -23,6 +33,14 @@ interface ILayoutProps {}
 
 const Layout: FunctionComponent<ILayoutProps> = ({ children }) => {
     const { authStore, uiStore, settingStore, tagStore }: RootStore = useContext(StoreContext)
+
+    message.config({
+        top: 75,
+    })
+
+    notification.config({
+        top: 75,
+    })
 
     return (
         <AntdLayout>

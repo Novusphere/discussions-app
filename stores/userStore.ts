@@ -144,4 +144,39 @@ export class UserStore {
             return error
         }
     }
+
+    toggleUserFollowing = (user: string, pub: string) => {
+        if (this.following.has(pub)) {
+            this.following.delete(pub)
+            this.uiStore.showMessage('This user has been unfollowed!', 'success')
+        } else {
+            this.following.set(pub, user)
+            this.uiStore.showMessage('You are now following this user!', 'success')
+        }
+    }
+
+    /**
+     * @param {string} asPathURL - i.e. /tag/test/1hx6xdq9iwehn/testt
+     */
+    toggleBlockPost = (asPathURL: string) => {
+        if (this.blockedPosts.has(asPathURL)) {
+            this.blockedPosts.delete(asPathURL)
+            this.uiStore.showMessage('This post has been unmarked as spam!', 'success')
+        } else {
+            const date = new Date(Date.now())
+            const dateStamp = `${date.getFullYear()}${date.getMonth()}`
+            this.blockedPosts.set(asPathURL, dateStamp)
+            this.uiStore.showMessage('This post has been marked as spam!', 'success')
+        }
+    }
+
+    // togglePinPost(tagName: string, asPathURL: string) {
+    //     if (this.pinnedPosts.has(asPathURL)) {
+    //         this.uiStore.showToast('This post has been unpinned!', 'success')
+    //         this.pinnedPosts.delete(asPathURL)
+    //     } else {
+    //         this.pinnedPosts.set(asPathURL, tagName)
+    //         this.uiStore.showToast('This post has been pinned!', 'success')
+    //     }
+    // }
 }

@@ -1,6 +1,6 @@
 import { action, observable } from 'mobx'
 import { MODAL_OPTIONS } from '@globals'
-import { notification } from 'antd'
+import { notification, message } from 'antd'
 import { Router } from 'next/router'
 import { RootStore } from '@stores'
 
@@ -42,5 +42,9 @@ export class UIStore {
             message,
             description,
         })
+    }
+
+    showMessage = (description: string, type = 'success') => {
+        message[type](description)
     }
 }
