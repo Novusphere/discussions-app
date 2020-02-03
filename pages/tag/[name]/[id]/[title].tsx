@@ -7,6 +7,7 @@ import Link from 'next/link'
 import { UserNameWithIcon, Tips, VotingHandles, RichTextPreview, Replies, Icons } from '@components'
 import moment from 'moment'
 import { NextRouter, withRouter } from 'next/router'
+import _ from 'lodash'
 
 interface IPostPageProps {
     router: NextRouter
@@ -32,6 +33,25 @@ const PostPage: NextPage<IPostPageProps> = ({ router, thread, query: { name, id,
                 }
 
                 return 0
+            },
+
+            get threadUsers() {
+                return _.uniqBy(
+                    _.map(_.filter(postStore.observableThread.map, (posts: any) => posts.pub.length), posts => {
+                        let poster = posts.poster
+
+                        if (poster === 'eosforumanon') {
+                            poster = posts.displayName
+                        }
+
+                        return {
+                            id: `${posts.pub}-${posts.uidw}`,
+                            value: poster,
+                            icon: posts.imageData,
+                        }
+                    }),
+                    option => option.id
+                )
             },
 
             handleVoting: () => {
@@ -143,7 +163,7 @@ const PostPage: NextPage<IPostPageProps> = ({ router, thread, query: { name, id,
                 </span>
                 <div className={'mt2 bg-white pv2'}>
                     {postStore.observableThread.openingPost.replies.map(reply => (
-                        <Replies key={reply.uuid} reply={reply} router={router} />
+                        <Replies key={reply.uuid} reply={reply} router={router} threadUsers={postStore.threadUsers} />
                     ))}
                 </div>
             </div>

@@ -66,6 +66,7 @@
         "react-toastify": "5.3.2",
         "remove-markdown": "0.3.0",
         "sanitize-html": "1.20.1",
+        "showdown": "^1.9.1",
         "string.prototype.matchall": "4.0.2",
         "to-markdown": "3.1.1",
         "turndown": "5.0.3",

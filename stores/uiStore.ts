@@ -37,10 +37,17 @@ export class UIStore {
         this.activeModal = MODAL_OPTIONS.none
     }
 
-    showToast = (message: string, description: string, type = 'open') => {
+    showToast = (
+        message: string,
+        description: string,
+        type = 'open',
+        { btn, onClose } = { btn: null, onClose: null } as any
+    ) => {
         notification[type]({
             message,
             description,
+            btn,
+            onClose,
         })
     }
 

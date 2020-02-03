@@ -7,6 +7,7 @@ export { default as VotingHandles } from './VotingHandles/VotingHandles'
 export { default as Tips } from './Tips/Tips'
 export { default as Replies } from './Replies/Replies'
 export { default as SharePostPopover } from './SharePostPopover/SharePostPopover'
+export { default as Editor } from './Editor/Editor'
 
 // header
 export { default as HeaderLogo } from './HeaderLogo/HeaderLogo'

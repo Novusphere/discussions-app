@@ -7,7 +7,7 @@ import { useEffect, useRef } from 'react'
 import cookie from 'cookie'
 
 const removeMd = require('remove-markdown')
-
+const matchAll = require('string.prototype.matchall')
 const pjson = require('../package.json')
 const uuid = require('uuidv4')
 
@@ -769,4 +769,142 @@ export const useInterval = (callback, delay) => {
 
 export const escapeRegExp = string => {
     return string.replace(/[|\\{}()[\]^$+*?.-]/g, '\\$&') // $& means the whole matched string
+}
+
+export const matchTipForTags = (content: string) => {
+    let tokens = 'ATMOS|EOS'
+
+    if (typeof window !== 'undefined') {
+        tokens = window.localStorage.getItem('supp_tokens')
+    }
+
+    // this is a fix for removing zero-width characters from a js string
+    const _content = content.replace(/[\u200B-\u200D\uFEFF]/g, '')
+    const regex = new RegExp(
+        `\[#tip\](.*?)\\s(?<amount>[0-9\.]+)\\s(?<symbol>${tokens})(?:\\s\\[\\@(?<username>.*?)\\]\\((?<url>.*?)\\))?`,
+        'gim'
+    )
+
+    let results = matchAll(_content, regex)
+    let tips = []
+
+    for (let result of results) {
+        const { amount, symbol, username, url } = result.groups
+
+        tips.push({
+            amount,
+            symbol,
+            username,
+            url,
+        })
+    }
+
+    return tips
+}
+
+export const matchContentForMentions = (content: string) => {
+    return content.match(/\[@(.*?)]\(.*?\)/gi)
+}
+
+export const extractMentionHashesForRegEx = (matchedContentForMentions: any) => {
+    if (!matchedContentForMentions) return []
+    const regex = new RegExp(/\(?EOS.*\)?\w/, 'gi')
+    return matchedContentForMentions.map(items => {
+        return items.match(regex)[0]
+    })
+}
+
+export const matchContentForTags = (content: string) => {
+    let results = matchAll(content, /\[\#([a-zA-Z0-9]*)\]/gim)
+
+    let tags = []
+
+    for (let result of results) {
+        const [, tag] = result
+        tags.push(tag)
+    }
+
+    return tags
+}
+
+export const createPostObject = ({
+    title,
+    content,
+    sub,
+    threadUuid,
+    uidw,
+    pub, // the person you are replying to
+    posterName,
+    isEdit = false,
+    skipId = false,
+    postPriv = '',
+}) => {
+    let reply = {
+        poster: null,
+        title: title,
+        createdAt: new Date(Date.now()),
+        content: content,
+        sub: sub,
+        chain: 'eos',
+        mentions: [],
+        tags: [sub],
+        id: '',
+        uuid: '',
+        parentUuid: uuid,
+        threadUuid: threadUuid,
+        uidw: uidw,
+        attachment: getAttachmentValue(content),
+        upvotes: 0,
+        downvotes: 0,
+        myVote: [],
+        edit: undefined,
+        transfers: undefined,
+        vote: null,
+        imageData: undefined,
+        pub: '',
+        displayName: posterName,
+    }
+
+    if (!isEdit) {
+        const generatedUuid = generateUuid()
+
+        if (!skipId) {
+            reply.id = generatedUuid
+            reply.uuid = generatedUuid
+        }
+
+        const value = 1
+
+        reply = {
+            ...reply,
+            upvotes: 1,
+        }
+
+        if (postPriv) {
+            reply.vote = generateVoteObject({
+                uuid: generatedUuid,
+                postPriv: postPriv,
+                value: value,
+            }).data
+        }
+
+        let tips = matchTipForTags(content)
+
+        if (tips && tips.length) {
+            reply.transfers = tips
+        }
+    }
+
+    let mentions = [...extractMentionHashesForRegEx(matchContentForMentions(content)), pub]
+
+    reply.mentions = mentions
+
+    let tags = matchTipForTags(content)
+
+    if (tags && tags.length) {
+        tags = tags.map(tag => tag.replace('#', ''))
+        reply.tags = [...reply.tags, ...tags]
+    }
+
+    return reply
 }
