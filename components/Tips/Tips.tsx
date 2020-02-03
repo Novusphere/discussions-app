@@ -2,7 +2,7 @@ import React, { FunctionComponent, useState } from 'react'
 
 import styles from './Tips.module.scss'
 import dynamic from 'next/dynamic'
-import { isServer } from '@utils'
+import { Badge } from 'antd'
 import { CSSTransition } from 'react-transition-group'
 
 interface ITipsProps {
@@ -61,10 +61,14 @@ const Tips: FunctionComponent<ITipsProps> = ({ tips }) => {
                                         className={'dib'}
                                         width={'25px'}
                                     />
-                                    <span className={'f6 gray dib pl1 tiny'}>
-                                        {' '}
-                                        × {tips[symbol].toFixed(precision)}
-                                    </span>
+                                    <Badge
+                                        count={`× ${tips[symbol].toFixed(precision)}`}
+                                        style={{
+                                            backgroundColor: '#fff',
+                                            color: '#999',
+                                            boxShadow: '0 0 0 1px #fff inset',
+                                        }}
+                                    />
                                 </span>
                             )
                         }) as any

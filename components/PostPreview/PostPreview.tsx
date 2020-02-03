@@ -293,12 +293,12 @@ const PostPreview: FunctionComponent<IPostPreviewProps> = ({
 
                                     <RichTextPreview>{post.content}</RichTextPreview>
 
-                                    <object className={'z-2 absolute bottom-0 mv3'}>
+                                    <object className={'z-2 absolute bottom-0 pv3'}>
                                         <Link
                                             href={'/tag/[name]/[id]/[title]'}
                                             as={`${url}#comments`}
                                         >
-                                            <a className={'o-80 f6 dim pointer'}>
+                                            <a className={'f6 mr2 dim pointer'}>
                                                 <Icon
                                                     component={() => (
                                                         <svg
@@ -322,16 +322,6 @@ const PostPreview: FunctionComponent<IPostPreviewProps> = ({
                                                 {post.totalReplies} comments
                                             </a>
                                         </Link>
-                                        {/*<Tooltip*/}
-                                        {/*    animateFill={false}*/}
-                                        {/*    interactive*/}
-                                        {/*    html={<Share url={url} />}*/}
-                                        {/*    trigger={'click'}*/}
-                                        {/*    position={'bottom'}*/}
-                                        {/*    duration={225}*/}
-                                        {/*>*/}
-                                        {/*
-                                        {/*</Tooltip>*/}
                                         <Popover
                                             title={'Share this post'}
                                             content={<SharePostPopover url={url} />}
@@ -339,7 +329,7 @@ const PostPreview: FunctionComponent<IPostPreviewProps> = ({
                                         >
                                             <a
                                                 href={'#'}
-                                                className={'o-80 f6 ml2 dim pointer'}
+                                                className={'f6 mh2 dim pointer'}
                                                 onClick={e => {
                                                     e.preventDefault()
                                                 }}
@@ -348,9 +338,9 @@ const PostPreview: FunctionComponent<IPostPreviewProps> = ({
                                                 share
                                             </a>
                                         </Popover>
-                                        <span className={'o-80 f6 ml2 dim pointer'}>reply</span>
+                                        <span className={'f6 mh2 dim pointer'}>reply</span>
                                         <span
-                                            className={'o-80 f6 ml2 dim pointer'}
+                                            className={'f6 mh2 dim pointer'}
                                             onClick={e => {
                                                 e.preventDefault()
                                                 toggleBlockPost(url)
