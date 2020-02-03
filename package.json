@@ -34,6 +34,7 @@
         "lodash": "4.17.14",
         "markdown-to-jsx": "6.10.3",
         "mobx": "5.14.2",
+        "mobx-cookie": "^2.0.3",
         "mobx-persist": "0.4.1",
         "mobx-react": "6.1.4",
         "mobx-react-form": "2.0.8",

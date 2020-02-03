@@ -6,7 +6,10 @@ export default class MyDocument extends Document {
         return (
             <Html>
                 <Head>
-                    <link rel="stylesheet" href="https://unpkg.com/tachyons@4.10.0/css/tachyons.min.css"/>
+                    <link
+                        rel="stylesheet"
+                        href="https://unpkg.com/tachyons@4.10.0/css/tachyons.min.css"
+                    />
                     <link rel="stylesheet" href="https://cdn.quilljs.com/1.2.6/quill.snow.css" />
                     <link
                         rel="apple-touch-icon"
@@ -28,6 +31,25 @@ export default class MyDocument extends Document {
                     <link rel="manifest" href="/static/site.webmanifest" />
                     <meta name="msapplication-TileColor" content="#da532c" />
                     <meta name="theme-color" content="#ffffff" />
+                    <style jsx global>{`
+                        .ql-toolbar.ql-snow {
+                            border-top-left-radius: 5px;
+                            border-top-right-radius: 5px;
+                        }
+                        
+                        .ql-container.ql-snow {
+                            border-bottom-left-radius: 5px;
+                            border-bottom-right-radius: 5px;
+                        }
+
+                        .primary {
+                            color: #079e99;
+                        }
+
+                        .b--primary {
+                            color: #079e99;
+                        }
+                    `}</style>
                 </Head>
                 <body style={{ margin: 0 }}>
                     <Main />

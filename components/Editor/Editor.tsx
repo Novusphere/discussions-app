@@ -26,7 +26,12 @@ class Editor extends React.Component<IEditorProps> {
         loaded: false,
     }
 
-    static contextType = StoreContext
+    constructor(props) {
+        super(props)
+
+        this.context = StoreContext
+    }
+
 
     static defaultProps = {
         placeholder: 'Enter your reply',

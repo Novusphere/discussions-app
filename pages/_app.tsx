@@ -6,7 +6,7 @@ import { Layout } from '@components'
 import { parseCookies } from 'nookies'
 import { create } from 'mobx-persist'
 import { SIGN_IN_OPTIONS } from '@globals'
-import { eos } from '@novuspherejs';
+import { eos } from '@novuspherejs'
 
 import '../assets/main.scss'
 
@@ -22,14 +22,32 @@ class DiscussionsApp extends App<any> {
         const cookies = parseCookies(appContext.ctx)
         const initialStoreData = initializeStore({
             authStore: {
-                uidwWalletPubKey: cookies.uidwWalletPubKey || '',
-                postPriv: cookies.postPriv || '',
-                postPub: cookies.postPub || '',
-                displayName: cookies.displayName || '',
-                hasAccount: cookies.hasAccount ? Boolean(cookies.hasAccount) : false,
-                hasEOSWallet: cookies.hasEOSWallet ? Boolean(cookies.hasEOSWallet) : false,
+                // set inside a value object because of next-cookies reads from value property
+
+                uidwWalletPubKey: {
+                    value: cookies.uidwWalletPubKey || '',
+                },
+                postPriv: {
+                    value: cookies.postPriv || '',
+                },
+                _postPubKey: {
+                    value: cookies.postPub || '',
+                },
+                displayName: {
+                    value: cookies.displayName || '',
+                },
+                _hasAccountCookie: {
+                    value: cookies.hasOwnProperty('hasAccount')
+                        ? JSON.parse(cookies.hasAccount)
+                        : false,
+                },
+                hasEOSWallet: {
+                    value: cookies.hasOwnProperty('hasEOSWallet')
+                        ? JSON.parse(cookies.hasEOSWallet)
+                        : false,
+                },
                 preferredSignInMethod: cookies.preferredSignInMethod || SIGN_IN_OPTIONS.brainKey,
-            }
+            },
         })
 
         const Component = appContext.Component

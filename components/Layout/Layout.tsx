@@ -1,4 +1,4 @@
-import React, { FunctionComponent, useContext } from 'react'
+import React, { FunctionComponent, useCallback, useContext } from 'react'
 import {
     Layout as AntdLayout,
     Icon,
@@ -42,6 +42,11 @@ const Layout: FunctionComponent<ILayoutProps> = ({ children }) => {
         top: 75,
     })
 
+    const logout = useCallback(() => {
+        authStore.logOut()
+        uiStore.showToast('Success', 'You have logged out!', 'success')
+    }, [])
+
     return (
         <AntdLayout>
             <Modals />
@@ -54,7 +59,7 @@ const Layout: FunctionComponent<ILayoutProps> = ({ children }) => {
                             <div className={styles.headerIntractable}>
                                 <HeaderNotifications />
                                 <HeaderNewPost />
-                                <HeaderUserBar icon={authStore.postPub} />
+                                <HeaderUserBar icon={authStore.postPub} logout={logout} />
                             </div>
                         ) : (
                             <HeaderLoggedOut />

@@ -908,3 +908,7 @@ export const createPostObject = ({
 
     return reply
 }
+
+export const hasErrors = (fieldsError) => {
+    return Object.keys(fieldsError).some(field => fieldsError[field]);
+}
