@@ -4,28 +4,31 @@ import { InfiniteScrollFeed } from '@components'
 import { observer } from 'mobx-react-lite'
 import { StoreContext } from '@stores'
 
-const IndexPage: NextPage<any> = ({ postPub }) => {
+const TagsPage: NextPage<any> = ({ postPub, split }) => {
     const { postsStore } = useContext(StoreContext)
 
     return (
         <InfiniteScrollFeed
             dataLength={postsStore.postsPosition.items}
             hasMore={postsStore.postsPosition.cursorId !== 0}
-            next={() => postsStore.fetchPostsForTag(postPub)}
+            next={() => postsStore.fetchPostsForTag(postPub, split)}
             posts={postsStore.posts}
         />
     )
 }
 
-IndexPage.getInitialProps = async function({ store }: any) {
+TagsPage.getInitialProps = async function({ store, query }: any) {
+    const tags = query.tags
+    const split = tags.split(',')
     store.postsStore.resetPostsAndPosition()
 
     const postPub = store.authStore.postPub
-    await store.postsStore.fetchPostsForTag(postPub)
+    await store.postsStore.fetchPostsForTag(postPub, split)
 
     return {
         postPub,
+        split,
     }
 }
 
-export default observer(IndexPage)
+export default observer(TagsPage)

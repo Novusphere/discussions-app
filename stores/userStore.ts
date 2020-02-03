@@ -3,6 +3,7 @@ import { observable } from 'mobx'
 import { RootStore } from '@stores/index'
 import axios from 'axios'
 import _ from 'lodash'
+import { setCookie, parseCookies } from 'nookies'
 
 export class UserStore {
     @persist('map') following = observable.map<string, string>()
@@ -10,11 +11,11 @@ export class UserStore {
     @persist('map') blockedUsers = observable.map<string, string>() // [pubKey, displayName]
     @persist('map') blockedPosts = observable.map<string, string>() // [asPathURL, yyyydd]
     @persist('map') delegated = observable.map<string, string>() // [name:pubKey:tagName, tagName]
-    @persist('map') pinnedPosts = observable.map<string, string>() // [asPathURL, tagName]
+    // @persist('map') pinnedPosts = observable.map<string, string>() // [asPathURL, tagName]
 
     blockedByDelegation = observable.map<string, string>() // either blockedUsers or blockedPosts
 
-    @persist('map') pinnedByDelegation = observable.map<string, string>() // [asPathURL, tagName]
+    // @persist('map') pinnedByDelegation = observable.map<string, string>() // [asPathURL, tagName]
     @persist('object') @observable activeDelegatedTag = { value: '', label: '' }
 
     @observable followingKeys = []
@@ -70,10 +71,13 @@ export class UserStore {
             })
         })
 
+        const b64 = Buffer.from(JSON.stringify(obj)).toString('base64')
+
         if (delegated) {
-            this.pinnedByDelegation.replace(obj)
+            setCookie(null, 'pinnedByDelegation', b64, { path: '/' })
         } else {
-            this.pinnedPosts.replace(obj)
+            setCookie(null, 'pinnedPosts', b64, { path: '/' })
+            // this.pinnedPosts.replace(obj)
         }
     }
 

@@ -104,7 +104,7 @@ const Layout: FunctionComponent<ILayoutProps> = ({ children }) => {
                                                             <Link
                                                                 href={`/tags/[tags]`}
                                                                 as={as}
-                                                                shallow={true}
+                                                                shallow={false}
                                                             >
                                                                 <a>{name}</a>
                                                             </Link>
@@ -192,9 +192,9 @@ const Layout: FunctionComponent<ILayoutProps> = ({ children }) => {
                                         >
                                             <span>
                                                 <Link
-                                                    href={`/tag/[tag]`}
+                                                    href={`/tag/[name]`}
                                                     as={`/tag/${subscribed}`}
-                                                    shallow
+                                                    shallow={false}
                                                 >
                                                     <a className={'dib'}>
                                                         <img
@@ -221,9 +221,11 @@ const Layout: FunctionComponent<ILayoutProps> = ({ children }) => {
             </div>
             <div className={cx([styles.footer, 'bg-white pv3 light-silver'])}>
                 <div className="tc lh-copy">
-                    <p className={'b f6'}>
-                        Version: {getVersion()} ({process.env.BUILD_ID})
-                    </p>
+                    {useObserver(() => (
+                        <p className={'b f6'}>
+                            Version: {getVersion()} ({process.env.BUILD_ID})
+                        </p>
+                    ))}
                     <p>
                         This site is fully{' '}
                         <a href="https://github.com/Novusphere/discussions-app">open source</a>

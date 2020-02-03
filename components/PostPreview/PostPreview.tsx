@@ -1,5 +1,5 @@
 import React, { FunctionComponent, useEffect, useState } from 'react'
-import { Icon, Comment, Avatar, Tooltip } from 'antd'
+import { Icon, Popover, Tooltip } from 'antd'
 import Link from 'next/link'
 import cx from 'classnames'
 import styles from './PostPreview.module.scss'
@@ -8,7 +8,13 @@ import { Post } from '@novuspherejs'
 import { getThreadUrl, generateVoteObject, voteAsync } from '@utils'
 import { ObservableMap } from 'mobx'
 import moment from 'moment'
-import { RichTextPreview, UserNameWithIcon, VotingHandles } from '@components'
+import {
+    RichTextPreview,
+    UserNameWithIcon,
+    VotingHandles,
+    Tips,
+    SharePostPopover,
+} from '@components'
 
 interface IPostPreviewProps {
     loading?: boolean
@@ -194,13 +200,13 @@ const PostPreview: FunctionComponent<IPostPreviewProps> = ({
     }
 
     return (
-        <Link href={'/tag/[name]/[id]/[title]'} as={url} passHref={true}>
+        <Link href={'/tag/[name]/[id]/[title]'} as={url}>
             <a
                 className={cx([
                     styles.postPreview,
                     'db bg-white mh1',
                     {
-                        'pinned-post': post.pinned,
+                        [styles.pinnedPost]: post.pinned,
                     },
                 ])}
                 data-url={url}
@@ -253,9 +259,10 @@ const PostPreview: FunctionComponent<IPostPreviewProps> = ({
                                             <span className={'flex flex-row items-center'}>
                                                 {tag && (
                                                     <img
-                                                        src={tag.icon}
+                                                        src={tag.logo}
                                                         title={`${tag.name} icon`}
-                                                        className={'tag-image'}
+                                                        className={'mr2 db'}
+                                                        width={25}
                                                     />
                                                 )}
                                                 <span className={'b ttu'}>{post.sub}</span>
@@ -276,7 +283,7 @@ const PostPreview: FunctionComponent<IPostPreviewProps> = ({
                                                     </span>
                                                 </Tooltip>
                                             </span>
-                                            {/*<Tips tokenImages={tokenImages} tips={post.tips} />*/}
+                                            <Tips tips={post.tips} />
                                         </div>
                                     </div>
 
@@ -323,15 +330,24 @@ const PostPreview: FunctionComponent<IPostPreviewProps> = ({
                                         {/*    position={'bottom'}*/}
                                         {/*    duration={225}*/}
                                         {/*>*/}
-                                        {/*    <span*/}
-                                        {/*        className={'o-80 f6 ml2 dim pointer'}*/}
-                                        {/*        onClick={e => {*/}
-                                        {/*            e.preventDefault()*/}
-                                        {/*        }}*/}
-                                        {/*    >*/}
-                                        {/*        share*/}
-                                        {/*    </span>*/}
+                                        {/*
                                         {/*</Tooltip>*/}
+                                        <Popover
+                                            title={'Share this post'}
+                                            content={<SharePostPopover url={url} />}
+                                            placement={'bottom'}
+                                        >
+                                            <a
+                                                href={'#'}
+                                                className={'o-80 f6 ml2 dim pointer'}
+                                                onClick={e => {
+                                                    e.preventDefault()
+                                                }}
+                                            >
+                                                {' '}
+                                                share
+                                            </a>
+                                        </Popover>
                                         <span className={'o-80 f6 ml2 dim pointer'}>reply</span>
                                         <span
                                             className={'o-80 f6 ml2 dim pointer'}

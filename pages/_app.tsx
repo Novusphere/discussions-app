@@ -6,6 +6,7 @@ import { Layout } from '@components'
 import { parseCookies } from 'nookies'
 import { create } from 'mobx-persist'
 import { SIGN_IN_OPTIONS } from '@globals'
+import { eos } from '@novuspherejs';
 
 
 class DiscussionsApp extends App<any> {
@@ -70,8 +71,14 @@ class DiscussionsApp extends App<any> {
     //     return state
     // }
 
-    componentDidMount(): void {
-
+    async componentDidMount(): Promise<void> {
+        await eos.initializeTokens()
+        await eos.init({
+            host: 'nodes.get-scatter.com',
+            port: 443,
+            protocol: 'https',
+            chainId: 'aca376f206b8fc25a6ed44dbdc66547c36c6c33e3a119ffbeaef943642f0e906',
+        })
     }
 
     render() {

@@ -1,6 +1,6 @@
 .postPreview {
-    transition: 0.1s all ease-in-out;
-    box-shadow: 0px 0px 6px 1px rgba(0, 0, 0, 0.1);
+    //transition: 0.1s all ease-in-out;
+    //box-shadow: 0px 0px 6px 1px rgba(0, 0, 0, 0.1);
     margin-bottom: 20px;
     min-height: 50px;
     max-height: 325px;
@@ -21,4 +21,8 @@
     border-radius: 2px;
     box-shadow: 0 1px 2px #c9cccd;
     margin-bottom: 20px;
+}
+
+.pinnedPost {
+    border: 1px solid #ff4136;
 }

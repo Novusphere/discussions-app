@@ -1,7 +1,8 @@
-import { action, computed, observable } from 'mobx'
-import { task } from 'mobx-task'
+import { computed, observable } from 'mobx'
 import { RootStore } from '@stores/index'
 import { discussions, Post } from '@novuspherejs'
+import _ from 'lodash'
+import { parseCookies } from 'nookies'
 
 export class PostsStore {
     @observable
@@ -29,12 +30,31 @@ export class PostsStore {
         }
     }
 
+    // @computed get pinnedPosts() {
+    //     let posts = {}
+    //
+    //     const cookies = parseCookies()
+    //
+    //     console.log(cookies)
+    //
+    //     // if (this.userStore.hasOwnProperty('pinnedPosts')) {
+    //     //     _.merge(posts, this.userStore['pinnedPosts'])
+    //     // }
+    //     //
+    //     // if (this.userStore.hasOwnProperty('pinnedByDelegation')) {
+    //     //     _.merge(posts, this.userStore['pinnedByDelegation'])
+    //     // }
+    //
+    //     return posts
+    // }
+
     /**
      * For fetching posts inside a tag, home page or all.
      * @param key
      * @param tagNames
+     * @param pinnedPostsBuffer - a Base64 version of { }asPathURL, tagName }
      */
-    fetchPostsForTag = async (key = '', tagNames = []) => {
+    fetchPostsForTag = async (key = '', tagNames = [], pinnedPostsBuffer = '') => {
         try {
             if (!tagNames.length) tagNames = ['all']
 
@@ -46,7 +66,29 @@ export class PostsStore {
                 key
             )
 
-            this.posts = [...this.posts, ...posts]
+            let pinnedPosts = []
+
+            // get pinned posts to put at the front
+            if (
+                !this.postsPosition.cursorId &&
+                pinnedPostsBuffer
+            ) {
+                // convert b64 back to obj
+                const pinnedPostsAsObj = JSON.parse(Buffer.from(pinnedPostsBuffer, 'base64').toString('ascii'))
+
+                await Promise.all(
+                    _.map(pinnedPostsAsObj, async (name, url: string) => {
+                        if (tagNames[0] === name) {
+                            const post = await discussions.getPostsByAsPathURL(url, key)
+                            post.pinned = true
+                            // this.posts.push(post)
+                            pinnedPosts.push(post)
+                        }
+                    })
+                )
+            }
+
+            this.posts = [...pinnedPosts, ...this.posts, ...posts]
 
             this.postsPosition = {
                 items: this.posts.length,

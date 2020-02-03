@@ -40,7 +40,7 @@ export class TagStore {
             return this.tags.get(tagName)
         }
 
-        return this.getGenericTag(name)
+        return this.getGenericTag(tagName)
     }
 
     setTagGroup = (groupName: string, tags: string[]) => {

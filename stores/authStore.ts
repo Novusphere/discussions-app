@@ -24,10 +24,10 @@ export class AuthStore {
     @observable
     hasEOSWallet = false
 
-    constructor(rootStore: RootStore, initialState = {}) {
-        if (initialState) {
-            set(this, initialState)
-        }
+    @observable supportedTokensForUnifiedWallet = []
+    @observable supportedTokensImages: { [symbol: string]: string } = {}
+
+    constructor(rootStore: RootStore) {
     }
 
     @action.bound

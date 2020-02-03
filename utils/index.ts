@@ -23,7 +23,7 @@ export const sleep = milliseconds => {
 }
 
 export const parseCookies = req => {
-    return cookie.parse(req ? req.headers.cookie || "" : document.cookie)
+    return cookie.parse(req ? req.headers.cookie || '' : document.cookie)
 }
 
 export const sanityCheckTag = (tagName: string) => {
@@ -36,10 +36,10 @@ export const sanityCheckTag = (tagName: string) => {
     return tagName
 }
 
-export const tweetCurrentPage = () => {
+export const tweetCurrentPage = (url = null) => {
     window.open(
         'https://twitter.com/share?url=' +
-            encodeURIComponent(window.location.href) +
+            (url ? url : encodeURIComponent(window.location.href)) +
             '&text=' +
             document.title,
         '',
@@ -767,6 +767,6 @@ export const useInterval = (callback, delay) => {
     }, [delay])
 }
 
-export const escapeRegExp = (string) => {
-    return string.replace(/[|\\{}()[\]^$+*?.-]/g, '\\$&'); // $& means the whole matched string
+export const escapeRegExp = string => {
+    return string.replace(/[|\\{}()[\]^$+*?.-]/g, '\\$&') // $& means the whole matched string
 }

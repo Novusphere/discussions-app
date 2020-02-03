@@ -4,6 +4,8 @@ export { default as RichTextPreview } from './RichTextPreview/RichTextPreview'
 export { default as InfiniteScrollFeed } from './InfiniteScrollFeed/InfiniteScrollFeed'
 export { default as UserNameWithIcon } from './UserNameWithIcon/UserNameWithIcon'
 export { default as VotingHandles } from './VotingHandles/VotingHandles'
+export { default as Tips } from './Tips/Tips'
+export { default as SharePostPopover } from './SharePostPopover/SharePostPopover'
 
 // header
 export { default as HeaderLogo } from './HeaderLogo/HeaderLogo'

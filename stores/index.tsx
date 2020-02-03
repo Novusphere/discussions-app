@@ -9,6 +9,7 @@ import { PostsStore } from '@stores/postsStore'
 import { UserStore } from '@stores/userStore'
 import { SettingsStore } from '@stores/settingsStore'
 import { create } from 'mobx-persist'
+import { WalletStore } from '@stores/walletStore'
 
 useStaticRendering(isServer)
 
@@ -22,11 +23,12 @@ export class RootStore {
     authStore = new AuthStore(this)
     userStore = new UserStore(this)
     uiStore = new UIStore(this)
+    walletStore = new WalletStore(this)
     tagStore = new TagStore(this)
     postsStore = new PostsStore(this)
     settingStore = new SettingsStore(this)
 
-    hydrate({ authStore, postsStore, tagStore, uiStore, userStore, settingStore }) {
+    hydrate({ authStore, postsStore, tagStore, uiStore, userStore, settingStore, walletStore }) {
         if (authStore) {
             set(this.authStore, authStore)
         }
@@ -66,6 +68,7 @@ function initializeStore(data = rootStore || {}) {
         postsStore: data.postsStore,
         tagStore: data.tagStore,
         uiStore: data.uiStore,
+        walletStore: data.walletStore,
         userStore: data.userStore ? data.userStore : {},
         settingStore: data.settingStore ? data.settingStore : {},
     })
@@ -81,6 +84,7 @@ function initializeStore(data = rootStore || {}) {
             userStore: stores.userStore,
             settingsStore: stores.settingStore,
             tagStore: stores.tagStore,
+            walletStore: stores.walletStore,
         }
 
         Object.keys(hydr).forEach(store => {
