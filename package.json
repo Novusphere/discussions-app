@@ -107,6 +107,7 @@
         "prettier": "1.18.2",
         "remotedev": "0.2.8",
         "ts-node": "8.3.0",
-        "tslint": "5.17.0"
+        "tslint": "5.17.0",
+        "webpack-filter-warnings-plugin": "^1.2.1"
     }
 }

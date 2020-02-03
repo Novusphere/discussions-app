@@ -1,6 +1,6 @@
-import { action, observable } from 'mobx'
-import { RootStore } from '@stores'
+import { action, observable, set } from 'mobx'
 import { SIGN_IN_OPTIONS } from '@globals'
+import { RootStore } from '@stores'
 
 export class AuthStore {
     @observable
@@ -24,7 +24,11 @@ export class AuthStore {
     @observable
     hasEOSWallet = false
 
-    constructor(rootStore: RootStore) {}
+    constructor(rootStore: RootStore, initialState = {}) {
+        if (initialState) {
+            set(this, initialState)
+        }
+    }
 
     @action.bound
     setPreferredSignInMethod(method: SIGN_IN_OPTIONS) {

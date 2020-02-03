@@ -1,81 +1,88 @@
 import App from 'next/app'
 import React from 'react'
 import { Provider } from 'mobx-react'
-import { fetchInitialStoreState, RootStore, RootStoreContext } from '@stores'
+import { initializeStore, InjectStoreContext, RootStore } from '@stores'
 import { Layout } from '@components'
 import { parseCookies } from 'nookies'
 import { create } from 'mobx-persist'
+import { SIGN_IN_OPTIONS } from '@globals'
 
-const rootStore = new RootStore()
-
-export const hydrate = storage =>
-    create({
-        storage: storage,
-        jsonify: true,
-    })
 
 class DiscussionsApp extends App<any> {
-    state = {
-        store: rootStore,
-    }
+    // state = {
+    //     store: new RootStore(),
+    // }
 
     // Fetching serialized(JSON) store state
     static async getInitialProps(appContext) {
+        let pageProps = {}
+
         const cookies = parseCookies(appContext.ctx)
-        const data = await fetchInitialStoreState(cookies)
+        const initialStoreData = initializeStore({
+            authStore: {
+                uidwWalletPubKey: cookies.uidwWalletPubKey || '',
+                postPriv: cookies.postPriv || '',
+                postPub: cookies.postPub || '',
+                displayName: cookies.displayName || '',
+                hasAccount: cookies.hasAccount ? Boolean(cookies.hasAccount) : false,
+                hasEOSWallet: cookies.hasEOSWallet ? Boolean(cookies.hasEOSWallet) : false,
+                preferredSignInMethod: cookies.preferredSignInMethod || SIGN_IN_OPTIONS.brainKey,
+            }
+        })
 
-        appContext.ctx.store = rootStore.hydrate(data as any)
+        const Component = appContext.Component
+        // const store = new RootStore()
+        // const refreshed = store.hydrate(initialStoreData as any)
 
-        const appProps: any = await App.getInitialProps(appContext)
+        appContext.ctx.store = initialStoreData
+
+        // const appProps: any = await App.getInitialProps(appContext)
 
         // overwrite some props before parsing serialized store
-        if (appProps.pageProps.hasOwnProperty('position')) {
-            data.postsStore = {
-                ...data.postsStore,
-                postsPosition: appProps.pageProps.position,
-            }
-        }
+        // if (appProps.pageProps.hasOwnProperty('position')) {
+        //     data.postsStore = {
+        //         ...data.postsStore,
+        //         postsPosition: appProps.pageProps.position,
+        //     }
+        // }
+        //
+        // if (appProps.pageProps.hasOwnProperty('posts')) {
+        //     data.postsStore = {
+        //         ...data.postsStore,
+        //         posts: appProps.pageProps.posts,
+        //     }
+        // }
 
-        if (appProps.pageProps.hasOwnProperty('posts')) {
-            data.postsStore = {
-                ...data.postsStore,
-                posts: appProps.pageProps.posts,
-            }
+        // Provide the store to getInitialProps of pages
+        if (Component.getInitialProps) {
+            pageProps = await Component.getInitialProps({ ...appContext.ctx, initialStoreData })
         }
 
         return {
-            ...appProps,
-            data,
+            pageProps,
+            initialStoreData,
         }
     }
 
     // Hydrate serialized state to store
-    static getDerivedStateFromProps(props, state) {
-        state.store.hydrate(props.data)
-        return state
-    }
+    // static getDerivedStateFromProps(props, state) {
+    //     state.store.hydrate(props.initialStoreData)
+    //     return state
+    // }
 
     componentDidMount(): void {
-        const stores = {
-            userStore: this.state.store.userStore,
-            settingsStore: this.state.store.settingStore,
-        }
 
-        Object.keys(stores).forEach(store => {
-            hydrate(localStorage)(store, stores[store])
-        })
     }
 
     render() {
-        const { Component, pageProps, data } = this.props
+        const { Component, pageProps, initialStoreData } = this.props
+
         return (
-            <Provider {...this.state.store}>
-                <RootStoreContext.Provider value={this.state.store}>
-                    <Layout>
-                        <Component {...pageProps} />
-                    </Layout>
-                </RootStoreContext.Provider>
-            </Provider>
+            <InjectStoreContext initialData={initialStoreData}>
+                <Layout>
+                    <Component {...pageProps} />
+                </Layout>
+            </InjectStoreContext>
         )
     }
 }

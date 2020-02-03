@@ -1,19 +1,19 @@
-import React, { FunctionComponent, useContext } from 'react'
+import React, { FunctionComponent } from 'react'
 import { Button } from 'antd'
-import { RootStoreContext } from '@stores'
 import { MODAL_OPTIONS } from '@globals'
+import { useStores } from '@stores'
 
 interface IHeaderLoggedOutProps {}
 
 const HeaderLoggedOut: FunctionComponent<IHeaderLoggedOutProps> = () => {
-    const store = useContext(RootStoreContext)
+    const { uiStore } = useStores()
 
     return (
         <>
             <Button
                 size={'default'}
                 style={{ marginRight: 10 }}
-                onClick={() => store.uiStore.setActiveModal(MODAL_OPTIONS.signIn)}
+                onClick={() => uiStore.setActiveModal(MODAL_OPTIONS.signIn)}
             >
                 Login
             </Button>

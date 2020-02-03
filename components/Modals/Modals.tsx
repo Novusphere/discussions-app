@@ -1,29 +1,29 @@
-import React, { FunctionComponent, useCallback, useContext } from 'react'
-import { RootStoreContext } from '@stores'
+import React, { FunctionComponent, useCallback } from 'react'
 import { observer } from 'mobx-react'
 import { MODAL_OPTIONS } from '@globals'
 import { ModalsSignIn } from '@components'
+import { useStores } from '@stores'
 
 interface IModalsProps {}
 
 const Modals: FunctionComponent<IModalsProps> = () => {
-    const store = useContext(RootStoreContext)
+    const { uiStore } = useStores()
 
     const handleOk = useCallback(() => {
-        store.uiStore.clearActiveModal()
+        uiStore.clearActiveModal()
     }, [])
 
     const handleCancel = useCallback(() => {
-        store.uiStore.clearActiveModal()
+        uiStore.clearActiveModal()
     }, [])
 
-    switch (store.uiStore.activeModal) {
+    switch (uiStore.activeModal) {
         case MODAL_OPTIONS.none:
             return null
         case MODAL_OPTIONS.signIn:
             return (
                 <ModalsSignIn
-                    visible={store.uiStore.activeModal === MODAL_OPTIONS.signIn}
+                    visible={uiStore.activeModal === MODAL_OPTIONS.signIn}
                     handleOk={handleOk}
                     handleCancel={handleCancel}
                 />

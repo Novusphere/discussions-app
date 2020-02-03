@@ -10,7 +10,7 @@ const HeaderSearch: FunctionComponent<IHeaderSearchProps> = () => {
     return (
         <Search
             className={styles.search}
-            size={'large'}
+            size={'default'}
             placeholder={'Search on Discussions.app'}
             onSearch={value => console.log(value)}
         />

@@ -1,13 +1,13 @@
-import React, { FunctionComponent, useCallback, useContext } from 'react'
+import React, { FunctionComponent, useCallback } from 'react'
 
 import styles from './ModalsSignIn.module.scss'
 import { Button, Checkbox, Modal, Typography } from 'antd'
 import { SIGN_IN_OPTIONS } from '@globals'
 import { observer } from 'mobx-react'
-import { RootStoreContext } from '@stores'
 import { SignInOptions } from '@constants/sign-in-options'
 import cx from 'classnames'
 import { setCookie } from 'nookies'
+import { useStores } from '@stores'
 
 const { Title, Text } = Typography
 
@@ -22,7 +22,8 @@ const ModalsSignIn: FunctionComponent<IModalsSignInProps> = ({
     handleCancel,
     handleOk,
 }) => {
-    const store = useContext(RootStoreContext)
+    const { authStore } = useStores()
+
     const onChange = useCallback(e => {
         console.log(e.target.checked)
 
@@ -31,8 +32,8 @@ const ModalsSignIn: FunctionComponent<IModalsSignInProps> = ({
                 path: '/',
             })
         } else {
-            if (store.authStore.preferredSignInMethod) {
-                setCookie(null, 'preferredSignInMethod', store.authStore.preferredSignInMethod, {
+            if (authStore.preferredSignInMethod) {
+                setCookie(null, 'preferredSignInMethod', authStore.preferredSignInMethod, {
                     path: '/',
                 })
             }
@@ -53,11 +54,11 @@ const ModalsSignIn: FunctionComponent<IModalsSignInProps> = ({
                 <Checkbox
                     key={'checkbox'}
                     onChange={onChange}
-                    disabled={store.authStore.preferredSignInMethod === SIGN_IN_OPTIONS.none}
+                    disabled={authStore.preferredSignInMethod === SIGN_IN_OPTIONS.none}
                 >
                     Automatically select this option next time
                 </Checkbox>,
-                store.authStore.preferredSignInMethod === SIGN_IN_OPTIONS.brainKey && (
+                authStore.preferredSignInMethod === SIGN_IN_OPTIONS.brainKey && (
                     <Button
                         key="signInWithAnotherBK"
                         type="primary"
@@ -72,7 +73,7 @@ const ModalsSignIn: FunctionComponent<IModalsSignInProps> = ({
                     type="primary"
                     loading={false}
                     onClick={handleOk}
-                    disabled={store.authStore.preferredSignInMethod === SIGN_IN_OPTIONS.none}
+                    disabled={authStore.preferredSignInMethod === SIGN_IN_OPTIONS.none}
                 >
                     Select a sign in method
                 </Button>,
@@ -87,14 +88,14 @@ const ModalsSignIn: FunctionComponent<IModalsSignInProps> = ({
                 <div className={styles.accountTypeContainer}>
                     {SignInOptions.map(option => (
                         <span
-                            onClick={() => store.authStore.setPreferredSignInMethod(option.name)}
+                            onClick={() => authStore.setPreferredSignInMethod(option.name)}
                             key={option.name}
                             title={`Toggle ${option.name} sign in`}
                             className={cx([
                                 'db br4 pointer dim',
                                 {
                                     'ba bw3 b--black-10':
-                                        store.authStore.preferredSignInMethod === option.name,
+                                        authStore.preferredSignInMethod === option.name,
                                 },
                             ])}
                         >

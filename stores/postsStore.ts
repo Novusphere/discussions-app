@@ -21,8 +21,7 @@ export class PostsStore {
         this.userStore = rootStore.userStore
     }
 
-    @action.bound
-    resetPostsAndPosition() {
+    resetPostsAndPosition = () => {
         this.posts = []
         this.postsPosition = {
             cursorId: undefined,
@@ -35,9 +34,7 @@ export class PostsStore {
      * @param key
      * @param tagNames
      */
-    @task
-    @action.bound
-    async fetchPostsForTag(key = '', tagNames = this.tagStore.subscribed.toJS()) {
+    fetchPostsForTag = async (key = '', tagNames = []) => {
         try {
             if (!tagNames.length) tagNames = ['all']
 
@@ -70,9 +67,7 @@ export class PostsStore {
      * @param key
      * @param keys
      */
-    @task
-    @action.bound
-    async getPostsForKeys(key = '', keys = []) {
+    getPostsForKeys = async (key = '', keys = []) => {
         try {
             const { posts, cursorId } = await discussions.getPostsForKeys(
                 [...this.userStore.following.keys()],

@@ -2,10 +2,13 @@ import React, { FunctionComponent, useCallback, useContext } from 'react'
 import InfiniteScroll from 'react-infinite-scroll-component'
 import { PostPreview } from '@components'
 import { Post } from '@novuspherejs'
+import { Button } from 'antd'
+
+import Empty from 'antd/lib/empty'
 
 import styles from './InfiniteScrollFeed.module.scss'
-import { RootStoreContext } from '@stores'
-import { observer } from 'mobx-react-lite'
+
+import { StoreContext } from '@stores'
 
 interface IInfiniteScrollFeedProps {
     dataLength: number
@@ -24,7 +27,7 @@ const InfiniteScrollFeed: FunctionComponent<IInfiniteScrollFeedProps> = ({
     posts,
     children,
 }) => {
-    const store = useContext(RootStoreContext)
+    const { uiStore, authStore, userStore, settingStore } = useContext(StoreContext)
 
     const renderEndMessage = useCallback(() => {
         return (
@@ -41,6 +44,16 @@ const InfiniteScrollFeed: FunctionComponent<IInfiniteScrollFeedProps> = ({
             </div>
         )
     }, [])
+
+    if (!posts.length) {
+        return (
+            <div className={'db center tc'}>
+                <Empty description={<span>There doesn't seem to be anything here...</span>}>
+                    <Button type="primary">Create a post now</Button>
+                </Empty>
+            </div>
+        )
+    }
 
     return (
         <InfiniteScroll
@@ -60,15 +73,15 @@ const InfiniteScrollFeed: FunctionComponent<IInfiniteScrollFeedProps> = ({
                                   post={post}
                                   tokenImages={[]}
                                   tag={null}
-                                  showToast={store.uiStore.showToast}
-                                  hasAccount={store.authStore.hasAccount}
-                                  postPriv={store.authStore.postPriv}
+                                  showToast={uiStore.showToast}
+                                  hasAccount={authStore.hasAccount}
+                                  postPriv={authStore.postPriv}
                                   voteHandler={post.vote}
-                                  blockedByDelegation={store.userStore.blockedByDelegation}
-                                  blockedContentSetting={store.settingStore.blockedContentSetting}
-                                  blockedPosts={store.userStore.blockedPosts}
-                                  blockedUsers={store.userStore.blockedUsers}
-                                  unsignedPostsIsSpam={store.settingStore.unsignedPostsIsSpam}
+                                  blockedByDelegation={userStore.blockedByDelegation}
+                                  blockedContentSetting={settingStore.blockedContentSetting}
+                                  blockedPosts={userStore.blockedPosts}
+                                  blockedUsers={userStore.blockedUsers}
+                                  unsignedPostsIsSpam={settingStore.unsignedPostsIsSpam}
                                   toggleBlockPost={null}
                               />
                           )
@@ -80,4 +93,4 @@ const InfiniteScrollFeed: FunctionComponent<IInfiniteScrollFeedProps> = ({
 
 InfiniteScrollFeed.defaultProps = {}
 
-export default observer(InfiniteScrollFeed)
+export default InfiniteScrollFeed

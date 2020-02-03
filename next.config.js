@@ -15,9 +15,11 @@ const withCss = require('@zeit/next-css')
 const withSass = require('@zeit/next-sass')
 const withLess = require('@zeit/next-less')
 const ForkTsCheckerWebpackPlugin = require('fork-ts-checker-webpack-plugin')
+const FilterWarningsPlugin = require('webpack-filter-warnings-plugin')
 const fs = require('fs')
 const path = require('path')
 const lessToJS = require('less-vars-to-js')
+const webpack = require('webpack')
 
 const themeVariables = lessToJS(
     fs.readFileSync(path.resolve(__dirname, './assets/antd-custom.less'), 'utf8')
@@ -45,11 +47,26 @@ module.exports = withCss(
                     includePaths: ['./assets'],
                 },
             },
+            generateBuildId: async () => {
+                return String(Date.now())
+            },
             webpack(config, options) {
                 if (options.isServer) {
                     config.plugins.push(
                         new ForkTsCheckerWebpackPlugin({
                             tsconfig: './tsconfig.json',
+                        })
+                    )
+
+                    config.plugins.push(
+                        new FilterWarningsPlugin({
+                            exclude: /mini-css-extract-plugin[^]*Conflicting order between:/,
+                        })
+                    );
+
+                    config.plugins.push(
+                        new webpack.DefinePlugin({
+                            'process.env.BUILD_ID': JSON.stringify(options.buildId),
                         })
                     )
 
