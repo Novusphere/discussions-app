@@ -1,8 +1,8 @@
 import React from 'react'
 import { NextPage } from 'next'
-import { observer, useLocalStore, useObserver } from 'mobx-react-lite'
-import { Thread } from '@novuspherejs'
-import { Button, Divider, Dropdown, Icon, Menu, Popover, Tooltip, Result } from 'antd'
+import { observer, useLocalStore } from 'mobx-react-lite'
+import { discussions, Thread } from '@novuspherejs'
+import { Button, Divider, Dropdown, Icon, Menu, Popover, Tooltip, Result, Input } from 'antd'
 import Link from 'next/link'
 import {
     UserNameWithIcon,
@@ -12,12 +12,24 @@ import {
     Replies,
     Icons,
     SharePostPopover,
+    Editor,
 } from '@components'
 import moment from 'moment'
 import { NextRouter, withRouter } from 'next/router'
 import _ from 'lodash'
-import { generateVoteObject, getThreadUrl, openInNewTab, voteAsync } from '@utils'
+import {
+    createPostObject,
+    generateVoteObject,
+    getThreadUrl,
+    openInNewTab,
+    signPost,
+    sleep,
+    transformTipsToTransfers,
+    voteAsync,
+} from '@utils'
 import { RootStore, useStores } from '@stores'
+import { MODAL_OPTIONS } from '@globals'
+import cx from 'classnames'
 
 interface IPostPageProps {
     router: NextRouter
@@ -36,7 +48,7 @@ const PostPage: NextPage<IPostPageProps> = ({
     url,
     query: { name, id, title },
 }) => {
-    const { userStore, settingStore, authStore, uiStore }: RootStore = useStores()
+    const { userStore, settingStore, authStore, uiStore, walletStore }: RootStore = useStores()
 
     const postStore = useLocalStore(
         source => ({
@@ -73,6 +85,222 @@ const PostPage: NextPage<IPostPageProps> = ({
                     ),
                     option => option.id
                 )
+            },
+
+            /**
+             * Editing
+             */
+            editing: false,
+            submitEditLoading: false,
+            titleContent: source.thread.openingPost.title,
+            editingContent: source.thread.openingPost.content,
+
+            setTitleContent: (e: any) => {
+                postStore.titleContent = e.target.value
+            },
+
+            setEditingContent: (content: string) => {
+                postStore.editingContent = content
+            },
+
+            toggleEdit: () => {
+                postStore.editing = !postStore.editing
+
+                // if (!postStore.editing) {
+                //     postStore.titleContent = source.thread.openingPost.title
+                //     postStore.setEditingContent(source.thread.openingPost.content)
+                // }
+            },
+
+            submitEdit: async () => {
+                postStore.submitEditLoading = true
+
+                const postObject = createPostObject({
+                    title: postStore.titleContent,
+                    content: postStore.editingContent,
+                    sub: thread.openingPost.sub,
+                    parentUuid: thread.openingPost.uuid,
+                    threadUuid: thread.openingPost.threadUuid,
+                    uidw: authStore.uidwWalletPubKey,
+                    pub: thread.openingPost.pub,
+                    posterName: authStore.displayName,
+                    postPub: authStore.postPub,
+                    postPriv: authStore.postPriv,
+                    isEdit: true,
+                })
+
+                try {
+                    const { sig } = signPost({
+                        privKey: authStore.postPriv,
+                        uuid: postObject.uuid,
+                        content: postObject.content,
+                    })
+
+                    postObject.sig = sig
+
+                    console.log(postObject)
+                    const { transaction, editedAt, uuid } = await discussions.post(
+                        postObject as any
+                    )
+
+                    return new Promise((resolve, reject) => {
+                        const int = setInterval(async () => {
+                            const submitted = await discussions.wasEditSubmitted(
+                                postStore.observableThread.openingPost.transaction,
+                                uuid
+                            )
+
+                            if (submitted) {
+                                clearInterval(int)
+                                postObject.myVote = [{ value: 1 }]
+                                postStore.toggleEdit()
+                                postStore.submitEditLoading = false
+                                postStore.titleContent = postObject.title
+                                postStore.setEditingContent(postObject.content)
+                                postStore.observableThread.openingPost.edit = true
+                                postStore.observableThread.openingPost.editedAt = editedAt
+
+                                uiStore.showToast('Success', 'Your edit was submitted', 'success')
+
+                                return resolve()
+                            }
+                        }, 2000)
+                    })
+                } catch (error) {
+                    let message = 'Your reply failed to submit'
+
+                    if (error.message) {
+                        message = error.message
+                    }
+
+                    postStore.submitEditLoading = false
+                    uiStore.showToast('Failed', message, 'error')
+                    return error
+                }
+            },
+
+            /**
+             * Replying
+             **/
+            replying: true,
+            submitReplyLoading: false,
+            replyingContent: '',
+            setReplyContent: (content: string) => {
+                postStore.replyingContent = content
+            },
+
+            toggleReply: () => {
+                postStore.replying = !postStore.replying
+            },
+
+            waitForUserInput: (cb: (walletPassword: string) => void) => {
+                const int = setInterval(() => {
+                    if (uiStore.activeModal === MODAL_OPTIONS.none) {
+                        clearInterval(int)
+                        return cb('incomplete')
+                    }
+
+                    const { TEMP_WalletPrivateKey } = authStore
+
+                    if (TEMP_WalletPrivateKey) {
+                        clearInterval(int)
+                        return cb(TEMP_WalletPrivateKey)
+                    }
+                }, 250)
+            },
+
+            submitReply: async () => {
+                try {
+                    postStore.submitReplyLoading = true
+
+                    // create a post object
+                    const postObject = createPostObject({
+                        title: '',
+                        content: postStore.replyingContent,
+                        sub: postStore.observableThread.openingPost.sub,
+                        parentUuid: postStore.observableThread.openingPost.uuid,
+                        threadUuid: postStore.observableThread.openingPost.threadUuid,
+                        uidw: authStore.uidwWalletPubKey,
+                        pub: postStore.observableThread.openingPost.pub,
+                        posterName: authStore.displayName,
+                        postPub: authStore.postPub,
+                        postPriv: authStore.postPriv,
+                    })
+
+                    if (postObject.transfers.length > 0) {
+                        // ask for password
+                        uiStore.setActiveModal(MODAL_OPTIONS.walletActionPasswordReentry)
+
+                        postStore.waitForUserInput(async walletPrivateKey => {
+                            if (walletPrivateKey === 'incomplete') {
+                                postStore.submitReplyLoading = false
+                                uiStore.showToast('Failed', 'User cancelled transaction', 'error')
+                                return
+                            }
+                            const _cached = `${walletPrivateKey}`
+                            authStore.setTEMPPrivateKey('')
+                            uiStore.clearActiveModal()
+
+                            if (!postStore.observableThread.openingPost.tips) {
+                                postStore.observableThread.openingPost.tips = {} as any
+                            }
+
+                            postObject.transfers = transformTipsToTransfers(
+                                postObject.transfers,
+                                postStore.observableThread.openingPost.uidw,
+                                _cached,
+                                walletStore.supportedTokensForUnifiedWallet
+                            )
+
+                            await postStore.finishSubmitting(postObject)
+                        })
+                    } else {
+                        await postStore.finishSubmitting(postObject)
+                    }
+                } catch (error) {
+                    throw error
+                }
+            },
+
+            finishSubmitting: async (postObject: any) => {
+                try {
+                    const { sig } = signPost({
+                        privKey: authStore.postPriv,
+                        uuid: postObject.uuid,
+                        content: postObject.content,
+                    })
+
+                    postObject.sig = sig
+
+                    const { transaction } = await discussions.post(postObject)
+
+                    postObject.myVote = [{ value: 1 }]
+                    postStore.observableThread.openingPost.replies.push(postObject)
+                    postStore.submitReplyLoading = false
+                    postStore.setReplyContent('')
+                    postStore.toggleReply()
+
+                    uiStore.showToast('Success', 'Your reply has been submitted', 'success', {
+                        btn: (
+                            <Button
+                                size="small"
+                                onClick={() => openInNewTab(`https://eosq.app/tx/${transaction}`)}
+                            >
+                                View transaction
+                            </Button>
+                        ),
+                    })
+                } catch (error) {
+                    let message = 'Your reply failed to submit'
+
+                    if (error.message) {
+                        message = error.message
+                    }
+
+                    postStore.submitReplyLoading = false
+                    uiStore.showToast('Failed', message, 'error')
+                    return error
+                }
             },
 
             handleVoting: async (e: any, uuid: string, value: any) => {
@@ -169,6 +397,7 @@ const PostPage: NextPage<IPostPageProps> = ({
         }
     )
 
+    const isSameUser = postStore.observableThread.openingPost.pub == authStore.postPub
     const menu = (
         <Menu>
             <Menu.Item>
@@ -187,32 +416,34 @@ const PostPage: NextPage<IPostPageProps> = ({
                     {userStore.blockedPosts.has(url) ? 'Unblock post' : 'Block post'}
                 </a>
             </Menu.Item>
-            <Menu.Item>
-                <a
-                    className={'flex flex-row items-center'}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    onClick={() =>
-                        userStore.setModerationMemberByTag(
-                            `${thread.openingPost.displayName}:${thread.openingPost.pub}`,
-                            thread.openingPost.sub
+            {!isSameUser && (
+                <Menu.Item>
+                    <a
+                        className={'flex flex-row items-center'}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        onClick={() =>
+                            userStore.setModerationMemberByTag(
+                                `${thread.openingPost.displayName}:${thread.openingPost.pub}`,
+                                thread.openingPost.sub
+                            )
+                        }
+                    >
+                        <Icon
+                            type="safety-certificate"
+                            theme="twoTone"
+                            className={'mr2'}
+                            twoToneColor={'#D5008F'}
+                        />
+                        {userStore.delegated.has(
+                            `${thread.openingPost.displayName}:${thread.openingPost.pub}:${thread.openingPost.sub}`
                         )
-                    }
-                >
-                    <Icon
-                        type="safety-certificate"
-                        theme="twoTone"
-                        className={'mr2'}
-                        twoToneColor={'#D5008F'}
-                    />
-                    {userStore.delegated.has(
-                        `${thread.openingPost.displayName}:${thread.openingPost.pub}:${thread.openingPost.sub}`
-                    )
-                        ? 'Remove'
-                        : 'Add'}{' '}
-                    {thread.openingPost.displayName} as moderator
-                </a>
-            </Menu.Item>
+                            ? 'Remove'
+                            : 'Add'}{' '}
+                        {thread.openingPost.displayName} as moderator
+                    </a>
+                </Menu.Item>
+            )}
             <Menu.Item>
                 <a
                     className={'flex flex-row items-center'}
@@ -235,7 +466,12 @@ const PostPage: NextPage<IPostPageProps> = ({
     const DropdownMenu = () => {
         return (
             <Dropdown key="more" overlay={menu}>
-                <Button size={'small'} icon={'ellipsis'} title={'View more options'} />
+                <Button
+                    size={'small'}
+                    icon={'ellipsis'}
+                    title={'View more options'}
+                    disabled={postStore.editing}
+                />
             </Dropdown>
         )
     }
@@ -285,7 +521,7 @@ const PostPage: NextPage<IPostPageProps> = ({
                 </Button>
             </Link>
 
-            <div className={'bg-white mv2 pa4'}>
+            <div className={'bg-white mv2 pa4 card'}>
                 <div className={'flex flex-row items-center justify-between'}>
                     <div className={'flex flex-row items-center'}>
                         <Link href={`/tag/[name]`} as={`/tag/${thread.openingPost.sub}`}>
@@ -302,17 +538,17 @@ const PostPage: NextPage<IPostPageProps> = ({
                         <Divider type={'vertical'} />
                         <Tooltip
                             title={moment(
-                                thread.openingPost.edit
-                                    ? thread.openingPost.editedAt
-                                    : thread.openingPost.createdAt
+                                postStore.observableThread.openingPost.edit
+                                    ? postStore.observableThread.openingPost.editedAt
+                                    : postStore.observableThread.openingPost.createdAt
                             ).format('YYYY-MM-DD HH:mm:ss')}
                         >
                             <span className={'light-silver f6'}>
-                                {thread.openingPost.edit && 'edited '}{' '}
+                                {postStore.observableThread.openingPost.edit && 'edited '}{' '}
                                 {moment(
-                                    thread.openingPost.edit
-                                        ? thread.openingPost.editedAt
-                                        : thread.openingPost.createdAt
+                                    postStore.observableThread.openingPost.edit
+                                        ? postStore.observableThread.openingPost.editedAt
+                                        : postStore.observableThread.openingPost.createdAt
                                 ).fromNow()}
                             </span>
                         </Tooltip>
@@ -320,8 +556,16 @@ const PostPage: NextPage<IPostPageProps> = ({
                     <Tips tips={thread.openingPost.tips} />
                 </div>
 
-                <div className={'mv3 flex flex-row justify-between'}>
-                    <span className={'black b f4 flex-wrap'}>{thread.openingPost.title}</span>
+                <div
+                    className={cx([
+                        'mv3 flex-row justify-between',
+                        {
+                            dn: postStore.editing,
+                            flex: !postStore.editing,
+                        },
+                    ])}
+                >
+                    <span className={'black b f4 flex-wrap'}>{postStore.titleContent}</span>
                     <VotingHandles
                         uuid={thread.openingPost.uuid}
                         myVote={postStore.myVoteValue}
@@ -332,77 +576,153 @@ const PostPage: NextPage<IPostPageProps> = ({
                 </div>
 
                 <div className={'mt2 db'}>
-                    <RichTextPreview hideFade className={'black f6 lh-copy overflow-break-word'}>
-                        {postStore.observableThread.openingPost.content}
-                    </RichTextPreview>
+                    {!postStore.editing && (
+                        <RichTextPreview
+                            hideFade
+                            className={'black f6 lh-copy overflow-break-word'}
+                        >
+                            {postStore.editingContent}
+                        </RichTextPreview>
+                    )}
+                    {postStore.editing && (
+                        <>
+                            <div className={'mb3 db'}>
+                                <Input
+                                    autoCorrect={'none'}
+                                    allowClear
+                                    size={'large'}
+                                    defaultValue={postStore.titleContent}
+                                    onChange={postStore.setTitleContent}
+                                />
+                            </div>
+                            <Editor
+                                onChange={postStore.setEditingContent}
+                                value={postStore.editingContent}
+                                threadUsers={postStore.threadUsers}
+                            />
+                            <div className={'flex flex-row justify-end pt2'}>
+                                <Button onClick={postStore.toggleEdit} className={'mr2'}>
+                                    Cancel
+                                </Button>
+                                <Button
+                                    disabled={postStore.editingContent === ''}
+                                    type={'danger'}
+                                    onClick={postStore.submitEdit}
+                                    loading={postStore.submitEditLoading}
+                                >
+                                    Save Edit
+                                </Button>
+                            </div>
+                        </>
+                    )}
                 </div>
 
-                <div className={'mt2 flex flex-row justify-between'}>
-                    <div className={'flex flex-row items-center'}>
-                        <Button size={'small'} className={'mr1'}>
-                            <Icons.ReplyIcon />
-                            Reply
-                        </Button>
-                        <Button
-                            size={'small'}
-                            title={'Watch post'}
-                            className={'mh1'}
-                            onClick={() =>
-                                userStore.toggleThreadWatch(
-                                    id,
-                                    postStore.observableThread.openingPost.totalReplies
-                                )
-                            }
-                        >
-                            <Icon
-                                type="eye-invisible"
-                                theme={userStore.watching.has(id) ? 'filled' : 'outlined'}
-                                style={{
-                                    color: userStore.watching.has(id) ? '#079e99' : 'inherit',
-                                }}
-                            />
-                        </Button>
-                        <Button
-                            size={'small'}
-                            title={'View block'}
-                            className={'mh1'}
-                            icon={'link'}
-                            onClick={() =>
-                                openInNewTab(
-                                    `https://eosq.app/tx/${postStore.observableThread.openingPost.transaction}`
-                                )
-                            }
-                        />
-                        <Popover
-                            title={'Share this post'}
-                            content={<SharePostPopover url={url} />}
-                            placement={'bottom'}
-                        >
+                {!postStore.editing && (
+                    <div className={'mt2 flex flex-row justify-between'}>
+                        <div className={'flex flex-row items-center'}>
+                            <Button
+                                disabled={postStore.editing}
+                                size={'small'}
+                                className={'mr1'}
+                                onClick={postStore.toggleReply}
+                            >
+                                <Icons.ReplyIcon />
+                                Reply
+                            </Button>
+                            {isSameUser && (
+                                <Button
+                                    type={postStore.editing ? 'danger' : 'default'}
+                                    size={'small'}
+                                    className={'mr1'}
+                                    onClick={postStore.toggleEdit}
+                                >
+                                    <Icon type="edit" theme={'filled'} />
+                                    Edit
+                                </Button>
+                            )}
                             <Button
                                 size={'small'}
-                                title={'Share post'}
+                                title={'Watch post'}
                                 className={'mh1'}
-                                icon={'share-alt'}
+                                onClick={() =>
+                                    userStore.toggleThreadWatch(
+                                        id,
+                                        postStore.observableThread.openingPost.totalReplies
+                                    )
+                                }
+                            >
+                                <Icon
+                                    type="eye-invisible"
+                                    theme={userStore.watching.has(id) ? 'filled' : 'outlined'}
+                                    style={{
+                                        color: userStore.watching.has(id) ? '#079e99' : 'inherit',
+                                    }}
+                                />
+                            </Button>
+                            <Button
+                                size={'small'}
+                                title={'View block'}
+                                className={'mh1'}
+                                icon={'link'}
                                 onClick={() =>
                                     openInNewTab(
                                         `https://eosq.app/tx/${postStore.observableThread.openingPost.transaction}`
                                     )
                                 }
                             />
-                        </Popover>
+                            <Popover
+                                title={'Share this post'}
+                                content={<SharePostPopover url={url} />}
+                                placement={'bottom'}
+                            >
+                                <Button
+                                    size={'small'}
+                                    title={'Share post'}
+                                    className={'mh1'}
+                                    icon={'share-alt'}
+                                    onClick={() =>
+                                        openInNewTab(
+                                            `https://eosq.app/tx/${postStore.observableThread.openingPost.transaction}`
+                                        )
+                                    }
+                                />
+                            </Popover>
+                        </div>
+                        {authStore.hasAccount && <DropdownMenu key="more" />}
                     </div>
-                    <DropdownMenu key="more" />
-                </div>
-
-                {/*Render Opening Post Reply Box*/}
+                )}
             </div>
+
+            {/*Render Opening Post Reply Box*/}
+            {postStore.replying && (
+                <div className={'mt3'}>
+                    <Editor
+                        disabled={postStore.editing}
+                        onChange={postStore.setReplyContent}
+                        threadUsers={postStore.threadUsers}
+                    />
+                    <div className={'flex flex-row justify-end pt2'}>
+                        <Button disabled={postStore.replyingContent === ''} className={'mr2'}>
+                            Preview
+                        </Button>
+                        <Button
+                            disabled={postStore.replyingContent === ''}
+                            type={'primary'}
+                            onClick={postStore.submitReply}
+                            loading={postStore.submitReplyLoading}
+                        >
+                            Post Reply
+                        </Button>
+                    </div>
+                </div>
+            )}
 
             {/*Render Replies*/}
             <div className={'mt3'}>
                 <span className={'silver'}>
                     viewing all {postStore.observableThread.openingPost.totalReplies} comments
                 </span>
-                <div className={'mt2 bg-white pv2'}>
+                <div className={'mt2 bg-white pv2 card'}>
                     {postStore.observableThread.openingPost.replies.map(reply => (
                         <Replies
                             key={reply.uuid}

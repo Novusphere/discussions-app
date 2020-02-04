@@ -80,7 +80,7 @@ const Layout: FunctionComponent<ILayoutProps> = ({ children }) => {
                 />
             </span>
             <div className={cx([styles.content, styles.container, 'center flex pv3'])}>
-                <div className={'fl w-30 ph2 bg-white list pv3'}>
+                <div className={'fl w-30 ph2 bg-white list pv3 card'}>
                     <li className={'ph3 pv1 mb2'} key="1">
                         <Link href={'/'} as={'/'}>
                             <a>

@@ -52,7 +52,7 @@ export class TagStore {
     addSubscribed = (tagName: string) => {
         if (this.subscribed.indexOf(tagName) === -1) {
             this.subscribed.unshift(tagName)
-            this.uiStore.showToast(`Subscribed!`, `You have subbed to ${tagName}`, 'success')
+            this.uiStore.showMessage(`You have subbed to ${tagName}`, 'success')
         }
     }
 

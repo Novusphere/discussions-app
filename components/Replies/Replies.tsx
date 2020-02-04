@@ -245,7 +245,7 @@ const Replies: FunctionComponent<IRepliesProps> = props => {
                         clearInterval(int)
                         return cb(TEMP_WalletPrivateKey)
                     }
-                }, 100)
+                }, 250)
             },
 
             submitReply: async () => {
@@ -330,9 +330,15 @@ const Replies: FunctionComponent<IRepliesProps> = props => {
                         ),
                     })
                 } catch (error) {
+                    let message = 'Your reply failed to submit'
+
+                    if (error.message) {
+                        message = error.message
+                    }
+
                     replyStore.submitReplyLoading = false
-                    uiStore.showToast('Failed', 'Your reply failed to submit', 'error')
-                    throw error
+                    uiStore.showToast('Failed', message, 'error')
+                    return error
                 }
             },
         }),

@@ -28,15 +28,10 @@ const InfiniteScrollFeed: FunctionComponent<IInfiniteScrollFeedProps> = ({
     posts,
     children,
 }) => {
-
     const { uiStore, authStore, userStore, settingStore, tagStore } = useContext(StoreContext)
 
     const renderEndMessage = useCallback(() => {
-        return (
-            <div className={'bg-white tc pa3'}>
-                <span className={'f6'}>You have reached the end!</span>
-            </div>
-        )
+        return <div className={'tc pa3 f6 card bg-white'}>You have reached the end!</div>
     }, [])
 
     const renderLoadingMessage = useCallback(() => {

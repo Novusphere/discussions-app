@@ -1,32 +1,40 @@
-import Quill from 'quill';
+import Quill from 'quill'
 
-const Embed = Quill.import('blots/embed');
+const Embed = Quill.import('blots/embed')
 
 class Hashtag extends Embed {
-  static create(value) {
-    let node = super.create(value);
-    node.setAttribute('href', `/tag/${value}`);
-    node.setAttribute('spellcheck', false);
-    node.textContent = "#" + value;
-    return node;
-  }
+    static create(value) {
+        let node = super.create(value)
+        let _value = value
 
-  static formats(domNode) {
-    return domNode.getAttribute('href').substr(this.BASE_URL.length);
-  }
+        if (_value.indexOf('/tag/') === -1) {
+            _value = `/tag/${value}`
+        }
 
-  format(name, value) {
-    this.domNode.setAttribute('href', this.BASE_URL + value);
-  }
-  
-  static value(domNode) {
-    return domNode.textContent.substr(1);
-  }
+        console.log(_value)
+
+        node.setAttribute('href', _value)
+        node.setAttribute('spellcheck', false)
+        node.textContent = '#' + value
+        return node
+    }
+
+    static formats(domNode) {
+        return domNode.getAttribute('href').substr(this.BASE_URL.length)
+    }
+
+    format(name, value) {
+        this.domNode.setAttribute('href', value)
+    }
+
+    static value(domNode) {
+        return domNode.textContent.substr(1)
+    }
 }
 
-Hashtag.blotName = 'hashtag';
-Hashtag.className = 'ql-hashtag';
-Hashtag.tagName = 'A';
-Hashtag.BASE_URL = '#';
+Hashtag.blotName = 'hashtag'
+Hashtag.className = 'ql-hashtag'
+Hashtag.tagName = 'A'
+Hashtag.BASE_URL = '#'
 
-export { Hashtag as default };
+export { Hashtag as default }

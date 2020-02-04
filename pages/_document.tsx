@@ -33,17 +33,15 @@ export default class MyDocument extends Document {
                     <meta name="theme-color" content="#ffffff" />
                     <style jsx global>{`
                         .ql-toolbar.ql-snow {
+                            background: white;
                             border-top-left-radius: 5px;
                             border-top-right-radius: 5px;
                         }
 
                         .ql-container.ql-snow {
+                            background: white;
                             border-bottom-left-radius: 5px;
                             border-bottom-right-radius: 5px;
-                        }
-
-                        .quill {
-                            background: white;
                         }
 
                         .primary {
@@ -52,6 +50,11 @@ export default class MyDocument extends Document {
 
                         .b--primary {
                             color: #079e99;
+                        }
+
+                        .card {
+                            border-radius: 5px;
+                            box-shadow: 0 1px 2px #c9cccd;
                         }
                     `}</style>
                 </Head>
