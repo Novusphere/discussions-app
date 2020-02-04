@@ -21,6 +21,7 @@ export { default as HeaderLoggedOut } from './HeaderLoggedOut/HeaderLoggedOut'
 // modals
 export { default as Modals } from './Modals/Modals'
 export { default as ModalsSignIn } from './ModalsSignIn/ModalsSignIn'
+export { default as ModalsPasswordReEntry } from './ModalsPasswordReEntry/ModalsPasswordReEntry'
 
 //icons
 export { default as Icons } from './Icons/Icons'

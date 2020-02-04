@@ -10,7 +10,6 @@ import {
     Icon,
     Form,
     Input,
-    Select,
     notification,
 } from 'antd'
 import { SIGN_IN_OPTIONS } from '@globals'
@@ -50,7 +49,7 @@ const ModalsSignIn: FunctionComponent<IModalsSignInProps> = ({
     const [remember, setRemember] = useState(
         cookies['preferredSignInMethod'] === SIGN_IN_OPTIONS.brainKey
     )
-    const [step, setStep] = useState<STEP_OPTIONS>(STEP_OPTIONS.SIGN_IN_WITH_ANOTHER_BK)
+    const [step, setStep] = useState<STEP_OPTIONS>(STEP_OPTIONS.SIGN_IN_WITH_CURRENT_BK)
 
     const onChange = useCallback(e => {
         if (!e.target.checked) {
@@ -68,6 +67,11 @@ const ModalsSignIn: FunctionComponent<IModalsSignInProps> = ({
             setRemember(true)
         }
     }, [])
+
+    const alreadyHasAccount =
+        typeof cookies['bk'] !== 'undefined' &&
+        typeof cookies['displayName'] !== 'undefined' &&
+        typeof cookies['postPriv'] !== 'undefined'
 
     const next = useCallback(() => {
         setStep(prevState => prevState + 1)
@@ -89,14 +93,22 @@ const ModalsSignIn: FunctionComponent<IModalsSignInProps> = ({
                     >
                         Automatically select this option next time
                     </Checkbox>,
-                    authStore.preferredSignInMethod === SIGN_IN_OPTIONS.brainKey && (
+                    <Button
+                        key="signInWithAnotherBK"
+                        type={alreadyHasAccount ? 'default' : 'primary'}
+                        loading={false}
+                        onClick={next}
+                    >
+                        Sign in via another brain key
+                    </Button>,
+                    alreadyHasAccount && (
                         <Button
-                            key="signInWithAnotherBK"
+                            key="continueAsUser"
                             type="primary"
                             loading={false}
-                            onClick={next}
+                            onClick={() => setStep(STEP_OPTIONS.SIGN_IN_WITH_CURRENT_BK)}
                         >
-                            Sign in via another brain key
+                            Continue as {cookies['displayName']}
                         </Button>
                     ),
                     !authStore.preferredSignInMethod && (
@@ -113,22 +125,36 @@ const ModalsSignIn: FunctionComponent<IModalsSignInProps> = ({
                 ]
             case STEP_OPTIONS.SIGN_IN_WITH_ANOTHER_BK:
                 return [
-                    <Button key="prev" onClick={back}>
+                    <Button key="prev" onClick={() => setStep(STEP_OPTIONS.METHOD)}>
                         Go Back
                     </Button>,
                     <Button
                         key="submit"
                         type="danger"
-                        onClick={handleSubmit}
+                        onClick={handleCreateAccountSubmit}
                         disabled={hasErrors(form.getFieldsError())}
                     >
                         Setup and login with new account
                     </Button>,
                 ]
+            case STEP_OPTIONS.SIGN_IN_WITH_CURRENT_BK:
+                return [
+                    <Button key="prev" onClick={() => setStep(STEP_OPTIONS.METHOD)}>
+                        Go Back
+                    </Button>,
+                    <Button
+                        key="submit"
+                        type="danger"
+                        onClick={handleLoginWithExisitingBKSubmit}
+                        disabled={hasErrors(form.getFieldsError())}
+                    >
+                        Login
+                    </Button>,
+                ]
         }
     }, [step])
 
-    const handleSubmit = useCallback(e => {
+    const handleCreateAccountSubmit = useCallback(e => {
         e.preventDefault()
         form.validateFields(async (err, values) => {
             if (!err) {
@@ -161,14 +187,42 @@ const ModalsSignIn: FunctionComponent<IModalsSignInProps> = ({
         })
     }, [])
 
-    const handleSelectChange = useCallback(value => {
-        console.log(value)
-        form.setFieldsValue({
-            note: `Hi, ${value === 'male' ? 'man' : 'lady'}!`,
+    const handleLoginWithExisitingBKSubmit = useCallback(e => {
+        e.preventDefault()
+        form.validateFields(async (err, values) => {
+            if (!err) {
+                const { passwordRentry } = values
+
+                try {
+                    await authStore.signInWithPassword(passwordRentry)
+                    notification.success({
+                        message: 'You have successfully signed in!',
+                    })
+                    uiStore.clearActiveModal()
+                } catch (error) {
+                    if (error.message === 'Incorrect brian key pasword') {
+                        form.setFields({
+                            passwordRentry: {
+                                value: passwordRentry,
+                                errors: [new Error(error.message)],
+                            },
+                        })
+                    } else {
+                        notification.error({
+                            message: 'Failed to sign in!',
+                            description: error.message,
+                        })
+                    }
+
+                    return error
+                }
+            }
         })
     }, [])
 
     const content = useCallback(() => {
+        const { getFieldDecorator } = form
+
         switch (step) {
             case STEP_OPTIONS.METHOD:
                 return (
@@ -203,8 +257,6 @@ const ModalsSignIn: FunctionComponent<IModalsSignInProps> = ({
                     </div>
                 )
             case STEP_OPTIONS.SIGN_IN_WITH_ANOTHER_BK:
-                const { getFieldDecorator } = form
-
                 return (
                     <>
                         <Result
@@ -222,7 +274,7 @@ const ModalsSignIn: FunctionComponent<IModalsSignInProps> = ({
                         <Form
                             labelCol={{ span: 7 }}
                             wrapperCol={{ span: 12 }}
-                            onSubmit={handleSubmit}
+                            onSubmit={handleCreateAccountSubmit}
                             className={'center'}
                         >
                             <Form.Item label="Brain Key">
@@ -248,6 +300,42 @@ const ModalsSignIn: FunctionComponent<IModalsSignInProps> = ({
                                     <Input
                                         placeholder={
                                             'Enter the password you want to use to encrypt this key.'
+                                        }
+                                        type={'password'}
+                                    />
+                                )}
+                            </Form.Item>
+                        </Form>
+                    </>
+                )
+            case STEP_OPTIONS.SIGN_IN_WITH_CURRENT_BK:
+                return (
+                    <>
+                        <Result
+                            icon={<Icon type="unlock" theme="twoTone" twoToneColor={'#FF4136'} />}
+                            title={'Enter your password'}
+                            subTitle={
+                                <span>
+                                    Enter your password to decrypt your keys and log in to EOS
+                                    Discussions App.
+                                </span>
+                            }
+                        />
+                        <Form
+                            labelCol={{ span: 7 }}
+                            wrapperCol={{ span: 12 }}
+                            onSubmit={handleCreateAccountSubmit}
+                            className={'center'}
+                        >
+                            <Form.Item label="Password">
+                                {getFieldDecorator('passwordRentry', {
+                                    rules: [
+                                        { required: true, message: 'Please enter your password.' },
+                                    ],
+                                })(
+                                    <Input
+                                        placeholder={
+                                            'Enter the password you used to encrypt your keys'
                                         }
                                         type={'password'}
                                     />

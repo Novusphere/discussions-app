@@ -36,10 +36,14 @@ export default class MyDocument extends Document {
                             border-top-left-radius: 5px;
                             border-top-right-radius: 5px;
                         }
-                        
+
                         .ql-container.ql-snow {
                             border-bottom-left-radius: 5px;
                             border-bottom-right-radius: 5px;
+                        }
+
+                        .quill {
+                            background: white;
                         }
 
                         .primary {

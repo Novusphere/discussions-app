@@ -1,17 +1,24 @@
-import React, { FunctionComponent, useContext } from 'react'
+import React, { FunctionComponent } from 'react'
 
 import styles from './Replies.module.scss'
-import { Post } from '@novuspherejs'
+import { discussions, Post } from '@novuspherejs'
 import { Editor, Icons, RichTextPreview, Tips, UserNameWithIcon, VotingHandles } from '@components'
 import moment from 'moment'
-import { Tooltip, Button, Menu, Dropdown, message } from 'antd'
-import { useLocalStore, useObserver } from 'mobx-react-lite'
+import { Button, Dropdown, Icon, Menu, message, Tooltip } from 'antd'
+import { observer, useLocalStore, useObserver } from 'mobx-react-lite'
 import cx from 'classnames'
-import { RootStore, StoreContext } from '@stores'
-import { createPostObject, getPermaLink, openInNewTab, sleep } from '@utils'
+import { RootStore, useStores } from '@stores'
+import {
+    createPostObject,
+    getPermaLink,
+    openInNewTab,
+    signPost,
+    transformTipsToTransfers,
+} from '@utils'
 import { NextRouter } from 'next/router'
 import copy from 'clipboard-copy'
 import { task } from 'mobx-task'
+import { MODAL_OPTIONS } from '@globals'
 
 interface IRepliesProps {
     threadUsers: any[]
@@ -22,7 +29,7 @@ interface IRepliesProps {
 const ButtonGroup = Button.Group
 
 const Replies: FunctionComponent<IRepliesProps> = props => {
-    const { userStore, uiStore }: RootStore = useContext(StoreContext)
+    const { userStore, uiStore, authStore, walletStore }: RootStore = useStores()
 
     const replyStore = useLocalStore(
         source =>
@@ -75,30 +82,107 @@ const Replies: FunctionComponent<IRepliesProps> = props => {
                     replyStore.replyingContent = content
                 },
 
+                waitForUserInput: (cb: (walletPassword: string) => void) => {
+                    const int = setInterval(() => {
+                        if (uiStore.activeModal === MODAL_OPTIONS.none) {
+                            clearInterval(int)
+                            return cb('incomplete')
+                        }
+
+                        const { TEMP_WalletPrivateKey } = authStore
+
+                        if (TEMP_WalletPrivateKey) {
+                            clearInterval(int)
+                            return cb(TEMP_WalletPrivateKey)
+                        }
+                    }, 100)
+                },
+
                 submitReply: task(async () => {
                     try {
                         replyStore.submitReplyLoading = true
-                        await sleep(1500)
 
                         // create a post object
                         const postObject = createPostObject({
                             title: '',
                             content: replyStore.replyingContent,
                             sub: props.reply.sub,
+                            parentUuid: props.reply.uuid,
                             threadUuid: props.reply.threadUuid,
-                            uidw: '',
+                            uidw: authStore.uidwWalletPubKey,
                             pub: props.reply.pub,
-                            posterName: 'test',
+                            posterName: authStore.displayName,
+                            postPub: authStore.postPub,
+                            postPriv: authStore.postPriv,
                         })
-                        console.log(postObject)
 
+                        if (postObject.transfers.length > 0) {
+                            // ask for password
+                            uiStore.setActiveModal(MODAL_OPTIONS.walletActionPasswordReentry)
 
-                        console.log(replyStore.replyingContent)
+                            replyStore.waitForUserInput(async walletPrivateKey => {
+                                if (walletPrivateKey === 'incomplete') {
+                                    replyStore.submitReplyLoading = false
+                                    uiStore.showToast(
+                                        'Failed',
+                                        'User cancelled transaction',
+                                        'error'
+                                    )
+                                    return
+                                }
+                                const _cached = `${walletPrivateKey}`
+                                authStore.setTEMPPrivateKey('')
+                                uiStore.clearActiveModal()
+
+                                if (!replyStore.reply.tips) {
+                                    replyStore.reply.tips = {}
+                                }
+
+                                postObject.transfers = transformTipsToTransfers(
+                                    postObject.transfers,
+                                    props.reply.uidw,
+                                    _cached,
+                                    walletStore.supportedTokensForUnifiedWallet
+                                )
+
+                                await replyStore.finishSubmitting(postObject)
+                            })
+                        } else {
+                            await replyStore.finishSubmitting(postObject)
+                        }
+                    } catch (error) {
+                        throw error
+                    }
+                }),
+
+                finishSubmitting: async postObject => {
+                    try {
+                        const { sig } = signPost({
+                            privKey: authStore.postPriv,
+                            uuid: postObject.uuid,
+                            content: postObject.content,
+                        })
+
+                        postObject.sig = sig
+
+                        const { transaction } = await discussions.post(postObject)
+
+                        postObject.myVote = [{ value: 1 }]
+
+                        replyStore.reply.replies.push(postObject)
+
                         replyStore.submitReplyLoading = false
                         replyStore.setReplyContent('')
+                        replyStore.toggleReply()
+
                         uiStore.showToast('Success', 'Your reply has been submitted', 'success', {
                             btn: (
-                                <Button type="primary" size="small">
+                                <Button
+                                    size="small"
+                                    onClick={() =>
+                                        openInNewTab(`https://eosq.app/tx/${transaction}`)
+                                    }
+                                >
                                     View transaction
                                 </Button>
                             ),
@@ -108,17 +192,21 @@ const Replies: FunctionComponent<IRepliesProps> = props => {
                         uiStore.showToast('Failed', 'Your reply failed to submit', 'error')
                         throw error
                     }
-                }),
+                },
             } as any),
         {
             reply: props.reply,
         }
     )
 
+    const isSameUser = props.reply.pub == authStore.postPub
+    const isSpamPost = userStore.blockedPosts.has(replyStore.permaLinkURL)
+
     const menu = (
         <Menu>
             <Menu.Item>
                 <a
+                    className={'flex flex-row items-center'}
                     target="_blank"
                     rel="noopener noreferrer"
                     onClick={() =>
@@ -128,6 +216,7 @@ const Replies: FunctionComponent<IRepliesProps> = props => {
                     //     color: userStore.following.has(props.reply.pub) ? '#079e99' : 'normal',
                     // }}
                 >
+                    <Icon type="user-add" className={'mr2'} />
                     {useObserver(() =>
                         userStore.following.has(props.reply.pub) ? 'Unfollow User' : 'Follow User'
                     )}
@@ -135,6 +224,7 @@ const Replies: FunctionComponent<IRepliesProps> = props => {
             </Menu.Item>
             <Menu.Item>
                 <a
+                    className={'flex flex-row items-center'}
                     target="_blank"
                     rel="noopener noreferrer"
                     onClick={() => userStore.toggleBlockPost(replyStore.permaLinkURL)}
@@ -142,6 +232,7 @@ const Replies: FunctionComponent<IRepliesProps> = props => {
                     //     color: userStore.following.has(props.reply.pub) ? '#FF4136' : 'normal',
                     // }}
                 >
+                    <Icon type="stop" className={'mr2'} />
                     {useObserver(() =>
                         userStore.blockedPosts.has(replyStore.permaLinkURL)
                             ? 'Unblock Post'
@@ -230,51 +321,60 @@ const Replies: FunctionComponent<IRepliesProps> = props => {
                         </div>
                         <Tips tips={replyStore.reply.tips} />
 
-                        <div
-                            className={'absolute top-0 right-1'}
-                            style={{
-                                display: !replyStore.hover ? 'none' : 'block',
-                            }}
-                        >
-                            <ButtonGroup>
-                                <Button
-                                    title={'Reply to this post'}
-                                    onClick={replyStore.toggleReply}
-                                >
-                                    <Icons.ReplyIcon />
-                                </Button>
-                                <Button
-                                    title={'Copy permalink'}
-                                    onClick={() => {
-                                        copy(`${window.location.origin}${replyStore.permaLinkURL}`)
-                                        message.success('Copied to your clipboard')
-                                    }}
-                                >
-                                    <Icons.ShareIcon />
-                                </Button>
-                                <Button
-                                    title={'Open transaction'}
-                                    onClick={() =>
-                                        openInNewTab(
-                                            `https://eosq.app/tx/${props.reply.transaction}`
-                                        )
-                                    }
-                                >
-                                    <Icons.LinkIcon />
-                                </Button>
-                                <DropdownMenu key="more" />
-                            </ButtonGroup>
-                        </div>
+                        {!isSpamPost && (
+                            <div
+                                className={'absolute top-0 right-1'}
+                                style={{
+                                    display: !replyStore.hover ? 'none' : 'block',
+                                }}
+                            >
+                                <ButtonGroup size={'small'}>
+                                    <Button
+                                        title={'Reply to this post'}
+                                        onClick={replyStore.toggleReply}
+                                    >
+                                        <Icons.ReplyIcon />
+                                    </Button>
+                                    <Button
+                                        title={'Copy permalink'}
+                                        onClick={() => {
+                                            copy(
+                                                `${window.location.origin}${replyStore.permaLinkURL}`
+                                            )
+                                            message.success('Copied to your clipboard')
+                                        }}
+                                    >
+                                        <Icons.ShareIcon />
+                                    </Button>
+                                    <Button
+                                        title={'Open transaction'}
+                                        onClick={() =>
+                                            openInNewTab(
+                                                `https://eosq.app/tx/${props.reply.transaction}`
+                                            )
+                                        }
+                                    >
+                                        <Icons.LinkIcon />
+                                    </Button>
+                                    {!isSameUser && <DropdownMenu key="more" />}
+                                    {isSameUser && (
+                                        <Button title={'Edit post'}>
+                                            <Icon type={'edit'} theme={'filled'} />
+                                        </Button>
+                                    )}
+                                </ButtonGroup>
+                            </div>
+                        )}
                     </div>
 
-                    {userStore.blockedPosts.has(replyStore.permaLinkURL) && (
+                    {isSpamPost && (
                         <span className={'f6 moon-gray pv1 i'}>
                             This post is hidden as it was marked as spam
                         </span>
                     )}
 
                     {/*Render Content*/}
-                    {!replyStore.collapsed && !userStore.blockedPosts.has(replyStore.permaLinkURL) && (
+                    {!replyStore.collapsed && !isSpamPost && (
                         <RichTextPreview hideFade className={'lh-copy pt2 dark-gray'}>
                             {replyStore.reply.content}
                         </RichTextPreview>
@@ -329,4 +429,4 @@ const Replies: FunctionComponent<IRepliesProps> = props => {
 
 Replies.defaultProps = {}
 
-export default Replies
+export default observer(Replies)

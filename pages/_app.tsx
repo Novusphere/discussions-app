@@ -1,10 +1,8 @@
 import App from 'next/app'
 import React from 'react'
-import { Provider } from 'mobx-react'
-import { initializeStore, InjectStoreContext, RootStore } from '@stores'
+import { initializeStore, InjectStoreContext, } from '@stores'
 import { Layout } from '@components'
 import { parseCookies } from 'nookies'
-import { create } from 'mobx-persist'
 import { SIGN_IN_OPTIONS } from '@globals'
 import { eos } from '@novuspherejs'
 
@@ -24,16 +22,16 @@ class DiscussionsApp extends App<any> {
             authStore: {
                 // set inside a value object because of next-cookies reads from value property
 
-                uidwWalletPubKey: {
+                _uidwWalletPubKey: {
                     value: cookies.uidwWalletPubKey || '',
                 },
-                postPriv: {
+                _postPrivKey: {
                     value: cookies.postPriv || '',
                 },
                 _postPubKey: {
                     value: cookies.postPub || '',
                 },
-                displayName: {
+                _displayName: {
                     value: cookies.displayName || '',
                 },
                 _hasAccountCookie: {

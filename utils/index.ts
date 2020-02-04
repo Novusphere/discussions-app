@@ -831,12 +831,14 @@ export const createPostObject = ({
     title,
     content,
     sub,
+    parentUuid,
     threadUuid,
     uidw,
     pub, // the person you are replying to
     posterName,
     isEdit = false,
     skipId = false,
+    postPub = '',
     postPriv = '',
 }) => {
     let reply = {
@@ -850,7 +852,7 @@ export const createPostObject = ({
         tags: [sub],
         id: '',
         uuid: '',
-        parentUuid: uuid,
+        parentUuid: parentUuid,
         threadUuid: threadUuid,
         uidw: uidw,
         attachment: getAttachmentValue(content),
@@ -858,11 +860,13 @@ export const createPostObject = ({
         downvotes: 0,
         myVote: [],
         edit: undefined,
-        transfers: undefined,
+        transfers: [],
         vote: null,
-        imageData: undefined,
-        pub: '',
+        imageData: getIdenticon(postPub),
+        pub: postPub,
         displayName: posterName,
+        sig: '',
+        replies: [],
     }
 
     if (!isEdit) {
@@ -899,7 +903,7 @@ export const createPostObject = ({
 
     reply.mentions = mentions
 
-    let tags = matchTipForTags(content)
+    let tags = matchContentForTags(content)
 
     if (tags && tags.length) {
         tags = tags.map(tag => tag.replace('#', ''))
@@ -909,6 +913,19 @@ export const createPostObject = ({
     return reply
 }
 
-export const hasErrors = (fieldsError) => {
-    return Object.keys(fieldsError).some(field => fieldsError[field]);
+export const hasErrors = fieldsError => {
+    return Object.keys(fieldsError).some(field => fieldsError[field])
+}
+
+export const signPost = ({ privKey, content, uuid }) => {
+    let pub = ecc.privateToPublic(privKey)
+    const hash0 = ecc.sha256(content)
+    const hash1 = ecc.sha256(uuid + hash0)
+    const sig = ecc.sign(hash1, privKey)
+    const verifySig = pub
+
+    return {
+        sig,
+        verifySig,
+    }
 }
