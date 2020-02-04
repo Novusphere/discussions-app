@@ -52,6 +52,10 @@ export default class MyDocument extends Document {
                             color: #079e99;
                         }
 
+                        .bg-primary {
+                            background-color: #079e99;
+                        }
+
                         .card {
                             border-radius: 5px;
                             box-shadow: 0 1px 2px #c9cccd;

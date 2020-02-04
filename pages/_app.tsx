@@ -22,7 +22,7 @@ class DiscussionsApp extends App<any> {
                 // set inside a value object because of next-cookies reads from value property
 
                 _uidwWalletPubKey: {
-                    value: cookies.uidwWalletPubKey || '',
+                    value: cookies.uidWalletPubKey || '',
                 },
                 _postPrivKey: {
                     value: cookies.postPriv || '',
@@ -38,7 +38,7 @@ class DiscussionsApp extends App<any> {
                         ? JSON.parse(cookies.hasAccount)
                         : false,
                 },
-                hasEOSWallet: {
+                _hasEOSWallet: {
                     value: cookies.hasOwnProperty('hasEOSWallet')
                         ? JSON.parse(cookies.hasEOSWallet)
                         : false,

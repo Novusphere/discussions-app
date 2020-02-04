@@ -2,12 +2,16 @@ import { action, computed, observable } from 'mobx'
 import { SIGN_IN_OPTIONS } from '@globals'
 import { RootStore } from '@stores'
 import { bkToStatusJson } from '@utils'
-import { discussions } from '@novuspherejs'
+import { discussions, init, eos } from '@novuspherejs'
 import { setCookie, parseCookies } from 'nookies'
 import Cookie from 'mobx-cookie'
+import { UIStore } from '@stores/uiStore'
+import { task } from 'mobx-task'
+import { notification } from 'antd'
 
 export class AuthStore {
     _hasAccountCookie = new Cookie('hasAccount')
+    _hasEOSWallet = new Cookie('hasEOSWallet')
     _postPubKey = new Cookie('postPub')
     _postPrivKey = new Cookie('postPriv')
     _displayName = new Cookie('displayName')
@@ -15,10 +19,6 @@ export class AuthStore {
 
     @observable
     preferredSignInMethod: SIGN_IN_OPTIONS = SIGN_IN_OPTIONS.brainKey
-
-
-    @observable
-    hasEOSWallet = false
 
     @observable supportedTokensImages: { [symbol: string]: string } = {}
 
@@ -29,6 +29,10 @@ export class AuthStore {
 
     @computed get hasAccount() {
         return JSON.parse(this._hasAccountCookie.value)
+    }
+
+    @computed get hasEOSWallet() {
+        return JSON.parse(this._hasEOSWallet.value)
     }
 
     @computed get displayName() {
@@ -71,13 +75,19 @@ export class AuthStore {
     }
 
     logOut = () => {
-        this.setAccountCookie('false')
+        this.setHasAccountCookie('false')
     }
 
-    setAccountCookie = (value: string) => {
+    setHasAccountCookie = (value: string) => {
         // refresh this key
         this._hasAccountCookie = new Cookie('hasAccount')
         this._hasAccountCookie.set(value)
+    }
+
+    setHasEOSWalletCookie = (value: string) => {
+        // refresh this key
+        this._hasEOSWallet = new Cookie('hasEOSWallet')
+        this._hasEOSWallet.set(value)
     }
 
     signInWithBK = async (brianKeyVerify, displayName, password) => {
@@ -96,7 +106,7 @@ export class AuthStore {
                 setCookie(null, 'displayName', statusJSON.displayName, { path: '/' })
                 setCookie(null, 'postPub', statusJSON.post, { path: '/' })
 
-                this.setAccountCookie('true')
+                this.setHasAccountCookie('true')
                 this.storeKeys(brianKeyVerify)
             }
         } catch (error) {
@@ -119,4 +129,52 @@ export class AuthStore {
             throw error
         }
     }
+
+    initializeScatterLogin = async (): Promise<any> => {
+        try {
+            await init()
+            const wallet = await eos.detectWallet()
+
+            if (typeof wallet !== 'boolean' && wallet) {
+                // prompt login
+                await eos.login()
+                return wallet as any
+            } else {
+                throw new Error('Failed to detect EOS wallet')
+            }
+        } catch (error) {
+            notification.error({
+                message: 'Failed',
+                description: 'Unable to detect EOS wallet',
+            })
+            return error
+        }
+    }
+
+    connectScatterWallet = task.resolved(async (hasEOSWallet = false) => {
+        try {
+            if (hasEOSWallet) {
+                // disconnect
+                await eos.logout()
+                this.setHasEOSWalletCookie('false')
+                notification.success({
+                    message: 'Success',
+                    description: 'You have disconnected your EOS wallet',
+                })
+            } else {
+                const wallet = await this.initializeScatterLogin()
+
+                console.log(wallet)
+
+                if (wallet.connected) {
+                    ;(wallet as any).connect()
+                    this.setHasEOSWalletCookie('true')
+                } else {
+                    this.setHasEOSWalletCookie('false')
+                }
+            }
+        } catch (error) {
+            throw error
+        }
+    })
 }
