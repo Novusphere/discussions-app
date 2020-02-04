@@ -49,7 +49,7 @@ const ModalsSignIn: FunctionComponent<IModalsSignInProps> = ({
     const [remember, setRemember] = useState(
         cookies['preferredSignInMethod'] === SIGN_IN_OPTIONS.brainKey
     )
-    const [step, setStep] = useState<STEP_OPTIONS>(STEP_OPTIONS.SIGN_IN_WITH_CURRENT_BK)
+    const [step, setStep] = useState<STEP_OPTIONS>(STEP_OPTIONS.METHOD)
 
     const onChange = useCallback(e => {
         if (!e.target.checked) {
