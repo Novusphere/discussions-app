@@ -1,4 +1,4 @@
-import React, { FunctionComponent, useCallback, useContext } from 'react'
+import React, { FunctionComponent, useCallback, useContext, useEffect } from 'react'
 import {
     Layout as AntdLayout,
     Icon,
@@ -41,6 +41,11 @@ const Layout: FunctionComponent<ILayoutProps> = ({ children }) => {
     notification.config({
         top: 75,
     })
+
+    // fire some stuff
+    useEffect(() => {
+        settingStore.loadSettings()
+    }, [])
 
     const logout = useCallback(() => {
         authStore.logOut()
@@ -100,51 +105,36 @@ const Layout: FunctionComponent<ILayoutProps> = ({ children }) => {
                             </a>
                         </Link>
                     </li>
-                    {useObserver(() =>
-                        settingStore.loadSettings['match']({
-                            pending: () => <Skeleton active />,
-                            resolved: res => {
-                                if (res.defaultTagsGroups.length) {
-                                    return (
-                                        <>
-                                            <Divider />
-                                            {[...tagStore.tagGroup.entries()].map(
-                                                ([name, tags]) => {
-                                                    const _name = name.toLowerCase()
-                                                    const as = `/tags/${tags.join(',')}`
-                                                    return (
-                                                        <li
-                                                            className={cx([
-                                                                'ph3 pv1 mb2',
-                                                                // {
-                                                                //     dim: router.asPath !== as,
-                                                                //     'sidebar-link-active':
-                                                                //         router.asPath === as,
-                                                                // },
-                                                            ])}
-                                                            key={_name}
-                                                        >
-                                                            <Link
-                                                                href={`/tags/[tags]`}
-                                                                as={as}
-                                                                shallow={false}
-                                                            >
-                                                                <a>{name}</a>
-                                                            </Link>
-                                                        </li>
-                                                    )
-                                                }
-                                            )}
-                                        </>
-                                    )
-                                }
-                            },
-                            rejected: error => {
-                                console.log(error)
-                                return null
-                            },
-                        })
-                    )}
+                    {useObserver(() => {
+                        if (tagStore.tagGroup.size) {
+                            return (
+                                <>
+                                    <Divider />
+                                    {[...tagStore.tagGroup.entries()].map(([name, tags]) => {
+                                        const _name = name.toLowerCase()
+                                        const as = `/tags/${tags.join(',')}`
+                                        return (
+                                            <li
+                                                className={cx([
+                                                    'ph3 pv1 mb2',
+                                                    // {
+                                                    //     dim: router.asPath !== as,
+                                                    //     'sidebar-link-active':
+                                                    //         router.asPath === as,
+                                                    // },
+                                                ])}
+                                                key={_name}
+                                            >
+                                                <Link href={`/tags/[tags]`} as={as} shallow={false}>
+                                                    <a>{name}</a>
+                                                </Link>
+                                            </li>
+                                        )
+                                    })}
+                                </>
+                            )
+                        }
+                    })}
                     <div className={'mt3 db'}>
                         <Input
                             size={'default'}

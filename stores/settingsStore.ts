@@ -1,9 +1,8 @@
 import { persist } from 'mobx-persist'
-import { action, observable } from 'mobx'
+import { observable } from 'mobx'
 import { RootStore } from '@stores/index'
 import { nsdb } from '@novuspherejs'
 import { isDev } from '@utils'
-import { task } from 'mobx-task'
 import axios from 'axios'
 import _ from 'lodash'
 
@@ -12,7 +11,7 @@ export type BlockedContentSetting = 'hidden' | 'collapsed'
 export class SettingsStore {
     @persist
     @observable
-    blockedContentSetting: BlockedContentSetting = 'hidden'
+    blockedContentSetting: BlockedContentSetting = 'collapsed'
 
     @persist
     @observable
@@ -26,8 +25,6 @@ export class SettingsStore {
         this.userStore = rootStore.userStore
         this.uiStore = rootStore.uiStore
         this.tagStore = rootStore.tagStore
-
-        this.loadSettings()
     }
 
     hydrate(initialState: any = {}) {
@@ -36,7 +33,7 @@ export class SettingsStore {
         }
     }
 
-    loadSettings = task(async () => {
+    loadSettings = async () => {
         const { data: setting } = await axios.get(`${nsdb.api}/discussions/site`)
         let host = ''
         // let host = window.location.host.toLowerCase()
@@ -91,5 +88,5 @@ export class SettingsStore {
         }
 
         return settings
-    })
+    }
 }

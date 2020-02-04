@@ -37,14 +37,6 @@ export class RootStore {
             set(this.postsStore, postsStore)
         }
 
-        // if (tagStore) {
-        //     set(this.tagStore, tagStore)
-        // }
-
-        // if (uiStore) {
-        //     set(this.uiStore, uiStore)
-        // }
-
         if (userStore) {
             this.userStore.hydrate(userStore)
         }

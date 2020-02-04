@@ -1,5 +1,5 @@
 import { persist } from 'mobx-persist'
-import { observable } from 'mobx'
+import { observable, observe } from 'mobx'
 import { RootStore } from '@stores/index'
 import axios from 'axios'
 import _ from 'lodash'
@@ -11,7 +11,7 @@ export class UserStore {
     @persist('map') blockedUsers = observable.map<string, string>() // [pubKey, displayName]
     @persist('map') blockedPosts = observable.map<string, string>() // [asPathURL, yyyydd]
     @persist('map') delegated = observable.map<string, string>() // [name:pubKey:tagName, tagName]
-    // @persist('map') pinnedPosts = observable.map<string, string>() // [asPathURL, tagName]
+    @persist('map') pinnedPosts = observable.map<string, string>() // [asPathURL, tagName]
 
     blockedByDelegation = observable.map<string, string>() // either blockedUsers or blockedPosts
 
@@ -30,6 +30,10 @@ export class UserStore {
         if (initialState.followingKeys) {
             this.followingKeys = initialState.followingKeys
         }
+
+        if (initialState.pinnedPosts) {
+            this.pinnedPosts = observable.map<string, string>(initialState.pinnedPosts)
+        }
     }
 
     private async setAndUpdateDelegatedPosts(
@@ -39,7 +43,7 @@ export class UserStore {
     ) {
         if (!suppressAlert) {
             if (!tagName || tagName === '') {
-                this.uiStore.showToast(
+                this.uiStore.showMessage(
                     'An empty tag string is not valid. Set this user as a global mod by setting the tag to be "all".',
                     'error'
                 )
@@ -50,7 +54,7 @@ export class UserStore {
         this.delegated.set(mergedName, tagName)
 
         if (!suppressAlert) {
-            this.uiStore.showToast('Added user as a moderator', 'success')
+            this.uiStore.showMessage('Added user as a moderator', 'success')
         }
 
         try {
@@ -61,7 +65,7 @@ export class UserStore {
     }
 
     async setPinnedPosts(posts: any[], delegated = false) {
-        const obj = {}
+        let obj = {}
 
         _.forEach(posts, (urls, name: string) => {
             _.forEach(urls, url => {
@@ -70,6 +74,19 @@ export class UserStore {
                 })
             })
         })
+
+        // console.log('existing', this.pinnedPosts.toJSON())
+        //
+        // // get existing b64
+        // const { pinnedByDelegation } = parseCookies(null)
+        //
+        // console.log(pinnedByDelegation)
+        //
+        // if (pinnedByDelegation) {
+        //     Object.assign(obj, pinnedByDelegation)
+        // }
+
+        Object.assign(obj, this.pinnedPosts.toJSON())
 
         const b64 = Buffer.from(JSON.stringify(obj)).toString('base64')
 
@@ -134,6 +151,10 @@ export class UserStore {
             if (this.delegated.has(mergedName)) {
                 if (this.delegated.get(mergedName) === tagName) {
                     this.delegated.delete(mergedName)
+
+                    if (!suppressAlert) {
+                        this.uiStore.showMessage('Removed user as a moderator', 'success')
+                    }
                 } else {
                     await this.setAndUpdateDelegatedPosts(mergedName, tagName, suppressAlert)
                 }
@@ -170,13 +191,52 @@ export class UserStore {
         }
     }
 
-    // togglePinPost(tagName: string, asPathURL: string) {
-    //     if (this.pinnedPosts.has(asPathURL)) {
-    //         this.uiStore.showToast('This post has been unpinned!', 'success')
-    //         this.pinnedPosts.delete(asPathURL)
-    //     } else {
-    //         this.pinnedPosts.set(asPathURL, tagName)
-    //         this.uiStore.showToast('This post has been pinned!', 'success')
-    //     }
-    // }
+    toggleThreadWatch = (id: string, count: number, suppressToast = false) => {
+        if (this.watching.has(id)) {
+            this.watching.delete(id)
+            if (!suppressToast)
+                this.uiStore.showMessage('You are no longer watching this thread', 'info')
+            return
+        }
+
+        if (this.watching.size <= 4) {
+            this.watching.set(id, [count, count])
+            if (!suppressToast)
+                this.uiStore.showMessage('Success! You are watching this thread', 'success')
+        } else {
+            if (!suppressToast)
+                this.uiStore.showMessage('You can only watch a maximum of 5 threads', 'info')
+        }
+    }
+
+    togglePinPost = (tagName: string, asPathURL: string) => {
+        const pinnedPostsBuffer = parseCookies(window)
+        let pinnedPostsAsObj = {}
+
+        if (pinnedPostsBuffer.pinnedByDelegation) {
+            pinnedPostsAsObj = JSON.parse(
+                Buffer.from(pinnedPostsBuffer.pinnedByDelegation, 'base64').toString('ascii')
+            )
+        }
+
+        if (this.pinnedPosts.has(asPathURL)) {
+            this.uiStore.showMessage('This post has been unpinned!', 'success')
+            this.pinnedPosts.delete(asPathURL)
+
+            if (pinnedPostsAsObj[asPathURL]) {
+                delete pinnedPostsAsObj[asPathURL]
+            }
+        } else {
+            this.pinnedPosts.set(asPathURL, tagName)
+            this.uiStore.showMessage('This post has been pinned!', 'success')
+
+            pinnedPostsAsObj = {
+                ...pinnedPostsAsObj,
+                [asPathURL]: tagName,
+            }
+        }
+
+        const b64 = Buffer.from(JSON.stringify(pinnedPostsAsObj)).toString('base64')
+        setCookie(window, 'pinnedByDelegation', b64, { path: '/' })
+    }
 }

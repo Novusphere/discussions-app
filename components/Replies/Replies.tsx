@@ -10,10 +10,13 @@ import cx from 'classnames'
 import { RootStore, useStores } from '@stores'
 import {
     createPostObject,
+    generateVoteObject,
     getPermaLink,
     openInNewTab,
     signPost,
+    sleep,
     transformTipsToTransfers,
+    voteAsync,
 } from '@utils'
 import { NextRouter } from 'next/router'
 import copy from 'clipboard-copy'
@@ -32,168 +35,307 @@ const Replies: FunctionComponent<IRepliesProps> = props => {
     const { userStore, uiStore, authStore, walletStore }: RootStore = useStores()
 
     const replyStore = useLocalStore(
-        source =>
-            ({
-                hover: false,
-                reply: source.reply,
-                myVote: source.reply.myVote,
-                downvotes: source.reply.downvotes,
-                upvotes: source.reply.upvotes,
-                replying: false,
-                collapsed: false,
-                blocked: false,
+        source => ({
+            hover: false,
+            reply: source.reply,
+            myVote: source.reply.myVote,
+            downvotes: source.reply.downvotes,
+            upvotes: source.reply.upvotes,
+            replying: false,
+            editing: false,
+            collapsed: false,
+            blocked: false,
 
-                get myVoteValue() {
-                    if (replyStore.myVote && replyStore.myVote.length) {
-                        return replyStore.myVote[0].value
+            get myVoteValue() {
+                if (replyStore.myVote && replyStore.myVote.length) {
+                    return replyStore.myVote[0].value
+                }
+
+                return 0
+            },
+
+            get permaLinkURL() {
+                return getPermaLink(props.router.asPath.split('#')[0], props.reply.uuid)
+            },
+
+            toggleCollapse: () => {
+                replyStore.collapsed = !replyStore.collapsed
+            },
+
+            toggleReply: () => {
+                replyStore.replying = !replyStore.replying
+            },
+
+            toggleEditing: () => {
+                replyStore.editing = !replyStore.editing
+            },
+
+            setHover: (status: boolean) => {
+                replyStore.hover = status
+            },
+
+            handleVoting: async (e: any, uuid: string, value: number) => {
+                if (!authStore.hasAccount) {
+                    return uiStore.showToast('Error', 'Please log in to vote', 'error')
+                }
+
+                let type
+
+                switch (value) {
+                    case 1:
+                        type = 'upvote'
+                        break
+                    case -1:
+                        type = 'downvote'
+                        break
+                }
+
+                try {
+                    const myVoteValue = replyStore.myVoteValue
+
+                    // check if your prev vote was positive
+                    if (myVoteValue === 1) {
+                        // what type of vote are you doing
+                        if (type === 'downvote') {
+                            replyStore.upvotes -= 1
+                            replyStore.downvotes += 1
+                            replyStore.myVote = [{ value: -1 }]
+                        }
+
+                        if (type === 'upvote') {
+                            replyStore.upvotes -= 1
+                            replyStore.myVote = [{ value: 0 }]
+                        }
                     }
 
-                    return 0
-                },
-
-                get permaLinkURL() {
-                    return getPermaLink(props.router.asPath.split('#')[0], props.reply.uuid)
-                },
-
-                toggleCollapse: () => {
-                    replyStore.collapsed = !replyStore.collapsed
-                },
-
-                toggleReply: () => {
-                    replyStore.replying = !replyStore.replying
-                },
-
-                setHover: status => {
-                    replyStore.hover = status
-                },
-
-                handleVoting: async () => {
-                    console.log('test')
-                    replyStore.reply.upvotes += 1
-                },
-
-                /**
-                 * Replying
-                 **/
-                submitReplyLoading: false,
-                replyingContent: '',
-
-                setReplyContent: content => {
-                    replyStore.replyingContent = content
-                },
-
-                waitForUserInput: (cb: (walletPassword: string) => void) => {
-                    const int = setInterval(() => {
-                        if (uiStore.activeModal === MODAL_OPTIONS.none) {
-                            clearInterval(int)
-                            return cb('incomplete')
+                    // check if your prev vote was negative
+                    if (myVoteValue === -1) {
+                        // what type of vote are you doing
+                        if (type === 'downvote') {
+                            replyStore.upvotes += 1
+                            replyStore.myVote = [{ value: 0 }]
                         }
 
-                        const { TEMP_WalletPrivateKey } = authStore
-
-                        if (TEMP_WalletPrivateKey) {
-                            clearInterval(int)
-                            return cb(TEMP_WalletPrivateKey)
+                        if (type === 'upvote') {
+                            replyStore.upvotes += 1
+                            replyStore.downvotes -= 1
+                            replyStore.myVote = [{ value: 1 }]
                         }
-                    }, 100)
-                },
+                    }
 
-                submitReply: task(async () => {
-                    try {
-                        replyStore.submitReplyLoading = true
+                    // you never voted
+                    if (myVoteValue === 0) {
+                        if (type === 'downvote') {
+                            replyStore.downvotes += 1
+                            replyStore.myVote = [{ value: -1 }]
+                        }
+                        //
+                        if (type === 'upvote') {
+                            replyStore.upvotes += 1
+                            replyStore.myVote = [{ value: 1 }]
+                        }
+                    }
 
-                        // create a post object
-                        const postObject = createPostObject({
-                            title: '',
-                            content: replyStore.replyingContent,
-                            sub: props.reply.sub,
-                            parentUuid: props.reply.uuid,
-                            threadUuid: props.reply.threadUuid,
-                            uidw: authStore.uidwWalletPubKey,
-                            pub: props.reply.pub,
-                            posterName: authStore.displayName,
-                            postPub: authStore.postPub,
-                            postPriv: authStore.postPriv,
-                        })
+                    const voteObject = generateVoteObject({
+                        uuid,
+                        postPriv: authStore.postPriv,
+                        value: replyStore.myVoteValue,
+                    })
 
-                        if (postObject.transfers.length > 0) {
-                            // ask for password
-                            uiStore.setActiveModal(MODAL_OPTIONS.walletActionPasswordReentry)
+                    const data = await voteAsync({
+                        voter: '',
+                        uuid,
+                        value: replyStore.myVoteValue,
+                        nonce: voteObject.nonce,
+                        pub: voteObject.pub,
+                        sig: voteObject.sig,
+                    })
 
-                            replyStore.waitForUserInput(async walletPrivateKey => {
-                                if (walletPrivateKey === 'incomplete') {
-                                    replyStore.submitReplyLoading = false
-                                    uiStore.showToast(
-                                        'Failed',
-                                        'User cancelled transaction',
-                                        'error'
-                                    )
-                                    return
-                                }
-                                const _cached = `${walletPrivateKey}`
-                                authStore.setTEMPPrivateKey('')
-                                uiStore.clearActiveModal()
+                    if (data.error) {
+                        uiStore.showToast(
+                            'Failed',
+                            `Failed to ${type.split('s')[0]} this post`,
+                            'error'
+                        )
+                    }
+                } catch (error) {
+                    uiStore.showToast('Failed', error.message, 'error')
+                }
+            },
 
-                                if (!replyStore.reply.tips) {
-                                    replyStore.reply.tips = {}
-                                }
+            /**
+             * Editing
+             */
+            submitEditLoading: false,
+            editingContent: source.reply.content,
 
-                                postObject.transfers = transformTipsToTransfers(
-                                    postObject.transfers,
-                                    props.reply.uidw,
-                                    _cached,
-                                    walletStore.supportedTokensForUnifiedWallet
-                                )
+            setEditContent: (content: string) => {
+                replyStore.editingContent = content
+            },
 
-                                await replyStore.finishSubmitting(postObject)
-                            })
-                        } else {
+            submitEdit: async () => {
+                replyStore.submitEditLoading = true
+                replyStore.reply.content = replyStore.editingContent
+
+                const postObject = createPostObject({
+                    title: '',
+                    content: replyStore.editingContent,
+                    sub: props.reply.sub,
+                    parentUuid: props.reply.uuid,
+                    threadUuid: props.reply.threadUuid,
+                    uidw: authStore.uidwWalletPubKey,
+                    pub: props.reply.pub,
+                    posterName: authStore.displayName,
+                    postPub: authStore.postPub,
+                    postPriv: authStore.postPriv,
+                    isEdit: true,
+                })
+
+                const { sig } = signPost({
+                    privKey: authStore.postPriv,
+                    uuid: postObject.uuid,
+                    content: postObject.content,
+                })
+
+                postObject.sig = sig
+
+                try {
+                    const { transaction, editedAt } = await discussions.post(postObject as any)
+                    replyStore.toggleEditing()
+                    replyStore.submitEditLoading = false
+
+                    uiStore.showToast('Success', 'Your edit was submitted!', 'success', {
+                        btn: (
+                            <Button
+                                size="small"
+                                onClick={() => openInNewTab(`https://eosq.app/tx/${transaction}`)}
+                            >
+                                View transaction
+                            </Button>
+                        ),
+                    })
+
+                    replyStore.reply.editedAt = editedAt
+                } catch (error) {
+                    replyStore.submitEditLoading = false
+                    uiStore.showToast('Failed', 'Your edit failed to submit', 'error')
+                }
+            },
+
+            /**
+             * Replying
+             **/
+            submitReplyLoading: false,
+            replyingContent: '',
+
+            setReplyContent: (content: string) => {
+                replyStore.replyingContent = content
+            },
+
+            waitForUserInput: (cb: (walletPassword: string) => void) => {
+                const int = setInterval(() => {
+                    if (uiStore.activeModal === MODAL_OPTIONS.none) {
+                        clearInterval(int)
+                        return cb('incomplete')
+                    }
+
+                    const { TEMP_WalletPrivateKey } = authStore
+
+                    if (TEMP_WalletPrivateKey) {
+                        clearInterval(int)
+                        return cb(TEMP_WalletPrivateKey)
+                    }
+                }, 100)
+            },
+
+            submitReply: async () => {
+                try {
+                    replyStore.submitReplyLoading = true
+
+                    // create a post object
+                    const postObject = createPostObject({
+                        title: '',
+                        content: replyStore.replyingContent,
+                        sub: props.reply.sub,
+                        parentUuid: props.reply.uuid,
+                        threadUuid: props.reply.threadUuid,
+                        uidw: authStore.uidwWalletPubKey,
+                        pub: props.reply.pub,
+                        posterName: authStore.displayName,
+                        postPub: authStore.postPub,
+                        postPriv: authStore.postPriv,
+                    })
+
+                    if (postObject.transfers.length > 0) {
+                        // ask for password
+                        uiStore.setActiveModal(MODAL_OPTIONS.walletActionPasswordReentry)
+
+                        replyStore.waitForUserInput(async walletPrivateKey => {
+                            if (walletPrivateKey === 'incomplete') {
+                                replyStore.submitReplyLoading = false
+                                uiStore.showToast('Failed', 'User cancelled transaction', 'error')
+                                return
+                            }
+                            const _cached = `${walletPrivateKey}`
+                            authStore.setTEMPPrivateKey('')
+                            uiStore.clearActiveModal()
+
+                            if (!replyStore.reply.tips) {
+                                replyStore.reply.tips = {} as any
+                            }
+
+                            postObject.transfers = transformTipsToTransfers(
+                                postObject.transfers,
+                                props.reply.uidw,
+                                _cached,
+                                walletStore.supportedTokensForUnifiedWallet
+                            )
+
                             await replyStore.finishSubmitting(postObject)
-                        }
-                    } catch (error) {
-                        throw error
-                    }
-                }),
-
-                finishSubmitting: async postObject => {
-                    try {
-                        const { sig } = signPost({
-                            privKey: authStore.postPriv,
-                            uuid: postObject.uuid,
-                            content: postObject.content,
                         })
-
-                        postObject.sig = sig
-
-                        const { transaction } = await discussions.post(postObject)
-
-                        postObject.myVote = [{ value: 1 }]
-
-                        replyStore.reply.replies.push(postObject)
-
-                        replyStore.submitReplyLoading = false
-                        replyStore.setReplyContent('')
-                        replyStore.toggleReply()
-
-                        uiStore.showToast('Success', 'Your reply has been submitted', 'success', {
-                            btn: (
-                                <Button
-                                    size="small"
-                                    onClick={() =>
-                                        openInNewTab(`https://eosq.app/tx/${transaction}`)
-                                    }
-                                >
-                                    View transaction
-                                </Button>
-                            ),
-                        })
-                    } catch (error) {
-                        replyStore.submitReplyLoading = false
-                        uiStore.showToast('Failed', 'Your reply failed to submit', 'error')
-                        throw error
+                    } else {
+                        await replyStore.finishSubmitting(postObject)
                     }
-                },
-            } as any),
+                } catch (error) {
+                    throw error
+                }
+            },
+
+            finishSubmitting: async (postObject: any) => {
+                try {
+                    const { sig } = signPost({
+                        privKey: authStore.postPriv,
+                        uuid: postObject.uuid,
+                        content: postObject.content,
+                    })
+
+                    postObject.sig = sig
+
+                    const { transaction } = await discussions.post(postObject)
+
+                    postObject.myVote = [{ value: 1 }]
+                    replyStore.reply.replies.push(postObject)
+                    replyStore.submitReplyLoading = false
+                    replyStore.setReplyContent('')
+                    replyStore.toggleReply()
+
+                    uiStore.showToast('Success', 'Your reply has been submitted', 'success', {
+                        btn: (
+                            <Button
+                                size="small"
+                                onClick={() => openInNewTab(`https://eosq.app/tx/${transaction}`)}
+                            >
+                                View transaction
+                            </Button>
+                        ),
+                    })
+                } catch (error) {
+                    replyStore.submitReplyLoading = false
+                    uiStore.showToast('Failed', 'Your reply failed to submit', 'error')
+                    throw error
+                }
+            },
+        }),
         {
             reply: props.reply,
         }
@@ -275,8 +417,8 @@ const Replies: FunctionComponent<IRepliesProps> = props => {
                     <VotingHandles
                         uuid={replyStore.reply.uuid}
                         myVote={replyStore.myVoteValue}
-                        upVotes={replyStore.reply.upvotes}
-                        downVotes={replyStore.reply.downvotes}
+                        upVotes={replyStore.upvotes}
+                        downVotes={replyStore.downvotes}
                         handler={replyStore.handleVoting}
                     />
                 </div>
@@ -323,13 +465,17 @@ const Replies: FunctionComponent<IRepliesProps> = props => {
 
                         {!isSpamPost && (
                             <div
-                                className={'absolute top-0 right-1'}
-                                style={{
-                                    display: !replyStore.hover ? 'none' : 'block',
-                                }}
+                                className={cx([
+                                    'absolute top-0 right-1',
+                                    {
+                                        db: replyStore.hover || replyStore.editing,
+                                        dn: !replyStore.hover,
+                                    },
+                                ])}
                             >
                                 <ButtonGroup size={'small'}>
                                     <Button
+                                        disabled={replyStore.editing}
                                         title={'Reply to this post'}
                                         onClick={replyStore.toggleReply}
                                     >
@@ -356,9 +502,15 @@ const Replies: FunctionComponent<IRepliesProps> = props => {
                                     >
                                         <Icons.LinkIcon />
                                     </Button>
-                                    {!isSameUser && <DropdownMenu key="more" />}
+                                    {!isSameUser && authStore.hasAccount && (
+                                        <DropdownMenu key="more" />
+                                    )}
                                     {isSameUser && (
-                                        <Button title={'Edit post'}>
+                                        <Button
+                                            type={replyStore.editing ? 'danger' : 'default'}
+                                            title={'Edit post'}
+                                            onClick={replyStore.toggleEditing}
+                                        >
                                             <Icon type={'edit'} theme={'filled'} />
                                         </Button>
                                     )}
@@ -374,10 +526,33 @@ const Replies: FunctionComponent<IRepliesProps> = props => {
                     )}
 
                     {/*Render Content*/}
-                    {!replyStore.collapsed && !isSpamPost && (
+                    {!replyStore.collapsed && !isSpamPost && !replyStore.editing && (
                         <RichTextPreview hideFade className={'lh-copy pt2 dark-gray'}>
                             {replyStore.reply.content}
                         </RichTextPreview>
+                    )}
+
+                    {replyStore.editing && (
+                        <div className={'pa2'}>
+                            <Editor
+                                onChange={replyStore.setEditContent}
+                                value={replyStore.editingContent}
+                                threadUsers={props.threadUsers}
+                            />
+                            <div className={'flex flex-row justify-end pt2'}>
+                                <Button onClick={replyStore.toggleEditing} className={'mr2'}>
+                                    Cancel
+                                </Button>
+                                <Button
+                                    disabled={replyStore.editingContent === ''}
+                                    type={'danger'}
+                                    onClick={replyStore.submitEdit}
+                                    loading={replyStore.submitEditLoading}
+                                >
+                                    Save Edit
+                                </Button>
+                            </div>
+                        </div>
                     )}
 
                     {replyStore.replying ? (

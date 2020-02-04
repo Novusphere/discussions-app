@@ -1,6 +1,6 @@
 import App from 'next/app'
 import React from 'react'
-import { initializeStore, InjectStoreContext, } from '@stores'
+import { initializeStore, InjectStoreContext } from '@stores'
 import { Layout } from '@components'
 import { parseCookies } from 'nookies'
 import { SIGN_IN_OPTIONS } from '@globals'
@@ -45,6 +45,13 @@ class DiscussionsApp extends App<any> {
                         : false,
                 },
                 preferredSignInMethod: cookies.preferredSignInMethod || SIGN_IN_OPTIONS.brainKey,
+            },
+            userStore: {
+                pinnedPosts: cookies.pinnedByDelegation
+                    ? JSON.parse(
+                          Buffer.from(cookies.pinnedByDelegation, 'base64').toString('ascii')
+                      )
+                    : {},
             },
         })
 

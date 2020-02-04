@@ -43,7 +43,7 @@ const VotingHandles: React.FC<IVoteProps> = ({
                     className={'pointer hover-orange'}
                     type="caret-up"
                     style={{
-                        color: myVote === 1 ? '#FF6300' : 'none',
+                        color: myVote === 1 ? '#FF6300' : '#999999',
                     }}
                 />
             </span>
@@ -51,7 +51,7 @@ const VotingHandles: React.FC<IVoteProps> = ({
                 className={classNames(['f6 disable-user-select ph1 silver'])}
                 style={{
                     whiteSpace: 'pre',
-                    color: myVote === 1 ? '#FF6300' : 'none',
+                    color: myVote === 1 ? '#FF6300' : '#999999',
                 }}
                 // style={{ color: color ? color : '#b9b9b9', whiteSpace: 'pre' }}
             >
@@ -68,7 +68,7 @@ const VotingHandles: React.FC<IVoteProps> = ({
                     className={'link pointer hover-blue'}
                     type="caret-down"
                     style={{
-                        color: myVote === -1 ? '#00449E' : 'none',
+                        color: myVote === -1 ? '#00449E' : '#999999',
                     }}
                 />
             </span>

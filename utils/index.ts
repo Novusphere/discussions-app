@@ -897,6 +897,9 @@ export const createPostObject = ({
         if (tips && tips.length) {
             reply.transfers = tips
         }
+    } else {
+        reply.uuid = generateUuid()
+        reply.edit = true
     }
 
     let mentions = [...extractMentionHashesForRegEx(matchContentForMentions(content)), pub]
