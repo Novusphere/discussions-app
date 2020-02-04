@@ -55,12 +55,14 @@ const Tips: FunctionComponent<ITipsProps> = ({ tips }) => {
                                     className={'ph2 flex flex-row items-center'}
                                     title={`${tips[symbol].toFixed(precision)} ${symbol} tipped`}
                                 >
-                                    <img
-                                        src={img}
-                                        alt={`${symbol} image`}
-                                        className={'dib'}
-                                        width={'25px'}
-                                    />
+                                    {img && (
+                                        <img
+                                            src={img}
+                                            alt={`${symbol} image`}
+                                            className={'dib'}
+                                            width={'25px'}
+                                        />
+                                    )}
                                     <Badge
                                         count={`× ${tips[symbol].toFixed(precision)}`}
                                         style={{

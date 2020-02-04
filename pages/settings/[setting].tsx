@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react'
+import React, { useCallback, useEffect, useState } from 'react'
 import { NextPage } from 'next'
 import { observer, useObserver } from 'mobx-react-lite'
 import { RootStore, useStores } from '@stores'
@@ -6,10 +6,12 @@ import cx from 'classnames'
 import dynamic from 'next/dynamic'
 import Link from 'next/link'
 import _ from 'lodash'
-import { Form, Icon, Input, Tabs, Button, Typography } from 'antd'
-const { Paragraph, Text } = Typography
+import { Form, Icon, Input, Tabs, Button, Typography, Select, InputNumber } from 'antd'
+const { Text } = Typography
 const { TabPane } = Tabs
 import { Tab, TabList } from 'react-tabs'
+
+const { Option } = Select
 
 const Connections = () => {
     const { authStore }: RootStore = useStores()
@@ -46,10 +48,153 @@ const Connections = () => {
     )
 }
 
-const UnwrappedWallet = ({ form }) => {
+const UnwrappedDeposit = ({ form }) => {
     const { getFieldDecorator } = form
-    const { authStore }: RootStore = useStores()
+    const { authStore, walletStore, uiStore }: RootStore = useStores()
 
+    let walletStoreLS = window.localStorage.getItem('walletStore')
+    let images: any = []
+
+    if (walletStoreLS) {
+        walletStoreLS = JSON.parse(walletStoreLS)
+        images = walletStoreLS['supportedTokensImages']
+    }
+
+    const handleDepositSubmit = useCallback(e => {
+        e.preventDefault()
+        form.validateFields(async (err, values) => {
+            if (!err) {
+                console.log(values)
+                // const { brainKey, displayName, password } = values
+                //
+                // try {
+                //     await authStore.signInWithBK(brainKey, displayName, password)
+                //     notification.success({
+                //         message: 'You have successfully signed in!',
+                //     })
+                //     uiStore.clearActiveModal()
+                // } catch (error) {
+                //     if (error.message === 'You have entered an invalid brain key') {
+                //         form.setFields({
+                //             brainKey: {
+                //                 value: brainKey,
+                //                 errors: [new Error(error.message)],
+                //             },
+                //         })
+                //     } else {
+                //         notification.error({
+                //             message: 'Failed to sign in!',
+                //             description: error.message,
+                //         })
+                //     }
+                //
+                //     return error
+                // }
+            }
+        })
+    }, [])
+
+    return useObserver(() => (
+        <div className={'ba b--light-gray pa3 br3'}>
+            <Form
+                labelCol={{ span: 4 }}
+                wrapperCol={{ span: 16, offset: 4 }}
+                onSubmit={() => console.log('hey')}
+                className={'center'}
+            >
+                <Form.Item label="Token">
+                    {getFieldDecorator('token', {
+                        rules: [
+                            {
+                                required: true,
+                                message: 'Please select a token',
+                            },
+                        ],
+                    })(
+                        <Select
+                            size={'large'}
+                            showSearch
+                            className={'w-100'}
+                            placeholder={'Select a token'}
+                        >
+                            {walletStore.supportedTokensAsSelectable.map(option => {
+                                return (
+                                    <Option
+                                        key={option.value}
+                                        value={option.value}
+                                        className={'flex flex-row items-center'}
+                                    >
+                                        {images[option.label] && (
+                                            <img
+                                                src={images[option.label][0]}
+                                                className={'mr2 dib'}
+                                                width={15}
+                                            />
+                                        )}
+                                        {option.label}
+                                    </Option>
+                                )
+                            })}
+                        </Select>
+                    )}
+                </Form.Item>
+                <Form.Item label="Amount">
+                    {getFieldDecorator('amount', {
+                        rules: [
+                            {
+                                required: true,
+                                message: 'Please enter an amount',
+                            },
+                        ],
+                    })(<InputNumber size={'large'} style={{ width: '100%' }} />)}
+                </Form.Item>
+            </Form>
+
+            <div className={'mt3 flex flex-row justify-end'}>
+                <Button type={'primary'} onClick={handleDepositSubmit}>
+                    Submit Deposit
+                </Button>
+            </div>
+
+            {walletStore.selectedToken && (
+                <div className={'mt5'}>
+                    <span className={'light-silver f6'}>
+                        Alternatively, to manually deposit funds from your wallet or an exchange
+                        please send them to
+                    </span>
+
+                    <div className={'center db mw6 mv4'}>
+                        <div className={'flex flex-row items-center justify-between mb3'}>
+                            <span className={'f6 b'}>Account</span>
+                            <Text ellipsis copyable>
+                                {walletStore.selectedToken.contract}
+                            </Text>
+                        </div>
+
+                        <div className={'flex flex-row items-center justify-between mb3'}>
+                            <span className={'f6 b'}>Memo</span>
+                            <Text ellipsis copyable>
+                                {authStore.uidwWalletPubKey}
+                            </Text>
+                        </div>
+                    </div>
+                </div>
+            )}
+
+            <div className={'mt3'}>
+                <span className={'light-silver f6'}>
+                    <strong>Please note:</strong> It's important you use this memo EXACTLY! If you
+                    are depositing from an exchange and cannot specify a memo then you must first
+                    withdraw to an EOS wallet of your own first!
+                </span>
+            </div>
+        </div>
+    ))
+}
+
+const Deposit = Form.create({ name: 'depositForm' })(UnwrappedDeposit)
+
+const Wallet = () => {
     return (
         <>
             <div className={'db'}>
@@ -83,87 +228,7 @@ const UnwrappedWallet = ({ form }) => {
                     }}
                 >
                     <TabPane tab="Deposit" key="1">
-                        <div className={'ba b--light-gray pa3 br3'}>
-                            <Form
-                                labelCol={{ span: 4 }}
-                                wrapperCol={{ span: 16, offset: 4 }}
-                                onSubmit={() => console.log('hey')}
-                                className={'center'}
-                            >
-                                <Form.Item label="Token">
-                                    {getFieldDecorator('token', {
-                                        rules: [
-                                            {
-                                                required: true,
-                                                message: 'Please select a token',
-                                            },
-                                        ],
-                                    })(
-                                        <Input
-                                            size={'large'}
-                                            placeholder={
-                                                'Enter the password you used to encrypt your keys'
-                                            }
-                                            type={'password'}
-                                        />
-                                    )}
-                                </Form.Item>
-                                <Form.Item label="Amount">
-                                    {getFieldDecorator('amount', {
-                                        rules: [
-                                            {
-                                                required: true,
-                                                message: 'Please enter an amount',
-                                            },
-                                        ],
-                                    })(<Input size={'large'} style={{ width: '100%' }} />)}
-                                </Form.Item>
-                            </Form>
-
-                            <div className={'mt3 flex flex-row justify-end'}>
-                                <Button type={'primary'}>Submit Deposit</Button>
-                            </div>
-
-                            <div className={'mt5'}>
-                                <span className={'light-silver f6'}>
-                                    Alternatively, to manually deposit funds from your wallet or an
-                                    exchange please send them to
-                                </span>
-
-                                <div className={'center db mw6 mv4'}>
-                                    <div
-                                        className={
-                                            'flex flex-row items-center justify-between mb3'
-                                        }
-                                    >
-                                        <span className={'f6 b'}>Account</span>
-                                        <Text ellipsis copyable>
-                                            Hey
-                                        </Text>
-                                    </div>
-
-                                    <div
-                                        className={
-                                            'flex flex-row items-center justify-between mb3'
-                                        }
-                                    >
-                                        <span className={'f6 b'}>Memo</span>
-                                        <Text ellipsis copyable>
-                                            {authStore.uidwWalletPubKey}
-                                        </Text>
-                                    </div>
-                                </div>
-                            </div>
-
-                            <div className={'mt3'}>
-                                <span className={'light-silver f6'}>
-                                    <strong>Please note:</strong> It's important you use this memo
-                                    EXACTLY! If you are depositing from an exchange and cannot
-                                    specify a memo then you must first withdraw to an EOS wallet of
-                                    your own first!
-                                </span>
-                            </div>
-                        </div>
+                        <Deposit />
                     </TabPane>
                     <TabPane tab="Transfer" key="2">
                         Content of Tab Pane 2
@@ -176,8 +241,6 @@ const UnwrappedWallet = ({ form }) => {
         </>
     )
 }
-
-const Wallet = Form.create({ name: 'depositForm' })(UnwrappedWallet)
 
 const Setting = dynamic(
     () =>

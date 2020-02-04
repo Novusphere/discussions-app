@@ -1,6 +1,6 @@
 import { RootStore } from '@stores/index'
 import { persist } from 'mobx-persist'
-import { observable } from 'mobx'
+import { computed, observable } from 'mobx'
 import { eos, nsdb } from '@novuspherejs'
 import { isServer, sleep } from '@utils'
 import { ApiGetUnifiedId } from '../interfaces/ApiGet-UnifiedId'
@@ -24,6 +24,13 @@ export class WalletStore {
 
     constructor(rootStore: RootStore) {
         this.authStore = rootStore.authStore
+    }
+
+    @computed get supportedTokensAsSelectable() {
+        return this.supportedTokensForUnifiedWallet.map(token => ({
+            value: token.value,
+            label: token.label,
+        }))
     }
 
     getSupportedTokensForUnifiedWallet = () => {

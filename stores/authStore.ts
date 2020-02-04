@@ -22,6 +22,13 @@ export class AuthStore {
 
     @observable supportedTokensImages: { [symbol: string]: string } = {}
 
+    /**
+     * Used in transaction payload
+     * when running actions such as depositing
+     */
+    @observable
+    eosWalletDisplayName = ''
+
     // used for password re-entry
     @observable TEMP_WalletPrivateKey = ''
 
@@ -163,8 +170,7 @@ export class AuthStore {
                 })
             } else {
                 const wallet = await this.initializeScatterLogin()
-
-                console.log(wallet)
+                this.eosWalletDisplayName = wallet.auth.accountName
 
                 if (wallet.connected) {
                     ;(wallet as any).connect()
