@@ -30,15 +30,6 @@ export class PostsStore {
         }
     }
 
-    @computed get getPlausibleTagOptions() {
-        return this.tagStore.subscribed
-            .filter(tag => ['home', 'all', 'feed'].indexOf(tag) === -1)
-            .map(tag => ({
-                value: tag,
-                label: `#${tag}`,
-            }))
-    }
-
     /**
      * For fetching posts inside a tag, home page or all.
      * @param key

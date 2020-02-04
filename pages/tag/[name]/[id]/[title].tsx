@@ -218,6 +218,10 @@ const PostPage: NextPage<IPostPageProps> = ({
 
             submitReply: async () => {
                 try {
+                    if (!authStore.hasAccount) {
+                        return uiStore.showToast('Failed', 'Please log in to reply', 'error')
+                    }
+
                     postStore.submitReplyLoading = true
 
                     // create a post object
@@ -735,21 +739,23 @@ const PostPage: NextPage<IPostPageProps> = ({
             )}
 
             {/*Render Replies*/}
-            <div className={'mt3'}>
-                <span className={'silver'}>
-                    viewing all {postStore.observableThread.openingPost.totalReplies} comments
-                </span>
-                <div className={'mt2 bg-white pv2 card'}>
-                    {postStore.observableThread.openingPost.replies.map(reply => (
-                        <Replies
-                            key={reply.uuid}
-                            reply={reply}
-                            router={router}
-                            threadUsers={postStore.threadUsers}
-                        />
-                    ))}
+            {postStore.observableThread.openingPost.totalReplies > 0 && (
+                <div className={'mt3'}>
+                    <span className={'silver'}>
+                        viewing all {postStore.observableThread.openingPost.totalReplies} comments
+                    </span>
+                    <div className={'mt2 bg-white pv2 card'}>
+                        {postStore.observableThread.openingPost.replies.map(reply => (
+                            <Replies
+                                key={reply.uuid}
+                                reply={reply}
+                                router={router}
+                                threadUsers={postStore.threadUsers}
+                            />
+                        ))}
+                    </div>
                 </div>
-            </div>
+            )}
         </>
     )
 }

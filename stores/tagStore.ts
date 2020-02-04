@@ -1,4 +1,4 @@
-import { action, observable } from 'mobx'
+import { action, computed, observable } from 'mobx'
 import { RootStore } from '@stores/index'
 import { persist } from 'mobx-persist'
 
@@ -23,6 +23,15 @@ export class TagStore {
 
     constructor(rootStore: RootStore) {
         this.uiStore = rootStore.uiStore
+    }
+
+    @computed get tagsWithoutBaseOptions() {
+        return [...this.subscribed, 'all']
+            .filter(tag => ['home', 'feed'].indexOf(tag) === -1)
+            .map(tag => ({
+                value: tag,
+                label: `#${tag}`,
+            }))
     }
 
     getGenericTag(tagName: string) {

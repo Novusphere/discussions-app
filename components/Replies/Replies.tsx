@@ -249,6 +249,10 @@ const Replies: FunctionComponent<IRepliesProps> = props => {
             },
 
             submitReply: async () => {
+                if (!authStore.hasAccount) {
+                    return uiStore.showToast('Failed', 'Please log in to reply', 'error')
+                }
+
                 try {
                     replyStore.submitReplyLoading = true
 

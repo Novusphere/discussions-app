@@ -1,5 +1,5 @@
 import { persist } from 'mobx-persist'
-import { observable, observe } from 'mobx'
+import { computed, observable, observe } from 'mobx'
 import { RootStore } from '@stores/index'
 import axios from 'axios'
 import _ from 'lodash'
@@ -14,9 +14,6 @@ export class UserStore {
     @persist('map') pinnedPosts = observable.map<string, string>() // [asPathURL, tagName]
 
     blockedByDelegation = observable.map<string, string>() // either blockedUsers or blockedPosts
-
-    // @persist('map') pinnedByDelegation = observable.map<string, string>() // [asPathURL, tagName]
-    @persist('object') @observable activeDelegatedTag = { value: '', label: '' }
 
     @observable followingKeys = []
 
@@ -64,8 +61,15 @@ export class UserStore {
         }
     }
 
-    setActiveDelegatedTag = (option) => {
-        this.activeDelegatedTag = option
+    /**
+     * Input: USERNAME:KEY:TAG
+     * Output: [tag]
+     * @param username
+     * @param pub
+     */
+    activeModerationForCurrentUser = (username, pub) => {
+        const vals = [...this.delegated.keys()]
+        return vals.filter(val => val.indexOf(`${username}:${pub}`) !== -1).map(val => val.split(':')[2])
     }
 
     async setPinnedPosts(posts: any[], delegated = false) {
@@ -127,9 +131,30 @@ export class UserStore {
         }
     }
 
+    setModerationFromDropdown = async (username, key, tags: string[]) => {
+        // use tags are source of truth for self-delegated
+        const current = this.activeModerationForCurrentUser(username, key)
+        const usernameWithKey = `${username}:${key}`
+
+        if (tags.length > current.length) {
+            // adding
+            tags.map(tag => {
+                this.delegated.set(`${usernameWithKey}:${tag}`, tag)
+            })
+        } else if (tags.length < current.length) {
+            // remove diff
+            const diff = _.difference(current, tags)
+            diff.map(tag => {
+                this.delegated.delete(`${usernameWithKey}:${tag}`)
+            })
+        }
+
+        this.uiStore.showMessage('Moderation list updated', 'success')
+    }
+
     async setModerationMemberByTag(
         accountNameWithPubKey: string,
-        tagName = this.activeDelegatedTag.value,
+        tagName = '',
         suppressAlert = false,
         override = false
     ) {

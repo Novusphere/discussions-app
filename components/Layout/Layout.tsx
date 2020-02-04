@@ -26,7 +26,7 @@ import Link from 'next/link'
 import { RootStore, StoreContext } from '@stores'
 import { getVersion } from '@utils'
 import { eos } from '@novuspherejs'
-import { observer } from 'mobx-react';
+import { observer } from 'mobx-react'
 
 const { Search } = Input
 const { Header, Footer, Content } = AntdLayout
@@ -74,7 +74,12 @@ const Layout: FunctionComponent<ILayoutProps> = ({ children }) => {
                             <div className={styles.headerIntractable}>
                                 <HeaderNotifications />
                                 <HeaderNewPost />
-                                <HeaderUserBar icon={authStore.postPub} logout={logout} />
+                                <HeaderUserBar
+                                    icon={authStore.postPub}
+                                    logout={logout}
+                                    displayName={authStore.displayName}
+                                    postPub={authStore.postPub}
+                                />
                             </div>
                         ) : (
                             <HeaderLoggedOut />
