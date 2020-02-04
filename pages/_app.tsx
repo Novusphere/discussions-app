@@ -4,7 +4,6 @@ import { initializeStore, InjectStoreContext } from '@stores'
 import { Layout } from '@components'
 import { parseCookies } from 'nookies'
 import { SIGN_IN_OPTIONS } from '@globals'
-import { eos } from '@novuspherejs'
 
 import '../assets/main.scss'
 
@@ -53,6 +52,13 @@ class DiscussionsApp extends App<any> {
                       )
                     : {},
             },
+            uiStore: {
+                _hideSidebar: {
+                    value: cookies.hasOwnProperty('hideSideBar')
+                        ? JSON.parse(cookies.hideSideBar)
+                        : false,
+                },
+            },
         })
 
         const Component = appContext.Component
@@ -94,16 +100,6 @@ class DiscussionsApp extends App<any> {
     //     state.store.hydrate(props.initialStoreData)
     //     return state
     // }
-
-    async componentDidMount(): Promise<void> {
-        await eos.initializeTokens()
-        await eos.init({
-            host: 'nodes.get-scatter.com',
-            port: 443,
-            protocol: 'https',
-            chainId: 'aca376f206b8fc25a6ed44dbdc66547c36c6c33e3a119ffbeaef943642f0e906',
-        })
-    }
 
     render() {
         const { Component, pageProps, initialStoreData } = this.props

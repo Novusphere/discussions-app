@@ -170,12 +170,6 @@ class Editor extends React.Component<IEditorProps> {
         })
         const markdown = this.turndownService.turndown(clean)
 
-        console.log({
-            text,
-            clean,
-            markdown,
-        })
-
         // https://github.com/Novusphere/discussions-app/issues/169
         // this might have to be re-visited
         this.props.onChange(

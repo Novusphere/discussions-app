@@ -25,6 +25,8 @@ import cx from 'classnames'
 import Link from 'next/link'
 import { RootStore, StoreContext } from '@stores'
 import { getVersion } from '@utils'
+import { eos } from '@novuspherejs'
+import { observer } from 'mobx-react';
 
 const { Search } = Input
 const { Header, Footer, Content } = AntdLayout
@@ -44,7 +46,15 @@ const Layout: FunctionComponent<ILayoutProps> = ({ children }) => {
 
     // fire some stuff
     useEffect(() => {
-        settingStore.loadSettings()
+        eos.initializeTokens().then(() => {
+            eos.init({
+                host: 'nodes.get-scatter.com',
+                port: 443,
+                protocol: 'https',
+                chainId: 'aca376f206b8fc25a6ed44dbdc66547c36c6c33e3a119ffbeaef943642f0e906',
+            })
+            settingStore.loadSettings()
+        })
     }, [])
 
     const logout = useCallback(() => {
@@ -80,7 +90,15 @@ const Layout: FunctionComponent<ILayoutProps> = ({ children }) => {
                 />
             </span>
             <div className={cx([styles.content, styles.container, 'center flex pv3'])}>
-                <div className={'fl w-30 ph2 bg-white list pv3 card'}>
+                <div
+                    className={cx([
+                        'fl w-30 vh-75 ph2 bg-white list pv3 card',
+                        {
+                            dn: uiStore.hideSidebar,
+                            db: !uiStore.hideSidebar,
+                        },
+                    ])}
+                >
                     <li className={'ph3 pv1 mb2'} key="1">
                         <Link href={'/'} as={'/'}>
                             <a>
@@ -230,7 +248,17 @@ const Layout: FunctionComponent<ILayoutProps> = ({ children }) => {
                     ))}
                 </div>
 
-                <div className={'fl w-70 ml4'}>{children}</div>
+                <div
+                    className={cx([
+                        'fl ml4',
+                        {
+                            'w-100': uiStore.hideSidebar,
+                            'w-70': !uiStore.hideSidebar,
+                        },
+                    ])}
+                >
+                    {children}
+                </div>
             </div>
             <div className={cx([styles.footer, 'bg-white pv3 light-silver'])}>
                 <div className="tc lh-copy">
@@ -269,4 +297,4 @@ const Layout: FunctionComponent<ILayoutProps> = ({ children }) => {
 
 Layout.defaultProps = {}
 
-export default Layout
+export default observer(Layout)

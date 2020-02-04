@@ -483,7 +483,6 @@ export default class DiscussionsService {
         posts: Post[]
         cursorId: number
     }> {
-        console.log(keys)
         const query = await nsdb.search({
             key,
             cursorId,

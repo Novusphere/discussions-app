@@ -48,7 +48,14 @@ const PostPage: NextPage<IPostPageProps> = ({
     url,
     query: { name, id, title },
 }) => {
-    const { userStore, settingStore, authStore, uiStore, walletStore }: RootStore = useStores()
+    const {
+        userStore,
+        settingStore,
+        authStore,
+        uiStore,
+        walletStore,
+        tagStore,
+    }: RootStore = useStores()
 
     const postStore = useLocalStore(
         source => ({
@@ -508,6 +515,8 @@ const PostPage: NextPage<IPostPageProps> = ({
         )
     }
 
+    const tag = tagStore.tagModelFromObservables(thread.openingPost.sub)
+
     return (
         <>
             <Link
@@ -517,7 +526,15 @@ const PostPage: NextPage<IPostPageProps> = ({
                 passHref
             >
                 <Button title={`See all posts in ${name}`} icon={'caret-left'} type={'primary'}>
-                    #{name}
+                    <span className={'flex flex-row items-center'}>
+                        <img
+                            className={'dib'}
+                            src={tag.logo}
+                            alt={`${thread.openingPost.sub} icon`}
+                            width={25}
+                        />
+                        <span className={'dib ml1'}>#{name}</span>
+                    </span>
                 </Button>
             </Link>
 

@@ -64,6 +64,10 @@ export class UserStore {
         }
     }
 
+    setActiveDelegatedTag = (option) => {
+        this.activeDelegatedTag = option
+    }
+
     async setPinnedPosts(posts: any[], delegated = false) {
         let obj = {}
 
@@ -75,17 +79,6 @@ export class UserStore {
             })
         })
 
-        // console.log('existing', this.pinnedPosts.toJSON())
-        //
-        // // get existing b64
-        // const { pinnedByDelegation } = parseCookies(null)
-        //
-        // console.log(pinnedByDelegation)
-        //
-        // if (pinnedByDelegation) {
-        //     Object.assign(obj, pinnedByDelegation)
-        // }
-
         Object.assign(obj, this.pinnedPosts.toJSON())
 
         const b64 = Buffer.from(JSON.stringify(obj)).toString('base64')
@@ -94,7 +87,6 @@ export class UserStore {
             setCookie(null, 'pinnedByDelegation', b64, { path: '/' })
         } else {
             setCookie(null, 'pinnedPosts', b64, { path: '/' })
-            // this.pinnedPosts.replace(obj)
         }
     }
 
@@ -188,6 +180,14 @@ export class UserStore {
             const dateStamp = `${date.getFullYear()}${date.getMonth()}`
             this.blockedPosts.set(asPathURL, dateStamp)
             this.uiStore.showMessage('This post has been marked as spam!', 'success')
+        }
+    }
+
+    toggleBlockUser = (displayName: string, pubKey: string) => {
+        if (this.blockedUsers.has(pubKey)) {
+            this.blockedUsers.delete(pubKey)
+        } else {
+            this.blockedUsers.set(pubKey, displayName)
         }
     }
 

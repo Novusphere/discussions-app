@@ -15,7 +15,7 @@ const UserNameWithIcon: FunctionComponent<IUserNameWithIconProps> = ({ imageData
         <>
             <Avatar icon={'user'} src={imageData} size={'small'} />
             <object className={'z-2 pl2'}>
-                <Link href={`/u/[username]`} as={`/u/${name}-${pub}`}>
+                <Link href={`/u/[username]`} as={`/u/${name}-${pub}`} shallow={false}>
                     <a className={'flex items-center dim pointer'}>{name}</a>
                 </Link>
             </object>

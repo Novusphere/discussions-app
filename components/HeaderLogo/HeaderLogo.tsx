@@ -3,13 +3,16 @@ import { Typography } from 'antd'
 
 const { Title } = Typography
 import styles from './HeaderLogo.module.scss'
+import Link from 'next/link'
 
 interface IHeaderLogoProps {}
 
 const HeaderLogo: FunctionComponent<IHeaderLogoProps> = () => {
     return (
         <Title className={styles.logo} level={4}>
-            Home
+            <Link href={'/'}>
+                <a>Home</a>
+            </Link>
         </Title>
     )
 }

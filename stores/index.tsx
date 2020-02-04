@@ -44,6 +44,11 @@ export class RootStore {
         if (settingStore) {
             this.settingStore.hydrate(settingStore)
         }
+
+        if (uiStore) {
+            set(this.uiStore, uiStore)
+            // this.uiStore.hydrate(uiStore)
+        }
     }
 }
 
