@@ -932,3 +932,21 @@ export const signPost = ({ privKey, content, uuid }) => {
         verifySig,
     }
 }
+
+export const getSignatureAndSubmit = (robj, fromAddress) => {
+    try {
+        robj.sig = eos.transactionSignature(
+            robj.chain,
+            fromAddress,
+            robj.to,
+            robj.amount,
+            robj.fee,
+            robj.nonce,
+            robj.memo
+        )
+
+        return submitRelayAsync([robj])
+    } catch (error) {
+        throw error
+    }
+}

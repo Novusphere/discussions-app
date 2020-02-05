@@ -35,58 +35,60 @@ export class SettingsStore {
 
     loadSettings = async () => {
         const { data: setting } = await axios.get(`${nsdb.api}/discussions/site`)
-        let host = ''
-        // let host = window.location.host.toLowerCase()
-
+        let host = window.location.host.toLowerCase()
         if (isDev) host = 'discussions.app'
+
         const settings = setting[host]
-        const tags = settings['tags']
-        const tagGroups = settings['defaultTagsGroups']
-        const moderators = settings['defaultModerators']
 
-        this.uiStore.banners = settings['bannerImages']
+        if (settings) {
+            const tags = settings['tags']
+            const tagGroups = settings['defaultTagsGroups']
+            const moderators = settings['defaultModerators']
 
-        if (moderators.length) {
-            _.forEach(moderators, moderator => {
-                const [tag] = Object.keys(moderator)
-                const tagModerators = moderator[tag]
+            this.uiStore.banners = settings['bannerImages']
 
-                _.forEach(tagModerators, tagModerator => {
-                    const [accountName, publicKey] = tagModerator.split('-')
-                    this.userStore.setModerationMemberByTag(
-                        `${accountName}:${publicKey}`,
-                        tag,
-                        true,
-                        true
-                    )
-                })
-            })
-        }
+            if (moderators.length) {
+                _.forEach(moderators, moderator => {
+                    const [tag] = Object.keys(moderator)
+                    const tagModerators = moderator[tag]
 
-        if (tagGroups.length > 0) {
-            _.forEach(tagGroups, group => {
-                const [key] = Object.keys(group)
-                this.tagStore.setTagGroup(key, group[key])
-            })
-        }
-
-        if (tags) {
-            await Promise.all(
-                _.map(tags, async (tag, name) => {
-                    const { data: members } = await axios.get(
-                        `${nsdb.api}/discussions/site/members/${name}`
-                    )
-
-                    this.tagStore.tags.set(name, {
-                        name: name,
-                        logo: tag.icon,
-                        tagDescription: tag.desc,
-                        memberCount: members.count,
+                    _.forEach(tagModerators, tagModerator => {
+                        const [accountName, publicKey] = tagModerator.split('-')
+                        this.userStore.setModerationMemberByTag(
+                            `${accountName}:${publicKey}`,
+                            tag,
+                            true,
+                            true
+                        )
                     })
                 })
-            )
-        }
+            }
 
-        return settings
+            if (tagGroups.length > 0) {
+                _.forEach(tagGroups, group => {
+                    const [key] = Object.keys(group)
+                    this.tagStore.setTagGroup(key, group[key])
+                })
+            }
+
+            if (tags) {
+                await Promise.all(
+                    _.map(tags, async (tag, name) => {
+                        const { data: members } = await axios.get(
+                            `${nsdb.api}/discussions/site/members/${name}`
+                        )
+
+                        this.tagStore.tags.set(name, {
+                            name: name,
+                            logo: tag.icon,
+                            tagDescription: tag.desc,
+                            memberCount: members.count,
+                        })
+                    })
+                )
+            }
+
+            return settings
+        }
     }
 }

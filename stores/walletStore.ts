@@ -26,6 +26,13 @@ export class WalletStore {
         this.authStore = rootStore.authStore
     }
 
+    /**
+     * Returns the token from supportedTokensForUnifiedWallet
+     */
+    tokenFromSupportedUIDWallet = (value: string) => {
+        return this.supportedTokensForUnifiedWallet.find(token => token.value === value)
+    }
+
     @computed get supportedTokensAsSelectable() {
         return this.supportedTokensForUnifiedWallet.map(token => ({
             value: token.value,

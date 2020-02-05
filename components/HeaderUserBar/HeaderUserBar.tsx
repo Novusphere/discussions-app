@@ -1,5 +1,5 @@
 import React, { FunctionComponent, useCallback, useState } from 'react'
-import { Avatar, Menu, Dropdown, Icon, Popover, Divider } from 'antd'
+import { Avatar, Menu, Icon, Popover, Divider } from 'antd'
 
 import styles from './HeaderUserBar.module.scss'
 import { getIdenticon } from '@utils'
@@ -50,7 +50,7 @@ const HeaderUserBar: FunctionComponent<IHeaderUserBarProps> = ({
         {
             label: 'Wallet',
             as: '/settings/[setting]',
-            link: '/settings/wallets',
+            link: '/settings/wallet',
         },
     ]
 
@@ -63,43 +63,48 @@ const HeaderUserBar: FunctionComponent<IHeaderUserBarProps> = ({
     }
 
     const menu = (
-        <ul className={'list ma0 pa0'}>
+        <Menu style={{ borderRight: 0 }}>
             {defaults.map((item, index) => (
-                <li key={index + 1} onClick={item.onClick} className={'mb2 primary dim pointer'}>
+                <Menu.Item key={index + 1} style={{ padding: 0 }}>
                     {item.link ? (
                         <Link href={item.as} as={item.link}>
-                            <a>{item.label}</a>
+                            <a>
+                                <li onClick={item.onClick}>
+                                    {item.label}{' '}
+                                </li>
+                            </a>
                         </Link>
                     ) : (
                         item.label
                     )}
-                </li>
+                </Menu.Item>
             ))}
 
-            {Object.keys(balances).length > 0 &&  <Divider />}
+            {Object.keys(balances).length > 0 && <Menu.Divider />}
 
             {Object.keys(balances).map(symbol => (
-                <li key={symbol} className={'mb2 flex flex-row items-center'}>
+                <Menu.Item key={symbol} className={'flex flex-row items-center justify-between'} style={{ display: 'flex', padding: 0 }}>
                     <img
                         src={images[symbol][0]}
                         alt={`${symbol} image`}
                         className={'dib'}
-                        width={'25px'}
+                        width={25}
                     />
-                    <span className={'db ml2'}>
+                    <span className={'ml3 tr dib'}>
                         {balances[symbol]} {symbol}
                     </span>
-                </li>
+                </Menu.Item>
             ))}
-        </ul>
+        </Menu>
     )
 
-    const content = menu
-
     return (
-        <Popover content={content} style={{ width: 400 }} overlayClassName={styles.userOptions}>
+        <Popover
+            content={menu}
+            overlayClassName={styles.userOptions}
+        >
             <a href={'#'} className={styles.userLink}>
-                shovel12
+                {displayName}
                 <Icon type="down" style={{ marginLeft: 5 }} />
                 <Avatar
                     src={getIdenticon(icon)}

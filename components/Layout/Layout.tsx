@@ -1,4 +1,10 @@
-import React, { FunctionComponent, useCallback, useContext, useEffect, useLayoutEffect } from 'react'
+import React, {
+    FunctionComponent,
+    useCallback,
+    useContext,
+    useEffect,
+    useLayoutEffect,
+} from 'react'
 import {
     Layout as AntdLayout,
     Icon,
@@ -34,7 +40,9 @@ const { Header, Footer, Content } = AntdLayout
 interface ILayoutProps {}
 
 const Layout: FunctionComponent<ILayoutProps> = ({ children }) => {
-    const { authStore, uiStore, settingStore, tagStore, walletStore }: RootStore = useContext(StoreContext)
+    const { authStore, uiStore, settingStore, tagStore, walletStore }: RootStore = useContext(
+        StoreContext
+    )
 
     message.config({
         top: 75,
@@ -45,22 +53,23 @@ const Layout: FunctionComponent<ILayoutProps> = ({ children }) => {
     })
 
     // fire some stuff
-    useEffect(
-        () => {
-            if (!isServer) {
-                eos.initializeTokens().then(() => {
-                    eos.init({
-                        host: 'nodes.get-scatter.com',
-                        port: 443,
-                        protocol: 'https',
-                        chainId: 'aca376f206b8fc25a6ed44dbdc66547c36c6c33e3a119ffbeaef943642f0e906',
-                    })
-                    settingStore.loadSettings()
-                    walletStore.getSupportedTokensForUnifiedWallet()
-                })
+    useEffect(() => {
+        if (!isServer) {
+            if (authStore.hasEOSWallet) {
+                authStore.connectScatterWallet()
             }
-        }, []
-    )
+            eos.initializeTokens().then(() => {
+                eos.init({
+                    host: 'nodes.get-scatter.com',
+                    port: 443,
+                    protocol: 'https',
+                    chainId: 'aca376f206b8fc25a6ed44dbdc66547c36c6c33e3a119ffbeaef943642f0e906',
+                })
+                settingStore.loadSettings()
+                walletStore.getSupportedTokensForUnifiedWallet()
+            })
+        }
+    }, [])
 
     const logout = useCallback(() => {
         authStore.logOut()
@@ -181,7 +190,7 @@ const Layout: FunctionComponent<ILayoutProps> = ({ children }) => {
                                     <li key={subscribed} className={'ph3 pv1 mb2'}>
                                         <Popover
                                             content={
-                                                <div className={'pa3'}>
+                                                <div className={'pa1'}>
                                                     <span
                                                         className={
                                                             'f5 flex flex-row items-center justify-between'
