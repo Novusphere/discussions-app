@@ -6,12 +6,25 @@ import cx from 'classnames'
 import dynamic from 'next/dynamic'
 import Link from 'next/link'
 import _ from 'lodash'
-import { Form, Icon, Input, Tabs, Button, Typography, Select, InputNumber } from 'antd'
+import {
+    Form,
+    Icon,
+    Input,
+    Tabs,
+    Button,
+    Typography,
+    Select,
+    InputNumber,
+    Switch,
+    Divider,
+    List,
+    Avatar,
+} from 'antd'
 const { Text } = Typography
 const { TabPane } = Tabs
 import { Tab, TabList } from 'react-tabs'
 import { eos } from '@novuspherejs'
-import { getSignatureAndSubmit, openInNewTab } from '@utils'
+import { getIdenticon, getSignatureAndSubmit, openInNewTab } from '@utils'
 import { MODAL_OPTIONS } from '@globals'
 import ecc from 'eosjs-ecc'
 
@@ -25,7 +38,7 @@ const Connections = () => {
             <div className={'flex flex-row items-center justify-between'}>
                 <span className={'db'}>
                     <span className={'db b black f6'}>EOS Wallet</span>
-                    <span className={'db silver f6'}>
+                    <span className={'db gray f6'}>
                         You can connect your EOS wallets to Discussions App.
                     </span>
                 </span>
@@ -897,6 +910,122 @@ const Wallet = () => {
     )
 }
 
+const Blocked = () => {
+    const { userStore, tagStore }: RootStore = useStores()
+
+    const handleHiddenOnChange = useCallback(val => {
+        console.log(val)
+    }, [])
+
+    return useObserver(() => (
+        <>
+            <span className={'f6 gray'}>
+                Here you can set how you wish to view blocked content.
+            </span>
+            <div className={'mt4'}>
+                <div className={'flex flex-row items-center justify-between mb4'}>
+                    <span className={'f6'}>
+                        <span className={'b db'}>Hidden</span>
+                        <span className={'db silver'}>
+                            Hide blocked content entirely including all replies.
+                        </span>
+                    </span>
+                    <Switch defaultChecked onChange={handleHiddenOnChange} />
+                </div>
+                <div className={'flex flex-row items-center justify-between mb4'}>
+                    <span className={'f6'}>
+                        <span className={'b db'}>Collapse</span>
+                        <span className={'db silver'}>
+                            Auto-Collapse all blocked content, with the ability to expand the post.
+                        </span>
+                    </span>
+                    <Switch defaultChecked onChange={handleHiddenOnChange} />
+                </div>
+                <div className={'flex flex-row items-center justify-between mb4'}>
+                    <span className={'f6'}>
+                        <span className={'b db'}>Hide Unsigned Posts</span>
+                        <span className={'db silver'}>
+                            If a post has no signature, hide it with the above settings.
+                        </span>
+                    </span>
+                    <Switch defaultChecked onChange={handleHiddenOnChange} />
+                </div>
+            </div>
+            <Divider />
+            <div className={'mt4'}>
+                <span className={'f4 b black db mb3'}>Users</span>
+                <List
+                    locale={{
+                        emptyText: (
+                            <span>You have no blocked users</span>
+                        )
+                    }}
+                    itemLayout="horizontal"
+                    dataSource={[...userStore.blockedUsers.toJS()]}
+                    renderItem={([keys, name]) => (
+                        <List.Item
+                            actions={[
+                                <Button size={'small'} type={'danger'} key={'unblock'} onClick={() => userStore.toggleBlockUser(name, keys)}>
+                                    unblock
+                                </Button>,
+                            ]}
+                        >
+                            <List.Item.Meta
+                                avatar={<Avatar src={getIdenticon(keys)} size={'large'} />}
+                                title={
+                                    <Link href={`/u/[username]`} as={`/u/${name}-${keys}`}>
+                                        <a>{name}</a>
+                                    </Link>
+                                }
+                                description={<Text ellipsis>{keys}</Text>}
+                            />
+                        </List.Item>
+                    )}
+                />
+            </div>
+            <div className={'mt4'}>
+                <span className={'f4 b black db mb3'}>Posts</span>
+                <List
+                    locale={{
+                        emptyText: (
+                            <span>You have no blocked posts</span>
+                        )
+                    }}
+                    itemLayout="horizontal"
+                    dataSource={[...userStore.blockedPosts.toJS()]}
+                    renderItem={([path, date]) => {
+                        const [, tagName] = path.split('/')
+                        const tag = tagStore.tagModelFromObservables(tagName)
+                        return (
+                            <List.Item
+                                actions={[
+                                    <Button
+                                        size={'small'}
+                                        type={'danger'}
+                                        key={'unblock'}
+                                        onClick={() => userStore.toggleBlockPost(path)}
+                                    >
+                                        unblock
+                                    </Button>,
+                                ]}
+                            >
+                                <List.Item.Meta
+                                    avatar={<Avatar src={tag.logo} size={'large'} />}
+                                    title={
+                                        <Link href={'/tag/[name]/[id]/[title]'} as={path}>
+                                            {path}
+                                        </Link>
+                                    }
+                                />
+                            </List.Item>
+                        )
+                    }}
+                />
+            </div>
+        </>
+    ))
+}
+
 const Setting = dynamic(
     () =>
         Promise.resolve(({ page }: any) => {
@@ -905,6 +1034,8 @@ const Setting = dynamic(
                     return <Connections />
                 case 'wallet':
                     return <Wallet />
+                case 'blocked':
+                    return <Blocked />
                 default:
                     return <span>Hey</span>
             }
@@ -962,7 +1093,7 @@ const SettingsPage: NextPage<any> = ({ page }) => {
                             replace={true}
                         >
                             <a className={'gray'}>
-                                <li className={className(page, 'moderation')}>Moderation </li>
+                                <li className={className(page, 'moderation')}>Moderation</li>
                             </a>
                         </Link>
 
@@ -974,7 +1105,7 @@ const SettingsPage: NextPage<any> = ({ page }) => {
 
                         <Link href={'/settings/[setting]'} as={'/settings/blocked'} replace={true}>
                             <a className={'gray'}>
-                                <li className={className(page, 'blocked')}>Blocked </li>
+                                <li className={className(page, 'blocked')}>Blocked</li>
                             </a>
                         </Link>
                     </ul>

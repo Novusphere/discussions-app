@@ -1,5 +1,5 @@
 import React, { FunctionComponent, useCallback, useState } from 'react'
-import { Avatar, Menu, Icon, Popover, Divider } from 'antd'
+import { Avatar, Menu, Icon, Popover, Divider, Dropdown } from 'antd'
 
 import styles from './HeaderUserBar.module.scss'
 import { getIdenticon } from '@utils'
@@ -63,15 +63,13 @@ const HeaderUserBar: FunctionComponent<IHeaderUserBarProps> = ({
     }
 
     const menu = (
-        <Menu style={{ borderRight: 0 }}>
+        <Menu>
             {defaults.map((item, index) => (
-                <Menu.Item key={index + 1} style={{ padding: 0 }}>
+                <Menu.Item key={index + 1}>
                     {item.link ? (
                         <Link href={item.as} as={item.link}>
                             <a>
-                                <li onClick={item.onClick}>
-                                    {item.label}{' '}
-                                </li>
+                                <li onClick={item.onClick}>{item.label} </li>
                             </a>
                         </Link>
                     ) : (
@@ -83,7 +81,11 @@ const HeaderUserBar: FunctionComponent<IHeaderUserBarProps> = ({
             {Object.keys(balances).length > 0 && <Menu.Divider />}
 
             {Object.keys(balances).map(symbol => (
-                <Menu.Item key={symbol} className={'flex flex-row items-center justify-between'} style={{ display: 'flex', padding: 0 }}>
+                <Menu.Item
+                    key={symbol}
+                    className={'flex flex-row items-center justify-between'}
+                    style={{ display: 'flex' }}
+                >
                     <img
                         src={images[symbol][0]}
                         alt={`${symbol} image`}
@@ -99,10 +101,7 @@ const HeaderUserBar: FunctionComponent<IHeaderUserBarProps> = ({
     )
 
     return (
-        <Popover
-            content={menu}
-            overlayClassName={styles.userOptions}
-        >
+        <Dropdown overlay={menu}>
             <a href={'#'} className={styles.userLink}>
                 {displayName}
                 <Icon type="down" style={{ marginLeft: 5 }} />
@@ -113,7 +112,7 @@ const HeaderUserBar: FunctionComponent<IHeaderUserBarProps> = ({
                     className={styles.avatar}
                 />
             </a>
-        </Popover>
+        </Dropdown>
     )
 }
 
