@@ -57,7 +57,7 @@ export default class MyDocument extends Document {
                         }
 
                         .card {
-                            border-radius: 5px;
+                            border-radius: 3px;
                             box-shadow: 0 1px 2px #c9cccd;
                         }
                     `}</style>

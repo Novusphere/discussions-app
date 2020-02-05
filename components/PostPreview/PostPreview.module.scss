@@ -1,6 +1,6 @@
 .postPreview {
-    //transition: 0.1s all ease-in-out;
-    //box-shadow: 0px 0px 6px 1px rgba(0, 0, 0, 0.1);
+    transition: 0.1s all ease-in-out;
+    box-shadow: 0px 0px 6px 1px rgba(0, 0, 0, 0.1);
     margin-bottom: 20px;
     min-height: 50px;
     max-height: 325px;
@@ -8,7 +8,12 @@
     position: relative;
     text-overflow: ellipsis;
     content: '';
-    border-radius: 5px;
+    border-radius: 3px;
+    border: 1px solid white;
+
+    &:hover {
+        border: 1px solid #aaaaaa;
+    }
 
     .footer {
         position: absolute;

@@ -112,14 +112,14 @@ const Layout: FunctionComponent<ILayoutProps> = ({ children }) => {
             <div className={cx([styles.content, styles.container, 'center flex pv3'])}>
                 <div
                     className={cx([
-                        'fl w-30 vh-75 ph2 bg-white list pv3 card',
+                        'fl w-30 vh-75 ph2 bg-white list pv2 card',
                         {
                             dn: uiStore.hideSidebar,
                             db: !uiStore.hideSidebar,
                         },
                     ])}
                 >
-                    <li className={'ph3 pv1 mb2'} key="1">
+                    <li className={'ph3 pv1'} key="1">
                         <Link href={'/'} as={'/'}>
                             <a>
                                 <Icon className={'pr2'} type="home" />
@@ -127,7 +127,7 @@ const Layout: FunctionComponent<ILayoutProps> = ({ children }) => {
                             </a>
                         </Link>
                     </li>
-                    <li className={'ph3 pv1 mb2'} key="2">
+                    <li className={'ph3 pv1'} key="2">
                         <Link href={'/feed'} as={'/feed'}>
                             <a>
                                 <Icon className={'pr2'} type="team" />
@@ -147,14 +147,14 @@ const Layout: FunctionComponent<ILayoutProps> = ({ children }) => {
                         if (tagStore.tagGroup.size) {
                             return (
                                 <>
-                                    <Divider />
+                                    <Divider style={{ marginTop: 10, marginBottom: 10 }} />
                                     {[...tagStore.tagGroup.entries()].map(([name, tags]) => {
                                         const _name = name.toLowerCase()
                                         const as = `/tags/${tags.join(',')}`
                                         return (
                                             <li
                                                 className={cx([
-                                                    'ph3 pv1 mb2',
+                                                    'ph3 pv1',
                                                     // {
                                                     //     dim: router.asPath !== as,
                                                     //     'sidebar-link-active':
@@ -187,7 +187,7 @@ const Layout: FunctionComponent<ILayoutProps> = ({ children }) => {
                             {[...tagStore.subscribed.toJS()].map(subscribed => {
                                 const tag: any = tagStore.tagModelFromObservables(subscribed)
                                 return (
-                                    <li key={subscribed} className={'ph3 pv1 mb2'}>
+                                    <li key={subscribed} className={'ph3 pv1 black'}>
                                         <Popover
                                             content={
                                                 <div className={'pa1'}>
@@ -223,10 +223,10 @@ const Layout: FunctionComponent<ILayoutProps> = ({ children }) => {
                                                                     subscribed
                                                                 )
                                                             }
-                                                            type={'danger'}
                                                             shape="circle"
-                                                            icon="delete"
-                                                        />
+                                                        >
+                                                            <Icon type="delete" />
+                                                        </Button>
                                                     </span>
                                                     {tag.tagDescription && (
                                                         <>

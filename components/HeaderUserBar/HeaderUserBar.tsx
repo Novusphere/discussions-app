@@ -67,7 +67,7 @@ const HeaderUserBar: FunctionComponent<IHeaderUserBarProps> = ({
 
             {Object.keys(balances).length > 0 && <Menu.Divider />}
 
-            <UserBalances className={'ph2'} />
+            <UserBalances className={'ph2 pb2'} />
         </Menu>
     )
 
