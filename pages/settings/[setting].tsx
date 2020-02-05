@@ -19,6 +19,7 @@ import {
     Divider,
     List,
     Avatar,
+    Menu,
 } from 'antd'
 const { Text } = Typography
 const { TabPane } = Tabs
@@ -27,6 +28,7 @@ import { eos } from '@novuspherejs'
 import { getIdenticon, getSignatureAndSubmit, openInNewTab } from '@utils'
 import { MODAL_OPTIONS } from '@globals'
 import ecc from 'eosjs-ecc'
+import { UserBalances } from '@components'
 
 const { Option } = Select
 
@@ -956,16 +958,19 @@ const Blocked = () => {
                 <span className={'f4 b black db mb3'}>Users</span>
                 <List
                     locale={{
-                        emptyText: (
-                            <span>You have no blocked users</span>
-                        )
+                        emptyText: <span>You have no blocked users</span>,
                     }}
                     itemLayout="horizontal"
                     dataSource={[...userStore.blockedUsers.toJS()]}
                     renderItem={([keys, name]) => (
                         <List.Item
                             actions={[
-                                <Button size={'small'} type={'danger'} key={'unblock'} onClick={() => userStore.toggleBlockUser(name, keys)}>
+                                <Button
+                                    size={'small'}
+                                    type={'danger'}
+                                    key={'unblock'}
+                                    onClick={() => userStore.toggleBlockUser(name, keys)}
+                                >
                                     unblock
                                 </Button>,
                             ]}
@@ -987,9 +992,7 @@ const Blocked = () => {
                 <span className={'f4 b black db mb3'}>Posts</span>
                 <List
                     locale={{
-                        emptyText: (
-                            <span>You have no blocked posts</span>
-                        )
+                        emptyText: <span>You have no blocked posts</span>,
                     }}
                     itemLayout="horizontal"
                     dataSource={[...userStore.blockedPosts.toJS()]}
@@ -1054,7 +1057,7 @@ const className = (current, page) =>
     ])
 
 const SettingsPage: NextPage<any> = ({ page }) => {
-    const { uiStore, postsStore, userStore, authStore, tagStore }: RootStore = useStores()
+    const { uiStore, walletStore }: RootStore = useStores()
 
     useEffect(() => {
         uiStore.setSidebarHidden('true')
@@ -1110,6 +1113,62 @@ const SettingsPage: NextPage<any> = ({ page }) => {
                         </Link>
                     </ul>
                 </div>
+                <div className={'db'}>
+                    <span
+                        className={
+                            'db f6 b black ph4 pt4 flex flex-row justify-between items-center'
+                        }
+                    >
+                        Balances{' '}
+                        {!walletStore.refreshAllBalances['pending'] ? (
+                            <Icon type="reload" onClick={walletStore.refreshAllBalances} />
+                        ) : (
+                            <Icon type="loading" />
+                        )}
+                    </span>
+
+                    <UserBalances className={'ph4'} />
+
+                    {/*<ul className={'list pa0 ma0 mt3'}>*/}
+                    {/*    <Link*/}
+                    {/*        href={'/settings/[setting]'}*/}
+                    {/*        as={'/settings/connections'}*/}
+                    {/*        replace={true}*/}
+                    {/*    >*/}
+                    {/*        <a className={'gray'}>*/}
+                    {/*            <li className={className(page, 'connections')}>Connections</li>*/}
+                    {/*        </a>*/}
+                    {/*    </Link>*/}
+
+                    {/*    <Link href={'/settings/[setting]'} as={'/settings/wallet'} replace={true}>*/}
+                    {/*        <a className={'gray'}>*/}
+                    {/*            <li className={className(page, 'wallet')}>Wallet </li>*/}
+                    {/*        </a>*/}
+                    {/*    </Link>*/}
+
+                    {/*    <Link*/}
+                    {/*        href={'/settings/[setting]'}*/}
+                    {/*        as={'/settings/moderation'}*/}
+                    {/*        replace={true}*/}
+                    {/*    >*/}
+                    {/*        <a className={'gray'}>*/}
+                    {/*            <li className={className(page, 'moderation')}>Moderation</li>*/}
+                    {/*        </a>*/}
+                    {/*    </Link>*/}
+
+                    {/*    <Link href={'/settings/[setting]'} as={'/settings/airdrop'} replace={true}>*/}
+                    {/*        <a className={'gray'}>*/}
+                    {/*            <li className={className(page, 'airdrop')}>Airdrop </li>*/}
+                    {/*        </a>*/}
+                    {/*    </Link>*/}
+
+                    {/*    <Link href={'/settings/[setting]'} as={'/settings/blocked'} replace={true}>*/}
+                    {/*        <a className={'gray'}>*/}
+                    {/*            <li className={className(page, 'blocked')}>Blocked</li>*/}
+                    {/*        </a>*/}
+                    {/*    </Link>*/}
+                    {/*</ul>*/}
+                </div>
             </div>
             <div className={'fl ml3 w-70 bg-white card pa4'}>
                 <span className={'f4 b black db mb3'}>{_.startCase(page)}</span>
@@ -1120,7 +1179,12 @@ const SettingsPage: NextPage<any> = ({ page }) => {
 }
 
 SettingsPage.getInitialProps = async function({ query }) {
-    const page = query.setting
+    let page = query.setting as string
+
+    if (['connections', 'wallet', 'moderation', 'airdrop', 'blocked'].indexOf(page) === -1) {
+        page = 'connections'
+    }
+
     return {
         page,
     }

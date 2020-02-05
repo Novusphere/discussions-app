@@ -9,6 +9,7 @@ export { default as Replies } from './Replies/Replies'
 export { default as SharePostPopover } from './SharePostPopover/SharePostPopover'
 export { default as Editor } from './Editor/Editor'
 export { default as Form } from './Form/Form'
+export { default as UserBalances } from './UserBalances/UserBalances'
 
 // header
 export { default as HeaderLogo } from './HeaderLogo/HeaderLogo'

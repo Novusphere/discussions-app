@@ -5,6 +5,7 @@ import { eos, nsdb } from '@novuspherejs'
 import { isServer, sleep } from '@utils'
 import { ApiGetUnifiedId } from '../interfaces/ApiGet-UnifiedId'
 import { AuthStore } from '@stores/authStore'
+import { task } from 'mobx-task'
 
 export class WalletStore {
     @persist('list')
@@ -55,7 +56,7 @@ export class WalletStore {
         }
     }
 
-    async refreshAllBalances() {
+    refreshAllBalances = task.resolved(async () => {
         try {
             await sleep(250)
             await this.supportedTokensForUnifiedWallet.map(async datum => {
@@ -65,7 +66,7 @@ export class WalletStore {
         } catch (error) {
             throw error
         }
-    }
+    })
 
     fetchBalanceForSelectedToken = async (token = this.selectedToken) => {
         try {

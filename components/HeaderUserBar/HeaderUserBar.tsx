@@ -1,10 +1,11 @@
-import React, { FunctionComponent, useCallback, useState } from 'react'
-import { Avatar, Menu, Icon, Popover, Divider, Dropdown } from 'antd'
+import React, { FunctionComponent } from 'react'
+import { Avatar, Menu, Icon, Dropdown } from 'antd'
 
 import styles from './HeaderUserBar.module.scss'
 import { getIdenticon } from '@utils'
 import Link from 'next/link'
 import dynamic from 'next/dynamic'
+import { UserBalances } from '@components';
 
 interface IHeaderUserBarProps {
     icon: string
@@ -21,12 +22,6 @@ const HeaderUserBar: FunctionComponent<IHeaderUserBarProps> = ({
     postPub,
     balances,
 }) => {
-    const [visible, setVisible] = useState(false)
-
-    const visibleChange = useCallback(() => {
-        setVisible(!visible)
-    }, [])
-
     const defaults = [
         {
             label: 'Logout',
@@ -54,14 +49,6 @@ const HeaderUserBar: FunctionComponent<IHeaderUserBarProps> = ({
         },
     ]
 
-    let walletStore = window.localStorage.getItem('walletStore')
-    let images = []
-
-    if (walletStore) {
-        walletStore = JSON.parse(walletStore)
-        images = walletStore['supportedTokensImages']
-    }
-
     const menu = (
         <Menu>
             {defaults.map((item, index) => (
@@ -69,7 +56,7 @@ const HeaderUserBar: FunctionComponent<IHeaderUserBarProps> = ({
                     {item.link ? (
                         <Link href={item.as} as={item.link}>
                             <a>
-                                <li onClick={item.onClick}>{item.label} </li>
+                                <span onClick={item.onClick}>{item.label}</span>
                             </a>
                         </Link>
                     ) : (
@@ -80,23 +67,7 @@ const HeaderUserBar: FunctionComponent<IHeaderUserBarProps> = ({
 
             {Object.keys(balances).length > 0 && <Menu.Divider />}
 
-            {Object.keys(balances).map(symbol => (
-                <Menu.Item
-                    key={symbol}
-                    className={'flex flex-row items-center justify-between'}
-                    style={{ display: 'flex' }}
-                >
-                    <img
-                        src={images[symbol][0]}
-                        alt={`${symbol} image`}
-                        className={'dib'}
-                        width={25}
-                    />
-                    <span className={'ml3 tr dib'}>
-                        {balances[symbol]} {symbol}
-                    </span>
-                </Menu.Item>
-            ))}
+            <UserBalances className={'ph2'} />
         </Menu>
     )
 
