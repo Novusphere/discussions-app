@@ -33,12 +33,12 @@ export class PostsStore {
     /**
      * For fetching posts inside a tag, home page or all.
      * @param key
-     * @param tagNames
+     * @param {string[]} tagNames
      * @param pinnedPostsBuffer - a Base64 version of { }asPathURL, tagName }
      */
-    fetchPostsForTag = async (key = '', tagNames = [], pinnedPostsBuffer = '') => {
+    fetchPostsForTag = async (key = '', tagNames, pinnedPostsBuffer = '') => {
         try {
-            if (!tagNames.length) tagNames = ['all']
+            if (!tagNames || !tagNames.length) tagNames = ['all']
 
             const { posts, cursorId } = await discussions.getPostsForSubs(
                 tagNames,
@@ -87,8 +87,8 @@ export class PostsStore {
 
     /**
      * Fetch posts given an array of pub keys
-     * @param key
-     * @param keys
+     * @param {string} key - the users post pub
+     * @param {string[]} keys - the post pubs of users whose posts you want to return
      */
     getPostsForKeys = async (key = '', keys = []) => {
         try {

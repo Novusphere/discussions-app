@@ -13,6 +13,7 @@ import {
     Icons,
     SharePostPopover,
     Editor,
+    ReplyingPostPreview,
 } from '@components'
 import moment from 'moment'
 import { NextRouter, withRouter } from 'next/router'
@@ -63,6 +64,7 @@ const PostPage: NextPage<IPostPageProps> = ({
             downvotes: source.thread.openingPost.downvotes,
             upvotes: source.thread.openingPost.upvotes,
             highlightedPostUUID: '',
+            showPreview: false,
 
             get myVoteValue() {
                 if (postStore.myVote && postStore.myVote.length) {
@@ -112,6 +114,10 @@ const PostPage: NextPage<IPostPageProps> = ({
 
             setEditingContent: (content: string) => {
                 postStore.editingContent = content
+            },
+
+            togglePreview: () => {
+                postStore.showPreview = !postStore.showPreview
             },
 
             toggleEdit: () => {
@@ -413,7 +419,7 @@ const PostPage: NextPage<IPostPageProps> = ({
     )
 
     useEffect(() => {
-        const [,hash] = router.asPath.split('#')
+        const [, hash] = router.asPath.split('#')
         if (hash) {
             postStore.setHighlightedPosUUID(hash)
         }
@@ -738,7 +744,7 @@ const PostPage: NextPage<IPostPageProps> = ({
                         threadUsers={postStore.threadUsers}
                     />
                     <div className={'flex flex-row justify-end pt2'}>
-                        <Button disabled={postStore.replyingContent === ''} className={'mr2'}>
+                        <Button disabled={postStore.replyingContent === ''} onClick={postStore.togglePreview} className={'mr2'}>
                             Preview
                         </Button>
                         <Button
@@ -752,6 +758,8 @@ const PostPage: NextPage<IPostPageProps> = ({
                     </div>
                 </div>
             )}
+
+            {postStore.showPreview && <ReplyingPostPreview content={postStore.replyingContent} />}
 
             {/*Render Replies*/}
             {postStore.observableThread.openingPost.totalReplies > 0 && (

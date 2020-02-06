@@ -1,28 +1,40 @@
-import React, { useContext } from 'react'
+import React, { useContext, useEffect } from 'react'
 import { NextPage } from 'next'
 import { InfiniteScrollFeed } from '@components'
-import { observer } from 'mobx-react-lite'
+import { observer, useObserver } from 'mobx-react-lite'
 import { StoreContext } from '@stores'
+import dynamic from 'next/dynamic'
+
+const IndexPageNoSSR = dynamic(
+    () =>
+        Promise.resolve(({ postPub }: any) => {
+            const { postsStore, tagStore } = useContext(StoreContext)
+
+            useEffect(() => {
+                postsStore.resetPostsAndPosition()
+                postsStore.fetchPostsForTag(postPub, [...tagStore.subscribed.toJS()])
+            }, [])
+
+            return useObserver(() => (
+                <InfiniteScrollFeed
+                    dataLength={postsStore.postsPosition.items}
+                    hasMore={postsStore.postsPosition.cursorId !== 0}
+                    next={() => postsStore.fetchPostsForTag(postPub)}
+                    posts={postsStore.posts}
+                />
+            ))
+        }),
+    {
+        ssr: false,
+    }
+)
 
 const IndexPage: NextPage<any> = ({ postPub }) => {
-    const { postsStore } = useContext(StoreContext)
-
-    return (
-        <InfiniteScrollFeed
-            dataLength={postsStore.postsPosition.items}
-            hasMore={postsStore.postsPosition.cursorId !== 0}
-            next={() => postsStore.fetchPostsForTag(postPub)}
-            posts={postsStore.posts}
-        />
-    )
+    return <IndexPageNoSSR postPub={postPub} />
 }
 
 IndexPage.getInitialProps = async function({ store }: any) {
-    store.postsStore.resetPostsAndPosition()
-
     const postPub = store.authStore.postPub
-    await store.postsStore.fetchPostsForTag(postPub)
-
     return {
         postPub,
     }

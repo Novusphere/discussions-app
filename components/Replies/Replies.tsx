@@ -2,7 +2,7 @@ import React, { FunctionComponent } from 'react'
 
 import styles from './Replies.module.scss'
 import { discussions, Post } from '@novuspherejs'
-import { Editor, Icons, RichTextPreview, Tips, UserNameWithIcon, VotingHandles } from '@components'
+import { Editor, Icons, ReplyingPostPreview, RichTextPreview, Tips, UserNameWithIcon, VotingHandles } from '@components'
 import moment from 'moment'
 import { Button, Dropdown, Icon, Menu, message, Tooltip } from 'antd'
 import { observer, useLocalStore, useObserver } from 'mobx-react-lite'
@@ -22,10 +22,11 @@ import copy from 'clipboard-copy'
 import { MODAL_OPTIONS } from '@globals'
 
 interface IRepliesProps {
+    preview?: boolean
     setHighlightedPosUUID: (uuid: string) => void
     highlightedPostUUID: string
     threadUsers: any[]
-    router: NextRouter
+    router?: NextRouter
     reply: Post
 }
 
@@ -46,6 +47,7 @@ const Replies: FunctionComponent<IRepliesProps> = props => {
             editing: false,
             collapsed: false,
             blocked: false,
+            showPreview: false,
 
             get myVoteValue() {
                 if (replyStore.myVote && replyStore.myVote.length) {
@@ -56,7 +58,12 @@ const Replies: FunctionComponent<IRepliesProps> = props => {
             },
 
             get permaLinkURL() {
+                if (typeof props.router === 'undefined') return ''
                 return getPermaLink(props.router.asPath.split('#')[0], props.reply.uuid)
+            },
+
+            toggleShowPreview: () => {
+              replyStore.showPreview = !replyStore.showPreview
             },
 
             toggleCollapse: () => {
@@ -415,7 +422,7 @@ const Replies: FunctionComponent<IRepliesProps> = props => {
                     },
                 ])}
             >
-                <div
+                {<div
                     className={'flex flex-1 pr2 pt1 pl2'}
                     style={{
                         visibility: replyStore.collapsed ? 'hidden' : 'visible',
@@ -423,12 +430,12 @@ const Replies: FunctionComponent<IRepliesProps> = props => {
                 >
                     <VotingHandles
                         uuid={replyStore.reply.uuid}
-                        myVote={replyStore.myVoteValue}
+                        myVote={props.preview ? 1 : replyStore.myVoteValue}
                         upVotes={replyStore.upvotes}
                         downVotes={replyStore.downvotes}
-                        handler={replyStore.handleVoting}
+                        handler={props.preview ? () => null : replyStore.handleVoting}
                     />
-                </div>
+                </div>}
                 <div className={'tl pt2 w-100'}>
                     <div className={'flex flex-row items-center w-100 relative'}>
                         <div className={'flex flex-row items-center'}>
@@ -470,7 +477,7 @@ const Replies: FunctionComponent<IRepliesProps> = props => {
                         </div>
                         <Tips tips={replyStore.reply.tips} />
 
-                        {!isSpamPost && (
+                        {!props.preview && !isSpamPost && (
                             <div
                                 className={cx([
                                     'absolute top-0 right-1',
@@ -537,7 +544,7 @@ const Replies: FunctionComponent<IRepliesProps> = props => {
                     {/*Render Content*/}
                     {!replyStore.collapsed && !isSpamPost && !replyStore.editing && (
                         <RichTextPreview hideFade className={'lh-copy pt2 dark-gray'}>
-                            {replyStore.reply.content}
+                            {props.preview ? props.reply.content : replyStore.reply.content}
                         </RichTextPreview>
                     )}
 
@@ -564,7 +571,7 @@ const Replies: FunctionComponent<IRepliesProps> = props => {
                         </div>
                     )}
 
-                    {replyStore.replying ? (
+                    {!props.preview && replyStore.replying ? (
                         <div className={'mr3 mb3'}>
                             <Editor
                                 onChange={replyStore.setReplyContent}
@@ -572,6 +579,7 @@ const Replies: FunctionComponent<IRepliesProps> = props => {
                             />
                             <div className={'flex flex-row justify-end pt2'}>
                                 <Button
+                                    onClick={replyStore.toggleShowPreview}
                                     disabled={replyStore.replyingContent === ''}
                                     className={'mr2'}
                                 >
@@ -588,11 +596,15 @@ const Replies: FunctionComponent<IRepliesProps> = props => {
                             </div>
                         </div>
                     ) : null}
+
+                    {replyStore.showPreview && (
+                        <ReplyingPostPreview className={'mr3 mb3'} content={replyStore.replyingContent} />
+                    )}
                 </div>
             </div>
 
             {/*Render Replies*/}
-            {!replyStore.collapsed &&
+            {!props.preview && !replyStore.collapsed &&
                 replyStore.reply.replies.map(child => (
                     <div
                         key={child.uuid}
@@ -613,6 +625,8 @@ const Replies: FunctionComponent<IRepliesProps> = props => {
     ))
 }
 
-Replies.defaultProps = {}
+Replies.defaultProps = {
+    preview: false,
+}
 
 export default observer(Replies)

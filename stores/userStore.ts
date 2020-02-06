@@ -15,8 +15,6 @@ export class UserStore {
 
     blockedByDelegation = observable.map<string, string>() // either blockedUsers or blockedPosts
 
-    @observable followingKeys = []
-
     @observable private uiStore: RootStore['uiStore']
 
     constructor(rootStore: RootStore) {
@@ -24,11 +22,7 @@ export class UserStore {
     }
 
     hydrate(initialState: any = {}) {
-        if (initialState.followingKeys) {
-            this.followingKeys = initialState.followingKeys
-        }
-
-        if (initialState.pinnedPosts) {
+         if (initialState.pinnedPosts) {
             this.pinnedPosts = observable.map<string, string>(initialState.pinnedPosts)
         }
     }

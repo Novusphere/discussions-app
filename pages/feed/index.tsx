@@ -1,29 +1,40 @@
-import React, { useContext } from 'react'
+import React, { useContext, useEffect } from 'react'
 import { NextPage } from 'next'
-// import { RootStoreContext } from '@stores'
 import { InfiniteScrollFeed } from '@components'
-import { observer } from 'mobx-react-lite'
-import nookies from 'nookies'
-import { StoreContext } from '@stores'
+import { observer, useObserver } from 'mobx-react-lite'
+import { RootStore, StoreContext } from '@stores'
+import dynamic from 'next/dynamic'
+
+const FeedPageNoSSR = dynamic(
+    () =>
+        Promise.resolve(({ postPub }: any) => {
+            const { postsStore, userStore }: RootStore = useContext(StoreContext)
+
+            useEffect(() => {
+                postsStore.resetPostsAndPosition()
+                postsStore.getPostsForKeys(postPub, [...userStore.following.keys()])
+            }, [])
+
+            return useObserver(() => (
+                <InfiniteScrollFeed
+                    dataLength={postsStore.postsPosition.items}
+                    hasMore={postsStore.postsPosition.cursorId !== 0}
+                    next={() => postsStore.getPostsForKeys(postPub)}
+                    posts={postsStore.posts}
+                />
+            ))
+        }),
+    {
+        ssr: false,
+    }
+)
 
 const FeedPage: NextPage<any> = ({ postPub }) => {
-    const { postsStore } = useContext(StoreContext)
-
-    return (
-        <InfiniteScrollFeed
-            dataLength={postsStore.postsPosition.items}
-            hasMore={postsStore.postsPosition.cursorId !== 0}
-            next={() => postsStore.getPostsForKeys(postPub)}
-            posts={postsStore.posts}
-        />
-    )
+    return <FeedPageNoSSR postPub={postPub} />
 }
 
 FeedPage.getInitialProps = async function(ctx: any) {
-    ctx.store.postsStore.resetPostsAndPosition()
-
     const postPub = ctx.store.authStore.postPub
-    await ctx.store.postsStore.getPostsForKeys(postPub)
 
     return {
         postPub,
