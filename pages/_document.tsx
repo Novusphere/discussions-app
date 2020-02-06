@@ -60,6 +60,10 @@ export default class MyDocument extends Document {
                             border-radius: 3px;
                             box-shadow: 0 1px 2px #c9cccd;
                         }
+                        
+                        .ant-form-explain {
+                            white-space: pre-line;
+                            }
                     `}</style>
                 </Head>
                 <body style={{ margin: 0 }}>

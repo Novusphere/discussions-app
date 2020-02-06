@@ -618,9 +618,9 @@ export const checkIfNameIsValid = async (accountName: string): Promise<boolean |
         )
 
         if (data.rows.length > 0) return true
-        throw new Error(`${accountName} is not a valid EOS username, please try again.`)
+        throw new Error(accountName)
     } catch (error) {
-        throw new Error(`${accountName} is not a valid EOS username, please try again.`)
+        throw new Error(accountName)
     }
 }
 

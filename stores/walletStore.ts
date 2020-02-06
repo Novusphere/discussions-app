@@ -18,6 +18,7 @@ export class WalletStore {
 
     @observable supportedTokensForUnifiedWallet = []
     @observable selectedToken = null
+    @observable eosTokens = [] // all the possible tokens we support
 
     balances = observable.map<string, string>()
 
@@ -27,11 +28,27 @@ export class WalletStore {
         this.authStore = rootStore.authStore
     }
 
+    setTokens = tokens => {
+        this.eosTokens = tokens.map(token => ({
+            label: `${token.name} (${token.account})`,
+            name: token.name,
+            value: token.account,
+            symbol: token.symbol,
+        }))
+    }
+
     /**
      * Returns the token from supportedTokensForUnifiedWallet
      */
     tokenFromSupportedUIDWallet = (value: string) => {
         return this.supportedTokensForUnifiedWallet.find(token => token.value === value)
+    }
+
+    /**
+     * Returns the token from supportedTokensForUnifiedWallet
+     */
+    tokenFromAllAvailableTokens = (value: string) => {
+        return this.eosTokens.find(token => token.value === value)
     }
 
     @computed get supportedTokensAsSelectable() {

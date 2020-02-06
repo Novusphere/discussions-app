@@ -170,9 +170,9 @@ export class AuthStore {
                 })
             } else {
                 const wallet = await this.initializeScatterLogin()
-                this.eosWalletDisplayName = wallet.auth.accountName
 
-                if (wallet.connected) {
+                if (wallet && wallet.connected) {
+                    this.eosWalletDisplayName = wallet.auth.accountName
                     ;(wallet as any).connect()
                     this.setHasEOSWalletCookie('true')
                 } else {

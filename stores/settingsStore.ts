@@ -27,6 +27,14 @@ export class SettingsStore {
         this.tagStore = rootStore.tagStore
     }
 
+    setBlockedContent = (type: BlockedContentSetting) => {
+        this.blockedContentSetting = type
+    }
+
+    toggleUnsignedPostsIsSpam = () => {
+        this.unsignedPostsIsSpam = !this.unsignedPostsIsSpam
+    }
+
     hydrate(initialState: any = {}) {
         if (initialState.unsignedPostsIsSpam) {
             this.unsignedPostsIsSpam = initialState.unsignedPostsIsSpam
