@@ -334,11 +334,12 @@ const PostPreview: FunctionComponent<IPostPreviewProps> = ({
                                                     e.preventDefault()
                                                 }}
                                             >
-                                                {' '}
                                                 share
                                             </a>
                                         </Popover>
-                                        <span className={'f6 mh2 dim pointer'}>reply</span>
+                                        <Link href={'/tag/[name]/[id]/[title]'} as={`${url}#reply`}>
+                                            <a className={'f6 mh2 dim pointer'}>reply</a>
+                                        </Link>
                                         <span
                                             className={'f6 mh2 dim pointer'}
                                             onClick={e => {

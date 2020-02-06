@@ -90,8 +90,12 @@ export class PostsStore {
      * @param key
      * @param keys
      */
-    getPostsForKeys = async (key = '', keys = [...this.userStore.following.keys()]) => {
+    getPostsForKeys = async (key = '', keys = []) => {
         try {
+            if (!keys.length) {
+                keys = [...this.userStore.following.keys()]
+            }
+
             const { posts, cursorId } = await discussions.getPostsForKeys(
                 keys,
                 this.postsPosition.cursorId,
@@ -124,7 +128,7 @@ export class PostsStore {
         }
     }
 
-    getSearchResults = async (value: string, key= '') => {
+    getSearchResults = async (value: string, key = '') => {
         try {
             const { results: posts, cursorId } = await discussions.getPostsForSearch(
                 value,

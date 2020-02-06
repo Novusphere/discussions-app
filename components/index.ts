@@ -25,3 +25,10 @@ export { default as ModalsPasswordReEntry } from './ModalsPasswordReEntry/Modals
 
 //icons
 export { default as Icons } from './Icons/Icons'
+
+// settings
+export { default as SettingsAirdrop } from './SettingsAirdrop/SettingsAirdrop'
+export { default as SettingsBlocked } from './SettingsBlocked/SettingsBlocked'
+export { default as SettingsConnections } from './SettingsConnections/SettingsConnections'
+export { default as SettingsModeration } from './SettingsModeration/SettingsModeration'
+export { default as SettingsWallet } from './SettingsWallet/SettingsWallet'

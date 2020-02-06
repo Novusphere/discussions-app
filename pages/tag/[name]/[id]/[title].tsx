@@ -663,7 +663,7 @@ const PostPage: NextPage<IPostPageProps> = ({
                             )}
                             <Button
                                 size={'small'}
-                                title={'Watch post'}
+                                title={userStore.watching.has(id) ? 'Unwatch post' : 'Watch post'}
                                 className={'mh1'}
                                 onClick={() =>
                                     userStore.toggleThreadWatch(
@@ -716,7 +716,7 @@ const PostPage: NextPage<IPostPageProps> = ({
 
             {/*Render Opening Post Reply Box*/}
             {postStore.replying && (
-                <div className={'mt3'}>
+                <div className={'mt3'} id={'reply'}>
                     <Editor
                         disabled={postStore.editing}
                         onChange={postStore.setReplyContent}
@@ -740,7 +740,7 @@ const PostPage: NextPage<IPostPageProps> = ({
 
             {/*Render Replies*/}
             {postStore.observableThread.openingPost.totalReplies > 0 && (
-                <div className={'mt3'}>
+                <div className={'mt3'} id={'comments'}>
                     <span className={'silver'}>
                         viewing all {postStore.observableThread.openingPost.totalReplies} comments
                     </span>

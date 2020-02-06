@@ -14,13 +14,11 @@ import {
     getPermaLink,
     openInNewTab,
     signPost,
-    sleep,
     transformTipsToTransfers,
     voteAsync,
 } from '@utils'
-import { NextRouter } from 'next/router'
+import { NextRouter, useRouter } from 'next/router'
 import copy from 'clipboard-copy'
-import { task } from 'mobx-task'
 import { MODAL_OPTIONS } from '@globals'
 
 interface IRepliesProps {
@@ -33,6 +31,7 @@ const ButtonGroup = Button.Group
 
 const Replies: FunctionComponent<IRepliesProps> = props => {
     const { userStore, uiStore, authStore, walletStore }: RootStore = useStores()
+    const router = useRouter()
 
     const replyStore = useLocalStore(
         source => ({
@@ -45,6 +44,7 @@ const Replies: FunctionComponent<IRepliesProps> = props => {
             editing: false,
             collapsed: false,
             blocked: false,
+            highlightedPostUUID: '',
 
             get myVoteValue() {
                 if (replyStore.myVote && replyStore.myVote.length) {
@@ -410,14 +410,18 @@ const Replies: FunctionComponent<IRepliesProps> = props => {
             onMouseEnter={() => replyStore.setHover(true)}
             onMouseLeave={() => replyStore.setHover(false)}
         >
+            {replyStore.highlightedPostUUID}
+
             <div
                 className={cx('flex flex-row items-start justify-start bl b--near-white w-100', [
                     {
+                        'bg-washed-yellow': replyStore.highlightedPostUUID === props.reply.uuid,
                         [styles.postHover]: replyStore.hover,
                         [styles.postHoverTransparent]: !replyStore.hover,
                     },
                 ])}
             >
+                {props.reply.uuid}
                 <div
                     className={'flex flex-1 pr2 pt1 pl2'}
                     style={{
@@ -498,6 +502,11 @@ const Replies: FunctionComponent<IRepliesProps> = props => {
                                                 `${window.location.origin}${replyStore.permaLinkURL}`
                                             )
                                             message.success('Copied to your clipboard')
+                                            replyStore.highlightedPostUUID = props.reply.uuid
+                                            router.replace(
+                                                router.pathname,
+                                                `${replyStore.permaLinkURL}#${props.reply.uuid}`
+                                            )
                                         }}
                                     >
                                         <Icons.ShareIcon />
