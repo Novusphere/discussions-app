@@ -987,8 +987,24 @@ const Blocked = () => {
                     itemLayout="horizontal"
                     dataSource={[...userStore.blockedUsers.toJS()]}
                     renderItem={([keys, name]) => (
-                        <List.Item
-                            actions={[
+                        <List.Item className={'flex flex-row items-center justify-between'}>
+                            <>
+                                <span className={'flex flex-row items-center'}>
+                                    <span className={'pr3 dib'}>
+                                        <Avatar src={getIdenticon(keys)} size={'large'} />
+                                    </span>
+                                    <span className={'dib'}>
+                                        <span className={'db'}>
+                                            <Link href={`/u/[username]`} as={`/u/${name}-${keys}`}>
+                                                <a>{name}</a>
+                                            </Link>
+                                        </span>
+
+                                        <Text className={'db'} ellipsis>
+                                            {keys}
+                                        </Text>
+                                    </span>
+                                </span>
                                 <Button
                                     size={'small'}
                                     type={'danger'}
@@ -996,18 +1012,8 @@ const Blocked = () => {
                                     onClick={() => userStore.toggleBlockUser(name, keys)}
                                 >
                                     unblock
-                                </Button>,
-                            ]}
-                        >
-                            <List.Item.Meta
-                                avatar={<Avatar src={getIdenticon(keys)} size={'large'} />}
-                                title={
-                                    <Link href={`/u/[username]`} as={`/u/${name}-${keys}`}>
-                                        <a>{name}</a>
-                                    </Link>
-                                }
-                                description={<Text ellipsis>{keys}</Text>}
-                            />
+                                </Button>
+                            </>
                         </List.Item>
                     )}
                 />
@@ -1024,8 +1030,16 @@ const Blocked = () => {
                         const [, tagName] = path.split('/')
                         const tag = tagStore.tagModelFromObservables(tagName)
                         return (
-                            <List.Item
-                                actions={[
+                            <List.Item className={'flex flex-row items-center justify-between'}>
+                                <>
+                                    <span>
+                                        <span className={'pr3 dib'}>
+                                            <Avatar src={tag.logo} size={'large'} />
+                                        </span>
+                                        <Link href={'/tag/[name]/[id]/[title]'} as={path}>
+                                            {path}
+                                        </Link>
+                                    </span>
                                     <Button
                                         size={'small'}
                                         type={'danger'}
@@ -1033,17 +1047,8 @@ const Blocked = () => {
                                         onClick={() => userStore.toggleBlockPost(path)}
                                     >
                                         unblock
-                                    </Button>,
-                                ]}
-                            >
-                                <List.Item.Meta
-                                    avatar={<Avatar src={tag.logo} size={'large'} />}
-                                    title={
-                                        <Link href={'/tag/[name]/[id]/[title]'} as={path}>
-                                            {path}
-                                        </Link>
-                                    }
-                                />
+                                    </Button>
+                                </>
                             </List.Item>
                         )
                     }}
@@ -1085,6 +1090,8 @@ const Moderation = () => {
                     </>
                 )
             },
+            sortDirections: ['descend', 'ascend'],
+            sorter: (a, b) => (a.name === b.name ? 0 : a.name < b.name ? -1 : 1),
         },
         {
             title: 'Tag',
@@ -1103,6 +1110,9 @@ const Moderation = () => {
                     </>
                 )
             },
+
+            sortDirections: ['descend', 'ascend'],
+            sorter: (a, b) => (a.tag === b.tag ? 0 : a.tag < b.tag ? -1 : 1),
         },
         {
             key: 'action',
@@ -1124,12 +1134,20 @@ const Moderation = () => {
                 </>
             ),
         },
-    ]
+    ] as any
 
     return useObserver(() => (
         <>
             <span className={'f6 gray'}>Here you can set the moderators you have delegated.</span>
-            <Table pagination={false} dataSource={dataSource} columns={columns} className={'mt4'} />
+            <Table
+                locale={{
+                    emptyText: <span>You have no delegated users</span>,
+                }}
+                pagination={false}
+                dataSource={dataSource}
+                columns={columns}
+                className={'mt4'}
+            />
         </>
     ))
 }

@@ -123,4 +123,29 @@ export class PostsStore {
             throw error
         }
     }
+
+    getSearchResults = async (value: string, key= '') => {
+        try {
+            const { results: posts, cursorId } = await discussions.getPostsForSearch(
+                value,
+                this.postsPosition.cursorId,
+                this.postsPosition.items,
+                key
+            )
+
+            this.posts = [...this.posts, ...posts]
+
+            this.postsPosition = {
+                items: this.posts.length,
+                cursorId,
+            }
+
+            return {
+                posts: this.posts,
+                position: this.postsPosition,
+            }
+        } catch (error) {
+            return error
+        }
+    }
 }

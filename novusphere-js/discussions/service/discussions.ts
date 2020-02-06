@@ -145,12 +145,14 @@ export default class DiscussionsService {
     async getPostsForSearch(
         search: string,
         searchCursorId = undefined,
-        count = 0
+        count = 0,
+        key = ''
     ): Promise<{
         results: Post[]
         cursorId: number
     }> {
         const { payload, cursorId } = await nsdb.search({
+            key,
             cursorId: searchCursorId,
             count,
             pipeline: [
