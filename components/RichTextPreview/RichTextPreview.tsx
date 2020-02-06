@@ -5,7 +5,7 @@ import cx from 'classnames'
 
 import styles from './RichTextPreview.module.scss'
 import { nsdb } from '@novuspherejs'
-import { generateUuid, LINK_LIMIT, openInNewTab } from '@utils'
+import { generateUuid, LINK_LIMIT, openInNewTab, sleep } from '@utils'
 
 interface IRichTextPreviewProps {
     hideFade?: boolean
@@ -114,6 +114,8 @@ const RtLink: FunctionComponent<any> = ({ children, href, index }) => {
         let timeout = null
 
         async function refreshIFrames() {
+            await sleep(250)
+
             if (href.match(/facebook|fb.me/)) {
                 if ((window as any).FB) {
                     ;(window as any).FB.XFBML.parse()

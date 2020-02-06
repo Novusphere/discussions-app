@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { useEffect } from 'react'
 import { NextPage } from 'next'
 import { observer, useLocalStore } from 'mobx-react-lite'
 import { discussions, Thread } from '@novuspherejs'
@@ -23,7 +23,6 @@ import {
     getThreadUrl,
     openInNewTab,
     signPost,
-    sleep,
     transformTipsToTransfers,
     voteAsync,
 } from '@utils'
@@ -63,6 +62,7 @@ const PostPage: NextPage<IPostPageProps> = ({
             myVote: source.thread.openingPost.myVote,
             downvotes: source.thread.openingPost.downvotes,
             upvotes: source.thread.openingPost.upvotes,
+            highlightedPostUUID: '',
 
             get myVoteValue() {
                 if (postStore.myVote && postStore.myVote.length) {
@@ -92,6 +92,10 @@ const PostPage: NextPage<IPostPageProps> = ({
                     ),
                     option => option.id
                 )
+            },
+
+            setHighlightedPosUUID: (uuid: string) => {
+                postStore.highlightedPostUUID = uuid
             },
 
             /**
@@ -407,6 +411,17 @@ const PostPage: NextPage<IPostPageProps> = ({
             thread,
         }
     )
+
+    useEffect(() => {
+        const [,hash] = router.asPath.split('#')
+        if (hash) {
+            postStore.setHighlightedPosUUID(hash)
+        }
+
+        return () => {
+            postStore.setHighlightedPosUUID('')
+        }
+    }, [])
 
     const isSameUser = postStore.observableThread.openingPost.pub == authStore.postPub
     const menu = (
@@ -751,6 +766,8 @@ const PostPage: NextPage<IPostPageProps> = ({
                                 reply={reply}
                                 router={router}
                                 threadUsers={postStore.threadUsers}
+                                highlightedPostUUID={postStore.highlightedPostUUID}
+                                setHighlightedPosUUID={postStore.setHighlightedPosUUID}
                             />
                         ))}
                     </div>

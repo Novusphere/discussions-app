@@ -91,7 +91,7 @@ const InfiniteScrollFeed: FunctionComponent<IInfiniteScrollFeedProps> = ({
                                   blockedPosts={userStore.blockedPosts}
                                   blockedUsers={userStore.blockedUsers}
                                   unsignedPostsIsSpam={settingStore.unsignedPostsIsSpam}
-                                  toggleBlockPost={null}
+                                  toggleBlockPost={userStore.toggleBlockPost}
                               />
                           )
                       })

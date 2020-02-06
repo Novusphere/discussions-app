@@ -22,6 +22,8 @@ import copy from 'clipboard-copy'
 import { MODAL_OPTIONS } from '@globals'
 
 interface IRepliesProps {
+    setHighlightedPosUUID: (uuid: string) => void
+    highlightedPostUUID: string
     threadUsers: any[]
     router: NextRouter
     reply: Post
@@ -44,7 +46,6 @@ const Replies: FunctionComponent<IRepliesProps> = props => {
             editing: false,
             collapsed: false,
             blocked: false,
-            highlightedPostUUID: '',
 
             get myVoteValue() {
                 if (replyStore.myVote && replyStore.myVote.length) {
@@ -347,6 +348,7 @@ const Replies: FunctionComponent<IRepliesProps> = props => {
             },
         }),
         {
+            highlightedPostUUID: props.highlightedPostUUID,
             reply: props.reply,
         }
     )
@@ -364,9 +366,6 @@ const Replies: FunctionComponent<IRepliesProps> = props => {
                     onClick={() =>
                         userStore.toggleUserFollowing(props.reply.displayName, props.reply.pub)
                     }
-                    // style={{
-                    //     color: userStore.following.has(props.reply.pub) ? '#079e99' : 'normal',
-                    // }}
                 >
                     <Icon type="user-add" className={'mr2'} />
                     {useObserver(() =>
@@ -380,9 +379,6 @@ const Replies: FunctionComponent<IRepliesProps> = props => {
                     target="_blank"
                     rel="noopener noreferrer"
                     onClick={() => userStore.toggleBlockPost(replyStore.permaLinkURL)}
-                    // style={{
-                    //     color: userStore.following.has(props.reply.pub) ? '#FF4136' : 'normal',
-                    // }}
                 >
                     <Icon type="stop" className={'mr2'} />
                     {useObserver(() =>
@@ -410,18 +406,15 @@ const Replies: FunctionComponent<IRepliesProps> = props => {
             onMouseEnter={() => replyStore.setHover(true)}
             onMouseLeave={() => replyStore.setHover(false)}
         >
-            {replyStore.highlightedPostUUID}
-
             <div
                 className={cx('flex flex-row items-start justify-start bl b--near-white w-100', [
                     {
-                        'bg-washed-yellow': replyStore.highlightedPostUUID === props.reply.uuid,
+                        'bg-washed-yellow': props.highlightedPostUUID === props.reply.uuid,
                         [styles.postHover]: replyStore.hover,
                         [styles.postHoverTransparent]: !replyStore.hover,
                     },
                 ])}
             >
-                {props.reply.uuid}
                 <div
                     className={'flex flex-1 pr2 pt1 pl2'}
                     style={{
@@ -502,11 +495,8 @@ const Replies: FunctionComponent<IRepliesProps> = props => {
                                                 `${window.location.origin}${replyStore.permaLinkURL}`
                                             )
                                             message.success('Copied to your clipboard')
-                                            replyStore.highlightedPostUUID = props.reply.uuid
-                                            router.replace(
-                                                router.pathname,
-                                                `${replyStore.permaLinkURL}#${props.reply.uuid}`
-                                            )
+                                            props.setHighlightedPosUUID(props.reply.uuid)
+                                            router.replace(router.pathname, replyStore.permaLinkURL)
                                         }}
                                     >
                                         <Icons.ShareIcon />
@@ -614,6 +604,8 @@ const Replies: FunctionComponent<IRepliesProps> = props => {
                             reply={child}
                             router={props.router}
                             threadUsers={props.threadUsers}
+                            highlightedPostUUID={props.highlightedPostUUID}
+                            setHighlightedPosUUID={props.setHighlightedPosUUID}
                         />
                     </div>
                 ))}

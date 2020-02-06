@@ -265,7 +265,11 @@ const PostPreview: FunctionComponent<IPostPreviewProps> = ({
                                                         width={25}
                                                     />
                                                 )}
-                                                <span className={'b ttu'}>{post.sub}</span>
+                                                <object className={'z-2'}>
+                                                    <Link href={'/tag/[name]'} as={`/tag/${post.sub}`} shallow={false}>
+                                                        <a className={'b ttu dim'}>#{post.sub}</a>
+                                                    </Link>
+                                                </object>
                                                 <span className={'ph1 b'}>&#183;</span>
                                                 <UserNameWithIcon
                                                     imageData={post.imageData}
