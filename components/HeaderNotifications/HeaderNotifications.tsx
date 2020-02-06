@@ -1,23 +1,24 @@
 import React, { FunctionComponent } from 'react'
-import { Icon, Badge } from 'antd'
+import { Icon, Badge, Button } from 'antd'
 
 import styles from './HeaderNotifications.module.scss'
+import { useObserver } from 'mobx-react-lite'
 
 interface IHeaderNotificationsProps {}
 
 const HeaderNotifications: FunctionComponent<IHeaderNotificationsProps> = () => {
-    return (
-        <div className={styles.notification}>
-            <Badge count={10} overflowCount={5}>
+    return useObserver(() => (
+        <Badge count={0} overflowCount={5}>
+            <Button type={'link'}>
                 <Icon
                     type={'bell'}
                     twoToneColor={'#08b2ad'}
                     theme={'filled'}
-                    style={{ fontSize: 24 }}
+                    style={{ fontSize: 24, color: '#a8a8a8' }}
                 />
-            </Badge>
-        </div>
-    )
+            </Button>
+        </Badge>
+    ))
 }
 
 HeaderNotifications.defaultProps = {}

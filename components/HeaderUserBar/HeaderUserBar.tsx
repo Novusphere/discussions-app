@@ -1,11 +1,11 @@
-import React, { FunctionComponent } from 'react'
+import React, { FunctionComponent, useState } from 'react'
 import { Avatar, Menu, Icon, Dropdown } from 'antd'
 
 import styles from './HeaderUserBar.module.scss'
 import { getIdenticon } from '@utils'
 import Link from 'next/link'
 import dynamic from 'next/dynamic'
-import { UserBalances } from '@components';
+import { UserBalances } from '@components'
 
 interface IHeaderUserBarProps {
     icon: string
@@ -22,6 +22,8 @@ const HeaderUserBar: FunctionComponent<IHeaderUserBarProps> = ({
     postPub,
     balances,
 }) => {
+    const [visible, onVisibleChange] = useState(false)
+
     const defaults = [
         {
             label: 'Logout',
@@ -72,10 +74,10 @@ const HeaderUserBar: FunctionComponent<IHeaderUserBarProps> = ({
     )
 
     return (
-        <Dropdown overlay={menu}>
+        <Dropdown overlay={menu} onVisibleChange={onVisibleChange}>
             <a href={'#'} className={styles.userLink}>
                 {displayName}
-                <Icon type="down" style={{ marginLeft: 5 }} />
+                <Icon type={'caret-down'} style={{ marginLeft: 5 }} rotate={visible ? 180 : 0} />
                 <Avatar
                     src={getIdenticon(icon)}
                     size={'default'}
