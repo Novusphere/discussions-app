@@ -78,7 +78,7 @@ const Layout: FunctionComponent<ILayoutProps> = ({ children }) => {
     }, [])
 
     return (
-        <AntdLayout>
+        <AntdLayout className={'overflow-x-hidden'}>
             <Modals />
             <Header className={cx([styles.header, 'container bb b--light-gray'])}>
                 <div className={cx([styles.container, 'center flex flex-row items-center'])}>
