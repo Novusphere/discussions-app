@@ -211,11 +211,12 @@ const UserPage: NextPage<any> = ({ username, wallet, imageData, count }) => {
 }
 
 UserPage.getInitialProps = async function({ query, store }: any) {
+    const postPub = store.authStore.postPub
     store.postsStore.resetPostsAndPosition()
     const [username, wallet] = query.username.split('-')
     const imageData = getIdenticon(wallet)
 
-    await store.postsStore.getPostsForKeys(wallet, [wallet])
+    await store.postsStore.getPostsForKeys(postPub, [wallet])
     const { count } = await discussions.getUser(wallet)
 
     return {
