@@ -1,6 +1,6 @@
 import React, { FunctionComponent, useCallback, useContext } from 'react'
 import InfiniteScroll from 'react-infinite-scroll-component'
-import { PostPreview } from '@components'
+import { PostPreview, VotingHandles } from '@components'
 import { Post } from '@novuspherejs'
 import { Button, Icon, Skeleton } from 'antd'
 
@@ -10,6 +10,8 @@ import styles from './InfiniteScrollFeed.module.scss'
 
 import { StoreContext } from '@stores'
 import { observer } from 'mobx-react-lite'
+import cx from 'classnames'
+import { useRouter } from 'next/router'
 
 interface IInfiniteScrollFeedProps {
     dataLength: number
@@ -29,6 +31,7 @@ const InfiniteScrollFeed: FunctionComponent<IInfiniteScrollFeedProps> = ({
     children,
 }) => {
     const { uiStore, authStore, userStore, settingStore, tagStore } = useContext(StoreContext)
+    const router = useRouter()
 
     const renderEndMessage = useCallback(() => {
         return <div className={'tc pa3 f6 card bg-white'}>You have reached the end!</div>
@@ -37,31 +40,32 @@ const InfiniteScrollFeed: FunctionComponent<IInfiniteScrollFeedProps> = ({
     const renderLoadingMessage = useCallback(() => {
         return (
             <>
-                <div className={'bg-white br3 pa3 mb3'}>
-                    <Skeleton active />
-                </div>
-                <div className={'bg-white br3 pa3 mb3'}>
-                    <Skeleton active />
-                </div>
-                <div className={'bg-white br3 pa3 mb3'}>
-                    <Skeleton active />
-                </div>
-                <div className={'bg-white br3 pa3 mb3'}>
-                    <Skeleton active />
-                </div>
+                {Array.from({ length: 5 }, (value, index) => (
+                    <div key={index} className={'flex flex-row items-center bg-white mh1 mb3'}>
+                        <div
+                            className={cx([
+                                'h-100 db bg-light-gray flex tc justify-center ph2 pv4 relative z-2 flex-auto',
+                            ])}
+                            style={{ height: '200px', width: '40px' }}
+                        />
+                        <Skeleton className={'ml3'} active />
+                    </div>
+                ))}
             </>
         )
     }, [])
 
-    // if (!posts.length && !hasMore) {
-    //     return (
-    //         <div className={'db center tc'}>
-    //             <Empty description={<span>There doesn't seem to be anything here...</span>}>
-    //                 <Button type="primary">Create a post now</Button>
-    //             </Empty>
-    //         </div>
-    //     )
-    // }
+    if (!posts.length && !hasMore) {
+        return (
+            <div className={'db center tc'}>
+                <Empty description={<span>There doesn't seem to be anything here...</span>}>
+                    <Button type="primary" onClick={() => router.push('/new', '/new')}>
+                        Create a post now
+                    </Button>
+                </Empty>
+            </div>
+        )
+    }
 
     return (
         <InfiniteScroll

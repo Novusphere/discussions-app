@@ -25,6 +25,7 @@ import {
     HeaderSearch,
     HeaderUserBar,
     Modals,
+    SidebarTagView,
 } from '@components'
 import { useObserver } from 'mobx-react-lite'
 import cx from 'classnames'
@@ -113,160 +114,184 @@ const Layout: FunctionComponent<ILayoutProps> = ({ children }) => {
             <div className={cx([styles.content, styles.container, 'center flex pv3'])}>
                 <div
                     className={cx([
-                        'fl w-30 vh-75 ph2 bg-white list pv2 card',
+                        'fl w-30 vh-75 ph2',
                         {
                             dn: uiStore.hideSidebar,
                             db: !uiStore.hideSidebar,
                         },
                     ])}
                 >
-                    <li className={'ph3 pv1'} key="1">
-                        <Link href={'/'} as={'/'}>
-                            <a>
-                                <Icon className={'pr2'} type="home" />
-                                Home
-                            </a>
-                        </Link>
-                    </li>
-                    <li className={'ph3 pv1'} key="2">
-                        <Link href={'/feed'} as={'/feed'}>
-                            <a>
-                                <Icon className={'pr2'} type="team" />
-                                Feed
-                            </a>
-                        </Link>
-                    </li>
-                    <li className={'ph3 pv1'} key="3">
-                        <Link href={'/all'} as={'/all'}>
-                            <a>
-                                <Icon className={'pr2'} type="read" />
-                                All
-                            </a>
-                        </Link>
-                    </li>
-                    {useObserver(() => {
-                        if (tagStore.tagGroup.size) {
-                            return (
-                                <>
-                                    <Divider style={{ marginTop: 10, marginBottom: 10 }} />
-                                    {[...tagStore.tagGroup.entries()].map(([name, tags]) => {
-                                        const _name = name.toLowerCase()
-                                        const as = `/tags/${tags.join(',')}`
-                                        return (
-                                            <li
-                                                className={cx([
-                                                    'ph3 pv1',
-                                                    // {
-                                                    //     dim: router.asPath !== as,
-                                                    //     'sidebar-link-active':
-                                                    //         router.asPath === as,
-                                                    // },
-                                                ])}
-                                                key={_name}
-                                            >
-                                                <Link href={`/tags/[tags]`} as={as} shallow={false}>
-                                                    <a>{name}</a>
-                                                </Link>
-                                            </li>
-                                        )
-                                    })}
-                                </>
-                            )
-                        }
-                    })}
-                    <div className={'mt3 db'}>
-                        <Input
-                            size={'default'}
-                            allowClear
-                            addonAfter={<Icon type="plus-circle" theme={'filled'} />}
-                            placeholder="Add a tag to subscribe"
-                            onPressEnter={(e: any) => tagStore.addSubscribed(e.target.value)}
-                        />
-                    </div>
-                    {useObserver(() => (
-                        <div className={'mt3 db'}>
-                            {[...tagStore.subscribed.toJS()].map(subscribed => {
-                                const tag: any = tagStore.tagModelFromObservables(subscribed)
+                    <SidebarTagView />
+
+                    <div className={'bg-white list pv2 card'}>
+                        <li className={'ph3 pv1'} key="1">
+                            <Link href={'/'} as={'/'}>
+                                <a>
+                                    <Icon className={'pr2'} type="home" />
+                                    Home
+                                </a>
+                            </Link>
+                        </li>
+                        <li className={'ph3 pv1'} key="2">
+                            <Link href={'/feed'} as={'/feed'}>
+                                <a>
+                                    <Icon className={'pr2'} type="team" />
+                                    Feed
+                                </a>
+                            </Link>
+                        </li>
+                        <li className={'ph3 pv1'} key="3">
+                            <Link href={'/all'} as={'/all'}>
+                                <a>
+                                    <Icon className={'pr2'} type="read" />
+                                    All
+                                </a>
+                            </Link>
+                        </li>
+                        {useObserver(() => {
+                            if (tagStore.tagGroup.size) {
                                 return (
-                                    <li key={subscribed} className={'ph3 pv1 black'}>
-                                        <Popover
-                                            content={
-                                                <div className={'pa1'}>
-                                                    <span
-                                                        className={
-                                                            'f5 flex flex-row items-center justify-between'
-                                                        }
+                                    <>
+                                        <Divider style={{ marginTop: 10, marginBottom: 10 }} />
+                                        {[...tagStore.tagGroup.entries()].map(([name, tags]) => {
+                                            const _name = name.toLowerCase()
+                                            const as = `/tags/${tags.join(',')}`
+                                            return (
+                                                <li
+                                                    className={cx([
+                                                        'ph3 pv1',
+                                                        // {
+                                                        //     dim: router.asPath !== as,
+                                                        //     'sidebar-link-active':
+                                                        //         router.asPath === as,
+                                                        // },
+                                                    ])}
+                                                    key={_name}
+                                                >
+                                                    <Link
+                                                        href={`/tags/[tags]`}
+                                                        as={as}
+                                                        shallow={false}
                                                     >
+                                                        <a>{name}</a>
+                                                    </Link>
+                                                </li>
+                                            )
+                                        })}
+                                    </>
+                                )
+                            }
+                        })}
+                        <div className={'mt3 db'}>
+                            <Input
+                                size={'default'}
+                                allowClear
+                                addonAfter={<Icon type="plus-circle" theme={'filled'} />}
+                                placeholder="Add a tag to subscribe"
+                                onPressEnter={(e: any) => tagStore.addSubscribed(e.target.value)}
+                            />
+                        </div>
+                        {useObserver(() => (
+                            <div className={'mt3 db'}>
+                                {[...tagStore.subscribed.toJS()].map(subscribed => {
+                                    const tag: any = tagStore.tagModelFromObservables(subscribed)
+                                    return (
+                                        <li key={subscribed} className={'ph3 pv1 black'}>
+                                            <Popover
+                                                content={
+                                                    <div className={'pa1'}>
                                                         <span
-                                                            className={'flex flex-row items-center'}
+                                                            className={
+                                                                'f5 flex flex-row items-center justify-between'
+                                                            }
                                                         >
+                                                            <span
+                                                                className={
+                                                                    'flex flex-row items-center'
+                                                                }
+                                                            >
+                                                                <img
+                                                                    className={'dib'}
+                                                                    src={tag.logo}
+                                                                    alt={`${subscribed} icon`}
+                                                                    width={45}
+                                                                />
+                                                                <span className={'ml3 dib'}>
+                                                                    <span className={'b db'}>
+                                                                        <Link
+                                                                            href={'/tag/[name]'}
+                                                                            as={`/tag/${subscribed}`}
+                                                                        >
+                                                                            <a
+                                                                                className={
+                                                                                    'f5 black db'
+                                                                                }
+                                                                            >
+                                                                                #{subscribed}
+                                                                            </a>
+                                                                        </Link>
+                                                                    </span>
+                                                                    {typeof tag.memberCount !==
+                                                                        'undefined' && (
+                                                                        <span
+                                                                            className={'f6 db gray'}
+                                                                        >
+                                                                            {tag.memberCount}{' '}
+                                                                            members
+                                                                        </span>
+                                                                    )}
+                                                                </span>
+                                                            </span>
+                                                            <Button
+                                                                onClick={() =>
+                                                                    tagStore.removeSubscribed(
+                                                                        subscribed
+                                                                    )
+                                                                }
+                                                                shape="circle"
+                                                            >
+                                                                <Icon type="delete" />
+                                                            </Button>
+                                                        </span>
+                                                        {tag.tagDescription && (
+                                                            <>
+                                                                <Divider />
+                                                                <span className={'f6'}>
+                                                                    {tag.tagDescription}
+                                                                </span>
+                                                            </>
+                                                        )}
+                                                    </div>
+                                                }
+                                                placement={'right'}
+                                                overlayClassName={styles.tagOverlay}
+                                            >
+                                                <span>
+                                                    <Link
+                                                        href={`/tag/[name]`}
+                                                        as={`/tag/${subscribed}`}
+                                                        shallow={false}
+                                                    >
+                                                        <a className={'dib'}>
                                                             <img
                                                                 className={'dib'}
                                                                 src={tag.logo}
                                                                 alt={`${subscribed} icon`}
-                                                                width={30}
+                                                                width={25}
                                                             />
-                                                            <span className={'ml3 dib'}>
-                                                                <span className={'b db'}>
-                                                                    #{subscribed}
-                                                                </span>
-                                                                {typeof tag.memberCount !==
-                                                                    'undefined' && (
-                                                                    <span className={'f6 db green'}>
-                                                                        {tag.memberCount} members
-                                                                    </span>
-                                                                )}
+                                                            <span className={'dib mh2'}>
+                                                                #{subscribed}
                                                             </span>
-                                                        </span>
-                                                        <Button
-                                                            onClick={() =>
-                                                                tagStore.removeSubscribed(
-                                                                    subscribed
-                                                                )
-                                                            }
-                                                            shape="circle"
-                                                        >
-                                                            <Icon type="delete" />
-                                                        </Button>
-                                                    </span>
-                                                    {tag.tagDescription && (
-                                                        <>
-                                                            <Divider />
-                                                            <span className={'f6'}>
-                                                                {tag.tagDescription}
-                                                            </span>
-                                                        </>
-                                                    )}
-                                                </div>
-                                            }
-                                            placement={'right'}
-                                            overlayClassName={styles.tagOverlay}
-                                        >
-                                            <span>
-                                                <Link
-                                                    href={`/tag/[name]`}
-                                                    as={`/tag/${subscribed}`}
-                                                    shallow={false}
-                                                >
-                                                    <a className={'dib'}>
-                                                        <img
-                                                            className={'dib'}
-                                                            src={tag.logo}
-                                                            alt={`${subscribed} icon`}
-                                                            width={25}
-                                                        />
-                                                        <span className={'dib mh2'}>
-                                                            #{subscribed}
-                                                        </span>
-                                                    </a>
-                                                </Link>
-                                            </span>
-                                        </Popover>
-                                    </li>
-                                )
-                            })}
-                        </div>
-                    ))}
+                                                        </a>
+                                                    </Link>
+                                                </span>
+                                            </Popover>
+                                        </li>
+                                    )
+                                })}
+                            </div>
+                        ))}
+                    </div>
                 </div>
 
                 <div

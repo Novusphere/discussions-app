@@ -33,12 +33,14 @@ export default class MyDocument extends Document {
                     <meta name="theme-color" content="#ffffff" />
                     <style jsx global>{`
                         .ql-toolbar.ql-snow {
+                            border: 1px solid #d9d9d9;
                             background: white;
                             border-top-left-radius: 5px;
                             border-top-right-radius: 5px;
                         }
 
                         .ql-container.ql-snow {
+                            border: 1px solid #d9d9d9;
                             background: white;
                             border-bottom-left-radius: 5px;
                             border-bottom-right-radius: 5px;

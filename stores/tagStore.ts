@@ -61,7 +61,7 @@ export class TagStore {
     addSubscribed = (tagName: string) => {
         if (this.subscribed.indexOf(tagName) === -1) {
             this.subscribed.unshift(tagName)
-            this.uiStore.showMessage(`You have subbed to ${tagName}`, 'success')
+            this.uiStore.showMessage(`You have subbed to #${tagName}`, 'success')
         }
     }
 
@@ -70,6 +70,14 @@ export class TagStore {
             this.subscribed.splice(this.subscribed.indexOf(tagName), 1)
         } else {
             this.subscribed.unshift(tagName)
+        }
+    }
+
+    toggleSubscribe = (tagName: string) => {
+        if (this.subscribed.indexOf(tagName) !== -1) {
+            this.removeSubscribed(tagName)
+        } else {
+            this.addSubscribed(tagName)
         }
     }
 }

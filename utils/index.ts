@@ -840,6 +840,7 @@ export const createPostObject = ({
     skipId = false,
     postPub = '',
     postPriv = '',
+    uuid = '',
 }) => {
     let reply = {
         poster: null,
@@ -851,7 +852,7 @@ export const createPostObject = ({
         mentions: [],
         tags: [sub],
         id: '',
-        uuid: '',
+        uuid: uuid,
         parentUuid: parentUuid,
         threadUuid: threadUuid,
         uidw: uidw,
@@ -902,9 +903,7 @@ export const createPostObject = ({
         reply.edit = true
     }
 
-    let mentions = [...extractMentionHashesForRegEx(matchContentForMentions(content)), pub]
-
-    reply.mentions = mentions
+    reply.mentions = [...extractMentionHashesForRegEx(matchContentForMentions(content)), pub]
 
     let tags = matchContentForTags(content)
 

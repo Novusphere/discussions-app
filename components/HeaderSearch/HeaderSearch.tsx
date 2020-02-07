@@ -15,7 +15,7 @@ const HeaderSearch: FunctionComponent<IHeaderSearchProps> = () => {
             className={styles.search}
             size={'default'}
             placeholder={'Search on Discussions.app'}
-            onSearch={value => router.push(`/search/${value}`)}
+            onSearch={value => router.push('/search/[search]', `/search/${value}`)}
         />
     )
 }

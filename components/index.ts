@@ -10,6 +10,7 @@ export { default as SharePostPopover } from './SharePostPopover/SharePostPopover
 export { default as Editor } from './Editor/Editor'
 export { default as UserBalances } from './UserBalances/UserBalances'
 export { default as ReplyingPostPreview } from './ReplyingPostPreview/ReplyingPostPreview'
+export { default as SidebarTagView } from './SidebarTagView/SidebarTagView'
 
 // header
 export { default as HeaderLogo } from './HeaderLogo/HeaderLogo'
