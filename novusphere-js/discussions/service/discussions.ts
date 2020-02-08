@@ -8,6 +8,7 @@ import * as bip32 from 'bip32'
 import ecc from 'eosjs-ecc'
 import axios from 'axios'
 import { INSDBSearchQuery } from '../../nsdb'
+import { encodeId, getThreadTitle, getThreadUrl } from '@utils'
 //import { isDev } from '@utils'
 
 export interface IBrainKeyPair {
@@ -561,7 +562,7 @@ export default class DiscussionsService {
         limit = 20
     ): Promise<INSDBSearchQuery> {
         try {
-            return await nsdb.search({
+            const response = await nsdb.search({
                 pipeline: [
                     {
                         $match: {
@@ -575,6 +576,17 @@ export default class DiscussionsService {
                 count,
                 limit,
             })
+
+            response.payload = await Promise.all(
+                 response.payload.map(async item => {
+                    return {
+                        ...item,
+                        url: await getThreadUrl(item, item.title === '' ? item.uuid : null),
+                    }
+                })
+            )
+
+            return response
         } catch (error) {
             throw error
         }

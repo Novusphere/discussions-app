@@ -182,7 +182,7 @@ const Layout: FunctionComponent<ILayoutProps> = ({ children }) => {
                                 )
                             }
                         })}
-                        <div className={'mt3 db'}>
+                        <div className={'pa3 db'}>
                             <Input
                                 size={'default'}
                                 allowClear

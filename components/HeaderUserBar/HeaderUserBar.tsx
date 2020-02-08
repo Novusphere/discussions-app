@@ -62,7 +62,7 @@ const HeaderUserBar: FunctionComponent<IHeaderUserBarProps> = ({
                             </a>
                         </Link>
                     ) : (
-                        item.label
+                        <span onClick={item.onClick}>{item.label}</span>
                     )}
                 </Menu.Item>
             ))}

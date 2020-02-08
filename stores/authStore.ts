@@ -82,6 +82,7 @@ export class AuthStore {
     }
 
     logOut = () => {
+        console.log('called')
         this.setHasAccountCookie('false')
     }
 

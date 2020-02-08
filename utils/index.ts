@@ -13,6 +13,7 @@ const uuid = require('uuidv4')
 
 export * from './useScrollPosition'
 export * from './wrapper'
+export * from './useInterval'
 
 export const INDEXER_NAME = '__LINKINDEXER__'
 export const LINK_LIMIT = 1000
@@ -743,28 +744,6 @@ export const generateVoteObject = ({ uuid, postPriv, value }) => {
             }),
         },
     }
-}
-
-export const useInterval = (callback, delay) => {
-    const savedCallback = useRef()
-
-    // Remember the latest callback.
-    useEffect(() => {
-        savedCallback.current = callback
-    }, [callback])
-
-    // Set up the interval.
-    useEffect(() => {
-        const tick = () => {
-            // @ts-ignore
-            savedCallback.current()
-        }
-
-        if (delay !== null) {
-            let id = setInterval(tick, delay)
-            return () => clearInterval(id)
-        }
-    }, [delay])
 }
 
 export const escapeRegExp = string => {

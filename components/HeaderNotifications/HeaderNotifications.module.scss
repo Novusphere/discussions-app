@@ -1,0 +1,19 @@
+.notificationsOverlayContainer {
+  max-width: 500px;
+  width: 35vw;
+}
+
+.notificationItem {
+  width: 100%;
+  display: block;
+  flex-wrap: wrap;
+  overflow-wrap: break-word;
+  position: relative;
+  max-height: 150px;
+
+  border-bottom: 1px solid red;
+
+  &:last-of-type {
+    border-bottom: none;
+  }
+}

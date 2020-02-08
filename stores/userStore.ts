@@ -1,9 +1,10 @@
 import { persist } from 'mobx-persist'
-import { computed, observable, observe } from 'mobx'
+import { observable } from 'mobx'
 import { RootStore } from '@stores/index'
 import axios from 'axios'
 import _ from 'lodash'
 import { setCookie, parseCookies } from 'nookies'
+import { discussions, Post } from '@novuspherejs'
 
 export class UserStore {
     @persist('map') following = observable.map<string, string>()
@@ -15,7 +16,15 @@ export class UserStore {
 
     blockedByDelegation = observable.map<string, string>() // either blockedUsers or blockedPosts
 
+    @observable notificationsPosition = {
+        cursorId: undefined,
+        count: 0,
+    }
+    @observable lastCheckedNotifications = 0
+    @observable notifications: Post[] = []
+
     @observable private uiStore: RootStore['uiStore']
+
 
     constructor(rootStore: RootStore) {
         this.uiStore = rootStore.uiStore
@@ -26,6 +35,7 @@ export class UserStore {
             this.pinnedPosts = observable.map<string, string>(initialState.pinnedPosts)
         }
     }
+
 
     private async setAndUpdateDelegatedPosts(
         mergedName: string,
@@ -257,5 +267,26 @@ export class UserStore {
 
         const b64 = Buffer.from(JSON.stringify(pinnedPostsAsObj)).toString('base64')
         setCookie(window, 'pinnedByDelegation', b64, { path: '/' })
+    }
+
+    fetchNotifications = async (publicKey: string): Promise<void> => {
+        try {
+            let { payload, cursorId } = await discussions.getPostsForNotifications(
+                publicKey,
+                this.lastCheckedNotifications,
+                this.notificationsPosition.cursorId,
+                5,
+            )
+
+            this.notificationsPosition = {
+                cursorId: cursorId,
+                count: payload.length,
+            }
+
+            this.notifications = payload
+        } catch (error) {
+            this.notifications = []
+            return error
+        }
     }
 }
