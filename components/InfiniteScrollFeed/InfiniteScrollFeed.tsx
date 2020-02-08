@@ -9,7 +9,7 @@ import Empty from 'antd/lib/empty'
 import styles from './InfiniteScrollFeed.module.scss'
 
 import { StoreContext } from '@stores'
-import { observer } from 'mobx-react-lite'
+import { observer, useObserver } from 'mobx-react-lite'
 import cx from 'classnames'
 import { useRouter } from 'next/router'
 
@@ -67,7 +67,7 @@ const InfiniteScrollFeed: FunctionComponent<IInfiniteScrollFeedProps> = ({
         )
     }
 
-    return (
+    return useObserver(() => (
         <InfiniteScroll
             dataLength={dataLength}
             next={next}
@@ -101,7 +101,7 @@ const InfiniteScrollFeed: FunctionComponent<IInfiniteScrollFeedProps> = ({
                       })
                 : children}
         </InfiniteScroll>
-    )
+    ))
 }
 
 InfiniteScrollFeed.defaultProps = {}

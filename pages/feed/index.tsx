@@ -4,6 +4,8 @@ import { InfiniteScrollFeed } from '@components'
 import { observer, useObserver } from 'mobx-react-lite'
 import { RootStore, StoreContext } from '@stores'
 import dynamic from 'next/dynamic'
+import { Button } from 'antd'
+import Empty from 'antd/lib/empty'
 
 const FeedPageNoSSR = dynamic(
     () =>
@@ -15,14 +17,18 @@ const FeedPageNoSSR = dynamic(
                 postsStore.getPostsForKeys(postPub, [...userStore.following.keys()])
             }, [])
 
-            return useObserver(() => (
-                <InfiniteScrollFeed
-                    dataLength={postsStore.postsPosition.items}
-                    hasMore={postsStore.postsPosition.cursorId !== 0}
-                    next={() => postsStore.getPostsForKeys(postPub)}
-                    posts={postsStore.posts}
-                />
-            ))
+            if (!postsStore.posts.length) {
+                return (
+                    <Empty description={<span>Follow some users to see their activity here!</span>} />
+                )
+            }
+
+            return <InfiniteScrollFeed
+                dataLength={postsStore.postsPosition.items}
+                hasMore={postsStore.postsPosition.cursorId !== 0}
+                next={() => postsStore.getPostsForKeys(postPub)}
+                posts={postsStore.posts}
+            />
         }),
     {
         ssr: false,

@@ -81,11 +81,14 @@ const Following = dynamic(
     { ssr: false }
 )
 
-const UserPage: NextPage<any> = ({ username, wallet, imageData, count }) => {
+const UserPage: NextPage<any> = ({ username, wallet, imageData, count, postPub }) => {
     const { uiStore, postsStore, userStore, authStore, tagStore }: RootStore = useStores()
     const [_count, _setCount] = useState(count)
 
     useEffect(() => {
+        postsStore.resetPostsAndPosition()
+        postsStore.getPostsForKeys(postPub, [wallet])
+
         uiStore.setSidebarHidden('true')
 
         return () => {
@@ -202,7 +205,7 @@ const UserPage: NextPage<any> = ({ username, wallet, imageData, count }) => {
                 <InfiniteScrollFeed
                     dataLength={postsStore.postsPosition.items}
                     hasMore={postsStore.postsPosition.cursorId !== 0}
-                    next={() => postsStore.getPostsForKeys(wallet, [wallet])}
+                    next={() => postsStore.getPostsForKeys(postPub, [wallet])}
                     posts={postsStore.posts}
                 />
             </div>
@@ -212,11 +215,8 @@ const UserPage: NextPage<any> = ({ username, wallet, imageData, count }) => {
 
 UserPage.getInitialProps = async function({ query, store }: any) {
     const postPub = store.authStore.postPub
-    store.postsStore.resetPostsAndPosition()
     const [username, wallet] = query.username.split('-')
     const imageData = getIdenticon(wallet)
-
-    await store.postsStore.getPostsForKeys(postPub, [wallet])
     const { count } = await discussions.getUser(wallet)
 
     return {
@@ -224,6 +224,7 @@ UserPage.getInitialProps = async function({ query, store }: any) {
         username,
         wallet,
         count,
+        postPub,
     }
 }
 
