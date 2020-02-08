@@ -20,6 +20,8 @@ export class UserStore {
         cursorId: undefined,
         count: 0,
     }
+
+    @observable notificationCount = 0
     @observable lastCheckedNotifications = 0
     @observable notifications: Post[] = []
 
@@ -283,10 +285,16 @@ export class UserStore {
                 count: payload.length,
             }
 
+            this.notificationCount = payload.length
             this.notifications = payload
         } catch (error) {
             this.notifications = []
             return error
         }
+    }
+
+    clearNotifications = () => {
+        this.notifications = []
+        this.uiStore.showMessage('Notifications cleared', 'success')
     }
 }

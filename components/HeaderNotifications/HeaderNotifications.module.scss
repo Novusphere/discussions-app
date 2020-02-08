@@ -1,19 +1,47 @@
+.list {
+    max-height: 400px;
+    overflow: auto;
+    position: relative;
+}
+
 .notificationsOverlayContainer {
-  max-width: 500px;
-  width: 35vw;
+    position: relative;
+    width: 336px;
+}
+
+.contentContainer {
+    max-height: 100px;
+    word-break: break-word;
 }
 
 .notificationItem {
-  width: 100%;
-  display: block;
-  flex-wrap: wrap;
-  overflow-wrap: break-word;
-  position: relative;
-  max-height: 150px;
+    margin-left: -40px;
+    padding: 1em;
+    border-bottom: 1px solid #EEEEEE;
 
-  border-bottom: 1px solid red;
+    &:last-of-type {
+        padding-bottom: 0;
+        border-bottom: none;
+    }
+}
 
-  &:last-of-type {
-    border-bottom: none;
-  }
+.bottomBar {
+    border-top: 1px solid #EEEEEE;
+    height: 46px;
+
+    span {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        height: 100%;
+        width: 50%;
+        text-align: center;
+
+        &:only-child {
+            width: 100%;
+        }
+        &:not(:only-child):last-child {
+            border-left: 1px solid #EEEEEE;
+        }
+    }
 }

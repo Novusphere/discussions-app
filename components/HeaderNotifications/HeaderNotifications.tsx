@@ -1,5 +1,5 @@
-import React, { FunctionComponent } from 'react'
-import { Icon, Badge, Button, Popover, List, Avatar } from 'antd'
+import React, { FunctionComponent, useState } from 'react'
+import { Icon, Badge, Button, Popover, List, Avatar, Dropdown } from 'antd'
 
 import styles from './HeaderNotifications.module.scss'
 import { useObserver } from 'mobx-react-lite'
@@ -8,6 +8,7 @@ import { getIdenticon, useInterval } from '@utils'
 import { RichTextPreview } from '@components'
 import Link from 'next/link'
 import moment from 'moment'
+import cx from 'classnames'
 
 interface IHeaderNotificationsProps {}
 
@@ -19,49 +20,53 @@ const NotificationContainer = () => {
     }
 
     return (
-        <div className={'pa2'}>
-            <div>
-                {!userStore.notifications.length && (
-                    <span className={'silver'}>You have no notifications</span>
-                )}
-                {userStore.notifications.length > 0 && (
-                    <List
-                        itemLayout="horizontal"
-                        dataSource={userStore.notifications}
-                        renderItem={item => {
-                            return (
-                                <Link href={'/tag/[name]/[id]/[title]'} as={item['url']} shallow={false}>
-                                    <a className={'dim'}>
-                                        <List.Item className={styles.notificationItem}>
-                                            <List.Item.Meta
-                                                avatar={<Avatar src={getIdenticon(item.pub)} />}
-                                                title={
-                                                    <span
-                                                        className={
-                                                            'dim flex flex-row items-center justify-between'
-                                                        }
-                                                    >
-                                                    <span className={'gray b f6'}>
-                                                        {item.displayName}
-                                                    </span>
-                                                    <span className={'light-silver'}>
-                                                        {moment(item.createdAt).fromNow()}
-                                                    </span>
-                                                </span>
-                                                }
-                                            />
-                                            <RichTextPreview className={'dim mt3 silver'}>
+        <List
+            itemLayout="horizontal"
+            dataSource={userStore.notifications}
+            renderItem={item => {
+                return (
+                    <List.Item className={styles.notificationItem}>
+                        <Link href={'/tag/[name]/[id]/[title]'} as={item['url']} shallow={false}>
+                            <a className={'dim w-100 relative'}>
+                                <List.Item.Meta
+                                    avatar={<Avatar src={getIdenticon(item.pub)} />}
+                                    title={
+                                        <span
+                                            className={
+                                                'w-100 flex flex-row items-center justify-between'
+                                            }
+                                        >
+                                            <span className={'gray b f6'}>{item.displayName}</span>
+                                            <span className={'light-silver f7'}>
+                                                {moment(item.createdAt).fromNow()}
+                                            </span>
+                                        </span>
+                                    }
+                                    description={
+                                        <div className={styles.contentContainer}>
+                                            <RichTextPreview className={'silver'}>
                                                 {item.content}
                                             </RichTextPreview>
-                                        </List.Item>
-                                    </a>
-                                </Link>
-                            )
-                        }}
-                    />
-                )}
-            </div>
-        </div>
+                                        </div>
+                                    }
+                                />
+                            </a>
+                        </Link>
+                    </List.Item>
+                )
+            }}
+            footer={
+                <div
+                    className={cx([
+                        styles.bottomBar,
+                        'flex flex-row items-center justify-between tc',
+                    ])}
+                >
+                    <span className={'dim pointer'} onClick={userStore.clearNotifications}>Clear Notifications</span>
+                    <span className={'dim pointer'}>View All</span>
+                </div>
+            }
+        />
     )
 }
 
@@ -77,11 +82,18 @@ const HeaderNotifications: FunctionComponent<IHeaderNotificationsProps> = () => 
     )
 
     return useObserver(() => (
-        <Popover
-            content={<NotificationContainer />}
+        <Dropdown
+            overlay={NotificationContainer()}
             overlayClassName={styles.notificationsOverlayContainer}
+            placement={'bottomRight'}
+            onVisibleChange={visible => {
+                if (visible) {
+                    userStore.lastCheckedNotifications = Date.now()
+                    userStore.notificationCount = 0
+                }
+            }}
         >
-            <Badge count={userStore.notifications.length} overflowCount={5} offset={[-10, 5]}>
+            <Badge count={userStore.notificationCount} overflowCount={5} offset={[-10, 5]}>
                 <Button type={'link'}>
                     <Icon
                         type={'bell'}
@@ -91,7 +103,7 @@ const HeaderNotifications: FunctionComponent<IHeaderNotificationsProps> = () => 
                     />
                 </Button>
             </Badge>
-        </Popover>
+        </Dropdown>
     ))
 }
 
