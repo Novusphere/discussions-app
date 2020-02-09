@@ -64,6 +64,7 @@
     "scripts": {
         "dev": "next",
         "build": "rm -rf .next/ && cross-env NODE_ENV=production next build",
+        "analyze": "ANALYZE=true npm run build",
         "start": "cross-env NODE_ENV=production next start",
         "dev-prod": "cross-env NODE_ENV=production next",
         "njstest": "tsc --target es5 novusphere-js/test.ts && node novusphere-js/test.js",
@@ -75,6 +76,7 @@
     "devDependencies": {
         "@babel/plugin-transform-runtime": "7.4.4",
         "@babel/preset-typescript": "7.3.3",
+        "@next/bundle-analyzer": "^9.2.1",
         "@types/classnames": "2.2.8",
         "@types/lodash": "4.14.136",
         "@types/mobx-task": "2.0.1",

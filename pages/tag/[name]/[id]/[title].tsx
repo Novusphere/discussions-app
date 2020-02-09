@@ -781,7 +781,7 @@ const PostPage: NextPage<IPostPageProps> = ({
         </>
     )
 }
-;(PostPage as any).getInitialProps = async function({ store, query, ...rest }: any) {
+;(PostPage as any).getInitialProps = async function({ store, query }: any) {
     const postPub = store.authStore.postPub
     const thread = await store.postsStore.getThreadById(query.id, postPub)
     const url = await getThreadUrl(thread.openingPost)
