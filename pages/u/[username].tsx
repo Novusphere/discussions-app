@@ -7,6 +7,7 @@ import { getIdenticon } from '@utils'
 import { InfiniteScrollFeed, Icons } from '@components'
 import { discussions } from '@novuspherejs'
 import dynamic from 'next/dynamic'
+import Head from 'next/head'
 
 const { Paragraph } = Typography
 const { Option } = Select
@@ -145,72 +146,86 @@ const UserPage: NextPage<any> = ({ username, wallet, imageData, count, postPub }
     }, [])
 
     return (
-        <div className={'flex flex-row'}>
-            <div className={'w-30 vh-75 bg-white card pa3'}>
-                <div className={'flex flex-row items-center'}>
-                    <Avatar icon={'user'} src={imageData} size={96} className={'shadow-1 flex-1'} />
-                    <div className={'ml3 db w-100'}>
-                        <span className={'db f5 b black'}>{username}</span>
-                        <span className={'db f6 light-silver'}>{_count} followers</span>
-                        {!isSameUser && (
-                            <div className={'mt2 flex flex-row items-center'}>
-                                <Button
-                                    block
-                                    size={'default'}
-                                    type={'primary'}
-                                    onClick={followUser}
-                                >
-                                    {userStore.following.has(wallet) ? 'Unfollow' : 'Follow'}
-                                </Button>
-                                <DropdownMenu key="more" />
-                            </div>
-                        )}
-                    </div>
-                </div>
-
-                <div className={'mt4'}>
-                    <span className={'moon-gray ttu f6'}>Wallet</span>
-                    <Paragraph ellipsis copyable className={'f6 pt2'}>
-                        {wallet}
-                    </Paragraph>
-                </div>
-
-                {isSameUser && (
-                    <div className={'mt4'}>
-                        <span className={'moon-gray ttu f6'}>Following (Only visible to you)</span>
-                        <Following
-                            data={[...userStore.following.toJS()]}
-                            handleRemoveUser={(pub, user) =>
-                                userStore.toggleUserFollowing(user, pub)
-                            }
+        <>
+            <Head>
+                <title>
+                    Discussions App - /u/{username}
+                </title>
+            </Head>
+            <div className={'flex flex-row'}>
+                <div className={'w-30 vh-75 bg-white card pa3'}>
+                    <div className={'flex flex-row items-center'}>
+                        <Avatar
+                            icon={'user'}
+                            src={imageData}
+                            size={96}
+                            className={'shadow-1 flex-1'}
                         />
-                    </div>
-                )}
-
-                {!isSameUser && (
-                    <div className={'mt4'}>
-                        <span className={'moon-gray ttu f6 mb2'}>Moderation</span>
-                        <Moderation
-                            onModerationChange={onModerationChange}
-                            defaultValue={userStore.activeModerationForCurrentUser(
-                                username,
-                                wallet
+                        <div className={'ml3 db w-100'}>
+                            <span className={'db f5 b black'}>{username}</span>
+                            <span className={'db f6 light-silver'}>{_count} followers</span>
+                            {!isSameUser && (
+                                <div className={'mt2 flex flex-row items-center'}>
+                                    <Button
+                                        block
+                                        size={'default'}
+                                        type={'primary'}
+                                        onClick={followUser}
+                                    >
+                                        {userStore.following.has(wallet) ? 'Unfollow' : 'Follow'}
+                                    </Button>
+                                    <DropdownMenu key="more" />
+                                </div>
                             )}
-                            options={tagStore.tagsWithoutBaseOptions}
-                            tagModelFromObservables={tagStore.tagModelFromObservables}
-                        />
+                        </div>
                     </div>
-                )}
+
+                    <div className={'mt4'}>
+                        <span className={'moon-gray ttu f6'}>Wallet</span>
+                        <Paragraph ellipsis copyable className={'f6 pt2'}>
+                            {wallet}
+                        </Paragraph>
+                    </div>
+
+                    {isSameUser && (
+                        <div className={'mt4'}>
+                            <span className={'moon-gray ttu f6'}>
+                                Following (Only visible to you)
+                            </span>
+                            <Following
+                                data={[...userStore.following.toJS()]}
+                                handleRemoveUser={(pub, user) =>
+                                    userStore.toggleUserFollowing(user, pub)
+                                }
+                            />
+                        </div>
+                    )}
+
+                    {!isSameUser && (
+                        <div className={'mt4'}>
+                            <span className={'moon-gray ttu f6 mb2'}>Moderation</span>
+                            <Moderation
+                                onModerationChange={onModerationChange}
+                                defaultValue={userStore.activeModerationForCurrentUser(
+                                    username,
+                                    wallet
+                                )}
+                                options={tagStore.tagsWithoutBaseOptions}
+                                tagModelFromObservables={tagStore.tagModelFromObservables}
+                            />
+                        </div>
+                    )}
+                </div>
+                <div className={'fl ml3 w-70'}>
+                    <InfiniteScrollFeed
+                        dataLength={postsStore.postsPosition.items}
+                        hasMore={postsStore.postsPosition.cursorId !== 0}
+                        next={() => postsStore.getPostsForKeys(postPub, [wallet])}
+                        posts={postsStore.posts}
+                    />
+                </div>
             </div>
-            <div className={'fl ml3 w-70'}>
-                <InfiniteScrollFeed
-                    dataLength={postsStore.postsPosition.items}
-                    hasMore={postsStore.postsPosition.cursorId !== 0}
-                    next={() => postsStore.getPostsForKeys(postPub, [wallet])}
-                    posts={postsStore.posts}
-                />
-            </div>
-        </div>
+        </>
     )
 }
 

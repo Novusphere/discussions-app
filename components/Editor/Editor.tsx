@@ -196,23 +196,27 @@ class Editor extends React.Component<IEditorProps> {
                 const formData = new FormData()
                 formData.append('image', file)
 
-                // Upload image to AWS via app route handler.
-                const { data } = await axios.post(`${nsdb.api}/discussions/upload`, formData, {
-                    headers: {
-                        'Content-Type': 'multipart/form-data',
-                    },
-                })
+                try {
+                    // Upload image to AWS via app route handler.
+                    const { data } = await axios.post(`${nsdb.api}/discussions/upload`, formData, {
+                        headers: {
+                            'Content-Type': 'multipart/form-data',
+                        },
+                    })
 
-                const ref = this.ref.current.getEditor()
+                    const ref = this.ref.current.getEditor()
 
-                // Get the current cursor position.
-                const range = ref.getSelection()
-                const url = `${nsdb.api}/discussions/upload/image/${data.filename}`
+                    // Get the current cursor position.
+                    const range = ref.getSelection()
+                    const url = `${nsdb.api}/discussions/upload/image/${data.filename}`
 
-                ref.insertText(range.index, url)
+                    ref.insertText(range.index, url)
 
-                // Move the cursor past the image.
-                ref.setSelection(range.index + url.length)
+                    // Move the cursor past the image.
+                    ref.setSelection(range.index + url.length)
+                } catch (error) {
+                    return error
+                }
             }
         }
     }

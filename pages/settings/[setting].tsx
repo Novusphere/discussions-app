@@ -15,6 +15,7 @@ import {
     SettingsModeration,
     SettingsWallet,
 } from '@components'
+import Head from 'next/head'
 
 /**
  * Use dynamic to prevent ssr renders
@@ -62,73 +63,90 @@ const SettingsPage: NextPage<any> = ({ page }) => {
     }, [])
 
     return (
-        <div className={'flex flex-row'}>
-            <div className={'w-30 vh-75 bg-white card'}>
-                <div className={'db'}>
-                    <span className={'db f6 b black ph4 pt4'}>Settings</span>
+        <>
+            <Head>
+                <title>Discussions App - Settings</title>
+            </Head>
+            <div className={'flex flex-row'}>
+                <div className={'w-30 vh-75 bg-white card'}>
+                    <div className={'db'}>
+                        <span className={'db f6 b black ph4 pt4'}>Settings</span>
 
-                    <ul className={'list pa0 ma0 mt3'}>
-                        <Link
-                            href={'/settings/[setting]'}
-                            as={'/settings/connections'}
-                            replace={true}
+                        <ul className={'list pa0 ma0 mt3'}>
+                            <Link
+                                href={'/settings/[setting]'}
+                                as={'/settings/connections'}
+                                replace={true}
+                            >
+                                <a className={'gray'}>
+                                    <li className={className(page, 'connections')}>Connections</li>
+                                </a>
+                            </Link>
+
+                            <Link
+                                href={'/settings/[setting]'}
+                                as={'/settings/wallet'}
+                                replace={true}
+                            >
+                                <a className={'gray'}>
+                                    <li className={className(page, 'wallet')}>Wallet </li>
+                                </a>
+                            </Link>
+
+                            <Link
+                                href={'/settings/[setting]'}
+                                as={'/settings/moderation'}
+                                replace={true}
+                            >
+                                <a className={'gray'}>
+                                    <li className={className(page, 'moderation')}>Moderation</li>
+                                </a>
+                            </Link>
+
+                            <Link
+                                href={'/settings/[setting]'}
+                                as={'/settings/airdrop'}
+                                replace={true}
+                            >
+                                <a className={'gray'}>
+                                    <li className={className(page, 'airdrop')}>Airdrop </li>
+                                </a>
+                            </Link>
+
+                            <Link
+                                href={'/settings/[setting]'}
+                                as={'/settings/blocked'}
+                                replace={true}
+                            >
+                                <a className={'gray'}>
+                                    <li className={className(page, 'blocked')}>Blocked</li>
+                                </a>
+                            </Link>
+                        </ul>
+                    </div>
+                    <div className={'db'}>
+                        <span
+                            className={
+                                'db f6 b black ph4 pt4 flex flex-row justify-between items-center'
+                            }
                         >
-                            <a className={'gray'}>
-                                <li className={className(page, 'connections')}>Connections</li>
-                            </a>
-                        </Link>
+                            Balances{' '}
+                            {!walletStore.refreshAllBalances['pending'] ? (
+                                <Icon type="reload" onClick={walletStore.refreshAllBalances} />
+                            ) : (
+                                <Icon type="loading" />
+                            )}
+                        </span>
 
-                        <Link href={'/settings/[setting]'} as={'/settings/wallet'} replace={true}>
-                            <a className={'gray'}>
-                                <li className={className(page, 'wallet')}>Wallet </li>
-                            </a>
-                        </Link>
-
-                        <Link
-                            href={'/settings/[setting]'}
-                            as={'/settings/moderation'}
-                            replace={true}
-                        >
-                            <a className={'gray'}>
-                                <li className={className(page, 'moderation')}>Moderation</li>
-                            </a>
-                        </Link>
-
-                        <Link href={'/settings/[setting]'} as={'/settings/airdrop'} replace={true}>
-                            <a className={'gray'}>
-                                <li className={className(page, 'airdrop')}>Airdrop </li>
-                            </a>
-                        </Link>
-
-                        <Link href={'/settings/[setting]'} as={'/settings/blocked'} replace={true}>
-                            <a className={'gray'}>
-                                <li className={className(page, 'blocked')}>Blocked</li>
-                            </a>
-                        </Link>
-                    </ul>
+                        <UserBalances className={'ph4'} />
+                    </div>
                 </div>
-                <div className={'db'}>
-                    <span
-                        className={
-                            'db f6 b black ph4 pt4 flex flex-row justify-between items-center'
-                        }
-                    >
-                        Balances{' '}
-                        {!walletStore.refreshAllBalances['pending'] ? (
-                            <Icon type="reload" onClick={walletStore.refreshAllBalances} />
-                        ) : (
-                            <Icon type="loading" />
-                        )}
-                    </span>
-
-                    <UserBalances className={'ph4'} />
+                <div className={'fl ml3 w-70 bg-white card pa4'}>
+                    <span className={'f4 b black db mb3'}>{_.startCase(page)}</span>
+                    <Setting page={page} />
                 </div>
             </div>
-            <div className={'fl ml3 w-70 bg-white card pa4'}>
-                <span className={'f4 b black db mb3'}>{_.startCase(page)}</span>
-                <Setting page={page} />
-            </div>
-        </div>
+        </>
     )
 }
 

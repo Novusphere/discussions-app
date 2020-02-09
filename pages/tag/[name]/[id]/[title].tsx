@@ -1,6 +1,6 @@
 import React, { useEffect } from 'react'
 import { NextPage } from 'next'
-import { observer, useLocalStore } from 'mobx-react-lite'
+import { useLocalStore, useObserver } from 'mobx-react-lite'
 import { discussions, Thread } from '@novuspherejs'
 import { Button, Divider, Dropdown, Icon, Menu, Popover, Tooltip, Result, Input } from 'antd'
 import Link from 'next/link'
@@ -16,13 +16,14 @@ import {
     ReplyingPostPreview,
 } from '@components'
 import moment from 'moment'
-import { NextRouter, withRouter } from 'next/router'
+import { useRouter } from 'next/router'
 import _ from 'lodash'
 import {
     createPostObject,
     generateVoteObject,
     getThreadUrl,
     openInNewTab,
+    removeMD,
     signPost,
     transformTipsToTransfers,
     voteAsync,
@@ -30,9 +31,10 @@ import {
 import { RootStore, useStores } from '@stores'
 import { MODAL_OPTIONS } from '@globals'
 import cx from 'classnames'
+import Head from 'next/head'
+import { NextSeo } from 'next-seo'
 
 interface IPostPageProps {
-    router: NextRouter
     thread: Thread
     url: string
     query: {
@@ -42,8 +44,7 @@ interface IPostPageProps {
     }
 }
 
-const PostPage: NextPage<IPostPageProps> = ({
-    router,
+const PostPageComponent: React.FunctionComponent<IPostPageProps> = ({
     thread,
     url,
     query: { name, id, title },
@@ -56,6 +57,8 @@ const PostPage: NextPage<IPostPageProps> = ({
         walletStore,
         tagStore,
     }: RootStore = useStores()
+
+    const router = useRouter()
 
     const postStore = useLocalStore(
         source => ({
@@ -533,7 +536,9 @@ const PostPage: NextPage<IPostPageProps> = ({
     }
 
     const tag = tagStore.tagModelFromObservables(thread.openingPost.sub)
+
     if (!tag) return null
+
     return (
         <>
             <Link
@@ -781,6 +786,36 @@ const PostPage: NextPage<IPostPageProps> = ({
         </>
     )
 }
+
+const PostPage: NextPage<any> = ({ url, thread, query }) => {
+    return (
+        <>
+            <Head>
+                <title>
+                    {thread.openingPost.title} - #{thread.openingPost.sub}
+                </title>
+            </Head>
+            <NextSeo
+                title={thread.openingPost.title}
+                description={removeMD(thread.openingPost.content).substring(0, 150)}
+                openGraph={{
+                    title: thread.openingPost.title,
+                    description: removeMD(thread.openingPost.content).substring(0, 150),
+                    site_name: 'Discussions App',
+                    images: [
+                        {
+                            url: thread.icon ? thread.icon : 'https://cdn.novusphere.io/static/atmos2.png',
+                            width: 50,
+                            height: 50,
+                            alt: 'https://cdn.novusphere.io/static/atmos2.png',
+                        },
+                    ],
+                }}
+            />
+            <PostPageComponent thread={thread} url={url} query={query} />
+        </>
+    )
+}
 ;(PostPage as any).getInitialProps = async function({ store, query }: any) {
     const postPub = store.authStore.postPub
     const thread = await store.postsStore.getThreadById(query.id, postPub)
@@ -793,4 +828,4 @@ const PostPage: NextPage<IPostPageProps> = ({
     }
 }
 
-export default withRouter(observer(PostPage as any))
+export default PostPage

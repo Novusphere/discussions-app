@@ -4,12 +4,16 @@ import { useContext } from 'react'
 import { StoreContext } from '@stores'
 import { InfiniteScrollFeed } from '@components'
 import { useObserver } from 'mobx-react-lite'
+import Head from 'next/head'
 
 const SearchPage: NextPage<any> = ({ query, postPub }) => {
     const { postsStore } = useContext(StoreContext)
 
     return useObserver(() => (
         <>
+            <Head>
+                <title>Discussions App - Searching: {query}</title>
+            </Head>
             <span className={'db mb3 f6'}>
                 Showing results for: "{query}" ({postsStore.postsPosition.items}{' '}
                 {postsStore.postsPosition.items === 1 ? 'result' : 'results'})

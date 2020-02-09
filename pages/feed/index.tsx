@@ -6,6 +6,7 @@ import { RootStore, StoreContext } from '@stores'
 import dynamic from 'next/dynamic'
 import { Button } from 'antd'
 import Empty from 'antd/lib/empty'
+import Head from 'next/head'
 
 const FeedPageNoSSR = dynamic(
     () =>
@@ -19,16 +20,20 @@ const FeedPageNoSSR = dynamic(
 
             if (!postsStore.posts.length) {
                 return (
-                    <Empty description={<span>Follow some users to see their activity here!</span>} />
+                    <Empty
+                        description={<span>Follow some users to see their activity here!</span>}
+                    />
                 )
             }
 
-            return <InfiniteScrollFeed
-                dataLength={postsStore.postsPosition.items}
-                hasMore={postsStore.postsPosition.cursorId !== 0}
-                next={() => postsStore.getPostsForKeys(postPub)}
-                posts={postsStore.posts}
-            />
+            return (
+                <InfiniteScrollFeed
+                    dataLength={postsStore.postsPosition.items}
+                    hasMore={postsStore.postsPosition.cursorId !== 0}
+                    next={() => postsStore.getPostsForKeys(postPub)}
+                    posts={postsStore.posts}
+                />
+            )
         }),
     {
         ssr: false,
@@ -36,7 +41,14 @@ const FeedPageNoSSR = dynamic(
 )
 
 const FeedPage: NextPage<any> = ({ postPub }) => {
-    return <FeedPageNoSSR postPub={postPub} />
+    return (
+        <>
+            <Head>
+                <title>Discussions App - #feed</title>
+            </Head>
+            <FeedPageNoSSR postPub={postPub} />
+        </>
+    )
 }
 
 FeedPage.getInitialProps = async function(ctx: any) {

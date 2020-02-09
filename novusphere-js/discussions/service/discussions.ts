@@ -8,7 +8,7 @@ import * as bip32 from 'bip32'
 import ecc from 'eosjs-ecc'
 import axios from 'axios'
 import { INSDBSearchQuery } from '../../nsdb'
-import { encodeId, getThreadTitle, getThreadUrl } from '@utils'
+import { encodeId, getThreadTitle, getThreadUrl, isDev } from '@utils'
 //import { isDev } from '@utils'
 
 export interface IBrainKeyPair {
@@ -406,8 +406,25 @@ export default class DiscussionsService {
             } while (sq.cursorId)
 
             let thread = new Thread()
+
             thread.init(posts)
             thread.normalize()
+
+            const { data: setting } = await axios.get(`${nsdb.api}/discussions/site`)
+
+            // get icon for seo
+            // #196
+            let host
+
+            if (process.env.NODE_ENV === 'production') host = 'discussions.app'
+            if (isDev) host = 'discussions.app'
+
+            const settings = setting[host]
+
+            if (settings && thread.openingPost) {
+                thread.icon = settings['tags'][thread.openingPost.sub]['icon']
+            }
+
             return thread
         } catch (error) {
             console.error('getThreadAsync error', error)
@@ -578,7 +595,7 @@ export default class DiscussionsService {
             })
 
             response.payload = await Promise.all(
-                 response.payload.map(async item => {
+                response.payload.map(async item => {
                     return {
                         ...item,
                         url: await getThreadUrl(item, item.title === '' ? item.uuid : null),

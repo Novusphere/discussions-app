@@ -24,7 +24,11 @@ export class UserStore {
     blockedByDelegation = observable.map<string, string>() // either blockedUsers or blockedPosts
 
     @observable notificationCount = 0
-    @observable lastCheckedNotifications = 0
+
+    @persist
+    @observable
+    lastCheckedNotifications = 0
+
     @observable notifications: Post[] = []
 
     @persist
@@ -128,6 +132,9 @@ export class UserStore {
         this.syncDataFromLocalToServer()
     }
 
+    /**
+     * Sync the data from delegated members
+     */
     async updateFromActiveDelegatedMembers() {
         try {
             return await Promise.all(
@@ -236,6 +243,8 @@ export class UserStore {
      * @param {string} asPathURL - i.e. /tag/test/1hx6xdq9iwehn/testt
      */
     toggleBlockPost = (asPathURL: string) => {
+        if (asPathURL === '') return
+
         if (this.blockedPosts.has(asPathURL)) {
             this.blockedPosts.delete(asPathURL)
             this.uiStore.showMessage('This post has been unmarked as spam!', 'success')
@@ -324,17 +333,35 @@ export class UserStore {
         try {
             const { data } = await nsdb.getAccount(privateKey)
             console.log(data)
+
             if (data) {
-                this.lastCheckedNotifications = data['lastCheckedNotifications']
-                this.watching.replace(data['watching'])
-                this.tagStore.subscribed.replace(data['tags'])
-                this.following.replace(data['following'].map(obj => [obj.pub, obj.name]))
-                this.blockedPosts.replace(data['moderation']['blockedPosts'])
-                this.delegated.replace(data['moderation']['delegated'])
-                this.blockedUsers.replace(data['moderation']['blockedUsers'])
-                this.pinnedPosts.replace(data['moderation']['pinnedPosts'])
-                this.unsignedPostsIsSpam = data['moderation']['unsignedPostsIsSpam']
-                this.blockedContentSetting = data['moderation']['blockedContentSetting']
+                if (typeof data['lastCheckedNotifications'] !== 'undefined')
+                    this.lastCheckedNotifications = data['lastCheckedNotifications']
+
+                if (data['watching']) this.watching.replace(data['watching'])
+
+                if (data['tags']) this.tagStore.subscribed.replace(data['tags'])
+
+                if (data['following'])
+                    this.following.replace(data['following'].map(obj => [obj.pub, obj.name]))
+
+                if (data['moderation']['blockedPosts'])
+                    this.blockedPosts.replace(data['moderation']['blockedPosts'])
+
+                if (data['moderation']['delegated'])
+                    this.delegated.replace(data['moderation']['delegated'])
+
+                if (data['moderation']['blockedUsers'])
+                    this.blockedUsers.replace(data['moderation']['blockedUsers'])
+
+                if (data['moderation']['pinnedPosts'])
+                    this.pinnedPosts.replace(data['moderation']['pinnedPosts'])
+
+                if (typeof data['moderation']['unsignedPostsIsSpam'] !== 'undefined')
+                    this.unsignedPostsIsSpam = data['moderation']['unsignedPostsIsSpam']
+
+                if (typeof data['moderation']['blockedContentSetting'] !== 'undefined')
+                    this.blockedContentSetting = data['moderation']['blockedContentSetting']
 
                 hydrate(localStorage)('userStore', this).rehydrate()
                 hydrate(localStorage)('tagStore', this.tagStore).rehydrate()
@@ -343,7 +370,7 @@ export class UserStore {
             console.log(error)
             this.uiStore.showToast(
                 'Unable to sync',
-                'We were unable to sync your account data to your current browser',
+                'We experienced some problems syncing your account data to your current browser',
                 'info'
             )
             return error
@@ -424,6 +451,7 @@ export class UserStore {
                     // results is an array of objects [encodedId, diff]
                     if (result[0] !== undefined && result.length > 0) {
                         each(result, async (item, cb) => {
+                            console.log(item)
                             const [threadId, diff, currentCount] = item
                             const thread = await discussions.getThread(threadId)
                             const id = encodeId(thread.openingPost)

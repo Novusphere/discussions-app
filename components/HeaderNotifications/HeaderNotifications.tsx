@@ -1,5 +1,5 @@
-import React, { FunctionComponent, useEffect, useState } from 'react'
-import { Icon, Badge, Button, Popover, List, Avatar, Dropdown } from 'antd'
+import React, { FunctionComponent } from 'react'
+import { Icon, Badge, Button, List, Avatar, Dropdown } from 'antd'
 
 import styles from './HeaderNotifications.module.scss'
 import { useObserver } from 'mobx-react-lite'
@@ -98,7 +98,7 @@ const HeaderNotifications: FunctionComponent<IHeaderNotificationsProps> = () => 
             }
         },
         20000,
-        false
+        true
     )
 
     return useObserver(() => (

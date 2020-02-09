@@ -4,6 +4,7 @@ import { initializeStore, InjectStoreContext } from '@stores'
 import { Layout } from '@components'
 import { parseCookies } from 'nookies'
 import { SIGN_IN_OPTIONS } from '@globals'
+import { DefaultSeo } from 'next-seo'
 
 import '../assets/main.scss'
 
@@ -75,11 +76,25 @@ class DiscussionsApp extends App<any> {
         const { Component, pageProps, initialStoreData } = this.props
 
         return (
-            <InjectStoreContext initialData={initialStoreData}>
-                <Layout>
-                    <Component {...pageProps} />
-                </Layout>
-            </InjectStoreContext>
+            <>
+                <DefaultSeo
+                    openGraph={{
+                        type: 'website',
+                        locale: 'en_US',
+                        url: 'https://www.discussions.app/',
+                        site_name: 'Discussions App',
+                    }}
+                    twitter={{
+                        site: '@thenovusphere',
+                        cardType: 'summary',
+                    }}
+                />
+                <InjectStoreContext initialData={initialStoreData}>
+                    <Layout>
+                        <Component {...pageProps} />
+                    </Layout>
+                </InjectStoreContext>
+            </>
         )
     }
 }

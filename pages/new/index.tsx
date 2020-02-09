@@ -16,6 +16,7 @@ import {
     signPost,
 } from '@utils'
 import { discussions } from '@novuspherejs'
+import Head from 'next/head'
 
 const { Option } = Select
 
@@ -29,7 +30,6 @@ const NewPageNoSSRUnwrapped = dynamic(
             const [options, setOptions] = useState(tagStore.tagsWithoutBaseOptions)
             const [newOption, setNewOption] = useState(null)
             const togglePreview = useCallback(() => setPreview(!isPreviewing), [])
-
 
             const handleSubmit = useCallback(e => {
                 e.preventDefault()
@@ -96,7 +96,9 @@ const NewPageNoSSRUnwrapped = dynamic(
                                                 clearInterval(int)
                                                 setLoading(false)
                                                 await pushToThread(submittedPost)
-                                                const newId = encodeId(submittedPost.openingPost as any)
+                                                const newId = encodeId(
+                                                    submittedPost.openingPost as any
+                                                )
                                                 userStore.toggleThreadWatch(newId, 0, true)
                                                 uiStore.showToast(
                                                     'Success',
@@ -259,7 +261,14 @@ const NewPageNoSSRUnwrapped = dynamic(
 const NewPageNoSSR = Form.create({ name: 'NewPost' })(NewPageNoSSRUnwrapped) as any
 
 const NewPage: NextPage<any> = ({ prefilledTag }) => {
-    return <NewPageNoSSR prefilledTag={prefilledTag} />
+    return (
+        <>
+            <Head>
+                <title>Discussions App - Create New Post</title>
+            </Head>
+            <NewPageNoSSR prefilledTag={prefilledTag} />
+        </>
+    )
 }
 
 NewPage.getInitialProps = async ({ query }) => {

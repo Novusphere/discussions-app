@@ -40,7 +40,7 @@
         "mobx-task": "2.0.0",
         "moment": "2.24.0",
         "next": "9.2.1",
-        "next-seo": "4.0.0",
+        "next-seo": "^4.0.0",
         "node-sass": "4.13.1",
         "nookies": "^2.0.8",
         "null-loader": "^3.0.0",

@@ -4,17 +4,25 @@ import { InfiniteScrollFeed } from '@components'
 import { observer } from 'mobx-react-lite'
 import { StoreContext } from '@stores'
 import { parseCookies } from 'nookies'
+import { NextSeo } from 'next-seo'
+import Head from 'next/head'
 
 const TagPage: NextPage<any> = ({ postPub, tag, pinnedByDelegation }) => {
     const { postsStore } = useContext(StoreContext)
 
     return (
-        <InfiniteScrollFeed
-            dataLength={postsStore.postsPosition.items}
-            hasMore={postsStore.postsPosition.cursorId !== 0}
-            next={() => postsStore.fetchPostsForTag(postPub, [tag], pinnedByDelegation)}
-            posts={postsStore.posts}
-        />
+        <>
+            <Head>
+                <title>Discussions App - #{tag}</title>
+            </Head>
+            <NextSeo title={`Discussions App - #${tag}`} description={`Viewing posts in #${tag}`} />
+            <InfiniteScrollFeed
+                dataLength={postsStore.postsPosition.items}
+                hasMore={postsStore.postsPosition.cursorId !== 0}
+                next={() => postsStore.fetchPostsForTag(postPub, [tag], pinnedByDelegation)}
+                posts={postsStore.posts}
+            />
+        </>
     )
 }
 

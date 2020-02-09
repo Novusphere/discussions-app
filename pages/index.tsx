@@ -4,6 +4,7 @@ import { InfiniteScrollFeed } from '@components'
 import { observer, useObserver } from 'mobx-react-lite'
 import { StoreContext } from '@stores'
 import dynamic from 'next/dynamic'
+import Head from 'next/head'
 
 const IndexPageNoSSR = dynamic(
     () =>
@@ -30,7 +31,14 @@ const IndexPageNoSSR = dynamic(
 )
 
 const IndexPage: NextPage<any> = ({ postPub }) => {
-    return <IndexPageNoSSR postPub={postPub} />
+    return (
+        <>
+            <Head>
+                <title>Discussions App</title>
+            </Head>
+            <IndexPageNoSSR postPub={postPub} />
+        </>
+    )
 }
 
 IndexPage.getInitialProps = async function({ store }: any) {

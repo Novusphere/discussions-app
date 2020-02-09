@@ -92,7 +92,7 @@ const Blocked = () => {
                                             </Link>
                                         </span>
 
-                                        <Text className={'db'} ellipsis>
+                                        <Text className={'db'} ellipsis style={{ maxWidth: '20vw' }}>
                                             {keys}
                                         </Text>
                                     </span>
@@ -125,12 +125,12 @@ const Blocked = () => {
                         return (
                             <List.Item className={'flex flex-row items-center justify-between'}>
                                 <>
-                                    <span>
-                                        <span className={'pr3 dib'}>
+                                    <span className={'flex flex-row items-center'}>
+                                        <span className={'pr3'}>
                                             <Avatar src={tag.logo} size={'large'} />
                                         </span>
                                         <Link href={'/tag/[name]/[id]/[title]'} as={path}>
-                                            {path}
+                                            <a><Text ellipsis style={{ maxWidth: '20vw' }}>{path}</Text></a>
                                         </Link>
                                     </span>
                                     <Button
