@@ -421,7 +421,11 @@ export default class DiscussionsService {
 
             const settings = setting[host]
 
-            if (typeof settings['tags'][thread.openingPost.sub] !== 'undefined') {
+            if (
+                typeof thread !== 'undefined' &&
+                typeof thread.openingPost !== 'undefined' &&
+                typeof settings['tags'][thread.openingPost.sub] !== 'undefined'
+            ) {
                 thread.icon = settings['tags'][thread.openingPost.sub]['icon']
             }
 
