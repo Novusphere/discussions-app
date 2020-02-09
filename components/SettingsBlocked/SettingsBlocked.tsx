@@ -12,17 +12,17 @@ const Blocked = () => {
 
     const handleHiddenOnChange = useCallback(val => {
         if (val) {
-            settingStore.setBlockedContent('hidden')
+            userStore.setBlockedContent('hidden')
         } else {
-            settingStore.setBlockedContent('collapsed')
+            userStore.setBlockedContent('collapsed')
         }
     }, [])
 
     const handleCollapsedOnChange = useCallback(val => {
         if (val) {
-            settingStore.setBlockedContent('collapsed')
+            userStore.setBlockedContent('collapsed')
         } else {
-            settingStore.setBlockedContent('hidden')
+            userStore.setBlockedContent('hidden')
         }
     }, [])
 
@@ -40,7 +40,7 @@ const Blocked = () => {
                         </span>
                     </span>
                     <Switch
-                        checked={settingStore.blockedContentSetting === 'hidden'}
+                        checked={userStore.blockedContentSetting === 'hidden'}
                         onChange={handleHiddenOnChange}
                     />
                 </div>
@@ -52,7 +52,7 @@ const Blocked = () => {
                         </span>
                     </span>
                     <Switch
-                        checked={settingStore.blockedContentSetting === 'collapsed'}
+                        checked={userStore.blockedContentSetting === 'collapsed'}
                         onChange={handleCollapsedOnChange}
                     />
                 </div>
@@ -64,8 +64,8 @@ const Blocked = () => {
                         </span>
                     </span>
                     <Switch
-                        checked={settingStore.unsignedPostsIsSpam}
-                        onChange={settingStore.toggleUnsignedPostsIsSpam}
+                        checked={userStore.unsignedPostsIsSpam}
+                        onChange={userStore.toggleUnsignedPostsIsSpam}
                     />
                 </div>
             </div>
@@ -121,6 +121,7 @@ const Blocked = () => {
                     renderItem={([path, date]) => {
                         const [, tagName] = path.split('/')
                         const tag = tagStore.tagModelFromObservables(tagName)
+                        if (!tag) return null
                         return (
                             <List.Item className={'flex flex-row items-center justify-between'}>
                                 <>

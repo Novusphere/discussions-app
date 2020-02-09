@@ -80,6 +80,7 @@ const InfiniteScrollFeed: FunctionComponent<IInfiniteScrollFeedProps> = ({
                       .filter(post => post.transaction)
                       .map(post => {
                           const tag = tagStore.tagModelFromObservables(post.sub)
+                          if (!tag) return null
                           return (
                               <PostPreview
                                   key={`${post.uuid}-${post.pinned}`}

@@ -122,11 +122,6 @@ const PostPage: NextPage<IPostPageProps> = ({
 
             toggleEdit: () => {
                 postStore.editing = !postStore.editing
-
-                // if (!postStore.editing) {
-                //     postStore.titleContent = source.thread.openingPost.title
-                //     postStore.setEditingContent(source.thread.openingPost.content)
-                // }
             },
 
             submitEdit: async () => {
@@ -155,10 +150,7 @@ const PostPage: NextPage<IPostPageProps> = ({
 
                     postObject.sig = sig
 
-                    console.log(postObject)
-                    const { transaction, editedAt, uuid } = await discussions.post(
-                        postObject as any
-                    )
+                    const { editedAt, uuid } = await discussions.post(postObject as any)
 
                     return new Promise((resolve, reject) => {
                         const int = setInterval(async () => {
@@ -509,7 +501,7 @@ const PostPage: NextPage<IPostPageProps> = ({
     }
 
     const shouldBeHidden =
-        userStore.blockedPosts.has(url) && settingStore.blockedContentSetting === 'hidden'
+        userStore.blockedPosts.has(url) && userStore.blockedContentSetting === 'hidden'
 
     if (shouldBeHidden) {
         return (
@@ -541,7 +533,7 @@ const PostPage: NextPage<IPostPageProps> = ({
     }
 
     const tag = tagStore.tagModelFromObservables(thread.openingPost.sub)
-
+    if (!tag) return null
     return (
         <>
             <Link
@@ -665,6 +657,7 @@ const PostPage: NextPage<IPostPageProps> = ({
                             <Button
                                 disabled={postStore.editing}
                                 size={'small'}
+                                type={'primary'}
                                 className={'mr1'}
                                 onClick={postStore.toggleReply}
                             >
@@ -744,7 +737,11 @@ const PostPage: NextPage<IPostPageProps> = ({
                         threadUsers={postStore.threadUsers}
                     />
                     <div className={'flex flex-row justify-end pt2'}>
-                        <Button disabled={postStore.replyingContent === ''} onClick={postStore.togglePreview} className={'mr2'}>
+                        <Button
+                            disabled={postStore.replyingContent === ''}
+                            onClick={postStore.togglePreview}
+                            className={'mr2'}
+                        >
                             Preview
                         </Button>
                         <Button
@@ -784,7 +781,6 @@ const PostPage: NextPage<IPostPageProps> = ({
         </>
     )
 }
-
 ;(PostPage as any).getInitialProps = async function({ store, query, ...rest }: any) {
     const postPub = store.authStore.postPub
     const thread = await store.postsStore.getThreadById(query.id, postPub)

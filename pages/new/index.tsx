@@ -185,6 +185,7 @@ const NewPageNoSSRUnwrapped = dynamic(
                                         )}
                                     {options.map(option => {
                                         const tag = tagStore.tagModelFromObservables(option.value)
+                                        if (!tag) return null
                                         return (
                                             <Option key={option.value} value={option.value}>
                                                 <img

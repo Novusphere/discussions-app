@@ -1,4 +1,4 @@
-import React, { FunctionComponent, useState } from 'react'
+import React, { FunctionComponent, useEffect, useState } from 'react'
 import { Icon, Badge, Button, Popover, List, Avatar, Dropdown } from 'antd'
 
 import styles from './HeaderNotifications.module.scss'
@@ -21,6 +21,11 @@ const NotificationContainer = () => {
 
     return (
         <List
+            locale={{
+                emptyText: (
+                    <span className={'db pa4 tc w-100 moon-gray'}>You have no notifications</span>
+                ),
+            }}
             itemLayout="horizontal"
             dataSource={userStore.notifications}
             renderItem={item => {
@@ -62,7 +67,9 @@ const NotificationContainer = () => {
                         'flex flex-row items-center justify-between tc',
                     ])}
                 >
-                    <span className={'dim pointer'} onClick={userStore.clearNotifications}>Clear Notifications</span>
+                    <span className={'dim pointer'} onClick={userStore.clearNotifications}>
+                        Clear Notifications
+                    </span>
                     <span className={'dim pointer'}>View All</span>
                 </div>
             }
@@ -73,12 +80,18 @@ const NotificationContainer = () => {
 const HeaderNotifications: FunctionComponent<IHeaderNotificationsProps> = () => {
     const { userStore, authStore }: RootStore = useStores()
 
+    useEffect(() => {
+        userStore.syncDataFromServerToLocal(authStore.postPriv).then(() => {
+            userStore.fetchNotifications(authStore.postPub)
+        })
+    }, [])
+
     useInterval(
         () => {
             userStore.fetchNotifications(authStore.postPub)
         },
         20000,
-        true
+        false
     )
 
     return useObserver(() => (
@@ -90,6 +103,7 @@ const HeaderNotifications: FunctionComponent<IHeaderNotificationsProps> = () => 
                 if (visible) {
                     userStore.lastCheckedNotifications = Date.now()
                     userStore.notificationCount = 0
+                    userStore.syncDataFromLocalToServer()
                 }
             }}
         >

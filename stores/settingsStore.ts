@@ -1,4 +1,3 @@
-import { persist } from 'mobx-persist'
 import { observable } from 'mobx'
 import { RootStore } from '@stores/index'
 import { nsdb } from '@novuspherejs'
@@ -6,17 +5,8 @@ import { isDev } from '@utils'
 import axios from 'axios'
 import _ from 'lodash'
 
-export type BlockedContentSetting = 'hidden' | 'collapsed'
 
 export class SettingsStore {
-    @persist
-    @observable
-    blockedContentSetting: BlockedContentSetting = 'collapsed'
-
-    @persist
-    @observable
-    unsignedPostsIsSpam = true
-
     @observable private userStore: RootStore['userStore']
     @observable private uiStore: RootStore['uiStore']
     @observable private tagStore: RootStore['tagStore']
@@ -25,20 +15,6 @@ export class SettingsStore {
         this.userStore = rootStore.userStore
         this.uiStore = rootStore.uiStore
         this.tagStore = rootStore.tagStore
-    }
-
-    setBlockedContent = (type: BlockedContentSetting) => {
-        this.blockedContentSetting = type
-    }
-
-    toggleUnsignedPostsIsSpam = () => {
-        this.unsignedPostsIsSpam = !this.unsignedPostsIsSpam
-    }
-
-    hydrate(initialState: any = {}) {
-        if (initialState.unsignedPostsIsSpam) {
-            this.unsignedPostsIsSpam = initialState.unsignedPostsIsSpam
-        }
     }
 
     loadSettings = async () => {

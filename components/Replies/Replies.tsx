@@ -543,7 +543,7 @@ const Replies: FunctionComponent<IRepliesProps> = props => {
 
                     {/*Render Content*/}
                     {!replyStore.collapsed && !isSpamPost && !replyStore.editing && (
-                        <RichTextPreview hideFade className={'lh-copy pt2 dark-gray'}>
+                        <RichTextPreview hideFade className={'lh-copy pt2 mr3 dark-gray'}>
                             {props.preview ? props.reply.content : replyStore.reply.content}
                         </RichTextPreview>
                     )}

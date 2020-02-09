@@ -22,9 +22,9 @@ export const hydrate = storage =>
 export class RootStore {
     uiStore = new UIStore(this)
     authStore = new AuthStore(this)
+    tagStore = new TagStore(this)
     userStore = new UserStore(this)
     walletStore = new WalletStore(this)
-    tagStore = new TagStore(this)
     postsStore = new PostsStore(this)
     settingStore = new SettingsStore(this)
 
@@ -41,20 +41,14 @@ export class RootStore {
             this.userStore.hydrate(userStore)
         }
 
-        if (settingStore) {
-            this.settingStore.hydrate(settingStore)
-        }
-
         if (uiStore) {
             set(this.uiStore, uiStore)
-            // this.uiStore.hydrate(uiStore)
         }
     }
 }
 
 const StoreContext = createContext<any | null>(null)
 
-let store
 let rootStore: any = {}
 
 function initializeStore(data = rootStore || {}) {
@@ -79,7 +73,6 @@ function initializeStore(data = rootStore || {}) {
 
         const hydr = {
             userStore: stores.userStore,
-            settingsStore: stores.settingStore,
             tagStore: stores.tagStore,
             walletStore: stores.walletStore,
         }

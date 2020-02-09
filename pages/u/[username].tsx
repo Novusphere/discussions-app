@@ -27,6 +27,7 @@ const Moderation = dynamic(
                     >
                         {options.map(option => {
                             const tag = tagModelFromObservables(option.value)
+                            if (!tag) return null
                             return (
                                 <Option key={option.value} value={option.value}>
                                     <img

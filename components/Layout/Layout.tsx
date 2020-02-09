@@ -41,9 +41,14 @@ const { Header, Footer, Content } = AntdLayout
 interface ILayoutProps {}
 
 const Layout: FunctionComponent<ILayoutProps> = ({ children }) => {
-    const { authStore, uiStore, settingStore, tagStore, walletStore }: RootStore = useContext(
-        StoreContext
-    )
+    const {
+        authStore,
+        uiStore,
+        settingStore,
+        tagStore,
+        walletStore,
+        userStore,
+    }: RootStore = useContext(StoreContext)
 
     message.config({
         top: 75,
@@ -55,21 +60,21 @@ const Layout: FunctionComponent<ILayoutProps> = ({ children }) => {
 
     // fire some stuff
     useEffect(() => {
-        if (!isServer) {
-            if (authStore.hasEOSWallet) {
-                authStore.connectScatterWallet()
-            }
-            eos.initializeTokens().then(() => {
-                eos.init({
-                    host: 'nodes.get-scatter.com',
-                    port: 443,
-                    protocol: 'https',
-                    chainId: 'aca376f206b8fc25a6ed44dbdc66547c36c6c33e3a119ffbeaef943642f0e906',
-                })
-                walletStore.setTokens(eos.tokens)
-                settingStore.loadSettings()
-                walletStore.getSupportedTokensForUnifiedWallet()
+        settingStore.loadSettings()
+
+        eos.initializeTokens().then(() => {
+            eos.init({
+                host: 'nodes.get-scatter.com',
+                port: 443,
+                protocol: 'https',
+                chainId: 'aca376f206b8fc25a6ed44dbdc66547c36c6c33e3a119ffbeaef943642f0e906',
             })
+            walletStore.setTokens(eos.tokens)
+            walletStore.getSupportedTokensForUnifiedWallet()
+        })
+
+        if (authStore.hasEOSWallet) {
+            authStore.connectScatterWallet()
         }
     }, [])
 
@@ -188,13 +193,19 @@ const Layout: FunctionComponent<ILayoutProps> = ({ children }) => {
                                 allowClear
                                 addonAfter={<Icon type="plus-circle" theme={'filled'} />}
                                 placeholder="Add a tag to subscribe"
-                                onPressEnter={(e: any) => tagStore.addSubscribed(e.target.value)}
+                                onPressEnter={(e: any) => {
+                                    tagStore.addSubscribed(e.target.value)
+                                    userStore.syncDataFromLocalToServer()
+                                }}
                             />
                         </div>
                         {useObserver(() => (
                             <div className={'mt3 db'}>
                                 {[...tagStore.subscribed.toJS()].map(subscribed => {
                                     const tag: any = tagStore.tagModelFromObservables(subscribed)
+
+                                    if (!tag) return null
+
                                     return (
                                         <li key={subscribed} className={'ph3 pv1 black'}>
                                             <Popover
@@ -243,11 +254,12 @@ const Layout: FunctionComponent<ILayoutProps> = ({ children }) => {
                                                                 </span>
                                                             </span>
                                                             <Button
-                                                                onClick={() =>
+                                                                onClick={() => {
                                                                     tagStore.removeSubscribed(
                                                                         subscribed
                                                                     )
-                                                                }
+                                                                    userStore.syncDataFromLocalToServer()
+                                                                }}
                                                                 shape="circle"
                                                             >
                                                                 <Icon type="delete" />

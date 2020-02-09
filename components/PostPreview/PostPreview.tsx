@@ -192,8 +192,8 @@ const PostPreview: FunctionComponent<IPostPreviewProps> = ({
         blockedByDelegation.has(post.pub) ||
         (unsignedPostsIsSpam && !post.pub)
 
+    const shouldBeHidden = blockedContentSetting === 'hidden' && isSpam
     const shouldBeCollapsed = blockedContentSetting === 'collapsed' && isSpam
-    const shouldBeHidden = isSpam && blockedContentSetting === 'hidden'
 
     if (shouldBeHidden) {
         return null
@@ -221,7 +221,7 @@ const PostPreview: FunctionComponent<IPostPreviewProps> = ({
                         ])}
                         style={{ width: '40px' }}
                     >
-                        {disableVoteHandler || isSpam
+                        {disableVoteHandler || shouldBeCollapsed
                             ? null
                             : post && (
                                   <VotingHandles

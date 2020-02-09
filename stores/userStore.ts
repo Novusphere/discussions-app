@@ -1,10 +1,13 @@
 import { persist } from 'mobx-persist'
 import { observable } from 'mobx'
-import { RootStore } from '@stores/index'
+import { hydrate, RootStore } from '@stores/index'
 import axios from 'axios'
 import _ from 'lodash'
 import { setCookie, parseCookies } from 'nookies'
-import { discussions, Post } from '@novuspherejs'
+import { discussions, nsdb, Post } from '@novuspherejs'
+import moment from 'moment'
+
+export type BlockedContentSetting = 'hidden' | 'collapsed'
 
 export class UserStore {
     @persist('map') following = observable.map<string, string>()
@@ -16,28 +19,45 @@ export class UserStore {
 
     blockedByDelegation = observable.map<string, string>() // either blockedUsers or blockedPosts
 
-    @observable notificationsPosition = {
-        cursorId: undefined,
-        count: 0,
-    }
-
     @observable notificationCount = 0
     @observable lastCheckedNotifications = 0
     @observable notifications: Post[] = []
 
-    @observable private uiStore: RootStore['uiStore']
+    @persist
+    @observable
+    blockedContentSetting: BlockedContentSetting = 'collapsed'
 
+    @persist
+    @observable
+    unsignedPostsIsSpam = true
+
+    @observable private uiStore: RootStore['uiStore']
+    @observable private tagStore: RootStore['tagStore']
 
     constructor(rootStore: RootStore) {
         this.uiStore = rootStore.uiStore
+        this.tagStore = rootStore.tagStore
     }
 
     hydrate(initialState: any = {}) {
-         if (initialState.pinnedPosts) {
+        if (initialState.pinnedPosts) {
             this.pinnedPosts = observable.map<string, string>(initialState.pinnedPosts)
+        }
+
+        if (initialState.unsignedPostsIsSpam) {
+            this.unsignedPostsIsSpam = initialState.unsignedPostsIsSpam
         }
     }
 
+    setBlockedContent = (type: BlockedContentSetting) => {
+        this.blockedContentSetting = type
+        this.syncDataFromLocalToServer()
+    }
+
+    toggleUnsignedPostsIsSpam = () => {
+        this.unsignedPostsIsSpam = !this.unsignedPostsIsSpam
+        this.syncDataFromLocalToServer()
+    }
 
     private async setAndUpdateDelegatedPosts(
         mergedName: string,
@@ -75,7 +95,9 @@ export class UserStore {
      */
     activeModerationForCurrentUser = (username, pub) => {
         const vals = [...this.delegated.keys()]
-        return vals.filter(val => val.indexOf(`${username}:${pub}`) !== -1).map(val => val.split(':')[2])
+        return vals
+            .filter(val => val.indexOf(`${username}:${pub}`) !== -1)
+            .map(val => val.split(':')[2])
     }
 
     async setPinnedPosts(posts: any[], delegated = false) {
@@ -98,6 +120,8 @@ export class UserStore {
         } else {
             setCookie(null, 'pinnedPosts', b64, { path: '/' })
         }
+
+        this.syncDataFromLocalToServer()
     }
 
     async updateFromActiveDelegatedMembers() {
@@ -156,6 +180,7 @@ export class UserStore {
         }
 
         this.uiStore.showMessage('Moderation list updated', 'success')
+        this.syncDataFromLocalToServer()
     }
 
     async setModerationMemberByTag(
@@ -187,6 +212,8 @@ export class UserStore {
         } catch (error) {
             return error
         }
+
+        this.syncDataFromLocalToServer()
     }
 
     toggleUserFollowing = (user: string, pub: string) => {
@@ -197,6 +224,8 @@ export class UserStore {
             this.following.set(pub, user)
             this.uiStore.showMessage('You are now following this user!', 'success')
         }
+
+        this.syncDataFromLocalToServer()
     }
 
     /**
@@ -207,11 +236,12 @@ export class UserStore {
             this.blockedPosts.delete(asPathURL)
             this.uiStore.showMessage('This post has been unmarked as spam!', 'success')
         } else {
-            const date = new Date(Date.now())
-            const dateStamp = `${date.getFullYear()}${date.getMonth()}`
+            const dateStamp = `${moment(Date.now()).format('YYYYMM')}`
             this.blockedPosts.set(asPathURL, dateStamp)
             this.uiStore.showMessage('This post has been marked as spam!', 'success')
         }
+
+        this.syncDataFromLocalToServer()
     }
 
     toggleBlockUser = (displayName: string, pubKey: string) => {
@@ -220,11 +250,14 @@ export class UserStore {
         } else {
             this.blockedUsers.set(pubKey, displayName)
         }
+
+        this.syncDataFromLocalToServer()
     }
 
     toggleThreadWatch = (id: string, count: number, suppressToast = false) => {
         if (this.watching.has(id)) {
             this.watching.delete(id)
+            this.syncDataFromLocalToServer()
             if (!suppressToast)
                 this.uiStore.showMessage('You are no longer watching this thread', 'info')
             return
@@ -238,6 +271,8 @@ export class UserStore {
             if (!suppressToast)
                 this.uiStore.showMessage('You can only watch a maximum of 5 threads', 'info')
         }
+
+        this.syncDataFromLocalToServer()
     }
 
     togglePinPost = (tagName: string, asPathURL: string) => {
@@ -267,26 +302,22 @@ export class UserStore {
             }
         }
 
+        this.syncDataFromLocalToServer()
         const b64 = Buffer.from(JSON.stringify(pinnedPostsAsObj)).toString('base64')
         setCookie(window, 'pinnedByDelegation', b64, { path: '/' })
     }
 
     fetchNotifications = async (publicKey: string): Promise<void> => {
         try {
-            let { payload, cursorId } = await discussions.getPostsForNotifications(
+            let { payload } = await discussions.getPostsForNotifications(
                 publicKey,
                 this.lastCheckedNotifications,
-                this.notificationsPosition.cursorId,
-                5,
+                undefined,
+                0
             )
 
-            this.notificationsPosition = {
-                cursorId: cursorId,
-                count: payload.length,
-            }
-
             this.notificationCount = payload.length
-            this.notifications = payload
+            this.notifications = [...this.notifications, ...payload]
         } catch (error) {
             this.notifications = []
             return error
@@ -296,5 +327,78 @@ export class UserStore {
     clearNotifications = () => {
         this.notifications = []
         this.uiStore.showMessage('Notifications cleared', 'success')
+    }
+
+    /**
+     * Syncing user data with the server
+     */
+    syncDataFromServerToLocal = async (privateKey: string) => {
+        try {
+            const { data } = await nsdb.getAccount(privateKey)
+            console.log(data)
+            if (data) {
+                this.lastCheckedNotifications = data['lastCheckedNotifications']
+                this.watching.replace(data['watching'])
+                this.tagStore.subscribed.replace(data['tags'])
+                this.following.replace(data['following'].map((obj) => ([obj.pub, obj.name])))
+                this.blockedPosts.replace(data['moderation']['blockedPosts'])
+                this.delegated.replace(data['moderation']['delegated'])
+                this.blockedUsers.replace(data['moderation']['blockedUsers'])
+                this.pinnedPosts.replace(data['moderation']['pinnedPosts'])
+                this.unsignedPostsIsSpam = data['moderation']['unsignedPostsIsSpam']
+                this.blockedContentSetting = data['moderation']['blockedContentSetting']
+
+                hydrate(localStorage)('userStore', this).rehydrate()
+                hydrate(localStorage)('tagStore', this.tagStore).rehydrate()
+            }
+        } catch (error) {
+            console.log(error)
+            this.uiStore.showToast(
+                'Unable to sync',
+                'We were unable to sync your account data to your current browser',
+                'info'
+            )
+            return error
+        }
+    }
+
+    /**
+     * Sync the current data in LS to the server
+     */
+    syncDataFromLocalToServer = async () => {
+        try {
+            const following = [...this.following.toJS()].map(([pub, name]) => ({
+                pub,
+                name,
+            }))
+
+            // we have to send the entire payload, not just the diff
+            const dataToSync = {
+                lastCheckedNotifications: this.lastCheckedNotifications,
+                watching: [...this.watching.toJS()],
+                following: following,
+                tags: [...this.tagStore.subscribed.toJS()],
+                moderation: {
+                    blockedPosts: [...this.blockedPosts.toJS()],
+                    blockedUsers: [...this.blockedUsers.toJS()],
+                    pinnedPosts: [...this.pinnedPosts.toJS()],
+                    delegated: [...this.delegated.toJS()],
+                    blockedContentSetting: this.blockedContentSetting,
+                    unsignedPostsIsSpam: this.unsignedPostsIsSpam,
+                },
+            }
+
+            const { postPriv } = parseCookies(window)
+            if (!postPriv) return
+
+            await nsdb.saveAccount(postPriv, dataToSync)
+        } catch (error) {
+            this.uiStore.showToast(
+                'Unable to sync',
+                'We were unable to sync your data to our servers.',
+                'info'
+            )
+            return error
+        }
     }
 }
