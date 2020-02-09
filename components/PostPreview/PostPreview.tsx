@@ -60,8 +60,8 @@ const PostPreview: FunctionComponent<IPostPreviewProps> = ({
         async function getUrl() {
             let uuid = undefined
 
-            if (!post.title && notificationUuid) {
-                uuid = notificationUuid
+            if (!post.title) {
+                uuid = post.uuid
             }
 
             return await getThreadUrl(post, uuid)
@@ -185,6 +185,7 @@ const PostPreview: FunctionComponent<IPostPreviewProps> = ({
             hasAccount,
         }
     )
+
     const isSpam =
         blockedPosts.has(url) ||
         blockedUsers.has(post.pub) ||
@@ -211,7 +212,7 @@ const PostPreview: FunctionComponent<IPostPreviewProps> = ({
                 ])}
                 data-url={url}
                 style={{
-                    opacity: isSpam && blockedContentSetting === 'collapsed' ? 0.5 : 1,
+                    opacity: shouldBeCollapsed ? 0.5 : 1,
                 }}
             >
                 <div className={'flex flex-auto'}>

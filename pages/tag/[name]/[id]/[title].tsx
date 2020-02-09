@@ -687,7 +687,7 @@ const PostPage: NextPage<IPostPageProps> = ({
                                 }
                             >
                                 <Icon
-                                    type="eye-invisible"
+                                    type={userStore.watching.has(id) ? 'eye' : 'eye-invisible'}
                                     theme={userStore.watching.has(id) ? 'filled' : 'outlined'}
                                     style={{
                                         color: userStore.watching.has(id) ? '#079e99' : 'inherit',

@@ -28,13 +28,18 @@ const NotificationContainer = () => {
             }}
             itemLayout="horizontal"
             dataSource={userStore.notifications}
-            renderItem={item => {
+            renderItem={(item, index) => {
                 return (
                     <List.Item className={styles.notificationItem}>
                         <Link href={'/tag/[name]/[id]/[title]'} as={item['url']} shallow={false}>
-                            <a className={'dim w-100 relative'}>
+                            <a className={'dim w-100 relative'} onClick={() => userStore.deleteNotification(index)}>
                                 <List.Item.Meta
-                                    avatar={<Avatar src={getIdenticon(item.pub)} />}
+                                    {...(item.pub && {
+                                        avatar: <Avatar src={getIdenticon(item.pub)} />,
+                                    })}
+                                    {...(item['tag'] && {
+                                        avatar: <Avatar src={item['tag']['logo']} />,
+                                    })}
                                     title={
                                         <span
                                             className={
@@ -103,6 +108,7 @@ const HeaderNotifications: FunctionComponent<IHeaderNotificationsProps> = () => 
                 if (visible) {
                     userStore.lastCheckedNotifications = Date.now()
                     userStore.notificationCount = 0
+                    userStore.resetThreadWatchCounts()
                     userStore.syncDataFromLocalToServer()
                 }
             }}

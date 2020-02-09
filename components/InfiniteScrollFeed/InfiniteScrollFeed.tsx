@@ -8,7 +8,7 @@ import Empty from 'antd/lib/empty'
 
 import styles from './InfiniteScrollFeed.module.scss'
 
-import { StoreContext } from '@stores'
+import { RootStore, StoreContext } from '@stores'
 import { observer, useObserver } from 'mobx-react-lite'
 import cx from 'classnames'
 import { useRouter } from 'next/router'
@@ -30,7 +30,7 @@ const InfiniteScrollFeed: FunctionComponent<IInfiniteScrollFeedProps> = ({
     posts,
     children,
 }) => {
-    const { uiStore, authStore, userStore, settingStore, tagStore } = useContext(StoreContext)
+    const { uiStore, authStore, userStore, tagStore }: RootStore = useContext(StoreContext)
     const router = useRouter()
 
     const renderEndMessage = useCallback(() => {
@@ -92,10 +92,10 @@ const InfiniteScrollFeed: FunctionComponent<IInfiniteScrollFeedProps> = ({
                                   postPriv={authStore.postPriv}
                                   voteHandler={post.vote}
                                   blockedByDelegation={userStore.blockedByDelegation}
-                                  blockedContentSetting={settingStore.blockedContentSetting}
+                                  blockedContentSetting={userStore.blockedContentSetting}
                                   blockedPosts={userStore.blockedPosts}
                                   blockedUsers={userStore.blockedUsers}
-                                  unsignedPostsIsSpam={settingStore.unsignedPostsIsSpam}
+                                  unsignedPostsIsSpam={userStore.unsignedPostsIsSpam}
                                   toggleBlockPost={userStore.toggleBlockPost}
                               />
                           )

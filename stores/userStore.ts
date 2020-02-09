@@ -6,6 +6,10 @@ import _ from 'lodash'
 import { setCookie, parseCookies } from 'nookies'
 import { discussions, nsdb, Post } from '@novuspherejs'
 import moment from 'moment'
+import mapSeries from 'async/mapSeries'
+import each from 'async/each'
+import thread from '@novuspherejs/discussions/thread'
+import { encodeId, getThreadTitle } from '@utils'
 
 export type BlockedContentSetting = 'hidden' | 'collapsed'
 
@@ -307,28 +311,6 @@ export class UserStore {
         setCookie(window, 'pinnedByDelegation', b64, { path: '/' })
     }
 
-    fetchNotifications = async (publicKey: string): Promise<void> => {
-        try {
-            let { payload } = await discussions.getPostsForNotifications(
-                publicKey,
-                this.lastCheckedNotifications,
-                undefined,
-                0
-            )
-
-            this.notificationCount = payload.length
-            this.notifications = [...this.notifications, ...payload]
-        } catch (error) {
-            this.notifications = []
-            return error
-        }
-    }
-
-    clearNotifications = () => {
-        this.notifications = []
-        this.uiStore.showMessage('Notifications cleared', 'success')
-    }
-
     /**
      * Syncing user data with the server
      */
@@ -340,7 +322,7 @@ export class UserStore {
                 this.lastCheckedNotifications = data['lastCheckedNotifications']
                 this.watching.replace(data['watching'])
                 this.tagStore.subscribed.replace(data['tags'])
-                this.following.replace(data['following'].map((obj) => ([obj.pub, obj.name])))
+                this.following.replace(data['following'].map(obj => [obj.pub, obj.name]))
                 this.blockedPosts.replace(data['moderation']['blockedPosts'])
                 this.delegated.replace(data['moderation']['delegated'])
                 this.blockedUsers.replace(data['moderation']['blockedUsers'])
@@ -400,5 +382,114 @@ export class UserStore {
             )
             return error
         }
+    }
+
+    /**
+     * Update thread watch count by calling this method
+     * in an interval. Compare the threadReplyCounts [currentCount, previousCount]
+     */
+    watchAndUpdateWatchedPostsCount = async () => {
+        try {
+            if (!this.watching.size) return
+
+            const threads = [...this.watching.keys()]
+
+            mapSeries(
+                threads,
+                (encodedThreadId, cb) => {
+                    discussions
+                        .getThreadReplyCount(encodedThreadId)
+                        .then(threadReplyCount => {
+                            const [, diff] = this.watching.get(encodedThreadId)
+                            if (threadReplyCount - diff > 0) {
+                                return cb(null, [encodedThreadId, threadReplyCount - diff, threadReplyCount])
+                            }
+                            return cb()
+                        })
+                        .catch(error => {
+                            return cb(null, error.message)
+                        })
+                },
+                async (error, result) => {
+                    // results is an array of objects [encodedId, diff]
+                    if (result[0] !== undefined && result.length > 0) {
+                        each(result, async (item, cb) => {
+                            const [threadId, diff, currentCount] = item
+                            const thread = await discussions.getThread(threadId)
+                            const id = encodeId(thread.openingPost)
+                            const tag: any = this.tagStore.tagModelFromObservables(
+                                thread.openingPost.sub
+                            )
+
+                            this.notifications.push({
+                                ...thread.openingPost,
+                                url: `/tag/${thread.openingPost.sub}/${id}/${getThreadTitle(
+                                    thread.openingPost
+                                )}`,
+                                displayName: `#${thread.openingPost.sub}`,
+                                content: `There are ${diff} new unread posts`,
+                                tag,
+                                createdAt: Date.now(),
+                            } as any)
+
+                            this.notificationCount += 1
+                            this.watching.set(threadId, [currentCount, currentCount])
+
+                            return cb()
+                        })
+                    }
+                }
+            )
+        } catch (error) {
+            return error
+        }
+    }
+
+    /**
+     * Delete a notification by index
+     *
+     * We don't have to clear the badge count because when the user opens the tray
+     * it will auto clear.
+     * @param {number} index
+     */
+    deleteNotification = index => {
+        this.notifications.splice(index, 1)
+    }
+
+    fetchNotifications = async (publicKey: string): Promise<void> => {
+        try {
+            let { payload } = await discussions.getPostsForNotifications(
+                publicKey,
+                this.lastCheckedNotifications,
+                undefined,
+                0
+            )
+
+            this.notificationCount = payload.length
+            this.notifications = [...this.notifications, ...payload]
+
+            this.watchAndUpdateWatchedPostsCount()
+        } catch (error) {
+            this.notifications = []
+            return error
+        }
+    }
+
+    clearNotifications = () => {
+        this.notifications = []
+        this.notificationCount = 0
+        this.uiStore.showMessage('Notifications cleared', 'success')
+    }
+
+    /**
+     * We need to reset the thread watch counter when the user clicks the notification tray
+     * so the next time we fetch notifications we aren't showing them a new post.
+     * [encodedId]: [currentCount, previousCount]
+     *
+     */
+    resetThreadWatchCounts = () => {
+        // this.watching.forEach(([curr, diff], encodedThread) => {
+        //     this.watching.set(encodedThread, [curr, curr])
+        // })
     }
 }
