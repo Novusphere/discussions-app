@@ -311,6 +311,12 @@ export class UserStore {
         setCookie(window, 'pinnedByDelegation', b64, { path: '/' })
     }
 
+    pingServerForData = ({ postPriv, postPub }) => {
+        this.syncDataFromServerToLocal(postPriv).then(() => {
+            this.fetchNotifications(postPub)
+        })
+    }
+
     /**
      * Syncing user data with the server
      */
@@ -402,7 +408,11 @@ export class UserStore {
                         .then(threadReplyCount => {
                             const [, diff] = this.watching.get(encodedThreadId)
                             if (threadReplyCount - diff > 0) {
-                                return cb(null, [encodedThreadId, threadReplyCount - diff, threadReplyCount])
+                                return cb(null, [
+                                    encodedThreadId,
+                                    threadReplyCount - diff,
+                                    threadReplyCount,
+                                ])
                             }
                             return cb()
                         })
@@ -488,8 +498,8 @@ export class UserStore {
      *
      */
     resetThreadWatchCounts = () => {
-        // this.watching.forEach(([curr, diff], encodedThread) => {
-        //     this.watching.set(encodedThread, [curr, curr])
-        // })
+        this.watching.forEach(([curr, diff], encodedThread) => {
+            this.watching.set(encodedThread, [curr, curr])
+        })
     }
 }

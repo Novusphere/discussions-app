@@ -1,17 +1,7 @@
 import React, { FunctionComponent, useCallback, useContext, useState } from 'react'
 
 import styles from './ModalsSignIn.module.scss'
-import {
-    Button,
-    Checkbox,
-    Modal,
-    Typography,
-    Result,
-    Icon,
-    Form,
-    Input,
-    notification,
-} from 'antd'
+import { Button, Checkbox, Modal, Typography, Result, Icon, Form, Input, notification } from 'antd'
 import { SIGN_IN_OPTIONS } from '@globals'
 import { observer } from 'mobx-react'
 import { SignInOptions } from '@constants/sign-in-options'
@@ -44,7 +34,7 @@ const ModalsSignIn: FunctionComponent<IModalsSignInProps> = ({
     handleOk,
     form,
 }) => {
-    const { authStore, uiStore }: RootStore = useContext(StoreContext)
+    const { authStore, uiStore, userStore }: RootStore = useContext(StoreContext)
     const cookies = parseCookies(window)
     const [remember, setRemember] = useState(
         cookies['preferredSignInMethod'] === SIGN_IN_OPTIONS.brainKey
@@ -131,7 +121,7 @@ const ModalsSignIn: FunctionComponent<IModalsSignInProps> = ({
                     <Button
                         key="submit"
                         type="danger"
-                        onClick={handleCreateAccountSubmit}
+                        onClick={handleSignInWithAnotherBKSubmit}
                         disabled={hasErrors(form.getFieldsError())}
                     >
                         Setup and login with new account
@@ -145,7 +135,7 @@ const ModalsSignIn: FunctionComponent<IModalsSignInProps> = ({
                     <Button
                         key="submit"
                         type="danger"
-                        onClick={handleLoginWithExisitingBKSubmit}
+                        onClick={handleLoginWithExistingBKSubmit}
                         disabled={hasErrors(form.getFieldsError())}
                     >
                         Login
@@ -154,7 +144,7 @@ const ModalsSignIn: FunctionComponent<IModalsSignInProps> = ({
         }
     }, [step])
 
-    const handleCreateAccountSubmit = useCallback(e => {
+    const handleSignInWithAnotherBKSubmit = useCallback(e => {
         e.preventDefault()
         form.validateFields(async (err, values) => {
             if (!err) {
@@ -166,6 +156,10 @@ const ModalsSignIn: FunctionComponent<IModalsSignInProps> = ({
                         message: 'You have successfully signed in!',
                     })
                     uiStore.clearActiveModal()
+                    userStore.pingServerForData({
+                        postPub: authStore.postPub,
+                        postPriv: authStore.postPriv,
+                    })
                 } catch (error) {
                     if (error.message === 'You have entered an invalid brain key') {
                         form.setFields({
@@ -187,7 +181,7 @@ const ModalsSignIn: FunctionComponent<IModalsSignInProps> = ({
         })
     }, [])
 
-    const handleLoginWithExisitingBKSubmit = useCallback(e => {
+    const handleLoginWithExistingBKSubmit = useCallback(e => {
         e.preventDefault()
         form.validateFields(async (err, values) => {
             if (!err) {
@@ -199,6 +193,10 @@ const ModalsSignIn: FunctionComponent<IModalsSignInProps> = ({
                         message: 'You have successfully signed in!',
                     })
                     uiStore.clearActiveModal()
+                    userStore.pingServerForData({
+                        postPub: authStore.postPub,
+                        postPriv: authStore.postPriv,
+                    })
                 } catch (error) {
                     if (error.message === 'Incorrect brian key pasword') {
                         form.setFields({
@@ -274,7 +272,7 @@ const ModalsSignIn: FunctionComponent<IModalsSignInProps> = ({
                         <Form
                             labelCol={{ span: 7 }}
                             wrapperCol={{ span: 12 }}
-                            onSubmit={handleCreateAccountSubmit}
+                            onSubmit={handleSignInWithAnotherBKSubmit}
                             className={'center'}
                         >
                             <Form.Item label="Brain Key">
@@ -324,7 +322,7 @@ const ModalsSignIn: FunctionComponent<IModalsSignInProps> = ({
                         <Form
                             labelCol={{ span: 7 }}
                             wrapperCol={{ span: 12 }}
-                            onSubmit={handleCreateAccountSubmit}
+                            onSubmit={handleSignInWithAnotherBKSubmit}
                             className={'center'}
                         >
                             <Form.Item label="Password">

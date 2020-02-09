@@ -17,17 +17,12 @@ import {
 } from '@components'
 
 interface IPostPreviewProps {
-    loading?: boolean
-    notificationUuid?: string
     post: Post
     hasAccount: boolean
     showToast: (m: string, d: string, type: string) => void
     postPriv: string
 
     tag: any
-    tokenImages: any
-    voteHandler?: (uuid: string, value: number) => Promise<void>
-    disableVoteHandler?: boolean // in case voting needs to be disabled
     blockedContentSetting: any
     blockedPosts: ObservableMap<string, string>
     blockedUsers: ObservableMap<string, string>
@@ -37,12 +32,8 @@ interface IPostPreviewProps {
 }
 
 const PostPreview: FunctionComponent<IPostPreviewProps> = ({
-    disableVoteHandler,
     post,
     tag,
-    tokenImages,
-    notificationUuid,
-    voteHandler,
     blockedContentSetting,
     blockedPosts,
     blockedUsers,
@@ -52,7 +43,6 @@ const PostPreview: FunctionComponent<IPostPreviewProps> = ({
     showToast,
     toggleBlockPost,
     hasAccount,
-    loading,
 }) => {
     const [url, setUrl] = useState('')
 
@@ -222,7 +212,7 @@ const PostPreview: FunctionComponent<IPostPreviewProps> = ({
                         ])}
                         style={{ width: '40px' }}
                     >
-                        {disableVoteHandler || shouldBeCollapsed
+                        {shouldBeCollapsed
                             ? null
                             : post && (
                                   <VotingHandles
@@ -365,8 +355,6 @@ const PostPreview: FunctionComponent<IPostPreviewProps> = ({
     )
 }
 
-PostPreview.defaultProps = {
-    loading: false,
-}
+PostPreview.defaultProps = {}
 
 export default observer(PostPreview)

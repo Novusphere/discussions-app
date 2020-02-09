@@ -67,42 +67,38 @@ const InfiniteScrollFeed: FunctionComponent<IInfiniteScrollFeedProps> = ({
         )
     }
 
-    return useObserver(() => (
-        <InfiniteScroll
-            dataLength={dataLength}
-            next={next}
-            hasMore={hasMore}
-            loader={renderLoadingMessage()}
-            endMessage={renderEndMessage()}
-        >
-            {!children
-                ? posts
-                      .filter(post => post.transaction)
-                      .map(post => {
-                          const tag = tagStore.tagModelFromObservables(post.sub)
-                          if (!tag) return null
-                          return (
-                              <PostPreview
-                                  key={`${post.uuid}-${post.pinned}`}
-                                  post={post}
-                                  tokenImages={[]}
-                                  tag={tag}
-                                  showToast={uiStore.showToast}
-                                  hasAccount={authStore.hasAccount}
-                                  postPriv={authStore.postPriv}
-                                  voteHandler={post.vote}
-                                  blockedByDelegation={userStore.blockedByDelegation}
-                                  blockedContentSetting={userStore.blockedContentSetting}
-                                  blockedPosts={userStore.blockedPosts}
-                                  blockedUsers={userStore.blockedUsers}
-                                  unsignedPostsIsSpam={userStore.unsignedPostsIsSpam}
-                                  toggleBlockPost={userStore.toggleBlockPost}
-                              />
-                          )
-                      })
-                : children}
-        </InfiniteScroll>
-    ))
+    return <InfiniteScroll
+        dataLength={dataLength}
+        next={next}
+        hasMore={hasMore}
+        loader={renderLoadingMessage()}
+        endMessage={renderEndMessage()}
+    >
+        {!children
+            ? posts
+                .filter(post => post.transaction)
+                .map(post => {
+                    const tag = tagStore.tagModelFromObservables(post.sub)
+                    if (!tag) return null
+                    return (
+                        <PostPreview
+                            key={`${post.uuid}-${post.pinned}`}
+                            post={post}
+                            tag={tag}
+                            showToast={uiStore.showToast}
+                            hasAccount={authStore.hasAccount}
+                            postPriv={authStore.postPriv}
+                            blockedByDelegation={userStore.blockedByDelegation}
+                            blockedContentSetting={userStore.blockedContentSetting}
+                            blockedPosts={userStore.blockedPosts}
+                            blockedUsers={userStore.blockedUsers}
+                            unsignedPostsIsSpam={userStore.unsignedPostsIsSpam}
+                            toggleBlockPost={userStore.toggleBlockPost}
+                        />
+                    )
+                })
+            : children}
+    </InfiniteScroll>
 }
 
 InfiniteScrollFeed.defaultProps = {}

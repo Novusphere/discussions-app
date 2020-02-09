@@ -32,7 +32,10 @@ const NotificationContainer = () => {
                 return (
                     <List.Item className={styles.notificationItem}>
                         <Link href={'/tag/[name]/[id]/[title]'} as={item['url']} shallow={false}>
-                            <a className={'dim w-100 relative'} onClick={() => userStore.deleteNotification(index)}>
+                            <a
+                                className={'dim w-100 relative'}
+                                onClick={() => userStore.deleteNotification(index)}
+                            >
                                 <List.Item.Meta
                                     {...(item.pub && {
                                         avatar: <Avatar src={getIdenticon(item.pub)} />,
@@ -85,15 +88,14 @@ const NotificationContainer = () => {
 const HeaderNotifications: FunctionComponent<IHeaderNotificationsProps> = () => {
     const { userStore, authStore }: RootStore = useStores()
 
-    useEffect(() => {
-        userStore.syncDataFromServerToLocal(authStore.postPriv).then(() => {
-            userStore.fetchNotifications(authStore.postPub)
-        })
-    }, [])
-
     useInterval(
         () => {
-            userStore.fetchNotifications(authStore.postPub)
+            if (authStore.hasAccount) {
+                userStore.pingServerForData({
+                    postPriv: authStore.postPriv,
+                    postPub: authStore.postPub,
+                })
+            }
         },
         20000,
         false
