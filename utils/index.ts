@@ -607,18 +607,11 @@ export const checkIfNameIsValid = async (accountName: string): Promise<boolean |
             return [isPublicKey, isPublicKey]
         }
 
-        const { data } = await axios.post(
-            'https://eos.eoscafeblock.com/v1/chain/get_table_by_scope',
-            {
-                code: 'eosio',
-                table: 'userres',
-                lower_bound: accountName,
-                upper_bound: accountName,
-                limit: 1,
-            }
+        const { data } = await axios.get(
+            `https://www.api.bloks.io/account/${accountName}?type=getAccountTokens`
         )
 
-        if (data.rows.length > 0) return true
+        if (data && data.tokens && data.tokens.length > 0) return true
         throw new Error(accountName)
     } catch (error) {
         throw new Error(accountName)
