@@ -523,6 +523,8 @@ export class UserStore {
                 0
             )
 
+            console.log(payload)
+
             this.notificationCount = payload.length
             this.notifications = [...this.notifications, ...payload]
 

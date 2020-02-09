@@ -2,7 +2,7 @@ import React, { FunctionComponent } from 'react'
 import { Icon, Badge, Button, List, Avatar, Dropdown } from 'antd'
 
 import styles from './HeaderNotifications.module.scss'
-import { useObserver } from 'mobx-react-lite'
+import { useObserver, observer } from 'mobx-react-lite'
 import { RootStore, useStores } from '@stores'
 import { getIdenticon, useInterval } from '@utils'
 import { RichTextPreview } from '@components'
@@ -131,4 +131,4 @@ const HeaderNotifications: FunctionComponent<IHeaderNotificationsProps> = () => 
 
 HeaderNotifications.defaultProps = {}
 
-export default HeaderNotifications
+export default observer(HeaderNotifications)

@@ -223,6 +223,7 @@ const Replies: FunctionComponent<IRepliesProps> = props => {
                         ),
                     })
 
+                    replyStore.reply.edit = true
                     replyStore.reply.editedAt = editedAt
                 } catch (error) {
                     replyStore.submitEditLoading = false
