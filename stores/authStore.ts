@@ -3,9 +3,8 @@ import { SIGN_IN_OPTIONS } from '@globals'
 import { RootStore } from '@stores'
 import { bkToStatusJson } from '@utils'
 import { discussions, init, eos } from '@novuspherejs'
-import { setCookie, parseCookies } from 'nookies'
+import { parseCookies } from 'nookies'
 import Cookie from 'mobx-cookie'
-import { UIStore } from '@stores/uiStore'
 import { task } from 'mobx-task'
 import { notification } from 'antd'
 
@@ -16,6 +15,7 @@ export class AuthStore {
     _postPrivKey = new Cookie('postPriv')
     _displayName = new Cookie('displayName')
     _uidwWalletPubKey = new Cookie('uidWalletPubKey')
+    _bk = new Cookie('bk')
 
     @observable
     preferredSignInMethod: SIGN_IN_OPTIONS = SIGN_IN_OPTIONS.brainKey
@@ -35,6 +35,7 @@ export class AuthStore {
     constructor(rootStore: RootStore) {}
 
     @computed get hasAccount() {
+        if (!this._hasAccountCookie.value) return false
         return JSON.parse(this._hasAccountCookie.value)
     }
 
@@ -72,8 +73,8 @@ export class AuthStore {
     private storeKeys = async (bk: string) => {
         try {
             const keys = await discussions.bkToKeys(bk)
-            setCookie(null, 'postPriv', keys.post.priv, { path: '/' })
-            setCookie(null, 'uidWalletPubKey', keys.uidwallet.pub, { path: '/' })
+            this.setPostPrivCookie(keys.post.priv)
+            this.setUidWalletPubKeyCookie(keys.uidwallet.pub)
             return keys
         } catch (error) {
             console.log(error)
@@ -81,9 +82,25 @@ export class AuthStore {
         }
     }
 
+    generateBrainKey = () => {
+        return discussions.bkCreate()
+    }
+
     logOut = () => {
         console.log('called')
         this.setHasAccountCookie('false')
+    }
+
+    setUidWalletPubKeyCookie = (value: string) => {
+        // refresh this key
+        this._uidwWalletPubKey = new Cookie('uidWalletPubKey')
+        this._uidwWalletPubKey.set(value)
+    }
+
+    setPostPrivCookie = (value: string) => {
+        // refresh this key
+        this._postPrivKey = new Cookie('postPriv')
+        this._postPrivKey.set(value)
     }
 
     setHasAccountCookie = (value: string) => {
@@ -98,6 +115,24 @@ export class AuthStore {
         this._hasEOSWallet.set(value)
     }
 
+    setBKCookie = (value: string) => {
+        // refresh this key
+        this._bk = new Cookie('bk')
+        this._bk.set(value)
+    }
+
+    setPostPubCookie = (value: string) => {
+        // refresh this key
+        this._postPubKey = new Cookie('postPub')
+        this._postPubKey.set(value)
+    }
+
+    setDisplayNameCookie = (value: string) => {
+        // refresh this key
+        this._displayName = new Cookie('displayName')
+        this._displayName.set(value)
+    }
+
     signInWithBK = async (brianKeyVerify, displayName, password) => {
         try {
             const bkIsValid = discussions.bkIsValid(brianKeyVerify)
@@ -110,10 +145,9 @@ export class AuthStore {
 
             if (unparsedJSON) {
                 const statusJSON = JSON.parse(unparsedJSON)
-                setCookie(null, 'bk', unparsedJSON, { path: '/' })
-                setCookie(null, 'displayName', statusJSON.displayName, { path: '/' })
-                setCookie(null, 'postPub', statusJSON.post, { path: '/' })
-
+                this.setDisplayNameCookie(statusJSON.displayName)
+                this.setBKCookie(unparsedJSON)
+                this.setPostPubCookie(statusJSON.post)
                 this.setHasAccountCookie('true')
                 this.storeKeys(brianKeyVerify)
             }

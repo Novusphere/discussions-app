@@ -75,14 +75,14 @@ const ModalsSignIn: FunctionComponent<IModalsSignInProps> = ({
         switch (step) {
             case STEP_OPTIONS.METHOD:
                 return [
-                    <Checkbox
-                        key={'checkbox'}
-                        onChange={onChange}
-                        checked={remember}
-                        disabled={authStore.preferredSignInMethod === SIGN_IN_OPTIONS.none}
-                    >
-                        Automatically select this option next time
-                    </Checkbox>,
+                    // <Checkbox
+                    //     key={'checkbox'}
+                    //     onChange={onChange}
+                    //     checked={remember}
+                    //     disabled={authStore.preferredSignInMethod === SIGN_IN_OPTIONS.none}
+                    // >
+                    //     Automatically select this option next time
+                    // </Checkbox>,
                     <Button
                         key="signInWithAnotherBK"
                         type={alreadyHasAccount ? 'default' : 'primary'}
@@ -233,7 +233,7 @@ const ModalsSignIn: FunctionComponent<IModalsSignInProps> = ({
                         <div className={styles.accountTypeContainer}>
                             {SignInOptions.map(option => (
                                 <span
-                                    onClick={() => authStore.setPreferredSignInMethod(option.name)}
+                                    // onClick={() => authStore.setPreferredSignInMethod(option.name)}
                                     key={option.name}
                                     title={`Toggle ${option.name} sign in`}
                                     className={cx([

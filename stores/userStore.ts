@@ -57,6 +57,21 @@ export class UserStore {
         }
     }
 
+    resetUserStore = () => {
+        this.following.replace([])
+        this.watching.replace([])
+        this.blockedUsers.replace([])
+        this.blockedPosts.replace([])
+        this.delegated.replace([])
+        this.pinnedPosts.replace([])
+        this.blockedByDelegation.replace([])
+        this.notificationCount = 0
+        this.lastCheckedNotifications = 0
+        this.notifications = []
+        this.unsignedPostsIsSpam = true
+        this.blockedContentSetting = 'hidden'
+    }
+
     setBlockedContent = (type: BlockedContentSetting) => {
         this.blockedContentSetting = type
         this.syncDataFromLocalToServer()
@@ -267,7 +282,7 @@ export class UserStore {
         this.syncDataFromLocalToServer()
     }
 
-    toggleThreadWatch = (id: string, count: number, suppressToast = false) => {
+    toggleThreadWatch = (id: string, count?: number, suppressToast = false) => {
         if (this.watching.has(id)) {
             this.watching.delete(id)
             this.syncDataFromLocalToServer()
@@ -276,13 +291,13 @@ export class UserStore {
             return
         }
 
-        if (this.watching.size <= 4) {
+        if (this.watching.size <= 99) {
             this.watching.set(id, [count, count])
             if (!suppressToast)
                 this.uiStore.showMessage('Success! You are watching this thread', 'success')
         } else {
             if (!suppressToast)
-                this.uiStore.showMessage('You can only watch a maximum of 5 threads', 'info')
+                this.uiStore.showMessage('You can only watch a maximum of 100 threads', 'info')
         }
 
         this.syncDataFromLocalToServer()
@@ -331,8 +346,13 @@ export class UserStore {
      */
     syncDataFromServerToLocal = async (privateKey: string) => {
         try {
-            const { data } = await nsdb.getAccount(privateKey)
+            let data = await nsdb.getAccount(privateKey)
+
             console.log(data)
+
+            if (!data) return
+
+            data = data['data']
 
             if (data) {
                 if (typeof data['lastCheckedNotifications'] !== 'undefined')

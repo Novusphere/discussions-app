@@ -5,6 +5,7 @@ import { useRouter } from 'next/router'
 import { useStores } from '@stores'
 import { Avatar, Button, Divider, Icon } from 'antd'
 import Link from 'next/link'
+import { observer } from 'mobx-react-lite'
 
 interface ISidebarTagViewProps {}
 
@@ -65,4 +66,4 @@ const SidebarTagView: FunctionComponent<ISidebarTagViewProps> = () => {
 
 SidebarTagView.defaultProps = {}
 
-export default SidebarTagView
+export default observer(SidebarTagView)

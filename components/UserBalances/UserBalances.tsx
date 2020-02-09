@@ -4,6 +4,7 @@ import styles from './UserBalances.module.scss'
 import dynamic from 'next/dynamic'
 import { RootStore, useStores } from '@stores'
 import { observer } from 'mobx-react'
+import cx from 'classnames'
 
 interface IUserBalancesProps {
     className?: string
@@ -23,7 +24,7 @@ const UserBalances: FunctionComponent<IUserBalancesProps> = ({ className }) => {
     const balances = walletStore.balances.toJSON()
 
     if (!balances || !Object.keys(balances).length) {
-        return null
+        return <span className={cx('mt3 ph4 db f6 light-silver', className)}>You have no balances</span>
     }
 
     return (

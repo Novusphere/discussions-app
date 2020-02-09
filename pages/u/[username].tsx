@@ -83,6 +83,40 @@ const Following = dynamic(
     { ssr: false }
 )
 
+// const Watching = dynamic(
+//     () => {
+//         return Promise.resolve(({ data, handleRemoveWatch }: any) => {
+//             if (data && data.length) {
+//                 return (
+//                     <List
+//                         dataSource={data}
+//                         renderItem={([pub, username]) => {
+//                             return (
+//                                 <List.Item
+//                                     actions={[
+//                                         <Icon
+//                                             onClick={() => handleRemoveUser(pub, username)}
+//                                             className={'dim pointer'}
+//                                             type="delete"
+//                                             theme={'filled'}
+//                                             style={{ color: '#FF4136' }}
+//                                         />,
+//                                     ]}
+//                                 >
+//                                     {username}
+//                                 </List.Item>
+//                             )
+//                         }}
+//                     />
+//                 )
+//             }
+//
+//             return <span className={'f6 light-silver db pt2'}>You are not watching any threads</span>
+//         })
+//     },
+//     { ssr: false }
+// )
+
 const UserPage: NextPage<any> = ({ username, wallet, imageData, count, postPub }) => {
     const { uiStore, postsStore, userStore, authStore, tagStore }: RootStore = useStores()
     const [_count, _setCount] = useState(count)
@@ -190,7 +224,7 @@ const UserPage: NextPage<any> = ({ username, wallet, imageData, count, postPub }
                     {isSameUser && (
                         <div className={'mt4'}>
                             <span className={'moon-gray ttu f6'}>
-                                Following (Only visible to you)
+                                Following Users (Only visible to you)
                             </span>
                             <Following
                                 data={[...userStore.following.toJS()]}
@@ -200,6 +234,20 @@ const UserPage: NextPage<any> = ({ username, wallet, imageData, count, postPub }
                             />
                         </div>
                     )}
+
+                    {/*{isSameUser && (*/}
+                    {/*    <div className={'mt4'}>*/}
+                    {/*        <span className={'moon-gray ttu f6'}>*/}
+                    {/*            Watching Posts (Only visible to you)*/}
+                    {/*        </span>*/}
+                    {/*        <Following*/}
+                    {/*            data={[...userStore.watching.toJS()]}*/}
+                    {/*            handleRemoveUser={(pub, user) =>*/}
+                    {/*                userStore.toggleThreadWatch(user, pub)*/}
+                    {/*            }*/}
+                    {/*        />*/}
+                    {/*    </div>*/}
+                    {/*)}*/}
 
                     {!isSameUser && (
                         <div className={'mt4'}>

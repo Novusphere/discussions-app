@@ -20,6 +20,9 @@ class DiscussionsApp extends App<any> {
                 _uidwWalletPubKey: {
                     value: cookies.uidWalletPubKey || '',
                 },
+                _bk: {
+                    value: cookies.bk || '',
+                },
                 _postPrivKey: {
                     value: cookies.postPriv || '',
                 },

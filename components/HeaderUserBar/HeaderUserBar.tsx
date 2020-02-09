@@ -6,6 +6,7 @@ import { getIdenticon } from '@utils'
 import Link from 'next/link'
 import dynamic from 'next/dynamic'
 import { UserBalances } from '@components'
+import { useObserver } from 'mobx-react-lite'
 
 interface IHeaderUserBarProps {
     icon: string
@@ -67,7 +68,7 @@ const HeaderUserBar: FunctionComponent<IHeaderUserBarProps> = ({
                 </Menu.Item>
             ))}
 
-            {Object.keys(balances).length > 0 && <Menu.Divider />}
+            <Menu.Divider />
 
             <UserBalances className={'ph2 pb2'} />
         </Menu>
@@ -75,15 +76,23 @@ const HeaderUserBar: FunctionComponent<IHeaderUserBarProps> = ({
 
     return (
         <Dropdown overlay={menu} onVisibleChange={onVisibleChange}>
-            <a href={'#'} className={styles.userLink}>
-                {displayName}
-                <Icon type={'caret-down'} style={{ marginLeft: 5 }} rotate={visible ? 180 : 0} />
-                <Avatar
-                    src={getIdenticon(icon)}
-                    size={'default'}
-                    icon={'user'}
-                    className={styles.avatar}
-                />
+            <a className={styles.userLink}>
+                {useObserver(() => (
+                    <>
+                        {displayName}
+                        <Icon
+                            type={'caret-down'}
+                            style={{ marginLeft: 5 }}
+                            rotate={visible ? 180 : 0}
+                        />
+                        <Avatar
+                            src={getIdenticon(icon)}
+                            size={'default'}
+                            icon={'user'}
+                            className={styles.avatar}
+                        />
+                    </>
+                ))}
             </a>
         </Dropdown>
     )

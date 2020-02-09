@@ -27,7 +27,7 @@ const RtLink: FunctionComponent<any> = ({ children, href, index }) => {
                     const [, id] = href.split('bitchute.com/video/')
                     embed = `<iframe width="560px" height="315px" src="https://www.bitchute.com/embed/${id}" frameborder="0" />`
                     break
-                case /https:\/\/www.youtube.com\/watch\?feature=youtu.be&v=[a-zA-Z0-9-_]+/.test(
+                case /https?:\/\/www.youtube.com\/watch\?feature=youtu.be&v=[a-zA-Z0-9-_]+/.test(
                     href
                 ):
                     // parse feature=youtu.be
@@ -38,18 +38,18 @@ const RtLink: FunctionComponent<any> = ({ children, href, index }) => {
                         )}`
                     )
                     break
-                case /https:\/\/www.youtube.com\/watch\?v=[a-zA-Z0-9-_]+/.test(href):
-                case /https:\/\/youtu.be\/[a-zA-Z0-9-_]+/.test(href):
+                case /https?:\/\/www.youtube.com\/watch\?v=[a-zA-Z0-9-_]+/.test(href):
+                case /https?:\/\/youtu.be\/[a-zA-Z0-9-_]+/.test(href):
                     embed = await nsdb.cors(
                         `https://www.youtube.com/oembed?format=json&url=${href}`
                     )
                     break
-                case /https:\/\/www.imgur.com(\/[a-zA-Z0-9-_]+)?\/p\/[a-zA-Z0-9-_]+(\/?.+)?/.test(
+                case /https?:\/\/www.imgur.com(\/[a-zA-Z0-9-_]+)?\/p\/[a-zA-Z0-9-_]+(\/?.+)?/.test(
                     href
                 ):
                     embed = await nsdb.cors(`https://api.imgur.com/oembed.json?url=${href}`)
                     break
-                case /https:\/\/twitter.com\/[a-zA-Z0-9-_]+\/status\/[0-9]+/.test(href):
+                case /https?:\/\/twitter.com\/[a-zA-Z0-9-_]+\/status\/[0-9]+/.test(href):
                     embed = await nsdb.cors(`https://publish.twitter.com/oembed?url=${href}`)
                     break
                 case /d.tube/.test(href):
@@ -58,10 +58,10 @@ const RtLink: FunctionComponent<any> = ({ children, href, index }) => {
                 case /soundcloud/.test(href):
                     embed = await nsdb.cors(`https://soundcloud.com/oembed?format=json&url=${href}`)
                     break
-                case /https:\/\/www.instagr.am(\/[a-zA-Z0-9-_]+)?\/p\/[a-zA-Z0-9-_]+(\/?.+)?/.test(
+                case /https?:\/\/www.instagr.am(\/[a-zA-Z0-9-_]+)?\/p\/[a-zA-Z0-9-_]+(\/?.+)?/.test(
                     href
                 ):
-                case /https:\/\/www.instagram.com(\/[a-zA-Z0-9-_]+)?\/p\/[a-zA-Z0-9-_]+(\/?.+)?/i.test(
+                case /https?:\/\/www.instagram.com(\/[a-zA-Z0-9-_]+)?\/p\/[a-zA-Z0-9-_]+(\/?.+)?/i.test(
                     href
                 ):
                     embed = await nsdb.cors(`https://api.instagram.com/oembed/?url=${href}`)

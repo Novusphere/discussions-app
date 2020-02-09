@@ -33,6 +33,8 @@ import { MODAL_OPTIONS } from '@globals'
 import cx from 'classnames'
 import Head from 'next/head'
 import { NextSeo } from 'next-seo'
+import { observable } from 'mobx'
+import { observer } from 'mobx-react'
 
 interface IPostPageProps {
     thread: Thread
@@ -44,7 +46,7 @@ interface IPostPageProps {
     }
 }
 
-const PostPageComponent: React.FunctionComponent<IPostPageProps> = ({
+const PostPageComponentObserverable: React.FunctionComponent<IPostPageProps> = ({
     thread,
     url,
     query: { name, id, title },
@@ -786,6 +788,8 @@ const PostPageComponent: React.FunctionComponent<IPostPageProps> = ({
         </>
     )
 }
+
+const PostPageComponent = observer(PostPageComponentObserverable)
 
 const PostPage: NextPage<any> = ({ url, thread, query }) => {
     return (

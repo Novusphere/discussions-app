@@ -1,6 +1,6 @@
 {
     "name": "discussions-app",
-    "version": "2.0.1",
+    "version": "2.5.0",
     "dependencies": {
         "@babel/runtime": "7.4.5",
         "@zeit/next-css": "^1.0.1",

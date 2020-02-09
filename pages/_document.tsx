@@ -6,6 +6,7 @@ export default class MyDocument extends Document {
         return (
             <Html>
                 <Head>
+                    <link rel="stylesheet" href="https://cdn.quilljs.com/1.2.6/quill.snow.css" />
                     <link
                         rel="apple-touch-icon"
                         sizes="180x180"
