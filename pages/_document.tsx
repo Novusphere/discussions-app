@@ -27,46 +27,6 @@ export default class MyDocument extends Document {
                     <link rel="manifest" href="/static/site.webmanifest" />
                     <meta name="msapplication-TileColor" content="#da532c" />
                     <meta name="theme-color" content="#ffffff" />
-                    <style jsx global>{`
-                        .ql-toolbar.ql-snow {
-                            border: 1px solid #d9d9d9;
-                            background: white;
-                            border-top-left-radius: 5px;
-                            border-top-right-radius: 5px;
-                        }
-
-                        .ql-container.ql-snow {
-                            border: 1px solid #d9d9d9;
-                            background: white;
-                            border-bottom-left-radius: 5px;
-                            border-bottom-right-radius: 5px;
-                        }
-
-                        .primary {
-                            color: #079e99;
-                        }
-
-                        .b--primary {
-                            color: #079e99;
-                        }
-
-                        .bg-primary {
-                            background-color: #079e99;
-                        }
-
-                        .card {
-                            border-radius: 3px;
-                            box-shadow: 0 1px 2px #c9cccd;
-                        }
-
-                        .ant-form-explain {
-                            white-space: pre-line;
-                        }
-
-                        .twitter-tweet {
-                            margin: 0 auto;
-                        }
-                    `}</style>
                 </Head>
                 <body style={{ margin: 0 }}>
                     <Main />

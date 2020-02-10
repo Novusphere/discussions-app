@@ -61,6 +61,46 @@ const Layout: FunctionComponent<ILayoutProps> = ({ children }) => {
 
     return (
         <AntdLayout className={'overflow-x-hidden'}>
+            <style jsx global>{`
+                .ql-toolbar.ql-snow {
+                    border: 1px solid #d9d9d9;
+                    background: white;
+                    border-top-left-radius: 5px;
+                    border-top-right-radius: 5px;
+                }
+
+                .ql-container.ql-snow {
+                    border: 1px solid #d9d9d9;
+                    background: white;
+                    border-bottom-left-radius: 5px;
+                    border-bottom-right-radius: 5px;
+                }
+
+                .primary {
+                    color: #079e99;
+                }
+
+                .b--primary {
+                    color: #079e99;
+                }
+
+                .bg-primary {
+                    background-color: #079e99;
+                }
+
+                .card {
+                    border-radius: 3px;
+                    box-shadow: 0 1px 2px #c9cccd;
+                }
+
+                .ant-form-explain {
+                    white-space: pre-line;
+                }
+
+                .twitter-tweet {
+                    margin: 0 auto;
+                }
+            `}</style>
             <Modals />
             <Header className={cx([styles.header, 'container bb b--light-gray'])}>
                 <div className={cx([styles.container, 'center flex flex-row items-center'])}>
