@@ -36,6 +36,7 @@ const NewPageNoSSRUnwrapped = dynamic(
                 form.validateFields(async (err, values) => {
                     if (!err) {
                         setLoading(true)
+                        setPreview(false)
                         let { tag, title, content } = values
 
                         // make sure tag doesn't have a hashtag in nit

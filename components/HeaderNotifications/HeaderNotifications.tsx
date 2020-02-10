@@ -26,6 +26,7 @@ const NotificationContainer = () => {
                     <span className={'db pa4 tc w-100 moon-gray'}>You have no notifications</span>
                 ),
             }}
+            className={styles.listContainer}
             itemLayout="horizontal"
             dataSource={userStore.notifications}
             renderItem={(item, index) => {

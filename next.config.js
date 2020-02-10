@@ -20,9 +20,10 @@ module.exports = withBundleAnalyzer(
     withCSS(
         withSass({
             cssModules: true,
+            generateBuildId: async () => {
+                return String(Date.now())
+            },
             ...withLess({
-                // dir: 'src',
-                // distDir: '../build',
                 cssLoaderOptions: {
                     importLoaders: 1,
                     localIdentName: '[local]___[hash:base64:5]',
@@ -38,9 +39,6 @@ module.exports = withBundleAnalyzer(
                     sassOptions: {
                         includePaths: ['./assets'],
                     },
-                },
-                generateBuildId: async () => {
-                    return String(Date.now())
                 },
                 webpack(config, options) {
                     if (options.isServer) {

@@ -549,7 +549,7 @@ const PostPageComponentObserverable: React.FunctionComponent<IPostPageProps> = (
                 shallow={false}
                 passHref
             >
-                <Button title={`See all posts in ${name}`} icon={'caret-left'} type={'primary'}>
+                <Button title={`See all posts in ${name}`} icon={'caret-left'}>
                     <span className={'flex flex-row items-center'}>
                         <img
                             className={'dib'}

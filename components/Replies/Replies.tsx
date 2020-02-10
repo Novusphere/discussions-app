@@ -263,6 +263,7 @@ const Replies: FunctionComponent<IRepliesProps> = props => {
                 }
 
                 try {
+                    replyStore.toggleShowPreview()
                     replyStore.submitReplyLoading = true
 
                     // create a post object

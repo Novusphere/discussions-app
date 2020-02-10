@@ -9,6 +9,12 @@
     width: 336px;
 }
 
+.listContainer {
+    background: white;
+    position: relative;
+    overflow: hidden;
+}
+
 .contentContainer {
     max-height: 100px;
     word-break: break-word;

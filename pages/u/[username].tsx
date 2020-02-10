@@ -193,12 +193,11 @@ const UserPage: NextPage<any> = ({ username, wallet, imageData, count, postPub }
                             icon={'user'}
                             src={imageData}
                             size={96}
-                            className={'shadow-1 flex-1'}
                         />
-                        <div className={'ml3 db w-100'}>
+                        <div className={'fl ml3'}>
                             <span className={'db f5 b black'}>{username}</span>
                             <span className={'db f6 light-silver'}>{_count} followers</span>
-                            {!isSameUser && (
+                            {!isSameUser && authStore.hasAccount && (
                                 <div className={'mt2 flex flex-row items-center'}>
                                     <Button
                                         block
@@ -249,7 +248,7 @@ const UserPage: NextPage<any> = ({ username, wallet, imageData, count, postPub }
                     {/*    </div>*/}
                     {/*)}*/}
 
-                    {!isSameUser && (
+                    {!isSameUser && authStore.hasAccount && (
                         <div className={'mt4'}>
                             <span className={'moon-gray ttu f6 mb2'}>Moderation</span>
                             <Moderation

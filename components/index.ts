@@ -11,6 +11,8 @@ export { default as Editor } from './Editor/Editor'
 export { default as UserBalances } from './UserBalances/UserBalances'
 export { default as ReplyingPostPreview } from './ReplyingPostPreview/ReplyingPostPreview'
 export { default as SidebarTagView } from './SidebarTagView/SidebarTagView'
+export { default as SidebarLinks } from './SidebarLinks/SidebarLinks'
+export { default as Footer } from './Footer/Footer'
 
 // header
 export { default as HeaderLogo } from './HeaderLogo/HeaderLogo'

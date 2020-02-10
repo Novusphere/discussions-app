@@ -48,4 +48,4 @@ IndexPage.getInitialProps = async function({ store }: any) {
     }
 }
 
-export default observer(IndexPage)
+export default IndexPage

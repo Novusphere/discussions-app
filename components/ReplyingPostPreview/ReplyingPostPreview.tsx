@@ -16,7 +16,7 @@ const ReplyingPostPreview: FunctionComponent<IReplyingPostPreviewProps> = ({ cla
     const { authStore }: RootStore = useStores()
 
     return useObserver(() => (
-        <div className={cx(['bg-white mt3 pa3 shadow-1 br2', className])}>
+        <div className={cx(['bg-white mt3 pa3 ba b--light-gray br2', className])}>
             <Replies
                 preview
                 highlightedPostUUID={''}
@@ -37,8 +37,8 @@ const ReplyingPostPreview: FunctionComponent<IReplyingPostPreviewProps> = ({ cla
                         poster: 'eosforumanon',
                         displayName: authStore.displayName,
                         content: content,
-                        createdAt: '2020-02-06T11:19:03.000Z',
-                        editedAt: '1970-01-01T00:00:00.000Z',
+                        createdAt: Date.now(),
+                        editedAt: 0,
                         sub: 'crypto',
                         tags: ['crypto', 'atmos', 'tip'],
                         mentions: [],

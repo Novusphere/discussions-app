@@ -479,7 +479,7 @@ export class UserStore {
                                 thread.openingPost.sub
                             )
 
-                            this.notifications.push({
+                            this.notifications.unshift({
                                 ...thread.openingPost,
                                 url: `/tag/${thread.openingPost.sub}/${id}/${getThreadTitle(
                                     thread.openingPost
@@ -526,7 +526,7 @@ export class UserStore {
             console.log(payload)
 
             this.notificationCount = payload.length
-            this.notifications = [...this.notifications, ...payload]
+            this.notifications = payload.filter((item, index) => index <= 5)
 
             this.watchAndUpdateWatchedPostsCount()
         } catch (error) {

@@ -1,5 +1,5 @@
 import React, { FunctionComponent, useEffect, useState } from 'react'
-import { Icon, Popover, Tooltip } from 'antd'
+import { Divider, Popover, Tooltip } from 'antd'
 import Link from 'next/link'
 import cx from 'classnames'
 import styles from './PostPreview.module.scss'
@@ -14,6 +14,7 @@ import {
     VotingHandles,
     Tips,
     SharePostPopover,
+    Icons,
 } from '@components'
 
 interface IPostPreviewProps {
@@ -250,24 +251,28 @@ const PostPreview: FunctionComponent<IPostPreviewProps> = ({
                                             <span className={'flex flex-row items-center'}>
                                                 {tag && (
                                                     <img
+                                                        className={'db mr2'}
                                                         src={tag.logo}
                                                         title={`${tag.name} icon`}
-                                                        className={'mr2 db'}
                                                         width={25}
                                                     />
                                                 )}
                                                 <object className={'z-2'}>
-                                                    <Link href={'/tag/[name]'} as={`/tag/${post.sub}`} shallow={false}>
+                                                    <Link
+                                                        href={'/tag/[name]'}
+                                                        as={`/tag/${post.sub}`}
+                                                        shallow={false}
+                                                    >
                                                         <a className={'b ttu dim'}>#{post.sub}</a>
                                                     </Link>
                                                 </object>
-                                                <span className={'ph1 b'}>&#183;</span>
+                                                <Divider type={'vertical'} />
                                                 <UserNameWithIcon
                                                     imageData={post.imageData}
                                                     pub={post.pub}
                                                     name={post.displayName}
                                                 />
-                                                <span className={'ph1 b'}>&#183;</span>
+                                                <Divider type={'vertical'} />
                                                 <Tooltip
                                                     title={moment(post.createdAt)
                                                         .toDate()
@@ -286,34 +291,15 @@ const PostPreview: FunctionComponent<IPostPreviewProps> = ({
                                         <span className={'black f4 b lh-title'}>{post.title}</span>
                                     </div>
 
-                                    <RichTextPreview>{post.content}</RichTextPreview>
+                                    <RichTextPreview className={'h4 gray'}>{post.content}</RichTextPreview>
 
                                     <object className={'z-2 absolute bottom-0 pv3'}>
                                         <Link
                                             href={'/tag/[name]/[id]/[title]'}
                                             as={`${url}#comments`}
                                         >
-                                            <a className={'f6 mr2 dim pointer'}>
-                                                <Icon
-                                                    component={() => (
-                                                        <svg
-                                                            aria-hidden="true"
-                                                            focusable="false"
-                                                            data-prefix="fas"
-                                                            data-icon="comment"
-                                                            className="svg-inline--fa fa-comment fa-w-16 pr2"
-                                                            role="img"
-                                                            xmlns="http://www.w3.org/2000/svg"
-                                                            viewBox="0 0 512 512"
-                                                            width="24"
-                                                        >
-                                                            <path
-                                                                fill="currentColor"
-                                                                d="M256 32C114.6 32 0 125.1 0 240c0 49.6 21.4 95 57 130.7C44.5 421.1 2.7 466 2.2 466.5c-2.2 2.3-2.8 5.7-1.5 8.7S4.8 480 8 480c66.3 0 116-31.8 140.6-51.4 32.7 12.3 69 19.4 107.4 19.4 141.4 0 256-93.1 256-208S397.4 32 256 32z"
-                                                            ></path>
-                                                        </svg>
-                                                    )}
-                                                />
+                                            <a className={'f6 mr2 black'}>
+                                                <Icons.CommentIcon />
                                                 {post.totalReplies} comments
                                             </a>
                                         </Link>
@@ -324,7 +310,7 @@ const PostPreview: FunctionComponent<IPostPreviewProps> = ({
                                         >
                                             <a
                                                 href={'#'}
-                                                className={'f6 mh2 dim pointer'}
+                                                className={'f6 mh2 black'}
                                                 onClick={e => {
                                                     e.preventDefault()
                                                 }}
@@ -333,17 +319,17 @@ const PostPreview: FunctionComponent<IPostPreviewProps> = ({
                                             </a>
                                         </Popover>
                                         <Link href={'/tag/[name]/[id]/[title]'} as={`${url}#reply`}>
-                                            <a className={'f6 mh2 dim pointer'}>reply</a>
+                                            <a className={'f6 mh2 black'}>reply</a>
                                         </Link>
-                                        <span
-                                            className={'f6 mh2 dim pointer'}
+                                        <a
+                                            className={'f6 mh2 black'}
                                             onClick={e => {
                                                 e.preventDefault()
                                                 toggleBlockPost(url)
                                             }}
                                         >
                                             mark as spam
-                                        </span>
+                                        </a>
                                     </object>
                                 </>
                             )}
