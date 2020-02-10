@@ -416,10 +416,11 @@ export default class DiscussionsService {
             // #196
             let host
 
-            if (process.env.NODE_ENV === 'production') host = 'discussions.app'
-            if (isDev) host = 'discussions.app'
+            if (process.env.NODE_ENV === 'production' || isDev) host = 'discussions.app'
 
-            const settings = setting[host]
+            let settings = setting[host]
+
+            if (!settings) settings = setting['discussions.app']
 
             if (
                 typeof thread !== 'undefined' &&

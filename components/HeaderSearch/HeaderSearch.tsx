@@ -12,6 +12,7 @@ const HeaderSearch: FunctionComponent<IHeaderSearchProps> = () => {
 
     return (
         <Search
+            allowClear
             className={styles.search}
             size={'default'}
             placeholder={'Search on Discussions.app'}

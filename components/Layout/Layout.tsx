@@ -34,6 +34,7 @@ import { RootStore, StoreContext } from '@stores'
 import { getVersion, isServer } from '@utils'
 import { eos } from '@novuspherejs'
 import { observer } from 'mobx-react'
+import { useRouter } from 'next/router'
 
 const { Search } = Input
 const { Header, Footer, Content } = AntdLayout
@@ -49,6 +50,8 @@ const Layout: FunctionComponent<ILayoutProps> = ({ children }) => {
         walletStore,
         userStore,
     }: RootStore = useContext(StoreContext)
+
+    const router = useRouter()
 
     message.config({
         top: 75,
@@ -82,6 +85,16 @@ const Layout: FunctionComponent<ILayoutProps> = ({ children }) => {
         authStore.logOut()
         uiStore.showToast('Success', 'You have logged out!', 'success')
     }, [])
+
+    console.log(router)
+
+    const topLevelLinkClassName = link =>
+        cx([
+            'ph3 pv1',
+            {
+                'bg-near-white': link === router.asPath,
+            },
+        ])
 
     return (
         <AntdLayout className={'overflow-x-hidden'}>
@@ -129,7 +142,7 @@ const Layout: FunctionComponent<ILayoutProps> = ({ children }) => {
                     <SidebarTagView />
 
                     <div className={'bg-white list pv2 card'}>
-                        <li className={'ph3 pv1'} key="1">
+                        <li className={topLevelLinkClassName('/')} key="1">
                             <Link href={'/'} as={'/'}>
                                 <a>
                                     <Icon className={'pr2'} type="home" />
@@ -137,7 +150,7 @@ const Layout: FunctionComponent<ILayoutProps> = ({ children }) => {
                                 </a>
                             </Link>
                         </li>
-                        <li className={'ph3 pv1'} key="2">
+                        <li className={topLevelLinkClassName('/feed')} key="2">
                             <Link href={'/feed'} as={'/feed'}>
                                 <a>
                                     <Icon className={'pr2'} type="team" />
@@ -145,7 +158,7 @@ const Layout: FunctionComponent<ILayoutProps> = ({ children }) => {
                                 </a>
                             </Link>
                         </li>
-                        <li className={'ph3 pv1'} key="3">
+                        <li className={topLevelLinkClassName('/all')} key="3">
                             <Link href={'/all'} as={'/all'}>
                                 <a>
                                     <Icon className={'pr2'} type="read" />
@@ -191,7 +204,7 @@ const Layout: FunctionComponent<ILayoutProps> = ({ children }) => {
                             <Input
                                 size={'default'}
                                 allowClear
-                                addonAfter={<Icon type="plus-circle" theme={'filled'} />}
+                                addonAfter={<Icon type="plus" theme={'outlined'} />}
                                 placeholder="Add a tag to subscribe"
                                 onPressEnter={(e: any) => {
                                     tagStore.addSubscribed(e.target.value)

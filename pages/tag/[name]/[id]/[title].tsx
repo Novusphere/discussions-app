@@ -606,7 +606,7 @@ const PostPageComponentObserverable: React.FunctionComponent<IPostPageProps> = (
                         },
                     ])}
                 >
-                    <span className={'black b f4 flex-wrap'}>{postStore.titleContent}</span>
+                    <span className={'measure black b f4 flex-wrap'}>{postStore.titleContent}</span>
                     <VotingHandles
                         uuid={thread.openingPost.uuid}
                         myVote={postStore.myVoteValue}

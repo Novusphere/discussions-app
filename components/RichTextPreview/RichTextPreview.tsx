@@ -73,13 +73,14 @@ const RtLink: FunctionComponent<any> = ({ children, href, index }) => {
                     // embed = `<img src="${href}" alt="Viewing image" />`
                     embed = {
                         html: (
-                            <span
+                            <a
+                                href={href}
                                 className={'pointer'}
                                 onClick={() => openInNewTab(href)}
                                 title={'Open image in new tab'}
                             >
                                 <LazyLoadImage alt={'Viewing image'} src={href} effect="blur" />
-                            </span>
+                            </a>
                         ),
                     }
                     break
