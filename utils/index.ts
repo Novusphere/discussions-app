@@ -753,7 +753,7 @@ export const matchTipForTags = (content: string) => {
     // this is a fix for removing zero-width characters from a js string
     const _content = content.replace(/[\u200B-\u200D\uFEFF]/g, '')
     const regex = new RegExp(
-        `\[#tip\](.*?)\\s(?<amount>[0-9\.]+)\\s(?<symbol>${tokens})(?:\\s\\[\\@(?<username>.*?)\\]\\((?<url>.*?)\\))?`,
+        `\[#tip\](.*?)\\s([0-9\.]+)\\s(${tokens})(?:\\s\\[\\@(.*?)\\]\\((.*?)\\))?`,
         'gim'
     )
 
@@ -761,7 +761,7 @@ export const matchTipForTags = (content: string) => {
     let tips = []
 
     for (let result of results) {
-        const { amount, symbol, username, url } = result.groups
+        const [,,amount,symbol,username,url] = result
 
         tips.push({
             amount,

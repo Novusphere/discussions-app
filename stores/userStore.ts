@@ -8,7 +8,6 @@ import { discussions, nsdb, Post } from '@novuspherejs'
 import moment from 'moment'
 import mapSeries from 'async/mapSeries'
 import each from 'async/each'
-import thread from '@novuspherejs/discussions/thread'
 import { encodeId, getThreadTitle } from '@utils'
 
 export type BlockedContentSetting = 'hidden' | 'collapsed'
@@ -347,13 +346,8 @@ export class UserStore {
     syncDataFromServerToLocal = async (privateKey: string) => {
         try {
             let data = await nsdb.getAccount(privateKey)
-
-            console.log(data)
-
             if (!data) return
-
             data = data['data']
-
             if (data) {
                 if (typeof data['lastCheckedNotifications'] !== 'undefined')
                     this.lastCheckedNotifications = data['lastCheckedNotifications']
@@ -365,17 +359,97 @@ export class UserStore {
                 if (data['following'])
                     this.following.replace(data['following'].map(obj => [obj.pub, obj.name]))
 
-                if (data['moderation']['blockedPosts'])
-                    this.blockedPosts.replace(data['moderation']['blockedPosts'])
+                if (data['moderation']['blockedPosts']) {
+                    /**
+                     * Deal with blocked posts from the old site (legacy)
+                     * We have to convert two types of old posts:
+                     *
+                     * 0: ["link", "date"]
+                     * "date": ["link1", "link2"]
+                     *
+                     * Currently, the new format is:
+                     * "link": "date"
+                     * as an object (so links are accessors)
+                     */
+                    const blockedPosts = data['moderation']['blockedPosts']
 
+                    if (data['legacy'] || typeof data['legacy'] === 'undefined') {
+                        console.log('found legacy user, updating')
+                        let formattedBlockedPosts = {}
+
+                        if (blockedPosts['0']) {
+                            const [url, date] = blockedPosts['0']
+                            formattedBlockedPosts = {
+                                ...formattedBlockedPosts,
+                                [url]: date,
+                            }
+                        }
+
+                        // there can only really be 3 possible dates
+                        // 201912, 20201, 20202
+                        const dates = { 201912: '201912', 20201: '20201', 20202: '20202' }
+                        _.forEach(dates, date => {
+                            if (blockedPosts[date]) {
+                                _.forEach(blockedPosts[date], blockedPostByDate => {
+                                    formattedBlockedPosts = {
+                                        ...formattedBlockedPosts,
+                                        [blockedPostByDate]: date,
+                                    }
+                                })
+                            }
+                        })
+
+                        this.blockedPosts.replace(formattedBlockedPosts)
+                    } else {
+                        this.blockedPosts.replace(blockedPosts)
+                    }
+                }
                 if (data['moderation']['delegated'])
                     this.delegated.replace(data['moderation']['delegated'])
 
                 if (data['moderation']['blockedUsers'])
                     this.blockedUsers.replace(data['moderation']['blockedUsers'])
 
-                if (data['moderation']['pinnedPosts'])
-                    this.pinnedPosts.replace(data['moderation']['pinnedPosts'])
+                if (data['moderation']['pinnedPosts']) {
+                    const pinnedPosts = data['moderation']['pinnedPosts']
+
+                    if (data['legacy'] || typeof data['legacy'] === 'undefined') {
+                        console.log('found legacy user, updating')
+                        let formattedPinnedPosts = {}
+                        /**
+                         * Legacy pinned posts are in a weird format
+                         * Usually they might look like
+                         *
+                         * {
+                         *     ...
+                         *     9: ['0', '0, 0, <link>,<sub>'],
+                         *     ...
+                         * }
+                         *
+                         * New format is:
+                         * {
+                         *    <link>: <sub>
+                         * }
+                         */
+
+                        _.forEach(pinnedPosts, post => {
+                            if (Array.isArray(post)) {
+                                if (typeof post[1] !== 'undefined' && typeof post[1] === 'string') {
+                                    console.log(post[1])
+                                    const [, , url, tag] = post[1].split(',')
+                                    formattedPinnedPosts = {
+                                        ...formattedPinnedPosts,
+                                        [url]: tag,
+                                    }
+                                }
+                            }
+                        })
+
+                        this.pinnedPosts.replace(formattedPinnedPosts)
+                    } else {
+                        this.pinnedPosts.replace(pinnedPosts)
+                    }
+                }
 
                 if (typeof data['moderation']['unsignedPostsIsSpam'] !== 'undefined')
                     this.unsignedPostsIsSpam = data['moderation']['unsignedPostsIsSpam']
@@ -383,8 +457,8 @@ export class UserStore {
                 if (typeof data['moderation']['blockedContentSetting'] !== 'undefined')
                     this.blockedContentSetting = data['moderation']['blockedContentSetting']
 
-                hydrate(localStorage)('userStore', this).rehydrate()
-                hydrate(localStorage)('tagStore', this.tagStore).rehydrate()
+                // hydrate(localStorage)('userStore', this).rehydrate()
+                // hydrate(localStorage)('tagStore', this.tagStore).rehydrate()
             }
         } catch (error) {
             console.log(error)
@@ -409,6 +483,7 @@ export class UserStore {
 
             // we have to send the entire payload, not just the diff
             const dataToSync = {
+                legacy: false,
                 lastCheckedNotifications: this.lastCheckedNotifications,
                 watching: [...this.watching.toJS()],
                 following: following,
