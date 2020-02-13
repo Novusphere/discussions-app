@@ -347,12 +347,21 @@ export default class DiscussionsService {
         return op.totalReplies
     }
 
-    async getUser(pub: string): Promise<{ count: number; pub: string }> {
+    async getUser(
+        pub: string
+    ): Promise<{
+        followers: number
+        pub: string
+        posts: number
+        threads: number
+        uidw: string
+        displayName: string
+    }> {
         try {
             const { data } = await axios.get(`${nsdb.api}/discussions/site/profile/${pub}`)
             return data
         } catch (error) {
-            return { count: 0, pub }
+            return { followers: 0, pub: '', posts: 0, threads: 0, uidw: '', displayName: '' }
         }
     }
 

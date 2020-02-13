@@ -8,6 +8,7 @@ import { InfiniteScrollFeed, Icons } from '@components'
 import { discussions } from '@novuspherejs'
 import dynamic from 'next/dynamic'
 import Head from 'next/head'
+import { useRouter } from 'next/router'
 
 const { Paragraph } = Typography
 const { Option } = Select
@@ -120,8 +121,12 @@ const Following = dynamic(
 const UserPage: NextPage<any> = ({ username, wallet, imageData, count, postPub }) => {
     const { uiStore, postsStore, userStore, authStore, tagStore }: RootStore = useStores()
     const [_count, _setCount] = useState(count)
+    const router = useRouter()
 
     useEffect(() => {
+        // replace username with the correct one
+        router.replace('/u/[username]', `/u/${username}-${wallet}`)
+
         postsStore.resetPostsAndPosition()
         postsStore.getPostsForKeys(postPub, [wallet])
 
@@ -280,13 +285,13 @@ UserPage.getInitialProps = async function({ query, store }: any) {
     const postPub = store.authStore.postPub
     const [username, wallet] = query.username.split('-')
     const imageData = getIdenticon(wallet)
-    const { count } = await discussions.getUser(wallet)
+    const { followers, displayName } = await discussions.getUser(wallet)
 
     return {
         imageData,
-        username,
+        username: displayName,
         wallet,
-        count,
+        count: followers,
         postPub,
     }
 }
