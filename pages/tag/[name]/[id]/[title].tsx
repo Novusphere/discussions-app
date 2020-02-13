@@ -567,7 +567,7 @@ const PostPageComponentObserverable: React.FunctionComponent<IPostPageProps> = (
                     <div className={'flex flex-row items-center'}>
                         <Link href={`/tag/[name]`} as={`/tag/${thread.openingPost.sub}`}>
                             <a>
-                                <span className={'b'}>{thread.openingPost.sub}</span>
+                                <span className={'b'}>#{thread.openingPost.sub}</span>
                             </a>
                         </Link>
                         <Divider type={'vertical'} />

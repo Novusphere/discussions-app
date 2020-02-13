@@ -179,7 +179,7 @@ const RichTextPreview: FunctionComponent<IRichTextPreviewProps> = ({
 }) => {
     return (
         <div
-            className={cx('pt0 pb3', [
+            className={cx('pt0 pb3', styles.richTextPreview, [
                 {
                     [styles.contentFade]: !hideFade,
                     'black lh-copy measure-wide pt0 overflow-break-word': !className,
