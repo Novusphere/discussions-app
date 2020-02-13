@@ -294,6 +294,7 @@ const PostPageComponentObserverable: React.FunctionComponent<IPostPageProps> = (
 
                     postObject.myVote = [{ value: 1 }]
                     postStore.observableThread.openingPost.replies.push(postObject)
+                    postStore.observableThread.openingPost.totalReplies += 1
                     postStore.submitReplyLoading = false
                     postStore.setReplyContent('')
                     postStore.toggleReply()
@@ -808,7 +809,9 @@ const PostPage: NextPage<any> = ({ url, thread, query }) => {
                     site_name: 'Discussions App',
                     images: [
                         {
-                            url: thread.icon ? thread.icon : 'https://cdn.novusphere.io/static/atmos2.png',
+                            url: thread.icon
+                                ? thread.icon
+                                : 'https://cdn.novusphere.io/static/atmos2.png',
                             width: 50,
                             height: 50,
                             alt: 'https://cdn.novusphere.io/static/atmos2.png',
