@@ -16,19 +16,24 @@ const Connections = () => {
                     </span>
                 </span>
                 <span
-                    className={'db primary pointer'}
+                    className={'db flex flex-column tr justify-end primary pointer'}
                     onClick={() => authStore.connectScatterWallet(authStore.hasEOSWallet)}
                 >
                     {useObserver(() => (
                         <>
-                            {!authStore.connectScatterWallet['pending'] ? (
-                                authStore.hasEOSWallet ? (
-                                    '(disconnect)'
+                            <span className={'db'}>
+                                {!authStore.connectScatterWallet['pending'] ? (
+                                    authStore.hasEOSWallet ? (
+                                        '(disconnect)'
+                                    ) : (
+                                        '(connect)'
+                                    )
                                 ) : (
-                                    '(connect)'
-                                )
-                            ) : (
-                                <Icon type="loading" />
+                                    <Icon type="loading" />
+                                )}
+                            </span>
+                            {authStore.eosWalletDisplayName && (
+                                <span className={'red db'}>{authStore.eosWalletDisplayName}</span>
                             )}
                         </>
                     ))}

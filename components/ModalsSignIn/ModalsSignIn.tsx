@@ -156,10 +156,11 @@ const ModalsSignIn: FunctionComponent<IModalsSignInProps> = ({
                         message: 'You have successfully signed in!',
                     })
                     uiStore.clearActiveModal()
-                    userStore.pingServerForData({
-                        postPub: authStore.postPub,
-                        postPriv: authStore.postPriv,
-                    })
+                    // this is dealt with HeaderNotifications.tsx
+                    // userStore.pingServerForData({
+                    //     postPub: authStore.postPub,
+                    //     postPriv: authStore.postPriv,
+                    // })
                 } catch (error) {
                     if (error.message === 'You have entered an invalid brain key') {
                         form.setFields({
@@ -193,10 +194,11 @@ const ModalsSignIn: FunctionComponent<IModalsSignInProps> = ({
                         message: 'You have successfully signed in!',
                     })
                     uiStore.clearActiveModal()
-                    userStore.pingServerForData({
-                        postPub: authStore.postPub,
-                        postPriv: authStore.postPriv,
-                    })
+                    // this is dealt with header notifications
+                    // userStore.pingServerForData({
+                    //     postPub: authStore.postPub,
+                    //     postPriv: authStore.postPriv,
+                    // })
                 } catch (error) {
                     if (error.message === 'Incorrect brian key pasword') {
                         form.setFields({
