@@ -220,7 +220,7 @@ const UserPage: NextPage<any> = ({ username, wallet, imageData, count, postPub }
 
                     <div className={'mt4'}>
                         <span className={'moon-gray ttu f6'}>Wallet</span>
-                        <Paragraph ellipsis copyable className={'f6 pt2'}>
+                        <Paragraph ellipsis copyable className={'f6 pt2 w-80'}>
                             {wallet}
                         </Paragraph>
                     </div>
