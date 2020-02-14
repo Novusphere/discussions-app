@@ -122,7 +122,7 @@ export class UserStore {
             .map(val => val.split(':')[2])
     }
 
-    async setPinnedPosts(posts: any[], delegated = false) {
+    async setPinnedPosts(posts: any[], delegated = false, sync = true) {
         let obj = {}
 
         _.forEach(posts, (urls, name: string) => {
@@ -143,7 +143,7 @@ export class UserStore {
             setCookie(null, 'pinnedPosts', b64, { path: '/' })
         }
 
-        this.syncDataFromLocalToServer()
+        if (sync) this.syncDataFromLocalToServer()
     }
 
     /**
@@ -164,7 +164,7 @@ export class UserStore {
                         const blockedPostsKeys = Object.keys(blockedPosts)
 
                         if (pinnedPosts) {
-                            this.setPinnedPosts(pinnedPosts, true)
+                            this.setPinnedPosts(pinnedPosts, true, false)
                         }
 
                         if (blockedPostsKeys.length) {

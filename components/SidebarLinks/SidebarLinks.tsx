@@ -12,7 +12,7 @@ interface ISidebarTopLevelLinksProps {}
 
 const SidebarLinks: FunctionComponent<ISidebarTopLevelLinksProps> = () => {
     const router = useRouter()
-    const { tagStore, userStore }: RootStore = useStores()
+    const { tagStore, userStore, authStore }: RootStore = useStores()
 
     const linkClassName = link =>
         cx([
@@ -76,7 +76,9 @@ const SidebarLinks: FunctionComponent<ISidebarTopLevelLinksProps> = () => {
                     placeholder="Add a tag to subscribe"
                     onPressEnter={(e: any) => {
                         tagStore.addSubscribed(e.target.value)
-                        userStore.syncDataFromLocalToServer()
+                        if (authStore.hasAccount) {
+                            userStore.syncDataFromLocalToServer()
+                        }
                     }}
                 />
             </div>
@@ -125,7 +127,9 @@ const SidebarLinks: FunctionComponent<ISidebarTopLevelLinksProps> = () => {
                                                 <Button
                                                     onClick={() => {
                                                         tagStore.removeSubscribed(subscribed)
-                                                        userStore.syncDataFromLocalToServer()
+                                                        if (authStore.hasAccount) {
+                                                            userStore.syncDataFromLocalToServer()
+                                                        }
                                                     }}
                                                     shape="circle"
                                                 >

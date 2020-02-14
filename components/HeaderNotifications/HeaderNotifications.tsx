@@ -108,7 +108,7 @@ const HeaderNotifications: FunctionComponent<IHeaderNotificationsProps> = () => 
             overlayClassName={styles.notificationsOverlayContainer}
             placement={'bottomRight'}
             onVisibleChange={visible => {
-                if (visible) {
+                if (visible && authStore.hasAccount) {
                     userStore.lastCheckedNotifications = Date.now()
                     userStore.notificationCount = 0
                     userStore.resetThreadWatchCounts()
