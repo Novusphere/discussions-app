@@ -349,10 +349,6 @@ export class UserStore {
         try {
             const { accountPrivKey, accountPubKey } = this.authStore
 
-            console.log(accountPrivKey, accountPubKey)
-
-            return
-
             if (!accountPrivKey || !accountPubKey) {
                 this.uiStore.showToast(
                     'Unable to fetch your data',
