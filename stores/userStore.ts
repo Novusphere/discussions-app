@@ -40,10 +40,12 @@ export class UserStore {
 
     @observable private uiStore: RootStore['uiStore']
     @observable private tagStore: RootStore['tagStore']
+    @observable private authStore: RootStore['authStore']
 
     constructor(rootStore: RootStore) {
         this.uiStore = rootStore.uiStore
         this.tagStore = rootStore.tagStore
+        this.authStore = rootStore.authStore
     }
 
     hydrate(initialState: any = {}) {
@@ -345,7 +347,12 @@ export class UserStore {
      */
     syncDataFromServerToLocal = async () => {
         try {
-            const { accountPrivKey, accountPubKey } = parseCookies(window)
+            const { accountPrivKey, accountPubKey } = this.authStore
+
+            console.log(accountPrivKey, accountPubKey)
+
+            return
+
             if (!accountPrivKey || !accountPubKey) {
                 this.uiStore.showToast(
                     'Unable to fetch your data',

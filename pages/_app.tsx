@@ -32,6 +32,12 @@ class DiscussionsApp extends App<any> {
                 _displayName: {
                     value: cookies.displayName || '',
                 },
+                _accountPrivKey: {
+                    value: cookies.accountPrivKey || '',
+                },
+                _accountPubKey: {
+                    value: cookies.accountPubKey || '',
+                },
                 _hasAccountCookie: {
                     value: cookies.hasOwnProperty('hasAccount')
                         ? JSON.parse(cookies.hasAccount)

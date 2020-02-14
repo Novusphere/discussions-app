@@ -61,6 +61,14 @@ export class AuthStore {
         return this._uidwWalletPubKey.value
     }
 
+    @computed get accountPrivKey() {
+        return this._accountPrivKey.value
+    }
+
+    @computed get accountPubKey() {
+        return this._accountPubKey.value
+    }
+
     @action.bound
     setTEMPPrivateKey = key => {
         this.TEMP_WalletPrivateKey = key
