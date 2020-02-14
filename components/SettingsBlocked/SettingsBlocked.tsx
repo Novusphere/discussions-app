@@ -8,7 +8,11 @@ import Link from 'next/link'
 const { Text } = Typography
 
 const Blocked = () => {
-    const { userStore, tagStore, settingStore }: RootStore = useStores()
+    const { userStore, tagStore, authStore }: RootStore = useStores()
+
+    if (!authStore.hasAccount) {
+        return <span className={'f6 gray'}>Please sign in to view this option</span>
+    }
 
     const handleHiddenOnChange = useCallback(val => {
         if (val) {

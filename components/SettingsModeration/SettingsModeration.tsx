@@ -6,7 +6,11 @@ import Link from 'next/link'
 import React from 'react'
 
 const Moderation = () => {
-    const { userStore, tagStore }: RootStore = useStores()
+    const { userStore, tagStore, authStore }: RootStore = useStores()
+
+    if (!authStore.hasAccount) {
+        return <span className={'f6 gray'}>Please sign in to view this option</span>
+    }
 
     const dataSource = useObserver(() =>
         [...userStore.delegated.toJS()].map(([delegated, date]) => {

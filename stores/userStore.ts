@@ -335,7 +335,7 @@ export class UserStore {
     }
 
     pingServerForData = ({ postPriv, postPub }) => {
-        this.syncDataFromServerToLocal(postPriv).then(() => {
+        this.syncDataFromServerToLocal().then(() => {
             this.fetchNotifications(postPub)
         })
     }
@@ -343,11 +343,26 @@ export class UserStore {
     /**
      * Syncing user data with the server
      */
-    syncDataFromServerToLocal = async (privateKey: string) => {
+    syncDataFromServerToLocal = async () => {
         try {
-            let data = await nsdb.getAccount(privateKey)
+            const { accountPrivKey, accountPubKey } = parseCookies(window)
+            if (!accountPrivKey || !accountPubKey) {
+                this.uiStore.showToast(
+                    'Unable to fetch your data',
+                    'Seems like your session is corrupt. Please sign out and sign back in.',
+                    'error'
+                )
+            }
+
+            let data = await nsdb.getAccount({
+                accountPrivateKey: accountPrivKey,
+                accountPublicKey: accountPubKey,
+            })
+
             if (!data) return
+
             data = data['data']
+
             if (data) {
                 if (typeof data['lastCheckedNotifications'] !== 'undefined')
                     this.lastCheckedNotifications = data['lastCheckedNotifications']
@@ -360,46 +375,11 @@ export class UserStore {
                     this.following.replace(data['following'].map(obj => [obj.pub, obj.name]))
 
                 if (data['moderation']['blockedPosts']) {
-                    /**
-                     * Deal with blocked posts from the old site (legacy)
-                     * We have to convert two types of old posts:
-                     *
-                     * 0: ["link", "date"]
-                     * "date": ["link1", "link2"]
-                     *
-                     * Currently, the new format is:
-                     * "link": "date"
-                     * as an object (so links are accessors)
-                     */
                     const blockedPosts = data['moderation']['blockedPosts']
 
                     if (data['legacy'] || typeof data['legacy'] === 'undefined') {
                         console.log('found legacy user, updating')
-                        let formattedBlockedPosts = {}
-
-                        if (blockedPosts['0']) {
-                            const [url, date] = blockedPosts['0']
-                            formattedBlockedPosts = {
-                                ...formattedBlockedPosts,
-                                [url]: date,
-                            }
-                        }
-
-                        // there can only really be 3 possible dates
-                        // 201912, 20201, 20202
-                        const dates = { 201912: '201912', 20201: '20201', 20202: '20202' }
-                        _.forEach(dates, date => {
-                            if (blockedPosts[date]) {
-                                _.forEach(blockedPosts[date], blockedPostByDate => {
-                                    formattedBlockedPosts = {
-                                        ...formattedBlockedPosts,
-                                        [blockedPostByDate]: date,
-                                    }
-                                })
-                            }
-                        })
-
-                        this.blockedPosts.replace(formattedBlockedPosts)
+                        this.blockedPosts.replace({})
                     } else {
                         this.blockedPosts.replace(blockedPosts)
                     }
@@ -415,37 +395,7 @@ export class UserStore {
 
                     if (data['legacy'] || typeof data['legacy'] === 'undefined') {
                         console.log('found legacy user, updating')
-                        let formattedPinnedPosts = {}
-                        /**
-                         * Legacy pinned posts are in a weird format
-                         * Usually they might look like
-                         *
-                         * {
-                         *     ...
-                         *     9: ['0', '0, 0, <link>,<sub>'],
-                         *     ...
-                         * }
-                         *
-                         * New format is:
-                         * {
-                         *    <link>: <sub>
-                         * }
-                         */
-
-                        _.forEach(pinnedPosts, post => {
-                            if (Array.isArray(post)) {
-                                if (typeof post[1] !== 'undefined' && typeof post[1] === 'string') {
-                                    console.log(post[1])
-                                    const [, , url, tag] = post[1].split(',')
-                                    formattedPinnedPosts = {
-                                        ...formattedPinnedPosts,
-                                        [url]: tag,
-                                    }
-                                }
-                            }
-                        })
-
-                        this.pinnedPosts.replace(formattedPinnedPosts)
+                        this.pinnedPosts.replace({})
                     } else {
                         this.pinnedPosts.replace(pinnedPosts)
                     }
@@ -456,9 +406,6 @@ export class UserStore {
 
                 if (typeof data['moderation']['blockedContentSetting'] !== 'undefined')
                     this.blockedContentSetting = data['moderation']['blockedContentSetting']
-
-                // hydrate(localStorage)('userStore', this).rehydrate()
-                // hydrate(localStorage)('tagStore', this.tagStore).rehydrate()
             }
         } catch (error) {
             console.log(error)
@@ -483,7 +430,7 @@ export class UserStore {
 
             // we have to send the entire payload, not just the diff
             const dataToSync = {
-                legacy: false,
+                legacy: false, // override
                 lastCheckedNotifications: this.lastCheckedNotifications,
                 watching: [...this.watching.toJS()],
                 following: following,
@@ -498,11 +445,23 @@ export class UserStore {
                 },
             }
 
-            const { postPriv } = parseCookies(window)
-            if (!postPriv) return
+            const { accountPrivKey, accountPubKey } = parseCookies(window)
 
-            await nsdb.saveAccount(postPriv, dataToSync)
+            if (!accountPrivKey || !accountPubKey) {
+                this.uiStore.showToast(
+                    'Unable to save your data',
+                    'Seems like your session is corrupt. Please sign out and sign back in.',
+                    'error'
+                )
+            }
+
+            await nsdb.saveAccount({
+                accountPrivateKey: accountPrivKey,
+                accountPublicKey: accountPubKey,
+                accountData: dataToSync,
+            })
         } catch (error) {
+            console.log(error)
             this.uiStore.showToast(
                 'Unable to sync',
                 'We were unable to sync your data to our servers.',

@@ -15,6 +15,10 @@ const UnwrappedAirdrop = ({ form }) => {
     const { getFieldDecorator } = form
     const { authStore, walletStore, uiStore }: RootStore = useStores()
 
+    if (!authStore.hasAccount) {
+        return <span className={'f6 gray'}>Please sign in to view this option</span>
+    }
+
     const [airdropSubmitLoading, setAirdropSubmitLoading] = useState(false)
     const [downloadAirdropSubmitLoading, setDownloadAirdropSubmitLoading] = useState(false)
 

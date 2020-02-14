@@ -13,6 +13,8 @@ export class AuthStore {
     _hasEOSWallet = new Cookie('hasEOSWallet')
     _postPubKey = new Cookie('postPub')
     _postPrivKey = new Cookie('postPriv')
+    _accountPrivKey = new Cookie('accountPrivKey')
+    _accountPubKey = new Cookie('accountPubKey')
     _displayName = new Cookie('displayName')
     _uidwWalletPubKey = new Cookie('uidWalletPubKey')
     _bk = new Cookie('bk')
@@ -75,6 +77,7 @@ export class AuthStore {
             const keys = await discussions.bkToKeys(bk)
             this.setPostPrivCookie(keys.post.priv)
             this.setUidWalletPubKeyCookie(keys.uidwallet.pub)
+            this.setAccountKey({ pub: keys.account.pub, priv: keys.account.priv })
             return keys
         } catch (error) {
             console.log(error)
@@ -101,6 +104,15 @@ export class AuthStore {
         // refresh this key
         this._postPrivKey = new Cookie('postPriv')
         this._postPrivKey.set(value)
+    }
+
+    setAccountKey = ({ pub, priv }) => {
+        // refresh this key
+        this._accountPrivKey = new Cookie('accountPrivKey')
+        this._accountPrivKey.set(priv)
+
+        this._accountPubKey = new Cookie('accountPubKey')
+        this._accountPubKey.set(pub)
     }
 
     setHasAccountCookie = (value: string) => {

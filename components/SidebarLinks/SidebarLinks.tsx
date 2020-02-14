@@ -91,7 +91,7 @@ const SidebarLinks: FunctionComponent<ISidebarTopLevelLinksProps> = () => {
                             <li key={subscribed} className={linkClassName(`/tag/${tag.name}`)}>
                                 <Popover
                                     content={
-                                        <div className={'pa1'}>
+                                        <div className={'pa1 w5'}>
                                             <span
                                                 className={
                                                     'f5 flex flex-row items-center justify-between'

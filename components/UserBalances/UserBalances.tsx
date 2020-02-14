@@ -11,7 +11,11 @@ interface IUserBalancesProps {
 }
 
 const UserBalances: FunctionComponent<IUserBalancesProps> = ({ className }) => {
-    const { walletStore }: RootStore = useStores()
+    const { walletStore, authStore }: RootStore = useStores()
+
+    if (!authStore.hasAccount) {
+        return <span className={cx([className, 'mt3 ph4 db f6 light-silver'])}>Please sign in to view your balances</span>
+    }
 
     let walletStoreLS = window.localStorage.getItem('walletStore')
     let images = []
