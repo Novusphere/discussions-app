@@ -433,6 +433,8 @@ export class UserStore {
 
             // we have to send the entire payload, not just the diff
             const dataToSync = {
+                uidw: this.authStore.uidwWalletPubKey,
+                postPub: this.authStore.postPub,
                 legacy: false, // override
                 lastCheckedNotifications: this.lastCheckedNotifications,
                 watching: [...this.watching.toJS()],
