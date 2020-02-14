@@ -370,6 +370,8 @@ export default class DiscussionsService {
     private convertEncodedThreadIdIntoQuery = (_id: string, key = '') => {
         let dId = Post.decodeId(_id)
 
+        if (!dId) throw new Error('Unable to decode id')
+
         const searchQuery = {
             key: key,
             pipeline: [
