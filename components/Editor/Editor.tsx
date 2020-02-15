@@ -1,27 +1,43 @@
 import * as React from 'react'
-import { inject, observer } from 'mobx-react'
-import { IStores } from '@stores'
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
-import { faSpinner } from '@fortawesome/free-solid-svg-icons'
+import { observer } from 'mobx-react'
 import sanitizeHTML from 'sanitize-html'
 import dynamic from 'next/dynamic'
 import axios from 'axios'
 import { nsdb } from '@novuspherejs'
+import { StoreContext } from '@stores'
+import cx from 'classnames'
+import { Icon } from 'antd'
+
+import styles from './Editor.module.scss'
 
 interface IEditorProps {
-    postsStore?: IStores['postsStore']
     onChange: (html: any) => void // passed in via spread (bind) in form.tsx
-    placeholder: string
+    placeholder?: string
     className?: string
     value?: any
     disabled?: boolean
+
+    threadUsers: any[]
 }
 
-@inject('postsStore')
 @observer
-class EditorComponent extends React.Component<IEditorProps> {
+class Editor extends React.Component<IEditorProps> {
     state = {
         loaded: false,
+    }
+
+    constructor(props) {
+        super(props)
+
+        this.context = StoreContext
+    }
+
+
+    static defaultProps = {
+        placeholder: 'Enter your reply',
+        className: '',
+        disabled: false,
+        threadUsers: [],
     }
 
     public turndownService: any
@@ -68,7 +84,6 @@ class EditorComponent extends React.Component<IEditorProps> {
         })
 
         this.quillBase.Quill.register('modules/mention', Mention)
-        // this.quillBase.Quill.register('modules/eos-tip', EosTip)
         this.quillBase.Quill.register('modules/autoformat', Autoformat)
         this.quillBase.Quill.register('formats/hashtag', Hashtag)
         this.quillBase.Quill.register('modules/magicUrl', MagicUrl)
@@ -78,7 +93,7 @@ class EditorComponent extends React.Component<IEditorProps> {
                 fixMentionsToQuill: true,
                 mentionDenotationChars: ['@'],
                 source: async (searchTerm, renderList, mentionChar) => {
-                    const accounts = this.props.postsStore.getPossibleUsersToTag
+                    const accounts = this.props.threadUsers
 
                     if (searchTerm.length === 0) {
                         renderList(accounts, searchTerm)
@@ -103,6 +118,8 @@ class EditorComponent extends React.Component<IEditorProps> {
                     item.denotationChar = ''
                     return insertItem(item)
                 },
+                mentionContainerClass: cx([styles.mentionList, 'bg-white f5 ba b--light-gray']),
+                // listItemClass: cx([styles.mentionItem])
             },
             autoformat: true,
         }
@@ -133,7 +150,7 @@ class EditorComponent extends React.Component<IEditorProps> {
     }
 
     componentWillReceiveProps(nextProps: Readonly<IEditorProps>, nextContext: any): void {
-        if (this.props.value.length > 0 && nextProps.value === '') {
+        if (this.props.value && this.props.value.length > 0 && nextProps.value === '') {
             this.updateContentByRef('')
         }
 
@@ -179,67 +196,86 @@ class EditorComponent extends React.Component<IEditorProps> {
                 const formData = new FormData()
                 formData.append('image', file)
 
-                // Upload image to AWS via app route handler.
-                const { data } = await axios.post(`${nsdb.api}/discussions/upload`, formData, {
-                    headers: {
-                        'Content-Type': 'multipart/form-data',
-                    },
-                })
+                try {
+                    // Upload image to AWS via app route handler.
+                    const { data } = await axios.post(`${nsdb.api}/discussions/upload`, formData, {
+                        headers: {
+                            'Content-Type': 'multipart/form-data',
+                        },
+                    })
 
-                const ref = this.ref.current.getEditor()
+                    const ref = this.ref.current.getEditor()
 
-                // Get the current cursor position.
-                const range = ref.getSelection()
-                const url = `${nsdb.api}/discussions/upload/image/${data.filename}`
+                    // Get the current cursor position.
+                    const range = ref.getSelection()
+                    const url = `${nsdb.api}/discussions/upload/image/${data.filename}`
 
-                ref.insertText(range.index, url)
+                    ref.insertText(range.index, url)
 
-                // Move the cursor past the image.
-                ref.setSelection(range.index + url.length)
+                    // Move the cursor past the image.
+                    ref.setSelection(range.index + url.length)
+                } catch (error) {
+                    return error
+                }
             }
         }
     }
 
     public render(): React.ReactNode {
         if (!this.state.loaded) {
-            return <FontAwesomeIcon width={13} icon={faSpinner} spin />
+            return <Icon type="loading" />
         }
 
         const { Editor } = this.quillBase
         const { placeholder } = this.props
 
         return (
-            <Editor
-                ref={this.ref}
-                key={'editor'}
-                debug={'error'}
-                placeholder={placeholder}
-                onChange={this.onChange}
-                style={{
-                    opacity: this.props.disabled ? 0.5 : 1,
-                    cursor: this.props.disabled ? 'not-allowed' : 'default',
-                }}
-                modules={{
-                    autoformat: this.modules.autoformat,
-                    mention: this.modules.mention,
-                    magicUrl: true,
-                    toolbar: {
-                        container: [
-                            [{ header: 1 }, { header: 2 }], // custom button values
-                            [{ list: 'ordered' }, { list: 'bullet' }],
-                            ['bold', 'italic', 'blockquote', 'link', 'image'],
-                        ],
-                        handlers: {
-                            image: this.handleImageUpload,
+            <>
+                <style global jsx>{`
+                    .ql-mention-list-item.selected {
+                        background: #eeeeee;
+                    }
+                    .ql-editor {
+                        font-size: 14px;
+                    }
+                    .ql-snow a {
+                        text-decoration: none !important;
+                        color: #079e99;
+                    }
+                `}</style>
+                <Editor
+                    disabled={this.props.disabled}
+                    classNames={cx([this.props.className, 'bg-white'])}
+                    ref={this.ref}
+                    key={'editor'}
+                    debug={'error'}
+                    placeholder={placeholder}
+                    onChange={this.onChange}
+                    style={{
+                        opacity: this.props.disabled ? 0.5 : 1,
+                        cursor: this.props.disabled ? 'not-allowed' : 'default',
+                    }}
+                    modules={{
+                        autoformat: this.modules.autoformat,
+                        mention: this.modules.mention,
+                        magicUrl: true,
+                        toolbar: {
+                            container: [
+                                [{ header: 1 }, { header: 2 }], // custom button values
+                                [{ list: 'ordered' }, { list: 'bullet' }],
+                                ['bold', 'italic', 'blockquote', 'link', 'image'],
+                            ],
+                            handlers: {
+                                image: this.handleImageUpload,
+                            },
                         },
-                    },
-                }}
-            />
+                    }}
+                />
+            </>
         )
     }
 }
 
-export default dynamic(() => Promise.resolve(EditorComponent), {
+export default dynamic(() => Promise.resolve(Editor), {
     ssr: false,
-    loading: () => <FontAwesomeIcon width={13} icon={faSpinner} spin />,
 })

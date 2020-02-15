@@ -2,7 +2,7 @@ import _ from 'lodash'
 
 export default async (req, res) => {
     let { token, amount, memoId, actor, p2k } = req.query
-    let accountNames = req.query['accountNames[]']
+    let accountNames = req.query['accountNames']
 
     if (
         _.isUndefined(req.query) ||
@@ -22,7 +22,7 @@ export default async (req, res) => {
     res.charset = 'UTF-8'
 
     if (!Array.isArray(accountNames)) {
-        accountNames = [accountNames]
+        accountNames = accountNames.split(', ')
     }
 
     if (!_.isUndefined(p2k)) {

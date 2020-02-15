@@ -1,109 +1,282 @@
-import * as React from 'react'
-import { inject, observer } from 'mobx-react'
-import { IStores } from '@stores'
-import { Form, TagDropdown } from '@components'
-import NewPostPreview from './new-post-preview/new-post-preview'
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
-import { faSpinner } from '@fortawesome/free-solid-svg-icons'
-import { sanityCheckTag } from '@utils'
-import classNames from 'classnames'
+import React, { useCallback, useEffect, useState } from 'react'
+import { NextPage } from 'next'
+import { Button, Form, Input, Select, Skeleton } from 'antd'
+import { RootStore, useStores } from '@stores'
+import { useObserver } from 'mobx-react-lite'
+import dynamic from 'next/dynamic'
+import { Editor, RichTextPreview, UserNameWithIcon } from '@components'
+import {
+    createPostObject,
+    encodeId,
+    generateUuid,
+    generateVoteObject,
+    getIdenticon,
+    openInNewTab,
+    pushToThread,
+    signPost,
+} from '@utils'
+import { discussions } from '@novuspherejs'
+import Head from 'next/head'
 
-interface INewPageProps {
-    postsStore: IStores['postsStore']
-    uiStore: IStores['uiStore']
-}
+const { Option } = Select
 
-interface INewPageState {
-    form: any
-}
+const NewPageNoSSRUnwrapped = dynamic(
+    () =>
+        Promise.resolve(({ form, prefilledTag }: any) => {
+            const { getFieldDecorator } = form
+            const { tagStore, authStore, uiStore, userStore }: RootStore = useStores()
+            const [loading, setLoading] = useState(false)
+            const [isPreviewing, setPreview] = useState(false)
+            const [options, setOptions] = useState(tagStore.tagsWithoutBaseOptions)
+            const [newOption, setNewOption] = useState(null)
+            const togglePreview = useCallback(() => setPreview(!isPreviewing), [])
 
-@inject('postsStore', 'uiStore')
-@observer
-class NewPage extends React.Component<INewPageProps, INewPageState> {
-    constructor(props) {
-        super(props)
+            const handleSubmit = useCallback(e => {
+                e.preventDefault()
+                form.validateFields(async (err, values) => {
+                    if (!err) {
+                        setLoading(true)
+                        setPreview(false)
+                        let { tag, title, content } = values
 
-        this.state = {
-            form: props.postsStore.newPostForm,
-        }
-    }
-
-    componentDidMount(): void {
-        this.props.uiStore.toggleSidebarStatus(false)
-    }
-
-    private onChange = option => {
-        const {
-            postsStore: { newPostForm },
-        } = this.props
-        const { form } = this.state
-
-        if (!form) return
-
-        const cached = {
-            title: form.form.$('title').value || '',
-            content: form.form.$('content').value || '',
-        }
-
-        this.props.postsStore.newPostTag = {
-            label: `#${sanityCheckTag(option.label)}`,
-            value: sanityCheckTag(option.value),
-        }
-
-        // set form again
-        const _form = newPostForm
-        _form.form.$('title').set('value', cached.title)
-        _form.form.$('content').set('value', cached.content)
-
-        this.setState({
-            form: _form,
-        })
-    }
-
-    render() {
-        const {
-            postsStore: { subFields, newPostTag },
-        } = this.props
-        const { form } = this.state
-
-        if (!form) return <FontAwesomeIcon width={13} icon={faSpinner} spin />
-
-        return (
-            <>
-                <div className={'flex flex-row items-center mb3'}>
-                    <span className={'w-20 black f4 b'}>Create a post in</span>
-                    <TagDropdown
-                        formatCreateLabel={inputValue =>
-                            `Make a new post in #${
-                                inputValue.indexOf('#') !== -1
-                                    ? inputValue.split('#')[1]
-                                    : inputValue
-                            }`
+                        // make sure tag doesn't have a hashtag in nit
+                        if (tag[0] === '#') {
+                            let [, tagPreHas] = tag.split('#')
+                            tag = tagPreHas
                         }
-                        onChange={this.onChange}
-                        className={'w-80'}
-                        value={newPostTag}
-                        options={subFields.extra.options}
-                        placeholder={'Select or type tag name...'}
-                    />
-                </div>
-                <div
-                    className={classNames([
-                        'card pa4',
-                        {
-                            'o-50': !newPostTag.value,
-                            'o-100': newPostTag.value,
-                        },
-                    ])}
-                >
-                    <Form form={form} hideSubmitButton />
-                    <div className={'pv3'}>
-                        <NewPostPreview />
+
+                        const uuid = generateUuid()
+
+                        const { data: vote } = generateVoteObject({
+                            uuid: uuid,
+                            postPriv: authStore.postPriv,
+                            value: 1,
+                        })
+
+                        const post = createPostObject({
+                            title,
+                            content,
+                            sub: tag,
+                            parentUuid: '',
+                            uuid: uuid,
+                            threadUuid: uuid,
+                            uidw: authStore.uidwWalletPubKey,
+                            pub: '',
+                            posterName: authStore.displayName,
+                            skipId: true,
+                            postPub: authStore.postPub,
+                            postPriv: authStore.postPriv,
+                        })
+
+                        const { sig } = signPost({
+                            privKey: authStore.postPriv,
+                            uuid: post.uuid,
+                            content: post.content,
+                        })
+
+                        post.vote = vote
+                        post.sig = sig
+
+                        try {
+                            const submittedPost = await discussions.post(post as any)
+
+                            const isPostValid = discussions.checkIfPostIsValid(submittedPost)
+
+                            return new Promise((resolve, reject) => {
+                                if (isPostValid) {
+                                    const id = encodeId(submittedPost)
+
+                                    const int = setInterval(async () => {
+                                        const getThread = await discussions.getThread(
+                                            id,
+                                            authStore.postPub
+                                        )
+
+                                        if (getThread) {
+                                            if (int) {
+                                                clearInterval(int)
+                                                setLoading(false)
+                                                await pushToThread(submittedPost)
+                                                const newId = encodeId(
+                                                    submittedPost.openingPost as any
+                                                )
+                                                userStore.toggleThreadWatch(newId, 0, true)
+                                                uiStore.showToast(
+                                                    'Success',
+                                                    'Your post has been successfully created',
+                                                    'success',
+                                                    {
+                                                        btn: (
+                                                            <Button
+                                                                size="small"
+                                                                onClick={() =>
+                                                                    openInNewTab(
+                                                                        `https://bloks.io/transaction/${submittedPost.transaction}`
+                                                                    )
+                                                                }
+                                                            >
+                                                                View transaction
+                                                            </Button>
+                                                        ),
+                                                    }
+                                                )
+                                                resolve()
+                                            }
+                                        }
+                                    }, 2000)
+                                }
+                            })
+                        } catch (error) {
+                            let message = error.message || 'Failed to create a new post'
+                            uiStore.showToast('Failed', message, 'error')
+                            setLoading(false)
+                            return error
+                        }
+                    }
+                })
+            }, [])
+
+            const handleOnSearch = useCallback(value => {
+                if (value && value.length > 0) {
+                    if (options.find(option => option.value === value)) {
+                        return
+                    }
+
+                    if (value[0] !== '#') {
+                        value = `#${value}`
+                    }
+
+                    setNewOption(value)
+                }
+            }, [])
+
+            return useObserver(() => (
+                <div className={'w-100 bg-white card pa4'}>
+                    <span className={'f5 b db mb3'}>Create a new post in</span>
+                    <Form onSubmit={() => console.log('hey')}>
+                        <Form.Item>
+                            {getFieldDecorator('tag', {
+                                initialValue: prefilledTag,
+                                rules: [
+                                    {
+                                        required: true,
+                                        message: 'Please select a tag',
+                                    },
+                                ],
+                            })(
+                                <Select
+                                    size={'large'}
+                                    // mode={'tags'}
+                                    showSearch
+                                    style={{ width: '100%' }}
+                                    placeholder={'Enter a tag i.e. #eos'}
+                                    onSearch={handleOnSearch}
+                                >
+                                    {newOption &&
+                                        options.filter(o => o === newOption).length === 0 && (
+                                            <Option key={newOption} value={newOption}>
+                                                <img
+                                                    src={
+                                                        'https://cdn.novusphere.io/static/atmos.svg'
+                                                    }
+                                                    title={`${newOption} icon`}
+                                                    className={'mr2 dib'}
+                                                    width={15}
+                                                />
+                                                {newOption}
+                                            </Option>
+                                        )}
+                                    {options.map(option => {
+                                        const tag = tagStore.tagModelFromObservables(option.value)
+                                        if (!tag) return null
+                                        return (
+                                            <Option key={option.value} value={option.value}>
+                                                <img
+                                                    src={tag.logo}
+                                                    title={`${tag.name} icon`}
+                                                    className={'mr2 dib'}
+                                                    width={15}
+                                                />
+                                                {option.label}
+                                            </Option>
+                                        )
+                                    })}
+                                </Select>
+                            )}
+                        </Form.Item>
+                        <Form.Item>
+                            {getFieldDecorator('title', {
+                                rules: [
+                                    {
+                                        required: true,
+                                        message: 'Please enter a title for your post',
+                                    },
+                                ],
+                            })(<Input size={'large'} placeholder={'Post title'} />)}
+                        </Form.Item>
+                        <Form.Item>
+                            {getFieldDecorator('content', {
+                                rules: [
+                                    {
+                                        required: true,
+                                        message: 'Please enter content for your post',
+                                    },
+                                ],
+                            })(<Editor />)}
+                        </Form.Item>
+                    </Form>
+                    <div className={'mt3 flex flex-row justify-end'}>
+                        <Button className={'mr2'} onClick={togglePreview} disabled={loading}>
+                            Preview
+                        </Button>
+                        <Button type={'primary'} onClick={handleSubmit} loading={loading}>
+                            Create new post
+                        </Button>
                     </div>
+                    {form.getFieldValue('content') && isPreviewing && (
+                        <div className={'mt3 w-100 ba b--light-gray pa4 br3 relative'}>
+                            <div className={'flex flex-row items-center'}>
+                                <UserNameWithIcon
+                                    imageData={getIdenticon(authStore.postPub)}
+                                    pub={authStore.postPub}
+                                    name={authStore.displayName}
+                                />
+                                <div className={'w-100 ml3 bg-near-white pa2 mv1'} />
+                            </div>
+                            {form.getFieldValue('title') && (
+                                <span className={'db mt3 b f4'}>{form.getFieldValue('title')}</span>
+                            )}
+                            <RichTextPreview hideFade className={'mt3'}>
+                                {form.getFieldValue('content')}
+                            </RichTextPreview>
+                        </div>
+                    )}
                 </div>
-            </>
-        )
+            ))
+        }),
+    {
+        ssr: false,
+    }
+)
+
+const NewPageNoSSR = Form.create({ name: 'NewPost' })(NewPageNoSSRUnwrapped) as any
+
+const NewPage: NextPage<any> = ({ prefilledTag }) => {
+    return (
+        <>
+            <Head>
+                <title>Discussions App - Create New Post</title>
+            </Head>
+            <NewPageNoSSR prefilledTag={prefilledTag} />
+        </>
+    )
+}
+
+NewPage.getInitialProps = async ({ query }) => {
+    const prefilledTag = query.tag
+    return {
+        prefilledTag,
     }
 }
 
-export default inject('postsStore')(NewPage)
+export default NewPage

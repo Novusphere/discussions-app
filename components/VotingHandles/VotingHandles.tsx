@@ -1,7 +1,7 @@
 import * as React from 'react'
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
-import { faArrowUp, faArrowDown } from '@fortawesome/free-solid-svg-icons'
+import { Icon } from 'antd'
 import classNames from 'classnames'
+import { observer } from 'mobx-react-lite'
 
 interface IVoteProps {
     uuid: string
@@ -32,48 +32,48 @@ const VotingHandles: React.FC<IVoteProps> = ({
             })}
             {...props}
         >
-            <span onClick={(e) => {
-                e.preventDefault()
-                handler(e, uuid, 1)
-            }}>
-                <FontAwesomeIcon
-                    width={13}
-                    icon={faArrowUp}
-                    color={color ? color : '#b9b9b9'}
-                    className={classNames([
-                        'pointer disable-user-select',
-                        {
-                            'o-50 dim': myVote !== 1,
-                            orange: myVote === 1,
-                        },
-                    ])}
+            <span
+                className={'silver'}
+                onClick={e => {
+                    e.preventDefault()
+                    handler(e, uuid, 1)
+                }}
+            >
+                <Icon
+                    className={'pointer hover-orange'}
+                    type="caret-up"
+                    style={{
+                        color: myVote === 1 ? '#FF6300' : '#999999',
+                    }}
                 />
             </span>
             <span
-                className={classNames(['f6 disable-user-select ph1'])}
-                style={{ color: color ? color : '#b9b9b9', whiteSpace: 'pre' }}
+                className={classNames(['f6 disable-user-select ph1 silver'])}
+                style={{
+                    whiteSpace: 'pre',
+                    color: myVote === 1 ? '#FF6300' : '#999999',
+                }}
+                // style={{ color: color ? color : '#b9b9b9', whiteSpace: 'pre' }}
             >
                 {upVotes - downVotes}
             </span>
-            <span onClick={(e) => {
-                e.preventDefault()
-                handler(e, uuid, -1)
-            }}>
-                <FontAwesomeIcon
-                    width={13}
-                    color={color ? color : '#b9b9b9'}
-                    icon={faArrowDown}
-                    className={classNames([
-                        'pointer disable-user-select',
-                        {
-                            'o-50 dim': myVote !== -1,
-                            blue: myVote === -1,
-                        },
-                    ])}
+            <span
+                className={'silver'}
+                onClick={e => {
+                    e.preventDefault()
+                    handler(e, uuid, -1)
+                }}
+            >
+                <Icon
+                    className={'link pointer hover-blue'}
+                    type="caret-down"
+                    style={{
+                        color: myVote === -1 ? '#00449E' : '#999999',
+                    }}
                 />
             </span>
         </span>
     )
 }
 
-export default VotingHandles
+export default observer(VotingHandles)

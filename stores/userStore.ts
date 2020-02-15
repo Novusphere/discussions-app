@@ -1,16 +1,18 @@
-import { action, computed, observable, observe } from 'mobx'
-import { BaseStore, getOrCreateStore } from 'next-mobx-wrapper'
 import { persist } from 'mobx-persist'
-import { computedFn } from 'mobx-utils'
-import { getNotificationsStore, getTagStore, getUiStore, IStores } from '@stores/index'
-import { discussions } from '@novuspherejs'
-import NotificationModel from '@models/notificationModel'
-import { checkIfNameIsValid, sleep } from '@utils'
-import { task } from 'mobx-task'
+import { observable } from 'mobx'
+import { hydrate, RootStore } from '@stores/index'
 import axios from 'axios'
 import _ from 'lodash'
+import { setCookie, parseCookies } from 'nookies'
+import { discussions, nsdb, Post } from '@novuspherejs'
+import moment from 'moment'
+import mapSeries from 'async/mapSeries'
+import each from 'async/each'
+import { encodeId, getThreadTitle } from '@utils'
 
-export default class UserStore extends BaseStore {
+export type BlockedContentSetting = 'hidden' | 'collapsed'
+
+export class UserStore {
     @persist('map') following = observable.map<string, string>()
     @persist('map') watching = observable.map<string, [number, number]>() // [currentCount, prevCount]
     @persist('map') blockedUsers = observable.map<string, string>() // [pubKey, displayName]
@@ -19,97 +21,111 @@ export default class UserStore extends BaseStore {
     @persist('map') pinnedPosts = observable.map<string, string>() // [asPathURL, tagName]
 
     blockedByDelegation = observable.map<string, string>() // either blockedUsers or blockedPosts
-    @persist('map') pinnedByDelegation = observable.map<string, string>() // [asPathURL, tagName]
 
-    @persist('object')
+    @observable notificationCount = 0
+
+    @persist
     @observable
-    activeDelegatedTag = { value: '', label: '' }
+    lastCheckedNotifications = 0
 
-    private readonly uiStore: IStores['uiStore'] = getUiStore()
-    private readonly tagStore: IStores['tagStore'] = getTagStore()
-    private readonly notificationsStore: IStores['notificationsStore'] = getNotificationsStore()
+    @observable notifications: Post[] = []
 
-    constructor(props) {
-        super(props)
+    @persist
+    @observable
+    blockedContentSetting: BlockedContentSetting = 'collapsed'
 
-        observe(this.watching, async change => {
-            if (change.type === 'update') {
-                const count = change.newValue[0] - change.newValue[1]
+    @persist
+    @observable
+    unsignedPostsIsSpam = true
 
-                if (count > 0) {
-                    const thread = await discussions.getThread(change.name, '')
-                    const notificationModel = new NotificationModel({
-                        type: 'watch',
-                        post: {
-                            ...thread.openingPost,
-                            totalReplies: count,
-                        },
-                        tag: this.tagStore.tags.get(thread.openingPost.sub),
-                    })
+    @observable private uiStore: RootStore['uiStore']
+    @observable private tagStore: RootStore['tagStore']
+    @observable private authStore: RootStore['authStore']
 
-                    if (this.notificationsStore.notificationTrayItems.size > 4) {
-                        const [, , , , last] = Array.from(
-                            this.notificationsStore.notificationTrayItems.keys()
-                        )
-                        this.notificationsStore.notificationTrayItems.delete(last)
-                    }
-
-                    this.notificationsStore.notificationTrayItems.set(
-                        thread.openingPost.uuid,
-                        notificationModel
-                    )
-                }
-            }
-        })
-
-        this.notificationsStore.pingTheseMethods.push(this.updateWatchThreadCount)
+    constructor(rootStore: RootStore) {
+        this.uiStore = rootStore.uiStore
+        this.tagStore = rootStore.tagStore
+        this.authStore = rootStore.authStore
     }
 
-    @computed get activeDelegatedTagMembers() {
-        if (!this.activeDelegatedTag) return []
+    hydrate(initialState: any = {}) {
+        if (initialState.pinnedPosts) {
+            this.pinnedPosts = observable.map<string, string>(initialState.pinnedPosts)
+        }
 
-        const keys = Array.from(this.delegated.keys())
-        const values = Array.from(this.delegated.values())
-        const names = []
-
-        values.forEach((tagName, index) => {
-            if (tagName !== this.activeDelegatedTag.value) return
-
-            const accountNameWithPubKey = keys[index]
-            if (names.indexOf(accountNameWithPubKey) === -1) {
-                names.push(accountNameWithPubKey)
-            }
-        })
-
-        return names
-    }
-
-    @action.bound
-    private async validateAccountNameAndReturnMap(
-        accountNameWithPubKey: string,
-        map: string[]
-    ): Promise<string[]> {
-        let cache = map
-
-        try {
-            // validate the member
-            const [name] = accountNameWithPubKey.split(':')
-            const isValidAccountName = await checkIfNameIsValid(name)
-
-            if (isValidAccountName) {
-                cache.push(accountNameWithPubKey)
-            }
-
-            return cache
-        } catch (error) {
-            throw error
-            // return error.message
+        if (initialState.unsignedPostsIsSpam) {
+            this.unsignedPostsIsSpam = initialState.unsignedPostsIsSpam
         }
     }
 
-    @action.bound
-    async setPinnedPosts(posts: any[], delegated = false) {
-        const obj = {}
+    resetUserStore = () => {
+        this.following.replace([])
+        this.watching.replace([])
+        this.blockedUsers.replace([])
+        this.blockedPosts.replace([])
+        this.delegated.replace([])
+        this.pinnedPosts.replace([])
+        this.blockedByDelegation.replace([])
+        this.notificationCount = 0
+        this.lastCheckedNotifications = 0
+        this.notifications = []
+        this.unsignedPostsIsSpam = true
+        this.blockedContentSetting = 'hidden'
+    }
+
+    setBlockedContent = (type: BlockedContentSetting) => {
+        this.blockedContentSetting = type
+        this.syncDataFromLocalToServer()
+    }
+
+    toggleUnsignedPostsIsSpam = () => {
+        this.unsignedPostsIsSpam = !this.unsignedPostsIsSpam
+        this.syncDataFromLocalToServer()
+    }
+
+    private async setAndUpdateDelegatedPosts(
+        mergedName: string,
+        tagName: string,
+        suppressAlert = false
+    ) {
+        if (!suppressAlert) {
+            if (!tagName || tagName === '') {
+                this.uiStore.showMessage(
+                    'An empty tag string is not valid. Set this user as a global mod by setting the tag to be "all".',
+                    'error'
+                )
+                return
+            }
+        }
+
+        this.delegated.set(mergedName, tagName)
+
+        if (!suppressAlert) {
+            this.uiStore.showMessage('Added user as a moderator', 'success')
+        }
+
+        try {
+            return await this.updateFromActiveDelegatedMembers()
+        } catch (error) {
+            return error
+        }
+    }
+
+    /**
+     * Input: USERNAME:KEY:TAG
+     * Output: [tag]
+     * @param username
+     * @param pub
+     */
+    activeModerationForCurrentUser = (username, pub) => {
+        const vals = [...this.delegated.keys()]
+        return vals
+            .filter(val => val.indexOf(`${username}:${pub}`) !== -1)
+            .map(val => val.split(':')[2])
+    }
+
+    async setPinnedPosts(posts: any[], delegated = false, sync = true) {
+        let obj = {}
 
         _.forEach(posts, (urls, name: string) => {
             _.forEach(urls, url => {
@@ -119,14 +135,22 @@ export default class UserStore extends BaseStore {
             })
         })
 
+        Object.assign(obj, this.pinnedPosts.toJSON())
+
+        const b64 = Buffer.from(JSON.stringify(obj)).toString('base64')
+
         if (delegated) {
-            this.pinnedByDelegation.replace(obj)
+            setCookie(null, 'pinnedByDelegation', b64, { path: '/' })
         } else {
-            this.pinnedPosts.replace(obj)
+            setCookie(null, 'pinnedPosts', b64, { path: '/' })
         }
+
+        if (sync) this.syncDataFromLocalToServer()
     }
 
-    @action.bound
+    /**
+     * Sync the data from delegated members
+     */
     async updateFromActiveDelegatedMembers() {
         try {
             return await Promise.all(
@@ -142,7 +166,7 @@ export default class UserStore extends BaseStore {
                         const blockedPostsKeys = Object.keys(blockedPosts)
 
                         if (pinnedPosts) {
-                            this.setPinnedPosts(pinnedPosts, true)
+                            this.setPinnedPosts(pinnedPosts, true, false)
                         }
 
                         if (blockedPostsKeys.length) {
@@ -164,40 +188,31 @@ export default class UserStore extends BaseStore {
         }
     }
 
-    @action.bound
-    private async setAndUpdateDelegatedPosts(
-        mergedName: string,
-        tagName: string,
-        suppressAlert = false
-    ) {
-        if (!suppressAlert) {
-            if (!tagName || tagName === '') {
-                this.uiStore.showToast(
-                    'An empty tag string is not valid. Set this user as a global mod by setting the tag to be "all".',
-                    'error'
-                )
-                return
-            }
+    setModerationFromDropdown = async (username, key, tags: string[]) => {
+        // use tags are source of truth for self-delegated
+        const current = this.activeModerationForCurrentUser(username, key)
+        const usernameWithKey = `${username}:${key}`
+
+        if (tags.length > current.length) {
+            // adding
+            tags.map(tag => {
+                this.delegated.set(`${usernameWithKey}:${tag}`, tag)
+            })
+        } else if (tags.length < current.length) {
+            // remove diff
+            const diff = _.difference(current, tags)
+            diff.map(tag => {
+                this.delegated.delete(`${usernameWithKey}:${tag}`)
+            })
         }
 
-        this.delegated.set(mergedName, tagName)
-
-        if (!suppressAlert) {
-            this.uiStore.showToast('Added user as a moderator', 'success')
-        }
-
-        try {
-            return await this.updateFromActiveDelegatedMembers()
-        } catch (error) {
-            return error
-        }
+        this.uiStore.showMessage('Moderation list updated', 'success')
+        this.syncDataFromLocalToServer()
     }
 
-    @task.resolved({ swallow: true })
-    @action.bound
     async setModerationMemberByTag(
         accountNameWithPubKey: string,
-        tagName = this.activeDelegatedTag.value,
+        tagName = '',
         suppressAlert = false,
         override = false
     ) {
@@ -211,6 +226,10 @@ export default class UserStore extends BaseStore {
             if (this.delegated.has(mergedName)) {
                 if (this.delegated.get(mergedName) === tagName) {
                     this.delegated.delete(mergedName)
+
+                    if (!suppressAlert) {
+                        this.uiStore.showMessage('Removed user as a moderator', 'success')
+                    }
                 } else {
                     await this.setAndUpdateDelegatedPosts(mergedName, tagName, suppressAlert)
                 }
@@ -220,120 +239,356 @@ export default class UserStore extends BaseStore {
         } catch (error) {
             return error
         }
+
+        this.syncDataFromLocalToServer()
     }
 
-    @action.bound
-    setActiveDelegatedTag(option) {
-        this.activeDelegatedTag = option
-    }
-
-    @computed get followingKeys() {
-        return Array.from(this.following.keys())
-    }
-
-    @action.bound
-    toggleUserFollowing(user: string, pub: string) {
+    toggleUserFollowing = (user: string, pub: string) => {
         if (this.following.has(pub)) {
             this.following.delete(pub)
+            this.uiStore.showMessage('This user has been unfollowed!', 'success')
         } else {
             this.following.set(pub, user)
-        }
-    }
-
-    isFollowingUser = computedFn((pub: string) => {
-        return this.following.has(pub)
-    }, true)
-
-    @action.bound
-    async updateWatchThreadCount() {
-        if (!this.watching.size) return
-
-        const threads = Array.from(this.watching.keys())
-
-        await threads.map(async encodedThreadId => {
-            const threadReplyCount = await discussions.getThreadReplyCount(encodedThreadId)
-
-            let count = [threadReplyCount, threadReplyCount]
-
-            if (this.isWatchingThread(encodedThreadId)) {
-                const [, diff] = this.watching.get(encodedThreadId)
-                count = [threadReplyCount, diff]
-            }
-
-            // @ts-ignore
-            this.watching.set(encodedThreadId, count)
-        })
-    }
-
-    @action.bound
-    syncCountsForUnread() {
-        this.watching.forEach(([curr, diff], encodedThread) => {
-            this.watching.set(encodedThread, [curr, curr])
-        })
-    }
-
-    @action.bound
-    toggleThreadWatch(id: string, count: number, suppressToast = false) {
-        if (this.watching.has(id)) {
-            this.watching.delete(id)
-            if (!suppressToast)
-                this.uiStore.showToast('You are no longer watching this thread', 'info')
-            return
+            this.uiStore.showMessage('You are now following this user!', 'success')
         }
 
-        if (this.watching.size <= 4) {
-            this.watching.set(id, [count, count])
-            if (!suppressToast)
-                this.uiStore.showToast('Success! You are watching this thread', 'success')
+        this.syncDataFromLocalToServer()
+    }
+
+    /**
+     * @param {string} asPathURL - i.e. /tag/test/1hx6xdq9iwehn/testt
+     */
+    toggleBlockPost = (asPathURL: string) => {
+        if (asPathURL === '') return
+
+        if (this.blockedPosts.has(asPathURL)) {
+            this.blockedPosts.delete(asPathURL)
+            this.uiStore.showMessage('This post has been unmarked as spam!', 'success')
         } else {
-            if (!suppressToast)
-                this.uiStore.showToast('You can only watch a maximum of 5 threads', 'info')
+            const dateStamp = `${moment(Date.now()).format('YYYYMM')}`
+            this.blockedPosts.set(asPathURL, dateStamp)
+            this.uiStore.showMessage('This post has been marked as spam!', 'success')
         }
+
+        this.syncDataFromLocalToServer()
     }
 
-    isWatchingThread = computedFn((id: string) => {
-        return this.watching.has(id)
-    })
-
-    @action.bound
-    toggleBlockUser(displayName: string, pubKey: string) {
+    toggleBlockUser = (displayName: string, pubKey: string) => {
         if (this.blockedUsers.has(pubKey)) {
             this.blockedUsers.delete(pubKey)
         } else {
             this.blockedUsers.set(pubKey, displayName)
         }
+
+        this.syncDataFromLocalToServer()
     }
 
-    isUserBlocked = computedFn((pubKey: string) => {
-        return this.blockedUsers.has(pubKey)
-    })
-
-    /**
-     * @param {string} asPathURL - i.e. /tag/test/1hx6xdq9iwehn/testt
-     */
-    @action.bound
-    toggleBlockPost(asPathURL: string) {
-        if (this.blockedPosts.has(asPathURL)) {
-            this.blockedPosts.delete(asPathURL)
-            this.uiStore.showToast('This post has been unmarked as spam!', 'success')
-        } else {
-            const date = new Date(Date.now())
-            const dateStamp = `${date.getFullYear()}${date.getMonth()}`
-            this.blockedPosts.set(asPathURL, dateStamp)
-            this.uiStore.showToast('This post has been marked as spam!', 'success')
+    toggleThreadWatch = (id: string, count?: number, suppressToast = false) => {
+        if (this.watching.has(id)) {
+            this.watching.delete(id)
+            this.syncDataFromLocalToServer()
+            if (!suppressToast)
+                this.uiStore.showMessage('You are no longer watching this thread', 'info')
+            return
         }
+
+        if (this.watching.size <= 99) {
+            this.watching.set(id, [count, count])
+            if (!suppressToast)
+                this.uiStore.showMessage('Success! You are watching this thread', 'success')
+        } else {
+            if (!suppressToast)
+                this.uiStore.showMessage('You can only watch a maximum of 100 threads', 'info')
+        }
+
+        this.syncDataFromLocalToServer()
     }
 
-    @action.bound
-    togglePinPost(tagName: string, asPathURL: string) {
+    togglePinPost = (tagName: string, asPathURL: string) => {
+        const pinnedPostsBuffer = parseCookies(window)
+        let pinnedPostsAsObj = {}
+
+        if (pinnedPostsBuffer.pinnedByDelegation) {
+            pinnedPostsAsObj = JSON.parse(
+                Buffer.from(pinnedPostsBuffer.pinnedByDelegation, 'base64').toString('ascii')
+            )
+        }
+
         if (this.pinnedPosts.has(asPathURL)) {
-            this.uiStore.showToast('This post has been unpinned!', 'success')
+            this.uiStore.showMessage('This post has been unpinned!', 'success')
             this.pinnedPosts.delete(asPathURL)
+
+            if (pinnedPostsAsObj[asPathURL]) {
+                delete pinnedPostsAsObj[asPathURL]
+            }
         } else {
             this.pinnedPosts.set(asPathURL, tagName)
-            this.uiStore.showToast('This post has been pinned!', 'success')
+            this.uiStore.showMessage('This post has been pinned!', 'success')
+
+            pinnedPostsAsObj = {
+                ...pinnedPostsAsObj,
+                [asPathURL]: tagName,
+            }
+        }
+
+        this.syncDataFromLocalToServer()
+        const b64 = Buffer.from(JSON.stringify(pinnedPostsAsObj)).toString('base64')
+        setCookie(window, 'pinnedByDelegation', b64, { path: '/' })
+    }
+
+    pingServerForData = ({ postPriv, postPub }) => {
+        this.syncDataFromServerToLocal().then(() => {
+            this.fetchNotifications(postPub)
+        })
+    }
+
+    /**
+     * Syncing user data with the server
+     */
+    syncDataFromServerToLocal = async () => {
+        try {
+            const { accountPrivKey, accountPubKey } = this.authStore
+
+            if (!accountPrivKey || !accountPubKey) {
+                this.uiStore.showToast(
+                    'Unable to fetch your data',
+                    'Seems like your session is corrupt. Please sign out and sign back in.',
+                    'error'
+                )
+            }
+
+            let data = await nsdb.getAccount({
+                accountPrivateKey: accountPrivKey,
+                accountPublicKey: accountPubKey,
+            })
+
+            if (!data) return
+
+            data = data['data']
+
+            if (data) {
+                if (typeof data['lastCheckedNotifications'] !== 'undefined')
+                    this.lastCheckedNotifications = data['lastCheckedNotifications']
+
+                if (data['watching']) this.watching.replace(data['watching'])
+
+                if (data['tags']) this.tagStore.subscribed.replace(data['tags'])
+
+                if (data['following'])
+                    this.following.replace(data['following'].map(obj => [obj.pub, obj.name]))
+
+                if (data['moderation']['blockedPosts']) {
+                    const blockedPosts = data['moderation']['blockedPosts']
+
+                    if (data['legacy'] || typeof data['legacy'] === 'undefined') {
+                        console.log('found legacy user, updating')
+                        this.blockedPosts.replace({})
+                    } else {
+                        this.blockedPosts.replace(blockedPosts)
+                    }
+                }
+                if (data['moderation']['delegated'])
+                    this.delegated.replace(data['moderation']['delegated'])
+
+                if (data['moderation']['blockedUsers'])
+                    this.blockedUsers.replace(data['moderation']['blockedUsers'])
+
+                if (data['moderation']['pinnedPosts']) {
+                    const pinnedPosts = data['moderation']['pinnedPosts']
+
+                    if (data['legacy'] || typeof data['legacy'] === 'undefined') {
+                        console.log('found legacy user, updating')
+                        this.pinnedPosts.replace({})
+                    } else {
+                        this.pinnedPosts.replace(pinnedPosts)
+                    }
+                }
+
+                if (typeof data['moderation']['unsignedPostsIsSpam'] !== 'undefined')
+                    this.unsignedPostsIsSpam = data['moderation']['unsignedPostsIsSpam']
+
+                if (typeof data['moderation']['blockedContentSetting'] !== 'undefined')
+                    this.blockedContentSetting = data['moderation']['blockedContentSetting']
+            }
+        } catch (error) {
+            console.log(error)
+            this.uiStore.showToast(
+                'Unable to sync',
+                'We experienced some problems syncing your account data to your current browser',
+                'info'
+            )
+            return error
         }
     }
-}
 
-export const getUserStore = getOrCreateStore('userStore', UserStore)
+    /**
+     * Sync the current data in LS to the server
+     */
+    syncDataFromLocalToServer = async () => {
+        try {
+            const following = [...this.following.toJS()].map(([pub, name]) => ({
+                pub,
+                name,
+            }))
+
+            // we have to send the entire payload, not just the diff
+            const dataToSync = {
+                uidw: this.authStore.uidwWalletPubKey,
+                postPub: this.authStore.postPub,
+                legacy: false, // override
+                lastCheckedNotifications: this.lastCheckedNotifications,
+                watching: [...this.watching.toJS()],
+                following: following,
+                tags: [...this.tagStore.subscribed.toJS()],
+                moderation: {
+                    blockedPosts: [...this.blockedPosts.toJS()],
+                    blockedUsers: [...this.blockedUsers.toJS()],
+                    pinnedPosts: [...this.pinnedPosts.toJS()],
+                    delegated: [...this.delegated.toJS()],
+                    blockedContentSetting: this.blockedContentSetting,
+                    unsignedPostsIsSpam: this.unsignedPostsIsSpam,
+                },
+            }
+
+            const { accountPrivKey, accountPubKey } = parseCookies(window)
+
+            if (!accountPrivKey || !accountPubKey) {
+                this.uiStore.showToast(
+                    'Unable to save your data',
+                    'Seems like your session is corrupt. Please sign out and sign back in.',
+                    'error'
+                )
+            }
+
+            await nsdb.saveAccount({
+                accountPrivateKey: accountPrivKey,
+                accountPublicKey: accountPubKey,
+                accountData: dataToSync,
+            })
+        } catch (error) {
+            console.log(error)
+            this.uiStore.showToast(
+                'Unable to sync',
+                'We were unable to sync your data to our servers.',
+                'info'
+            )
+            return error
+        }
+    }
+
+    /**
+     * Update thread watch count by calling this method
+     * in an interval. Compare the threadReplyCounts [currentCount, previousCount]
+     */
+    watchAndUpdateWatchedPostsCount = async () => {
+        try {
+            if (!this.watching.size) return
+
+            const threads = [...this.watching.keys()]
+
+            mapSeries(
+                threads,
+                (encodedThreadId, cb) => {
+                    discussions
+                        .getThreadReplyCount(encodedThreadId)
+                        .then(threadReplyCount => {
+                            const [, diff] = this.watching.get(encodedThreadId)
+                            if (threadReplyCount - diff > 0) {
+                                return cb(null, [
+                                    encodedThreadId,
+                                    threadReplyCount - diff,
+                                    threadReplyCount,
+                                ])
+                            }
+                            return cb()
+                        })
+                        .catch(error => {
+                            return cb(null, error.message)
+                        })
+                },
+                async (error, result) => {
+                    // results is an array of objects [encodedId, diff]
+                    if (result[0] !== undefined && result.length > 0) {
+                        each(result, async (item, cb) => {
+                            console.log(item)
+                            const [threadId, diff, currentCount] = item
+                            const thread = await discussions.getThread(threadId)
+                            const id = encodeId(thread.openingPost)
+                            const tag: any = this.tagStore.tagModelFromObservables(
+                                thread.openingPost.sub
+                            )
+
+                            this.notifications.unshift({
+                                ...thread.openingPost,
+                                url: `/tag/${thread.openingPost.sub}/${id}/${getThreadTitle(
+                                    thread.openingPost
+                                )}`,
+                                displayName: `#${thread.openingPost.sub}`,
+                                content: `There are ${diff} new unread posts`,
+                                tag,
+                                createdAt: Date.now(),
+                            } as any)
+
+                            this.notificationCount += 1
+                            this.watching.set(threadId, [currentCount, currentCount])
+
+                            return cb()
+                        })
+                    }
+                }
+            )
+        } catch (error) {
+            return error
+        }
+    }
+
+    /**
+     * Delete a notification by index
+     *
+     * We don't have to clear the badge count because when the user opens the tray
+     * it will auto clear.
+     * @param {number} index
+     */
+    deleteNotification = index => {
+        this.notifications.splice(index, 1)
+    }
+
+    fetchNotifications = async (publicKey: string): Promise<void> => {
+        try {
+            let { payload } = await discussions.getPostsForNotifications(
+                publicKey,
+                this.lastCheckedNotifications,
+                undefined,
+                0
+            )
+
+            console.log(payload)
+
+            this.notificationCount = payload.length
+            this.notifications = payload.filter((item, index) => index <= 5)
+
+            this.watchAndUpdateWatchedPostsCount()
+        } catch (error) {
+            this.notifications = []
+            return error
+        }
+    }
+
+    clearNotifications = () => {
+        this.notifications = []
+        this.notificationCount = 0
+        this.uiStore.showMessage('Notifications cleared', 'success')
+    }
+
+    /**
+     * We need to reset the thread watch counter when the user clicks the notification tray
+     * so the next time we fetch notifications we aren't showing them a new post.
+     * [encodedId]: [currentCount, previousCount]
+     *
+     */
+    resetThreadWatchCounts = () => {
+        this.watching.forEach(([curr, diff], encodedThread) => {
+            this.watching.set(encodedThread, [curr, curr])
+        })
+    }
+}

@@ -1,92 +1,44 @@
-import * as React from 'react'
-import { inject, observer } from 'mobx-react'
-import { IStores } from '@stores'
+import React, { useContext } from 'react'
+import { NextPage } from 'next'
 import { InfiniteScrollFeed } from '@components'
-import { TagModel } from '@models/tagModel'
+import { observer } from 'mobx-react-lite'
+import { StoreContext } from '@stores'
+import { parseCookies } from 'nookies'
+import { NextSeo } from 'next-seo'
 import Head from 'next/head'
-import { Post } from '@novuspherejs'
 
-interface ITagProps {
-    tagStore: IStores['tagStore']
-    postsStore: IStores['postsStore']
-    uiStore: IStores['uiStore']
-    tagModel: TagModel
+const TagPage: NextPage<any> = ({ postPub, tag, pinnedByDelegation }) => {
+    const { postsStore } = useContext(StoreContext)
 
-    tag: undefined | string
+    return (
+        <>
+            <Head>
+                <title>Discussions App - #{tag}</title>
+            </Head>
+            <NextSeo title={`Discussions App - #${tag}`} description={`Viewing posts in #${tag}`} />
+            <InfiniteScrollFeed
+                dataLength={postsStore.postsPosition.items}
+                hasMore={postsStore.postsPosition.cursorId !== 0}
+                next={() => postsStore.fetchPostsForTag(postPub, [tag], pinnedByDelegation)}
+                posts={postsStore.posts}
+            />
+        </>
+    )
 }
 
-// TODO: Merge logic between e/page and tag/page. Right now it's separated.
+TagPage.getInitialProps = async function({ store, query, ...rest }: any) {
+    const tag = query.name
+    const { pinnedByDelegation } = parseCookies(rest)
+    store.postsStore.resetPostsAndPosition()
 
-interface ITagPageState {}
+    const postPub = store.authStore.postPub
+    await store.postsStore.fetchPostsForTag(postPub, [tag], pinnedByDelegation)
 
-@inject('tagStore', 'postsStore', 'uiStore')
-@observer
-class Tag extends React.Component<ITagProps, ITagPageState> {
-    state = {
-        isFirstRender: false,
-    }
-
-    static async getInitialProps({ query, store }) {
-        const postsStore: IStores['postsStore'] = store.postsStore
-        const tagStore: IStores['tagStore'] = store.tagStore
-        const tag = query.name
-
-        tagStore.setActiveTag(tag)
-        tagStore.setActiveSlug(tag)
-        postsStore.resetPositionAndPosts()
-
-        postsStore.getPostsByTag([tag], true)
-
-        return {
-            tag,
-        }
-    }
-
-    componentWillMount(): void {
-        this.props.uiStore.toggleBannerStatus(true)
-        this.props.uiStore.toggleSidebarStatus(true)
-    }
-
-    componentDidMount(): void {
-        window.scrollTo(0, 0)
-        if (!this.state.isFirstRender) {
-            this.props.tagStore.setActiveTag(this.props.tag)
-            this.props.tagStore.setActiveSlug(this.props.tag)
-            this.props.postsStore.getPostsByTag([this.props.tag], true)
-            this.setState({
-                isFirstRender: true,
-            })
-        }
-    }
-
-    componentWillUnmount(): void {
-        this.props.tagStore.destroyActiveTag()
-    }
-
-    public render() {
-        const {
-            props: {
-                postsStore: { posts, postsPosition, getPostsByTag },
-                tagStore,
-                tag,
-            },
-        } = this
-
-        return (
-            <>
-                <Head>
-                    <title>{tag}</title>
-                </Head>
-                <InfiniteScrollFeed
-                    dataLength={postsPosition.items}
-                    hasMore={postsPosition.cursorId !== 0}
-                    next={() => getPostsByTag([tag])}
-                    posts={posts}
-                    tagModel={tagStore.activeTag}
-                />
-            </>
-        )
+    return {
+        postPub,
+        tag,
+        pinnedByDelegation,
     }
 }
 
-export default Tag
+export default observer(TagPage)

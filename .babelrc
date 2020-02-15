@@ -1,16 +1,13 @@
 {
-    "presets": [
+    "presets": ["next/babel"],
+    "plugins": [
         [
-            "next/babel",
+            "import",
             {
-                "transform-runtime": {
-                    "corejs": false
-                }
+                "libraryName": "antd",
+                "style": true
             }
         ],
-        "@zeit/next-typescript/babel"
-    ],
-    "plugins": [
         [
             "@babel/plugin-proposal-decorators",
             {

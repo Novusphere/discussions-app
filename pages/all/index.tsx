@@ -1,47 +1,40 @@
-import * as React from 'react'
-import { IStores } from '@stores'
-import { Post } from '@novuspherejs'
-import { inject, observer } from 'mobx-react'
+import React, { useContext } from 'react'
+import { NextPage } from 'next'
 import { InfiniteScrollFeed } from '@components'
-import { sleep } from '@utils'
+import { observer } from 'mobx-react-lite'
+import { StoreContext } from '@stores'
+import Head from 'next/head'
+import { NextSeo } from 'next-seo'
 
-interface IAllProps {
-    postsStore: IStores['postsStore']
-    uiStore: IStores['uiStore']
-    tagStore: IStores['tagStore']
-    posts: Post[]
-    cursorId: number
-}
+const AllPage: NextPage<any> = ({ postPub }) => {
+    const { postsStore } = useContext(StoreContext)
+    const title = 'Discussions App - #all'
 
-interface IAllState {}
-
-@inject('postsStore', 'uiStore', 'tagStore')
-@observer
-class All extends React.Component<IAllProps, IAllState> {
-    async componentDidMount(): Promise<void> {
-        this.props.postsStore.resetPositionAndPosts()
-
-        this.props.uiStore.toggleSidebarStatus(true)
-        this.props.uiStore.toggleBannerStatus(true)
-        this.props.tagStore.destroyActiveTag()
-
-        await sleep(500)
-        await this.props.postsStore.getPostsForSubs(['all'])
-    }
-
-    public render() {
-        const { getPostsForSubs, postsPosition, posts } = this.props.postsStore
-        const { cursorId, items } = postsPosition
-
-        return (
+    return (
+        <>
+            <Head>
+                <title>{title}</title>
+            </Head>
+            <NextSeo title={title} description={'Viewing all posts in #all'} />
             <InfiniteScrollFeed
-                dataLength={items}
-                hasMore={cursorId !== 0}
-                next={getPostsForSubs}
-                posts={posts}
+                dataLength={postsStore.postsPosition.items}
+                hasMore={postsStore.postsPosition.cursorId !== 0}
+                next={() => postsStore.fetchPostsForTag(postPub, ['all'])}
+                posts={postsStore.posts}
             />
-        )
+        </>
+    )
+}
+
+AllPage.getInitialProps = async function({ store }: any) {
+    store.postsStore.resetPostsAndPosition()
+
+    const postPub = store.authStore.postPub
+    await store.postsStore.fetchPostsForTag(postPub, ['all'])
+
+    return {
+        postPub,
     }
 }
 
-export default All
+export default observer(AllPage)

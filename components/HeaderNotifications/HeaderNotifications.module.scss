@@ -1,0 +1,53 @@
+.list {
+    max-height: 400px;
+    overflow: auto;
+    position: relative;
+}
+
+.notificationsOverlayContainer {
+    position: relative;
+    width: 336px;
+}
+
+.listContainer {
+    background: white;
+    position: relative;
+    overflow: hidden;
+}
+
+.contentContainer {
+    max-height: 100px;
+    word-break: break-word;
+}
+
+.notificationItem {
+    margin-left: -40px;
+    padding: 1em;
+    border-bottom: 1px solid #EEEEEE;
+
+    &:last-of-type {
+        padding-bottom: 0;
+        border-bottom: none;
+    }
+}
+
+.bottomBar {
+    border-top: 1px solid #EEEEEE;
+    height: 46px;
+
+    span {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        height: 100%;
+        width: 50%;
+        text-align: center;
+
+        &:only-child {
+            width: 100%;
+        }
+        &:not(:only-child):last-child {
+            border-left: 1px solid #EEEEEE;
+        }
+    }
+}

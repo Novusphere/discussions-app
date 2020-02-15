@@ -1,0 +1,22 @@
+.mentionList {
+    border-radius: 5px;
+    z-index: 5;
+
+    ul {
+        padding: 0;
+        margin: 0;
+        list-style-type: none;
+
+        li {
+            padding: 1em;
+        }
+    }
+}
+
+.mentionItem {
+    background: white;
+
+    &.selected {
+        background: red !important;
+    }
+}

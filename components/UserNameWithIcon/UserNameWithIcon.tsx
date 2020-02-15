@@ -1,56 +1,28 @@
-import * as React from 'react'
+import React, { FunctionComponent } from 'react'
+import { Avatar, Icon } from 'antd'
+
+import styles from './UserNameWithIcon.module.scss'
 import Link from 'next/link'
-import { getDefaultIdenticon } from '@utils'
 
 interface IUserNameWithIconProps {
-    imageSize?: number
     imageData: string
-    name: string
     pub: string
+    name: string
 }
 
-const UserNameWithIcon: React.FC<IUserNameWithIconProps> = ({
-    imageSize,
-    imageData= getDefaultIdenticon,
-    name,
-    pub,
-}) => {
-    let size = imageSize
-
-    if (!imageSize || typeof imageSize === 'undefined') {
-        size = 15
-    }
-
-    const image = (
-        <img width={size} height={size} src={imageData} className={'post-icon mr2'} alt={'Icon'} />
-    )
-
-    const user = <span>{name}</span>
-
-    if (imageData === getDefaultIdenticon) {
-        return (
-            <span
-                className={'flex items-center'}
-                title={
-                    'Since no pub key was found for this post, you cannot use user actions on this user'
-                }
-            >
-                {image}
-                {user}
-            </span>
-        )
-    }
-
+const UserNameWithIcon: FunctionComponent<IUserNameWithIconProps> = ({ imageData, pub, name }) => {
     return (
-        <object className={'z-2'}>
-            <Link href={`/u/[username]`} as={`/u/${name}-${pub}`}>
-                <a className={'flex items-center dim pointer'}>
-                    {image}
-                    {user}
-                </a>
-            </Link>
-        </object>
+        <>
+            <Avatar icon={'user'} src={imageData} size={'small'} />
+            <object className={'z-2 pl2'}>
+                <Link href={`/u/[username]`} as={`/u/${name}-${pub}`} shallow={false}>
+                    <a className={'flex items-center dim pointer'}>{name}</a>
+                </Link>
+            </object>
+        </>
     )
 }
+
+UserNameWithIcon.defaultProps = {}
 
 export default UserNameWithIcon

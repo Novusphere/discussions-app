@@ -1,17 +1,19 @@
 import Router from 'next/router'
 import { discussions, eos, nsdb, Post } from '@novuspherejs'
-import { IPost } from '@stores/postsStore'
 import _ from 'lodash'
 import axios from 'axios'
 import ecc from 'eosjs-ecc'
 import { useEffect, useRef } from 'react'
+import cookie from 'cookie'
 
 const removeMd = require('remove-markdown')
-
+const matchAll = require('string.prototype.matchall')
 const pjson = require('../package.json')
 const uuid = require('uuidv4')
 
 export * from './useScrollPosition'
+export * from './wrapper'
+export * from './useInterval'
 
 export const INDEXER_NAME = '__LINKINDEXER__'
 export const LINK_LIMIT = 1000
@@ -19,6 +21,10 @@ export const isDev = process.env.NODE_ENV === 'development'
 export const isServer = typeof window === 'undefined'
 export const sleep = milliseconds => {
     return new Promise(resolve => setTimeout(resolve, milliseconds))
+}
+
+export const parseCookies = req => {
+    return cookie.parse(req ? req.headers.cookie || '' : document.cookie)
 }
 
 export const sanityCheckTag = (tagName: string) => {
@@ -31,10 +37,10 @@ export const sanityCheckTag = (tagName: string) => {
     return tagName
 }
 
-export const tweetCurrentPage = () => {
+export const tweetCurrentPage = (url = null) => {
     window.open(
         'https://twitter.com/share?url=' +
-            encodeURIComponent(window.location.href) +
+            (url ? url : encodeURIComponent(window.location.href)) +
             '&text=' +
             document.title,
         '',
@@ -83,7 +89,7 @@ export const openInNewTab = (url: string) => {
     return win.focus()
 }
 
-export const encodeId = (post: IPost) => {
+export const encodeId = (post: Post) => {
     if (!post) return ''
     return Post.encodeId(post.transaction, new Date(post.createdAt))
 }
@@ -601,21 +607,14 @@ export const checkIfNameIsValid = async (accountName: string): Promise<boolean |
             return [isPublicKey, isPublicKey]
         }
 
-        const { data } = await axios.post(
-            'https://eos.eoscafeblock.com/v1/chain/get_table_by_scope',
-            {
-                code: 'eosio',
-                table: 'userres',
-                lower_bound: accountName,
-                upper_bound: accountName,
-                limit: 1,
-            }
+        const { data } = await axios.get(
+            `https://www.api.bloks.io/account/${accountName}?type=getAccountTokens`
         )
 
-        if (data.rows.length > 0) return true
-        throw new Error(`${accountName} is not a valid EOS username, please try again.`)
+        if (data && data.tokens && data.tokens.length > 0) return true
+        throw new Error(accountName)
     } catch (error) {
-        throw new Error(`${accountName} is not a valid EOS username, please try again.`)
+        throw new Error(accountName)
     }
 }
 
@@ -740,28 +739,185 @@ export const generateVoteObject = ({ uuid, postPriv, value }) => {
     }
 }
 
-export const useInterval = (callback, delay) => {
-    const savedCallback = useRef()
-
-    // Remember the latest callback.
-    useEffect(() => {
-        savedCallback.current = callback
-    }, [callback])
-
-    // Set up the interval.
-    useEffect(() => {
-        const tick = () => {
-            // @ts-ignore
-            savedCallback.current()
-        }
-
-        if (delay !== null) {
-            let id = setInterval(tick, delay)
-            return () => clearInterval(id)
-        }
-    }, [delay])
+export const escapeRegExp = string => {
+    return string.replace(/[|\\{}()[\]^$+*?.-]/g, '\\$&') // $& means the whole matched string
 }
 
-export const escapeRegExp = (string) => {
-    return string.replace(/[|\\{}()[\]^$+*?.-]/g, '\\$&'); // $& means the whole matched string
+export const matchTipForTags = (content: string) => {
+    let tokens = 'ATMOS|EOS'
+
+    if (typeof window !== 'undefined') {
+        tokens = window.localStorage.getItem('supp_tokens')
+    }
+
+    // this is a fix for removing zero-width characters from a js string
+    const _content = content.replace(/[\u200B-\u200D\uFEFF]/g, '')
+    const regex = new RegExp(
+        `\[#tip\](.*?)\\s([0-9\.]+)\\s(${tokens})(?:\\s\\[\\@(.*?)\\]\\((.*?)\\))?`,
+        'gim'
+    )
+
+    let results = matchAll(_content, regex)
+    let tips = []
+
+    for (let result of results) {
+        const [,,amount,symbol,username,url] = result
+
+        tips.push({
+            amount,
+            symbol,
+            username,
+            url,
+        })
+    }
+
+    return tips
+}
+
+export const matchContentForMentions = (content: string) => {
+    return content.match(/\[@(.*?)]\(.*?\)/gi)
+}
+
+export const extractMentionHashesForRegEx = (matchedContentForMentions: any) => {
+    if (!matchedContentForMentions) return []
+    const regex = new RegExp(/\(?EOS.*\)?\w/, 'gi')
+    return matchedContentForMentions.map(items => {
+        return items.match(regex)[0]
+    })
+}
+
+export const matchContentForTags = (content: string) => {
+    let results = matchAll(content, /\[\#([a-zA-Z0-9]*)\]/gim)
+
+    let tags = []
+
+    for (let result of results) {
+        const [, tag] = result
+        tags.push(tag)
+    }
+
+    return tags
+}
+
+export const createPostObject = ({
+    title,
+    content,
+    sub,
+    parentUuid,
+    threadUuid,
+    uidw,
+    pub, // the person you are replying to
+    posterName,
+    isEdit = false,
+    skipId = false,
+    postPub = '',
+    postPriv = '',
+    uuid = '',
+}) => {
+    let reply = {
+        poster: null,
+        title: title,
+        createdAt: new Date(Date.now()),
+        content: content,
+        sub: sub,
+        chain: 'eos',
+        mentions: [],
+        tags: [sub],
+        id: '',
+        uuid: uuid,
+        parentUuid: parentUuid,
+        threadUuid: threadUuid,
+        uidw: uidw,
+        attachment: getAttachmentValue(content),
+        upvotes: 0,
+        downvotes: 0,
+        myVote: [],
+        edit: undefined,
+        transfers: [],
+        vote: null,
+        imageData: getIdenticon(postPub),
+        pub: postPub,
+        displayName: posterName,
+        sig: '',
+        replies: [],
+    }
+
+    if (!isEdit) {
+        const generatedUuid = generateUuid()
+
+        if (!skipId) {
+            reply.id = generatedUuid
+            reply.uuid = generatedUuid
+        }
+
+        const value = 1
+
+        reply = {
+            ...reply,
+            upvotes: 1,
+        }
+
+        if (postPriv) {
+            reply.vote = generateVoteObject({
+                uuid: generatedUuid,
+                postPriv: postPriv,
+                value: value,
+            }).data
+        }
+
+        let tips = matchTipForTags(content)
+
+        if (tips && tips.length) {
+            reply.transfers = tips
+        }
+    } else {
+        reply.uuid = generateUuid()
+        reply.edit = true
+    }
+
+    reply.mentions = [...extractMentionHashesForRegEx(matchContentForMentions(content)), pub]
+
+    let tags = matchContentForTags(content)
+
+    if (tags && tags.length) {
+        tags = tags.map(tag => tag.replace('#', ''))
+        reply.tags = [...reply.tags, ...tags]
+    }
+
+    return reply
+}
+
+export const hasErrors = fieldsError => {
+    return Object.keys(fieldsError).some(field => fieldsError[field])
+}
+
+export const signPost = ({ privKey, content, uuid }) => {
+    let pub = ecc.privateToPublic(privKey)
+    const hash0 = ecc.sha256(content)
+    const hash1 = ecc.sha256(uuid + hash0)
+    const sig = ecc.sign(hash1, privKey)
+    const verifySig = pub
+
+    return {
+        sig,
+        verifySig,
+    }
+}
+
+export const getSignatureAndSubmit = (robj, fromAddress) => {
+    try {
+        robj.sig = eos.transactionSignature(
+            robj.chain,
+            fromAddress,
+            robj.to,
+            robj.amount,
+            robj.fee,
+            robj.nonce,
+            robj.memo
+        )
+
+        return submitRelayAsync([robj])
+    } catch (error) {
+        throw error
+    }
 }

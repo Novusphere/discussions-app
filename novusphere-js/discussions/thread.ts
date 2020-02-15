@@ -3,6 +3,7 @@ import { REDDIT_URL } from './attachment'
 import { RedditService } from './service/reddit'
 
 export default class Thread {
+    icon: string | undefined
     openingPost: Post | undefined
     map: { [uuid: string]: Post }
 

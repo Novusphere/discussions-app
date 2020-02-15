@@ -8,6 +8,7 @@ import * as bip32 from 'bip32'
 import ecc from 'eosjs-ecc'
 import axios from 'axios'
 import { INSDBSearchQuery } from '../../nsdb'
+import { encodeId, getThreadTitle, getThreadUrl, isDev } from '@utils'
 //import { isDev } from '@utils'
 
 export interface IBrainKeyPair {
@@ -127,30 +128,34 @@ export default class DiscussionsService {
 
     async bkToKeys(
         bk: string
-    ): Promise<{ post: { priv: string; pub: string }; uidwallet: { priv: string; pub: string } }> {
+    ): Promise<{ post: { priv: string; pub: string }; uidwallet: { priv: string; pub: string }; account: { priv: string; pub: string } }> {
         const seed = await bip39.mnemonicToSeed(bk)
         const node = await bip32.fromSeed(seed)
 
         const keys = {
             post: null,
             uidwallet: null,
+            account: null,
         }
 
         //keys['BTC'] = this.bkGetBitcoin(node);
         keys['post'] = this.bkGetEOS(node, 0)
         keys['uidwallet'] = this.bkGetEOS(node, 1)
+        keys['account'] = this.bkGetEOS(node, 2)
         return keys
     }
 
     async getPostsForSearch(
         search: string,
         searchCursorId = undefined,
-        count = 0
+        count = 0,
+        key = ''
     ): Promise<{
         results: Post[]
         cursorId: number
     }> {
         const { payload, cursorId } = await nsdb.search({
+            key,
             cursorId: searchCursorId,
             count,
             pipeline: [
@@ -344,17 +349,28 @@ export default class DiscussionsService {
         return op.totalReplies
     }
 
-    async getUser(pub: string): Promise<{ count: number; pub: string }> {
+    async getUser(
+        pub: string
+    ): Promise<{
+        followers: number
+        pub: string
+        posts: number
+        threads: number
+        uidw: string
+        displayName: string
+    }> {
         try {
             const { data } = await axios.get(`${nsdb.api}/discussions/site/profile/${pub}`)
             return data
         } catch (error) {
-            return { count: 0, pub }
+            return { followers: 0, pub: '', posts: 0, threads: 0, uidw: '', displayName: '' }
         }
     }
 
     private convertEncodedThreadIdIntoQuery = (_id: string, key = '') => {
         let dId = Post.decodeId(_id)
+
+        if (!dId) throw new Error('Unable to decode id')
 
         const searchQuery = {
             key: key,
@@ -403,8 +419,30 @@ export default class DiscussionsService {
             } while (sq.cursorId)
 
             let thread = new Thread()
+
             thread.init(posts)
             thread.normalize()
+
+            const { data: setting } = await axios.get(`${nsdb.api}/discussions/site`)
+
+            // get icon for seo
+            // #196
+            let host
+
+            if (process.env.NODE_ENV === 'production' || isDev) host = 'discussions.app'
+
+            let settings = setting[host]
+
+            if (!settings) settings = setting['discussions.app']
+
+            if (
+                typeof thread !== 'undefined' &&
+                typeof thread.openingPost !== 'undefined' &&
+                typeof settings['tags'][thread.openingPost.sub] !== 'undefined'
+            ) {
+                thread.icon = settings['tags'][thread.openingPost.sub]['icon']
+            }
+
             return thread
         } catch (error) {
             console.error('getThreadAsync error', error)
@@ -559,7 +597,7 @@ export default class DiscussionsService {
         limit = 20
     ): Promise<INSDBSearchQuery> {
         try {
-            return await nsdb.search({
+            const response = await nsdb.search({
                 pipeline: [
                     {
                         $match: {
@@ -573,6 +611,17 @@ export default class DiscussionsService {
                 count,
                 limit,
             })
+
+            response.payload = await Promise.all(
+                response.payload.map(async item => {
+                    return {
+                        ...item,
+                        url: await getThreadUrl(item, item.title === '' ? item.uuid : null),
+                    }
+                })
+            )
+
+            return response
         } catch (error) {
             throw error
         }

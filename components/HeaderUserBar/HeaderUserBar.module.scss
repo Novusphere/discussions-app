@@ -1,0 +1,19 @@
+.userBar {
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.avatar {
+  margin-left: 0.5em;
+}
+
+.userLink {
+  font-weight: 500;
+  color: $secondaryLink !important;
+}
+
+.userOptions {
+  padding: 0 !important;
+}

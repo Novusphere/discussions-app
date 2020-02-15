@@ -1,23 +1,20 @@
-import { action, computed, observable } from 'mobx'
-import { BaseStore, getOrCreateStore } from 'next-mobx-wrapper'
-import { toast } from 'react-toastify'
+import { computed, observable } from 'mobx'
+import { MODAL_OPTIONS } from '@globals'
+import { notification, message } from 'antd'
 import { Router } from 'next/router'
+import { RootStore } from '@stores'
+import Cookie from 'mobx-cookie'
 
-export default class UiStore extends BaseStore {
-    @observable activeBanner = '/static/banners/default.png'
-    @observable activeModal = ''
-
-    @observable showSidebar = true
-    @observable showBanner = true
+export class UIStore {
+    @observable activeModal: MODAL_OPTIONS = MODAL_OPTIONS.none
 
     @observable currentIndex = 0
     @observable banners = ['/static/banners/default.png']
+    @observable activeBanner = this.banners[this.currentIndex]
 
-    @observable isServer = true
+    _hideSideBar = new Cookie('hideSideBar')
 
-    constructor() {
-        super()
-
+    constructor(rootStore: RootStore) {
         Router.events.on('routeChangeStart', url => {
             if (url.indexOf('tag') === -1) {
                 let index = this.currentIndex
@@ -35,39 +32,40 @@ export default class UiStore extends BaseStore {
         })
     }
 
-    @action.bound
-    toggleSidebarStatus(status: boolean) {
-        this.showSidebar = status
+    setSidebarHidden = (value: string) => {
+        this._hideSideBar = new Cookie('hideSideBar')
+        this._hideSideBar.set(value)
     }
 
-    @action.bound
-    toggleBannerStatus(status: boolean) {
-        this.showBanner = status
+    @computed get hideSidebar() {
+        const val = this._hideSideBar.value
+        if (typeof val === 'string') return JSON.parse(val)
+        return val
     }
 
-    @computed get isModalOpen(): boolean {
-        return this.activeModal !== ''
-    }
-
-    @action showModal = modal => {
+    setActiveModal = (modal: MODAL_OPTIONS) => {
         this.activeModal = modal
     }
 
-    @action hideModal = () => {
-        this.activeModal = ''
+    clearActiveModal = () => {
+        this.activeModal = MODAL_OPTIONS.none
     }
 
     showToast = (
         message: string,
-        type: 'error' | 'info' | 'success' | 'warn',
-        onClick = undefined
+        description: string,
+        type = 'open',
+        { btn, onClose } = { btn: null, onClose: null } as any
     ) => {
-        return toast[type](message, {
-            hideProgressBar: true,
-            pauseOnHover: false,
-            onClick,
+        notification[type]({
+            message,
+            description,
+            btn,
+            onClose,
         })
     }
-}
 
-export const getUiStore = getOrCreateStore('uiStore', UiStore)
+    showMessage = (description: string, type = 'success') => {
+        message[type](description)
+    }
+}

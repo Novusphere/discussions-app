@@ -1,5 +1,6 @@
 import axios from 'axios'
 import { ApiGetUnifiedId } from 'interfaces/ApiGet-UnifiedId'
+import { isDev } from '@utils'
 const ecc = require('eosjs-ecc')
 export const DEFAULT_NSDB_ENDPOINT = 'https://atmosdb.novusphere.io'
 
@@ -31,13 +32,22 @@ export class NSDB {
         }
     }
 
-    async getAccount(privateKey: string) {
+    async getAccount({
+        accountPrivateKey,
+        accountPublicKey,
+    }) {
         const time = new Date().getTime()
-        const sig = ecc.sign(ecc.sha256(`discussions-${time}`), privateKey)
-        const pub = ecc.privateToPublic(privateKey)
+        let domain = window.location.origin
 
-        const qs = `pub=${pub}&sig=${sig}&time=${time}`
-        const rurl = `${this.api}/discussions/account/data`
+        if (isDev) {
+            domain = 'https://beta.discussions.app'
+        }
+
+        const sig = ecc.sign(ecc.sha256(`${domain}-${time}`), accountPrivateKey)
+        const pub = accountPublicKey
+
+        const qs = `pub=${pub}&sig=${sig}&time=${time}&domain=${domain}`
+        const rurl = `${this.api}/account/data`
 
         const { data } = await axios.post(rurl, qs)
 
@@ -49,13 +59,22 @@ export class NSDB {
         return data.payload
     }
 
-    async saveAccount(privateKey: string, accountData: any) {
+    async saveAccount({
+        accountPrivateKey,
+        accountPublicKey,
+        accountData,
+    }) {
         const jsonData = JSON.stringify(accountData)
-        const sig = ecc.sign(ecc.sha256(jsonData), privateKey)
-        const pub = ecc.privateToPublic(privateKey)
+        const sig = ecc.sign(ecc.sha256(jsonData), accountPrivateKey)
+        const pub = accountPublicKey
+        let domain = window.location.origin
 
-        const qs = `pub=${pub}&sig=${sig}&data=${encodeURIComponent(jsonData)}`
-        const rurl = `${this.api}/discussions/account/save`
+        if (isDev) {
+            domain = 'https://beta.discussions.app'
+        }
+
+        const qs = `pub=${pub}&sig=${sig}&data=${encodeURIComponent(jsonData)}&domain=${domain}`
+        const rurl = `${this.api}/account/save`
 
         const { data } = await axios.post(rurl, qs)
         if (data.error) {

@@ -1,18 +1,26 @@
-import * as React from 'react'
-import { PostTips } from '@novuspherejs/discussions/post'
-import { observer } from 'mobx-react'
-import { useState } from 'react'
-import { faCoins } from '@fortawesome/free-solid-svg-icons'
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
+import React, { FunctionComponent, useState } from 'react'
+
+import styles from './Tips.module.scss'
+import dynamic from 'next/dynamic'
+import { Badge } from 'antd'
 import { CSSTransition } from 'react-transition-group'
 
-interface ITipProps {
-    tips: PostTips | null
-    tokenImages: any
+interface ITipsProps {
+    tips: any
 }
 
-export default observer(({ tips, tokenImages }: ITipProps) => {
-    if (!tips || !tokenImages) return null
+const Tips: FunctionComponent<ITipsProps> = ({ tips }) => {
+    let images = []
+
+    let walletStore = window.localStorage.getItem('walletStore')
+
+    if (!walletStore || !tips) return null
+
+    if (walletStore) {
+        walletStore = JSON.parse(walletStore)
+        images = walletStore['supportedTokensImages']
+    }
+
     const [collapse, toggleCollapse] = useState(Object.keys(tips).length > 3)
 
     const renderCollapsed = () => {
@@ -24,7 +32,6 @@ export default observer(({ tips, tokenImages }: ITipProps) => {
                 title={'Click to toggle tips'}
             >
                 <span className={'tiny gray'}>
-                    <FontAwesomeIcon icon={faCoins} color={'#AAAAAA'} />
                     <span className={'pl2'}>{Object.keys(tips).length}</span>
                 </span>
             </object>
@@ -37,7 +44,7 @@ export default observer(({ tips, tokenImages }: ITipProps) => {
                 <div className={'flex flex-wrap'}>
                     {
                         Object.keys(tips).map(symbol => {
-                            let tokenImageSymbol = tokenImages[symbol]
+                            let tokenImageSymbol = images[symbol]
                             if (!tokenImageSymbol)
                                 tokenImageSymbol = ['https://cdn.novusphere.io/static/atmos.svg', 3]
                             const [img, precision] = tokenImageSymbol
@@ -48,16 +55,22 @@ export default observer(({ tips, tokenImages }: ITipProps) => {
                                     className={'ph2 flex flex-row items-center'}
                                     title={`${tips[symbol].toFixed(precision)} ${symbol} tipped`}
                                 >
-                                    <img
-                                        src={img}
-                                        alt={`${symbol} image`}
-                                        className={'dib'}
-                                        width={'25px'}
+                                    {img && (
+                                        <img
+                                            src={img}
+                                            alt={`${symbol} image`}
+                                            className={'dib'}
+                                            width={'25px'}
+                                        />
+                                    )}
+                                    <Badge
+                                        count={`× ${tips[symbol].toFixed(precision)}`}
+                                        style={{
+                                            backgroundColor: '#fff',
+                                            color: '#999',
+                                            boxShadow: '0 0 0 1px #fff inset',
+                                        }}
                                     />
-                                    <span className={'f6 gray dib pl1 tiny'}>
-                                        {' '}
-                                        × {tips[symbol].toFixed(precision)}
-                                    </span>
                                 </span>
                             )
                         }) as any
@@ -73,4 +86,11 @@ export default observer(({ tips, tokenImages }: ITipProps) => {
             {renderCollapsed()}
         </div>
     )
+}
+
+Tips.defaultProps = {}
+
+export default dynamic(() => Promise.resolve(Tips), {
+    ssr: false,
+    loading: () => <span>...</span>,
 })

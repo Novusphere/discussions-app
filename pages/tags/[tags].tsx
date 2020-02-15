@@ -1,63 +1,44 @@
-import * as React from 'react'
-import { IStores } from '@stores'
-import { Post } from '@novuspherejs'
-import { inject, observer } from 'mobx-react'
+import React, { useContext } from 'react'
+import { NextPage } from 'next'
 import { InfiniteScrollFeed } from '@components'
-import { NextRouter, withRouter } from 'next/router'
+import { observer } from 'mobx-react-lite'
+import { StoreContext } from '@stores'
+import Head from 'next/head'
 
-interface IAllProps {
-    router: NextRouter
-    postsStore: IStores['postsStore']
-    uiStore: IStores['uiStore']
-    tagStore: IStores['tagStore']
-    posts: Post[]
-    cursorId: number
-}
+const TagsPage: NextPage<any> = ({ postPub, split, tags }) => {
+    const { postsStore } = useContext(StoreContext)
 
-interface IAllState {}
-
-@(withRouter as any)
-@inject('postsStore', 'uiStore', 'tagStore')
-@observer
-class Tags extends React.Component<IAllProps, IAllState> {
-    componentDidUpdate(
-        prevProps: Readonly<IAllProps>,
-        prevState: Readonly<IAllState>,
-        snapshot?: any
-    ): void {
-        if (prevProps.router.query.tags !== this.props.router.query.tags) {
-            this.props.postsStore.resetPositionAndPosts()
-            this.fetchWithTags(this.props.router.query.tags)
-        }
-    }
-
-    async componentDidMount(): Promise<void> {
-        this.props.uiStore.toggleSidebarStatus(true)
-        this.props.uiStore.toggleBannerStatus(true)
-        this.props.tagStore.destroyActiveTag()
-
-        this.fetchWithTags(this.props.router.query.tags)
-    }
-
-    private fetchWithTags = async tags => {
-        await this.props.postsStore.getPostsForSubs(tags.split(','))
-    }
-
-    public render() {
-        const { getPostsForSubs, postsPosition, posts } = this.props.postsStore
-        const { cursorId, items } = postsPosition
-
-        let hasMore = cursorId !== 0
-
-        return (
+    return (
+        <>
+            <Head>
+                <title>Discussions App - {tags}</title>
+            </Head>
             <InfiniteScrollFeed
-                dataLength={items}
-                hasMore={hasMore}
-                next={getPostsForSubs}
-                posts={posts}
+                dataLength={postsStore.postsPosition.items}
+                hasMore={postsStore.postsPosition.cursorId !== 0}
+                next={() => postsStore.fetchPostsForTag(postPub, split)}
+                posts={postsStore.posts}
             />
-        )
+        </>
+    )
+}
+
+TagsPage.getInitialProps = async function({ store, query }: any) {
+    let tags = query.tags
+    let split = tags.split(',')
+    store.postsStore.resetPostsAndPosition()
+
+    const postPub = store.authStore.postPub
+    await store.postsStore.fetchPostsForTag(postPub, split)
+
+    split = split.map(tag => `#${tag}`)
+    tags = split.join(',')
+
+    return {
+        tags,
+        postPub,
+        split,
     }
 }
 
-export default Tags
+export default observer(TagsPage)

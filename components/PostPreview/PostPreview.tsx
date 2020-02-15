@@ -1,44 +1,40 @@
-import * as React from 'react'
-import moment from 'moment'
-import { RichTextPreview, Share, Tips, UserNameWithIcon, VotingHandles } from '@components'
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
-import { faComment, faStar } from '@fortawesome/free-solid-svg-icons'
-import { TagModel } from '@models/tagModel'
-import { observer, useLocalStore } from 'mobx-react'
-import classNames from 'classnames'
+import React, { FunctionComponent, useEffect, useState } from 'react'
+import { Divider, Popover, Tooltip } from 'antd'
 import Link from 'next/link'
-import { useEffect, useState } from 'react'
-import { generateVoteObject, getThreadUrl, voteAsync } from '@utils'
+import cx from 'classnames'
+import styles from './PostPreview.module.scss'
+import { observer, useLocalStore } from 'mobx-react-lite'
 import { Post } from '@novuspherejs'
-import { BlockedContentSetting } from '@stores/settingsStore'
+import { getThreadUrl, generateVoteObject, voteAsync } from '@utils'
 import { ObservableMap } from 'mobx'
-import { Tooltip } from 'react-tippy'
+import moment from 'moment'
+import {
+    RichTextPreview,
+    UserNameWithIcon,
+    VotingHandles,
+    Tips,
+    SharePostPopover,
+    Icons,
+} from '@components'
 
 interface IPostPreviewProps {
     post: Post
-    tag: TagModel
-    tokenImages: any
-    notificationUuid?: string
-    voteHandler?: (uuid: string, value: number) => Promise<void>
-    disableVoteHandler?: boolean // in case voting needs to be disabled
-    blockedContentSetting: BlockedContentSetting
+    hasAccount: boolean
+    showToast: (m: string, d: string, type: string) => void
+    postPriv: string
+
+    tag: any
+    blockedContentSetting: any
     blockedPosts: ObservableMap<string, string>
     blockedUsers: ObservableMap<string, string>
     blockedByDelegation: ObservableMap<string, string>
     unsignedPostsIsSpam: boolean
-    postPriv: string
-    showToast: (m: string, t: string) => void
     toggleBlockPost: (url) => void
-    hasAccount: boolean
 }
 
-const PostPreview: React.FC<IPostPreviewProps> = ({
-    disableVoteHandler,
+const PostPreview: FunctionComponent<IPostPreviewProps> = ({
     post,
     tag,
-    tokenImages,
-    notificationUuid,
-    voteHandler,
     blockedContentSetting,
     blockedPosts,
     blockedUsers,
@@ -51,6 +47,28 @@ const PostPreview: React.FC<IPostPreviewProps> = ({
 }) => {
     const [url, setUrl] = useState('')
 
+    useEffect(() => {
+        async function getUrl() {
+            let uuid = undefined
+
+            if (!post.title) {
+                uuid = post.uuid
+            }
+
+            return await getThreadUrl(post, uuid)
+        }
+
+        let notDone = true
+
+        getUrl().then(result => {
+            if (notDone) {
+                setUrl(result)
+            }
+        })
+
+        return () => (notDone = false)
+    }, [])
+
     const postStore = useLocalStore(
         source => ({
             myVote: post.myVote,
@@ -58,6 +76,8 @@ const PostPreview: React.FC<IPostPreviewProps> = ({
             upvotes: post.upvotes,
 
             get myVoteValue() {
+                if (!source.hasAccount) return 0
+
                 if (postStore.myVote && postStore.myVote.length) {
                     return postStore.myVote[0].value
                 }
@@ -67,7 +87,7 @@ const PostPreview: React.FC<IPostPreviewProps> = ({
 
             async handleVote(e: any, uuid: string, value: number) {
                 if (!source.hasAccount) {
-                    return showToast('Please log in to vote', 'error')
+                    return showToast('Failed', 'Please log in to vote', 'error')
                 }
 
                 let type
@@ -143,10 +163,10 @@ const PostPreview: React.FC<IPostPreviewProps> = ({
                     })
 
                     if (data.error) {
-                        showToast(`Failed to ${type.split('s')[0]} this post`, 'error')
+                        showToast('Failed', `Failed to ${type.split('s')[0]} this post`, 'error')
                     }
                 } catch (error) {
-                    showToast(error.message, 'error')
+                    showToast('Failed', error.message, 'error')
                 }
             },
         }),
@@ -157,28 +177,6 @@ const PostPreview: React.FC<IPostPreviewProps> = ({
         }
     )
 
-    useEffect(() => {
-        async function getUrl() {
-            let uuid = undefined
-
-            if (!post.title && notificationUuid) {
-                uuid = notificationUuid
-            }
-
-            return await getThreadUrl(post, uuid)
-        }
-
-        let notDone = true
-
-        getUrl().then(result => {
-            if (notDone) {
-                setUrl(result)
-            }
-        })
-
-        return () => (notDone = false)
-    }, [])
-
     const isSpam =
         blockedPosts.has(url) ||
         blockedUsers.has(post.pub) ||
@@ -186,35 +184,36 @@ const PostPreview: React.FC<IPostPreviewProps> = ({
         blockedByDelegation.has(post.pub) ||
         (unsignedPostsIsSpam && !post.pub)
 
+    const shouldBeHidden = blockedContentSetting === 'hidden' && isSpam
     const shouldBeCollapsed = blockedContentSetting === 'collapsed' && isSpam
-    const shouldBeHidden = isSpam && blockedContentSetting === 'hidden'
 
     if (shouldBeHidden) {
         return null
     }
 
     return (
-        <Link href={'/tag/[name]/[id]/[title]'} as={url} passHref={true}>
+        <Link href={'/tag/[name]/[id]/[title]'} as={url}>
             <a
-                className={classNames([
-                    'post-preview',
+                className={cx([
+                    styles.postPreview,
+                    'db bg-white mh1',
                     {
-                        'pinned-post': post.pinned,
+                        [styles.pinnedPost]: post.pinned,
                     },
                 ])}
                 data-url={url}
                 style={{
-                    opacity: isSpam && blockedContentSetting === 'collapsed' ? 0.5 : 1,
+                    opacity: shouldBeCollapsed ? 0.5 : 1,
                 }}
             >
                 <div className={'flex flex-auto'}>
                     <div
-                        className={classNames([
+                        className={cx([
                             'bg-light-gray flex tc justify-center ph2 pv4 relative z-2 flex-auto',
                         ])}
                         style={{ width: '40px' }}
                     >
-                        {disableVoteHandler || isSpam
+                        {shouldBeCollapsed
                             ? null
                             : post && (
                                   <VotingHandles
@@ -227,8 +226,8 @@ const PostPreview: React.FC<IPostPreviewProps> = ({
                               )}
                     </div>
 
-                    <div className={'no-style w-100'}>
-                        <div className={'flex flex-column post-content w-100'}>
+                    <div className={'pa4 w-100'}>
+                        <div className={'flex flex-column bg-white w-100'}>
                             {shouldBeCollapsed && (
                                 <span className={'silver'}>This post was marked as spam.</span>
                             )}
@@ -241,7 +240,6 @@ const PostPreview: React.FC<IPostPreviewProps> = ({
                                                     'f6 b red mb2 flex flex-row items-center'
                                                 }
                                             >
-                                                <FontAwesomeIcon icon={faStar} className={'mr2'} />
                                                 PINNED
                                             </span>
                                         )}
@@ -253,83 +251,86 @@ const PostPreview: React.FC<IPostPreviewProps> = ({
                                             <span className={'flex flex-row items-center'}>
                                                 {tag && (
                                                     <img
-                                                        src={tag.icon}
+                                                        className={'db mr2'}
+                                                        src={tag.logo}
                                                         title={`${tag.name} icon`}
-                                                        className={'tag-image'}
+                                                        width={25}
                                                     />
                                                 )}
-                                                <span className={'b ttu'}>{post.sub}</span>
-                                                <span className={'ph1 b'}>&#183;</span>
+                                                <object className={'z-2'}>
+                                                    <Link
+                                                        href={'/tag/[name]'}
+                                                        as={`/tag/${post.sub}`}
+                                                        shallow={false}
+                                                    >
+                                                        <a className={'b ttu dim'}>#{post.sub}</a>
+                                                    </Link>
+                                                </object>
+                                                <Divider type={'vertical'} />
                                                 <UserNameWithIcon
                                                     imageData={post.imageData}
                                                     pub={post.pub}
                                                     name={post.displayName}
-                                                    imageSize={20}
                                                 />
-                                                <span className={'ph1 b'}>&#183;</span>
-                                                <span
-                                                    className={'o-50'}
+                                                <Divider type={'vertical'} />
+                                                <Tooltip
                                                     title={moment(post.createdAt)
                                                         .toDate()
                                                         .toLocaleString()}
                                                 >
-                                                    {moment(post.createdAt).fromNow()}
-                                                </span>
+                                                    <span className={'light-silver'}>
+                                                        {moment(post.createdAt).fromNow()}
+                                                    </span>
+                                                </Tooltip>
                                             </span>
-                                            <Tips tokenImages={tokenImages} tips={post.tips} />
+                                            <Tips tips={post.tips} />
                                         </div>
                                     </div>
 
                                     <div className={'db pt1 mv2'}>
-                                        <span className={'black f3 b lh-title'}>{post.title}</span>
+                                        <span className={'black f4 b lh-title'}>{post.title}</span>
                                     </div>
 
-                                    <RichTextPreview>{post.content}</RichTextPreview>
+                                    <RichTextPreview className={'h4 gray'}>{post.content}</RichTextPreview>
 
-                                    <div className={'flex z-2 footer b'}>
-                                        <object>
-                                            <Link
-                                                href={'/tag/[name]/[id]/[title]'}
-                                                as={`${url}#comments`}
-                                            >
-                                                <a className={'o-80 f6 ml2 dim pointer'}>
-                                                    <FontAwesomeIcon
-                                                        width={13}
-                                                        icon={faComment}
-                                                        className={'pr2'}
-                                                    />
-                                                    {post.totalReplies} comments
-                                                </a>
-                                            </Link>
-                                        </object>
-                                        <Tooltip
-                                            animateFill={false}
-                                            interactive
-                                            html={<Share url={url} />}
-                                            trigger={'click'}
-                                            position={'bottom'}
-                                            duration={225}
+                                    <object className={'z-2 absolute bottom-0 pv3'}>
+                                        <Link
+                                            href={'/tag/[name]/[id]/[title]'}
+                                            as={`${url}#comments`}
                                         >
-                                            <span
-                                                className={'o-80 f6 ml2 dim pointer'}
+                                            <a className={'f6 mr2 black'}>
+                                                <Icons.CommentIcon />
+                                                {post.totalReplies} comments
+                                            </a>
+                                        </Link>
+                                        <Popover
+                                            title={'Share this post'}
+                                            content={<SharePostPopover url={url} />}
+                                            placement={'bottom'}
+                                        >
+                                            <a
+                                                href={'#'}
+                                                className={'f6 mh2 black'}
                                                 onClick={e => {
                                                     e.preventDefault()
                                                 }}
                                             >
                                                 share
-                                            </span>
-                                        </Tooltip>
-                                        <span className={'o-80 f6 ml2 dim pointer'}>reply</span>
-                                        <span
-                                            className={'o-80 f6 ml2 dim pointer'}
+                                            </a>
+                                        </Popover>
+                                        <Link href={'/tag/[name]/[id]/[title]'} as={`${url}#reply`}>
+                                            <a className={'f6 mh2 black'}>reply</a>
+                                        </Link>
+                                        <a
+                                            className={'f6 mh2 black'}
                                             onClick={e => {
                                                 e.preventDefault()
                                                 toggleBlockPost(url)
                                             }}
                                         >
                                             mark as spam
-                                        </span>
-                                    </div>
+                                        </a>
+                                    </object>
                                 </>
                             )}
                         </div>
@@ -339,5 +340,7 @@ const PostPreview: React.FC<IPostPreviewProps> = ({
         </Link>
     )
 }
+
+PostPreview.defaultProps = {}
 
 export default observer(PostPreview)

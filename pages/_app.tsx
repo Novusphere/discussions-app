@@ -1,110 +1,110 @@
 import App from 'next/app'
 import React from 'react'
-import * as Stores from '@stores'
-import { Provider, useStaticRendering } from 'mobx-react'
-import { MainLayout } from '@components'
-import { withMobx } from 'next-mobx-wrapper'
-import { isServer, pageview } from '@utils'
-import { create } from 'mobx-persist'
-import { toast } from 'react-toastify'
+import { initializeStore, InjectStoreContext } from '@stores'
+import { Layout } from '@components'
+import { parseCookies } from 'nookies'
+import { SIGN_IN_OPTIONS } from '@globals'
 import { DefaultSeo } from 'next-seo'
-import Router from 'next/router'
 
-import '../styles/style.scss'
-import { eos } from '@novuspherejs'
+import '../assets/main.scss'
 
-// configure({ enforceActions: 'observed' })
-useStaticRendering(isServer) // NOT `true` value
-toast.configure()
+class DiscussionsApp extends App<any> {
+    // Fetching serialized(JSON) store state
+    static async getInitialProps(appContext) {
+        let pageProps = {}
 
-Router.events.on('routeChangeComplete', url => pageview(url))
+        const cookies = parseCookies(appContext.ctx)
+        const initialStoreData = initializeStore({
+            authStore: {
+                // set inside a value object because of next-cookies reads from value property
+                _uidwWalletPubKey: {
+                    value: cookies.uidWalletPubKey || '',
+                },
+                _bk: {
+                    value: cookies.bk || '',
+                },
+                _postPrivKey: {
+                    value: cookies.postPriv || '',
+                },
+                _postPubKey: {
+                    value: cookies.postPub || '',
+                },
+                _displayName: {
+                    value: cookies.displayName || '',
+                },
+                _accountPrivKey: {
+                    value: cookies.accountPrivKey || '',
+                },
+                _accountPubKey: {
+                    value: cookies.accountPubKey || '',
+                },
+                _hasAccountCookie: {
+                    value: cookies.hasOwnProperty('hasAccount')
+                        ? JSON.parse(cookies.hasAccount)
+                        : false,
+                },
+                _hasEOSWallet: {
+                    value: cookies.hasOwnProperty('hasEOSWallet')
+                        ? JSON.parse(cookies.hasEOSWallet)
+                        : false,
+                },
+                preferredSignInMethod: cookies.preferredSignInMethod || SIGN_IN_OPTIONS.brainKey,
+            },
+            userStore: {
+                pinnedPosts: cookies.pinnedByDelegation
+                    ? JSON.parse(
+                          Buffer.from(cookies.pinnedByDelegation, 'base64').toString('ascii')
+                      )
+                    : {},
+            },
+            uiStore: {
+                _hideSidebar: {
+                    value: cookies.hasOwnProperty('hideSideBar')
+                        ? JSON.parse(cookies.hideSideBar)
+                        : false,
+                },
+            },
+        })
 
-export const hydrate = storage =>
-    create({
-        storage: storage,
-        jsonify: true,
-    })
+        const Component = appContext.Component
 
-class DiscussionApp extends App {
-    public props: any
+        appContext.ctx.store = initialStoreData
 
-    /**
-     * Hydrate the store for LS here
-     * Due to SSR, we have to execute this part
-     * on the client.
-     */
-    async componentDidMount(): Promise<void> {
-        if (!isServer) {
-            await eos.initializeTokens()
-            await eos.init({
-                host: 'nodes.get-scatter.com',
-                port: 443,
-                protocol: 'https',
-                chainId: 'aca376f206b8fc25a6ed44dbdc66547c36c6c33e3a119ffbeaef943642f0e906',
-            })
+        // Provide the store to getInitialProps of pages
+        if (Component.getInitialProps) {
+            pageProps = await Component.getInitialProps({ ...appContext.ctx, initialStoreData })
+        }
 
-            const {
-                authStore,
-                settingsStore,
-                userStore,
-                notificationsStore,
-                tagStore,
-                uiStore,
-            } = this.props.store
-
-            uiStore.isServer = false
-
-            const stores = {
-                auth: authStore,
-                settings: settingsStore,
-                user: userStore,
-                notifications: notificationsStore,
-                tags: tagStore,
-            }
-
-            Object.keys(stores).forEach(store => {
-                hydrate(localStorage)(store, stores[store])
-            })
-
-            settingsStore.setTokens(eos.tokens)
+        return {
+            pageProps,
+            initialStoreData,
         }
     }
 
-    public render() {
-        const { Component, pageProps, store } = (this as any).props
+    render() {
+        const { Component, pageProps, initialStoreData } = this.props
 
         return (
-            <Provider {...store}>
-                <MainLayout>
-                    <DefaultSeo
-                        openGraph={{
-                            type: 'website',
-                            locale: 'en_US',
-                            url: 'https://www.discussions.app/',
-                            site_name: 'Discussions App',
-                            images: [
-                                {
-                                    url: store.tagStore.activeTag
-                                        ? store.tagStore.activeTag.icon
-                                        : 'https://cdn.novusphere.io/static/atmos2.png',
-                                    width: 250,
-                                    height: 250,
-                                    alt: store.tagStore.activeTag
-                                        ? store.tagStore.activeTag.name
-                                        : 'Discussions App',
-                                },
-                            ],
-                        }}
-                        twitter={{
-                            site: '@thenovusphere',
-                            cardType: 'summary',
-                        }}
-                    />
-                    <Component {...pageProps} />
-                </MainLayout>
-            </Provider>
+            <>
+                <DefaultSeo
+                    openGraph={{
+                        type: 'website',
+                        locale: 'en_US',
+                        url: 'https://www.discussions.app/',
+                        site_name: 'Discussions App',
+                    }}
+                    twitter={{
+                        site: '@thenovusphere',
+                        cardType: 'summary',
+                    }}
+                />
+                <InjectStoreContext initialData={initialStoreData}>
+                    <Layout>
+                        <Component {...pageProps} />
+                    </Layout>
+                </InjectStoreContext>
+            </>
         )
     }
 }
-
-export default withMobx(Stores)(DiscussionApp)
+export default DiscussionsApp

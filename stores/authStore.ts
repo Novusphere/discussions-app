@@ -1,531 +1,198 @@
-import { BaseStore, getOrCreateStore } from 'next-mobx-wrapper'
-import { action, autorun, computed, observable, reaction } from 'mobx'
-import { persist } from 'mobx-persist'
-import { ModalOptions, SignInMethods } from '@globals'
-import { CreateForm } from '@components'
+import { action, computed, observable } from 'mobx'
+import { SIGN_IN_OPTIONS } from '@globals'
+import { RootStore } from '@stores'
+import { bkToStatusJson } from '@utils'
+import { discussions, init, eos } from '@novuspherejs'
+import { parseCookies } from 'nookies'
+import Cookie from 'mobx-cookie'
 import { task } from 'mobx-task'
-import { discussions, eos, init, nsdb } from '@novuspherejs'
-import { getUiStore, IStores } from '@stores/index'
-import { bkToStatusJson, isServer, sleep } from '@utils'
-import { ApiGetUnifiedId } from '../interfaces/ApiGet-UnifiedId'
+import { notification } from 'antd'
 
-export default class AuthStore extends BaseStore {
-    static LOG_OUT_USER_INTEGER = 1579089600
+export class AuthStore {
+    _hasAccountCookie = new Cookie('hasAccount')
+    _hasEOSWallet = new Cookie('hasEOSWallet')
+    _postPubKey = new Cookie('postPub')
+    _postPrivKey = new Cookie('postPriv')
+    _accountPrivKey = new Cookie('accountPrivKey')
+    _accountPubKey = new Cookie('accountPubKey')
+    _displayName = new Cookie('displayName')
+    _uidwWalletPubKey = new Cookie('uidWalletPubKey')
+    _bk = new Cookie('bk')
 
-    @persist('object')
     @observable
-    displayName = {
-        bk: null,
-        scatter: null,
-    }
+    preferredSignInMethod: SIGN_IN_OPTIONS = SIGN_IN_OPTIONS.brainKey
 
-    @persist @observable postPriv = ''
-    @persist @observable uidWalletPubKey = ''
-    @persist @observable preferredSignInMethod = SignInMethods.brainKey
-
-    // private stuff
-    @observable privateKey = ''
-
-    @persist('object')
-    @observable
-    statusJson = {
-        bk: null,
-        scatter: null,
-    }
-
-    @observable clickedSignInMethod = ''
-
-    // login objects
-    @observable signInObject = {
-        ref: null,
-        step: 1,
-    }
-
-    // status
-    @persist
-    @observable
-    hasAccount = false
-
-    @persist
-    @observable
-    hasEOSWalletAccount = false
-
-    // wallet
-    balances = observable.map<string, string>()
-
-    @observable supportedTokensForUnifiedWallet = []
     @observable supportedTokensImages: { [symbol: string]: string } = {}
-    @observable selectedToken = null
-
-    @persist
-    @observable
-    logOutTimestamp = AuthStore.LOG_OUT_USER_INTEGER
-
-    @observable
-    temporaryWalletPrivateKey = ''
-
-    @observable
-    hasRenteredPassword = false
-
-    private readonly uiStore: IStores['uiStore'] = getUiStore()
-
-    constructor() {
-        super()
-
-        if (!isServer) {
-            this.checkInitialConditions()
-        }
-
-        const rn = autorun(() => {
-            if (this.uidWalletPubKey && this.selectedToken) {
-                this.fetchBalanceForSelectedToken()
-            }
-        })
-
-        rn()
-
-        nsdb.getSupportedTokensForUnifiedWallet().then(async data => {
-            this.setDepositTokenOptions(data)
-            this.refreshAllBalances()
-
-            sleep(1000).then(() => {
-                this.updateTokenImages(data)
-            })
-        })
-    }
-
-    @action.bound
-    setWalletPrivateKey(key: string) {
-        this.temporaryWalletPrivateKey = key
-    }
-
-    @action.bound
-    clearWalletPrivateKey() {
-        this.temporaryWalletPrivateKey = ''
-    }
-
-    @task.resolved
-    @action.bound
-    async refreshAllBalances() {
-        try {
-            await sleep(250)
-            await this.supportedTokensForUnifiedWallet.map(async datum => {
-                await sleep(250)
-                await this.fetchBalanceForSelectedToken(datum)
-            })
-        } catch (error) {
-            throw error
-        }
-    }
-
-    @action.bound
-    updateTokenImages(depositTokens) {
-        depositTokens.map(token => {
-            if (!eos.tokens) return
-
-            if (
-                !this.supportedTokensImages ||
-                !this.supportedTokensImages.hasOwnProperty(token.symbol)
-            ) {
-                let logo
-
-                const tokenFromList = eos.tokens.find(t => t.name === token.symbol)
-
-                if (tokenFromList) {
-                    logo = tokenFromList.logo
-                }
-
-                this.supportedTokensImages = {
-                    ...this.supportedTokensImages,
-                    [token.symbol]: [logo, token.precision],
-                }
-            }
-        })
-    }
-
-    @action.bound
-    setDepositTokenOptions(depositTokens: ApiGetUnifiedId) {
-        let tokens = []
-
-        this.supportedTokensForUnifiedWallet = depositTokens.map(token => {
-            tokens.push(token.symbol)
-
-            return {
-                label: token.symbol,
-                value: token.contract,
-                contract: token.p2k.contract,
-                chain: token.p2k.chain,
-                decimals: token.precision,
-                fee: token.fee,
-                min: token.min,
-            }
-        })
-
-        this.selectedToken = this.supportedTokensForUnifiedWallet[0]
-
-        if (typeof window !== 'undefined') {
-            window.localStorage.setItem('supp_tokens', tokens.join('|'))
-        }
-    }
-
-    @task
-    @action.bound
-    async fetchBalanceForSelectedToken(token = this.selectedToken) {
-        try {
-            let symbol, chain, contract
-
-            if (!token.hasOwnProperty('symbol')) {
-                symbol = token.label
-                chain = token.chain
-                contract = token.contract
-            } else {
-                symbol = token.symbol
-                chain = token.p2k.chain
-                contract = token.p2k.contract
-            }
-
-            let balance = await eos.getBalance(this.uidWalletPubKey, chain, contract)
-
-            if (!balance.length) {
-                return
-            }
-
-            this.balances.set(symbol, balance[0].amount)
-        } catch (error) {
-            return error
-        }
-    }
-
-    @task.resolved
-    @action.bound
-    async connectScatterWallet() {
-        try {
-            const wallet = await this.initializeScatterLogin()
-
-            if (wallet.connected) {
-                ;(wallet as any).connect()
-                this.hasEOSWalletAccount = true
-                this.displayName.scatter = wallet.auth.accountName
-            }
-        } catch (error) {
-            throw error
-        }
-    }
-
-    @task.resolved
-    @action.bound
-    async disconnectScatterWallet() {
-        try {
-            await eos.logout()
-            this.hasEOSWalletAccount = false
-            this.displayName.scatter = null
-            this.uiStore.showToast('You have disconnected your scatter wallet!', 'success')
-        } catch (error) {
-            throw error
-        }
-    }
-
-    @task
-    @action.bound
-    async checkInitialConditions() {
-        if (this.logOutTimestamp === AuthStore.LOG_OUT_USER_INTEGER || !this.hasAccount) {
-            return
-        }
-
-        if (this.statusJson.bk && this.postPriv && this.displayName.bk) {
-            this.hasAccount = true
-            this.logOutTimestamp = Date.now()
-            if (this.hasEOSWalletAccount) this.connectScatterWallet()
-        } else {
-            this.hasAccount = false
-        }
-    }
-
-    @computed get isBKAccount() {
-        return this.activeDisplayName === this.displayName.bk
-    }
-
-    @computed get activePublicKey() {
-        if (!this.hasAccount) return null
-
-        if (this.statusJson.bk) {
-            return this.statusJson.bk.post
-        }
-
-        if (this.statusJson.scatter) {
-            return this.statusJson.scatter.post
-        }
-
-        return null
-    }
-
-    @computed get activeUidWalletKey() {
-        if (!this.activePublicKey) return null
-        return this.uidWalletPubKey
-    }
-
-    @computed get activePrivateKey() {
-        if (!this.hasAccount) return null
-        if (!this.statusJson.bk && !this.statusJson.scatter) return null
-
-        return this.postPriv
-    }
-
-    @action.bound
-    setClickedSignInMethod(method: string) {
-        this.clickedSignInMethod = method
-    }
 
     /**
-     * Used for posting, returns empty string if the
-     * user is logged in via a non-scatter method
+     * Used in transaction payload
+     * when running actions such as depositing
      */
-    @computed get posterName(): string {
-        return this.activeDisplayName
+    @observable
+    eosWalletDisplayName = ''
+
+    // used for password re-entry
+    @observable TEMP_WalletPrivateKey = ''
+
+    constructor(rootStore: RootStore) {}
+
+    @computed get hasAccount() {
+        if (!this._hasAccountCookie.value) return false
+        return JSON.parse(this._hasAccountCookie.value)
     }
 
-    // return bk or scatter
-    @computed get posterType(): string {
-        const posterName = this.posterName
-
-        if (posterName === this.displayName.bk) return 'bk'
-        return 'scatter'
+    @computed get hasEOSWallet() {
+        return JSON.parse(this._hasEOSWallet.value)
     }
 
-    @computed get activeDisplayName() {
-        if (this.statusJson.bk) {
-            return this.displayName.bk
-        }
-
-        if (this.statusJson.scatter) {
-            return this.displayName.scatter
-        }
-
-        return null
+    @computed get displayName() {
+        return this._displayName.value
     }
 
-    @computed get hasBKAccount() {
-        if (!this.displayName.bk) return false
-        return this.displayName.bk
+    @computed get postPub() {
+        return this._postPubKey.value
+    }
+
+    @computed get postPriv() {
+        return this._postPrivKey.value
+    }
+
+    @computed get uidwWalletPubKey() {
+        return this._uidwWalletPubKey.value
+    }
+
+    @computed get accountPrivKey() {
+        return this._accountPrivKey.value
+    }
+
+    @computed get accountPubKey() {
+        return this._accountPubKey.value
     }
 
     @action.bound
-    setPreferredSignInMethod(method: string) {
-        if (method !== this.preferredSignInMethod) {
-            this.preferredSignInMethod = method
-        } else {
-            if (method === SignInMethods.brainKey) {
-                this.preferredSignInMethod = SignInMethods.scatter
-            }
-            if (method === SignInMethods.scatter) {
-                this.preferredSignInMethod = SignInMethods.brainKey
-            }
-        }
+    setTEMPPrivateKey = key => {
+        this.TEMP_WalletPrivateKey = key
     }
 
-    @task.resolved
     @action.bound
-    async logOut() {
+    setPreferredSignInMethod(method: SIGN_IN_OPTIONS) {
+        if (this.preferredSignInMethod === method) this.preferredSignInMethod = SIGN_IN_OPTIONS.none
+        else this.preferredSignInMethod = method
+    }
+
+    private storeKeys = async (bk: string) => {
         try {
-            this.hasAccount = false
-            this.uiStore.showToast('You have logged out!', 'success')
+            const keys = await discussions.bkToKeys(bk)
+            this.setPostPrivCookie(keys.post.priv)
+            this.setUidWalletPubKeyCookie(keys.uidwallet.pub)
+            this.setAccountKey({ pub: keys.account.pub, priv: keys.account.priv })
+            return keys
         } catch (error) {
+            console.log(error)
             throw error
         }
     }
 
-    @task.resolved
-    @action.bound
-    async signUpWithBK(
-        brianKeyVerify,
-        displayName,
-        password
-    ): Promise<{ json: string; transaction: string }> {
+    generateBrainKey = () => {
+        return discussions.bkCreate()
+    }
+
+    logOut = () => {
+        console.log('called')
+        this.setHasAccountCookie('false')
+    }
+
+    setUidWalletPubKeyCookie = (value: string) => {
+        // refresh this key
+        this._uidwWalletPubKey = new Cookie('uidWalletPubKey')
+        this._uidwWalletPubKey.set(value)
+    }
+
+    setPostPrivCookie = (value: string) => {
+        // refresh this key
+        this._postPrivKey = new Cookie('postPriv')
+        this._postPrivKey.set(value)
+    }
+
+    setAccountKey = ({ pub, priv }) => {
+        // refresh this key
+        this._accountPrivKey = new Cookie('accountPrivKey')
+        this._accountPrivKey.set(priv)
+
+        this._accountPubKey = new Cookie('accountPubKey')
+        this._accountPubKey.set(pub)
+    }
+
+    setHasAccountCookie = (value: string) => {
+        // refresh this key
+        this._hasAccountCookie = new Cookie('hasAccount')
+        this._hasAccountCookie.set(value)
+    }
+
+    setHasEOSWalletCookie = (value: string) => {
+        // refresh this key
+        this._hasEOSWallet = new Cookie('hasEOSWallet')
+        this._hasEOSWallet.set(value)
+    }
+
+    setBKCookie = (value: string) => {
+        // refresh this key
+        this._bk = new Cookie('bk')
+        this._bk.set(value)
+    }
+
+    setPostPubCookie = (value: string) => {
+        // refresh this key
+        this._postPubKey = new Cookie('postPub')
+        this._postPubKey.set(value)
+    }
+
+    setDisplayNameCookie = (value: string) => {
+        // refresh this key
+        this._displayName = new Cookie('displayName')
+        this._displayName.set(value)
+    }
+
+    signInWithBK = async (brianKeyVerify, displayName, password) => {
         try {
-            const auth = await this.parseAndReturnsAuthInfo(brianKeyVerify, displayName, password)
-            this.uiStore.hideModal()
-            this.uiStore.showToast('You have successfully signed up!', 'success')
-            this.hasAccount = true
-            return auth
-        } catch (error) {
-            this.uiStore.showToast(error.message, 'error')
-            console.error(error)
-            return error
-        }
-    }
-
-    /**
-     * Sign in forms
-     */
-    get setNewBKAndPasswordForm() {
-        return new CreateForm(
-            {
-                onSubmit: form => {
-                    const { bk, displayName, password } = form.values()
-
-                    if (!form.hasError) {
-                        this.loginWithBK(bk, displayName, password)
-                    }
-                },
-            },
-            [
-                {
-                    name: 'bk',
-                    label: 'Brain Key',
-                    type: 'textarea',
-                    placeholder: 'Enter your BK',
-                    rules: 'required|string',
-                },
-                {
-                    name: 'displayName',
-                    label: 'Display Name',
-                    type: 'text',
-                    placeholder: 'Enter your preferred display name',
-                    rules: 'required|string',
-                },
-                {
-                    name: 'password',
-                    label: 'Password',
-                    type: 'password',
-                    placeholder: 'Your password',
-                    rules: 'required|string|between:5,25',
-                },
-            ]
-        )
-    }
-
-    @computed get setPasswordBK() {
-        return new CreateForm(
-            {
-                onSubmit: form => {
-                    const { password } = form.values()
-                    if (!form.hasError) {
-                        this.loginWithPassword(password)
-                    }
-                },
-            },
-            [
-                {
-                    name: 'password',
-                    label: 'Password',
-                    type: 'password',
-                    placeholder: 'Your password',
-                    rules: 'required|string|between:5,25',
-                },
-            ]
-        )
-    }
-
-    get setPasswordScatter() {
-        return new CreateForm(
-            {
-                onSubmit: form => {
-                    const { password } = form.values()
-
-                    if (!form.hasError) {
-                        return this.loginWithScatter(password)
-                    }
-                },
-            },
-            [
-                {
-                    name: 'password',
-                    label: 'Password',
-                    type: 'password',
-                    placeholder: 'Your password',
-                    rules: 'required|string|between:5,25',
-                },
-            ]
-        )
-    }
-
-    get choosePassword() {
-        return new CreateForm(
-            {
-                onSubmit: async form => {
-                    const { password } = form.values()
-                    console.log('Class: NewAuth, Function: onSubmit, Line 264 password: ', password)
-                },
-            },
-            [
-                {
-                    name: 'password',
-                    label: 'Password',
-                    type: 'password',
-                    placeholder: 'Your password',
-                    rules: 'required|string|between:5,25',
-                },
-                {
-                    name: 'passwordConfirm',
-                    label: 'Password Confirmation',
-                    type: 'password',
-                    placeholder: 'Confirm Password',
-                    rules: 'required|string|same:password',
-                },
-            ]
-        )
-    }
-
-    @task.resolved
-    @action.bound
-    async loginWithBK(
-        bk: string,
-        displayName: string,
-        password: string,
-        opts?: {
-            hideSuccessModal: boolean
-        }
-    ) {
-        try {
-            // check if valid bk
-            const bkIsValid = discussions.bkIsValid(bk)
+            const bkIsValid = discussions.bkIsValid(brianKeyVerify)
 
             if (!bkIsValid) {
-                this.uiStore.showToast('You have entered an invalid brain key.', 'error')
-                return
+                throw new Error('You have entered an invalid brain key')
             }
 
-            const unparsedJSON = await bkToStatusJson(bk, displayName, password, null)
+            const unparsedJSON = await bkToStatusJson(brianKeyVerify, displayName, password, null)
+
             if (unparsedJSON) {
                 const statusJSON = JSON.parse(unparsedJSON)
-                this.statusJson.bk = statusJSON
-                this.displayName.bk = statusJSON['displayName']
-
-                await this.storeKeys(bk)
-
-                this.completeSignInProcess()
-
-                if (!opts || !opts.hideSuccessModal) {
-                    this.uiStore.showToast('You have successfully signed in!', 'success')
-                }
-            } else {
-                this.uiStore.showToast('Something went wrong!', 'error')
+                this.setDisplayNameCookie(statusJSON.displayName)
+                this.setBKCookie(unparsedJSON)
+                this.setPostPubCookie(statusJSON.post)
+                this.setHasAccountCookie('true')
+                this.storeKeys(brianKeyVerify)
             }
         } catch (error) {
-            this.uiStore.showToast('Something went wrong!', 'error')
-            return error
+            throw error
         }
     }
 
-    @task.resolved
-    @action.bound
-    async loginWithPassword(password: string) {
+    signInWithPassword = async (password: string) => {
         try {
-            const bk = await discussions.bkFromStatusJson(
-                JSON.stringify(this.statusJson.bk),
-                password
-            )
+            const { bk } = parseCookies(window)
 
-            await this.loginWithBK(bk, this.statusJson.bk['displayName'], password)
+            if (typeof bk === 'undefined') {
+                throw new Error('No active BK found, please log in with another BK.')
+            }
+
+            const bkFromStatusJSON = await discussions.bkFromStatusJson(bk, password)
+            const statusJSON = JSON.parse(bk)
+            this.signInWithBK(bkFromStatusJSON, statusJSON['displayName'], password)
         } catch (error) {
-            this.uiStore.showToast(error.message, 'error')
-            return error
+            throw error
         }
     }
 
-    @task.resolved
-    @action.bound
-    async initializeScatterLogin(): Promise<Scatter.RootObject> {
+    initializeScatterLogin = async (): Promise<any> => {
         try {
             await init()
             const wallet = await eos.detectWallet()
@@ -538,95 +205,37 @@ export default class AuthStore extends BaseStore {
                 throw new Error('Failed to detect EOS wallet')
             }
         } catch (error) {
-            this.uiStore.showToast('Failed to detect EOS wallet', 'error')
-            console.log(error)
+            notification.error({
+                message: 'Failed',
+                description: 'Unable to detect EOS wallet',
+            })
             return error
         }
     }
 
-    @task.resolved
-    @action.bound
-    async loginWithScatter(password: string) {
+    connectScatterWallet = task.resolved(async (hasEOSWallet = false) => {
         try {
-            const accountName = eos.accountName
-            const json = await discussions.bkRetrieveStatusEOS(accountName)
-            const bk = await discussions.bkFromStatusJson(json, password)
-
-            // await this.storeKeys(bk)
-
-            if (!bk) {
-                return
-            }
-
-            this.statusJson.scatter = JSON.parse(json)
-            this.displayName.scatter = accountName
-
-            if (accountName) {
-                this.completeSignInProcess()
+            if (hasEOSWallet) {
+                // disconnect
+                await eos.logout()
+                this.setHasEOSWalletCookie('false')
+                notification.success({
+                    message: 'Success',
+                    description: 'You have disconnected your EOS wallet',
+                })
             } else {
-                throw new Error('Failed to get account name')
+                const wallet = await this.initializeScatterLogin()
+
+                if (wallet && wallet.connected) {
+                    this.eosWalletDisplayName = wallet.auth.accountName
+                    ;(wallet as any).connect()
+                    this.setHasEOSWalletCookie('true')
+                } else {
+                    this.setHasEOSWalletCookie('false')
+                }
             }
         } catch (error) {
-            this.uiStore.showToast(error.message, 'error')
-            return error
-        }
-    }
-
-    @task.resolved
-    @action.bound
-    async handleStepSwitchForBK() {
-        if (this.hasBKAccount) {
-            // push them to password
-            this.signInObject.ref.goToStep(3)
-            console.log('handleStepSwitchForBK clicked, has bk account')
-        } else {
-            // let them setup a new bk
-            this.signInObject.ref.goToStep(2)
-            console.log('handleStepSwitchForBK clicked, does not have BK account')
-        }
-    }
-
-    @action.bound
-    private completeSignInProcess() {
-        this.hasAccount = true
-        this.logOutTimestamp = Date.now()
-
-        if (this.signInObject.ref) {
-            this.signInObject.ref.goToStep(1)
-        }
-
-        if (this.uiStore.activeModal) {
-            this.uiStore.hideModal()
-        }
-    }
-
-    @task.resolved
-    private async parseAndReturnsAuthInfo(brianKeyVerify, displayName, password) {
-        try {
-            const json = await bkToStatusJson(brianKeyVerify, displayName, password, null)
-            const transaction = await discussions.bkUpdateStatusEOS(json)
-            await this.storeKeys(brianKeyVerify)
-
-            return {
-                json,
-                transaction,
-            }
-        } catch (error) {}
-    }
-
-    @task.resolved
-    @action.bound
-    private async storeKeys(bk: string) {
-        try {
-            const keys = await discussions.bkToKeys(bk)
-            this.postPriv = keys.post.priv
-            this.uidWalletPubKey = keys.uidwallet.pub
-            return keys
-        } catch (error) {
-            console.log(error)
             throw error
         }
-    }
+    })
 }
-
-export const getAuthStore = getOrCreateStore('authStore', AuthStore)

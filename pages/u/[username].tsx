@@ -1,334 +1,299 @@
-import * as React from 'react'
-import { discussions, dummy, Post } from '@novuspherejs'
-import { IStores } from '@stores'
-import { inject, observer } from 'mobx-react'
-import { Tab, Tabs, TabList, TabPanel } from 'react-tabs'
-import { faMinusCircle } from '@fortawesome/free-solid-svg-icons'
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
-import { computed } from 'mobx'
+import React, { useCallback, useEffect, useState } from 'react'
+import { NextPage } from 'next'
+import { observer, useObserver } from 'mobx-react-lite'
+import { RootStore, useStores } from '@stores'
+import { Avatar, Typography, Button, Dropdown, Menu, Icon, Select, List } from 'antd'
 import { getIdenticon } from '@utils'
-import { CopyToClipboard, InfiniteScrollFeed, TagDropdown } from '@components'
+import { InfiniteScrollFeed, Icons } from '@components'
+import { discussions } from '@novuspherejs'
+import dynamic from 'next/dynamic'
+import Head from 'next/head'
+import { useRouter } from 'next/router'
 
-interface IUPageProps {
-    userStore: IStores['userStore']
-    postsStore: IStores['postsStore']
-    authStore: IStores['authStore']
-    tagStore: IStores['tagStore']
-    uiStore: IStores['uiStore']
+const { Paragraph } = Typography
+const { Option } = Select
 
-    followers: number
-
-    username: string
-    uidw: string
-    pub: string
-    icon: string
-    posts: Post[]
-}
-
-interface IUIPageState {
-    followers: number
-    isFirstRender: boolean
-}
-
-@inject('userStore', 'authStore', 'postsStore', 'tagStore', 'uiStore')
-@observer
-class U extends React.Component<IUPageProps, IUIPageState> {
-    constructor(props) {
-        super(props)
-
-        this.state = {
-            followers: props.followers,
-            isFirstRender: false,
-        }
+const Moderation = dynamic(
+    () =>
+        Promise.resolve(
+            ({ onModerationChange, defaultValue, options, tagModelFromObservables }: any) =>
+                useObserver(() => (
+                    <Select
+                        mode={'tags'}
+                        size={'default'}
+                        showSearch
+                        className={'w-100'}
+                        placeholder={'Select a tag to assign as moderator'}
+                        onChange={onModerationChange}
+                        defaultValue={defaultValue}
+                    >
+                        {options.map(option => {
+                            const tag = tagModelFromObservables(option.value)
+                            if (!tag) return null
+                            return (
+                                <Option key={option.value} value={option.value}>
+                                    <img
+                                        src={tag.logo}
+                                        title={`${tag.name} icon`}
+                                        className={'mr2 dib'}
+                                        width={15}
+                                    />
+                                    {option.label}
+                                </Option>
+                            )
+                        })}
+                    </Select>
+                ))
+        ),
+    {
+        ssr: false,
     }
+)
 
-    static async getInitialProps({ query, store }) {
-        const postsStore: IStores['postsStore'] = store.postsStore
-        const [username, pub] = query.username.split('-')
-        const icon = getIdenticon(pub)
-
-        postsStore.resetPositionAndPosts()
-        const posts = await postsStore.getPostsForKeys([pub])
-
-        let uidw
-
-        if (posts.length) {
-            uidw = posts[0].uidw
-        }
-
-        return {
-            uidw,
-            posts,
-            icon,
-            username,
-            pub,
-        }
-    }
-
-    componentDidUpdate(
-        prevProps: Readonly<IUPageProps>,
-        prevState: Readonly<IUIPageState>,
-        snapshot?: any
-    ): void {
-        if (prevProps.pub !== this.props.pub) {
-            this.getFollowers()
-        }
-    }
-
-    private getFollowers = async () => {
-        const data = await discussions.getUser(this.props.pub)
-        console.log(data)
-        this.setState({
-            followers: data.count,
-        })
-    }
-
-    async componentDidMount(): Promise<void> {
-        this.getFollowers()
-        window.scrollTo(0, 0)
-        this.props.tagStore.destroyActiveTag()
-        this.props.uiStore.toggleSidebarStatus(false)
-        this.props.uiStore.toggleBannerStatus(true)
-
-        if (!this.state.isFirstRender) {
-            await this.props.postsStore.getPostsForKeys([this.props.pub])
-            this.setState({
-                isFirstRender: true,
-            })
-        }
-    }
-
-    @computed get isSameUser() {
-        return this.props.username === this.props.authStore.activeDisplayName
-    }
-
-    private handleUserFollowing = (user, pub) => {
-        if (!this.props.authStore.hasAccount) {
-            this.props.uiStore.showToast('You must be logged in follow users', 'error')
-            return
-        }
-
-        this.props.userStore.toggleUserFollowing(user, pub)
-
-        if (!this.isSameUser) {
-            let currentFollowers = this.state.followers
-            const following = this.props.userStore.isFollowingUser(pub)
-
-            if (!following) {
-                if (currentFollowers - 1 < 0) {
-                    currentFollowers = 0
-                } else {
-                    currentFollowers = currentFollowers - 1
-                }
-            } else {
-                currentFollowers = currentFollowers + 1
+const Following = dynamic(
+    () => {
+        return Promise.resolve(({ data, handleRemoveUser }: any) => {
+            if (data && data.length) {
+                return (
+                    <List
+                        dataSource={data}
+                        renderItem={([pub, username]) => {
+                            return (
+                                <List.Item
+                                    actions={[
+                                        <Icon
+                                            onClick={() => handleRemoveUser(pub, username)}
+                                            className={'dim pointer'}
+                                            type="delete"
+                                            theme={'filled'}
+                                            style={{ color: '#FF4136' }}
+                                        />,
+                                    ]}
+                                >
+                                    {username}
+                                </List.Item>
+                            )
+                        }}
+                    />
+                )
             }
 
-            this.setState({
-                followers: currentFollowers,
-            })
+            return <span className={'f6 light-silver db pt2'}>You are not following anyone</span>
+        })
+    },
+    { ssr: false }
+)
+
+// const Watching = dynamic(
+//     () => {
+//         return Promise.resolve(({ data, handleRemoveWatch }: any) => {
+//             if (data && data.length) {
+//                 return (
+//                     <List
+//                         dataSource={data}
+//                         renderItem={([pub, username]) => {
+//                             return (
+//                                 <List.Item
+//                                     actions={[
+//                                         <Icon
+//                                             onClick={() => handleRemoveUser(pub, username)}
+//                                             className={'dim pointer'}
+//                                             type="delete"
+//                                             theme={'filled'}
+//                                             style={{ color: '#FF4136' }}
+//                                         />,
+//                                     ]}
+//                                 >
+//                                     {username}
+//                                 </List.Item>
+//                             )
+//                         }}
+//                     />
+//                 )
+//             }
+//
+//             return <span className={'f6 light-silver db pt2'}>You are not watching any threads</span>
+//         })
+//     },
+//     { ssr: false }
+// )
+
+const UserPage: NextPage<any> = ({ username, wallet, imageData, count, postPub }) => {
+    const { uiStore, postsStore, userStore, authStore, tagStore }: RootStore = useStores()
+    const [_count, _setCount] = useState(count)
+    const router = useRouter()
+
+    useEffect(() => {
+        // replace username with the correct one
+        router.replace('/u/[username]', `/u/${username}-${wallet}`)
+
+        postsStore.resetPostsAndPosition()
+        postsStore.getPostsForKeys(postPub, [wallet])
+
+        uiStore.setSidebarHidden('true')
+
+        return () => {
+            uiStore.setSidebarHidden('false')
         }
-    }
+    }, [])
 
-    private handleUserBlock = (user, pub) => {
-        this.props.userStore.toggleBlockUser(user, pub)
-    }
+    const followUser = useCallback(() => {
+        userStore.toggleUserFollowing(username, wallet)
 
-    private renderFollowingList = () => {
-        if (!this.props.userStore.following.size) {
-            return (
-                <li className={'f6'} key={'none'}>
-                    You are not following any users.
-                </li>
-            )
+        if (userStore.following.has(wallet)) {
+            _setCount(_count + 1)
+        } else {
+            _setCount(_count - 1)
         }
+    }, [_count])
 
-        const pubs = Array.from(this.props.userStore.following.keys())
-        const following = Array.from(this.props.userStore.following.values())
+    const isSameUser = username == authStore.displayName
 
-        return following.map((follow, index) => (
-            <li className={'pa0 mb2'} key={follow}>
-                <span title={pubs[index]} className={'link pr2 pointer dim'}>
-                    {follow}
-                </span>
-                <span
-                    onClick={() => this.handleUserFollowing(follow, pubs[index])}
-                    title={'Click to unfollow'}
+    const menu = (
+        <Menu>
+            <Menu.Item>
+                <a
+                    className={'flex flex-row items-center'}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    onClick={() => userStore.toggleBlockUser(username, wallet)}
                 >
-                    <FontAwesomeIcon
-                        width={13}
-                        icon={faMinusCircle}
-                        className={'pointer dim'}
-                        color={'red'}
+                    <Icon
+                        type="delete"
+                        className={'mr2'}
+                        theme="twoTone"
+                        twoToneColor={'#E7040F'}
                     />
-                </span>
-            </li>
-        ))
-    }
+                    {userStore.blockedUsers.has(wallet) ? 'Unblock' : 'Block'} {username}
+                </a>
+            </Menu.Item>
+        </Menu>
+    )
 
-    private addAsModerator = () => {
-        const usernameWithKey = `${this.props.username}:${this.props.pub}`
-        this.props.userStore.setModerationMemberByTag(usernameWithKey)
-    }
-
-    private renderSidebarContent = () => {
-        const { followers } = this.state
-
-        const {
-            icon,
-            username,
-            pub,
-            uidw,
-            postsStore: { getPlausibleTagOptions },
-            authStore: { hasAccount },
-            userStore: {
-                delegated,
-                isFollowingUser,
-                isUserBlocked,
-                activeDelegatedTag,
-                setActiveDelegatedTag,
-            },
-        } = this.props
-
+    const DropdownMenu = () => {
         return (
-            <>
-                <div className={'flex flex-row items-center flex-wrap'}>
-                    <img
-                        width={100}
-                        height={100}
-                        src={icon}
-                        className={'post-icon mr3'}
-                        alt={'Icon'}
-                    />
-                    <div className={'flex flex-column items-start justify-center'}>
-                        <span className={'b black f5 mb2'}>{username}</span>
-                        <span className={'b f6 mb2'}>{followers} Followers</span>
-                        {!this.isSameUser && hasAccount && (
-                            <button
-                                title={isFollowingUser(pub) ? 'Unfollow user' : 'Follow user'}
-                                className={'button-outline'}
-                                onClick={() => this.handleUserFollowing(username, pub)}
-                            >
-                                {isFollowingUser(pub) ? 'Unfollow' : 'Follow'}
-                            </button>
-                        )}
-                    </div>
-                </div>
-                <div className={'mt4 flex flex-column'}>
-                    <span className={'small-title mb2'}>Wallets</span>
-
-                    <ul className={'list'}>
-                        <li className={'pa0 mb2'} title={uidw}>
-                            {typeof uidw === 'string' ? <CopyToClipboard value={uidw} /> : '--'}
-                        </li>
-                    </ul>
-                </div>
-                {!this.isSameUser && hasAccount && (
-                    <div className={'mt4 flex flex-column'}>
-                        <span className={'small-title mb2'}>Options</span>
-
-                        <ul className={'list lh-copy'}>
-                            <li
-                                className={'red f6 pointer dim'}
-                                onClick={() => this.handleUserBlock(username, pub)}
-                            >
-                                <button
-                                    className={
-                                        'mt1 w-100 f6 link dim ph3 pv2 dib white bg-red pointer'
-                                    }
-                                    type="submit"
-                                >
-                                    {isUserBlocked(pub) ? 'Unblock User' : 'Block User'}
-                                </button>
-                            </li>
-                            <li className={'f6 mt2'}>
-                                <TagDropdown
-                                    className={'f6'}
-                                    formatCreateLabel={() => `Choose a tag`}
-                                    onChange={setActiveDelegatedTag}
-                                    value={activeDelegatedTag}
-                                    options={[
-                                        { value: 'all', label: '#all' },
-                                        ...getPlausibleTagOptions,
-                                    ]}
-                                />
-                                <button
-                                    className={
-                                        'mt1 w-100 f6 link dim ph3 pv2 dib white bg-green pointer'
-                                    }
-                                    type="submit"
-                                    onClick={this.addAsModerator}
-                                >
-                                    {delegated.has(`${username}:${pub}:${activeDelegatedTag.value}`)
-                                        ? 'Remove as moderator'
-                                        : 'Add as moderator'}
-                                </button>
-                            </li>
-                        </ul>
-                    </div>
-                )}
-                {this.isSameUser && (
-                    <div className={'mt4 flex flex-column'}>
-                        <span className={'small-title mb2'}>Following (only visible to you)</span>
-
-                        <ul className={'list'}>{this.renderFollowingList()}</ul>
-                    </div>
-                )}
-            </>
+            <Dropdown key="more" overlay={menu}>
+                <Button size={'default'} title={'View more options'} className={'ml3'}>
+                    <Icons.VerticalEllipsisIcon />
+                </Button>
+            </Dropdown>
         )
     }
 
-    private renderUsersPosts = () => {
-        const { pub, posts } = this.props
+    const onModerationChange = useCallback((tags: string[]) => {
+        return userStore.setModerationFromDropdown(username, wallet, tags)
+    }, [])
 
-        const {
-            getPostsForKeys,
-            postsPosition: { cursorId, items },
-        } = this.props.postsStore
-
-        return (
-            <InfiniteScrollFeed
-                withAnchorUid
-                dataLength={items}
-                hasMore={cursorId !== 0}
-                next={() => getPostsForKeys([pub])}
-                posts={posts}
-            />
-        )
-    }
-
-    public render(): React.ReactNode {
-        return (
+    return (
+        <>
+            <Head>
+                <title>
+                    Discussions App - /u/{username}
+                </title>
+            </Head>
             <div className={'flex flex-row'}>
-                <div className={'card w-30 mr3 pa3'} style={{ maxHeight: '90vh' }}>
-                    {this.renderSidebarContent()}
-                </div>
-                <div className={'w-70'}>
-                    <Tabs selectedIndex={1} onSelect={index => console.log(index)}>
-                        <TabList className={'settings-tabs'}>
-                            <Tab className={'settings-tab'}>Blog</Tab>
-                            <Tab className={'settings-tab'}>Posts</Tab>
-                            <Tab className={'settings-tab'}>Latest</Tab>
-                        </TabList>
-
-                        <div className={'mt3'}>
-                            <TabPanel>
-                                <div className={'card settings-card'}>
-                                    There are no blog posts from this uer.
+                <div className={'w-30 vh-75 bg-white card pa3'}>
+                    <div className={'flex flex-row items-center'}>
+                        <Avatar
+                            icon={'user'}
+                            src={imageData}
+                            size={96}
+                        />
+                        <div className={'fl ml3'}>
+                            <span className={'db f5 b black'}>{username}</span>
+                            <span className={'db f6 light-silver'}>{_count} followers</span>
+                            {!isSameUser && authStore.hasAccount && (
+                                <div className={'mt2 flex flex-row items-center'}>
+                                    <Button
+                                        block
+                                        size={'default'}
+                                        type={'primary'}
+                                        onClick={followUser}
+                                    >
+                                        {userStore.following.has(wallet) ? 'Unfollow' : 'Follow'}
+                                    </Button>
+                                    <DropdownMenu key="more" />
                                 </div>
-                            </TabPanel>
-                            <TabPanel>{this.renderUsersPosts()}</TabPanel>
-                            <TabPanel>
-                                <div className={'card settings-card'}>
-                                    There are no posts from this user.
-                                </div>
-                            </TabPanel>
+                            )}
                         </div>
-                    </Tabs>
+                    </div>
+
+                    <div className={'mt4'}>
+                        <span className={'moon-gray ttu f6'}>Wallet</span>
+                        <Paragraph ellipsis copyable className={'f6 pt2 w-80'}>
+                            {wallet}
+                        </Paragraph>
+                    </div>
+
+                    {isSameUser && (
+                        <div className={'mt4'}>
+                            <span className={'moon-gray ttu f6'}>
+                                Following Users (Only visible to you)
+                            </span>
+                            <Following
+                                data={[...userStore.following.toJS()]}
+                                handleRemoveUser={(pub, user) =>
+                                    userStore.toggleUserFollowing(user, pub)
+                                }
+                            />
+                        </div>
+                    )}
+
+                    {/*{isSameUser && (*/}
+                    {/*    <div className={'mt4'}>*/}
+                    {/*        <span className={'moon-gray ttu f6'}>*/}
+                    {/*            Watching Posts (Only visible to you)*/}
+                    {/*        </span>*/}
+                    {/*        <Following*/}
+                    {/*            data={[...userStore.watching.toJS()]}*/}
+                    {/*            handleRemoveUser={(pub, user) =>*/}
+                    {/*                userStore.toggleThreadWatch(user, pub)*/}
+                    {/*            }*/}
+                    {/*        />*/}
+                    {/*    </div>*/}
+                    {/*)}*/}
+
+                    {!isSameUser && authStore.hasAccount && (
+                        <div className={'mt4'}>
+                            <span className={'moon-gray ttu f6 mb2'}>Moderation</span>
+                            <Moderation
+                                onModerationChange={onModerationChange}
+                                defaultValue={userStore.activeModerationForCurrentUser(
+                                    username,
+                                    wallet
+                                )}
+                                options={tagStore.tagsWithoutBaseOptions}
+                                tagModelFromObservables={tagStore.tagModelFromObservables}
+                            />
+                        </div>
+                    )}
+                </div>
+                <div className={'fl ml3 w-70'}>
+                    <InfiniteScrollFeed
+                        dataLength={postsStore.postsPosition.items}
+                        hasMore={postsStore.postsPosition.cursorId !== 0}
+                        next={() => postsStore.getPostsForKeys(postPub, [wallet])}
+                        posts={postsStore.posts}
+                    />
                 </div>
             </div>
-        )
+        </>
+    )
+}
+
+UserPage.getInitialProps = async function({ query, store }: any) {
+    const postPub = store.authStore.postPub
+    const [username, wallet] = query.username.split('-')
+    const imageData = getIdenticon(wallet)
+    const { followers, displayName } = await discussions.getUser(wallet)
+
+    return {
+        imageData,
+        username: displayName,
+        wallet,
+        count: followers,
+        postPub,
     }
 }
 
-export default U
+export default observer(UserPage)

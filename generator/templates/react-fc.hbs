@@ -1,11 +1,13 @@
-import * as React from 'react'
+import React, { FunctionComponent } from 'react'
 
-import './style.scss'
+import styles from './{{properCase name}}.module.scss'
 
 interface I{{properCase name}}Props {}
 
-const {{properCase name}}: React.FC<I{{properCase name}}Props> = () => (
-    <span>Hello</span>
-)
+const {{properCase name}}: FunctionComponent<I{{properCase name}}Props> = () => {
+    return null
+    }
 
-export default {{properCase name}}
+    {{properCase name}}.defaultProps = {}
+
+    export default {{properCase name}}
