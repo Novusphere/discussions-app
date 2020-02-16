@@ -27,21 +27,14 @@ const RtLink: FunctionComponent<any> = ({ children, href, index }) => {
                     const [, id] = href.split('bitchute.com/video/')
                     embed = `<iframe width="560px" height="315px" src="https://www.bitchute.com/embed/${id}" frameborder="0" />`
                     break
-                case /https?:\/\/www.youtube.com\/watch\?feature=youtu.be&v=[a-zA-Z0-9-_]+/.test(
-                    href
-                ):
-                    // parse feature=youtu.be
-                    embed = await nsdb.cors(
-                        `https://www.youtube.com/oembed?format=json&url=${href.replace(
-                            'feature=youtu.be&',
-                            ''
-                        )}`
-                    )
-                    break
+                case /https?:\/\/www.youtube.com\/watch\?feature=(.*?)&v=[a-zA-Z0-9-_]+/.test(href):
                 case /https?:\/\/www.youtube.com\/watch\?v=[a-zA-Z0-9-_]+/.test(href):
                 case /https?:\/\/youtu.be\/[a-zA-Z0-9-_]+/.test(href):
                     embed = await nsdb.cors(
-                        `https://www.youtube.com/oembed?format=json&url=${href}`
+                        `https://www.youtube.com/oembed?format=json&url=${href.replace(
+                            /feature=(.*?)&/,
+                            ''
+                        )}`
                     )
                     break
                 case /https?:\/\/www.imgur.com(\/[a-zA-Z0-9-_]+)?\/p\/[a-zA-Z0-9-_]+(\/?.+)?/.test(

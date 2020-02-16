@@ -1,13 +1,14 @@
 import React, { FunctionComponent, useCallback, useState } from 'react'
 
 import styles from './ModalsSignUp.module.scss'
-import { Button, Form, Input, Modal, notification } from 'antd'
+import { Button, Form, Icon, Input, Modal, notification, Result } from 'antd'
 import { observer } from 'mobx-react'
 import { Collapse } from 'antd'
 import { RootStore, useStores } from '@stores'
 import cx from 'classnames'
 import { bkToStatusJson, sleep } from '@utils'
 import { discussions } from '@novuspherejs'
+import copy from 'clipboard-copy'
 
 const { Panel } = Collapse
 
@@ -166,7 +167,6 @@ const ModalsSignUp: FunctionComponent<IModalsSignUpProps> = ({
                     form.validateFields(async (err, values) => {
                         if (!err) {
                             const { displayName, password, confirmPassword } = values
-
                             const match = displayName.match(/^[\d]*[a-z_][a-z\d_]*$/i)
 
                             if (!match) {
@@ -370,6 +370,13 @@ const ModalsSignUp: FunctionComponent<IModalsSignUpProps> = ({
                                     )
                                 })}
                             </div>
+                            <Button
+                                icon={'copy'}
+                                type={'danger'}
+                                onClick={() => copy(initialValues.brainKeyGenerated)}
+                            >
+                                Copy to clipboard
+                            </Button>
                         </div>
                     </>
                 )
@@ -416,6 +423,18 @@ const ModalsSignUp: FunctionComponent<IModalsSignUpProps> = ({
                 />
             }
         >
+            <Result
+                icon={<Icon type="lock" theme="twoTone" twoToneColor={'#09c3bd'} />}
+                title={'Enter your BK and Password'}
+                subTitle={
+                    <span>
+                        Sign up for an account
+                        <br />
+                        You can create a unified ID that creates a EOS wallet key and a username
+                        below.
+                    </span>
+                }
+            />
             <Content step={currentStep} next={next} back={back} currentForm={currentForm} />
         </Modal>
     )

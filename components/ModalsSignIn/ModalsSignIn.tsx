@@ -1,7 +1,7 @@
 import React, { FunctionComponent, useCallback, useContext, useState } from 'react'
 
 import styles from './ModalsSignIn.module.scss'
-import { Button, Checkbox, Modal, Typography, Result, Icon, Form, Input, notification } from 'antd'
+import { Button, Modal, Typography, Result, Icon, Form, Input, notification } from 'antd'
 import { SIGN_IN_OPTIONS } from '@globals'
 import { observer } from 'mobx-react'
 import { SignInOptions } from '@constants/sign-in-options'

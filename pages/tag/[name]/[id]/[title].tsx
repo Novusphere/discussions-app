@@ -683,25 +683,31 @@ const PostPageComponentObserverable: React.FunctionComponent<IPostPageProps> = (
                                     Edit
                                 </Button>
                             )}
-                            <Button
-                                size={'small'}
-                                title={userStore.watching.has(id) ? 'Unwatch post' : 'Watch post'}
-                                className={'mh1'}
-                                onClick={() =>
-                                    userStore.toggleThreadWatch(
-                                        id,
-                                        postStore.observableThread.openingPost.totalReplies
-                                    )
-                                }
-                            >
-                                <Icon
-                                    type={userStore.watching.has(id) ? 'eye' : 'eye-invisible'}
-                                    theme={userStore.watching.has(id) ? 'filled' : 'outlined'}
-                                    style={{
-                                        color: userStore.watching.has(id) ? '#079e99' : 'inherit',
-                                    }}
-                                />
-                            </Button>
+                            {authStore.hasAccount && (
+                                <Button
+                                    size={'small'}
+                                    title={
+                                        userStore.watching.has(id) ? 'Unwatch post' : 'Watch post'
+                                    }
+                                    className={'mh1'}
+                                    onClick={() =>
+                                        userStore.toggleThreadWatch(
+                                            id,
+                                            postStore.observableThread.openingPost.totalReplies
+                                        )
+                                    }
+                                >
+                                    <Icon
+                                        type={userStore.watching.has(id) ? 'eye' : 'eye-invisible'}
+                                        theme={userStore.watching.has(id) ? 'filled' : 'outlined'}
+                                        style={{
+                                            color: userStore.watching.has(id)
+                                                ? '#079e99'
+                                                : 'inherit',
+                                        }}
+                                    />
+                                </Button>
+                            )}
                             <Button
                                 size={'small'}
                                 title={'View block'}
@@ -746,14 +752,14 @@ const PostPageComponentObserverable: React.FunctionComponent<IPostPageProps> = (
                     />
                     <div className={'flex flex-row justify-end pt2'}>
                         <Button
-                            disabled={postStore.replyingContent === ''}
+                            disabled={postStore.replyingContent === '' || !authStore.hasAccount}
                             onClick={postStore.togglePreview}
                             className={'mr2'}
                         >
                             Preview
                         </Button>
                         <Button
-                            disabled={postStore.replyingContent === ''}
+                            disabled={postStore.replyingContent === '' || !authStore.hasAccount}
                             type={'primary'}
                             onClick={postStore.submitReply}
                             loading={postStore.submitReplyLoading}
@@ -823,7 +829,8 @@ const PostPage: NextPage<any> = ({ url, thread, query }) => {
         </>
     )
 }
-;(PostPage as any).getInitialProps = async function({ store, query }: any) {
+
+PostPage.getInitialProps = async function({ store, query }: any) {
     const postPub = store.authStore.postPub
     const thread = await store.postsStore.getThreadById(query.id, postPub)
     const url = await getThreadUrl(thread.openingPost)
