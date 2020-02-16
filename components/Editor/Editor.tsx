@@ -83,6 +83,16 @@ class Editor extends React.Component<IEditorProps> {
             simpleLineBreaks: true,
         })
 
+        this.turndownService.addRule('h1', {
+            filter: ['h1'],
+            replacement: content => `<p># ${content}</p>`
+        })
+
+        this.turndownService.addRule('h2', {
+            filter: ['h2'],
+            replacement: content => `<p>## ${content}</p>`
+        })
+
         this.quillBase.Quill.register('modules/mention', Mention)
         this.quillBase.Quill.register('modules/autoformat', Autoformat)
         this.quillBase.Quill.register('formats/hashtag', Hashtag)
@@ -163,11 +173,12 @@ class Editor extends React.Component<IEditorProps> {
 
     public onChange = (text: string) => {
         const clean = sanitizeHTML(text, {
-            allowedTags: [...sanitizeHTML.defaults.allowedTags],
+            allowedTags: [...sanitizeHTML.defaults.allowedTags, 'h1', 'h2'],
             allowedAttributes: {
                 ...sanitizeHTML.defaults.allowedAttributes,
             },
         })
+
         const markdown = this.turndownService.turndown(clean)
 
         // https://github.com/Novusphere/discussions-app/issues/169
