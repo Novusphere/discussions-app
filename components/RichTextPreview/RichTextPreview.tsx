@@ -1,11 +1,11 @@
-import React, { FunctionComponent, useEffect, useState } from 'react'
+import React, { FunctionComponent, useCallback, useEffect, useState } from 'react'
 import Markdown from 'markdown-to-jsx'
 import { LazyLoadImage } from 'react-lazy-load-image-component'
 import cx from 'classnames'
 
 import styles from './RichTextPreview.module.scss'
 import { nsdb } from '@novuspherejs'
-import { generateUuid, LINK_LIMIT, openInNewTab, sleep } from '@utils'
+import { Desktop, generateUuid, LINK_LIMIT, Mobile, openInNewTab, sleep } from '@utils'
 
 interface IRichTextPreviewProps {
     hideFade?: boolean
@@ -170,16 +170,8 @@ const RichTextPreview: FunctionComponent<IRichTextPreviewProps> = ({
     children,
     className,
 }) => {
-    return (
-        <div
-            className={cx('pt0 pb3', styles.richTextPreview, [
-                {
-                    [styles.contentFade]: !hideFade,
-                    'black lh-copy measure-wide pt0 overflow-break-word': !className,
-                    [className]: !!className,
-                },
-            ])}
-        >
+    const renderMarkdown = useCallback(
+        () => (
             <Markdown
                 options={{
                     overrides: {
@@ -187,19 +179,43 @@ const RichTextPreview: FunctionComponent<IRichTextPreviewProps> = ({
                             component: RtLink,
                         },
                         blockquote: {
-                            component: ({ children }) => <span className={'db pl3 bw2 bl b--light-gray'}>{children}</span>
+                            component: ({ children }) => (
+                                <span className={'db pl3 bw2 bl b--light-gray'}>{children}</span>
+                            ),
                         },
                         h1: {
-                            component: ({ children }) => <span className={'f4 b'}>{children}</span>
+                            component: ({ children }) => <span className={'f4 b'}>{children}</span>,
                         },
                         h2: {
-                            component: ({ children }) => <span className={'f5 b'}>{children}</span>
+                            component: ({ children }) => <span className={'f5 b'}>{children}</span>,
                         },
                     },
                 }}
             >
                 {children}
             </Markdown>
+        ),
+        []
+    )
+
+    return (
+        <div
+            className={cx('pt0 pb3', styles.richTextPreview, [
+                {
+                    'black lh-copy measure-wide pt0 overflow-break-word': !className,
+                    [className]: !!className,
+                },
+            ])}
+        >
+            <div
+                className={cx([
+                    {
+                        [styles.contentFade]: !hideFade,
+                    },
+                ])}
+            >
+                {renderMarkdown()}
+            </div>
         </div>
     )
 }

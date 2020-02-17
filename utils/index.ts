@@ -14,6 +14,7 @@ const uuid = require('uuidv4')
 export * from './useScrollPosition'
 export * from './wrapper'
 export * from './useInterval'
+export *  from './mediaQueries'
 
 export const INDEXER_NAME = '__LINKINDEXER__'
 export const LINK_LIMIT = 1000
@@ -753,7 +754,7 @@ export const matchTipForTags = (content: string) => {
     // this is a fix for removing zero-width characters from a js string
     const _content = content.replace(/[\u200B-\u200D\uFEFF]/g, '')
     const regex = new RegExp(
-        `\[#tip\](.*?)\\s([0-9\.]+)\\s(${tokens})(?:\\s\\[\\@(.*?)\\]\\((.*?)\\))?`,
+        `\\[#tip\\](.*?)\\s([0-9\.]+)\\s(${tokens})(?:\\s\\[\\@(.*?)\\]\\((.*?)\\))?`,
         'gim'
     )
 

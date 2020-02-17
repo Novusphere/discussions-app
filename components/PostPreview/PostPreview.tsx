@@ -1,11 +1,11 @@
-import React, { FunctionComponent, useEffect, useState } from 'react'
+import React, { FunctionComponent, useCallback, useEffect, useState } from 'react'
 import { Divider, Popover, Tooltip } from 'antd'
 import Link from 'next/link'
 import cx from 'classnames'
 import styles from './PostPreview.module.scss'
 import { observer, useLocalStore } from 'mobx-react-lite'
 import { Post } from '@novuspherejs'
-import { getThreadUrl, generateVoteObject, voteAsync } from '@utils'
+import { getThreadUrl, generateVoteObject, voteAsync, Desktop, Mobile } from '@utils'
 import { ObservableMap } from 'mobx'
 import moment from 'moment'
 import {
@@ -191,12 +191,116 @@ const PostPreview: FunctionComponent<IPostPreviewProps> = ({
         return null
     }
 
+    const postIcon = useCallback((size = 25) => {
+        if (!tag) return null
+        return <img className={'db mr2'} src={tag.logo} title={`${tag.name} icon`} width={size} />
+    }, [])
+
+    const postSub = useCallback(
+        () => (
+            <object className={'z-2'}>
+                <Link href={'/tag/[name]'} as={`/tag/${post.sub}`} shallow={false}>
+                    <a className={'b ttu dim'}>#{post.sub}</a>
+                </Link>
+            </object>
+        ),
+        []
+    )
+
+    const postUsername = useCallback(
+        () => (
+            <UserNameWithIcon imageData={post.imageData} pub={post.pub} name={post.displayName} />
+        ),
+        []
+    )
+
+    const postDate = useCallback(
+        () => (
+            <Tooltip
+                title={moment(post.createdAt)
+                    .toDate()
+                    .toLocaleString()}
+            >
+                <span className={'light-silver'}>{moment(post.createdAt).fromNow()}</span>
+            </Tooltip>
+        ),
+        []
+    )
+
+    const postTips = useCallback(() => <Tips tips={post.tips} />, [])
+
+    const postMetaData = useCallback(
+        () => (
+            <div
+                className={'flex flex-row f6 lh-copy black items-center flex-wrap justify-between'}
+            >
+                <span className={'flex flex-row items-center'}>
+                    {postIcon()}
+                    {postSub()}
+                    <Divider type={'vertical'} />
+                    {postUsername()}
+                    <Divider type={'vertical'} />
+                    {postDate()}
+                </span>
+                {postTips()}
+            </div>
+        ),
+        []
+    )
+
+    const postTotalReplies = useCallback(
+        () => (
+            <Link href={'/tag/[name]/[id]/[title]'} as={`${url}#comments`}>
+                <a className={'f6 mr2 black'}>
+                    <Icons.CommentIcon />
+                    {post.totalReplies} comments
+                </a>
+            </Link>
+        ),
+        []
+    )
+
+    const postActions = useCallback(
+        () => (
+            <>
+                <Popover
+                    title={'Share this post'}
+                    content={<SharePostPopover url={url} />}
+                    placement={'bottom'}
+                >
+                    <a
+                        href={'#'}
+                        className={'f6 mh2 black'}
+                        onClick={e => {
+                            e.preventDefault()
+                        }}
+                    >
+                        share
+                    </a>
+                </Popover>
+                <Link href={'/tag/[name]/[id]/[title]'} as={`${url}#reply`}>
+                    <a className={'f6 mh2 black'}>reply</a>
+                </Link>
+                <a
+                    className={'f6 mh2 black'}
+                    onClick={e => {
+                        e.preventDefault()
+                        toggleBlockPost(url)
+                    }}
+                >
+                    mark as spam
+                </a>
+            </>
+        ),
+        []
+    )
+
     return (
         <Link href={'/tag/[name]/[id]/[title]'} as={url}>
             <a
                 className={cx([
                     styles.postPreview,
-                    'db bg-white mh1',
+                    'db bg-white mb0 mb2-ns w-100',
                     {
                         [styles.pinnedPost]: post.pinned,
                     },
@@ -209,9 +313,8 @@ const PostPreview: FunctionComponent<IPostPreviewProps> = ({
                 <div className={'flex flex-auto'}>
                     <div
                         className={cx([
-                            'bg-light-gray flex tc justify-center ph2 pv4 relative z-2 flex-auto',
+                            'bg-light-gray flex tc justify-center w2 ph2 pv4 relative z-2 flex-auto',
                         ])}
-                        style={{ width: '40px' }}
                     >
                         {shouldBeCollapsed
                             ? null
@@ -226,7 +329,7 @@ const PostPreview: FunctionComponent<IPostPreviewProps> = ({
                               )}
                     </div>
 
-                    <div className={'pa4 w-100'}>
+                    <div className={'pa2 pa4-ns w-100'}>
                         <div className={'flex flex-column bg-white w-100'}>
                             {shouldBeCollapsed && (
                                 <span className={'silver'}>This post was marked as spam.</span>
@@ -243,94 +346,47 @@ const PostPreview: FunctionComponent<IPostPreviewProps> = ({
                                                 PINNED
                                             </span>
                                         )}
-                                        <div
-                                            className={
-                                                'flex flex-row f6 lh-copy black items-center flex-wrap justify-between'
-                                            }
-                                        >
-                                            <span className={'flex flex-row items-center'}>
-                                                {tag && (
-                                                    <img
-                                                        className={'db mr2'}
-                                                        src={tag.logo}
-                                                        title={`${tag.name} icon`}
-                                                        width={25}
-                                                    />
-                                                )}
-                                                <object className={'z-2'}>
-                                                    <Link
-                                                        href={'/tag/[name]'}
-                                                        as={`/tag/${post.sub}`}
-                                                        shallow={false}
-                                                    >
-                                                        <a className={'b ttu dim'}>#{post.sub}</a>
-                                                    </Link>
-                                                </object>
-                                                <Divider type={'vertical'} />
-                                                <UserNameWithIcon
-                                                    imageData={post.imageData}
-                                                    pub={post.pub}
-                                                    name={post.displayName}
-                                                />
-                                                <Divider type={'vertical'} />
-                                                <Tooltip
-                                                    title={moment(post.createdAt)
-                                                        .toDate()
-                                                        .toLocaleString()}
-                                                >
-                                                    <span className={'light-silver'}>
-                                                        {moment(post.createdAt).fromNow()}
-                                                    </span>
-                                                </Tooltip>
+                                        <Desktop>{postMetaData()}</Desktop>
+                                    </div>
+
+                                    <Desktop>
+                                        <div className={'db pt1 mv2'}>
+                                            <span className={'black f6 f4-ns b lh-title'}>
+                                                {post.title}
                                             </span>
-                                            <Tips tips={post.tips} />
                                         </div>
-                                    </div>
+                                    </Desktop>
 
-                                    <div className={'db pt1 mv2'}>
-                                        <span className={'black f4 b lh-title'}>{post.title}</span>
-                                    </div>
+                                    <Mobile>
+                                        <div className={'f7 flex flex-row items-center mb2'}>
+                                            {postUsername()}
+                                            <span className={'ph2'}>{postDate()}</span>
+                                        </div>
+                                    </Mobile>
 
-                                    <RichTextPreview className={'h4 gray'}>{post.content}</RichTextPreview>
+                                    <Mobile>
+                                        <div className={'flex flex-row items-center justify-between'}>
+                                            <span className={'black f5 f4-ns b lh-title'}>
+                                                {post.title}
+                                            </span>
+                                            {postIcon(60)}
+                                        </div>
+                                    </Mobile>
 
-                                    <object className={'z-2 absolute bottom-0 pv3'}>
-                                        <Link
-                                            href={'/tag/[name]/[id]/[title]'}
-                                            as={`${url}#comments`}
-                                        >
-                                            <a className={'f6 mr2 black'}>
-                                                <Icons.CommentIcon />
-                                                {post.totalReplies} comments
-                                            </a>
-                                        </Link>
-                                        <Popover
-                                            title={'Share this post'}
-                                            content={<SharePostPopover url={url} />}
-                                            placement={'bottom'}
-                                        >
-                                            <a
-                                                href={'#'}
-                                                className={'f6 mh2 black'}
-                                                onClick={e => {
-                                                    e.preventDefault()
-                                                }}
-                                            >
-                                                share
-                                            </a>
-                                        </Popover>
-                                        <Link href={'/tag/[name]/[id]/[title]'} as={`${url}#reply`}>
-                                            <a className={'f6 mh2 black'}>reply</a>
-                                        </Link>
-                                        <a
-                                            className={'f6 mh2 black'}
-                                            onClick={e => {
-                                                e.preventDefault()
-                                                toggleBlockPost(url)
-                                            }}
-                                        >
-                                            mark as spam
-                                        </a>
-                                    </object>
+                                    <Mobile>
+                                        <div className={'pt2 f7 o-50'}>{postTotalReplies()}</div>
+                                    </Mobile>
+
+                                    <Desktop>
+                                        <RichTextPreview className={'h4 gray'}>
+                                            {post.content}
+                                        </RichTextPreview>
+
+                                        <object className={'z-2 absolute bottom-0 pv3'}>
+                                            {postTotalReplies()}
+                                            {postActions()}
+                                        </object>
+                                    </Desktop>
                                 </>
                             )}
                         </div>

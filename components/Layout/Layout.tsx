@@ -1,5 +1,5 @@
 import React, { FunctionComponent, useCallback, useEffect } from 'react'
-import { Layout as AntdLayout, Input, message, notification } from 'antd'
+import { Layout as AntdLayout, message, notification } from 'antd'
 import styles from './Layout.module.scss'
 import {
     HeaderLoggedOut,
@@ -16,7 +16,6 @@ import {
 import { useObserver } from 'mobx-react-lite'
 import cx from 'classnames'
 import { RootStore, useStores } from '@stores'
-import { getVersion } from '@utils'
 import { eos } from '@novuspherejs'
 
 const { Header } = AntdLayout
@@ -132,14 +131,14 @@ const Layout: FunctionComponent<ILayoutProps> = ({ children }) => {
                     alt={'Active banner image'}
                 />
             </span>
-            <div className={cx([styles.content, styles.container, 'center flex pv3'])}>
+            <div className={cx([styles.content, styles.container, 'center flex pa0 pa3-ns'])}>
                 {useObserver(() => (
                     <div
                         className={cx([
                             'fl w-30 vh-100 ph2',
                             {
-                                dn: uiStore.hideSidebar,
-                                db: !uiStore.hideSidebar,
+                                'dn': uiStore.hideSidebar,
+                                'dn db-ns': !uiStore.hideSidebar,
                             },
                         ])}
                     >
@@ -153,10 +152,10 @@ const Layout: FunctionComponent<ILayoutProps> = ({ children }) => {
 
                 <div
                     className={cx([
-                        'fl ml4',
+                        'fl ml4-ns ml0',
                         {
                             'w-100': uiStore.hideSidebar,
-                            'w-70': !uiStore.hideSidebar,
+                            'w-70-ns w-100': !uiStore.hideSidebar,
                         },
                     ])}
                 >
