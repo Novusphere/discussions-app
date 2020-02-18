@@ -107,12 +107,12 @@ const Layout: FunctionComponent<ILayoutProps> = ({ children }) => {
                     alt={'Active banner image'}
                 />
             </span>
-            <Alert
-                message={'Alert'}
-                description={'Sign in has been disabled temporarily.'}
-                type={'warning'}
-                showIcon
-            />
+            {/*<Alert*/}
+            {/*    message={'Alert'}*/}
+            {/*    description={'Sign in has been disabled temporarily.'}*/}
+            {/*    type={'warning'}*/}
+            {/*    showIcon*/}
+            {/*/>*/}
             <div className={cx([styles.content, styles.container, 'center flex pa0 pa3-ns'])}>
                 {useObserver(() => (
                     <div

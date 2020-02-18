@@ -95,6 +95,8 @@ const HeaderNotifications: FunctionComponent<IHeaderNotificationsProps> = () => 
                 userStore.pingServerForData({
                     postPriv: authStore.postPriv,
                     postPub: authStore.postPub,
+                    accountPrivKey: authStore.accountPrivKey,
+                    accountPubKey: authStore.accountPubKey,
                 })
             }
         },

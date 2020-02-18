@@ -49,9 +49,7 @@ export class RootStore {
 
 const StoreContext = createContext<any | null>(null)
 
-let rootStore: any = {}
-
-function initializeStore(data = rootStore || {}) {
+function initializeStore(data) {
     const stores = new RootStore()
 
     stores.hydrate({
@@ -68,6 +66,8 @@ function initializeStore(data = rootStore || {}) {
         return stores
     }
 
+    let rootStore = {}
+
     if (!Object.keys(rootStore).length) {
         rootStore = stores
 
@@ -75,6 +75,7 @@ function initializeStore(data = rootStore || {}) {
             userStore: stores.userStore,
             tagStore: stores.tagStore,
             walletStore: stores.walletStore,
+            authStore: stores.authStore,
         }
 
         Object.keys(hydr).forEach(store => {

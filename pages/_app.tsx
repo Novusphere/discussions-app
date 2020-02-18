@@ -24,17 +24,11 @@ class DiscussionsApp extends App<any> {
                 _bk: {
                     value: cookies.bk || '',
                 },
-                _postPrivKey: {
-                    value: cookies.postPriv || '',
-                },
                 _postPubKey: {
                     value: cookies.postPub || '',
                 },
                 _displayName: {
                     value: cookies.displayName || '',
-                },
-                _accountPrivKey: {
-                    value: cookies.accountPrivKey || '',
                 },
                 _accountPubKey: {
                     value: cookies.accountPubKey || '',

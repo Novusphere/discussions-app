@@ -336,8 +336,8 @@ export class UserStore {
         setCookie(window, 'pinnedByDelegation', b64, { path: '/' })
     }
 
-    pingServerForData = ({ postPriv, postPub }) => {
-        this.syncDataFromServerToLocal().then(() => {
+    pingServerForData = ({ postPriv, postPub, accountPrivKey, accountPubKey }) => {
+        this.syncDataFromServerToLocal({ accountPubKey, accountPrivKey }).then(() => {
             this.fetchNotifications(postPub)
         })
     }
@@ -345,16 +345,25 @@ export class UserStore {
     /**
      * Syncing user data with the server
      */
-    syncDataFromServerToLocal = async () => {
+    syncDataFromServerToLocal = async ({ accountPrivKey, accountPubKey }) => {
         try {
-            const { accountPrivKey, accountPubKey } = this.authStore
-
             if (!accountPrivKey || !accountPubKey) {
-                this.uiStore.showToast(
-                    'Unable to fetch your data',
-                    'Seems like your session is corrupt. Please sign out and sign back in.',
-                    'error'
-                )
+                // try to get from ls
+
+                const authStore = window.localStorage.getItem('authStore')
+                const parsed = JSON.parse(authStore)
+
+                if (parsed['accountPrivKey']) {
+                    accountPrivKey = parsed['accountPrivKey']
+                } else {
+                    this.uiStore.showToast(
+                        'Unable to fetch your data',
+                        'Seems like your session is corrupt. Please sign out and sign back in.',
+                        'error'
+                    )
+
+                    return
+                }
             }
 
             let data = await nsdb.getAccount({
@@ -450,9 +459,9 @@ export class UserStore {
                 },
             }
 
-            const { accountPrivKey, accountPubKey } = parseCookies(window)
+            const { accountPubKey } = parseCookies(window)
 
-            if (!accountPrivKey || !accountPubKey) {
+            if (!accountPubKey) {
                 this.uiStore.showToast(
                     'Unable to save your data',
                     'Seems like your session is corrupt. Please sign out and sign back in.',
@@ -461,7 +470,7 @@ export class UserStore {
             }
 
             await nsdb.saveAccount({
-                accountPrivateKey: accountPrivKey,
+                accountPrivateKey: this.authStore.accountPrivKey,
                 accountPublicKey: accountPubKey,
                 accountData: dataToSync,
             })

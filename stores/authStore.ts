@@ -7,13 +7,12 @@ import { parseCookies } from 'nookies'
 import Cookie from 'mobx-cookie'
 import { task } from 'mobx-task'
 import { notification } from 'antd'
+import { persist } from 'mobx-persist'
 
 export class AuthStore {
     _hasAccountCookie = new Cookie('hasAccount')
     _hasEOSWallet = new Cookie('hasEOSWallet')
     _postPubKey = new Cookie('postPub')
-    _postPrivKey = new Cookie('postPriv')
-    _accountPrivKey = new Cookie('accountPrivKey')
     _accountPubKey = new Cookie('accountPubKey')
     _displayName = new Cookie('displayName')
     _uidwWalletPubKey = new Cookie('uidWalletPubKey')
@@ -23,6 +22,14 @@ export class AuthStore {
     preferredSignInMethod: SIGN_IN_OPTIONS = SIGN_IN_OPTIONS.brainKey
 
     @observable supportedTokensImages: { [symbol: string]: string } = {}
+
+    @persist
+    @observable
+    postPriv = ''
+
+    @persist
+    @observable
+    accountPrivKey = ''
 
     /**
      * Used in transaction payload
@@ -37,13 +44,11 @@ export class AuthStore {
     constructor(rootStore: RootStore) {}
 
     @computed get hasAccount() {
-        return false
         if (!this._hasAccountCookie.value) return false
         return JSON.parse(this._hasAccountCookie.value)
     }
 
     @computed get hasEOSWallet() {
-        return false
         return JSON.parse(this._hasEOSWallet.value)
     }
 
@@ -55,16 +60,8 @@ export class AuthStore {
         return this._postPubKey.value
     }
 
-    @computed get postPriv() {
-        return this._postPrivKey.value
-    }
-
     @computed get uidwWalletPubKey() {
         return this._uidwWalletPubKey.value
-    }
-
-    @computed get accountPrivKey() {
-        return this._accountPrivKey.value
     }
 
     @computed get accountPubKey() {
@@ -85,7 +82,7 @@ export class AuthStore {
     private storeKeys = async (bk: string) => {
         try {
             const keys = await discussions.bkToKeys(bk)
-            this.setPostPrivCookie(keys.post.priv)
+            this.postPriv = keys.post.priv
             this.setUidWalletPubKeyCookie(keys.uidwallet.pub)
             this.setAccountKey({ pub: keys.account.pub, priv: keys.account.priv })
             return keys
@@ -110,16 +107,9 @@ export class AuthStore {
         this._uidwWalletPubKey.set(value)
     }
 
-    setPostPrivCookie = (value: string) => {
-        // refresh this key
-        this._postPrivKey = new Cookie('postPriv')
-        this._postPrivKey.set(value)
-    }
-
     setAccountKey = ({ pub, priv }) => {
         // refresh this key
-        this._accountPrivKey = new Cookie('accountPrivKey')
-        this._accountPrivKey.set(priv)
+        this.accountPrivKey = priv
 
         this._accountPubKey = new Cookie('accountPubKey')
         this._accountPubKey.set(pub)
