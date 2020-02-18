@@ -1,8 +1,7 @@
-import { computed, observable } from 'mobx'
+import { observable } from 'mobx'
 import { RootStore } from '@stores/index'
 import { discussions, Post, Thread } from '@novuspherejs'
 import _ from 'lodash'
-import { parseCookies } from 'nookies'
 
 export class PostsStore {
     @observable
@@ -14,11 +13,9 @@ export class PostsStore {
         items: 0,
     }
 
-    @observable tagStore: RootStore['tagStore']
     @observable userStore: RootStore['userStore']
 
     constructor(rootStore: RootStore) {
-        this.tagStore = rootStore.tagStore
         this.userStore = rootStore.userStore
     }
 

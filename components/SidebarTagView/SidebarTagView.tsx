@@ -15,7 +15,8 @@ const SidebarTagView: FunctionComponent<ISidebarTagViewProps> = () => {
 
     if (router.pathname.indexOf('/tag/') !== -1) {
         // get the name
-        const [, , tag] = router.asPath.split('/')
+        let [, , tag] = router.asPath.split('/')
+        tag = tag.trim()
         const tagObj = tagStore.tagModelFromObservables(tag)
 
         return (

@@ -491,7 +491,7 @@ export default class DiscussionsService {
             pipeline: [
                 {
                     $match: {
-                        sub: q,
+                        tags: q,
                         parentUuid: '', // top-level only
                     },
                 },

@@ -11,8 +11,6 @@ class Hashtag extends Embed {
             _value = `/tag/${value}`
         }
 
-        console.log(_value)
-
         node.setAttribute('href', _value)
         node.setAttribute('spellcheck', false)
         node.textContent = '#' + value
