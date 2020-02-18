@@ -295,7 +295,7 @@ const PostPreview: FunctionComponent<IPostPreviewProps> = ({
         []
     )
 
-    const renderVotingHandles = useCallback((horizontal = false, props = {}) => {
+    const renderVotingHandles = (horizontal = false, props = {}) => {
         return shouldBeCollapsed
             ? null
             : post && (
@@ -309,7 +309,7 @@ const PostPreview: FunctionComponent<IPostPreviewProps> = ({
                       {...props}
                   />
               )
-    }, [])
+    }
 
     return (
         <Link href={'/tag/[name]/[id]/[title]'} as={url}>
@@ -326,37 +326,43 @@ const PostPreview: FunctionComponent<IPostPreviewProps> = ({
                     opacity: shouldBeCollapsed ? 0.5 : 1,
                 }}
             >
-                <div className={'flex flex-auto'}>
-                    <Desktop>
-                        <div
-                            className={cx([
-                                'bg-light-gray flex tc justify-center w2 ph2 pv4 relative z-2 flex-auto',
-                            ])}
-                        >
-                            {renderVotingHandles()}
-                        </div>
-                    </Desktop>
-                    <div className={"flex flex-column bg-white w-100'} pa2 pa4-ns w-100"}>
+                <div className={'flex flex-row'}>
+                    <div
+                        className={
+                            'bg-light-gray w2 ph2 pv4 z-2'
+                        }
+                    >
+                        {renderVotingHandles()}
+                    </div>
+                    <div className={'flex flex-column bg-white pa2 pa4-ns'}>
                         {shouldBeCollapsed && (
                             <span className={'silver'}>This post was marked as spam.</span>
                         )}
                         {!shouldBeCollapsed && (
                             <>
-                                <div className={'db'}>
-                                    {post.pinned && (
-                                        <span className={'f6 b red mb2 flex flex-row items-center'}>
-                                            PINNED
-                                        </span>
-                                    )}
-                                    <Desktop>{postMetaData()}</Desktop>
-                                </div>
+                                {post.pinned && (
+                                    <span className={'db f6 b red mb2 flex flex-row items-center'}>
+                                        PINNED
+                                    </span>
+                                )}
 
                                 <Desktop>
+                                    {postMetaData()}
                                     <div className={'db pt1 mv2'}>
                                         <span className={'black f6 f4-ns b lh-title'}>
                                             {post.title}
                                         </span>
                                     </div>
+                                    <object>
+                                        <RichTextPreview className={'h4 gray'}>
+                                            {post.content}
+                                        </RichTextPreview>
+                                    </object>
+
+                                    <object className={'z-2 absolute bottom-0 pv3'}>
+                                        {postTotalReplies()}
+                                        {postActions()}
+                                    </object>
                                 </Desktop>
 
                                 <Mobile>
@@ -396,19 +402,6 @@ const PostPreview: FunctionComponent<IPostPreviewProps> = ({
                                         <Divider style={{ margin: 0, padding: 0 }} />
                                     </div>
                                 </Mobile>
-
-                                <Desktop>
-                                    <object>
-                                        <RichTextPreview className={'h4 gray'}>
-                                            {post.content}
-                                        </RichTextPreview>
-                                    </object>
-
-                                    <object className={'z-2 absolute bottom-0 pv3'}>
-                                        {postTotalReplies()}
-                                        {postActions()}
-                                    </object>
-                                </Desktop>
                             </>
                         )}
                     </div>
