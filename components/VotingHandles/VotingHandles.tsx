@@ -26,7 +26,7 @@ const VotingHandles: React.FC<IVoteProps> = ({
 }) => {
     return (
         <span
-            className={classNames(['black f6 vote flex items-center disable-user-select ph1'], {
+            className={classNames(['black f6 vote flex items-center disable-user-select ph1'], props.className, {
                 'flex-row': horizontal,
                 'flex-column': !horizontal,
             })}
@@ -48,7 +48,7 @@ const VotingHandles: React.FC<IVoteProps> = ({
                 />
             </span>
             <span
-                className={classNames(['f6 disable-user-select ph1 silver'])}
+                className={classNames(['disable-user-select ph1 silver'])}
                 style={{
                     whiteSpace: 'pre',
                     color: myVote === 1 ? '#FF6300' : '#999999',

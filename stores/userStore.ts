@@ -510,7 +510,6 @@ export class UserStore {
                     // results is an array of objects [encodedId, diff]
                     if (result[0] !== undefined && result.length > 0) {
                         each(result, async (item, cb) => {
-                            console.log(item)
                             const [threadId, diff, currentCount] = item
                             const thread = await discussions.getThread(threadId)
                             const id = encodeId(thread.openingPost)
@@ -561,8 +560,6 @@ export class UserStore {
                 undefined,
                 0
             )
-
-            console.log(payload)
 
             this.notificationCount = payload.length
             this.notifications = payload.filter((item, index) => index <= 5)

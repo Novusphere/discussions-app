@@ -251,7 +251,7 @@ const PostPreview: FunctionComponent<IPostPreviewProps> = ({
     const postTotalReplies = useCallback(
         () => (
             <Link href={'/tag/[name]/[id]/[title]'} as={`${url}#comments`}>
-                <a className={'f6 mr2 black'}>
+                <a className={'mr2 black'}>
                     <Icons.CommentIcon />
                     {post.totalReplies} comments
                 </a>
@@ -295,6 +295,22 @@ const PostPreview: FunctionComponent<IPostPreviewProps> = ({
         []
     )
 
+    const renderVotingHandles = useCallback((horizontal = false, props = {}) => {
+        return shouldBeCollapsed
+            ? null
+            : post && (
+                  <VotingHandles
+                      horizontal={horizontal}
+                      upVotes={postStore.upvotes}
+                      downVotes={postStore.downvotes}
+                      myVote={postStore.myVoteValue}
+                      uuid={post.uuid}
+                      handler={postStore.handleVote}
+                      {...props}
+                  />
+              )
+    }, [])
+
     return (
         <Link href={'/tag/[name]/[id]/[title]'} as={url}>
             <a
@@ -311,23 +327,15 @@ const PostPreview: FunctionComponent<IPostPreviewProps> = ({
                 }}
             >
                 <div className={'flex flex-auto'}>
-                    <div
-                        className={cx([
-                            'bg-light-gray flex tc justify-center w2 ph2 pv4 relative z-2 flex-auto',
-                        ])}
-                    >
-                        {shouldBeCollapsed
-                            ? null
-                            : post && (
-                                  <VotingHandles
-                                      upVotes={postStore.upvotes}
-                                      downVotes={postStore.downvotes}
-                                      myVote={postStore.myVoteValue}
-                                      uuid={post.uuid}
-                                      handler={postStore.handleVote}
-                                  />
-                              )}
-                    </div>
+                    <Desktop>
+                        <div
+                            className={cx([
+                                'bg-light-gray flex tc justify-center w2 ph2 pv4 relative z-2 flex-auto',
+                            ])}
+                        >
+                            {renderVotingHandles()}
+                        </div>
+                    </Desktop>
 
                     <div className={'pa2 pa4-ns w-100'}>
                         <div className={'flex flex-column bg-white w-100'}>
@@ -358,23 +366,43 @@ const PostPreview: FunctionComponent<IPostPreviewProps> = ({
                                     </Desktop>
 
                                     <Mobile>
-                                        <div className={'f7 flex flex-row items-center mb2'}>
-                                            {postUsername()}
-                                            <span className={'ph2'}>{postDate()}</span>
-                                        </div>
-                                    </Mobile>
+                                        <div className={'relative overflow-hidden'}>
+                                            <div
+                                                className={
+                                                    'w-20 fl flex items-center justify-center pt3'
+                                                }
+                                            >
+                                                {postIcon(50)}
+                                            </div>
+                                            <div className={'w-80 fl'}>
+                                                <div
+                                                    className={'f7 flex flex-row items-center mb2'}
+                                                >
+                                                    {postUsername()}
+                                                    <span className={'ph2'}>{postDate()}</span>
+                                                </div>
+                                                <span className={'black f6 f4-ns b lh-title'}>
+                                                    {post.title}
+                                                </span>
 
-                                    <Mobile>
-                                        <div className={'flex flex-row items-center justify-between'}>
-                                            <span className={'black f5 f4-ns b lh-title'}>
-                                                {post.title}
-                                            </span>
-                                            {postIcon(60)}
-                                        </div>
-                                    </Mobile>
+                                                {/*<RichTextPreview className={'h3 gray mb3'}>*/}
+                                                {/*    {post.content}*/}
+                                                {/*</RichTextPreview>*/}
 
-                                    <Mobile>
-                                        <div className={'pt2 f7 o-50'}>{postTotalReplies()}</div>
+                                                <div
+                                                    className={
+                                                        'mt2 w-100 left-0 bottom-0 z-2 db f7 flex flex-row items-center mb2'
+                                                    }
+                                                >
+                                                    {renderVotingHandles(true, { className: 'f7' })}
+                                                    <div className={'o-30 ml2'}>
+                                                        {postTotalReplies()}
+                                                    </div>
+                                                    {postTips()}
+                                                </div>
+                                            </div>
+                                            <Divider style={{ margin: 0, padding: 0 }} />
+                                        </div>
                                     </Mobile>
 
                                     <Desktop>

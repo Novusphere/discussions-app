@@ -4,6 +4,7 @@ import styles from './Tips.module.scss'
 import dynamic from 'next/dynamic'
 import { Badge } from 'antd'
 import { CSSTransition } from 'react-transition-group'
+import { Desktop, Mobile } from '@utils'
 
 interface ITipsProps {
     tips: any
@@ -38,41 +39,48 @@ const Tips: FunctionComponent<ITipsProps> = ({ tips }) => {
         )
     }
 
+    const renderTip = (symbol, { imgProps = {}, spanProps = {} } = {}) => {
+        let tokenImageSymbol = images[symbol]
+        if (!tokenImageSymbol) tokenImageSymbol = ['https://cdn.novusphere.io/static/atmos.svg', 3]
+        const [img, precision] = tokenImageSymbol
+        const count = `${tips[symbol].toFixed(precision)}`
+        return (
+            <span
+                key={symbol}
+                className={'ph2 flex flex-row items-center'}
+                title={`${tips[symbol].toFixed(precision)} ${symbol} tipped`}
+                {...spanProps}
+            >
+                {img && (
+                    <img
+                        src={img}
+                        alt={`${symbol} image`}
+                        className={'dib'}
+                        width={'25px'}
+                        {...imgProps}
+                    />
+                )}
+                <Desktop>
+                    <Badge
+                        count={`× ${count}`}
+                        style={{
+                            backgroundColor: '#fff',
+                            color: '#999',
+                            boxShadow: '0 0 0 1px #fff inset',
+                        }}
+                    />
+                </Desktop>
+            </span>
+        )
+    }
+
     const renderUncollapsed = () => {
         return (
             <CSSTransition timeout={200} classNames={'slide'} unmountOnExit in={!collapse}>
                 <div className={'flex flex-wrap'}>
                     {
                         Object.keys(tips).map(symbol => {
-                            let tokenImageSymbol = images[symbol]
-                            if (!tokenImageSymbol)
-                                tokenImageSymbol = ['https://cdn.novusphere.io/static/atmos.svg', 3]
-                            const [img, precision] = tokenImageSymbol
-
-                            return (
-                                <span
-                                    key={symbol}
-                                    className={'ph2 flex flex-row items-center'}
-                                    title={`${tips[symbol].toFixed(precision)} ${symbol} tipped`}
-                                >
-                                    {img && (
-                                        <img
-                                            src={img}
-                                            alt={`${symbol} image`}
-                                            className={'dib'}
-                                            width={'25px'}
-                                        />
-                                    )}
-                                    <Badge
-                                        count={`× ${tips[symbol].toFixed(precision)}`}
-                                        style={{
-                                            backgroundColor: '#fff',
-                                            color: '#999',
-                                            boxShadow: '0 0 0 1px #fff inset',
-                                        }}
-                                    />
-                                </span>
-                            )
+                            return renderTip(symbol)
                         }) as any
                     }
                 </div>
@@ -81,10 +89,24 @@ const Tips: FunctionComponent<ITipsProps> = ({ tips }) => {
     }
 
     return (
-        <div className={'flex flex-wrap'}>
-            {renderUncollapsed()}
-            {renderCollapsed()}
-        </div>
+        <>
+            <Desktop>
+                <div className={'flex flex-wrap'}>
+                    {renderUncollapsed()}
+                    {renderCollapsed()}
+                </div>
+            </Desktop>
+            <Mobile>
+                {
+                    Object.keys(tips).map(symbol => {
+                        return renderTip(symbol, {
+                            imgProps: { width: '20px' },
+                            spanProps: { className: 'pr1 dib' },
+                        })
+                    }) as any
+                }
+            </Mobile>
+        </>
     )
 }
 

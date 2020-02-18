@@ -12,13 +12,14 @@ import {
     SidebarTagView,
     SidebarLinks,
     Footer,
+    Header,
 } from '@components'
 import { useObserver } from 'mobx-react-lite'
 import cx from 'classnames'
 import { RootStore, useStores } from '@stores'
 import { eos } from '@novuspherejs'
 
-const { Header } = AntdLayout
+const { Header: AntdLayoutHeader } = AntdLayout
 
 interface ILayoutProps {}
 
@@ -51,11 +52,6 @@ const Layout: FunctionComponent<ILayoutProps> = ({ children }) => {
         if (authStore.hasEOSWallet) {
             authStore.connectScatterWallet()
         }
-    }, [])
-
-    const logout = useCallback(() => {
-        authStore.logOut()
-        uiStore.showToast('Success', 'You have logged out!', 'success')
     }, [])
 
     return (
@@ -101,29 +97,9 @@ const Layout: FunctionComponent<ILayoutProps> = ({ children }) => {
                 }
             `}</style>
             <Modals />
-            <Header className={cx([styles.header, 'container bb b--light-gray'])}>
-                <div className={cx([styles.container, 'center flex flex-row items-center'])}>
-                    <HeaderLogo />
-                    <HeaderSearch />
-                    {useObserver(() =>
-                        authStore.hasAccount ? (
-                            <div className={styles.headerIntractable}>
-                                <HeaderNotifications />
-                                <HeaderNewPost />
-                                <HeaderUserBar
-                                    icon={authStore.postPub}
-                                    logout={logout}
-                                    displayName={authStore.displayName}
-                                    postPub={authStore.postPub}
-                                    balances={walletStore.balances.toJSON()}
-                                />
-                            </div>
-                        ) : (
-                            <HeaderLoggedOut />
-                        )
-                    )}
-                </div>
-            </Header>
+            <AntdLayoutHeader className={cx([styles.header, 'container bb b--light-gray'])}>
+                <Header />
+            </AntdLayoutHeader>
             <span className={styles.banner}>
                 <img
                     src={uiStore.activeBanner}
@@ -137,7 +113,7 @@ const Layout: FunctionComponent<ILayoutProps> = ({ children }) => {
                         className={cx([
                             'fl w-30 vh-100 ph2',
                             {
-                                'dn': uiStore.hideSidebar,
+                                dn: uiStore.hideSidebar,
                                 'dn db-ns': !uiStore.hideSidebar,
                             },
                         ])}

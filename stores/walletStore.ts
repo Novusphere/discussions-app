@@ -63,9 +63,6 @@ export class WalletStore {
             nsdb.getSupportedTokensForUnifiedWallet().then(async data => {
                 this.setDepositTokenOptions(data)
                 this.refreshAllBalances()
-                await this.supportedTokensForUnifiedWallet.map(async datum => {
-                    await sleep(250)
-                })
                 this.updateTokenImages(data)
             })
         } catch (error) {
@@ -75,9 +72,7 @@ export class WalletStore {
 
     refreshAllBalances = task.resolved(async () => {
         try {
-            await sleep(250)
             await this.supportedTokensForUnifiedWallet.map(async datum => {
-                await sleep(250)
                 await this.fetchBalanceForSelectedToken(datum)
             })
         } catch (error) {
