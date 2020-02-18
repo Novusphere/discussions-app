@@ -336,88 +336,81 @@ const PostPreview: FunctionComponent<IPostPreviewProps> = ({
                             {renderVotingHandles()}
                         </div>
                     </Desktop>
+                    <div className={"flex flex-column bg-white w-100'} pa2 pa4-ns w-100"}>
+                        {shouldBeCollapsed && (
+                            <span className={'silver'}>This post was marked as spam.</span>
+                        )}
+                        {!shouldBeCollapsed && (
+                            <>
+                                <div className={'db'}>
+                                    {post.pinned && (
+                                        <span className={'f6 b red mb2 flex flex-row items-center'}>
+                                            PINNED
+                                        </span>
+                                    )}
+                                    <Desktop>{postMetaData()}</Desktop>
+                                </div>
 
-                    <div className={'pa2 pa4-ns w-100'}>
-                        <div className={'flex flex-column bg-white w-100'}>
-                            {shouldBeCollapsed && (
-                                <span className={'silver'}>This post was marked as spam.</span>
-                            )}
-                            {!shouldBeCollapsed && (
-                                <>
-                                    <div className={'db'}>
-                                        {post.pinned && (
-                                            <span
-                                                className={
-                                                    'f6 b red mb2 flex flex-row items-center'
-                                                }
-                                            >
-                                                PINNED
-                                            </span>
-                                        )}
-                                        <Desktop>{postMetaData()}</Desktop>
+                                <Desktop>
+                                    <div className={'db pt1 mv2'}>
+                                        <span className={'black f6 f4-ns b lh-title'}>
+                                            {post.title}
+                                        </span>
                                     </div>
+                                </Desktop>
 
-                                    <Desktop>
-                                        <div className={'db pt1 mv2'}>
+                                <Mobile>
+                                    <div className={'relative overflow-hidden'}>
+                                        <div
+                                            className={
+                                                'w-20 fl flex items-center justify-center pt3'
+                                            }
+                                        >
+                                            {postIcon(50)}
+                                        </div>
+                                        <div className={'w-80 fl'}>
+                                            <div className={'f7 flex flex-row items-center mb2'}>
+                                                {postUsername()}
+                                                <span className={'ph2'}>{postDate()}</span>
+                                            </div>
                                             <span className={'black f6 f4-ns b lh-title'}>
                                                 {post.title}
                                             </span>
-                                        </div>
-                                    </Desktop>
 
-                                    <Mobile>
-                                        <div className={'relative overflow-hidden'}>
+                                            {/*<RichTextPreview className={'h3 gray mb3'}>*/}
+                                            {/*    {post.content}*/}
+                                            {/*</RichTextPreview>*/}
+
                                             <div
                                                 className={
-                                                    'w-20 fl flex items-center justify-center pt3'
+                                                    'mt2 w-100 left-0 bottom-0 z-2 db f7 flex flex-row items-center mb2'
                                                 }
                                             >
-                                                {postIcon(50)}
-                                            </div>
-                                            <div className={'w-80 fl'}>
-                                                <div
-                                                    className={'f7 flex flex-row items-center mb2'}
-                                                >
-                                                    {postUsername()}
-                                                    <span className={'ph2'}>{postDate()}</span>
+                                                {renderVotingHandles(true, { className: 'f7' })}
+                                                <div className={'o-30 ml2'}>
+                                                    {postTotalReplies()}
                                                 </div>
-                                                <span className={'black f6 f4-ns b lh-title'}>
-                                                    {post.title}
-                                                </span>
-
-                                                {/*<RichTextPreview className={'h3 gray mb3'}>*/}
-                                                {/*    {post.content}*/}
-                                                {/*</RichTextPreview>*/}
-
-                                                <div
-                                                    className={
-                                                        'mt2 w-100 left-0 bottom-0 z-2 db f7 flex flex-row items-center mb2'
-                                                    }
-                                                >
-                                                    {renderVotingHandles(true, { className: 'f7' })}
-                                                    <div className={'o-30 ml2'}>
-                                                        {postTotalReplies()}
-                                                    </div>
-                                                    {postTips()}
-                                                </div>
+                                                {postTips()}
                                             </div>
-                                            <Divider style={{ margin: 0, padding: 0 }} />
                                         </div>
-                                    </Mobile>
+                                        <Divider style={{ margin: 0, padding: 0 }} />
+                                    </div>
+                                </Mobile>
 
-                                    <Desktop>
+                                <Desktop>
+                                    <object>
                                         <RichTextPreview className={'h4 gray'}>
                                             {post.content}
                                         </RichTextPreview>
+                                    </object>
 
-                                        <object className={'z-2 absolute bottom-0 pv3'}>
-                                            {postTotalReplies()}
-                                            {postActions()}
-                                        </object>
-                                    </Desktop>
-                                </>
-                            )}
-                        </div>
+                                    <object className={'z-2 absolute bottom-0 pv3'}>
+                                        {postTotalReplies()}
+                                        {postActions()}
+                                    </object>
+                                </Desktop>
+                            </>
+                        )}
                     </div>
                 </div>
             </a>

@@ -1,5 +1,5 @@
 import React, { FunctionComponent, useCallback, useEffect } from 'react'
-import { Layout as AntdLayout, message, notification } from 'antd'
+import { Alert, Layout as AntdLayout, message, notification } from 'antd'
 import styles from './Layout.module.scss'
 import {
     HeaderLoggedOut,
@@ -107,6 +107,12 @@ const Layout: FunctionComponent<ILayoutProps> = ({ children }) => {
                     alt={'Active banner image'}
                 />
             </span>
+            <Alert
+                message={'Alert'}
+                description={'Sign in has been disabled temporarily.'}
+                type={'warning'}
+                showIcon
+            />
             <div className={cx([styles.content, styles.container, 'center flex pa0 pa3-ns'])}>
                 {useObserver(() => (
                     <div

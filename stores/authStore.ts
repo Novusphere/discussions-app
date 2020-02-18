@@ -37,11 +37,13 @@ export class AuthStore {
     constructor(rootStore: RootStore) {}
 
     @computed get hasAccount() {
+        return false
         if (!this._hasAccountCookie.value) return false
         return JSON.parse(this._hasAccountCookie.value)
     }
 
     @computed get hasEOSWallet() {
+        return false
         return JSON.parse(this._hasEOSWallet.value)
     }
 

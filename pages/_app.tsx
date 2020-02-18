@@ -14,6 +14,7 @@ class DiscussionsApp extends App<any> {
         let pageProps = {}
 
         const cookies = parseCookies(appContext.ctx)
+
         const initialStoreData = initializeStore({
             authStore: {
                 // set inside a value object because of next-cookies reads from value property
