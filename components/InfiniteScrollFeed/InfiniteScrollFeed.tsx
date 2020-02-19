@@ -1,15 +1,15 @@
 import React, { FunctionComponent, useCallback, useContext } from 'react'
 import InfiniteScroll from 'react-infinite-scroll-component'
-import { PostPreview, VotingHandles } from '@components'
+import { PostPreview } from '@components'
 import { Post } from '@novuspherejs'
-import { Button, Icon, Skeleton } from 'antd'
+import { Button, Skeleton } from 'antd'
 
 import Empty from 'antd/lib/empty'
 
 import styles from './InfiniteScrollFeed.module.scss'
 
 import { RootStore, StoreContext } from '@stores'
-import { observer, useObserver } from 'mobx-react-lite'
+import { observer } from 'mobx-react-lite'
 import cx from 'classnames'
 import { useRouter } from 'next/router'
 
@@ -32,7 +32,6 @@ const InfiniteScrollFeed: FunctionComponent<IInfiniteScrollFeedProps> = ({
 }) => {
     const { uiStore, authStore, userStore, tagStore }: RootStore = useContext(StoreContext)
     const router = useRouter()
-
     const renderEndMessage = useCallback(() => {
         return <div className={'tc pa3 f6 card bg-white'}>You have reached the end!</div>
     }, [])

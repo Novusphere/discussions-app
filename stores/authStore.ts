@@ -1,23 +1,50 @@
-import { action, computed, observable } from 'mobx'
+import { action, observable } from 'mobx'
 import { SIGN_IN_OPTIONS } from '@globals'
 import { RootStore } from '@stores'
 import { bkToStatusJson } from '@utils'
 import { discussions, init, eos } from '@novuspherejs'
-import { parseCookies } from 'nookies'
-import Cookie from 'mobx-cookie'
 import { task } from 'mobx-task'
 import { notification } from 'antd'
 import { persist } from 'mobx-persist'
 
 export class AuthStore {
-    _hasAccountCookie = new Cookie('hasAccount')
-    _hasEOSWallet = new Cookie('hasEOSWallet')
-    _postPubKey = new Cookie('postPub')
-    _accountPubKey = new Cookie('accountPubKey')
-    _displayName = new Cookie('displayName')
-    _uidwWalletPubKey = new Cookie('uidWalletPubKey')
-    _bk = new Cookie('bk')
+    // _hasAccountCookie = new Cookie('hasAccount')
+    // _hasEOSWallet = new Cookie('hasEOSWallet')
+    // _postPubKey = new Cookie('postPub')
+    // _accountPubKey = new Cookie('accountPubKey')
+    // _displayName = new Cookie('displayName')
+    // _uidwWalletPubKey = new Cookie('uidWalletPubKey')
+    // _bk = new Cookie('bk')
 
+    @persist('object')
+    @observable
+    bk = null
+
+    @persist
+    @observable
+    hasAccount = false
+
+    @persist
+    @observable
+    hasEOSWallet = false
+
+    @persist
+    @observable
+    displayName = ''
+
+    @persist
+    @observable
+    postPub = ''
+
+    @persist
+    @observable
+    uidwWalletPubKey = ''
+
+    @persist
+    @observable
+    accountPubKey = ''
+
+    @persist
     @observable
     preferredSignInMethod: SIGN_IN_OPTIONS = SIGN_IN_OPTIONS.brainKey
 
@@ -42,31 +69,6 @@ export class AuthStore {
     @observable TEMP_WalletPrivateKey = ''
 
     constructor(rootStore: RootStore) {}
-
-    @computed get hasAccount() {
-        if (!this._hasAccountCookie.value) return false
-        return JSON.parse(this._hasAccountCookie.value)
-    }
-
-    @computed get hasEOSWallet() {
-        return JSON.parse(this._hasEOSWallet.value)
-    }
-
-    @computed get displayName() {
-        return this._displayName.value
-    }
-
-    @computed get postPub() {
-        return this._postPubKey.value
-    }
-
-    @computed get uidwWalletPubKey() {
-        return this._uidwWalletPubKey.value
-    }
-
-    @computed get accountPubKey() {
-        return this._accountPubKey.value
-    }
 
     @action.bound
     setTEMPPrivateKey = key => {
@@ -97,52 +99,36 @@ export class AuthStore {
     }
 
     logOut = () => {
-        console.log('called')
-        this.setHasAccountCookie('false')
+        this.setHasAccountCookie(false)
     }
 
     setUidWalletPubKeyCookie = (value: string) => {
-        // refresh this key
-        this._uidwWalletPubKey = new Cookie('uidWalletPubKey')
-        this._uidwWalletPubKey.set(value)
+        this.uidwWalletPubKey = value
     }
 
     setAccountKey = ({ pub, priv }) => {
-        // refresh this key
         this.accountPrivKey = priv
-
-        this._accountPubKey = new Cookie('accountPubKey')
-        this._accountPubKey.set(pub)
+        this.accountPubKey = pub
     }
 
-    setHasAccountCookie = (value: string) => {
-        // refresh this key
-        this._hasAccountCookie = new Cookie('hasAccount')
-        this._hasAccountCookie.set(value)
+    setHasAccountCookie = (value: boolean) => {
+        this.hasAccount = value
     }
 
-    setHasEOSWalletCookie = (value: string) => {
-        // refresh this key
-        this._hasEOSWallet = new Cookie('hasEOSWallet')
-        this._hasEOSWallet.set(value)
+    setHasEOSWalletCookie = (value: boolean) => {
+        this.hasEOSWallet = value
     }
 
     setBKCookie = (value: string) => {
-        // refresh this key
-        this._bk = new Cookie('bk')
-        this._bk.set(value)
+        this.bk = value
     }
 
     setPostPubCookie = (value: string) => {
-        // refresh this key
-        this._postPubKey = new Cookie('postPub')
-        this._postPubKey.set(value)
+        this.postPub = value
     }
 
     setDisplayNameCookie = (value: string) => {
-        // refresh this key
-        this._displayName = new Cookie('displayName')
-        this._displayName.set(value)
+        this.displayName = value
     }
 
     signInWithBK = async (brianKeyVerify, displayName, password) => {
@@ -160,7 +146,7 @@ export class AuthStore {
                 this.setDisplayNameCookie(statusJSON.displayName)
                 this.setBKCookie(unparsedJSON)
                 this.setPostPubCookie(statusJSON.post)
-                this.setHasAccountCookie('true')
+                this.setHasAccountCookie(true)
                 this.storeKeys(brianKeyVerify)
             }
         } catch (error) {
@@ -170,7 +156,7 @@ export class AuthStore {
 
     signInWithPassword = async (password: string) => {
         try {
-            const { bk } = parseCookies(window)
+            const { bk } = this
 
             if (typeof bk === 'undefined') {
                 throw new Error('No active BK found, please log in with another BK.')
@@ -210,7 +196,7 @@ export class AuthStore {
             if (hasEOSWallet) {
                 // disconnect
                 await eos.logout()
-                this.setHasEOSWalletCookie('false')
+                this.setHasEOSWalletCookie(false)
                 notification.success({
                     message: 'Success',
                     description: 'You have disconnected your EOS wallet',
@@ -221,9 +207,9 @@ export class AuthStore {
                 if (wallet && wallet.connected) {
                     this.eosWalletDisplayName = wallet.auth.accountName
                     ;(wallet as any).connect()
-                    this.setHasEOSWalletCookie('true')
+                    this.setHasEOSWalletCookie(true)
                 } else {
-                    this.setHasEOSWalletCookie('false')
+                    this.setHasEOSWalletCookie(false)
                 }
             }
         } catch (error) {

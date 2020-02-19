@@ -1,12 +1,11 @@
 import React, { FunctionComponent, useCallback, useContext, useState } from 'react'
 
 import styles from './ModalsSignIn.module.scss'
-import { Button, Modal, Typography, Result, Icon, Form, Input, notification } from 'antd'
+import { Button, Form, Icon, Input, Modal, notification, Result, Typography } from 'antd'
 import { SIGN_IN_OPTIONS } from '@globals'
 import { observer } from 'mobx-react'
 import { SignInOptions } from '@constants/sign-in-options'
 import cx from 'classnames'
-import { setCookie, parseCookies } from 'nookies'
 import { RootStore, StoreContext } from '@stores'
 import { hasErrors } from '@utils'
 
@@ -34,34 +33,29 @@ const ModalsSignIn: FunctionComponent<IModalsSignInProps> = ({
     handleOk,
     form,
 }) => {
-    const { authStore, uiStore, userStore }: RootStore = useContext(StoreContext)
-    const cookies = parseCookies(window)
+    const { authStore, uiStore }: RootStore = useContext(StoreContext)
     const [remember, setRemember] = useState(
-        cookies['preferredSignInMethod'] === SIGN_IN_OPTIONS.brainKey
+        authStore.preferredSignInMethod === SIGN_IN_OPTIONS.brainKey
     )
     const [step, setStep] = useState<STEP_OPTIONS>(STEP_OPTIONS.METHOD)
 
     const onChange = useCallback(e => {
         if (!e.target.checked) {
-            setCookie(window, 'preferredSignInMethod', SIGN_IN_OPTIONS.none, {
-                path: '/',
-            })
+            authStore.setPreferredSignInMethod(SIGN_IN_OPTIONS.none)
 
             setRemember(false)
         } else {
             if (authStore.preferredSignInMethod) {
-                setCookie(window, 'preferredSignInMethod', authStore.preferredSignInMethod, {
-                    path: '/',
-                })
+                authStore.setPreferredSignInMethod(authStore.preferredSignInMethod)
             }
             setRemember(true)
         }
     }, [])
 
     const alreadyHasAccount =
-        typeof cookies['bk'] !== 'undefined' &&
-        typeof cookies['displayName'] !== 'undefined' &&
-        typeof cookies['postPriv'] !== 'undefined'
+        typeof authStore.bk !== 'undefined' &&
+        typeof authStore.displayName !== 'undefined' &&
+        typeof authStore.postPriv !== 'undefined'
 
     const next = useCallback(() => {
         setStep(prevState => prevState + 1)
@@ -98,7 +92,7 @@ const ModalsSignIn: FunctionComponent<IModalsSignInProps> = ({
                             loading={false}
                             onClick={() => setStep(STEP_OPTIONS.SIGN_IN_WITH_CURRENT_BK)}
                         >
-                            Continue as {cookies['displayName']}
+                            Continue as {authStore.displayName}
                         </Button>
                     ),
                     !authStore.preferredSignInMethod && (

@@ -31,11 +31,17 @@ export class PostsStore {
      * For fetching posts inside a tag, home page or all.
      * @param key
      * @param {string[]} tagNames
-     * @param pinnedPostsBuffer - a Base64 version of { }asPathURL, tagName }
+     * @param {asPathURL, tagName[]} pinnedPosts
      */
-    fetchPostsForTag = async (key = '', tagNames, pinnedPostsBuffer = '') => {
+    fetchPostsForTag = async (key = '', tagNames, pinnedPosts) => {
         try {
+            console.log('here')
             if (!tagNames || !tagNames.length) tagNames = ['all']
+            console.log({
+                key,
+                tagNames,
+                pinnedPosts,
+            })
 
             const { posts, cursorId } = await discussions.getPostsForSubs(
                 tagNames,
@@ -45,28 +51,24 @@ export class PostsStore {
                 key
             )
 
-            let pinnedPosts = []
+            console.log(posts.length)
+
+            let _pinnedPosts = []
 
             // get pinned posts to put at the front
-            if (!this.postsPosition.cursorId && pinnedPostsBuffer) {
-                // convert b64 back to obj
-                const pinnedPostsAsObj = JSON.parse(
-                    Buffer.from(pinnedPostsBuffer, 'base64').toString('ascii')
-                )
-
+            if (!this.postsPosition.cursorId && pinnedPosts.length) {
                 await Promise.all(
-                    _.map(pinnedPostsAsObj, async (name, url: string) => {
+                    _.map(pinnedPosts, async (name, url: string) => {
                         if (tagNames[0] === name) {
                             const post = await discussions.getPostsByAsPathURL(url, key)
                             post.pinned = true
-                            // this.posts.push(post)
-                            pinnedPosts.push(post)
+                            _pinnedPosts.push(post)
                         }
                     })
                 )
             }
 
-            this.posts = [...pinnedPosts, ...this.posts, ...posts]
+            this.posts = [..._pinnedPosts, ...this.posts, ...posts]
 
             this.postsPosition = {
                 items: this.posts.length,

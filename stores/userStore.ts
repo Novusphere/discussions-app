@@ -1,9 +1,8 @@
 import { persist } from 'mobx-persist'
 import { observable } from 'mobx'
-import { hydrate, RootStore } from '@stores/index'
+import { RootStore } from '@stores/index'
 import axios from 'axios'
 import _ from 'lodash'
-import { setCookie, parseCookies } from 'nookies'
 import { discussions, nsdb, Post } from '@novuspherejs'
 import moment from 'moment'
 import mapSeries from 'async/mapSeries'
@@ -125,25 +124,11 @@ export class UserStore {
     }
 
     async setPinnedPosts(posts: any[], delegated = false, sync = true) {
-        let obj = {}
-
         _.forEach(posts, (urls, name: string) => {
             _.forEach(urls, url => {
-                Object.assign(obj, {
-                    [url]: name,
-                })
+                this.pinnedPosts.set(url, name)
             })
         })
-
-        Object.assign(obj, this.pinnedPosts.toJSON())
-
-        const b64 = Buffer.from(JSON.stringify(obj)).toString('base64')
-
-        if (delegated) {
-            setCookie(null, 'pinnedByDelegation', b64, { path: '/' })
-        } else {
-            setCookie(null, 'pinnedPosts', b64, { path: '/' })
-        }
 
         if (sync) this.syncDataFromLocalToServer()
     }
@@ -305,35 +290,17 @@ export class UserStore {
     }
 
     togglePinPost = (tagName: string, asPathURL: string) => {
-        const pinnedPostsBuffer = parseCookies(window)
-        let pinnedPostsAsObj = {}
-
-        if (pinnedPostsBuffer.pinnedByDelegation) {
-            pinnedPostsAsObj = JSON.parse(
-                Buffer.from(pinnedPostsBuffer.pinnedByDelegation, 'base64').toString('ascii')
-            )
-        }
-
         if (this.pinnedPosts.has(asPathURL)) {
             this.uiStore.showMessage('This post has been unpinned!', 'success')
             this.pinnedPosts.delete(asPathURL)
-
-            if (pinnedPostsAsObj[asPathURL]) {
-                delete pinnedPostsAsObj[asPathURL]
-            }
         } else {
             this.pinnedPosts.set(asPathURL, tagName)
             this.uiStore.showMessage('This post has been pinned!', 'success')
 
-            pinnedPostsAsObj = {
-                ...pinnedPostsAsObj,
-                [asPathURL]: tagName,
-            }
+            this.pinnedPosts.set(asPathURL, tagName)
         }
 
         this.syncDataFromLocalToServer()
-        const b64 = Buffer.from(JSON.stringify(pinnedPostsAsObj)).toString('base64')
-        setCookie(window, 'pinnedByDelegation', b64, { path: '/' })
     }
 
     pingServerForData = ({ postPriv, postPub, accountPrivKey, accountPubKey }) => {
@@ -441,9 +408,11 @@ export class UserStore {
             }))
 
             // we have to send the entire payload, not just the diff
+            const { uidwWalletPubKey, accountPrivKey, accountPubKey, postPub } = this.authStore
+
             const dataToSync = {
-                uidw: this.authStore.uidwWalletPubKey,
-                postPub: this.authStore.postPub,
+                uidw: uidwWalletPubKey,
+                postPub: postPub,
                 legacy: false, // override
                 lastCheckedNotifications: this.lastCheckedNotifications,
                 watching: [...this.watching.toJS()],
@@ -459,8 +428,6 @@ export class UserStore {
                 },
             }
 
-            const { accountPubKey } = parseCookies(window)
-
             if (!accountPubKey) {
                 this.uiStore.showToast(
                     'Unable to save your data',
@@ -470,7 +437,7 @@ export class UserStore {
             }
 
             await nsdb.saveAccount({
-                accountPrivateKey: this.authStore.accountPrivKey,
+                accountPrivateKey: accountPrivKey,
                 accountPublicKey: accountPubKey,
                 accountData: dataToSync,
             })

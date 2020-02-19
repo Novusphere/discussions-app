@@ -1,14 +1,22 @@
-import React, { useContext } from 'react'
+import React, { useContext, useEffect, useMemo } from 'react'
 import { NextPage } from 'next'
 import { InfiniteScrollFeed } from '@components'
 import { observer } from 'mobx-react-lite'
-import { StoreContext } from '@stores'
-import { parseCookies } from 'nookies'
+import { RootStore, StoreContext } from '@stores'
 import { NextSeo } from 'next-seo'
 import Head from 'next/head'
+import dynamic from 'next/dynamic'
 
-const TagPage: NextPage<any> = ({ postPub, tag, pinnedByDelegation }) => {
-    const { postsStore } = useContext(StoreContext)
+const TagPageObservable: NextPage<any> = ({ tag }) => {
+    const { postsStore, userStore, authStore }: RootStore = useContext(StoreContext)
+
+    const pinnedPosts = useMemo(() => [...userStore.pinnedPosts.toJS()], [])
+    const postPub = useMemo(() => authStore.postPub, [])
+
+    useEffect(() => {
+        postsStore.resetPostsAndPosition()
+        postsStore.fetchPostsForTag(postPub, [tag], pinnedPosts)
+    }, [])
 
     return (
         <>
@@ -19,26 +27,36 @@ const TagPage: NextPage<any> = ({ postPub, tag, pinnedByDelegation }) => {
             <InfiniteScrollFeed
                 dataLength={postsStore.postsPosition.items}
                 hasMore={postsStore.postsPosition.cursorId !== 0}
-                next={() => postsStore.fetchPostsForTag(postPub, [tag], pinnedByDelegation)}
+                next={() => postsStore.fetchPostsForTag(postPub, [tag], pinnedPosts)}
                 posts={postsStore.posts}
             />
         </>
     )
 }
 
-TagPage.getInitialProps = async function({ store, query, ...rest }: any) {
-    const tag = query.name
-    const { pinnedByDelegation } = parseCookies(rest)
-    store.postsStore.resetPostsAndPosition()
+const TagPage = observer(TagPageObservable) as any
 
-    const postPub = store.authStore.postPub
-    await store.postsStore.fetchPostsForTag(postPub, [tag], pinnedByDelegation)
+TagPage.getInitialProps = async function({ store, query }: any) {
+    const tag = query.name
+    // store.postsStore.resetPostsAndPosition()
+    // const pinnedPosts = store.userStore.pinnedPosts
+    // const postPub = store.authStore.postPub
+    // await store.postsStore.fetchPostsForTag(postPub, [tag], pinnedPosts)
+    //
+    // console.log({
+    //     pinnedPosts,
+    //     postPub,
+    //     tag,
+    // })
 
     return {
-        postPub,
+        // postPub,
         tag,
-        pinnedByDelegation,
+        // pinnedPosts,
     }
 }
-
-export default observer(TagPage)
+export default TagPage
+//
+// export default dynamic(() => Promise.resolve(TagPage), {
+//     ssr: false,
+// })

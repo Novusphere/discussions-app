@@ -49,18 +49,8 @@ export class RootStore {
 
 const StoreContext = createContext<any | null>(null)
 
-function initializeStore(data) {
+function initializeStore() {
     const stores = new RootStore()
-
-    stores.hydrate({
-        authStore: data.authStore,
-        postsStore: data.postsStore,
-        tagStore: data.tagStore,
-        uiStore: data.uiStore,
-        walletStore: data.walletStore,
-        userStore: data.userStore ? data.userStore : {},
-        settingStore: data.settingStore ? data.settingStore : {},
-    })
 
     if (isServer) {
         return stores
@@ -87,7 +77,7 @@ function initializeStore(data) {
 }
 
 function InjectStoreContext({ children, initialData }) {
-    const store = initializeStore(initialData)
+    const store = initializeStore()
     return <StoreContext.Provider value={store}>{children}</StoreContext.Provider>
 }
 
