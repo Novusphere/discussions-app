@@ -3,7 +3,7 @@ import React, { useCallback } from 'react'
 import { useObserver } from 'mobx-react-lite'
 import { Avatar, Button, Divider, List, Switch, Typography } from 'antd'
 import { getIdenticon } from '@utils'
-import Link from 'next/link'
+import { Link } from 'react-router-dom';
 
 const { Text } = Typography
 
@@ -91,7 +91,7 @@ const Blocked = () => {
                                     </span>
                                     <span className={'dib'}>
                                         <span className={'db'}>
-                                            <Link href={`/u/[username]`} as={`/u/${name}-${keys}`}>
+                                            <Link to={`/u/${name}-${keys}`}>
                                                 <a>{name}</a>
                                             </Link>
                                         </span>
@@ -133,7 +133,7 @@ const Blocked = () => {
                                         <span className={'pr3'}>
                                             <Avatar src={tag.logo} size={'large'} />
                                         </span>
-                                        <Link href={'/tag/[name]/[id]/[title]'} as={path}>
+                                        <Link to={path}>
                                             <a><Text ellipsis style={{ maxWidth: '20vw' }}>{path}</Text></a>
                                         </Link>
                                     </span>

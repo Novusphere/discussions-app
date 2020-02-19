@@ -33,15 +33,9 @@ export class PostsStore {
      * @param {string[]} tagNames
      * @param {asPathURL, tagName[]} pinnedPosts
      */
-    fetchPostsForTag = async (key = '', tagNames, pinnedPosts) => {
+    fetchPostsForTag = async (key = '', tagNames: string[], pinnedPosts: any[] = []) => {
         try {
-            console.log('here')
             if (!tagNames || !tagNames.length) tagNames = ['all']
-            console.log({
-                key,
-                tagNames,
-                pinnedPosts,
-            })
 
             const { posts, cursorId } = await discussions.getPostsForSubs(
                 tagNames,
@@ -51,9 +45,7 @@ export class PostsStore {
                 key
             )
 
-            console.log(posts.length)
-
-            let _pinnedPosts = []
+            let _pinnedPosts: any[] = []
 
             // get pinned posts to put at the front
             if (!this.postsPosition.cursorId && pinnedPosts.length) {

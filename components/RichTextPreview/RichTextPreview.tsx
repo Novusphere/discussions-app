@@ -105,7 +105,7 @@ const RtLink: FunctionComponent<any> = ({ children, href, index }) => {
             }
         })
 
-        let timeout = null
+        let timeout: any = null
 
         async function refreshIFrames() {
             await sleep(250)
@@ -123,8 +123,7 @@ const RtLink: FunctionComponent<any> = ({ children, href, index }) => {
                     ;(window as any).instgrm.Embeds.process()
                 }
             } else if (href.match(/t.me/)) {
-                // @ts-ignore
-                const tl = await import('/static/telegram.js')
+                const tl = await import('@static/telegram.js')
 
                 timeout = setTimeout(() => {
                     tl.default(window)

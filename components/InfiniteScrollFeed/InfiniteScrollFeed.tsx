@@ -11,7 +11,7 @@ import styles from './InfiniteScrollFeed.module.scss'
 import { RootStore, StoreContext } from '@stores'
 import { observer } from 'mobx-react-lite'
 import cx from 'classnames'
-import { useRouter } from 'next/router'
+import { useHistory } from 'react-router-dom'
 
 interface IInfiniteScrollFeedProps {
     dataLength: number
@@ -31,7 +31,7 @@ const InfiniteScrollFeed: FunctionComponent<IInfiniteScrollFeedProps> = ({
     children,
 }) => {
     const { uiStore, authStore, userStore, tagStore }: RootStore = useContext(StoreContext)
-    const router = useRouter()
+    const history = useHistory()
     const renderEndMessage = useCallback(() => {
         return <div className={'tc pa3 f6 card bg-white'}>You have reached the end!</div>
     }, [])
@@ -58,7 +58,7 @@ const InfiniteScrollFeed: FunctionComponent<IInfiniteScrollFeedProps> = ({
         return (
             <div className={'db center tc'}>
                 <Empty description={<span>There doesn't seem to be anything here...</span>}>
-                    <Button type="primary" onClick={() => router.push('/new', '/new')}>
+                    <Button type="primary" onClick={() => history.push('/new')}>
                         Create a post now
                     </Button>
                 </Empty>

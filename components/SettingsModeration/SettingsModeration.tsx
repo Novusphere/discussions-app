@@ -2,8 +2,8 @@ import { RootStore, useStores } from '@stores'
 import { useObserver } from 'mobx-react-lite'
 import { Avatar, Button, Table } from 'antd'
 import { getIdenticon } from '@utils'
-import Link from 'next/link'
 import React from 'react'
+import { Link } from 'react-router-dom'
 
 const Moderation = () => {
     const { userStore, tagStore, authStore }: RootStore = useStores()
@@ -29,12 +29,12 @@ const Moderation = () => {
             title: 'Display Name',
             dataIndex: 'name',
             key: 'name',
-            render: (name, record) => {
+            render: (name: React.ReactNode, record: { uidw: string }) => {
                 return (
                     <>
                         <Avatar src={getIdenticon(record.uidw)} />
                         <span className={'ml3'}>
-                            <Link href={`/u/[username]`} as={`/u/${name}-${record.uidw}`}>
+                            <Link to={`/u/${name}-${record.uidw}`}>
                                 <a>{name}</a>
                             </Link>
                         </span>
@@ -42,19 +42,20 @@ const Moderation = () => {
                 )
             },
             sortDirections: ['descend', 'ascend'],
-            sorter: (a, b) => (a.name === b.name ? 0 : a.name < b.name ? -1 : 1),
+            sorter: (a: { name: number }, b: { name: number }) =>
+                a.name === b.name ? 0 : a.name < b.name ? -1 : 1,
         },
         {
             title: 'Tag',
             dataIndex: 'tag',
             key: 'tag',
-            render: (tag, record) => {
+            render: (tag: React.ReactNode, record: any) => {
                 const tagModel = tagStore.tagModelFromObservables(tag)
                 return (
                     <>
                         <Avatar src={tagModel.logo} />
                         <span className={'ml3'}>
-                            <Link href={'/tag/[name]'} as={`/tag/${tag}`}>
+                            <Link to={`/tag/${tag}`}>
                                 <a>#{tag}</a>
                             </Link>
                         </span>
@@ -63,11 +64,12 @@ const Moderation = () => {
             },
 
             sortDirections: ['descend', 'ascend'],
-            sorter: (a, b) => (a.tag === b.tag ? 0 : a.tag < b.tag ? -1 : 1),
+            sorter: (a: { tag: number }, b: { tag: number }) =>
+                a.tag === b.tag ? 0 : a.tag < b.tag ? -1 : 1,
         },
         {
             key: 'action',
-            render: (text, record) => (
+            render: (text: any, record: { name: any; uidw: any; tag: string }) => (
                 <>
                     <Button
                         size={'small'}

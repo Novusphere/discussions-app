@@ -1,9 +1,9 @@
+import * as React from 'react'
 import { useStaticRendering } from 'mobx-react'
 import { isServer } from '@utils'
 import { AuthStore } from '@stores/authStore'
 import { createContext, useContext } from 'react'
 import { UIStore } from '@stores/uiStore'
-import { set } from 'mobx'
 import { TagStore } from '@stores/tagStore'
 import { PostsStore } from '@stores/postsStore'
 import { UserStore } from '@stores/userStore'
@@ -13,7 +13,7 @@ import { WalletStore } from '@stores/walletStore'
 
 useStaticRendering(isServer)
 
-export const hydrate = storage =>
+export const hydrate = (storage: Storage) =>
     create({
         storage: storage,
         jsonify: true,
@@ -27,24 +27,6 @@ export class RootStore {
     walletStore = new WalletStore(this)
     postsStore = new PostsStore(this)
     settingStore = new SettingsStore(this)
-
-    hydrate({ authStore, postsStore, tagStore, uiStore, userStore, settingStore, walletStore }) {
-        if (authStore) {
-            set(this.authStore, authStore)
-        }
-
-        if (postsStore) {
-            set(this.postsStore, postsStore)
-        }
-
-        if (userStore) {
-            this.userStore.hydrate(userStore)
-        }
-
-        if (uiStore) {
-            set(this.uiStore, uiStore)
-        }
-    }
 }
 
 const StoreContext = createContext<any | null>(null)
@@ -76,7 +58,7 @@ function initializeStore() {
     return rootStore
 }
 
-function InjectStoreContext({ children, initialData }) {
+function InjectStoreContext({ children, initialData }: any) {
     const store = initializeStore()
     return <StoreContext.Provider value={store}>{children}</StoreContext.Provider>
 }

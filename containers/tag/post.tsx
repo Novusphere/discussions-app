@@ -1,9 +1,7 @@
-import React, { useEffect } from 'react'
-import { NextPage } from 'next'
-import { useLocalStore, useObserver } from 'mobx-react-lite'
+import React, { useEffect, useCallback, useState } from 'react'
+import { useLocalStore } from 'mobx-react-lite'
 import { discussions, Thread } from '@novuspherejs'
 import { Button, Divider, Dropdown, Icon, Menu, Popover, Tooltip, Result, Input } from 'antd'
-import Link from 'next/link'
 import {
     UserNameWithIcon,
     Tips,
@@ -16,14 +14,12 @@ import {
     ReplyingPostPreview,
 } from '@components'
 import moment from 'moment'
-import { useRouter } from 'next/router'
 import _ from 'lodash'
 import {
     createPostObject,
     generateVoteObject,
     getThreadUrl,
     openInNewTab,
-    removeMD,
     signPost,
     transformTipsToTransfers,
     voteAsync,
@@ -31,10 +27,9 @@ import {
 import { RootStore, useStores } from '@stores'
 import { MODAL_OPTIONS } from '@globals'
 import cx from 'classnames'
-import Head from 'next/head'
-import { NextSeo } from 'next-seo'
-import { observable } from 'mobx'
 import { observer } from 'mobx-react'
+import Helmet from 'react-helmet'
+import { Link, useLocation, useParams } from 'react-router-dom'
 
 interface IPostPageProps {
     thread: Thread
@@ -59,8 +54,6 @@ const PostPageComponentObserverable: React.FunctionComponent<IPostPageProps> = (
         walletStore,
         tagStore,
     }: RootStore = useStores()
-
-    const router = useRouter()
 
     const postStore = useLocalStore(
         source => ({
@@ -416,8 +409,10 @@ const PostPageComponentObserverable: React.FunctionComponent<IPostPageProps> = (
         }
     )
 
+    const location = useLocation()
+
     useEffect(() => {
-        const [, hash] = router.asPath.split('#')
+        const [, hash] = location.pathname.split('#')
         if (hash) {
             postStore.setHighlightedPosUUID(hash)
         }
@@ -518,13 +513,7 @@ const PostPageComponentObserverable: React.FunctionComponent<IPostPageProps> = (
                     'You or a moderator marked this post as spam. You can unblock this post in your settings.'
                 }
                 extra={[
-                    <Link
-                        key={'returnBack'}
-                        href={`/tag/[name]`}
-                        as={`/tag/${thread.openingPost.sub}`}
-                        shallow={false}
-                        passHref
-                    >
+                    <Link to={`/tag/${thread.openingPost.sub}`}>
                         <Button
                             title={`See all posts in ${name}`}
                             icon={'caret-left'}
@@ -544,12 +533,7 @@ const PostPageComponentObserverable: React.FunctionComponent<IPostPageProps> = (
 
     return (
         <>
-            <Link
-                href={`/tag/[name]`}
-                as={`/tag/${thread.openingPost.sub}`}
-                shallow={false}
-                passHref
-            >
+            <Link to={`/tag/${thread.openingPost.sub}`}>
                 <Button title={`See all posts in ${name}`} icon={'caret-left'}>
                     <span className={'flex flex-row items-center'}>
                         <img
@@ -566,7 +550,7 @@ const PostPageComponentObserverable: React.FunctionComponent<IPostPageProps> = (
             <div className={'bg-white mv2 pa4 card'}>
                 <div className={'flex flex-row items-center justify-between'}>
                     <div className={'flex flex-row items-center'}>
-                        <Link href={`/tag/[name]`} as={`/tag/${thread.openingPost.sub}`}>
+                        <Link to={`/tag/${thread.openingPost.sub}`}>
                             <a>
                                 <span className={'b'}>#{thread.openingPost.sub}</span>
                             </a>
@@ -783,7 +767,6 @@ const PostPageComponentObserverable: React.FunctionComponent<IPostPageProps> = (
                             <Replies
                                 key={reply.uuid}
                                 reply={reply}
-                                router={router}
                                 threadUsers={postStore.threadUsers}
                                 highlightedPostUUID={postStore.highlightedPostUUID}
                                 setHighlightedPosUUID={postStore.setHighlightedPosUUID}
@@ -798,48 +781,53 @@ const PostPageComponentObserverable: React.FunctionComponent<IPostPageProps> = (
 
 const PostPageComponent = observer(PostPageComponentObserverable)
 
-const PostPage: NextPage<any> = ({ url, thread, query }) => {
+const PostPage: React.FC = () => {
+    const { postsStore, authStore }: RootStore = useStores()
+    const query: any = useParams()
+    const [thread, setThread] = useState(null)
+    const [url, setUrl] = useState('')
+    const fetchThread = useCallback(() => {
+        postsStore.getThreadById(query.id, authStore.postPub).then(thread => {
+            setThread(thread)
+            getThreadUrl(thread.openingPost).then((url: string) => setUrl(url))
+        })
+    }, [query.id])
+
+    useEffect(() => {
+        fetchThread()
+    }, [query.id])
+
+    if (!thread) return null
+    
     return (
         <>
-            <Head>
+            <Helmet>
                 <title>
                     {thread.openingPost.title} - #{thread.openingPost.sub}
                 </title>
-            </Head>
-            <NextSeo
-                title={thread.openingPost.title}
-                description={removeMD(thread.openingPost.content).substring(0, 150)}
-                openGraph={{
-                    title: thread.openingPost.title,
-                    description: removeMD(thread.openingPost.content).substring(0, 150),
-                    site_name: 'Discussions App',
-                    images: [
-                        {
-                            url: thread.icon
-                                ? thread.icon
-                                : 'https://cdn.novusphere.io/static/atmos2.png',
-                            width: 50,
-                            height: 50,
-                            alt: 'https://cdn.novusphere.io/static/atmos2.png',
-                        },
-                    ],
-                }}
-            />
+            </Helmet>
+            {/*<NextSeo*/}
+            {/*    title={thread.openingPost.title}*/}
+            {/*    description={removeMD(thread.openingPost.content).substring(0, 150)}*/}
+            {/*    openGraph={{*/}
+            {/*        title: thread.openingPost.title,*/}
+            {/*        description: removeMD(thread.openingPost.content).substring(0, 150),*/}
+            {/*        site_name: 'Discussions App',*/}
+            {/*        images: [*/}
+            {/*            {*/}
+            {/*                url: thread.icon*/}
+            {/*                    ? thread.icon*/}
+            {/*                    : 'https://cdn.novusphere.io/static/atmos2.png',*/}
+            {/*                width: 50,*/}
+            {/*                height: 50,*/}
+            {/*                alt: 'https://cdn.novusphere.io/static/atmos2.png',*/}
+            {/*            },*/}
+            {/*        ],*/}
+            {/*    }}*/}
+            {/*/>*/}
             <PostPageComponent thread={thread} url={url} query={query} />
         </>
     )
 }
 
-PostPage.getInitialProps = async function({ store, query }: any) {
-    const postPub = store.authStore.postPub
-    const thread = await store.postsStore.getThreadById(query.id, postPub)
-    const url = await getThreadUrl(thread.openingPost)
-
-    return {
-        url,
-        thread,
-        query: query,
-    }
-}
-
-export default PostPage
+export default observer(PostPage)

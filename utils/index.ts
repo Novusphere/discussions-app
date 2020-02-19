@@ -1,10 +1,7 @@
-import Router from 'next/router'
 import { discussions, eos, nsdb, Post } from '@novuspherejs'
 import _ from 'lodash'
 import axios from 'axios'
 import ecc from 'eosjs-ecc'
-import { useEffect, useRef } from 'react'
-import cookie from 'cookie'
 
 const removeMd = require('remove-markdown')
 const matchAll = require('string.prototype.matchall')
@@ -20,12 +17,8 @@ export const INDEXER_NAME = '__LINKINDEXER__'
 export const LINK_LIMIT = 1000
 export const isDev = process.env.NODE_ENV === 'development'
 export const isServer = typeof window === 'undefined'
-export const sleep = milliseconds => {
+export const sleep = (milliseconds: number) => {
     return new Promise(resolve => setTimeout(resolve, milliseconds))
-}
-
-export const parseCookies = req => {
-    return cookie.parse(req ? req.headers.cookie || '' : document.cookie)
 }
 
 export const sanityCheckTag = (tagName: string) => {
@@ -38,7 +31,7 @@ export const sanityCheckTag = (tagName: string) => {
     return tagName
 }
 
-export const tweetCurrentPage = (url = null) => {
+export const tweetCurrentPage = (url: string) => {
     window.open(
         'https://twitter.com/share?url=' +
             (url ? url : encodeURIComponent(window.location.href)) +
@@ -76,15 +69,6 @@ export const getAttachmentValue = (post: any) => {
     }
 }
 
-export function waitForObject(o, withObject, tries = 30) {
-    let obj = o()
-    if (obj && withObject) {
-        withObject(obj)
-    } else if (tries > 0) {
-        setTimeout(() => waitForObject(o, withObject, tries - 1), 1000)
-    }
-}
-
 export const openInNewTab = (url: string) => {
     const win = window.open(url, '_blank')
     return win.focus()
@@ -95,11 +79,11 @@ export const encodeId = (post: Post) => {
     return Post.encodeId(post.transaction, new Date(post.createdAt))
 }
 
-export const getThreadTitle = post => {
+export const getThreadTitle = (post: Post) => {
     return decodeURIComponent(_.snakeCase(post.title))
 }
 
-export const getThreadUrl = async (post, permalinkUuid?: string) => {
+export const getThreadUrl = async (post: Post, permalinkUuid?: string) => {
     const id = encodeId(post)
     let url = `/tag/${post.sub}/${id}/`
 
@@ -108,7 +92,7 @@ export const getThreadUrl = async (post, permalinkUuid?: string) => {
         const thread = await discussions.getThread(id, '')
         if (!thread || !thread.openingPost) return ''
         const newId = encodeId(thread.openingPost as any)
-        url = `/tag/${thread.openingPost.sub}/${newId}/${getThreadTitle(thread)}`
+        url = `/tag/${thread.openingPost.sub}/${newId}/${getThreadTitle(thread as any)}`
     } else {
         url += `${getThreadTitle(post)}`
     }
@@ -120,9 +104,9 @@ export const getThreadUrl = async (post, permalinkUuid?: string) => {
     return url
 }
 
-export const pushToThread = async (post, permalinkUuid?: string) => {
+export const pushToThread = async (post: Post, permalinkUuid?: string) => {
     const url = await getThreadUrl(post, permalinkUuid)
-    Router.push('/tag/[name]/[id]/[title]', url)
+    console.error('need to push: url')
 }
 
 export const getVersion = () => {
@@ -528,14 +512,14 @@ export const bkToStatusJson = async (
 export const GA_TRACKING_ID = 'UA-152897893-1'
 
 // https://developers.google.com/analytics/devguides/collection/gtagjs/pages
-export const pageview = url => {
+export const pageview = (url: string) => {
     ;(window as any).gtag('config', GA_TRACKING_ID, {
         page_path: url,
     })
 }
 
 // https://developers.google.com/analytics/devguides/collection/gtagjs/events
-export const event = ({ action, category, label, value }) => {
+export const event = ({ action, category, label, value }: any) => {
     ;(window as any).gtag('event', action, {
         event_category: category,
         event_label: label,
@@ -544,7 +528,7 @@ export const event = ({ action, category, label, value }) => {
 }
 
 // ombed stuff
-export const getYouTubeIDFromUrl = url => {
+export const getYouTubeIDFromUrl = (url: string) => {
     const regExp = /.*(?:youtu.be\/|v\/|u\/\w\/|embed\/|watch\?v=)([^#\&\?]*).*/
     const match = url.match(regExp)
 
@@ -581,15 +565,6 @@ export const refreshOEmbed = () => {
         window['twttr'].widgets.load()
         window['imgurEmbed'].createIframe()
     }, 500)
-}
-
-export const getHost = url => {
-    if (url.indexOf('magnet:') == 0) {
-        return 'magnet link'
-    }
-    const parser = document.createElement('a')
-    parser.href = url
-    return parser.host.toLowerCase()
 }
 
 /**
@@ -643,7 +618,7 @@ export const submitRelayAsync = async (transfers: any[]) => {
     }
 }
 
-export const voteAsync = async ({ voter, uuid, value, nonce, pub, sig }) => {
+export const voteAsync = async ({ voter, uuid, value, nonce, pub, sig }: any) => {
     try {
         const { data } = await axios.post(
             `${nsdb.api}/discussions/vote`,
@@ -717,7 +692,7 @@ export const transformTipsToTransfers = (
     })
 }
 
-export const generateVoteObject = ({ uuid, postPriv, value }) => {
+export const generateVoteObject = ({ uuid, postPriv, value }: any) => {
     const pub = ecc.privateToPublic(postPriv)
     const nonce = new Date().getTime()
     const hash0 = ecc.sha256(`${value} ${uuid} ${nonce}`)
@@ -740,7 +715,7 @@ export const generateVoteObject = ({ uuid, postPriv, value }) => {
     }
 }
 
-export const escapeRegExp = string => {
+export const escapeRegExp = (string: string) => {
     return string.replace(/[|\\{}()[\]^$+*?.-]/g, '\\$&') // $& means the whole matched string
 }
 
@@ -782,7 +757,7 @@ export const matchContentForMentions = (content: string) => {
 export const extractMentionHashesForRegEx = (matchedContentForMentions: any) => {
     if (!matchedContentForMentions) return []
     const regex = new RegExp(/\(?EOS.*\)?\w/, 'gi')
-    return matchedContentForMentions.map(items => {
+    return matchedContentForMentions.map((items: any) => {
         return items.match(regex)[0]
     })
 }
@@ -814,8 +789,8 @@ export const createPostObject = ({
     postPub = '',
     postPriv = '',
     uuid = '',
-}) => {
-    let reply = {
+}: any) => {
+    let reply: any = {
         poster: null,
         title: title,
         createdAt: new Date(Date.now()),
@@ -888,11 +863,11 @@ export const createPostObject = ({
     return reply
 }
 
-export const hasErrors = fieldsError => {
+export const hasErrors = (fieldsError: any) => {
     return Object.keys(fieldsError).some(field => fieldsError[field])
 }
 
-export const signPost = ({ privKey, content, uuid }) => {
+export const signPost = ({ privKey, content, uuid }: any) => {
     let pub = ecc.privateToPublic(privKey)
     const hash0 = ecc.sha256(content)
     const hash1 = ecc.sha256(uuid + hash0)
@@ -905,7 +880,7 @@ export const signPost = ({ privKey, content, uuid }) => {
     }
 }
 
-export const getSignatureAndSubmit = (robj, fromAddress) => {
+export const getSignatureAndSubmit = (robj: any, fromAddress: string) => {
     try {
         robj.sig = eos.transactionSignature(
             robj.chain,

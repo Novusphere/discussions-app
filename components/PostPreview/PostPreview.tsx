@@ -1,6 +1,5 @@
 import React, { FunctionComponent, useCallback, useEffect, useState } from 'react'
 import { Divider, Popover, Tooltip } from 'antd'
-import Link from 'next/link'
 import cx from 'classnames'
 import styles from './PostPreview.module.scss'
 import { observer, useLocalStore } from 'mobx-react-lite'
@@ -16,6 +15,7 @@ import {
     SharePostPopover,
     Icons,
 } from '@components'
+import { Link } from 'react-router-dom';
 
 interface IPostPreviewProps {
     post: Post
@@ -29,7 +29,7 @@ interface IPostPreviewProps {
     blockedUsers: ObservableMap<string, string>
     blockedByDelegation: ObservableMap<string, string>
     unsignedPostsIsSpam: boolean
-    toggleBlockPost: (url) => void
+    toggleBlockPost: (url: string) => void
 }
 
 const PostPreview: FunctionComponent<IPostPreviewProps> = ({
@@ -199,7 +199,7 @@ const PostPreview: FunctionComponent<IPostPreviewProps> = ({
     const postSub = useCallback(
         () => (
             <object className={'z-2'}>
-                <Link href={'/tag/[name]'} as={`/tag/${post.sub}`} shallow={false}>
+                <Link to={`/tag/${post.sub}`}>
                     <a className={'b ttu dim'}>#{post.sub}</a>
                 </Link>
             </object>
@@ -250,7 +250,7 @@ const PostPreview: FunctionComponent<IPostPreviewProps> = ({
 
     const postTotalReplies = useCallback(
         () => (
-            <Link href={'/tag/[name]/[id]/[title]'} as={`${url}#comments`}>
+            <Link to={`${url}#comments`}>
                 <a className={'mr2 black'}>
                     <Icons.CommentIcon />
                     {post.totalReplies} comments
@@ -278,7 +278,7 @@ const PostPreview: FunctionComponent<IPostPreviewProps> = ({
                         share
                     </a>
                 </Popover>
-                <Link href={'/tag/[name]/[id]/[title]'} as={`${url}#reply`}>
+                <Link to={`${url}#reply`}>
                     <a className={'f6 mh2 black'}>reply</a>
                 </Link>
                 <a
@@ -312,7 +312,7 @@ const PostPreview: FunctionComponent<IPostPreviewProps> = ({
     }
 
     return (
-        <Link href={'/tag/[name]/[id]/[title]'} as={url}>
+        <Link to={url}>
             <a
                 className={cx([
                     styles.postPreview,

@@ -2,7 +2,7 @@ import React, { FunctionComponent } from 'react'
 import { Avatar, Icon } from 'antd'
 
 import styles from './UserNameWithIcon.module.scss'
-import Link from 'next/link'
+import { Link } from 'react-router-dom'
 
 interface IUserNameWithIconProps {
     imageData: string
@@ -15,7 +15,7 @@ const UserNameWithIcon: FunctionComponent<IUserNameWithIconProps> = ({ imageData
         <>
             <Avatar icon={'user'} src={imageData} size={'small'} />
             <object className={'z-2 pl2'}>
-                <Link href={`/u/[username]`} as={`/u/${name}-${pub}`} shallow={false}>
+                <Link to={`/u/${name}-${pub}`}>
                     <a className={'flex items-center dim pointer'}>{name}</a>
                 </Link>
             </object>

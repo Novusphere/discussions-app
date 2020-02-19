@@ -14,7 +14,7 @@ class DiscussionsApp extends App<any> {
         const initialStoreData = initializeStore()
         const Component = appContext.Component
 
-        // Provide the store to getInitialProps of pages
+        // Provide the store to getInitialProps of containers
         if (Component.getInitialProps) {
             pageProps = await Component.getInitialProps({ ...appContext.ctx, store: initialStoreData })
         }

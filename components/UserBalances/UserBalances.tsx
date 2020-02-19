@@ -1,7 +1,6 @@
 import React, { FunctionComponent } from 'react'
 
 import styles from './UserBalances.module.scss'
-import dynamic from 'next/dynamic'
 import { RootStore, useStores } from '@stores'
 import { observer } from 'mobx-react'
 import cx from 'classnames'
@@ -18,7 +17,7 @@ const UserBalances: FunctionComponent<IUserBalancesProps> = ({ className }) => {
     }
 
     let walletStoreLS = window.localStorage.getItem('walletStore')
-    let images = []
+    let images: any = []
 
     if (walletStoreLS) {
         walletStoreLS = JSON.parse(walletStoreLS)
@@ -56,6 +55,4 @@ const UserBalances: FunctionComponent<IUserBalancesProps> = ({ className }) => {
 
 UserBalances.defaultProps = {}
 
-export default dynamic(() => Promise.resolve(observer(UserBalances)), {
-    ssr: false,
-})
+export default observer(UserBalances)

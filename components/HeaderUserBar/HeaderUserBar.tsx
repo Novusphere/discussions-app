@@ -3,10 +3,9 @@ import { Avatar, Menu, Icon, Dropdown } from 'antd'
 
 import styles from './HeaderUserBar.module.scss'
 import { getIdenticon } from '@utils'
-import Link from 'next/link'
-import dynamic from 'next/dynamic'
 import { UserBalances } from '@components'
 import { useObserver } from 'mobx-react-lite'
+import { Link } from 'react-router-dom'
 
 interface IHeaderUserBarProps {
     icon: string
@@ -57,7 +56,7 @@ const HeaderUserBar: FunctionComponent<IHeaderUserBarProps> = ({
             {defaults.map((item, index) => (
                 <Menu.Item key={index + 1}>
                     {item.link ? (
-                        <Link href={item.as} as={item.link}>
+                        <Link to={item.link}>
                             <a>
                                 <span onClick={item.onClick}>{item.label}</span>
                             </a>
@@ -102,4 +101,4 @@ HeaderUserBar.defaultProps = {
     icon: null,
 }
 
-export default dynamic(() => Promise.resolve(HeaderUserBar), { ssr: false })
+export default HeaderUserBar

@@ -2,7 +2,15 @@ import React, { FunctionComponent } from 'react'
 
 import styles from './Replies.module.scss'
 import { discussions, Post } from '@novuspherejs'
-import { Editor, Icons, ReplyingPostPreview, RichTextPreview, Tips, UserNameWithIcon, VotingHandles } from '@components'
+import {
+    Editor,
+    Icons,
+    ReplyingPostPreview,
+    RichTextPreview,
+    Tips,
+    UserNameWithIcon,
+    VotingHandles,
+} from '@components'
 import moment from 'moment'
 import { Button, Dropdown, Icon, Menu, message, Tooltip } from 'antd'
 import { observer, useLocalStore, useObserver } from 'mobx-react-lite'
@@ -17,16 +25,15 @@ import {
     transformTipsToTransfers,
     voteAsync,
 } from '@utils'
-import { NextRouter, useRouter } from 'next/router'
 import copy from 'clipboard-copy'
 import { MODAL_OPTIONS } from '@globals'
+import { useLocation } from 'react-router-dom'
 
 interface IRepliesProps {
     preview?: boolean
     setHighlightedPosUUID: (uuid: string) => void
     highlightedPostUUID: string
     threadUsers: any[]
-    router?: NextRouter
     reply: Post
 }
 
@@ -34,7 +41,7 @@ const ButtonGroup = Button.Group
 
 const Replies: FunctionComponent<IRepliesProps> = props => {
     const { userStore, uiStore, authStore, walletStore }: RootStore = useStores()
-    const router = useRouter()
+    const location = useLocation()
 
     const replyStore = useLocalStore(
         source => ({
@@ -58,12 +65,12 @@ const Replies: FunctionComponent<IRepliesProps> = props => {
             },
 
             get permaLinkURL() {
-                if (typeof props.router === 'undefined') return ''
-                return getPermaLink(props.router.asPath.split('#')[0], props.reply.uuid)
+                if (typeof location.pathname === 'undefined') return ''
+                return getPermaLink(location.pathname.split('#')[0], props.reply.uuid)
             },
 
             toggleShowPreview: () => {
-              replyStore.showPreview = !replyStore.showPreview
+                replyStore.showPreview = !replyStore.showPreview
             },
 
             toggleCollapse: () => {
@@ -424,20 +431,22 @@ const Replies: FunctionComponent<IRepliesProps> = props => {
                     },
                 ])}
             >
-                {<div
-                    className={'flex flex-1 pr2 pt1 pl2'}
-                    style={{
-                        visibility: replyStore.collapsed ? 'hidden' : 'visible',
-                    }}
-                >
-                    <VotingHandles
-                        uuid={replyStore.reply.uuid}
-                        myVote={props.preview ? 1 : replyStore.myVoteValue}
-                        upVotes={replyStore.upvotes}
-                        downVotes={replyStore.downvotes}
-                        handler={props.preview ? () => null : replyStore.handleVoting}
-                    />
-                </div>}
+                {
+                    <div
+                        className={'flex flex-1 pr2 pt1 pl2'}
+                        style={{
+                            visibility: replyStore.collapsed ? 'hidden' : 'visible',
+                        }}
+                    >
+                        <VotingHandles
+                            uuid={replyStore.reply.uuid}
+                            myVote={props.preview ? 1 : replyStore.myVoteValue}
+                            upVotes={replyStore.upvotes}
+                            downVotes={replyStore.downvotes}
+                            handler={props.preview ? () => null : replyStore.handleVoting}
+                        />
+                    </div>
+                }
                 <div className={'tl pt2 w-100'}>
                     <div className={'flex flex-row items-center w-100 relative'}>
                         <div className={'flex flex-row items-center'}>
@@ -505,7 +514,8 @@ const Replies: FunctionComponent<IRepliesProps> = props => {
                                             )
                                             message.success('Copied to your clipboard')
                                             props.setHighlightedPosUUID(props.reply.uuid)
-                                            router.replace(router.pathname, replyStore.permaLinkURL)
+                                            // TODO: Replace router pathname with permalinkURL
+                                            // router.replace(router.pathname, replyStore.permaLinkURL)
                                         }}
                                     >
                                         <Icons.ShareIcon />
@@ -600,13 +610,17 @@ const Replies: FunctionComponent<IRepliesProps> = props => {
                     ) : null}
 
                     {replyStore.showPreview && (
-                        <ReplyingPostPreview className={'mr3 mb3'} content={replyStore.replyingContent} />
+                        <ReplyingPostPreview
+                            className={'mr3 mb3'}
+                            content={replyStore.replyingContent}
+                        />
                     )}
                 </div>
             </div>
 
             {/*Render Replies*/}
-            {!props.preview && !replyStore.collapsed &&
+            {!props.preview &&
+                !replyStore.collapsed &&
                 replyStore.reply.replies.map(child => (
                     <div
                         key={child.uuid}
@@ -616,7 +630,6 @@ const Replies: FunctionComponent<IRepliesProps> = props => {
                     >
                         <Replies
                             reply={child}
-                            router={props.router}
                             threadUsers={props.threadUsers}
                             highlightedPostUUID={props.highlightedPostUUID}
                             setHighlightedPosUUID={props.setHighlightedPosUUID}

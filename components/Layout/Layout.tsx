@@ -1,19 +1,7 @@
-import React, { FunctionComponent, useCallback, useEffect } from 'react'
-import { Alert, Layout as AntdLayout, message, notification } from 'antd'
+import React, { FunctionComponent, useEffect } from 'react'
+import { Layout as AntdLayout, message, notification } from 'antd'
 import styles from './Layout.module.scss'
-import {
-    HeaderLoggedOut,
-    HeaderLogo,
-    HeaderNewPost,
-    HeaderNotifications,
-    HeaderSearch,
-    HeaderUserBar,
-    Modals,
-    SidebarTagView,
-    SidebarLinks,
-    Footer,
-    Header,
-} from '@components'
+import { Modals, SidebarTagView, SidebarLinks, Footer, Header } from '@components'
 import { useObserver } from 'mobx-react-lite'
 import cx from 'classnames'
 import { RootStore, useStores } from '@stores'
@@ -56,46 +44,6 @@ const Layout: FunctionComponent<ILayoutProps> = ({ children }) => {
 
     return (
         <AntdLayout className={'overflow-x-hidden'}>
-            <style jsx global>{`
-                .ql-toolbar.ql-snow {
-                    border: 1px solid #d9d9d9;
-                    background: white;
-                    border-top-left-radius: 5px;
-                    border-top-right-radius: 5px;
-                }
-
-                .ql-container.ql-snow {
-                    border: 1px solid #d9d9d9;
-                    background: white;
-                    border-bottom-left-radius: 5px;
-                    border-bottom-right-radius: 5px;
-                }
-
-                .primary {
-                    color: #079e99;
-                }
-
-                .b--primary {
-                    color: #079e99;
-                }
-
-                .bg-primary {
-                    background-color: #079e99;
-                }
-
-                .card {
-                    border-radius: 3px;
-                    box-shadow: 0 1px 2px #c9cccd;
-                }
-
-                .ant-form-explain {
-                    white-space: pre-line;
-                }
-
-                .twitter-tweet {
-                    margin: 0 auto;
-                }
-            `}</style>
             <Modals />
             <AntdLayoutHeader className={cx([styles.header, 'container bb b--light-gray'])}>
                 <Header />

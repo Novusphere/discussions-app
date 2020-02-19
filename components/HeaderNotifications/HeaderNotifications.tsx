@@ -6,9 +6,9 @@ import { useObserver, observer } from 'mobx-react-lite'
 import { RootStore, useStores } from '@stores'
 import { getIdenticon, useInterval } from '@utils'
 import { RichTextPreview } from '@components'
-import Link from 'next/link'
 import moment from 'moment'
 import cx from 'classnames'
+import { Link } from 'react-router-dom'
 
 interface IHeaderNotificationsProps {}
 
@@ -32,7 +32,7 @@ const NotificationContainer = () => {
             renderItem={(item, index) => {
                 return (
                     <List.Item className={styles.notificationItem}>
-                        <Link href={'/tag/[name]/[id]/[title]'} as={item['url']} shallow={false}>
+                        <Link to={item['url']}>
                             <a
                                 className={'dim w-100 relative'}
                                 onClick={() => userStore.deleteNotification(index)}

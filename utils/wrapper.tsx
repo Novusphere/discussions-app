@@ -78,7 +78,7 @@ export const withMobx = (getStores = {}) => App => {
         static async getInitialProps(appContext) {
             let appProps = {}
 
-            // Provide the store to getInitialProps of pages
+            // Provide the store to getInitialProps of containers
             appContext.ctx.store = {}
             for (const fnName in getStores) {
                 const storeKeyName = getKeyNameStore(fnName)

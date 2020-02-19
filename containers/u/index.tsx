@@ -1,139 +1,89 @@
 import React, { useCallback, useEffect, useState } from 'react'
-import { NextPage } from 'next'
 import { observer, useObserver } from 'mobx-react-lite'
 import { RootStore, useStores } from '@stores'
 import { Avatar, Typography, Button, Dropdown, Menu, Icon, Select, List } from 'antd'
 import { getIdenticon } from '@utils'
 import { InfiniteScrollFeed, Icons } from '@components'
 import { discussions } from '@novuspherejs'
-import dynamic from 'next/dynamic'
-import Head from 'next/head'
-import { useRouter } from 'next/router'
+import Helmet from 'react-helmet'
 
 const { Paragraph } = Typography
 const { Option } = Select
 
-const Moderation = dynamic(
-    () =>
-        Promise.resolve(
-            ({ onModerationChange, defaultValue, options, tagModelFromObservables }: any) =>
-                useObserver(() => (
-                    <Select
-                        mode={'tags'}
-                        size={'default'}
-                        showSearch
-                        className={'w-100'}
-                        placeholder={'Select a tag to assign as moderator'}
-                        onChange={onModerationChange}
-                        defaultValue={defaultValue}
-                    >
-                        {options.map(option => {
-                            const tag = tagModelFromObservables(option.value)
-                            if (!tag) return null
-                            return (
-                                <Option key={option.value} value={option.value}>
-                                    <img
-                                        src={tag.logo}
-                                        title={`${tag.name} icon`}
-                                        className={'mr2 dib'}
-                                        width={15}
-                                    />
-                                    {option.label}
-                                </Option>
-                            )
-                        })}
-                    </Select>
-                ))
-        ),
-    {
-        ssr: false,
-    }
-)
-
-const Following = dynamic(
-    () => {
-        return Promise.resolve(({ data, handleRemoveUser }: any) => {
-            if (data && data.length) {
+const Moderation = ({ onModerationChange, defaultValue, options, tagModelFromObservables }: any) =>
+    useObserver(() => (
+        <Select
+            mode={'tags'}
+            size={'default'}
+            showSearch
+            className={'w-100'}
+            placeholder={'Select a tag to assign as moderator'}
+            onChange={onModerationChange}
+            defaultValue={defaultValue}
+        >
+            {options.map((option: any) => {
+                const tag = tagModelFromObservables(option.value)
+                if (!tag) return null
                 return (
-                    <List
-                        dataSource={data}
-                        renderItem={([pub, username]) => {
-                            return (
-                                <List.Item
-                                    actions={[
-                                        <Icon
-                                            onClick={() => handleRemoveUser(pub, username)}
-                                            className={'dim pointer'}
-                                            type="delete"
-                                            theme={'filled'}
-                                            style={{ color: '#FF4136' }}
-                                        />,
-                                    ]}
-                                >
-                                    {username}
-                                </List.Item>
-                            )
-                        }}
-                    />
+                    <Option key={option.value} value={option.value}>
+                        <img
+                            src={tag.logo}
+                            title={`${tag.name} icon`}
+                            className={'mr2 dib'}
+                            width={15}
+                        />
+                        {option.label}
+                    </Option>
                 )
-            }
+            })}
+        </Select>
+    ))
 
-            return <span className={'f6 light-silver db pt2'}>You are not following anyone</span>
-        })
-    },
-    { ssr: false }
-)
+const Following = ({ data, handleRemoveUser }: any) => {
+    if (data && data.length) {
+        return (
+            <List
+                dataSource={data}
+                renderItem={([pub, username]) => {
+                    return (
+                        <List.Item
+                            actions={[
+                                <Icon
+                                    onClick={() => handleRemoveUser(pub, username)}
+                                    className={'dim pointer'}
+                                    type="delete"
+                                    theme={'filled'}
+                                    style={{ color: '#FF4136' }}
+                                />,
+                            ]}
+                        >
+                            {username}
+                        </List.Item>
+                    )
+                }}
+            />
+        )
+    }
 
-// const Watching = dynamic(
-//     () => {
-//         return Promise.resolve(({ data, handleRemoveWatch }: any) => {
-//             if (data && data.length) {
-//                 return (
-//                     <List
-//                         dataSource={data}
-//                         renderItem={([pub, username]) => {
-//                             return (
-//                                 <List.Item
-//                                     actions={[
-//                                         <Icon
-//                                             onClick={() => handleRemoveUser(pub, username)}
-//                                             className={'dim pointer'}
-//                                             type="delete"
-//                                             theme={'filled'}
-//                                             style={{ color: '#FF4136' }}
-//                                         />,
-//                                     ]}
-//                                 >
-//                                     {username}
-//                                 </List.Item>
-//                             )
-//                         }}
-//                     />
-//                 )
-//             }
-//
-//             return <span className={'f6 light-silver db pt2'}>You are not watching any threads</span>
-//         })
-//     },
-//     { ssr: false }
-// )
+    return <span className={'f6 light-silver db pt2'}>You are not following anyone</span>
+}
 
-const UserPage: NextPage<any> = ({ username, wallet, imageData, count, postPub }) => {
+const UserPage: React.FC<any> = ({ username, wallet, imageData, count, postPub }) => {
     const { uiStore, postsStore, userStore, authStore, tagStore }: RootStore = useStores()
     const [_count, _setCount] = useState(count)
-    const router = useRouter()
 
     useEffect(() => {
         // replace username with the correct one
-        router.replace('/u/[username]', `/u/${username}-${wallet}`)
+        // TODO: Replace username with correct one
+        // router.replace('/u/[username]', `/u/${username}-${wallet}`)
 
         postsStore.resetPostsAndPosition()
         postsStore.getPostsForKeys(postPub, [wallet])
 
-        uiStore.setSidebarHidden('true')
+        uiStore.setSidebarHidden(true)
 
         return () => {
-            uiStore.setSidebarHidden('false')
+            uiStore.setSidebarHidden(false)
         }
     }, [])
 
@@ -186,19 +136,13 @@ const UserPage: NextPage<any> = ({ username, wallet, imageData, count, postPub }
 
     return (
         <>
-            <Head>
-                <title>
-                    Discussions App - /u/{username}
-                </title>
-            </Head>
+            <Helmet>
+                <title>Discussions App - /u/{username}</title>
+            </Helmet>
             <div className={'flex flex-row'}>
                 <div className={'w-30 vh-75 bg-white card pa3'}>
                     <div className={'flex flex-row items-center'}>
-                        <Avatar
-                            icon={'user'}
-                            src={imageData}
-                            size={96}
-                        />
+                        <Avatar icon={'user'} src={imageData} size={96} />
                         <div className={'fl ml3'}>
                             <span className={'db f5 b black'}>{username}</span>
                             <span className={'db f6 light-silver'}>{_count} followers</span>
@@ -232,7 +176,7 @@ const UserPage: NextPage<any> = ({ username, wallet, imageData, count, postPub }
                             </span>
                             <Following
                                 data={[...userStore.following.toJS()]}
-                                handleRemoveUser={(pub, user) =>
+                                handleRemoveUser={(pub: string, user: string) =>
                                     userStore.toggleUserFollowing(user, pub)
                                 }
                             />
@@ -281,19 +225,20 @@ const UserPage: NextPage<any> = ({ username, wallet, imageData, count, postPub }
     )
 }
 
-UserPage.getInitialProps = async function({ query, store }: any) {
-    const postPub = store.authStore.postPub
-    const [username, wallet] = query.username.split('-')
-    const imageData = getIdenticon(wallet)
-    const { followers, displayName } = await discussions.getUser(wallet)
-
-    return {
-        imageData,
-        username: displayName,
-        wallet,
-        count: followers,
-        postPub,
-    }
-}
+// TODO: Replace this with useEffect
+// UserPage.getInitialProps = async function({ query, store }: any) {
+//     const postPub = store.authStore.postPub
+//     const [username, wallet] = query.username.split('-')
+//     const imageData = getIdenticon(wallet)
+//     const { followers, displayName } = await discussions.getUser(wallet)
+//
+//     return {
+//         imageData,
+//         username: displayName,
+//         wallet,
+//         count: followers,
+//         postPub,
+//     }
+// }
 
 export default observer(UserPage)

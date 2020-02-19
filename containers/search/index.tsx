@@ -1,19 +1,18 @@
 import * as React from 'react'
-import { NextPage } from 'next'
 import { useContext } from 'react'
 import { StoreContext } from '@stores'
 import { InfiniteScrollFeed } from '@components'
 import { useObserver } from 'mobx-react-lite'
-import Head from 'next/head'
+import Helmet from 'react-helmet'
 
-const SearchPage: NextPage<any> = ({ query, postPub }) => {
+const SearchPage: React.FC<any> = ({ query, postPub }) => {
     const { postsStore } = useContext(StoreContext)
 
     return useObserver(() => (
         <>
-            <Head>
+            <Helmet>
                 <title>Discussions App - Searching: {query}</title>
-            </Head>
+            </Helmet>
             <span className={'db mb3 f6'}>
                 Showing results for: "{query}" ({postsStore.postsPosition.items}{' '}
                 {postsStore.postsPosition.items === 1 ? 'result' : 'results'})
@@ -29,18 +28,19 @@ const SearchPage: NextPage<any> = ({ query, postPub }) => {
     ))
 }
 
-SearchPage.getInitialProps = async ({ query, store, ...rest }: any) => {
-    const searchQuery: string = query.search
-
-    store.postsStore.resetPostsAndPosition()
-
-    const postPub = store.authStore.postPub
-    await store.postsStore.getSearchResults(searchQuery, postPub)
-
-    return {
-        postPub,
-        query: searchQuery,
-    }
-}
+// TODO: Move this to useEffect
+// SearchPage.getInitialProps = async ({ query, store, ...rest }: any) => {
+//     const searchQuery: string = query.search
+//
+//     store.postsStore.resetPostsAndPosition()
+//
+//     const postPub = store.authStore.postPub
+//     await store.postsStore.getSearchResults(searchQuery, postPub)
+//
+//     return {
+//         postPub,
+//         query: searchQuery,
+//     }
+// }
 
 export default SearchPage
