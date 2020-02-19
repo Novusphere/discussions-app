@@ -9,69 +9,86 @@ const themeVariables = lessToJS(
 )
 
 const styleRules = [
-    {
-        test: /\.less$/,
-        use: [
-            {
-                loader: 'style-loader',
-            },
-            {
-                loader: 'css-loader', // translates CSS into CommonJS
-            },
-            {
-                loader: 'less-loader', // compiles Less to CSS
-                options: {
-                    modifyVars: themeVariables,
-                    javascriptEnabled: true,
-                },
-            },
-        ],
-    },
-    { test: /\.css$/, use: ['style-loader', 'css-loader'] },
+    // {
+    //     test: /\.less$/,
+    //     use: [
+    //         {
+    //             loader: 'style-loader',
+    //         },
+    //         {
+    //             loader: 'css-loader', // translates CSS into CommonJS
+    //         },
+    //         {
+    //             loader: 'less-loader', // compiles Less to CSS
+    //             options: {
+    //                 modifyVars: themeVariables,
+    //                 javascriptEnabled: true,
+    //             },
+    //         },
+    //     ],
+    // },
+    // { test: /\.css$/, use: ['style-loader', 'css-loader'] },
     {
         test: /\.module\.s(a|c)ss$/,
         use: [
-            {
-                loader: MiniCssExtractPlugin.loader,
-                options: {
-                    hmr: _DEV_,
-                },
-            },
+            { loader: MiniCssExtractPlugin.loader },
             {
                 loader: 'css-loader',
                 options: {
-                    modules: true,
+                    sourceMap: false,
+                    modules: {
+                        localIdentName: '[name]_[local]_[hash:base64:5]',
+                    }
                 },
             },
-            {
-                loader: 'postcss-loader',
-            },
+            { loader: 'sass-loader' },
+        ],
+    },
+    {
+        // test: /\.(scss|sass|css)$/,
+        test: /\.(s(a|c)|c)ss$/,
+        exclude: /\.module.(s(a|c)ss)$/,
+        use: [
+            MiniCssExtractPlugin.loader,
+            { loader: 'css-loader', options: { url: false, sourceMap: true } },
             {
                 loader: 'sass-loader',
+                options: { sourceMap: true },
             },
         ],
     },
     {
-        test: /\.s(a|c)ss$/,
-        exclude: /\.module.(s(a|c)ss)$/,
+        test: /\.(less)$/,
         use: [
+            MiniCssExtractPlugin.loader,
+            { loader: 'css-loader', options: { url: false, sourceMap: true } },
             {
-                loader: MiniCssExtractPlugin.loader,
-                options: {
-                    hmr: _DEV_,
-                },
-            },
-            {
-                loader: 'css-loader',
-            },
-            {
-                loader: 'postcss-loader',
-            },
-            {
-                loader: 'sass-loader',
+                loader: 'less-loader',
+                options: { javascriptEnabled: true, modifyVars: themeVariables },
             },
         ],
     },
+    // {
+    //     test: /\.s(a|c)ss$/,
+    //     exclude: /\.module.(s(a|c)ss)$/,
+    //     use: [
+    //         {
+    //             loader: MiniCssExtractPlugin.loader,
+    //             options: {
+    //                 hmr: _DEV_,
+    //             },
+    //         },
+    //         {
+    //             loader: 'css-loader',
+    //         },
+    //         {
+    //             loader: 'postcss-loader',
+    //         },
+    //         {
+    //             loader: 'sass-loader',
+    //         },
+    //     ],
+    // },
 ]
 
 module.exports = styleRules
