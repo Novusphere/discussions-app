@@ -200,7 +200,7 @@ const PostPreview: FunctionComponent<IPostPreviewProps> = ({
         () => (
             <object className={'z-2'}>
                 <Link to={`/tag/${post.sub}`}>
-                    <a className={'b ttu dim'}>#{post.sub}</a>
+                    <span className={'b ttu dim'}>#{post.sub}</span>
                 </Link>
             </object>
         ),
@@ -251,10 +251,10 @@ const PostPreview: FunctionComponent<IPostPreviewProps> = ({
     const postTotalReplies = useCallback(
         () => (
             <Link to={`${url}#comments`}>
-                <a className={'mr2 black'}>
+                <span className={'mr2 black'}>
                     <Icons.CommentIcon />
                     {post.totalReplies} comments
-                </a>
+                </span>
             </Link>
         ),
         []
@@ -279,7 +279,7 @@ const PostPreview: FunctionComponent<IPostPreviewProps> = ({
                     </a>
                 </Popover>
                 <Link to={`${url}#reply`}>
-                    <a className={'f6 mh2 black'}>reply</a>
+                    <span className={'f6 mh2 black'}>reply</span>
                 </Link>
                 <a
                     className={'f6 mh2 black'}
@@ -313,7 +313,7 @@ const PostPreview: FunctionComponent<IPostPreviewProps> = ({
 
     return (
         <Link to={url}>
-            <a
+            <span
                 className={cx([
                     styles.postPreview,
                     'db bg-white mb0 mb2-ns w-100',
@@ -406,7 +406,7 @@ const PostPreview: FunctionComponent<IPostPreviewProps> = ({
                         )}
                     </div>
                 </div>
-            </a>
+            </span>
         </Link>
     )
 }

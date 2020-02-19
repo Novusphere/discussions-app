@@ -15,6 +15,7 @@ import {
 } from '@utils'
 import { discussions } from '@novuspherejs'
 import Helmet from 'react-helmet'
+import { useHistory } from 'react-router-dom';
 
 const { Option } = Select
 
@@ -26,12 +27,13 @@ const NewPageNoSSRUnwrapped = ({ form, prefilledTag }: any) => {
     const [options, setOptions] = useState(tagStore.tagsWithoutBaseOptions)
     const [newOption, setNewOption] = useState(null)
     const togglePreview = useCallback(() => setPreview(!isPreviewing), [])
+    const history = useHistory()
 
     const handleSubmit = useCallback(e => {
+        setLoading(true)
         e.preventDefault()
         form.validateFields(async (err: any, values: { tag: any; title: any; content: any }) => {
             if (!err) {
-                setLoading(true)
                 setPreview(false)
                 let { tag, title, content } = values
 
@@ -89,7 +91,7 @@ const NewPageNoSSRUnwrapped = ({ form, prefilledTag }: any) => {
                                     if (int) {
                                         clearInterval(int)
                                         setLoading(false)
-                                        await pushToThread(submittedPost)
+                                        const url = await pushToThread(submittedPost)
                                         const newId = encodeId(submittedPost.openingPost as any)
                                         userStore.toggleThreadWatch(newId, 0, true)
                                         uiStore.showToast(
@@ -111,6 +113,7 @@ const NewPageNoSSRUnwrapped = ({ form, prefilledTag }: any) => {
                                                 ),
                                             }
                                         )
+                                        history.push(url)
                                         resolve()
                                     }
                                 }

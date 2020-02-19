@@ -1,5 +1,5 @@
 import React, { FunctionComponent } from 'react'
-import { Avatar, Icon } from 'antd'
+import { Avatar } from 'antd'
 
 import styles from './UserNameWithIcon.module.scss'
 import { Link } from 'react-router-dom'
@@ -16,7 +16,7 @@ const UserNameWithIcon: FunctionComponent<IUserNameWithIconProps> = ({ imageData
             <Avatar icon={'user'} src={imageData} size={'small'} />
             <object className={'z-2 pl2'}>
                 <Link to={`/u/${name}-${pub}`}>
-                    <a className={'flex items-center dim pointer'}>{name}</a>
+                    <span className={'flex items-center dim pointer'}>{name}</span>
                 </Link>
             </object>
         </>

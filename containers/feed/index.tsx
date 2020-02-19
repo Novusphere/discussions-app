@@ -1,24 +1,20 @@
-import React, { useContext, useEffect } from 'react'
+import React, { useContext, useEffect, useMemo } from 'react'
 import { InfiniteScrollFeed } from '@components'
 import { observer } from 'mobx-react-lite'
 import { RootStore, StoreContext } from '@stores'
 import Empty from 'antd/lib/empty'
 import Helmet from 'react-helmet'
 
-const FeedPageNoSSR = observer(({ postPub }: any) => {
-    const { postsStore, userStore }: RootStore = useContext(StoreContext)
-
+const FeedPageNoSSR = observer(() => {
+    const { postsStore, userStore, authStore }: RootStore = useContext(StoreContext)
+    const postPub = useMemo(() => authStore.postPub, [])
     useEffect(() => {
         postsStore.resetPostsAndPosition()
         postsStore.getPostsForKeys(postPub, [...userStore.following.keys()])
     }, [])
 
     if (!postsStore.posts.length) {
-        return (
-            <Empty
-                description={<span>Follow some users to see their activity here!</span>}
-            />
-        )
+        return <Empty description={<span>Follow some users to see their activity here!</span>} />
     }
 
     return (
@@ -31,24 +27,15 @@ const FeedPageNoSSR = observer(({ postPub }: any) => {
     )
 })
 
-const FeedPage: React.FC<any> = ({ postPub }) => {
+const FeedPage: React.FC<any> = () => {
     return (
         <>
             <Helmet>
                 <title>Discussions App - #feed</title>
             </Helmet>
-            <FeedPageNoSSR postPub={postPub} />
+            <FeedPageNoSSR />
         </>
     )
 }
-
-// TODO: Move this to useEffect
-// FeedPage.getInitialProps = async function(ctx: any) {
-//     const postPub = ctx.store.authStore.postPub
-//
-//     return {
-//         postPub,
-//     }
-// }
 
 export default observer(FeedPage)

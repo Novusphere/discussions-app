@@ -11,6 +11,7 @@ const AllPage: React.FC<any> = () => {
     const fetch = useCallback(() => postsStore.fetchPostsForTag(authStore.postPub, ['all']), [])
 
     useEffect(() => {
+        postsStore.resetPostsAndPosition()
         fetch()
     }, [])
 
@@ -28,17 +29,5 @@ const AllPage: React.FC<any> = () => {
         </>
     )
 }
-
-// TODO: Move this to useEffect
-// AllPage.getInitialProps = async function({ store }: any) {
-//     store.postsStore.resetPostsAndPosition()
-//
-//     const postPub = store.authStore.postPub
-//     await store.postsStore.fetchPostsForTag(postPub, ['all'])
-//
-//     return {
-//         postPub,
-//     }
-// }
 
 export default observer(AllPage)

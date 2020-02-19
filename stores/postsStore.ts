@@ -2,13 +2,14 @@ import { observable } from 'mobx'
 import { RootStore } from '@stores/index'
 import { discussions, Post, Thread } from '@novuspherejs'
 import _ from 'lodash'
+import { task } from 'mobx-task';
 
 export class PostsStore {
     @observable
     posts: Post[] = []
 
     @observable
-    postsPosition = {
+    postsPosition: { cursorId: number | undefined; items: number } = {
         cursorId: undefined,
         items: 0,
     }
@@ -81,7 +82,8 @@ export class PostsStore {
      * @param {string} key - the users post pub
      * @param {string[]} keys - the post pubs of users whose posts you want to return
      */
-    getPostsForKeys = async (key = '', keys = []) => {
+    @task
+    getPostsForKeys = async (key = '', keys: string[] = []) => {
         try {
             if (!keys.length) {
                 keys = [...this.userStore.following.keys()]

@@ -57,9 +57,7 @@ const HeaderUserBar: FunctionComponent<IHeaderUserBarProps> = ({
                 <Menu.Item key={index + 1}>
                     {item.link ? (
                         <Link to={item.link}>
-                            <a>
-                                <span onClick={item.onClick}>{item.label}</span>
-                            </a>
+                            <span onClick={item.onClick}>{item.label}</span>
                         </Link>
                     ) : (
                         <span onClick={item.onClick}>{item.label}</span>

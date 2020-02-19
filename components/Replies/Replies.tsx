@@ -27,7 +27,7 @@ import {
 } from '@utils'
 import copy from 'clipboard-copy'
 import { MODAL_OPTIONS } from '@globals'
-import { useLocation } from 'react-router-dom'
+import { useLocation, useHistory } from 'react-router-dom'
 
 interface IRepliesProps {
     preview?: boolean
@@ -42,6 +42,7 @@ const ButtonGroup = Button.Group
 const Replies: FunctionComponent<IRepliesProps> = props => {
     const { userStore, uiStore, authStore, walletStore }: RootStore = useStores()
     const location = useLocation()
+    const history = useHistory()
 
     const replyStore = useLocalStore(
         source => ({
@@ -514,8 +515,7 @@ const Replies: FunctionComponent<IRepliesProps> = props => {
                                             )
                                             message.success('Copied to your clipboard')
                                             props.setHighlightedPosUUID(props.reply.uuid)
-                                            // TODO: Replace router pathname with permalinkURL
-                                            // router.replace(router.pathname, replyStore.permaLinkURL)
+                                            history.replace(replyStore.permaLinkURL)
                                         }}
                                     >
                                         <Icons.ShareIcon />

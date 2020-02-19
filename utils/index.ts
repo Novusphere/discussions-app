@@ -106,7 +106,7 @@ export const getThreadUrl = async (post: Post, permalinkUuid?: string) => {
 
 export const pushToThread = async (post: Post, permalinkUuid?: string) => {
     const url = await getThreadUrl(post, permalinkUuid)
-    console.error('need to push: url')
+    return url
 }
 
 export const getVersion = () => {

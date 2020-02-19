@@ -8,17 +8,9 @@ import { notification } from 'antd'
 import { persist } from 'mobx-persist'
 
 export class AuthStore {
-    // _hasAccountCookie = new Cookie('hasAccount')
-    // _hasEOSWallet = new Cookie('hasEOSWallet')
-    // _postPubKey = new Cookie('postPub')
-    // _accountPubKey = new Cookie('accountPubKey')
-    // _displayName = new Cookie('displayName')
-    // _uidwWalletPubKey = new Cookie('uidWalletPubKey')
-    // _bk = new Cookie('bk')
-
     @persist('object')
     @observable
-    bk = null
+    bk: any = null
 
     @persist
     @observable
@@ -71,7 +63,7 @@ export class AuthStore {
     constructor(rootStore: RootStore) {}
 
     @action.bound
-    setTEMPPrivateKey = key => {
+    setTEMPPrivateKey = (key: string) => {
         this.TEMP_WalletPrivateKey = key
     }
 
@@ -106,7 +98,7 @@ export class AuthStore {
         this.uidwWalletPubKey = value
     }
 
-    setAccountKey = ({ pub, priv }) => {
+    setAccountKey = ({ pub, priv }: { pub: string; priv: string }) => {
         this.accountPrivKey = priv
         this.accountPubKey = pub
     }
@@ -131,7 +123,7 @@ export class AuthStore {
         this.displayName = value
     }
 
-    signInWithBK = async (brianKeyVerify, displayName, password) => {
+    signInWithBK = async (brianKeyVerify: string, displayName: string, password: string) => {
         try {
             const bkIsValid = discussions.bkIsValid(brianKeyVerify)
 

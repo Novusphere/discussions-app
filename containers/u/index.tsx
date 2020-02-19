@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useState } from 'react'
+import React, { useCallback, useEffect, useMemo, useState } from 'react'
 import { observer, useObserver } from 'mobx-react-lite'
 import { RootStore, useStores } from '@stores'
 import { Avatar, Typography, Button, Dropdown, Menu, Icon, Select, List } from 'antd'
@@ -6,6 +6,7 @@ import { getIdenticon } from '@utils'
 import { InfiniteScrollFeed, Icons } from '@components'
 import { discussions } from '@novuspherejs'
 import Helmet from 'react-helmet'
+import { useParams } from 'react-router-dom'
 
 const { Paragraph } = Typography
 const { Option } = Select
@@ -68,36 +69,49 @@ const Following = ({ data, handleRemoveUser }: any) => {
     return <span className={'f6 light-silver db pt2'}>You are not following anyone</span>
 }
 
-const UserPage: React.FC<any> = ({ username, wallet, imageData, count, postPub }) => {
+const UserPage: React.FC<any> = () => {
     const { uiStore, postsStore, userStore, authStore, tagStore }: RootStore = useStores()
-    const [_count, _setCount] = useState(count)
+    const [followers, setFollowers] = useState(0)
+    const params: { username?: string } = useParams()
+    const [username, setUsername] = useState('')
+    const [wallet, setWallet] = useState('')
+    const [imageData, setImageData] = useState('')
+    const postPub = useMemo(() => authStore.postPub, [])
 
     useEffect(() => {
-        // replace username with the correct one
-        // TODO: Replace username with correct one
-        // router.replace('/u/[username]', `/u/${username}-${wallet}`)
-
-        postsStore.resetPostsAndPosition()
-        postsStore.getPostsForKeys(postPub, [wallet])
-
         uiStore.setSidebarHidden(true)
+        const username = params.username
 
+        if (username) {
+            const [name, wallet] = username.split('-')
+            setUsername(name)
+            setWallet(wallet)
+            setImageData(getIdenticon(wallet))
+
+            discussions.getUser(wallet).then(({ followers, displayName }) => {
+                setUsername(displayName)
+                setFollowers(followers)
+
+                postsStore.resetPostsAndPosition()
+                postsStore.getPostsForKeys(postPub, [wallet])
+            })
+        }
         return () => {
             uiStore.setSidebarHidden(false)
         }
-    }, [])
+    }, [postPub])
 
     const followUser = useCallback(() => {
         userStore.toggleUserFollowing(username, wallet)
 
         if (userStore.following.has(wallet)) {
-            _setCount(_count + 1)
+            setFollowers(followers + 1)
         } else {
-            _setCount(_count - 1)
+            setFollowers(followers - 1)
         }
-    }, [_count])
+    }, [followers])
 
-    const isSameUser = username == authStore.displayName
+    const isSameUser = useMemo(() => username == authStore.displayName, [])
 
     const menu = (
         <Menu>
@@ -134,10 +148,14 @@ const UserPage: React.FC<any> = ({ username, wallet, imageData, count, postPub }
         return userStore.setModerationFromDropdown(username, wallet, tags)
     }, [])
 
+    if (postsStore.getPostsForKeys['pending']) {
+        return <Icon type="loading" />
+    }
+
     return (
         <>
             <Helmet>
-                <title>Discussions App - /u/{username}</title>
+                <title>{`Discussions App - /u/${username}`}</title>
             </Helmet>
             <div className={'flex flex-row'}>
                 <div className={'w-30 vh-75 bg-white card pa3'}>
@@ -145,7 +163,7 @@ const UserPage: React.FC<any> = ({ username, wallet, imageData, count, postPub }
                         <Avatar icon={'user'} src={imageData} size={96} />
                         <div className={'fl ml3'}>
                             <span className={'db f5 b black'}>{username}</span>
-                            <span className={'db f6 light-silver'}>{_count} followers</span>
+                            <span className={'db f6 light-silver'}>{followers} followers</span>
                             {!isSameUser && authStore.hasAccount && (
                                 <div className={'mt2 flex flex-row items-center'}>
                                     <Button
@@ -224,21 +242,5 @@ const UserPage: React.FC<any> = ({ username, wallet, imageData, count, postPub }
         </>
     )
 }
-
-// TODO: Replace this with useEffect
-// UserPage.getInitialProps = async function({ query, store }: any) {
-//     const postPub = store.authStore.postPub
-//     const [username, wallet] = query.username.split('-')
-//     const imageData = getIdenticon(wallet)
-//     const { followers, displayName } = await discussions.getUser(wallet)
-//
-//     return {
-//         imageData,
-//         username: displayName,
-//         wallet,
-//         count: followers,
-//         postPub,
-//     }
-// }
 
 export default observer(UserPage)

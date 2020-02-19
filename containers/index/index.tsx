@@ -1,11 +1,12 @@
-import React, { useContext, useEffect } from 'react'
+import React, { useContext, useEffect, useMemo } from 'react'
 import { InfiniteScrollFeed } from '@components'
 import { useObserver } from 'mobx-react-lite'
 import { StoreContext } from '@stores'
 import Helmet from 'react-helmet'
 
-const IndexPageNoSSR = ({ postPub }: any) => {
-    const { postsStore, tagStore } = useContext(StoreContext)
+const IndexPageNoSSR = () => {
+    const { postsStore, tagStore, authStore } = useContext(StoreContext)
+    const postPub = useMemo(() => authStore.postPub, [])
 
     useEffect(() => {
         postsStore.resetPostsAndPosition()
@@ -26,19 +27,11 @@ const IndexPage: React.FC<any> = ({ postPub }) => {
     return (
         <>
             <Helmet>
-                <title>Discussions App</title>
+                <title>{`Discussions App`}</title>
             </Helmet>
-            <IndexPageNoSSR postPub={postPub} />
+            <IndexPageNoSSR />
         </>
     )
 }
-
-// TODO: Move this to useEffect
-// IndexPage.getInitialProps = async function({ store }: any) {
-//     const postPub = store.authStore.postPub
-//     return {
-//         postPub,
-//     }
-// }
 
 export default IndexPage

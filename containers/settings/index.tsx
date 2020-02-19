@@ -12,14 +12,11 @@ import {
     SettingsModeration,
     SettingsWallet,
 } from '@components'
-import { Link } from 'react-router-dom'
+import { Link, useParams } from 'react-router-dom'
 import Helmet from 'react-helmet'
 
-/**
- * Use dynamic to prevent ssr renders
- */
-const Index = ({ page }: any) => {
-    switch (page) {
+const Index = ({ setting }: any) => {
+    switch (setting) {
         case 'connections':
             return <SettingsConnections />
         case 'wallet':
@@ -43,8 +40,9 @@ const className = (current: string, page: string) =>
         },
     ])
 
-const SettingsPage: React.FC<any> = ({ page }) => {
+const SettingsPage: React.FC<any> = () => {
     const { uiStore, walletStore }: RootStore = useStores()
+    const { setting } = useParams()
 
     useEffect(() => {
         uiStore.setSidebarHidden(true)
@@ -67,31 +65,31 @@ const SettingsPage: React.FC<any> = ({ page }) => {
                         <ul className={'list pa0 ma0 mt3'}>
                             <Link to={'/settings/connections'}>
                                 <a className={'gray'}>
-                                    <li className={className(page, 'connections')}>Connections</li>
+                                    <li className={className(setting, 'connections')}>Connections</li>
                                 </a>
                             </Link>
 
                             <Link to={'/settings/wallet'}>
                                 <a className={'gray'}>
-                                    <li className={className(page, 'wallet')}>Wallet </li>
+                                    <li className={className(setting, 'wallet')}>Wallet </li>
                                 </a>
                             </Link>
 
                             <Link to={'/settings/moderation'}>
                                 <a className={'gray'}>
-                                    <li className={className(page, 'moderation')}>Moderation</li>
+                                    <li className={className(setting, 'moderation')}>Moderation</li>
                                 </a>
                             </Link>
 
                             <Link to={'/settings/airdrop'}>
                                 <a className={'gray'}>
-                                    <li className={className(page, 'airdrop')}>Airdrop </li>
+                                    <li className={className(setting, 'airdrop')}>Airdrop </li>
                                 </a>
                             </Link>
 
                             <Link to={'/settings/blocked'}>
                                 <a className={'gray'}>
-                                    <li className={className(page, 'blocked')}>Blocked</li>
+                                    <li className={className(setting, 'blocked')}>Blocked</li>
                                 </a>
                             </Link>
                         </ul>
@@ -114,24 +112,12 @@ const SettingsPage: React.FC<any> = ({ page }) => {
                     </div>
                 </div>
                 <div className={'fl ml3 w-70 bg-white card pa4'}>
-                    <span className={'f4 b black db mb3'}>{_.startCase(page)}</span>
-                    <Index page={page} />
+                    <span className={'f4 b black db mb3'}>{_.startCase(setting)}</span>
+                    <Index setting={setting} />
                 </div>
             </div>
         </>
     )
 }
-
-// SettingsPage.getInitialProps = async function({ query }) {
-//     let page = query.setting as string
-//
-//     if (['connections', 'wallet', 'moderation', 'airdrop', 'blocked'].indexOf(page) === -1) {
-//         page = 'connections'
-//     }
-//
-//     return {
-//         page,
-//     }
-// }
 
 export default observer(SettingsPage)

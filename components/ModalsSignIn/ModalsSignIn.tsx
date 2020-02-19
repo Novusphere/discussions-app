@@ -52,10 +52,7 @@ const ModalsSignIn: FunctionComponent<IModalsSignInProps> = ({
         }
     }, [])
 
-    const alreadyHasAccount =
-        typeof authStore.bk !== 'undefined' &&
-        typeof authStore.displayName !== 'undefined' &&
-        typeof authStore.postPriv !== 'undefined'
+    const alreadyHasAccount = authStore.bk && authStore.displayName && authStore.postPriv
 
     const next = useCallback(() => {
         setStep(prevState => prevState + 1)
@@ -69,14 +66,6 @@ const ModalsSignIn: FunctionComponent<IModalsSignInProps> = ({
         switch (step) {
             case STEP_OPTIONS.METHOD:
                 return [
-                    // <Checkbox
-                    //     key={'checkbox'}
-                    //     onChange={onChange}
-                    //     checked={remember}
-                    //     disabled={authStore.preferredSignInMethod === SIGN_IN_OPTIONS.none}
-                    // >
-                    //     Automatically select this option next time
-                    // </Checkbox>,
                     <Button
                         key="signInWithAnotherBK"
                         type={alreadyHasAccount ? 'default' : 'primary'}
@@ -140,45 +129,47 @@ const ModalsSignIn: FunctionComponent<IModalsSignInProps> = ({
 
     const handleSignInWithAnotherBKSubmit = useCallback(e => {
         e.preventDefault()
-        form.validateFields(async (err, values) => {
-            if (!err) {
-                const { brainKey, displayName, password } = values
+        form.validateFields(
+            async (err: any, values: { brainKey: any; displayName: any; password: any }) => {
+                if (!err) {
+                    const { brainKey, displayName, password } = values
 
-                try {
-                    await authStore.signInWithBK(brainKey, displayName, password)
-                    notification.success({
-                        message: 'You have successfully signed in!',
-                    })
-                    uiStore.clearActiveModal()
-                    // this is dealt with HeaderNotifications.tsx
-                    // userStore.pingServerForData({
-                    //     postPub: authStore.postPub,
-                    //     postPriv: authStore.postPriv,
-                    // })
-                } catch (error) {
-                    if (error.message === 'You have entered an invalid brain key') {
-                        form.setFields({
-                            brainKey: {
-                                value: brainKey,
-                                errors: [new Error(error.message)],
-                            },
+                    try {
+                        await authStore.signInWithBK(brainKey, displayName, password)
+                        notification.success({
+                            message: 'You have successfully signed in!',
                         })
-                    } else {
-                        notification.error({
-                            message: 'Failed to sign in!',
-                            description: error.message,
-                        })
+                        uiStore.clearActiveModal()
+                        // this is dealt with HeaderNotifications.tsx
+                        // userStore.pingServerForData({
+                        //     postPub: authStore.postPub,
+                        //     postPriv: authStore.postPriv,
+                        // })
+                    } catch (error) {
+                        if (error.message === 'You have entered an invalid brain key') {
+                            form.setFields({
+                                brainKey: {
+                                    value: brainKey,
+                                    errors: [new Error(error.message)],
+                                },
+                            })
+                        } else {
+                            notification.error({
+                                message: 'Failed to sign in!',
+                                description: error.message,
+                            })
+                        }
+
+                        return error
                     }
-
-                    return error
                 }
             }
-        })
+        )
     }, [])
 
     const handleLoginWithExistingBKSubmit = useCallback(e => {
         e.preventDefault()
-        form.validateFields(async (err, values) => {
+        form.validateFields(async (err: any, values: { passwordRentry: any }) => {
             if (!err) {
                 const { passwordRentry } = values
 
@@ -229,7 +220,6 @@ const ModalsSignIn: FunctionComponent<IModalsSignInProps> = ({
                         <div className={styles.accountTypeContainer}>
                             {SignInOptions.map(option => (
                                 <span
-                                    // onClick={() => authStore.setPreferredSignInMethod(option.name)}
                                     key={option.name}
                                     title={`Toggle ${option.name} sign in`}
                                     className={cx([

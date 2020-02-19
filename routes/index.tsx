@@ -4,6 +4,7 @@ import { Layout } from '@components'
 
 const { lazy, Suspense } = React
 
+const HomePage = lazy(() => import('@containers/index/index'))
 const AllPage = lazy(() => import('@containers/all'))
 const FeedPage = lazy(() => import('@containers/feed'))
 const NewPage = lazy(() => import('@containers/new'))
@@ -15,6 +16,11 @@ const TagsViewPage = lazy(() => import('@containers/tags'))
 const UserViewPage = lazy(() => import('@containers/u'))
 
 export const routes = [
+    {
+        path: '/',
+        exact: true,
+        component: HomePage,
+    },
     {
         path: '/all',
         exact: true,
@@ -31,7 +37,7 @@ export const routes = [
         component: NewPage,
     },
     {
-        path: '/search',
+        path: '/search/:query',
         exact: true,
         component: SearchPage,
     },

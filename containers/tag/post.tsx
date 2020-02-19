@@ -35,7 +35,7 @@ interface IPostPageProps {
     thread: Thread
     url: string
     query: {
-        name: string
+        tag: string
         id: string
         title: string
     }
@@ -44,7 +44,7 @@ interface IPostPageProps {
 const PostPageComponentObserverable: React.FunctionComponent<IPostPageProps> = ({
     thread,
     url,
-    query: { name, id, title },
+    query: { tag: name, id, title },
 }) => {
     const {
         userStore,
@@ -551,9 +551,7 @@ const PostPageComponentObserverable: React.FunctionComponent<IPostPageProps> = (
                 <div className={'flex flex-row items-center justify-between'}>
                     <div className={'flex flex-row items-center'}>
                         <Link to={`/tag/${thread.openingPost.sub}`}>
-                            <a>
-                                <span className={'b'}>#{thread.openingPost.sub}</span>
-                            </a>
+                            <span className={'b'}>#{thread.openingPost.sub}</span>
                         </Link>
                         <Divider type={'vertical'} />
                         <UserNameWithIcon
@@ -798,7 +796,7 @@ const PostPage: React.FC = () => {
     }, [query.id])
 
     if (!thread) return null
-    
+
     return (
         <>
             <Helmet>
