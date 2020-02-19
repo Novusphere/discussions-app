@@ -58,11 +58,13 @@ const TerserPlugin = require('terser-webpack-plugin')
 // const RobotstxtPlugin = require('robotstxt-webpack-plugin')
 // const BundleAnalyzerPlugin = require('webpack-bundle-analyzer').BundleAnalyzerPlugin
 
+console.log(__dirname + '/../dist')
+
 module.exports = merge(baseWebpackConfig, {
     mode: 'production',
     devtool: false,
     output: {
-        path: __dirname + '../dist',
+        path: __dirname + '/../dist',
         publicPath: '/',
         filename: '[name].[hash].js',
     },

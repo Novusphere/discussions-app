@@ -63,7 +63,7 @@ novusphere-js/**/*.js
 
 # next.js build output
 .next
-dist/
+#dist/
 out/
 _next/
 
