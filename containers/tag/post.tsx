@@ -296,7 +296,7 @@ const PostPageComponentObserverable: React.FunctionComponent<IPostPageProps> = (
                         btn: (
                             <Button
                                 size="small"
-                                onClick={() => openInNewTab(`https://eosq.app/tx/${transaction}`)}
+                                onClick={() => openInNewTab(`https://bloks.io/transaction/${transaction}`)}
                             >
                                 View transaction
                             </Button>
@@ -697,7 +697,7 @@ const PostPageComponentObserverable: React.FunctionComponent<IPostPageProps> = (
                                 icon={'link'}
                                 onClick={() =>
                                     openInNewTab(
-                                        `https://eosq.app/tx/${postStore.observableThread.openingPost.transaction}`
+                                        `https://bloks.io/transaction/${postStore.observableThread.openingPost.transaction}`
                                     )
                                 }
                             />
@@ -713,7 +713,7 @@ const PostPageComponentObserverable: React.FunctionComponent<IPostPageProps> = (
                                     icon={'share-alt'}
                                     onClick={() =>
                                         openInNewTab(
-                                            `https://eosq.app/tx/${postStore.observableThread.openingPost.transaction}`
+                                            `https://bloks.io/transaction/${postStore.observableThread.openingPost.transaction}`
                                         )
                                     }
                                 />

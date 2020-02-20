@@ -224,7 +224,7 @@ const Replies: FunctionComponent<IRepliesProps> = props => {
                         btn: (
                             <Button
                                 size="small"
-                                onClick={() => openInNewTab(`https://eosq.app/tx/${transaction}`)}
+                                onClick={() => openInNewTab(`https://bloks.io/transaction/${transaction}`)}
                             >
                                 View transaction
                             </Button>
@@ -345,7 +345,7 @@ const Replies: FunctionComponent<IRepliesProps> = props => {
                         btn: (
                             <Button
                                 size="small"
-                                onClick={() => openInNewTab(`https://eosq.app/tx/${transaction}`)}
+                                onClick={() => openInNewTab(`https://bloks.io/transaction/${transaction}`)}
                             >
                                 View transaction
                             </Button>
@@ -524,7 +524,7 @@ const Replies: FunctionComponent<IRepliesProps> = props => {
                                         title={'Open transaction'}
                                         onClick={() =>
                                             openInNewTab(
-                                                `https://eosq.app/tx/${props.reply.transaction}`
+                                                `https://bloks.io/transaction/${props.reply.transaction}`
                                             )
                                         }
                                     >

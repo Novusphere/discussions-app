@@ -1,6 +1,7 @@
 import { discussions, eos, nsdb, Post } from '@novuspherejs'
 import _ from 'lodash'
 import axios from 'axios'
+// @ts-ignore
 import ecc from 'eosjs-ecc'
 
 const removeMd = require('remove-markdown')

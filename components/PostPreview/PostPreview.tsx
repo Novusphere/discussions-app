@@ -15,7 +15,7 @@ import {
     SharePostPopover,
     Icons,
 } from '@components'
-import { Link } from 'react-router-dom';
+import { Link } from 'react-router-dom'
 
 interface IPostPreviewProps {
     post: Post
@@ -274,21 +274,25 @@ const PostPreview: FunctionComponent<IPostPreviewProps> = ({
                         share
                     </a>
                 </Popover>
-                <Link to={`${url}#reply`}>
-                    <span className={'f6 mh2 black'}>reply</span>
-                </Link>
-                <a
-                    className={'f6 mh2 black'}
-                    onClick={e => {
-                        e.preventDefault()
-                        toggleBlockPost(url)
-                    }}
-                >
-                    mark as spam
-                </a>
+                {hasAccount && (
+                    <>
+                        <Link to={`${url}#reply`}>
+                            <span className={'f6 mh2 black'}>reply</span>
+                        </Link>
+                        <a
+                            className={'f6 mh2 black'}
+                            onClick={e => {
+                                e.preventDefault()
+                                toggleBlockPost(url)
+                            }}
+                        >
+                            mark as spam
+                        </a>
+                    </>
+                )}
             </>
         ),
-        []
+        [hasAccount]
     )
 
     const renderVotingHandles = (horizontal = false, props = {}) => {
@@ -327,13 +331,7 @@ const PostPreview: FunctionComponent<IPostPreviewProps> = ({
                 }}
             >
                 <div className={'flex flex-row'}>
-                    <div
-                        className={
-                            'bg-light-gray w2 ph2 pv4 z-2'
-                        }
-                    >
-                        {renderVotingHandles()}
-                    </div>
+                    <div className={'bg-light-gray w2 ph2 pv4 z-2'}>{renderVotingHandles()}</div>
                     <div className={'flex flex-column bg-white pa2 pa4-ns'}>
                         {shouldBeCollapsed && (
                             <span className={'silver'}>This post was marked as spam.</span>

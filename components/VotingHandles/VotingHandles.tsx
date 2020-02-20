@@ -26,10 +26,14 @@ const VotingHandles: React.FC<IVoteProps> = ({
 }) => {
     return (
         <span
-            className={classNames(['black f6 vote flex items-center disable-user-select ph1'], props.className, {
-                'flex-row': horizontal,
-                'flex-column': !horizontal,
-            })}
+            className={classNames(
+                ['black f6 vote flex items-center disable-user-select ph1'],
+                props.className,
+                {
+                    'flex-row': horizontal,
+                    'flex-column': !horizontal,
+                }
+            )}
             {...props}
         >
             <span
@@ -51,9 +55,8 @@ const VotingHandles: React.FC<IVoteProps> = ({
                 className={classNames(['disable-user-select ph1 silver'])}
                 style={{
                     whiteSpace: 'pre',
-                    color: myVote === 1 ? '#FF6300' : '#999999',
+                    color: myVote === 1 ? '#FF6300' : myVote === -1 ? '#357EDD' : '#999999',
                 }}
-                // style={{ color: color ? color : '#b9b9b9', whiteSpace: 'pre' }}
             >
                 {upVotes - downVotes}
             </span>
@@ -68,7 +71,7 @@ const VotingHandles: React.FC<IVoteProps> = ({
                     className={'link pointer hover-blue'}
                     type="caret-down"
                     style={{
-                        color: myVote === -1 ? '#00449E' : '#999999',
+                        color: myVote === -1 ? '#357EDD' : '#999999',
                     }}
                 />
             </span>

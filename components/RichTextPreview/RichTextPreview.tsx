@@ -1,11 +1,13 @@
-import React, { FunctionComponent, useCallback, useEffect, useState } from 'react'
+import React, { FunctionComponent, useCallback, useEffect, useLayoutEffect, useState } from 'react'
+// @ts-ignore
 import Markdown from 'markdown-to-jsx'
+// @ts-ignore
 import { LazyLoadImage } from 'react-lazy-load-image-component'
 import cx from 'classnames'
 
 import styles from './RichTextPreview.module.scss'
 import { nsdb } from '@novuspherejs'
-import { Desktop, generateUuid, LINK_LIMIT, Mobile, openInNewTab, sleep } from '@utils'
+import { generateUuid, LINK_LIMIT, openInNewTab, sleep } from '@utils'
 
 interface IRichTextPreviewProps {
     hideFade?: boolean
@@ -19,76 +21,84 @@ const RtLink: FunctionComponent<any> = ({ children, href, index }) => {
         async function getOEMBED() {
             let embed
 
-            switch (true) {
-                case /https?:\/\/(www\.)?(facebook|fb).(com|me)\/.+/.test(href):
-                    embed = `<div class="fb-post" data-href="${href}"></div>`
-                    break
-                case /bitchute/.test(href):
-                    const [, id] = href.split('bitchute.com/video/')
-                    embed = `<iframe width="560px" height="315px" src="https://www.bitchute.com/embed/${id}" frameborder="0" />`
-                    break
-                case /https?:\/\/www.youtube.com\/watch\?feature=(.*?)&v=[a-zA-Z0-9-_]+/.test(href):
-                case /https?:\/\/www.youtube.com\/watch\?v=[a-zA-Z0-9-_]+/.test(href):
-                case /https?:\/\/youtu.be\/[a-zA-Z0-9-_]+/.test(href):
-                    embed = await nsdb.cors(
-                        `https://www.youtube.com/oembed?format=json&url=${href.replace(
-                            /feature=(.*?)&/,
-                            ''
-                        )}`
-                    )
-                    break
-                case /https?:\/\/www.imgur.com(\/[a-zA-Z0-9-_]+)?\/p\/[a-zA-Z0-9-_]+(\/?.+)?/.test(
-                    href
-                ):
-                    embed = await nsdb.cors(`https://api.imgur.com/oembed.json?url=${href}`)
-                    break
-                case /https?:\/\/twitter.com\/[a-zA-Z0-9-_]+\/status\/[0-9]+/.test(href):
-                    embed = await nsdb.cors(`https://publish.twitter.com/oembed?url=${href}`)
-                    break
-                case /d.tube/.test(href):
-                    embed = await nsdb.cors(`https://api.d.tube/oembed?url=${href}`)
-                    break
-                case /soundcloud/.test(href):
-                    embed = await nsdb.cors(`https://soundcloud.com/oembed?format=json&url=${href}`)
-                    break
-                case /https?:\/\/www.instagr.am(\/[a-zA-Z0-9-_]+)?\/p\/[a-zA-Z0-9-_]+(\/?.+)?/.test(
-                    href
-                ):
-                case /https?:\/\/www.instagram.com(\/[a-zA-Z0-9-_]+)?\/p\/[a-zA-Z0-9-_]+(\/?.+)?/i.test(
-                    href
-                ):
-                    embed = await nsdb.cors(`https://api.instagram.com/oembed/?url=${href}`)
-                    break
-                case /https?:\/\/(www.)?tradingview.com\/x\//.test(href):
-                case /(.|)http[s]?:\/\/(\w|[:\/.%-])+\.(png|jpg|jpeg|gif)(\?(\w|[:\/.%-])+)?(.|)/.test(
-                    href
-                ):
-                    // embed = `<img src="${href}" alt="Viewing image" />`
-                    embed = {
-                        html: (
-                            <a
-                                href={href}
-                                className={'pointer'}
-                                onClick={() => openInNewTab(href)}
-                                title={'Open image in new tab'}
-                            >
-                                <LazyLoadImage alt={'Viewing image'} src={href} effect="blur" />
-                            </a>
-                        ),
-                    }
-                    break
-                case /t.me\/([a-zA-Z0-9\_\!\@\+]+)\/([a-zA-Z0-9]+)/.test(href):
-                    const [, ids] = href.split('t.me/')
-                    if (ids) {
-                        embed = `<span data-telegram-rn="${generateUuid()}" data-telegram-post="${ids}" data-width="100%"></span>`
-                    }
-                    break
-                default:
-                    embed = null
-                    break
-            }
+            try {
+                switch (true) {
+                    case /https?:\/\/(www\.)?(facebook|fb).(com|me)\/.+/.test(href):
+                        embed = `<div class="fb-post" data-href="${href}"></div>`
+                        break
+                    case /bitchute/.test(href):
+                        const [, id] = href.split('bitchute.com/video/')
+                        embed = `<iframe width="560px" height="315px" src="https://www.bitchute.com/embed/${id}" frameborder="0" />`
+                        break
+                    case /https?:\/\/www.youtube.com\/watch\?feature=(.*?)&v=[a-zA-Z0-9-_]+/.test(
+                        href
+                    ):
+                    case /https?:\/\/www.youtube.com\/watch\?v=[a-zA-Z0-9-_]+/.test(href):
+                    case /https?:\/\/youtu.be\/[a-zA-Z0-9-_]+/.test(href):
+                        embed = await nsdb.cors(
+                            `https://www.youtube.com/oembed?format=json&url=${href.replace(
+                                /feature=(.*?)&/,
+                                ''
+                            )}`
+                        )
+                        break
+                    case /https?:\/\/www.imgur.com(\/[a-zA-Z0-9-_]+)?\/p\/[a-zA-Z0-9-_]+(\/?.+)?/.test(
+                        href
+                    ):
+                        embed = await nsdb.cors(`https://api.imgur.com/oembed.json?url=${href}`)
+                        break
+                    case /https?:\/\/twitter.com\/[a-zA-Z0-9-_]+\/status\/[0-9]+/.test(href):
+                        embed = await nsdb.cors(`https://publish.twitter.com/oembed?url=${href}`)
+                        break
+                    case /d.tube/.test(href):
+                        embed = await nsdb.cors(`https://api.d.tube/oembed?url=${href}`)
+                        break
+                    case /soundcloud/.test(href):
+                        embed = await nsdb.cors(
+                            `https://soundcloud.com/oembed?format=json&url=${href}`
+                        )
+                        break
+                    case /https?:\/\/www.instagr.am(\/[a-zA-Z0-9-_]+)?\/p\/[a-zA-Z0-9-_]+(\/?.+)?/.test(
+                        href
+                    ):
+                    case /https?:\/\/www.instagram.com(\/[a-zA-Z0-9-_]+)?\/p\/[a-zA-Z0-9-_]+(\/?.+)?/i.test(
+                        href
+                    ):
+                        embed = await nsdb.cors(`https://api.instagram.com/oembed/?url=${href}`)
+                        break
+                    case /https?:\/\/(www.)?tradingview.com\/x\//.test(href):
+                    case /(.|)http[s]?:\/\/(\w|[:\/.%-])+\.(png|jpg|jpeg|gif)(\?(\w|[:\/.%-])+)?(.|)/.test(
+                        href
+                    ):
+                        // embed = `<img src="${href}" alt="Viewing image" />`
+                        embed = {
+                            html: (
+                                <a
+                                    href={href}
+                                    className={'pointer'}
+                                    onClick={() => openInNewTab(href)}
+                                    title={'Open image in new tab'}
+                                >
+                                    <LazyLoadImage alt={'Viewing image'} src={href} effect="blur" />
+                                </a>
+                            ),
+                        }
+                        break
+                    case /t.me\/([a-zA-Z0-9\_\!\@\+]+)\/([a-zA-Z0-9]+)/.test(href):
+                        const [, ids] = href.split('t.me/')
+                        if (ids) {
+                            embed = `<span data-telegram-rn="${generateUuid()}" data-telegram-post="${ids}" data-width="100%"></span>`
+                        }
+                        break
+                    default:
+                        embed = null
+                        break
+                }
 
-            return embed
+                return embed
+            } catch (error) {
+                embed = 'This content is unavailable'
+            }
         }
 
         let notDone = true
@@ -105,11 +115,15 @@ const RtLink: FunctionComponent<any> = ({ children, href, index }) => {
             }
         })
 
+        return () => {
+            notDone = false
+        }
+    }, [])
+
+    useLayoutEffect(() => {
         let timeout: any = null
 
         async function refreshIFrames() {
-            await sleep(250)
-
             if (href.match(/facebook|fb.me/)) {
                 if ((window as any).FB) {
                     ;(window as any).FB.XFBML.parse()
@@ -125,19 +139,20 @@ const RtLink: FunctionComponent<any> = ({ children, href, index }) => {
             } else if (href.match(/t.me/)) {
                 const tl = await import('@static/telegram.js')
 
-                timeout = setTimeout(() => {
+                setTimeout(() => {
                     tl.default(window)
                 }, 0)
             }
         }
 
-        refreshIFrames()
+        timeout = setTimeout(() => {
+            refreshIFrames()
+        }, 250)
 
         return () => {
             if (timeout) {
                 clearTimeout(timeout)
             }
-            notDone = false
         }
     }, [])
 
@@ -177,16 +192,20 @@ const RichTextPreview: FunctionComponent<IRichTextPreviewProps> = ({
                         a: {
                             component: RtLink,
                         },
-                        blockquote: {
-                            component: ({ children }) => (
-                                <span className={'db pl3 bw2 bl b--light-gray'}>{children}</span>
+                        // blockquote: {
+                        //     component: ({ children }: any) => (
+                        //         <span className={'db pl3 bw2 bl b--light-gray'}>{children}</span>
+                        //     ),
+                        // },
+                        h1: {
+                            component: ({ children }: any) => (
+                                <span className={'f4 b'}>{children}</span>
                             ),
                         },
-                        h1: {
-                            component: ({ children }) => <span className={'f4 b'}>{children}</span>,
-                        },
                         h2: {
-                            component: ({ children }) => <span className={'f5 b'}>{children}</span>,
+                            component: ({ children }: any) => (
+                                <span className={'f5 b'}>{children}</span>
+                            ),
                         },
                     },
                 }}
