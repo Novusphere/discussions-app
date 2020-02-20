@@ -253,7 +253,7 @@ const PostPreview: FunctionComponent<IPostPreviewProps> = ({
                 </span>
             </Link>
         ),
-        []
+        [url]
     )
 
     const postActions = useCallback(
