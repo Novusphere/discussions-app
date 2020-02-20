@@ -1,4 +1,4 @@
-import React, { useEffect, useCallback, useState } from 'react'
+import React, { useEffect, useCallback, useState, useLayoutEffect } from 'react'
 import { useLocalStore } from 'mobx-react-lite'
 import { discussions, Thread } from '@novuspherejs'
 import { Button, Divider, Dropdown, Icon, Menu, Popover, Tooltip, Result, Input } from 'antd'
@@ -30,6 +30,9 @@ import cx from 'classnames'
 import { observer } from 'mobx-react'
 import Helmet from 'react-helmet'
 import { Link, useLocation, useParams } from 'react-router-dom'
+
+import { animateScroll, scroller } from 'react-scroll'
+
 
 interface IPostPageProps {
     thread: Thread
@@ -296,7 +299,9 @@ const PostPageComponentObserverable: React.FunctionComponent<IPostPageProps> = (
                         btn: (
                             <Button
                                 size="small"
-                                onClick={() => openInNewTab(`https://bloks.io/transaction/${transaction}`)}
+                                onClick={() =>
+                                    openInNewTab(`https://bloks.io/transaction/${transaction}`)
+                                }
                             >
                                 View transaction
                             </Button>
@@ -411,11 +416,17 @@ const PostPageComponentObserverable: React.FunctionComponent<IPostPageProps> = (
 
     const location = useLocation()
 
-    useEffect(() => {
-        const [, hash] = location.pathname.split('#')
-        if (hash) {
-            postStore.setHighlightedPosUUID(hash)
-        }
+    useLayoutEffect(() => {
+        setTimeout(() => {
+            if (location.hash) {
+                const hash = location.hash.split('#')[1]
+                postStore.setHighlightedPosUUID(hash)
+                scroller.scrollTo(hash, {
+                    duration: 800,
+                    smooth: true,
+                })
+            }
+        }, 500)
 
         return () => {
             postStore.setHighlightedPosUUID('')
@@ -532,7 +543,7 @@ const PostPageComponentObserverable: React.FunctionComponent<IPostPageProps> = (
     if (!tag) return null
 
     return (
-        <>
+        <div id={'thread'}>
             <Link to={`/tag/${thread.openingPost.sub}`}>
                 <Button title={`See all posts in ${name}`} icon={'caret-left'}>
                     <span className={'flex flex-row items-center'}>
@@ -773,14 +784,14 @@ const PostPageComponentObserverable: React.FunctionComponent<IPostPageProps> = (
                     </div>
                 </div>
             )}
-        </>
+        </div>
     )
 }
 
 const PostPageComponent = observer(PostPageComponentObserverable)
 
 const PostPage: React.FC = () => {
-    const { postsStore, authStore }: RootStore = useStores()
+    const { postsStore, authStore, uiStore }: RootStore = useStores()
     const query: any = useParams()
     const [thread, setThread] = useState(null)
     const [url, setUrl] = useState('')
@@ -794,6 +805,7 @@ const PostPage: React.FC = () => {
     useEffect(() => {
         fetchThread()
     }, [query.id])
+
 
     if (!thread) return null
 

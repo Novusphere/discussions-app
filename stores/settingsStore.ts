@@ -22,7 +22,11 @@ export class SettingsStore {
         let host = window.location.host.toLowerCase()
         if (isDev) host = 'discussions.app'
 
-        const settings = setting[host]
+        let settings = setting[host]
+
+        if (typeof settings === 'undefined' || !settings) {
+            settings = setting['discussions.app']
+        }
 
         if (settings) {
             const tags = settings['tags']

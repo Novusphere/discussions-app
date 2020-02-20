@@ -418,6 +418,7 @@ const Replies: FunctionComponent<IRepliesProps> = props => {
 
     return useObserver(() => (
         <div
+            name={props.reply.uuid}
             data-post-uuid={props.reply.uuid}
             className={cx(['w-100'])}
             onMouseEnter={() => replyStore.setHover(true)}
