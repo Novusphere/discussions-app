@@ -187,10 +187,6 @@ const PostPreview: FunctionComponent<IPostPreviewProps> = ({
     const shouldBeHidden = blockedContentSetting === 'hidden' && isSpam
     const shouldBeCollapsed = blockedContentSetting === 'collapsed' && isSpam
 
-    if (shouldBeHidden) {
-        return null
-    }
-
     const postIcon = useCallback((size = 25) => {
         if (!tag) return null
         return <img className={'db mr2'} src={tag.logo} title={`${tag.name} icon`} width={size} />
@@ -309,6 +305,10 @@ const PostPreview: FunctionComponent<IPostPreviewProps> = ({
                       {...props}
                   />
               )
+    }
+
+    if (shouldBeHidden) {
+        return null
     }
 
     return (
