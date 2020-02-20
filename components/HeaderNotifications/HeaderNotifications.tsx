@@ -32,39 +32,38 @@ const NotificationContainer = () => {
             renderItem={(item, index) => {
                 return (
                     <List.Item className={styles.notificationItem}>
-                        <Link to={item['url']}>
-                            <a
-                                className={'dim w-100 relative'}
-                                onClick={() => userStore.deleteNotification(index)}
-                            >
-                                <List.Item.Meta
-                                    {...(item.pub && {
-                                        avatar: <Avatar src={getIdenticon(item.pub)} />,
-                                    })}
-                                    {...(item['tag'] && {
-                                        avatar: <Avatar src={item['tag']['logo']} />,
-                                    })}
-                                    title={
-                                        <span
-                                            className={
-                                                'w-100 flex flex-row items-center justify-between'
-                                            }
-                                        >
-                                            <span className={'gray b f6'}>{item.displayName}</span>
-                                            <span className={'light-silver f7'}>
-                                                {moment(item.createdAt).fromNow()}
-                                            </span>
+                        <Link
+                            to={item['url']}
+                            className={'dim w-100 relative'}
+                            onClick={() => userStore.deleteNotification(index)}
+                        >
+                            <List.Item.Meta
+                                {...(item.pub && {
+                                    avatar: <Avatar src={getIdenticon(item.pub)} />,
+                                })}
+                                {...(item['tag'] && {
+                                    avatar: <Avatar src={item['tag']['logo']} />,
+                                })}
+                                title={
+                                    <span
+                                        className={
+                                            'w-100 flex flex-row items-center justify-between'
+                                        }
+                                    >
+                                        <span className={'gray b f6'}>{item.displayName}</span>
+                                        <span className={'light-silver f7'}>
+                                            {moment(item.createdAt).fromNow()}
                                         </span>
-                                    }
-                                    description={
-                                        <div className={styles.contentContainer}>
-                                            <RichTextPreview className={'silver'}>
-                                                {item.content}
-                                            </RichTextPreview>
-                                        </div>
-                                    }
-                                />
-                            </a>
+                                    </span>
+                                }
+                                description={
+                                    <div className={styles.contentContainer}>
+                                        <RichTextPreview className={'silver'}>
+                                            {item.content}
+                                        </RichTextPreview>
+                                    </div>
+                                }
+                            />
                         </Link>
                     </List.Item>
                 )

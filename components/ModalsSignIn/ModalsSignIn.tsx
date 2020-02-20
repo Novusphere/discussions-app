@@ -52,7 +52,7 @@ const ModalsSignIn: FunctionComponent<IModalsSignInProps> = ({
         }
     }, [])
 
-    const alreadyHasAccount = authStore.bk && authStore.displayName && authStore.postPriv
+    const alreadyHasAccount = authStore.bk && authStore.displayName
 
     const next = useCallback(() => {
         setStep(prevState => prevState + 1)

@@ -77,7 +77,7 @@ export class AuthStore {
         try {
             const keys = await discussions.bkToKeys(bk)
             this.postPriv = keys.post.priv
-            this.setUidWalletPubKeyCookie(keys.uidwallet.pub)
+            this.setUidWalletKey(keys.uidwallet.pub)
             this.setAccountKey({ pub: keys.account.pub, priv: keys.account.priv })
             return keys
         } catch (error) {
@@ -91,10 +91,15 @@ export class AuthStore {
     }
 
     logOut = () => {
-        this.setHasAccountCookie(false)
+        this.setHasAccount(false)
+        this.postPub = ''
+        this.postPriv = ''
+        this.accountPubKey = ''
+        this.accountPrivKey = ''
+        this.uidwWalletPubKey = ''
     }
 
-    setUidWalletPubKeyCookie = (value: string) => {
+    setUidWalletKey = (value: string) => {
         this.uidwWalletPubKey = value
     }
 
@@ -103,23 +108,23 @@ export class AuthStore {
         this.accountPubKey = pub
     }
 
-    setHasAccountCookie = (value: boolean) => {
+    setHasAccount = (value: boolean) => {
         this.hasAccount = value
     }
 
-    setHasEOSWalletCookie = (value: boolean) => {
+    setHasEOSWallet = (value: boolean) => {
         this.hasEOSWallet = value
     }
 
-    setBKCookie = (value: string) => {
+    setBK = (value: string) => {
         this.bk = value
     }
 
-    setPostPubCookie = (value: string) => {
+    setPostPub = (value: string) => {
         this.postPub = value
     }
 
-    setDisplayNameCookie = (value: string) => {
+    setDisplayName = (value: string) => {
         this.displayName = value
     }
 
@@ -135,10 +140,10 @@ export class AuthStore {
 
             if (unparsedJSON) {
                 const statusJSON = JSON.parse(unparsedJSON)
-                this.setDisplayNameCookie(statusJSON.displayName)
-                this.setBKCookie(unparsedJSON)
-                this.setPostPubCookie(statusJSON.post)
-                this.setHasAccountCookie(true)
+                this.setDisplayName(statusJSON.displayName)
+                this.setBK(unparsedJSON)
+                this.setPostPub(statusJSON.post)
+                this.setHasAccount(true)
                 this.storeKeys(brianKeyVerify)
             }
         } catch (error) {
@@ -188,7 +193,7 @@ export class AuthStore {
             if (hasEOSWallet) {
                 // disconnect
                 await eos.logout()
-                this.setHasEOSWalletCookie(false)
+                this.setHasEOSWallet(false)
                 notification.success({
                     message: 'Success',
                     description: 'You have disconnected your EOS wallet',
@@ -199,9 +204,9 @@ export class AuthStore {
                 if (wallet && wallet.connected) {
                     this.eosWalletDisplayName = wallet.auth.accountName
                     ;(wallet as any).connect()
-                    this.setHasEOSWalletCookie(true)
+                    this.setHasEOSWallet(true)
                 } else {
-                    this.setHasEOSWalletCookie(false)
+                    this.setHasEOSWallet(false)
                 }
             }
         } catch (error) {
