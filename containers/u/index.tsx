@@ -111,7 +111,7 @@ const UserPage: React.FC<any> = () => {
         }
     }, [followers])
 
-    const isSameUser = useMemo(() => username == authStore.displayName, [])
+    const isSameUser = useMemo(() => username == authStore.displayName, [username])
 
     const menu = (
         <Menu>

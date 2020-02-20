@@ -116,7 +116,7 @@ export class UserStore {
      * @param username
      * @param pub
      */
-    activeModerationForCurrentUser = (username, pub) => {
+    activeModerationForCurrentUser = (username: string, pub: string) => {
         const vals = [...this.delegated.keys()]
         return vals
             .filter(val => val.indexOf(`${username}:${pub}`) !== -1)
@@ -173,7 +173,7 @@ export class UserStore {
         }
     }
 
-    setModerationFromDropdown = async (username, key, tags: string[]) => {
+    setModerationFromDropdown = async (username: string, key: string, tags: string[]) => {
         // use tags are source of truth for self-delegated
         const current = this.activeModerationForCurrentUser(username, key)
         const usernameWithKey = `${username}:${key}`
@@ -303,20 +303,32 @@ export class UserStore {
         this.syncDataFromLocalToServer()
     }
 
-    pingServerForData = ({ postPriv, postPub, accountPrivKey, accountPubKey }) => {
-        this.syncDataFromServerToLocal({ accountPubKey, accountPrivKey }).then(() => {
-            this.fetchNotifications(postPub)
-        })
+    pingServerForData = () => {
+        const authStore = JSON.parse(window.localStorage.getItem('authStore'))
+        const data = {
+            postPriv: authStore.postPriv,
+            postPub: authStore.postPub,
+            accountPrivKey: authStore.accountPrivKey,
+            accountPubKey: authStore.accountPubKey,
+        }
+
+        if (data.postPub && data.postPriv && data.accountPubKey && data.accountPrivKey) {
+            this.syncDataFromServerToLocal({
+                accountPubKey: data.accountPubKey,
+                accountPrivKey: data.accountPrivKey,
+            }).then(() => {
+                this.fetchNotifications(data.postPub)
+            })
+        }
     }
 
     /**
      * Syncing user data with the server
      */
-    syncDataFromServerToLocal = async ({ accountPrivKey, accountPubKey }) => {
+    syncDataFromServerToLocal = async ({ accountPrivKey, accountPubKey }: any) => {
         try {
             if (!accountPrivKey || !accountPubKey) {
                 // try to get from ls
-
                 const authStore = window.localStorage.getItem('authStore')
                 const parsed = JSON.parse(authStore)
 
@@ -351,7 +363,9 @@ export class UserStore {
                 if (data['tags']) this.tagStore.subscribed.replace(data['tags'])
 
                 if (data['following'])
-                    this.following.replace(data['following'].map(obj => [obj.pub, obj.name]))
+                    this.following.replace(
+                        data['following'].map((obj: { pub: any; name: any }) => [obj.pub, obj.name])
+                    )
 
                 if (data['moderation']['blockedPosts']) {
                     const blockedPosts = data['moderation']['blockedPosts']
@@ -464,7 +478,7 @@ export class UserStore {
 
             mapSeries(
                 threads,
-                (encodedThreadId, cb) => {
+                (encodedThreadId: string, cb: any) => {
                     discussions
                         .getThreadReplyCount(encodedThreadId)
                         .then(threadReplyCount => {
@@ -482,10 +496,10 @@ export class UserStore {
                             return cb(null, error.message)
                         })
                 },
-                async (error, result) => {
+                async (error: any, result: any) => {
                     // results is an array of objects [encodedId, diff]
                     if (result[0] !== undefined && result.length > 0) {
-                        each(result, async (item, cb) => {
+                        each(result, async (item: any, cb: any) => {
                             const [threadId, diff, currentCount] = item
                             const thread = await discussions.getThread(threadId)
                             const id = encodeId(thread.openingPost)
@@ -524,7 +538,7 @@ export class UserStore {
      * it will auto clear.
      * @param {number} index
      */
-    deleteNotification = index => {
+    deleteNotification = (index: number) => {
         this.notifications.splice(index, 1)
     }
 
@@ -538,7 +552,7 @@ export class UserStore {
             )
 
             this.notificationCount = payload.length
-            this.notifications = payload.filter((item, index) => index <= 5)
+            this.notifications = payload.filter((item: any, index: number) => index <= 5)
 
             this.watchAndUpdateWatchedPostsCount()
         } catch (error) {

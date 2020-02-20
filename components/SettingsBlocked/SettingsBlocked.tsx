@@ -3,16 +3,12 @@ import React, { useCallback } from 'react'
 import { useObserver } from 'mobx-react-lite'
 import { Avatar, Button, Divider, List, Switch, Typography } from 'antd'
 import { getIdenticon } from '@utils'
-import { Link } from 'react-router-dom';
+import { Link } from 'react-router-dom'
 
 const { Text } = Typography
 
 const Blocked = () => {
     const { userStore, tagStore, authStore }: RootStore = useStores()
-
-    if (!authStore.hasAccount) {
-        return <span className={'f6 gray'}>Please sign in to view this option</span>
-    }
 
     const handleHiddenOnChange = useCallback(val => {
         if (val) {
@@ -29,6 +25,10 @@ const Blocked = () => {
             userStore.setBlockedContent('hidden')
         }
     }, [])
+
+    if (!authStore.hasAccount) {
+        return <span className={'f6 gray'}>Please sign in to view this option</span>
+    }
 
     return useObserver(() => (
         <>
@@ -91,12 +91,14 @@ const Blocked = () => {
                                     </span>
                                     <span className={'dib'}>
                                         <span className={'db'}>
-                                            <Link to={`/u/${name}-${keys}`}>
-                                                <a>{name}</a>
-                                            </Link>
+                                            <Link to={`/u/${name}-${keys}`}>{name}</Link>
                                         </span>
 
-                                        <Text className={'db'} ellipsis style={{ maxWidth: '20vw' }}>
+                                        <Text
+                                            className={'db'}
+                                            ellipsis
+                                            style={{ maxWidth: '20vw' }}
+                                        >
                                             {keys}
                                         </Text>
                                     </span>
@@ -134,7 +136,9 @@ const Blocked = () => {
                                             <Avatar src={tag.logo} size={'large'} />
                                         </span>
                                         <Link to={path}>
-                                            <a><Text ellipsis style={{ maxWidth: '20vw' }}>{path}</Text></a>
+                                            <Text ellipsis style={{ maxWidth: '20vw' }}>
+                                                {path}
+                                            </Text>
                                         </Link>
                                     </span>
                                     <Button

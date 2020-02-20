@@ -1,6 +1,7 @@
 import * as React from 'react'
 import { Route, Switch } from 'react-router-dom'
 import { Layout } from '@components'
+import { Icon } from 'antd'
 
 const { lazy, Suspense } = React
 
@@ -69,7 +70,7 @@ export const routes = [
 ]
 
 const Routes = () => (
-    <Suspense fallback={<span>Loading...</span>}>
+    <Suspense fallback={<Layout><Icon type="loading" /></Layout>}>
         <Switch>
             <Layout>
                 {routes.map(({ path, exact, component: LazyComponent }) => (

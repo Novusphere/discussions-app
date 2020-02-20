@@ -63,34 +63,24 @@ const SettingsPage: React.FC<any> = () => {
                         <span className={'db f6 b black ph4 pt4'}>Settings</span>
 
                         <ul className={'list pa0 ma0 mt3'}>
-                            <Link to={'/settings/connections'}>
-                                <a className={'gray'}>
-                                    <li className={className(setting, 'connections')}>Connections</li>
-                                </a>
+                            <Link to={'/settings/connections'} className={'gray'}>
+                                <li className={className(setting, 'connections')}>Connections</li>
                             </Link>
 
-                            <Link to={'/settings/wallet'}>
-                                <a className={'gray'}>
-                                    <li className={className(setting, 'wallet')}>Wallet </li>
-                                </a>
+                            <Link to={'/settings/wallet'} className={'gray'}>
+                                <li className={className(setting, 'wallet')}>Wallet </li>
                             </Link>
 
-                            <Link to={'/settings/moderation'}>
-                                <a className={'gray'}>
-                                    <li className={className(setting, 'moderation')}>Moderation</li>
-                                </a>
+                            <Link to={'/settings/moderation'} className={'gray'}>
+                                <li className={className(setting, 'moderation')}>Moderation</li>
                             </Link>
 
-                            <Link to={'/settings/airdrop'}>
-                                <a className={'gray'}>
-                                    <li className={className(setting, 'airdrop')}>Airdrop </li>
-                                </a>
+                            <Link to={'/settings/airdrop'} className={'gray'}>
+                                <li className={className(setting, 'airdrop')}>Airdrop </li>
                             </Link>
 
-                            <Link to={'/settings/blocked'}>
-                                <a className={'gray'}>
-                                    <li className={className(setting, 'blocked')}>Blocked</li>
-                                </a>
+                            <Link to={'/settings/blocked'} className={'gray'}>
+                                <li className={className(setting, 'blocked')}>Blocked</li>
                             </Link>
                         </ul>
                     </div>

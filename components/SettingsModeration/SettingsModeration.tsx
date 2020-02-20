@@ -34,9 +34,7 @@ const Moderation = () => {
                     <>
                         <Avatar src={getIdenticon(record.uidw)} />
                         <span className={'ml3'}>
-                            <Link to={`/u/${name}-${record.uidw}`}>
-                                <a>{name}</a>
-                            </Link>
+                            <Link to={`/u/${name}-${record.uidw}`}>{name}</Link>
                         </span>
                     </>
                 )
@@ -55,9 +53,7 @@ const Moderation = () => {
                     <>
                         <Avatar src={tagModel.logo} />
                         <span className={'ml3'}>
-                            <Link to={`/tag/${tag}`}>
-                                <a>#{tag}</a>
-                            </Link>
+                            <Link to={`/tag/${tag}`}>#{tag}</Link>
                         </span>
                     </>
                 )

@@ -28,7 +28,7 @@ module.exports = merge(webpackConfig, {
         new HtmlWebpackPlugin({
             title: 'Discussions App',
             filename: 'index.html',
-            template: '../static/index.html',
+            template: './static/index.html',
         }),
     ],
 })

@@ -87,17 +87,13 @@ const NotificationContainer = () => {
 }
 
 const HeaderNotifications: FunctionComponent<IHeaderNotificationsProps> = () => {
-    const { userStore, authStore }: RootStore = useStores()
+    const { userStore, authStore, walletStore }: RootStore = useStores()
 
     useInterval(
         () => {
             if (authStore.hasAccount) {
-                userStore.pingServerForData({
-                    postPriv: authStore.postPriv,
-                    postPub: authStore.postPub,
-                    accountPrivKey: authStore.accountPrivKey,
-                    accountPubKey: authStore.accountPubKey,
-                })
+                userStore.pingServerForData()
+                walletStore.refreshAllBalances()
             }
         },
         20000,
