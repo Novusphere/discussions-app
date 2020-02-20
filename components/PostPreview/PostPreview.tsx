@@ -292,7 +292,7 @@ const PostPreview: FunctionComponent<IPostPreviewProps> = ({
                 )}
             </>
         ),
-        [hasAccount]
+        [url, hasAccount]
     )
 
     const renderVotingHandles = (horizontal = false, props = {}) => {
