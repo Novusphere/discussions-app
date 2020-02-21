@@ -1,6 +1,6 @@
 import axios from 'axios'
 import { ApiGetUnifiedId } from 'interfaces/ApiGet-UnifiedId'
-import { isDev } from '@utils'
+import { getHostName, isDev } from '@utils'
 const ecc = require('eosjs-ecc')
 export const DEFAULT_NSDB_ENDPOINT = 'https://atmosdb.novusphere.io'
 
@@ -67,13 +67,8 @@ export class NSDB {
         const jsonData = JSON.stringify(accountData)
         const sig = ecc.sign(ecc.sha256(jsonData), accountPrivateKey)
         const pub = accountPublicKey
-        let domain = window.location.origin
 
-        if (isDev) {
-            domain = 'https://beta.discussions.app'
-        }
-
-        const qs = `pub=${pub}&sig=${sig}&data=${encodeURIComponent(jsonData)}&domain=${domain}`
+        const qs = `pub=${pub}&sig=${sig}&data=${encodeURIComponent(jsonData)}&domain=${getHostName()}`
         const rurl = `${this.api}/account/save`
 
         const { data } = await axios.post(rurl, qs)
