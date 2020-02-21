@@ -5,7 +5,9 @@ import axios from 'axios'
 import _ from 'lodash'
 import { discussions, nsdb, Post } from '@novuspherejs'
 import moment from 'moment'
+// @ts-ignore
 import mapSeries from 'async/mapSeries'
+// @ts-ignore
 import each from 'async/each'
 import { encodeId, getThreadTitle } from '@utils'
 
@@ -45,16 +47,6 @@ export class UserStore {
         this.uiStore = rootStore.uiStore
         this.tagStore = rootStore.tagStore
         this.authStore = rootStore.authStore
-    }
-
-    hydrate(initialState: any = {}) {
-        if (initialState.pinnedPosts) {
-            this.pinnedPosts = observable.map<string, string>(initialState.pinnedPosts)
-        }
-
-        if (initialState.unsignedPostsIsSpam) {
-            this.unsignedPostsIsSpam = initialState.unsignedPostsIsSpam
-        }
     }
 
     resetUserStore = () => {
@@ -220,11 +212,11 @@ export class UserStore {
             } else {
                 await this.setAndUpdateDelegatedPosts(mergedName, tagName, suppressAlert)
             }
+
+            this.syncDataFromLocalToServer()
         } catch (error) {
             return error
         }
-
-        this.syncDataFromLocalToServer()
     }
 
     toggleUserFollowing = (user: string, pub: string) => {
@@ -376,8 +368,10 @@ export class UserStore {
                         this.blockedPosts.replace(blockedPosts)
                     }
                 }
-                if (data['moderation']['delegated'])
+                if (data['moderation']['delegated']) {
                     this.delegated.replace(data['moderation']['delegated'])
+                    this.updateFromActiveDelegatedMembers()
+                }
 
                 if (data['moderation']['blockedUsers'])
                     this.blockedUsers.replace(data['moderation']['blockedUsers'])
