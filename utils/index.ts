@@ -22,6 +22,10 @@ export const sleep = (milliseconds: number) => {
     return new Promise(resolve => setTimeout(resolve, milliseconds))
 }
 
+export const getHostName = () => {
+    if (isDev) return 'discussions.app'
+    return window.location.hostname
+}
 
 export const deleteAllCookies = () => {
     const cookies = document.cookie.split(';')
