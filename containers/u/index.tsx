@@ -146,7 +146,7 @@ const UserPage: React.FC<any> = () => {
 
     const onModerationChange = useCallback((tags: string[]) => {
         return userStore.setModerationFromDropdown(username, wallet, tags)
-    }, [])
+    }, [username, wallet])
 
     if (postsStore.getPostsForKeys['pending']) {
         return <Icon type="loading" />

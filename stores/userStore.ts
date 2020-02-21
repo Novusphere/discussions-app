@@ -124,10 +124,9 @@ export class UserStore {
     }
 
     async setPinnedPosts(posts: any[], delegated = false, sync = true) {
-        _.forEach(posts, (urls, name: string) => {
-            _.forEach(urls, url => {
-                this.pinnedPosts.set(url, name)
-            })
+        _.forEach(posts, pinnedPosts => {
+            const [url, tag] = pinnedPosts
+            this.pinnedPosts.set(url, tag)
         })
 
         if (sync) this.syncDataFromLocalToServer()
