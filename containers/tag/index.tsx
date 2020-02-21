@@ -10,7 +10,7 @@ const TagPage: React.FC<any> = () => {
     const { tag } = useParams()
     const pinnedPosts = useMemo(() => [...userStore.pinnedPosts.toJS()], [])
     const postPub = useMemo(() => authStore.postPub, [])
-    const fetch = useCallback(() => postsStore.fetchPostsForTag(postPub, [tag], pinnedPosts), [tag])
+    const fetch = useCallback(() => postsStore.fetchPostsForTag(postPub, [tag], pinnedPosts), [tag, pinnedPosts])
 
     useEffect(() => {
         postsStore.resetPostsAndPosition()

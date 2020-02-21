@@ -51,7 +51,7 @@ export class PostsStore {
             // get pinned posts to put at the front
             if (!this.postsPosition.cursorId && pinnedPosts.length) {
                 await Promise.all(
-                    _.map(pinnedPosts, async (name, url: string) => {
+                    _.map(pinnedPosts, async ([url, name]) => {
                         if (tagNames[0] === name) {
                             const post = await discussions.getPostsByAsPathURL(url, key)
                             post.pinned = true
