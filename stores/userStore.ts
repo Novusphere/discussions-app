@@ -1,5 +1,5 @@
 import { persist } from 'mobx-persist'
-import { observable } from 'mobx'
+import { observable, when } from 'mobx'
 import { RootStore } from '@stores/index'
 import axios from 'axios'
 import _ from 'lodash'
@@ -9,7 +9,7 @@ import moment from 'moment'
 import mapSeries from 'async/mapSeries'
 // @ts-ignore
 import each from 'async/each'
-import { encodeId, getThreadTitle } from '@utils'
+import { encodeId, getThreadTitle, sleep } from '@utils'
 
 export type BlockedContentSetting = 'hidden' | 'collapsed'
 
@@ -47,6 +47,19 @@ export class UserStore {
         this.uiStore = rootStore.uiStore
         this.tagStore = rootStore.tagStore
         this.authStore = rootStore.authStore
+
+        when(
+            () => this.authStore.hasAccount,
+            () => {
+                this.syncDataFromServerToLocal({
+                    accountPrivKey: this.authStore.accountPrivKey,
+                    accountPubKey: this.authStore.accountPubKey,
+                })
+            },
+            {
+                timeout: 500,
+            }
+        )
     }
 
     resetUserStore = () => {

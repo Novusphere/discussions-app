@@ -35,7 +35,7 @@ export class NSDB {
     async getAccount({
         accountPrivateKey,
         accountPublicKey,
-    }) {
+    }: any) {
         const time = new Date().getTime()
         let domain = window.location.origin
 
@@ -63,7 +63,7 @@ export class NSDB {
         accountPrivateKey,
         accountPublicKey,
         accountData,
-    }) {
+    }: any) {
         const jsonData = JSON.stringify(accountData)
         const sig = ecc.sign(ecc.sha256(jsonData), accountPrivateKey)
         const pub = accountPublicKey
