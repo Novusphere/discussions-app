@@ -67,7 +67,7 @@
         "plain-build": "next build",
         "start": "npm run dev",
         "start-prod": "node --experimental-modules server.mjs",
-        "start-beta": "node PORT=3001 server.js",
+        "start-beta": "SET PORT=3001 && node server.js",
         "dev": "NODE_ENV=development webpack-dev-server --config webpack/webpack.dev.js",
         "build": "rm -rf dist && webpack --config webpack/webpack.prod.js",
         "lint": "eslint --ext ts,tsx src/",
