@@ -37,16 +37,10 @@ export class NSDB {
         accountPublicKey,
     }: any) {
         const time = new Date().getTime()
-        let domain = window.location.origin
-
-        if (isDev) {
-            domain = 'https://beta.discussions.app'
-        }
-
-        const sig = ecc.sign(ecc.sha256(`${domain}-${time}`), accountPrivateKey)
+        const sig = ecc.sign(ecc.sha256(`${getOrigin()}-${time}`), accountPrivateKey)
         const pub = accountPublicKey
 
-        const qs = `pub=${pub}&sig=${sig}&time=${time}&domain=${domain}`
+        const qs = `pub=${pub}&sig=${sig}&time=${time}&domain=${getOrigin()}`
         const rurl = `${this.api}/account/data`
 
         const { data } = await axios.post(rurl, qs)
