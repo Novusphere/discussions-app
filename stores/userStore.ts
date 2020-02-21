@@ -9,7 +9,7 @@ import moment from 'moment'
 import mapSeries from 'async/mapSeries'
 // @ts-ignore
 import each from 'async/each'
-import { encodeId, getThreadTitle, sleep, getHostName } from '@utils'
+import { encodeId, getThreadTitle, sleep, getHostName, getOrigin } from '@utils'
 
 export type BlockedContentSetting = 'hidden' | 'collapsed'
 
@@ -146,7 +146,7 @@ export class UserStore {
                 [...this.delegated.keys()].map(async delegatedMember => {
                     const [, key] = delegatedMember.split(':')
                     const { data } = await axios.get(
-                        `https://atmosdb.novusphere.io/discussions/moderation/${key}?domain=${getHostName()}`
+                        `https://atmosdb.novusphere.io/discussions/moderation/${key}?domain=${getOrigin()}`
                     )
 
                     if (data.hasOwnProperty('moderation')) {

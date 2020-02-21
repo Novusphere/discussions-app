@@ -27,6 +27,11 @@ export const getHostName = () => {
     return window.location.hostname
 }
 
+export const getOrigin = () => {
+    if (isDev) return 'https://discussions.app'
+    return window.location.origin
+}
+
 export const deleteAllCookies = () => {
     const cookies = document.cookie.split(';')
 
