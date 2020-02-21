@@ -9,7 +9,7 @@ import { Link, useHistory, useLocation } from 'react-router-dom'
 interface ISidebarTagViewProps {}
 
 const SidebarTagView: FunctionComponent<ISidebarTagViewProps> = () => {
-    const { tagStore } = useStores()
+    const { tagStore, userStore } = useStores()
     const history = useHistory()
     const location = useLocation()
 
@@ -41,7 +41,13 @@ const SidebarTagView: FunctionComponent<ISidebarTagViewProps> = () => {
                     </>
                 )}
                 <div className={'mt3'}>
-                    <Button block onClick={() => tagStore.toggleSubscribe(tag)}>
+                    <Button
+                        block
+                        onClick={() => {
+                            tagStore.toggleSubscribe(tag)
+                            userStore.syncDataFromLocalToServer()
+                        }}
+                    >
                         {tagStore.subscribed.indexOf(tag) !== -1 ? 'Unsubscribe' : 'Subscribe'}
                     </Button>
                 </div>

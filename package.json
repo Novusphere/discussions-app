@@ -66,7 +66,7 @@
         "build-editor": "webpack --mode=development --config=./modules/quill-autoformat/webpack.config.js",
         "plain-build": "next build",
         "start": "npm run dev",
-        "start-prod": "node --experimental-modules server.mjs",
+        "start-prod": "node helmet-server.js",
         "start-beta": "SET PORT=3001 && node server.js",
         "dev": "NODE_ENV=development webpack-dev-server --config webpack/webpack.dev.js",
         "build": "rm -rf dist && webpack --config webpack/webpack.prod.js",
