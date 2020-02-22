@@ -73,6 +73,7 @@ export class PostsStore {
                 position: this.postsPosition,
             }
         } catch (error) {
+            console.error(error);
             return error
         }
     }

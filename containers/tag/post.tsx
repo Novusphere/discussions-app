@@ -1,7 +1,7 @@
 import React, { useEffect, useCallback, useState, useLayoutEffect } from 'react'
 import { useLocalStore } from 'mobx-react-lite'
 import { discussions, Thread } from '@novuspherejs'
-import { Button, Divider, Dropdown, Icon, Menu, Popover, Tooltip, Result, Input } from 'antd'
+import { Button, Divider, Dropdown, Icon, Menu, Popover, Tooltip, Result, Input, Empty } from 'antd'
 import {
     UserNameWithIcon,
     Tips,
@@ -807,7 +807,7 @@ const PostPage: React.FC = () => {
     }, [query.id])
 
 
-    if (!thread) return null
+    if (!thread) return <Empty description={'This is not the thread you were looking for...'} />
 
     return (
         <>
