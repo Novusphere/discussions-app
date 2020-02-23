@@ -11,6 +11,7 @@ import {
     SettingsBlocked,
     SettingsModeration,
     SettingsWallet,
+    SettingsContent,
 } from '@components'
 import { Link, useParams } from 'react-router-dom'
 import Helmet from 'react-helmet'
@@ -27,6 +28,8 @@ const Index = ({ setting }: any) => {
             return <SettingsModeration />
         case 'airdrop':
             return <SettingsAirdrop />
+        case 'content':
+            return <SettingsContent />
         default:
             return null
     }
@@ -68,7 +71,7 @@ const SettingsPage: React.FC<any> = () => {
                             </Link>
 
                             <Link to={'/settings/wallet'} className={'gray'}>
-                                <li className={className(setting, 'wallet')}>Wallet </li>
+                                <li className={className(setting, 'wallet')}>Wallet</li>
                             </Link>
 
                             <Link to={'/settings/moderation'} className={'gray'}>
@@ -76,11 +79,15 @@ const SettingsPage: React.FC<any> = () => {
                             </Link>
 
                             <Link to={'/settings/airdrop'} className={'gray'}>
-                                <li className={className(setting, 'airdrop')}>Airdrop </li>
+                                <li className={className(setting, 'airdrop')}>Airdrop</li>
                             </Link>
 
                             <Link to={'/settings/blocked'} className={'gray'}>
                                 <li className={className(setting, 'blocked')}>Blocked</li>
+                            </Link>
+
+                            <Link to={'/settings/content'} className={'gray'}>
+                                <li className={className(setting, 'content')}>Content</li>
                             </Link>
                         </ul>
                     </div>

@@ -1,8 +1,8 @@
-import React from 'react'
-import { renderToString } from 'react-dom/server'
-import Helmet from 'react-helmet'
-import App from '@containers/app'
+require("@babel/register")({
+    presets: ['es2015', 'react']
+});
 
+const appGet = require('./_appGet')
 const express = require('express')
 const path = require('path')
 const app = express()
@@ -10,12 +10,7 @@ const app = express()
 // Serve the static files from the React app
 app.use(express.static(path.join(__dirname, './dist')))
 
-app.get('/*', (req, res) => {
-    const app = renderToString(<App/>)
-    const helmet = Helmet.renderStatic()
-
-    res.send(formatHTML(app, helmet))
-})
+appGet(app);
 
 const port = process.env.PORT || 3000
 app.listen(port)
