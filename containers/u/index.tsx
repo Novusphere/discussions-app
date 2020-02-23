@@ -155,7 +155,7 @@ const UserPage: React.FC<any> = () => {
     return (
         <>
             <Helmet>
-                <title>{`Discussions App - /u/${username}`}</title>
+                <title>{`/u/${username}`}</title>
             </Helmet>
             <div className={'flex flex-row'}>
                 <div className={'w-30 vh-75 bg-white card pa3'}>

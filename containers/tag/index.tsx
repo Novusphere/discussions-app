@@ -20,7 +20,7 @@ const TagPage: React.FC<any> = () => {
     return (
         <>
             <Helmet>
-                <title>{`Discussions App - #${tag}`}</title>
+                <title>{`#${tag}`}</title>
             </Helmet>
             <InfiniteScrollFeed
                 dataLength={postsStore.postsPosition.items}

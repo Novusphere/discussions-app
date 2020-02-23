@@ -6,8 +6,6 @@ import Helmet from 'react-helmet'
 
 const AllPage: React.FC<any> = () => {
     const { postsStore, authStore }: RootStore = useContext(StoreContext)
-    const title = 'Discussions App - #all'
-
     const fetch = useCallback(() => postsStore.fetchPostsForTag(authStore.postPub, ['all']), [])
 
     useEffect(() => {
@@ -18,7 +16,7 @@ const AllPage: React.FC<any> = () => {
     return (
         <>
             <Helmet>
-                <title>{title}</title>
+                <title>{`#all`}</title>
             </Helmet>
             <InfiniteScrollFeed
                 dataLength={postsStore.postsPosition.items}

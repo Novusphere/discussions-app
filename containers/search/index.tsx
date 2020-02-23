@@ -20,7 +20,7 @@ const SearchPage: React.FC<any> = () => {
     return useObserver(() => (
         <>
             <Helmet>
-                <title>{`Discussions App - Searching: ${query}`}</title>
+                <title>{`Search results: ${query}`}</title>
             </Helmet>
             <span className={'db mb3 f6'}>
                 Showing results for: "{query}" ({postsStore.postsPosition.items}{' '}

@@ -58,7 +58,7 @@ const SettingsPage: React.FC<any> = () => {
     return (
         <>
             <Helmet>
-                <title>Discussions App - Settings</title>
+                <title>{`Settings - ${setting}`}</title>
             </Helmet>
             <div className={'flex flex-row'}>
                 <div className={'w-30 vh-75 bg-white card'}>

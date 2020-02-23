@@ -20,7 +20,7 @@ const TagsPage: React.FC<any> = () => {
     return (
         <>
             <Helmet>
-                <title>{`Discussions App - ${split.map(tag => `#${tag}`)}`}</title>
+                <title>{`${split.map(tag => `#${tag}`)}`}</title>
             </Helmet>
             <InfiniteScrollFeed
                 dataLength={postsStore.postsPosition.items}

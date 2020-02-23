@@ -31,7 +31,7 @@ const FeedPage: React.FC<any> = () => {
     return (
         <>
             <Helmet>
-                <title>Discussions App - #feed</title>
+                <title>{`#feed`}</title>
             </Helmet>
             <FeedPageNoSSR />
         </>

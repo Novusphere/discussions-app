@@ -791,7 +791,7 @@ const PostPageComponentObserverable: React.FunctionComponent<IPostPageProps> = (
 const PostPageComponent = observer(PostPageComponentObserverable)
 
 const PostPage: React.FC = () => {
-    const { postsStore, authStore, uiStore }: RootStore = useStores()
+    const { postsStore, authStore }: RootStore = useStores()
     const query: any = useParams()
     const [thread, setThread] = useState(null)
     const [url, setUrl] = useState('')
@@ -816,25 +816,6 @@ const PostPage: React.FC = () => {
                     {thread.openingPost.title} - #{thread.openingPost.sub}
                 </title>
             </Helmet>
-            {/*<NextSeo*/}
-            {/*    title={thread.openingPost.title}*/}
-            {/*    description={removeMD(thread.openingPost.content).substring(0, 150)}*/}
-            {/*    openGraph={{*/}
-            {/*        title: thread.openingPost.title,*/}
-            {/*        description: removeMD(thread.openingPost.content).substring(0, 150),*/}
-            {/*        site_name: 'Discussions App',*/}
-            {/*        images: [*/}
-            {/*            {*/}
-            {/*                url: thread.icon*/}
-            {/*                    ? thread.icon*/}
-            {/*                    : 'https://cdn.novusphere.io/static/atmos2.png',*/}
-            {/*                width: 50,*/}
-            {/*                height: 50,*/}
-            {/*                alt: 'https://cdn.novusphere.io/static/atmos2.png',*/}
-            {/*            },*/}
-            {/*        ],*/}
-            {/*    }}*/}
-            {/*/>*/}
             <PostPageComponent thread={thread} url={url} query={query} />
         </>
     )

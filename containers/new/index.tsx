@@ -252,7 +252,7 @@ const NewPage: React.FC<any> = ({ prefilledTag }) => {
     return (
         <>
             <Helmet>
-                <title>Discussions App - Create New Post</title>
+                <title>{'Create a new post'}</title>
             </Helmet>
             <NewPageNoSSR prefilledTag={prefilledTag} />
         </>
