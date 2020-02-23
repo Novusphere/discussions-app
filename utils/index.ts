@@ -9,8 +9,6 @@ const matchAll = require('string.prototype.matchall')
 const pjson = require('../package.json')
 const uuid = require('uuidv4')
 
-export * from './useScrollPosition'
-export * from './wrapper'
 export * from './useInterval'
 export * from './mediaQueries'
 

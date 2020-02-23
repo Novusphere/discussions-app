@@ -3,7 +3,12 @@
 // _inspired by_ https://overreacted.io/making-setinterval-declarative-with-react-hooks/
 import { useEffect, useRef } from 'react'
 
-export function useInterval(callback, delay, runOnLoad = false, effectDependencies = []) {
+export function useInterval(
+    callback: () => void,
+    delay: number,
+    runOnLoad = false,
+    effectDependencies: any[] = []
+) {
     const savedCallback = useRef()
 
     useEffect(() => {
@@ -14,12 +19,14 @@ export function useInterval(callback, delay, runOnLoad = false, effectDependenci
 
     // Remember the latest callback.
     useEffect(() => {
+        // @ts-ignore
         savedCallback.current = callback
     }, [callback])
 
     // Set up the interval.
     useEffect(() => {
         if (delay !== null) {
+            // @ts-ignore
             const id = setInterval(() => savedCallback.current(), delay)
             return () => clearInterval(id)
         }
