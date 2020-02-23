@@ -5,7 +5,7 @@ const express = require('express')
 const path = require('path')
 const fs = require('fs')
 const app = express()
-const filePath = path.resolve(`${process.cwd()}/dist/index.html`)
+const filePath = path.resolve(`${process.cwd()}/dist/app.html`)
 
 // Serve the static files from the React app
 app.use(express.static(path.join(process.cwd() + '/dist')))
