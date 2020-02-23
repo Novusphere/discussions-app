@@ -65,7 +65,7 @@
         "plop": "plop --plopfile ./generator/index.js",
         "build-editor": "webpack --mode=development --config=./modules/quill-autoformat/webpack.config.js",
         "dev": "NODE_ENV=development webpack-dev-server --config webpack/webpack.dev.js",
-        "start:prod": "NODE_ENV=production node dist/server.js",
+        "start:prod": "node dist/server.js",
         "start:beta": "SET PORT=3001 && node dist/server.js",
         "build:client": "rm -rf dist && webpack --config webpack/webpack.prod.js",
         "build:server": "webpack --config webpack/webpack.server.js"
