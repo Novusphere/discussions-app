@@ -1,5 +1,5 @@
 import { getSettings, removeMD } from '../utils'
-import { discussions } from '../novusphere-js';
+import { discussions } from '../novusphere-js'
 
 const express = require('express')
 const path = require('path')
@@ -9,7 +9,6 @@ const filePath = path.resolve(`${process.cwd()}/dist/index.html`)
 
 // Serve the static files from the React app
 app.use(express.static(path.join(process.cwd() + '/dist')))
-
 app.use(async (req, res, next) => {
     res.settings = await getSettings(req.hostname)
     res.genericTagUrl = 'https://cdn.novusphere.io/static/atmos.svg'
@@ -90,7 +89,6 @@ app.get('/tags/:tags', (req, res) => {
     })
 })
 
-
 app.get('/u/:username', (req, res) => {
     const { username } = req.params
     const [name] = username.split('-')
@@ -133,7 +131,8 @@ app.get('/tag/:tag/:id/:title', async (req, res) => {
 
     const thread = await discussions.getThread(id)
 
-    let title = '', description = ''
+    let title = '',
+        description = ''
 
     if (!thread) {
         title = 'Unable to find post'
