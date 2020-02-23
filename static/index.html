@@ -1,37 +1,44 @@
 <!DOCTYPE html>
 <html lang="en">
-    <head>
-        <meta charset="UTF-8" />
-        <meta
+<head>
+    <meta charset="UTF-8"/>
+    <meta
             name="viewport"
             content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"
-        />
-        <meta http-equiv="X-UA-Compatible" content="ie=edge" />
-        <title>Discussions App</title>
-        <link rel="icon" href="/favicon.ico" type="image/x-icon" />
-        <link rel="manifest" href="/manifest.json" />
-    </head>
-    <body>
-        <div id="app"></div>
+    />
+    <meta http-equiv="X-UA-Compatible" content="ie=edge"/>
+    <title>$OG_TITLE</title>
+    <meta name="description" content="$OG_DESCRIPTION"/>
+    <meta property="og:title" content="$OG_TITLE"/>
+    <meta property="og:description" content="$OG_DESCRIPTION"/>
+    <meta property="og:image" content="$OG_IMAGE"/>
+    <link rel="icon" href="/favicon.ico" type="image/x-icon"/>
+    <link rel="manifest" href="/manifest.json"/>
+</head>
+<body>
+<div id="app"></div>
+<script
+        async
+        src=https://www.googletagmanager.com/gtag/js?id=UA-152897893-1
+></script>
+<script async src=https://platform.twitter.com/widgets.js charSet="utf-8"></script>
+<script async src=https://imgur.com/min/embed.js charSet="utf-8"></script>
+<script async src=https://www.instagram.com/embed.js charSet="utf-8"></script>
+<script async src=https://w.soundcloud.com/player/api.js charSet="utf-8"></script>
+<script
+        async
+        src=https://connect.facebook.net/en_US/sdk.js#xfbml=1&version=v3.2
+        charSet="utf-8"
+></script>
+<script>
+    window.dataLayer = window.dataLayer || []
 
-        <script
-                async
-                src=https://www.googletagmanager.com/gtag/js?id=UA-152897893-1
-        ></script>
-        <script async src=https://platform.twitter.com/widgets.js charSet="utf-8"></script>
-        <script async src=https://imgur.com/min/embed.js charSet="utf-8"></script>
-        <script async src=https://www.instagram.com/embed.js charSet="utf-8"></script>
-        <script async src=https://w.soundcloud.com/player/api.js charSet="utf-8"></script>
-        <script
-                async
-                src=https://connect.facebook.net/en_US/sdk.js#xfbml=1&version=v3.2
-                charSet="utf-8"
-       ></script>
-        <script>
-            window.dataLayer = window.dataLayer || [];
-            function gtag(){dataLayer.push(arguments);}
-            gtag('js', new Date());
-            gtag('config', 'UA-152897893-1');
-       </script>
-    </body>
+    function gtag() {
+        dataLayer.push(arguments)
+    }
+
+    gtag('js', new Date())
+    gtag('config', 'UA-152897893-1')
+</script>
+</body>
 </html>

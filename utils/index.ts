@@ -12,7 +12,7 @@ const uuid = require('uuidv4')
 export * from './useScrollPosition'
 export * from './wrapper'
 export * from './useInterval'
-export *  from './mediaQueries'
+export * from './mediaQueries'
 
 export const INDEXER_NAME = '__LINKINDEXER__'
 export const LINK_LIMIT = 1000
@@ -20,6 +20,19 @@ export const isDev = process.env.NODE_ENV === 'development'
 export const isServer = typeof window === 'undefined'
 export const sleep = (milliseconds: number) => {
     return new Promise(resolve => setTimeout(resolve, milliseconds))
+}
+
+export const getSettings = async (host = window.location.host.toLowerCase()) => {
+    const { data: setting } = await axios.get(`${nsdb.api}/discussions/site`)
+    if (isDev) host = 'discussions.app'
+
+    let settings = setting[host]
+
+    if (typeof settings === 'undefined' || !settings) {
+        settings = setting['discussions.app']
+    }
+
+    return settings
 }
 
 export const getHostName = () => {
@@ -39,7 +52,7 @@ export const deleteAllCookies = () => {
         const cookie = cookies[i]
         const eqPos = cookie.indexOf('=')
         const name = eqPos > -1 ? cookie.substr(0, eqPos) : cookie
-        document.cookie = name + "=;expires=Thu, 01 Jan 1970 00:00:00 GMT";
+        document.cookie = name + '=;expires=Thu, 01 Jan 1970 00:00:00 GMT'
     }
 }
 
@@ -759,7 +772,7 @@ export const matchTipForTags = (content: string) => {
     let tips = []
 
     for (let result of results) {
-        const [,,amount,symbol,username,url] = result
+        const [, , amount, symbol, username, url] = result
 
         tips.push({
             amount,

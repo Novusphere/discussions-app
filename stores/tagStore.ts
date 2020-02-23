@@ -42,7 +42,7 @@ export class TagStore {
         }
     }
 
-    tagModelFromObservables = tagName => {
+    tagModelFromObservables = (tagName: string) => {
         if (tagName === '') return null
 
         if (this.tags.has(tagName)) {
