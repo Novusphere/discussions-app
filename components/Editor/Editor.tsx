@@ -219,8 +219,7 @@ class Editor extends React.Component<IEditorProps> {
                     const range = ref.getSelection()
                     const url = `${nsdb.api}/discussions/upload/image/${data.filename}`
 
-                    ref.insertText(range.index, url)
-
+                    ref.insertText(range.index, url, { link: url })
                     // Move the cursor past the image.
                     ref.setSelection(range.index + url.length)
                 } catch (error) {

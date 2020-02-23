@@ -9,7 +9,7 @@ import moment from 'moment'
 import mapSeries from 'async/mapSeries'
 // @ts-ignore
 import each from 'async/each'
-import { encodeId, getThreadTitle, sleep, getHostName, getOrigin } from '@utils'
+import { encodeId, getThreadTitle, getOrigin } from '@utils'
 
 export type BlockedContentSetting = 'hidden' | 'collapsed'
 
