@@ -33,7 +33,7 @@ const serveAndReplaceMeta = (res, { title, description, image }) => {
 app.get('/', (req, res) => {
     serveAndReplaceMeta(res, {
         title: 'Discussions App',
-        description: 'Welcome to Discussions App!',
+        description: res.settings.description || 'Welcome to Discussions App!',
         image: res.genericTagUrl,
     })
 })
