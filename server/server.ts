@@ -11,7 +11,7 @@ const filePath = path.resolve(`${process.cwd()}/dist/app.html`)
 app.use(express.static(path.join(process.cwd() + '/dist')))
 app.use(async (req, res, next) => {
     res.settings = await getSettings(req.hostname)
-    res.genericTagUrl = 'https://cdn.novusphere.io/static/atmos.svg'
+    res.genericTagUrl = res.settings.icon || 'https://cdn.novusphere.io/static/atmos.svg'
     next()
 })
 
