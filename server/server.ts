@@ -31,15 +31,6 @@ const serveAndReplaceMeta = (res, { title, description, image }) => {
     })
 }
 
-// Handles any requests that don't match the ones above
-app.get('/', (req, res) => {
-    serveAndReplaceMeta(res, {
-        title: 'Discussions App',
-        description: 'Welcome to Discussions App!',
-        image: res.genericTagUrl,
-    })
-})
-
 app.get('/all', (req, res) => {
     serveAndReplaceMeta(res, {
         title: '#all',
@@ -150,6 +141,16 @@ app.get('/tag/:tag/:id/:title', async (req, res) => {
         image: tagModel.icon,
     })
 })
+
+app.get('*', (req, res) => {
+    console.log(req)
+    serveAndReplaceMeta(res, {
+        title: 'Discussions App',
+        description: 'Welcome to Discussions App!',
+        image: res.genericTagUrl,
+    })
+})
+
 
 const port = process.env.PORT || 3000
 app.listen(port)
