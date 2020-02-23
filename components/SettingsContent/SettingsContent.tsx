@@ -82,8 +82,10 @@ const WatchedThreads = () => {
 
 const SettingsContent = () => {
     const { userStore }: RootStore = useStores()
-
-    const clearWatchedThreads = useCallback(() => userStore.following.clear(), [])
+    const clearWatchedThreads = useCallback(() => {
+        userStore.watching.clear()
+        userStore.syncDataFromLocalToServer()
+    }, [])
 
     return (
         <>
@@ -98,14 +100,19 @@ const SettingsContent = () => {
                         type={'danger'}
                         size={'small'}
                         key={'unblock'}
+                        disabled={!userStore.watching.size}
                         onClick={clearWatchedThreads}
                     >
                         unwatch all
                     </Button>
                 </span>
-                {useObserver(() => (
-                    <WatchedThreads />
-                ))}
+                {useObserver(() => {
+                    if (!userStore.watching.size) {
+                        return <span className={'f6 gray'}>You have no watched threads</span>
+                    }
+
+                    return <WatchedThreads />
+                })}
             </div>
         </>
     )
