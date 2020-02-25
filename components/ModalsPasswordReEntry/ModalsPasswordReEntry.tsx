@@ -5,7 +5,6 @@ import { observer } from 'mobx-react'
 import { Button, Form, Icon, Input, Modal, Result } from 'antd'
 import { hasErrors } from '@utils'
 import { RootStore, useStores } from '@stores'
-import { parseCookies } from 'nookies'
 import { discussions } from '@novuspherejs'
 
 interface IModalsPasswordReEntryProps {
@@ -44,7 +43,7 @@ const ModalsPasswordReEntry: FunctionComponent<IModalsPasswordReEntryProps> = ({
                 const { passwordRentry } = values
 
                 try {
-                    const { bk: cookieBk } = parseCookies(window)
+                    const { bk: cookieBk } = authStore
 
                     if (typeof cookieBk === 'undefined') {
                         throw new Error('No BK found')

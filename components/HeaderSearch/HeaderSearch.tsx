@@ -1,22 +1,21 @@
 import React, { FunctionComponent } from 'react'
 import { Input } from 'antd'
 import styles from './HeaderSearch.module.scss'
-import { useRouter } from 'next/router'
+import { useHistory } from 'react-router-dom'
 
 const { Search } = Input
 
 interface IHeaderSearchProps {}
 
 const HeaderSearch: FunctionComponent<IHeaderSearchProps> = () => {
-    const router = useRouter()
+    const history = useHistory()
 
     return (
         <Search
-            allowClear
             className={styles.search}
             size={'default'}
             placeholder={'Search on Discussions.app'}
-            onSearch={value => router.push('/search/[search]', `/search/${value}`)}
+            onSearch={value => history.push(`/search/${value}`)}
         />
     )
 }

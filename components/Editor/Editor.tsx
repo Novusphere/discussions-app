@@ -1,7 +1,6 @@
 import * as React from 'react'
 import { observer } from 'mobx-react'
 import sanitizeHTML from 'sanitize-html'
-import dynamic from 'next/dynamic'
 import axios from 'axios'
 import { nsdb } from '@novuspherejs'
 import { StoreContext } from '@stores'
@@ -32,13 +31,12 @@ class Editor extends React.Component<IEditorProps> {
         this.context = StoreContext
     }
 
-
     static defaultProps = {
         placeholder: 'Enter your reply',
         className: '',
         disabled: false,
         threadUsers: [],
-    }
+    } as any
 
     public turndownService: any
     public showdownService: any
@@ -85,12 +83,12 @@ class Editor extends React.Component<IEditorProps> {
 
         this.turndownService.addRule('h1', {
             filter: ['h1'],
-            replacement: content => `<p># ${content}</p>`
+            replacement: (content: any) => `<p># ${content}</p>`,
         })
 
         this.turndownService.addRule('h2', {
             filter: ['h2'],
-            replacement: content => `<p>## ${content}</p>`
+            replacement: (content: any) => `<p>## ${content}</p>`,
         })
 
         this.quillBase.Quill.register('modules/mention', Mention)
@@ -102,7 +100,7 @@ class Editor extends React.Component<IEditorProps> {
             mention: {
                 fixMentionsToQuill: true,
                 mentionDenotationChars: ['@'],
-                source: async (searchTerm, renderList, mentionChar) => {
+                source: async (searchTerm: string, renderList: any, mentionChar: any) => {
                     const accounts = this.props.threadUsers
 
                     if (searchTerm.length === 0) {
@@ -119,11 +117,11 @@ class Editor extends React.Component<IEditorProps> {
                         renderList(matches, searchTerm)
                     }
                 },
-                renderItem: item => {
+                renderItem: (item: { icon: any; id: any; value: any }) => {
                     const image = `<img width=20 height=20 src="${item.icon}" class="mention-list-icon" />`
                     return `<span class="mention-list-item" title={${item.id}}>${image} <span>${item.value}</span></span>`
                 },
-                onSelect: (item, insertItem) => {
+                onSelect: (item: any, insertItem: any) => {
                     item.value = `<a href=/u/${item.value}-${item.id}>@${item.value}</a>`
                     item.denotationChar = ''
                     return insertItem(item)
@@ -152,7 +150,7 @@ class Editor extends React.Component<IEditorProps> {
         }
     }
 
-    private updateContentByRef = content => {
+    private updateContentByRef = (content: any) => {
         if (this.ref && this.ref.current && typeof this.props.value !== 'undefined') {
             const editor = this.ref.current.getEditor()
             editor.pasteHTML(content)
@@ -221,8 +219,7 @@ class Editor extends React.Component<IEditorProps> {
                     const range = ref.getSelection()
                     const url = `${nsdb.api}/discussions/upload/image/${data.filename}`
 
-                    ref.insertText(range.index, url)
-
+                    ref.insertText(range.index, url, { link: url })
                     // Move the cursor past the image.
                     ref.setSelection(range.index + url.length)
                 } catch (error) {
@@ -242,18 +239,6 @@ class Editor extends React.Component<IEditorProps> {
 
         return (
             <>
-                <style global jsx>{`
-                    .ql-mention-list-item.selected {
-                        background: #eeeeee;
-                    }
-                    .ql-editor {
-                        font-size: 14px;
-                    }
-                    .ql-snow a {
-                        text-decoration: none !important;
-                        color: #079e99;
-                    }
-                `}</style>
                 <Editor
                     disabled={this.props.disabled}
                     classNames={cx([this.props.className, 'bg-white'])}
@@ -287,6 +272,4 @@ class Editor extends React.Component<IEditorProps> {
     }
 }
 
-export default dynamic(() => Promise.resolve(Editor), {
-    ssr: false,
-})
+export default Editor

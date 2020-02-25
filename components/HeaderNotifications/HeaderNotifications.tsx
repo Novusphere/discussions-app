@@ -6,9 +6,9 @@ import { useObserver, observer } from 'mobx-react-lite'
 import { RootStore, useStores } from '@stores'
 import { getIdenticon, useInterval } from '@utils'
 import { RichTextPreview } from '@components'
-import Link from 'next/link'
 import moment from 'moment'
 import cx from 'classnames'
+import { Link } from 'react-router-dom'
 
 interface IHeaderNotificationsProps {}
 
@@ -32,39 +32,38 @@ const NotificationContainer = () => {
             renderItem={(item, index) => {
                 return (
                     <List.Item className={styles.notificationItem}>
-                        <Link href={'/tag/[name]/[id]/[title]'} as={item['url']} shallow={false}>
-                            <a
-                                className={'dim w-100 relative'}
-                                onClick={() => userStore.deleteNotification(index)}
-                            >
-                                <List.Item.Meta
-                                    {...(item.pub && {
-                                        avatar: <Avatar src={getIdenticon(item.pub)} />,
-                                    })}
-                                    {...(item['tag'] && {
-                                        avatar: <Avatar src={item['tag']['logo']} />,
-                                    })}
-                                    title={
-                                        <span
-                                            className={
-                                                'w-100 flex flex-row items-center justify-between'
-                                            }
-                                        >
-                                            <span className={'gray b f6'}>{item.displayName}</span>
-                                            <span className={'light-silver f7'}>
-                                                {moment(item.createdAt).fromNow()}
-                                            </span>
+                        <Link
+                            to={item['url']}
+                            className={'dim w-100 relative'}
+                            onClick={() => userStore.deleteNotification(index)}
+                        >
+                            <List.Item.Meta
+                                {...(item.pub && {
+                                    avatar: <Avatar src={getIdenticon(item.pub)} />,
+                                })}
+                                {...(item['tag'] && {
+                                    avatar: <Avatar src={item['tag']['logo']} />,
+                                })}
+                                title={
+                                    <span
+                                        className={
+                                            'w-100 flex flex-row items-center justify-between'
+                                        }
+                                    >
+                                        <span className={'gray b f6'}>{item.displayName}</span>
+                                        <span className={'light-silver f7'}>
+                                            {moment(item.createdAt).fromNow()}
                                         </span>
-                                    }
-                                    description={
-                                        <div className={styles.contentContainer}>
-                                            <RichTextPreview className={'silver'}>
-                                                {item.content}
-                                            </RichTextPreview>
-                                        </div>
-                                    }
-                                />
-                            </a>
+                                    </span>
+                                }
+                                description={
+                                    <div className={styles.contentContainer}>
+                                        <RichTextPreview className={'silver'}>
+                                            {item.content}
+                                        </RichTextPreview>
+                                    </div>
+                                }
+                            />
                         </Link>
                     </List.Item>
                 )
@@ -87,15 +86,13 @@ const NotificationContainer = () => {
 }
 
 const HeaderNotifications: FunctionComponent<IHeaderNotificationsProps> = () => {
-    const { userStore, authStore }: RootStore = useStores()
+    const { userStore, authStore, walletStore }: RootStore = useStores()
 
     useInterval(
         () => {
             if (authStore.hasAccount) {
-                userStore.pingServerForData({
-                    postPriv: authStore.postPriv,
-                    postPub: authStore.postPub,
-                })
+                userStore.pingServerForData()
+                walletStore.refreshAllBalances()
             }
         },
         20000,

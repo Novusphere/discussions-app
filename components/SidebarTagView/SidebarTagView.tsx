@@ -1,21 +1,21 @@
 import React, { FunctionComponent } from 'react'
 
 import styles from './SidebarTagView.module.scss'
-import { useRouter } from 'next/router'
 import { useStores } from '@stores'
 import { Avatar, Button, Divider, Icon } from 'antd'
-import Link from 'next/link'
 import { observer } from 'mobx-react-lite'
+import { Link, useHistory, useLocation } from 'react-router-dom'
 
 interface ISidebarTagViewProps {}
 
 const SidebarTagView: FunctionComponent<ISidebarTagViewProps> = () => {
-    const router = useRouter()
-    const { tagStore } = useStores()
+    const { tagStore, userStore } = useStores()
+    const history = useHistory()
+    const location = useLocation()
 
-    if (router.pathname.indexOf('/tag/') !== -1) {
+    if (location.pathname.indexOf('/tag/') !== -1) {
         // get the name
-        let [, , tag] = router.asPath.split('/')
+        let [, , tag] = location.pathname.split('/')
         tag = tag.trim()
         const tagObj = tagStore.tagModelFromObservables(tag)
 
@@ -26,8 +26,8 @@ const SidebarTagView: FunctionComponent<ISidebarTagViewProps> = () => {
                         <Avatar src={tagObj.logo} size={'large'} />
                     </span>
                     <span>
-                        <Link href={'/tag/[name]'} as={`/tag/${tag}`}>
-                            <a className={'f5 black db'}>#{tag}</a>
+                        <Link to={`/tag/${tag}`}>
+                            <span className={'f5 black db'}>#{tag}</span>
                         </Link>
                         {typeof tagObj.memberCount !== 'undefined' && (
                             <span className={'f6 db gray'}>{tagObj.memberCount} members</span>
@@ -41,20 +41,18 @@ const SidebarTagView: FunctionComponent<ISidebarTagViewProps> = () => {
                     </>
                 )}
                 <div className={'mt3'}>
-                    <Button block onClick={() => tagStore.toggleSubscribe(tag)}>
+                    <Button
+                        block
+                        onClick={() => {
+                            tagStore.toggleSubscribe(tag)
+                            userStore.syncDataFromLocalToServer()
+                        }}
+                    >
                         {tagStore.subscribed.indexOf(tag) !== -1 ? 'Unsubscribe' : 'Subscribe'}
                     </Button>
                 </div>
                 <div className={'mt3'}>
-                    <Button
-                        block
-                        type={'primary'}
-                        onClick={() =>
-                            router.push(`/new?tag=${tag}`, `/new`, {
-                                shallow: true,
-                            })
-                        }
-                    >
+                    <Button block type={'primary'} onClick={() => history.push('/new')}>
                         Create Post
                     </Button>
                 </div>

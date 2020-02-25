@@ -3,7 +3,6 @@ import React, { FunctionComponent } from 'react'
 import styles from './Footer.module.scss'
 import { useObserver } from 'mobx-react-lite'
 import { getVersion } from '@utils'
-import dynamic from 'next/dynamic'
 
 interface IFooterProps {}
 
@@ -12,7 +11,7 @@ const Footer: FunctionComponent<IFooterProps> = () => {
         <>
             {useObserver(() => (
                 <p className={'b f6'}>
-                    Version: {getVersion()} ({(window as any).__NEXT_DATA__.buildId})
+                    Version: {getVersion()} (dev)
                 </p>
             ))}
             <p>
@@ -42,6 +41,4 @@ const Footer: FunctionComponent<IFooterProps> = () => {
 
 Footer.defaultProps = {}
 
-export default dynamic(() => Promise.resolve(Footer), {
-    ssr: false,
-})
+export default Footer

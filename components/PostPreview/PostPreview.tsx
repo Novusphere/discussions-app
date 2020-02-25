@@ -1,6 +1,5 @@
 import React, { FunctionComponent, useCallback, useEffect, useState } from 'react'
 import { Divider, Popover, Tooltip } from 'antd'
-import Link from 'next/link'
 import cx from 'classnames'
 import styles from './PostPreview.module.scss'
 import { observer, useLocalStore } from 'mobx-react-lite'
@@ -16,6 +15,7 @@ import {
     SharePostPopover,
     Icons,
 } from '@components'
+import { Link } from 'react-router-dom'
 
 interface IPostPreviewProps {
     post: Post
@@ -29,7 +29,7 @@ interface IPostPreviewProps {
     blockedUsers: ObservableMap<string, string>
     blockedByDelegation: ObservableMap<string, string>
     unsignedPostsIsSpam: boolean
-    toggleBlockPost: (url) => void
+    toggleBlockPost: (url: string) => void
 }
 
 const PostPreview: FunctionComponent<IPostPreviewProps> = ({
@@ -187,10 +187,6 @@ const PostPreview: FunctionComponent<IPostPreviewProps> = ({
     const shouldBeHidden = blockedContentSetting === 'hidden' && isSpam
     const shouldBeCollapsed = blockedContentSetting === 'collapsed' && isSpam
 
-    if (shouldBeHidden) {
-        return null
-    }
-
     const postIcon = useCallback((size = 25) => {
         if (!tag) return null
         return <img className={'db mr2'} src={tag.logo} title={`${tag.name} icon`} width={size} />
@@ -199,8 +195,8 @@ const PostPreview: FunctionComponent<IPostPreviewProps> = ({
     const postSub = useCallback(
         () => (
             <object className={'z-2'}>
-                <Link href={'/tag/[name]'} as={`/tag/${post.sub}`} shallow={false}>
-                    <a className={'b ttu dim'}>#{post.sub}</a>
+                <Link to={`/tag/${post.sub}`}>
+                    <span className={'b ttu dim'}>#{post.sub}</span>
                 </Link>
             </object>
         ),
@@ -250,14 +246,14 @@ const PostPreview: FunctionComponent<IPostPreviewProps> = ({
 
     const postTotalReplies = useCallback(
         () => (
-            <Link href={'/tag/[name]/[id]/[title]'} as={`${url}#comments`}>
-                <a className={'mr2 black'}>
+            <Link to={`${url}#comments`}>
+                <span className={'mr2 black'}>
                     <Icons.CommentIcon />
                     {post.totalReplies} comments
-                </a>
+                </span>
             </Link>
         ),
-        []
+        [url]
     )
 
     const postActions = useCallback(
@@ -278,21 +274,25 @@ const PostPreview: FunctionComponent<IPostPreviewProps> = ({
                         share
                     </a>
                 </Popover>
-                <Link href={'/tag/[name]/[id]/[title]'} as={`${url}#reply`}>
-                    <a className={'f6 mh2 black'}>reply</a>
-                </Link>
-                <a
-                    className={'f6 mh2 black'}
-                    onClick={e => {
-                        e.preventDefault()
-                        toggleBlockPost(url)
-                    }}
-                >
-                    mark as spam
-                </a>
+                {hasAccount && (
+                    <>
+                        <Link to={`${url}#reply`}>
+                            <span className={'f6 mh2 black'}>reply</span>
+                        </Link>
+                        <a
+                            className={'f6 mh2 black'}
+                            onClick={e => {
+                                e.preventDefault()
+                                toggleBlockPost(url)
+                            }}
+                        >
+                            mark as spam
+                        </a>
+                    </>
+                )}
             </>
         ),
-        []
+        [url, hasAccount]
     )
 
     const renderVotingHandles = (horizontal = false, props = {}) => {
@@ -311,9 +311,13 @@ const PostPreview: FunctionComponent<IPostPreviewProps> = ({
               )
     }
 
+    if (shouldBeHidden) {
+        return null
+    }
+
     return (
-        <Link href={'/tag/[name]/[id]/[title]'} as={url}>
-            <a
+        <Link to={url}>
+            <span
                 className={cx([
                     styles.postPreview,
                     'db bg-white mb0 mb2-ns w-100',
@@ -327,13 +331,7 @@ const PostPreview: FunctionComponent<IPostPreviewProps> = ({
                 }}
             >
                 <div className={'flex flex-row'}>
-                    <div
-                        className={
-                            'bg-light-gray w2 ph2 pv4 z-2'
-                        }
-                    >
-                        {renderVotingHandles()}
-                    </div>
+                    <div className={'bg-light-gray w2 ph2 pv4 z-2'}>{renderVotingHandles()}</div>
                     <div className={'flex flex-column bg-white pa2 pa4-ns'}>
                         {shouldBeCollapsed && (
                             <span className={'silver'}>This post was marked as spam.</span>
@@ -406,7 +404,7 @@ const PostPreview: FunctionComponent<IPostPreviewProps> = ({
                         )}
                     </div>
                 </div>
-            </a>
+            </span>
         </Link>
     )
 }

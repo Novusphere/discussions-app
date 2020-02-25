@@ -95,7 +95,10 @@ export class EOS {
     }
 
     get api(): Api {
-        if (this.wallet) return this.wallet.eosApi
+        if (this.wallet) {
+            // @ts-ignore
+            return this.wallet.eosApi
+        }
 
         if (this._api) return this._api
 

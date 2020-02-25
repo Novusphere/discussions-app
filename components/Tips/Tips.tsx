@@ -1,7 +1,6 @@
 import React, { FunctionComponent, useState } from 'react'
 
 import styles from './Tips.module.scss'
-import dynamic from 'next/dynamic'
 import { Badge } from 'antd'
 import { CSSTransition } from 'react-transition-group'
 import { Desktop, Mobile } from '@utils'
@@ -112,7 +111,4 @@ const Tips: FunctionComponent<ITipsProps> = ({ tips }) => {
 
 Tips.defaultProps = {}
 
-export default dynamic(() => Promise.resolve(Tips), {
-    ssr: false,
-    loading: () => <span>...</span>,
-})
+export default Tips

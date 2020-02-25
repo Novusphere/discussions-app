@@ -1,11 +1,16 @@
 import { action, computed, observable } from 'mobx'
 import { RootStore } from '@stores/index'
 import { persist } from 'mobx-persist'
+import { task } from 'mobx-task'
+import { nsdb } from '@novuspherejs'
 
 export class TagStore {
     @persist('list')
     @observable
     subscribed = observable.array([])
+
+    @observable
+    trendingTags: { tag: string }[] = []
 
     tags = observable.map<
         string,
@@ -25,6 +30,12 @@ export class TagStore {
         this.uiStore = rootStore.uiStore
     }
 
+    @task
+    fetchTrendingTags = async () => {
+        const tags = await nsdb.getTrendingsTags()
+        this.trendingTags = tags.payload.filter(({ tag }: { tag: string }) => tag !== 'tip')
+    }
+
     @computed get tagsWithoutBaseOptions() {
         return [...this.subscribed, 'all']
             .filter(tag => ['home', 'feed'].indexOf(tag) === -1)
@@ -42,7 +53,7 @@ export class TagStore {
         }
     }
 
-    tagModelFromObservables = tagName => {
+    tagModelFromObservables = (tagName: string) => {
         if (tagName === '') return null
 
         if (this.tags.has(tagName)) {

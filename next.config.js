@@ -13,7 +13,7 @@ const lessToJS = require('less-vars-to-js')
 const webpack = require('webpack')
 
 const themeVariables = lessToJS(
-    fs.readFileSync(path.resolve(__dirname, './assets/antd-custom.less'), 'utf8')
+    fs.readFileSync(path.resolve(__dirname, './assets/theme.less'), 'utf8')
 )
 
 module.exports = withBundleAnalyzer(

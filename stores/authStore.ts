@@ -1,28 +1,54 @@
-import { action, computed, observable } from 'mobx'
+import { action, observable } from 'mobx'
 import { SIGN_IN_OPTIONS } from '@globals'
 import { RootStore } from '@stores'
 import { bkToStatusJson } from '@utils'
 import { discussions, init, eos } from '@novuspherejs'
-import { parseCookies } from 'nookies'
-import Cookie from 'mobx-cookie'
 import { task } from 'mobx-task'
 import { notification } from 'antd'
+import { persist } from 'mobx-persist'
 
 export class AuthStore {
-    _hasAccountCookie = new Cookie('hasAccount')
-    _hasEOSWallet = new Cookie('hasEOSWallet')
-    _postPubKey = new Cookie('postPub')
-    _postPrivKey = new Cookie('postPriv')
-    _accountPrivKey = new Cookie('accountPrivKey')
-    _accountPubKey = new Cookie('accountPubKey')
-    _displayName = new Cookie('displayName')
-    _uidwWalletPubKey = new Cookie('uidWalletPubKey')
-    _bk = new Cookie('bk')
+    @persist('object')
+    @observable
+    bk: any = null
 
+    @persist
+    @observable
+    hasAccount = false
+
+    @persist
+    @observable
+    hasEOSWallet = false
+
+    @persist
+    @observable
+    displayName = ''
+
+    @persist
+    @observable
+    postPub = ''
+
+    @persist
+    @observable
+    uidwWalletPubKey = ''
+
+    @persist
+    @observable
+    accountPubKey = ''
+
+    @persist
     @observable
     preferredSignInMethod: SIGN_IN_OPTIONS = SIGN_IN_OPTIONS.brainKey
 
     @observable supportedTokensImages: { [symbol: string]: string } = {}
+
+    @persist
+    @observable
+    postPriv = ''
+
+    @persist
+    @observable
+    accountPrivKey = ''
 
     /**
      * Used in transaction payload
@@ -36,43 +62,8 @@ export class AuthStore {
 
     constructor(rootStore: RootStore) {}
 
-    @computed get hasAccount() {
-        return false
-        if (!this._hasAccountCookie.value) return false
-        return JSON.parse(this._hasAccountCookie.value)
-    }
-
-    @computed get hasEOSWallet() {
-        return false
-        return JSON.parse(this._hasEOSWallet.value)
-    }
-
-    @computed get displayName() {
-        return this._displayName.value
-    }
-
-    @computed get postPub() {
-        return this._postPubKey.value
-    }
-
-    @computed get postPriv() {
-        return this._postPrivKey.value
-    }
-
-    @computed get uidwWalletPubKey() {
-        return this._uidwWalletPubKey.value
-    }
-
-    @computed get accountPrivKey() {
-        return this._accountPrivKey.value
-    }
-
-    @computed get accountPubKey() {
-        return this._accountPubKey.value
-    }
-
     @action.bound
-    setTEMPPrivateKey = key => {
+    setTEMPPrivateKey = (key: string) => {
         this.TEMP_WalletPrivateKey = key
     }
 
@@ -85,8 +76,8 @@ export class AuthStore {
     private storeKeys = async (bk: string) => {
         try {
             const keys = await discussions.bkToKeys(bk)
-            this.setPostPrivCookie(keys.post.priv)
-            this.setUidWalletPubKeyCookie(keys.uidwallet.pub)
+            this.postPriv = keys.post.priv
+            this.setUidWalletKey(keys.uidwallet.pub)
             this.setAccountKey({ pub: keys.account.pub, priv: keys.account.priv })
             return keys
         } catch (error) {
@@ -100,62 +91,44 @@ export class AuthStore {
     }
 
     logOut = () => {
-        console.log('called')
-        this.setHasAccountCookie('false')
+        this.setHasAccount(false)
+        this.postPub = ''
+        this.postPriv = ''
+        this.accountPubKey = ''
+        this.accountPrivKey = ''
+        this.uidwWalletPubKey = ''
     }
 
-    setUidWalletPubKeyCookie = (value: string) => {
-        // refresh this key
-        this._uidwWalletPubKey = new Cookie('uidWalletPubKey')
-        this._uidwWalletPubKey.set(value)
+    setUidWalletKey = (value: string) => {
+        this.uidwWalletPubKey = value
     }
 
-    setPostPrivCookie = (value: string) => {
-        // refresh this key
-        this._postPrivKey = new Cookie('postPriv')
-        this._postPrivKey.set(value)
+    setAccountKey = ({ pub, priv }: { pub: string; priv: string }) => {
+        this.accountPrivKey = priv
+        this.accountPubKey = pub
     }
 
-    setAccountKey = ({ pub, priv }) => {
-        // refresh this key
-        this._accountPrivKey = new Cookie('accountPrivKey')
-        this._accountPrivKey.set(priv)
-
-        this._accountPubKey = new Cookie('accountPubKey')
-        this._accountPubKey.set(pub)
+    setHasAccount = (value: boolean) => {
+        this.hasAccount = value
     }
 
-    setHasAccountCookie = (value: string) => {
-        // refresh this key
-        this._hasAccountCookie = new Cookie('hasAccount')
-        this._hasAccountCookie.set(value)
+    setHasEOSWallet = (value: boolean) => {
+        this.hasEOSWallet = value
     }
 
-    setHasEOSWalletCookie = (value: string) => {
-        // refresh this key
-        this._hasEOSWallet = new Cookie('hasEOSWallet')
-        this._hasEOSWallet.set(value)
+    setBK = (value: string) => {
+        this.bk = value
     }
 
-    setBKCookie = (value: string) => {
-        // refresh this key
-        this._bk = new Cookie('bk')
-        this._bk.set(value)
+    setPostPub = (value: string) => {
+        this.postPub = value
     }
 
-    setPostPubCookie = (value: string) => {
-        // refresh this key
-        this._postPubKey = new Cookie('postPub')
-        this._postPubKey.set(value)
+    setDisplayName = (value: string) => {
+        this.displayName = value
     }
 
-    setDisplayNameCookie = (value: string) => {
-        // refresh this key
-        this._displayName = new Cookie('displayName')
-        this._displayName.set(value)
-    }
-
-    signInWithBK = async (brianKeyVerify, displayName, password) => {
+    signInWithBK = async (brianKeyVerify: string, displayName: string, password: string) => {
         try {
             const bkIsValid = discussions.bkIsValid(brianKeyVerify)
 
@@ -167,10 +140,10 @@ export class AuthStore {
 
             if (unparsedJSON) {
                 const statusJSON = JSON.parse(unparsedJSON)
-                this.setDisplayNameCookie(statusJSON.displayName)
-                this.setBKCookie(unparsedJSON)
-                this.setPostPubCookie(statusJSON.post)
-                this.setHasAccountCookie('true')
+                this.setDisplayName(statusJSON.displayName)
+                this.setBK(unparsedJSON)
+                this.setPostPub(statusJSON.post)
+                this.setHasAccount(true)
                 this.storeKeys(brianKeyVerify)
             }
         } catch (error) {
@@ -180,7 +153,7 @@ export class AuthStore {
 
     signInWithPassword = async (password: string) => {
         try {
-            const { bk } = parseCookies(window)
+            const { bk } = this
 
             if (typeof bk === 'undefined') {
                 throw new Error('No active BK found, please log in with another BK.')
@@ -220,7 +193,7 @@ export class AuthStore {
             if (hasEOSWallet) {
                 // disconnect
                 await eos.logout()
-                this.setHasEOSWalletCookie('false')
+                this.setHasEOSWallet(false)
                 notification.success({
                     message: 'Success',
                     description: 'You have disconnected your EOS wallet',
@@ -231,9 +204,9 @@ export class AuthStore {
                 if (wallet && wallet.connected) {
                     this.eosWalletDisplayName = wallet.auth.accountName
                     ;(wallet as any).connect()
-                    this.setHasEOSWalletCookie('true')
+                    this.setHasEOSWallet(true)
                 } else {
-                    this.setHasEOSWalletCookie('false')
+                    this.setHasEOSWallet(false)
                 }
             }
         } catch (error) {

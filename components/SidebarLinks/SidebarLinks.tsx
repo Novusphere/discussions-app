@@ -2,50 +2,44 @@ import React, { FunctionComponent } from 'react'
 
 import styles from './SidebarLinks.module.scss'
 import cx from 'classnames'
-import { useRouter } from 'next/router'
-import Link from 'next/link'
 import { Button, Divider, Icon, Input, Popover } from 'antd'
 import { useObserver } from 'mobx-react-lite'
 import { RootStore, useStores } from '@stores'
+import { Link, useLocation } from 'react-router-dom'
 
 interface ISidebarTopLevelLinksProps {}
 
 const SidebarLinks: FunctionComponent<ISidebarTopLevelLinksProps> = () => {
-    const router = useRouter()
+    const location = useLocation()
+
     const { tagStore, userStore, authStore }: RootStore = useStores()
 
-    const linkClassName = link =>
+    const linkClassName = (link: string) =>
         cx([
             'ph3 pv1',
             {
-                'bg-near-white': link === router.asPath,
+                'bg-near-white': link === location.pathname,
             },
         ])
 
     return (
-        <>
+        <div className={'bg-white list card mb3 pv3'}>
             <li className={linkClassName('/')} key="1">
-                <Link href={'/'} as={'/'}>
-                    <a>
-                        <Icon className={'pr2'} type="home" />
-                        Home
-                    </a>
+                <Link to={'/'}>
+                    <Icon className={'pr2'} type="home" />
+                    Home
                 </Link>
             </li>
             <li className={linkClassName('/feed')} key="2">
-                <Link href={'/feed'} as={'/feed'}>
-                    <a>
-                        <Icon className={'pr2'} type="team" />
-                        Feed
-                    </a>
+                <Link to={'/feed'}>
+                    <Icon className={'pr2'} type="team" />
+                    Feed
                 </Link>
             </li>
             <li className={linkClassName('/all')} key="3">
-                <Link href={'/all'} as={'/all'}>
-                    <a>
-                        <Icon className={'pr2'} type="read" />
-                        All
-                    </a>
+                <Link to={'/all'}>
+                    <Icon className={'pr2'} type="read" />
+                    All
                 </Link>
             </li>
             {useObserver(() => {
@@ -58,9 +52,7 @@ const SidebarLinks: FunctionComponent<ISidebarTopLevelLinksProps> = () => {
                                 const as = `/tags/${tags.join(',')}`
                                 return (
                                     <li className={cx(['ph3 pv1'])} key={_name}>
-                                        <Link href={`/tags/[tags]`} as={as} shallow={false}>
-                                            <a>{name}</a>
-                                        </Link>
+                                        <Link to={as}>{name}</Link>
                                     </li>
                                 )
                             })}
@@ -82,14 +74,14 @@ const SidebarLinks: FunctionComponent<ISidebarTopLevelLinksProps> = () => {
                     }}
                 />
             </div>
-            {![...tagStore.subscribed.toJS()].length && <span className={'f6 light-silver ph3'}>Add a #tag to see more posts!</span>}
+            {![...tagStore.subscribed.toJS()].length && (
+                <span className={'f6 light-silver ph3'}>Add a #tag to see more posts!</span>
+            )}
             {useObserver(() => (
                 <div className={'mt3 db'}>
                     {[...tagStore.subscribed.toJS()].map(subscribed => {
                         const tag: any = tagStore.tagModelFromObservables(subscribed)
-
                         if (!tag) return null
-
                         return (
                             <li key={subscribed} className={linkClassName(`/tag/${tag.name}`)}>
                                 <Popover
@@ -109,13 +101,10 @@ const SidebarLinks: FunctionComponent<ISidebarTopLevelLinksProps> = () => {
                                                     />
                                                     <span className={'ml3 dib'}>
                                                         <span className={'b db'}>
-                                                            <Link
-                                                                href={'/tag/[name]'}
-                                                                as={`/tag/${subscribed}`}
-                                                            >
-                                                                <a className={'f5 black db'}>
+                                                            <Link to={`/tag/${subscribed}`}>
+                                                                <span className={'f5 black db'}>
                                                                     #{subscribed}
-                                                                </a>
+                                                                </span>
                                                             </Link>
                                                         </span>
                                                         {typeof tag.memberCount !== 'undefined' && (
@@ -150,30 +139,24 @@ const SidebarLinks: FunctionComponent<ISidebarTopLevelLinksProps> = () => {
                                     placement={'right'}
                                     overlayClassName={styles.tagOverlay}
                                 >
-                                    <span>
-                                        <Link
-                                            href={`/tag/[name]`}
-                                            as={`/tag/${subscribed}`}
-                                            shallow={false}
-                                        >
-                                            <a className={'dib'}>
-                                                <img
-                                                    className={'dib'}
-                                                    src={tag.logo}
-                                                    alt={`${subscribed} icon`}
-                                                    width={25}
-                                                />
-                                                <span className={'dib mh2'}>#{subscribed}</span>
-                                            </a>
-                                        </Link>
-                                    </span>
+                                    <Link to={`/tag/${subscribed}`}>
+                                        <span className={'dib'}>
+                                            <img
+                                                className={'dib'}
+                                                src={tag.logo}
+                                                alt={`${subscribed} icon`}
+                                                width={25}
+                                            />
+                                            <span className={'dib mh2'}>#{subscribed}</span>
+                                        </span>
+                                    </Link>
                                 </Popover>
                             </li>
                         )
                     })}
                 </div>
             ))}
-        </>
+        </div>
     )
 }
 

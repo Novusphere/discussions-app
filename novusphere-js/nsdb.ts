@@ -1,6 +1,6 @@
 import axios from 'axios'
-import { ApiGetUnifiedId } from 'interfaces/ApiGet-UnifiedId'
-import { isDev } from '@utils'
+import { ApiGetUnifiedId } from '../interfaces/ApiGet-UnifiedId'
+import { getHostName, isDev, getOrigin } from '@utils'
 const ecc = require('eosjs-ecc')
 export const DEFAULT_NSDB_ENDPOINT = 'https://atmosdb.novusphere.io'
 
@@ -23,6 +23,15 @@ export class NSDB {
         this.api = apiEndpoint
     }
 
+    async getTrendingsTags(): Promise<any> {
+        try {
+            const { data } = await axios.get(`${this.api}/discussions/search/trendingtags`)
+            return data
+        } catch(error) {
+            throw error
+        }
+    }
+
     async getSupportedTokensForUnifiedWallet(): Promise<ApiGetUnifiedId> {
         try {
             const { data } = await axios.get<ApiGetUnifiedId>(`${this.api}/unifiedid/p2k`)
@@ -35,18 +44,12 @@ export class NSDB {
     async getAccount({
         accountPrivateKey,
         accountPublicKey,
-    }) {
+    }: any) {
         const time = new Date().getTime()
-        let domain = window.location.origin
-
-        if (isDev) {
-            domain = 'https://beta.discussions.app'
-        }
-
-        const sig = ecc.sign(ecc.sha256(`${domain}-${time}`), accountPrivateKey)
+        const sig = ecc.sign(ecc.sha256(`${getOrigin()}-${time}`), accountPrivateKey)
         const pub = accountPublicKey
 
-        const qs = `pub=${pub}&sig=${sig}&time=${time}&domain=${domain}`
+        const qs = `pub=${pub}&sig=${sig}&time=${time}&domain=${getOrigin()}`
         const rurl = `${this.api}/account/data`
 
         const { data } = await axios.post(rurl, qs)
@@ -63,17 +66,12 @@ export class NSDB {
         accountPrivateKey,
         accountPublicKey,
         accountData,
-    }) {
+    }: any) {
         const jsonData = JSON.stringify(accountData)
         const sig = ecc.sign(ecc.sha256(jsonData), accountPrivateKey)
         const pub = accountPublicKey
-        let domain = window.location.origin
 
-        if (isDev) {
-            domain = 'https://beta.discussions.app'
-        }
-
-        const qs = `pub=${pub}&sig=${sig}&data=${encodeURIComponent(jsonData)}&domain=${domain}`
+        const qs = `pub=${pub}&sig=${sig}&data=${encodeURIComponent(jsonData)}&domain=${getOrigin()}`
         const rurl = `${this.api}/account/save`
 
         const { data } = await axios.post(rurl, qs)

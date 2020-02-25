@@ -1,9 +1,9 @@
+import * as React from 'react'
 import { useStaticRendering } from 'mobx-react'
 import { isServer } from '@utils'
 import { AuthStore } from '@stores/authStore'
 import { createContext, useContext } from 'react'
 import { UIStore } from '@stores/uiStore'
-import { set } from 'mobx'
 import { TagStore } from '@stores/tagStore'
 import { PostsStore } from '@stores/postsStore'
 import { UserStore } from '@stores/userStore'
@@ -13,7 +13,7 @@ import { WalletStore } from '@stores/walletStore'
 
 useStaticRendering(isServer)
 
-export const hydrate = storage =>
+export const hydrate = (storage: Storage) =>
     create({
         storage: storage,
         jsonify: true,
@@ -27,46 +27,18 @@ export class RootStore {
     walletStore = new WalletStore(this)
     postsStore = new PostsStore(this)
     settingStore = new SettingsStore(this)
-
-    hydrate({ authStore, postsStore, tagStore, uiStore, userStore, settingStore, walletStore }) {
-        if (authStore) {
-            set(this.authStore, authStore)
-        }
-
-        if (postsStore) {
-            set(this.postsStore, postsStore)
-        }
-
-        if (userStore) {
-            this.userStore.hydrate(userStore)
-        }
-
-        if (uiStore) {
-            set(this.uiStore, uiStore)
-        }
-    }
 }
 
 const StoreContext = createContext<any | null>(null)
 
-let rootStore: any = {}
-
-function initializeStore(data = rootStore || {}) {
+function initializeStore() {
     const stores = new RootStore()
-
-    stores.hydrate({
-        authStore: data.authStore,
-        postsStore: data.postsStore,
-        tagStore: data.tagStore,
-        uiStore: data.uiStore,
-        walletStore: data.walletStore,
-        userStore: data.userStore ? data.userStore : {},
-        settingStore: data.settingStore ? data.settingStore : {},
-    })
 
     if (isServer) {
         return stores
     }
+
+    let rootStore = {}
 
     if (!Object.keys(rootStore).length) {
         rootStore = stores
@@ -75,6 +47,7 @@ function initializeStore(data = rootStore || {}) {
             userStore: stores.userStore,
             tagStore: stores.tagStore,
             walletStore: stores.walletStore,
+            authStore: stores.authStore,
         }
 
         Object.keys(hydr).forEach(store => {
@@ -85,8 +58,8 @@ function initializeStore(data = rootStore || {}) {
     return rootStore
 }
 
-function InjectStoreContext({ children, initialData }) {
-    const store = initializeStore(initialData)
+function InjectStoreContext({ children, initialData }: any) {
+    const store = initializeStore()
     return <StoreContext.Provider value={store}>{children}</StoreContext.Provider>
 }
 

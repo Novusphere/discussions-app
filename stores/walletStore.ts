@@ -1,6 +1,6 @@
 import { RootStore } from '@stores/index'
 import { persist } from 'mobx-persist'
-import { computed, observable } from 'mobx'
+import { computed, observable, action } from 'mobx'
 import { eos, nsdb } from '@novuspherejs'
 import { isServer, sleep } from '@utils'
 import { ApiGetUnifiedId } from '../interfaces/ApiGet-UnifiedId'
@@ -70,7 +70,9 @@ export class WalletStore {
         }
     }
 
-    refreshAllBalances = task.resolved(async () => {
+    @task.resolved
+    @action.bound
+    async refreshAllBalances() {
         try {
             await this.supportedTokensForUnifiedWallet.map(async datum => {
                 await this.fetchBalanceForSelectedToken(datum)
@@ -78,7 +80,7 @@ export class WalletStore {
         } catch (error) {
             throw error
         }
-    })
+    }
 
     fetchBalanceForSelectedToken = async (token = this.selectedToken) => {
         try {

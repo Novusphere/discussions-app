@@ -1,18 +1,13 @@
-import React, { FunctionComponent, useCallback, useEffect } from 'react'
-import { Alert, Layout as AntdLayout, message, notification } from 'antd'
+import React, { FunctionComponent, useEffect } from 'react'
+import { Layout as AntdLayout, message, notification } from 'antd'
 import styles from './Layout.module.scss'
 import {
-    HeaderLoggedOut,
-    HeaderLogo,
-    HeaderNewPost,
-    HeaderNotifications,
-    HeaderSearch,
-    HeaderUserBar,
     Modals,
     SidebarTagView,
     SidebarLinks,
     Footer,
     Header,
+    SidebarTrendingTags,
 } from '@components'
 import { useObserver } from 'mobx-react-lite'
 import cx from 'classnames'
@@ -45,6 +40,7 @@ const Layout: FunctionComponent<ILayoutProps> = ({ children }) => {
                 protocol: 'https',
                 chainId: 'aca376f206b8fc25a6ed44dbdc66547c36c6c33e3a119ffbeaef943642f0e906',
             })
+
             walletStore.setTokens(eos.tokens)
             walletStore.getSupportedTokensForUnifiedWallet()
         })
@@ -56,46 +52,6 @@ const Layout: FunctionComponent<ILayoutProps> = ({ children }) => {
 
     return (
         <AntdLayout className={'overflow-x-hidden'}>
-            <style jsx global>{`
-                .ql-toolbar.ql-snow {
-                    border: 1px solid #d9d9d9;
-                    background: white;
-                    border-top-left-radius: 5px;
-                    border-top-right-radius: 5px;
-                }
-
-                .ql-container.ql-snow {
-                    border: 1px solid #d9d9d9;
-                    background: white;
-                    border-bottom-left-radius: 5px;
-                    border-bottom-right-radius: 5px;
-                }
-
-                .primary {
-                    color: #079e99;
-                }
-
-                .b--primary {
-                    color: #079e99;
-                }
-
-                .bg-primary {
-                    background-color: #079e99;
-                }
-
-                .card {
-                    border-radius: 3px;
-                    box-shadow: 0 1px 2px #c9cccd;
-                }
-
-                .ant-form-explain {
-                    white-space: pre-line;
-                }
-
-                .twitter-tweet {
-                    margin: 0 auto;
-                }
-            `}</style>
             <Modals />
             <AntdLayoutHeader className={cx([styles.header, 'container bb b--light-gray'])}>
                 <Header />
@@ -107,17 +63,17 @@ const Layout: FunctionComponent<ILayoutProps> = ({ children }) => {
                     alt={'Active banner image'}
                 />
             </span>
-            <Alert
-                message={'Alert'}
-                description={'Sign in has been disabled temporarily.'}
-                type={'warning'}
-                showIcon
-            />
+            {/*<Alert*/}
+            {/*    message={'Alert'}*/}
+            {/*    description={'Sign in has been disabled temporarily.'}*/}
+            {/*    type={'warning'}*/}
+            {/*    showIcon*/}
+            {/*/>*/}
             <div className={cx([styles.content, styles.container, 'center flex pa0 pa3-ns'])}>
                 {useObserver(() => (
                     <div
                         className={cx([
-                            'fl w-30 vh-100 ph2',
+                            'fl w-30 h-100 ph2',
                             {
                                 dn: uiStore.hideSidebar,
                                 'dn db-ns': !uiStore.hideSidebar,
@@ -125,10 +81,8 @@ const Layout: FunctionComponent<ILayoutProps> = ({ children }) => {
                         ])}
                     >
                         <SidebarTagView />
-
-                        <div className={'bg-white list pv2 card'}>
-                            <SidebarLinks />
-                        </div>
+                        <SidebarLinks />
+                        <SidebarTrendingTags />
                     </div>
                 ))}
 

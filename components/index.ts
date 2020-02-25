@@ -13,6 +13,7 @@ export { default as UserBalances } from './UserBalances/UserBalances'
 export { default as ReplyingPostPreview } from './ReplyingPostPreview/ReplyingPostPreview'
 export { default as SidebarTagView } from './SidebarTagView/SidebarTagView'
 export { default as SidebarLinks } from './SidebarLinks/SidebarLinks'
+export { default as SidebarTrendingTags } from './SidebarTrendingTags/SidebarTrendingTags'
 export { default as Footer } from './Footer/Footer'
 
 // header
@@ -38,3 +39,4 @@ export { default as SettingsBlocked } from './SettingsBlocked/SettingsBlocked'
 export { default as SettingsConnections } from './SettingsConnections/SettingsConnections'
 export { default as SettingsModeration } from './SettingsModeration/SettingsModeration'
 export { default as SettingsWallet } from './SettingsWallet/SettingsWallet'
+export { default as SettingsContent } from './SettingsContent/SettingsContent'

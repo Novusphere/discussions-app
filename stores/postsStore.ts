@@ -2,13 +2,14 @@ import { observable } from 'mobx'
 import { RootStore } from '@stores/index'
 import { discussions, Post, Thread } from '@novuspherejs'
 import _ from 'lodash'
+import { task } from 'mobx-task';
 
 export class PostsStore {
     @observable
     posts: Post[] = []
 
     @observable
-    postsPosition = {
+    postsPosition: { cursorId: number | undefined; items: number } = {
         cursorId: undefined,
         items: 0,
     }
@@ -31,9 +32,9 @@ export class PostsStore {
      * For fetching posts inside a tag, home page or all.
      * @param key
      * @param {string[]} tagNames
-     * @param pinnedPostsBuffer - a Base64 version of { }asPathURL, tagName }
+     * @param {asPathURL, tagName[]} pinnedPosts
      */
-    fetchPostsForTag = async (key = '', tagNames, pinnedPostsBuffer = '') => {
+    fetchPostsForTag = async (key = '', tagNames: string[], pinnedPosts: any[] = []) => {
         try {
             if (!tagNames || !tagNames.length) tagNames = ['all']
 
@@ -45,28 +46,22 @@ export class PostsStore {
                 key
             )
 
-            let pinnedPosts = []
+            let _pinnedPosts: any[] = []
 
             // get pinned posts to put at the front
-            if (!this.postsPosition.cursorId && pinnedPostsBuffer) {
-                // convert b64 back to obj
-                const pinnedPostsAsObj = JSON.parse(
-                    Buffer.from(pinnedPostsBuffer, 'base64').toString('ascii')
-                )
-
+            if (!this.postsPosition.cursorId && pinnedPosts.length) {
                 await Promise.all(
-                    _.map(pinnedPostsAsObj, async (name, url: string) => {
+                    _.map(pinnedPosts, async ([url, name]) => {
                         if (tagNames[0] === name) {
                             const post = await discussions.getPostsByAsPathURL(url, key)
                             post.pinned = true
-                            // this.posts.push(post)
-                            pinnedPosts.push(post)
+                            _pinnedPosts.push(post)
                         }
                     })
                 )
             }
 
-            this.posts = [...pinnedPosts, ...this.posts, ...posts]
+            this.posts = [..._pinnedPosts, ...this.posts, ...posts]
 
             this.postsPosition = {
                 items: this.posts.length,
@@ -78,6 +73,7 @@ export class PostsStore {
                 position: this.postsPosition,
             }
         } catch (error) {
+            console.error(error);
             return error
         }
     }
@@ -87,7 +83,8 @@ export class PostsStore {
      * @param {string} key - the users post pub
      * @param {string[]} keys - the post pubs of users whose posts you want to return
      */
-    getPostsForKeys = async (key = '', keys = []) => {
+    @task
+    getPostsForKeys = async (key = '', keys: string[] = []) => {
         try {
             if (!keys.length) {
                 keys = [...this.userStore.following.keys()]
