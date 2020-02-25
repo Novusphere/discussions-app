@@ -31,19 +31,19 @@ const RtLink: FunctionComponent<any> = ({ children, href, index }) => {
                         embed = `<iframe width="560px" height="315px" src="https://www.bitchute.com/embed/${id}" frameborder="0" />`
                         break
                     case /https?:\/\/www.youtube.com\/watch\?feature=(.*?)&v=[a-zA-Z0-9-_]+/.test(
-                        href,
+                        href
                     ):
                     case /https?:\/\/www.youtube.com\/watch\?v=[a-zA-Z0-9-_]+/.test(href):
                     case /https?:\/\/youtu.be\/[a-zA-Z0-9-_]+/.test(href):
                         embed = await nsdb.cors(
                             `https://www.youtube.com/oembed?format=json&url=${href.replace(
                                 /feature=(.*?)&/,
-                                '',
-                            )}`,
+                                ''
+                            )}`
                         )
                         break
                     case /https?:\/\/www.imgur.com(\/[a-zA-Z0-9-_]+)?\/p\/[a-zA-Z0-9-_]+(\/?.+)?/.test(
-                        href,
+                        href
                     ):
                         embed = await nsdb.cors(`https://api.imgur.com/oembed.json?url=${href}`)
                         break
@@ -55,20 +55,20 @@ const RtLink: FunctionComponent<any> = ({ children, href, index }) => {
                         break
                     case /soundcloud/.test(href):
                         embed = await nsdb.cors(
-                            `https://soundcloud.com/oembed?format=json&url=${href}`,
+                            `https://soundcloud.com/oembed?format=json&url=${href}`
                         )
                         break
                     case /https?:\/\/www.instagr.am(\/[a-zA-Z0-9-_]+)?\/p\/[a-zA-Z0-9-_]+(\/?.+)?/.test(
-                        href,
+                        href
                     ):
                     case /https?:\/\/www.instagram.com(\/[a-zA-Z0-9-_]+)?\/p\/[a-zA-Z0-9-_]+(\/?.+)?/i.test(
-                        href,
+                        href
                     ):
                         embed = await nsdb.cors(`https://api.instagram.com/oembed/?url=${href}`)
                         break
                     case /https?:\/\/(www.)?tradingview.com\/x\//.test(href):
                     case /(.|)http[s]?:\/\/(\w|[:\/.%-])+\.(png|jpg|jpeg|gif)(\?(\w|[:\/.%-])+)?(.|)/.test(
-                        href,
+                        href
                     ):
                         // embed = `<img src="${href}" alt="Viewing image" />`
                         embed = {
@@ -79,7 +79,7 @@ const RtLink: FunctionComponent<any> = ({ children, href, index }) => {
                                     onClick={() => openInNewTab(href)}
                                     title={'Open image in new tab'}
                                 >
-                                    <LazyLoadImage alt={'Viewing image'} src={href} effect="blur"/>
+                                    <LazyLoadImage alt={'Viewing image'} src={href} effect="blur" />
                                 </a>
                             ),
                         }
@@ -115,12 +115,6 @@ const RtLink: FunctionComponent<any> = ({ children, href, index }) => {
             }
         })
 
-        return () => {
-            notDone = false
-        }
-    }, [])
-
-    useEffect(() => {
         let timeout: any = null
 
         async function refreshIFrames() {
@@ -151,11 +145,15 @@ const RtLink: FunctionComponent<any> = ({ children, href, index }) => {
         }, 250)
 
         return () => {
+            notDone = false
+
             if (timeout) {
                 clearTimeout(timeout)
             }
         }
     }, [])
+
+    useEffect(() => {}, [])
 
     if (!getEmbed || index > LINK_LIMIT) {
         return (
@@ -181,10 +179,10 @@ const RtLink: FunctionComponent<any> = ({ children, href, index }) => {
 }
 
 const RichTextPreview: FunctionComponent<IRichTextPreviewProps> = ({
-                                                                       hideFade,
-                                                                       children,
-                                                                       className,
-                                                                   }) => {
+    hideFade,
+    children,
+    className,
+}) => {
     const renderMarkdown = useCallback(
         () => (
             <Markdown
@@ -214,7 +212,7 @@ const RichTextPreview: FunctionComponent<IRichTextPreviewProps> = ({
                 {children}
             </Markdown>
         ),
-        [],
+        []
     )
 
     return (
