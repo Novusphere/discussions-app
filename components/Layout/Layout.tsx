@@ -1,7 +1,14 @@
 import React, { FunctionComponent, useEffect } from 'react'
 import { Layout as AntdLayout, message, notification } from 'antd'
 import styles from './Layout.module.scss'
-import { Modals, SidebarTagView, SidebarLinks, Footer, Header } from '@components'
+import {
+    Modals,
+    SidebarTagView,
+    SidebarLinks,
+    Footer,
+    Header,
+    SidebarTrendingTags,
+} from '@components'
 import { useObserver } from 'mobx-react-lite'
 import cx from 'classnames'
 import { RootStore, useStores } from '@stores'
@@ -33,6 +40,7 @@ const Layout: FunctionComponent<ILayoutProps> = ({ children }) => {
                 protocol: 'https',
                 chainId: 'aca376f206b8fc25a6ed44dbdc66547c36c6c33e3a119ffbeaef943642f0e906',
             })
+
             walletStore.setTokens(eos.tokens)
             walletStore.getSupportedTokensForUnifiedWallet()
         })
@@ -73,10 +81,8 @@ const Layout: FunctionComponent<ILayoutProps> = ({ children }) => {
                         ])}
                     >
                         <SidebarTagView />
-
-                        <div className={'bg-white list pv2 card'}>
-                            <SidebarLinks />
-                        </div>
+                        <SidebarLinks />
+                        <SidebarTrendingTags />
                     </div>
                 ))}
 

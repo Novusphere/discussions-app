@@ -23,6 +23,15 @@ export class NSDB {
         this.api = apiEndpoint
     }
 
+    async getTrendingsTags(): Promise<any> {
+        try {
+            const { data } = await axios.get(`${this.api}/discussions/search/trendingtags`)
+            return data
+        } catch(error) {
+            throw error
+        }
+    }
+
     async getSupportedTokensForUnifiedWallet(): Promise<ApiGetUnifiedId> {
         try {
             const { data } = await axios.get<ApiGetUnifiedId>(`${this.api}/unifiedid/p2k`)

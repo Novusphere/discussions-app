@@ -5,12 +5,11 @@ import cx from 'classnames'
 import { Button, Divider, Icon, Input, Popover } from 'antd'
 import { useObserver } from 'mobx-react-lite'
 import { RootStore, useStores } from '@stores'
-import { Link, useHistory, useLocation } from 'react-router-dom'
+import { Link, useLocation } from 'react-router-dom'
 
 interface ISidebarTopLevelLinksProps {}
 
 const SidebarLinks: FunctionComponent<ISidebarTopLevelLinksProps> = () => {
-    const history = useHistory()
     const location = useLocation()
 
     const { tagStore, userStore, authStore }: RootStore = useStores()
@@ -24,7 +23,7 @@ const SidebarLinks: FunctionComponent<ISidebarTopLevelLinksProps> = () => {
         ])
 
     return (
-        <>
+        <div className={'bg-white list card mb3 pv3'}>
             <li className={linkClassName('/')} key="1">
                 <Link to={'/'}>
                     <Icon className={'pr2'} type="home" />
@@ -82,9 +81,7 @@ const SidebarLinks: FunctionComponent<ISidebarTopLevelLinksProps> = () => {
                 <div className={'mt3 db'}>
                     {[...tagStore.subscribed.toJS()].map(subscribed => {
                         const tag: any = tagStore.tagModelFromObservables(subscribed)
-
                         if (!tag) return null
-
                         return (
                             <li key={subscribed} className={linkClassName(`/tag/${tag.name}`)}>
                                 <Popover
@@ -159,7 +156,7 @@ const SidebarLinks: FunctionComponent<ISidebarTopLevelLinksProps> = () => {
                     })}
                 </div>
             ))}
-        </>
+        </div>
     )
 }
 
