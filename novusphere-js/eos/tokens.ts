@@ -1,7 +1,5 @@
 import { nsdb } from '@novuspherejs'
 
-const fetch = require('node-fetch')
-
 export interface IToken {
     name: string
     logo: string
