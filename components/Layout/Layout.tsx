@@ -73,7 +73,7 @@ const Layout: FunctionComponent<ILayoutProps> = ({ children }) => {
                 {useObserver(() => (
                     <div
                         className={cx([
-                            'fl w-30 vh-100 ph2',
+                            'fl w-30 h-100 ph2',
                             {
                                 dn: uiStore.hideSidebar,
                                 'dn db-ns': !uiStore.hideSidebar,
