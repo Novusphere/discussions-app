@@ -126,7 +126,7 @@ app.get('/tag/:tag', (req, res) => {
 
     serveAndReplaceMeta(res, {
         title: `#${tag}`,
-        description: tagModel.desc,
+        description: tagModel.desc || res.settings.description,
         image: tagModel.icon,
     })
 })
