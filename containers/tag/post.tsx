@@ -33,7 +33,6 @@ import { Link, useLocation, useParams } from 'react-router-dom'
 
 import { animateScroll, scroller } from 'react-scroll'
 
-
 interface IPostPageProps {
     thread: Thread
     url: string
@@ -794,18 +793,28 @@ const PostPage: React.FC = () => {
     const { postsStore, authStore }: RootStore = useStores()
     const query: any = useParams()
     const [thread, setThread] = useState(null)
+    const [loading, setLoading] = useState(false)
     const [url, setUrl] = useState('')
     const fetchThread = useCallback(() => {
-        postsStore.getThreadById(query.id, authStore.postPub).then(thread => {
-            setThread(thread)
-            getThreadUrl(thread.openingPost).then((url: string) => setUrl(url))
-        })
+        setLoading(true)
+        postsStore
+            .getThreadById(query.id, authStore.postPub)
+            .then(thread => {
+                setThread(thread)
+                getThreadUrl(thread.openingPost).then((url: string) => setUrl(url))
+                setLoading(false)
+            })
+            .catch(() => {
+                setLoading(false)
+                setThread(null)
+            })
     }, [query.id])
 
     useEffect(() => {
         fetchThread()
     }, [query.id])
 
+    if (loading) return <Icon type="loading" />
 
     if (!thread) return <Empty description={'This is not the thread you were looking for...'} />
 
