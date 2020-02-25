@@ -423,15 +423,16 @@ export class UserStore {
     syncDataFromLocalToServer = async () => {
         try {
             const following = [...this.following.toJS()].map(([pub, name]) => ({
-                pub,
+                pub,playName
                 name,
             }))
 
             // we have to send the entire payload, not just the diff
-            const { uidwWalletPubKey, accountPrivKey, accountPubKey, postPub } = this.authStore
+            const { uidwWalletPubKey, accountPrivKey, accountPubKey, postPub, displayName } = this.authStore
 
             const dataToSync = {
                 uidw: uidwWalletPubKey,
+                displayName: displayName,
                 postPub: postPub,
                 legacy: false, // override
                 lastCheckedNotifications: this.lastCheckedNotifications,
