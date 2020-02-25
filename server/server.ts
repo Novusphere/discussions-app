@@ -22,8 +22,8 @@ const serveAndReplaceMeta = (res, { title, description, image }) => {
         }
 
         const result = data
-            .replace(/\$OG_TITLE/g, encodeURI(title))
-            .replace(/\$OG_DESCRIPTION/g, encodeURI(description))
+            .replace(/\$OG_TITLE/g, title)
+            .replace(/\$OG_DESCRIPTION/g, description)
             .replace(/\$OG_IMAGE/g, image)
 
         res.send(result)
