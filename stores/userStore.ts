@@ -423,7 +423,7 @@ export class UserStore {
     syncDataFromLocalToServer = async () => {
         try {
             const following = [...this.following.toJS()].map(([pub, name]) => ({
-                pub,playName
+                pub,
                 name,
             }))
 
