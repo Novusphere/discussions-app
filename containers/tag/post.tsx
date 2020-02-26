@@ -423,6 +423,7 @@ const PostPageComponentObserverable: React.FunctionComponent<IPostPageProps> = (
                 scroller.scrollTo(hash, {
                     duration: 800,
                     smooth: true,
+                    offset: -75,
                 })
             }
         }, 500)
@@ -430,7 +431,7 @@ const PostPageComponentObserverable: React.FunctionComponent<IPostPageProps> = (
         return () => {
             postStore.setHighlightedPosUUID('')
         }
-    }, [])
+    }, [location])
 
     const isSameUser = postStore.observableThread.openingPost.pub == authStore.postPub
     const menu = (
