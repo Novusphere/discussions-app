@@ -20,7 +20,7 @@ export const hydrate = (storage: Storage) =>
     })
 
 export class RootStore {
-    uiStore = new UIStore(this)
+    uiStore = new UIStore()
     authStore = new AuthStore(this)
     tagStore = new TagStore(this)
     userStore = new UserStore(this)

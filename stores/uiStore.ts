@@ -1,7 +1,6 @@
 import { computed, observable } from 'mobx'
 import { MODAL_OPTIONS } from '@globals'
 import { notification, message } from 'antd'
-import { RootStore } from '@stores'
 
 import baseImg from '@static/banners/default.png'
 
@@ -10,26 +9,21 @@ export class UIStore {
 
     @observable currentIndex = 0
     @observable banners = [baseImg]
-    @observable     activeBanner = this.banners[this.currentIndex]
 
     @observable hideSidebar = false
 
-    constructor(rootStore: RootStore) {
-        // Router.events.on('routeChangeStart', url => {
-        //     if (url.indexOf('tag') === -1) {
-        //         let index = this.currentIndex
-        //
-        //         if (
-        //             this.banners.length - 1 > index &&
-        //             typeof this.banners[index + 1] !== 'undefined'
-        //         ) {
-        //             index = index + 1
-        //         }
-        //
-        //         this.activeBanner = this.banners[index]
-        //         this.currentIndex = index
-        //     }
-        // })
+    rotateBannerImage = () => {
+        let index = this.currentIndex
+
+        if (this.banners.length - 1 > index && typeof this.banners[index + 1] !== 'undefined') {
+            index = index + 1
+        }
+
+        this.currentIndex = index
+    }
+
+    @computed get activeBanner() {
+        return this.banners[this.currentIndex]
     }
 
     setSidebarHidden = (value: boolean) => {

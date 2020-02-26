@@ -9,10 +9,12 @@ import {
     Header,
     SidebarTrendingTags,
 } from '@components'
+import { useLocation } from 'react-router-dom'
 import { useObserver } from 'mobx-react-lite'
 import cx from 'classnames'
 import { RootStore, useStores } from '@stores'
 import { eos } from '@novuspherejs'
+import { refreshOEmbed } from '@utils'
 
 const { Header: AntdLayoutHeader } = AntdLayout
 
@@ -20,6 +22,7 @@ interface ILayoutProps {}
 
 const Layout: FunctionComponent<ILayoutProps> = ({ children }) => {
     const { authStore, uiStore, settingStore, walletStore }: RootStore = useStores()
+    const location = useLocation()
 
     message.config({
         top: 75,
@@ -50,19 +53,46 @@ const Layout: FunctionComponent<ILayoutProps> = ({ children }) => {
         }
     }, [])
 
+    useEffect(() => {
+        uiStore.rotateBannerImage()
+
+        let interval: any = null
+        let timesRun = 0
+
+        if (location.pathname.search(/(search|tag)/i) !== -1) {
+            refreshOEmbed()
+            interval = setInterval(() => {
+                timesRun += 1
+                refreshOEmbed()
+
+                if (timesRun === 5) {
+                    clearInterval(interval)
+                }
+            }, 2000)
+        }
+
+        return () => {
+            if (interval) {
+                clearInterval(interval)
+            }
+        }
+    }, [location])
+
     return (
         <AntdLayout className={'overflow-x-hidden'}>
             <Modals />
             <AntdLayoutHeader className={cx([styles.header, 'container bb b--light-gray'])}>
                 <Header />
             </AntdLayoutHeader>
-            <span className={styles.banner}>
-                <img
-                    src={uiStore.activeBanner}
-                    title={'Active banner'}
-                    alt={'Active banner image'}
-                />
-            </span>
+            {useObserver(() => (
+                <span className={styles.banner}>
+                    <img
+                        src={uiStore.activeBanner}
+                        title={'Active banner'}
+                        alt={'Active banner image'}
+                    />
+                </span>
+            ))}
             {/*<Alert*/}
             {/*    message={'Alert'}*/}
             {/*    description={'Sign in has been disabled temporarily.'}*/}

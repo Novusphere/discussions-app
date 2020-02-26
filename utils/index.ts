@@ -12,7 +12,6 @@ const uuid = require('uuidv4')
 export * from './useInterval'
 export * from './mediaQueries'
 
-export const INDEXER_NAME = '__LINKINDEXER__'
 export const LINK_LIMIT = 1000
 export const isDev = process.env.NODE_ENV === 'development'
 export const isServer = typeof window === 'undefined'
@@ -22,7 +21,7 @@ export const sleep = (milliseconds: number) => {
 
 export const getSettings = async (host = window.location.host.toLowerCase()) => {
     const { data: setting } = await axios.get(`${nsdb.api}/discussions/site`)
-    if (isDev) host = 'discussions.app'
+    if (isDev) host = 'beta.discussions.app'
 
     let settings = setting[host]
 
@@ -593,11 +592,24 @@ export const allowedHosts = [
     'whaleshares.io',
 ]
 
-export const refreshOEmbed = () => {
+export const refreshOEmbed = async () => {
+    if ((window as any).FB) {
+        ;(window as any).FB.XFBML.parse()
+    }
+
+    if ((window as any).twttr) {
+        ;(window as any).twttr.widgets.load()
+    }
+
+    if ((window as any).instgrm) {
+        ;(window as any).instgrm.Embeds.process()
+    }
+
+    const tl = await import('@static/telegram.js')
+
     setTimeout(() => {
-        window['twttr'].widgets.load()
-        window['imgurEmbed'].createIframe()
-    }, 500)
+        tl.default(window)
+    }, 0)
 }
 
 /**

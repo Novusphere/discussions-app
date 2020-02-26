@@ -14,3 +14,13 @@
 .richTextPreview {
     word-break: break-word;
 }
+
+.rtObject {
+    width: 100%;
+    display: block;
+    text-align: center;
+
+    iframe {
+        margin: 0 auto;
+    }
+}

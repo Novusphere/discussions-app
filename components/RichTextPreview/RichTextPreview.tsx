@@ -1,4 +1,4 @@
-import React, { FunctionComponent, useCallback, useEffect, useLayoutEffect, useState } from 'react'
+import React, { FunctionComponent, useCallback, useEffect, useState } from 'react'
 // @ts-ignore
 import Markdown from 'markdown-to-jsx'
 // @ts-ignore
@@ -7,7 +7,7 @@ import cx from 'classnames'
 
 import styles from './RichTextPreview.module.scss'
 import { nsdb } from '@novuspherejs'
-import { generateUuid, LINK_LIMIT, openInNewTab, sleep } from '@utils'
+import { generateUuid, LINK_LIMIT, openInNewTab, refreshOEmbed } from '@utils'
 
 interface IRichTextPreviewProps {
     hideFade?: boolean
@@ -117,31 +117,8 @@ const RtLink: FunctionComponent<any> = ({ children, href, index }) => {
 
         let timeout: any = null
 
-        async function refreshIFrames() {
-            if (href.match(/facebook|fb.me/)) {
-                if ((window as any).FB) {
-                    ;(window as any).FB.XFBML.parse()
-                }
-            } else if (href.match(/twitter/)) {
-                if ((window as any).twttr) {
-                    // twitter.com/thenovusphere/status/1204870218939416580
-                    ;(window as any).twttr.widgets.load()
-                }
-            } else if (href.match(/instagram/)) {
-                if ((window as any).instgrm) {
-                    ;(window as any).instgrm.Embeds.process()
-                }
-            } else if (href.match(/t.me/)) {
-                const tl = await import('@static/telegram.js')
-
-                setTimeout(() => {
-                    tl.default(window)
-                }, 0)
-            }
-        }
-
         timeout = setTimeout(() => {
-            refreshIFrames()
+            refreshOEmbed()
         }, 250)
 
         return () => {
@@ -171,7 +148,7 @@ const RtLink: FunctionComponent<any> = ({ children, href, index }) => {
 
     return (
         <object
-            className={'rt-object'}
+            className={cx([styles.rtObject, 'center'])}
             data-index={index}
             dangerouslySetInnerHTML={{ __html: getEmbed }}
         />
