@@ -5,6 +5,7 @@ const ecc = require('eosjs-ecc')
 export const DEFAULT_NSDB_ENDPOINT = 'https://atmosdb.novusphere.io'
 
 export interface INSDBSearchQuery {
+    sort?: string
     cursorId?: number
     pipeline: any[]
     payload?: any
