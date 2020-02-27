@@ -16,6 +16,7 @@ export { default as SidebarLinks } from './SidebarLinks/SidebarLinks'
 export { default as SidebarTrendingTags } from './SidebarTrendingTags/SidebarTrendingTags'
 export { default as Footer } from './Footer/Footer'
 export { default as Sorter } from './Sorter/Sorter'
+export { default as CommonFeed } from './CommonFeed/CommonFeed'
 
 // header
 export { default as HeaderLogo } from './HeaderLogo/HeaderLogo'

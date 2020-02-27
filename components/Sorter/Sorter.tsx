@@ -9,17 +9,9 @@ interface ISorterProps {
 }
 
 const Sorter: FunctionComponent<ISorterProps> = ({ onChange, value }) => {
-    const [currentOption, setOption] = useState(value)
-    const onClick = useCallback(
-        (option: SORTER_OPTIONS) => {
-            console.log('setitng option: ', option)
-            setOption(SORTER_OPTIONS[option])
-            onChange(option)
-        },
-        [currentOption]
-    )
-
-    console.log(currentOption)
+    const onClick = useCallback((option: SORTER_OPTIONS) => {
+        onChange(option)
+    }, [])
 
     return (
         <div className={'flex flex-row items-center justify-end mb3'}>
@@ -28,10 +20,10 @@ const Sorter: FunctionComponent<ISorterProps> = ({ onChange, value }) => {
                     <span
                         onClick={() => onClick(OPTION)}
                         className={cx([
-                            'ml2 br3 db f6 pv2 ph3 pointer',
+                            'ml2 br2 db f7 ttu pv1 ph2 pointer dim',
                             {
-                                'bg-near-white dark-gray': currentOption !== SORTER_OPTIONS[OPTION],
-                                'bg-primary white': currentOption === SORTER_OPTIONS[OPTION],
+                                'bg-white light-silver': value !== OPTION,
+                                'bg-primary white': value === OPTION,
                             },
                         ])}
                         key={OPTION}
@@ -45,7 +37,7 @@ const Sorter: FunctionComponent<ISorterProps> = ({ onChange, value }) => {
 }
 
 Sorter.defaultProps = {
-    value: SORTER_OPTIONS.popular,
+    value: 'popular',
 }
 
 export default Sorter

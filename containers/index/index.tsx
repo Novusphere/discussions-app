@@ -1,49 +1,33 @@
-import React, { useCallback, useContext, useEffect, useMemo } from 'react'
-import { InfiniteScrollFeed, Sorter } from '@components'
-import { useObserver } from 'mobx-react-lite'
-import { StoreContext } from '@stores'
+import React, { useCallback } from 'react'
+import { CommonFeed } from '@components'
+import { observer } from 'mobx-react-lite'
+import { RootStore, useStores } from '@stores'
 import Helmet from 'react-helmet'
 
-const IndexPageNoSSR = () => {
-    const { postsStore, tagStore, authStore } = useContext(StoreContext)
-    const postPub = useMemo(() => authStore.postPub, [])
+const IndexPage: React.FC<any> = () => {
+    const { postsStore, tagStore }: RootStore = useStores()
     const fetch = useCallback(
-        (sort = '') =>
+        ({ postPub, sort }) =>
             postsStore.fetchPostsForTag(postPub, [...tagStore.subscribed.toJS()], [], sort),
         []
     )
 
-    const resetAndFetch = useCallback((sort = '') => {
-        postsStore.resetPostsAndPosition()
-        fetch(sort)
-    }, [])
+    const { items, cursorId } = postsStore.postsPosition
 
-    useEffect(() => {
-        resetAndFetch()
-    }, [])
-
-    return useObserver(() => (
-        <>
-            <Sorter onChange={resetAndFetch} />
-            <InfiniteScrollFeed
-                dataLength={postsStore.postsPosition.items}
-                hasMore={postsStore.postsPosition.cursorId !== 0}
-                next={() => postsStore.fetchPostsForTag(postPub)}
-                posts={postsStore.posts}
-            />
-        </>
-    ))
-}
-
-const IndexPage: React.FC<any> = () => {
     return (
         <>
             <Helmet>
                 <title>{`Discussions App`}</title>
             </Helmet>
-            <IndexPageNoSSR />
+            <CommonFeed
+                onFetch={fetch}
+                emptyDescription={'There are no posts currently'}
+                posts={postsStore.posts}
+                dataLength={items}
+                cursorId={cursorId}
+            />
         </>
     )
 }
 
-export default IndexPage
+export default observer(IndexPage)

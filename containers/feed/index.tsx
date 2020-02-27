@@ -1,55 +1,33 @@
-import React, { useCallback, useContext, useEffect, useMemo, useState } from 'react'
-import { InfiniteScrollFeed, Sorter } from '@components'
+import React, { useCallback } from 'react'
+import { CommonFeed } from '@components'
 import { observer } from 'mobx-react-lite'
-import { RootStore, StoreContext } from '@stores'
-import { Empty } from 'antd'
+import { RootStore, useStores } from '@stores'
 import Helmet from 'react-helmet'
 
-const FeedPageNoSSR = observer(() => {
-    const { postsStore, userStore, authStore }: RootStore = useContext(StoreContext)
-    const [sort, setSort] = useState()
-    const postPub = useMemo(() => authStore.postPub, [])
+const FeedPage: React.FC<any> = () => {
+    const { postsStore, userStore }: RootStore = useStores()
     const fetch = useCallback(
-        (sort = '') => postsStore.getPostsForKeys(postPub, [...userStore.following.keys()], sort),
+        ({ sort, postPub }) =>
+            postsStore.getPostsForKeys(postPub, [...userStore.following.keys()], sort),
         []
     )
 
-    const resetAndFetch = useCallback((sort = '') => {
-        postsStore.resetPostsAndPosition()
-        fetch(sort)
-    }, [])
+    const { items, cursorId } = postsStore.postsPosition
 
-    useEffect(() => {
-        resetAndFetch()
-    }, [])
-
-
-    if (!postsStore.posts.length) {
-        return <Empty description={<span>Follow some users to see their activity here!</span>} />
-    }
-
-    return (
-        <>
-            <Sorter onChange={resetAndFetch} />
-            <InfiniteScrollFeed
-                dataLength={postsStore.postsPosition.items}
-                hasMore={postsStore.postsPosition.cursorId !== 0}
-                next={() => postsStore.getPostsForKeys(postPub)}
-                posts={postsStore.posts}
-            />
-        </>
-    )
-})
-
-const FeedPage: React.FC<any> = () => {
     return (
         <>
             <Helmet>
                 <title>{`#feed`}</title>
             </Helmet>
-            <FeedPageNoSSR />
+            <CommonFeed
+                onFetch={fetch}
+                emptyDescription={'Follow some users to see their activity here!'}
+                posts={postsStore.posts}
+                dataLength={items}
+                cursorId={cursorId}
+            />
         </>
     )
 }
 
-export default FeedPage
+export default observer(FeedPage)

@@ -149,12 +149,14 @@ export default class DiscussionsService {
         search: string,
         searchCursorId = undefined,
         count = 0,
-        key = ''
+        key = '',
+        sort = 'popular'
     ): Promise<{
         results: Post[]
         cursorId: number
     }> {
         const { payload, cursorId } = await nsdb.search({
+            sort,
             key,
             cursorId: searchCursorId,
             count,

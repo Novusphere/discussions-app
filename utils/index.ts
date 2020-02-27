@@ -32,10 +32,10 @@ export const getSettings = async (host = window.location.host.toLowerCase()) => 
     return settings
 }
 
-export enum SORTER_OPTIONS {
-    'popular' = 'Popular',
-    'recent' = 'Recent',
-    'controversial' = 'Controversial',
+export const SORTER_OPTIONS = {
+    popular: 'Popular',
+    recent: 'Recent',
+    controversial: 'Controversial',
 }
 
 export const getHostName = () => {

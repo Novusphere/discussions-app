@@ -32,7 +32,7 @@ export class PostsStore {
      * @param key
      * @param {string[]} tagNames
      * @param {asPathURL, tagName[]} pinnedPosts
-     * @param {sort} - popular | recent | controversial
+     * @param sort
      */
     fetchPostsForTag = async (
         key = '',
@@ -104,11 +104,6 @@ export class PostsStore {
                 keys = [...this.userStore.following.keys()]
             }
 
-            console.log({
-                key,
-                keys,
-                sort,
-            })
 
             const { posts, cursorId } = await discussions.getPostsForKeys(
                 keys,
@@ -143,13 +138,14 @@ export class PostsStore {
         }
     }
 
-    getSearchResults = async (value: string, key = '') => {
+    getSearchResults = async (value: string, key = '', sort) => {
         try {
             const { results: posts, cursorId } = await discussions.getPostsForSearch(
                 value,
                 this.postsPosition.cursorId,
                 this.postsPosition.items,
-                key
+                key,
+                sort,
             )
 
             this.posts = [...this.posts, ...posts]

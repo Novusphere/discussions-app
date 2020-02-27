@@ -15,7 +15,7 @@ import {
 } from '@utils'
 import { discussions } from '@novuspherejs'
 import Helmet from 'react-helmet'
-import { useHistory } from 'react-router-dom';
+import { useHistory } from 'react-router-dom'
 
 const { Option } = Select
 
@@ -42,6 +42,9 @@ const NewPageNoSSRUnwrapped = ({ form, prefilledTag }: any) => {
                     let [, tagPreHas] = tag.split('#')
                     tag = tagPreHas
                 }
+
+                // make sure we trim spaces in tag
+                tag = tag.replace(/ /g, '')
 
                 const uuid = generateUuid()
 

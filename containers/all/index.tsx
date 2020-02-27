@@ -1,36 +1,29 @@
-import React, { useCallback, useContext, useEffect } from 'react'
-import { InfiniteScrollFeed, Sorter } from '@components'
+import React, { useCallback } from 'react'
+import { CommonFeed } from '@components'
 import { observer } from 'mobx-react-lite'
-import { RootStore, StoreContext } from '@stores'
+import { RootStore, useStores } from '@stores'
 import Helmet from 'react-helmet'
 
 const AllPage: React.FC<any> = () => {
-    const { postsStore, authStore }: RootStore = useContext(StoreContext)
+    const { postsStore }: RootStore = useStores()
     const fetch = useCallback(
-        (sort = '') => postsStore.fetchPostsForTag(authStore.postPub, ['all'], [], sort),
+        ({ sort, postPub }) => postsStore.fetchPostsForTag(postPub, ['all'], [], sort),
         []
     )
 
-    const resetAndFetch = useCallback((sort = '') => {
-        postsStore.resetPostsAndPosition()
-        fetch(sort)
-    }, [])
-
-    useEffect(() => {
-        resetAndFetch()
-    }, [])
+    const { items, cursorId } = postsStore.postsPosition
 
     return (
         <>
             <Helmet>
                 <title>{`#all`}</title>
             </Helmet>
-            <Sorter onChange={resetAndFetch} />
-            <InfiniteScrollFeed
-                dataLength={postsStore.postsPosition.items}
-                hasMore={postsStore.postsPosition.cursorId !== 0}
-                next={fetch}
+            <CommonFeed
+                onFetch={fetch}
+                emptyDescription={'There are no posts currently'}
                 posts={postsStore.posts}
+                dataLength={items}
+                cursorId={cursorId}
             />
         </>
     )

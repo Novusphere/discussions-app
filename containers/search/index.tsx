@@ -1,23 +1,22 @@
 import * as React from 'react'
-import { useCallback, useContext, useEffect, useMemo } from 'react'
-import { StoreContext } from '@stores'
-import { InfiniteScrollFeed } from '@components'
-import { useObserver } from 'mobx-react-lite'
+import { useCallback } from 'react'
+import { CommonFeed } from '@components'
+import { observer } from 'mobx-react-lite'
+import { RootStore, useStores } from '@stores'
 import Helmet from 'react-helmet'
 import { useParams } from 'react-router-dom'
 
 const SearchPage: React.FC<any> = () => {
-    const { postsStore, authStore } = useContext(StoreContext)
-    const postPub = useMemo(() => authStore.postPub, [])
+    const { postsStore }: RootStore = useStores()
     const { query } = useParams()
-    const fetch = useCallback(() => postsStore.getSearchResults(query, postPub), [query, postPub])
+    const fetch = useCallback(
+        ({ postPub, sort }) => postsStore.getSearchResults(query, postPub, sort),
+        [query]
+    )
 
-    useEffect(() => {
-        postsStore.resetPostsAndPosition()
-        fetch()
-    }, [query])
+    const { items, cursorId } = postsStore.postsPosition
 
-    return useObserver(() => (
+    return (
         <>
             <Helmet>
                 <title>{`Search results: ${query}`}</title>
@@ -26,15 +25,16 @@ const SearchPage: React.FC<any> = () => {
                 Showing results for: "{query}" ({postsStore.postsPosition.items}{' '}
                 {postsStore.postsPosition.items === 1 ? 'result' : 'results'})
             </span>
-            <InfiniteScrollFeed
-                withAnchorUid
-                dataLength={postsStore.postsPosition.items}
-                hasMore={postsStore.postsPosition.cursorId !== 0}
-                next={fetch}
+            <CommonFeed
+                onFetch={fetch}
+                emptyDescription={'No results found for query'}
                 posts={postsStore.posts}
+                dataLength={items}
+                cursorId={cursorId}
+                tag={query}
             />
         </>
-    ))
+    )
 }
 
-export default SearchPage
+export default observer(SearchPage)
