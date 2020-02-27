@@ -2,7 +2,6 @@ import { observable } from 'mobx'
 import { RootStore } from '@stores/index'
 import { discussions, Post, Thread } from '@novuspherejs'
 import _ from 'lodash'
-import { task } from 'mobx-task';
 
 export class PostsStore {
     @observable
@@ -33,8 +32,18 @@ export class PostsStore {
      * @param key
      * @param {string[]} tagNames
      * @param {asPathURL, tagName[]} pinnedPosts
+     * @param {sort} - popular | recent | controversial
      */
-    fetchPostsForTag = async (key = '', tagNames: string[], pinnedPosts: any[] = []) => {
+    fetchPostsForTag = async (
+        key = '',
+        tagNames: string[],
+        pinnedPosts: any[] = [],
+        sort = 'popular'
+    ) => {
+        if (sort === '') {
+            sort = 'popular'
+        }
+
         try {
             if (!tagNames || !tagNames.length) tagNames = ['all']
 
@@ -43,7 +52,8 @@ export class PostsStore {
                 this.postsPosition.cursorId,
                 this.postsPosition.items,
                 20,
-                key
+                key,
+                sort
             )
 
             let _pinnedPosts: any[] = []
@@ -73,7 +83,7 @@ export class PostsStore {
                 position: this.postsPosition,
             }
         } catch (error) {
-            console.error(error);
+            console.error(error)
             return error
         }
     }
@@ -82,20 +92,31 @@ export class PostsStore {
      * Fetch posts given an array of pub keys
      * @param {string} key - the users post pub
      * @param {string[]} keys - the post pubs of users whose posts you want to return
+     * @param sort
      */
-    @task
-    getPostsForKeys = async (key = '', keys: string[] = []) => {
+    getPostsForKeys = async (key = '', keys: string[] = [], sort = 'popular') => {
         try {
+            if (!sort) {
+                sort = 'popular'
+            }
+
             if (!keys.length) {
                 keys = [...this.userStore.following.keys()]
             }
+
+            console.log({
+                key,
+                keys,
+                sort,
+            })
 
             const { posts, cursorId } = await discussions.getPostsForKeys(
                 keys,
                 this.postsPosition.cursorId,
                 this.postsPosition.items,
                 20,
-                key
+                key,
+                sort
             )
 
             this.posts = [...this.posts, ...posts]

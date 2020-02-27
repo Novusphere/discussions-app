@@ -473,7 +473,8 @@ export default class DiscussionsService {
         cursorId = undefined,
         count = 0,
         limit = 20,
-        key = ''
+        key = '',
+        sort = 'popular',
     ): Promise<{
         posts: Post[]
         cursorId: number
@@ -484,6 +485,7 @@ export default class DiscussionsService {
         }
 
         const query = await nsdb.search({
+            sort,
             key,
             cursorId,
             count,
@@ -516,12 +518,14 @@ export default class DiscussionsService {
         cursorId = undefined,
         count = 0,
         limit = 20,
-        key = ''
+        key = '',
+        sort = 'popular',
     ): Promise<{
         posts: Post[]
         cursorId: number
     }> {
         const query = await nsdb.search({
+            sort,
             key,
             cursorId,
             count,

@@ -32,6 +32,12 @@ export const getSettings = async (host = window.location.host.toLowerCase()) => 
     return settings
 }
 
+export enum SORTER_OPTIONS {
+    'popular' = 'Popular',
+    'recent' = 'Recent',
+    'controversial' = 'Controversial',
+}
+
 export const getHostName = () => {
     if (isDev) return 'discussions.app'
     return window.location.hostname
@@ -117,7 +123,8 @@ export const getThreadTitle = (post: Post) => {
 
 export const getThreadUrl = async (post: Post, permalinkUuid?: string) => {
     const id = encodeId(post)
-    let url = `/tag/${post.sub}/${id}/`
+    let sub = _.trim(post.sub)
+    let url = `/tag/${sub}/${id}/`
 
     // if a post is a comment not a opening post
     if (post.title === '') {

@@ -1,5 +1,5 @@
 import React, { useCallback, useContext, useEffect, useMemo } from 'react'
-import { InfiniteScrollFeed } from '@components'
+import { InfiniteScrollFeed, Sorter } from '@components'
 import { RootStore, StoreContext } from '@stores'
 import Helmet from 'react-helmet'
 import { useParams } from 'react-router-dom'
@@ -10,11 +10,18 @@ const TagPage: React.FC<any> = () => {
     const { tag } = useParams()
     const pinnedPosts = useMemo(() => [...userStore.pinnedPosts.toJS()], [])
     const postPub = useMemo(() => authStore.postPub, [])
-    const fetch = useCallback(() => postsStore.fetchPostsForTag(postPub, [tag], pinnedPosts), [tag, pinnedPosts])
+    const fetch = useCallback(
+        (sort = '') => postsStore.fetchPostsForTag(postPub, [tag], pinnedPosts, sort),
+        [tag, pinnedPosts]
+    )
+
+    const resetAndFetch = useCallback((sort = '') => {
+        postsStore.resetPostsAndPosition()
+        fetch(sort)
+    }, [])
 
     useEffect(() => {
-        postsStore.resetPostsAndPosition()
-        fetch()
+        resetAndFetch()
     }, [tag])
 
     return (
@@ -22,6 +29,7 @@ const TagPage: React.FC<any> = () => {
             <Helmet>
                 <title>{`#${tag}`}</title>
             </Helmet>
+            <Sorter onChange={resetAndFetch} />
             <InfiniteScrollFeed
                 dataLength={postsStore.postsPosition.items}
                 hasMore={postsStore.postsPosition.cursorId !== 0}

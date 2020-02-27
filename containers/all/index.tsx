@@ -1,16 +1,23 @@
 import React, { useCallback, useContext, useEffect } from 'react'
-import { InfiniteScrollFeed } from '@components'
+import { InfiniteScrollFeed, Sorter } from '@components'
 import { observer } from 'mobx-react-lite'
 import { RootStore, StoreContext } from '@stores'
 import Helmet from 'react-helmet'
 
 const AllPage: React.FC<any> = () => {
     const { postsStore, authStore }: RootStore = useContext(StoreContext)
-    const fetch = useCallback(() => postsStore.fetchPostsForTag(authStore.postPub, ['all']), [])
+    const fetch = useCallback(
+        (sort = '') => postsStore.fetchPostsForTag(authStore.postPub, ['all'], [], sort),
+        []
+    )
+
+    const resetAndFetch = useCallback((sort = '') => {
+        postsStore.resetPostsAndPosition()
+        fetch(sort)
+    }, [])
 
     useEffect(() => {
-        postsStore.resetPostsAndPosition()
-        fetch()
+        resetAndFetch()
     }, [])
 
     return (
@@ -18,6 +25,7 @@ const AllPage: React.FC<any> = () => {
             <Helmet>
                 <title>{`#all`}</title>
             </Helmet>
+            <Sorter onChange={resetAndFetch} />
             <InfiniteScrollFeed
                 dataLength={postsStore.postsPosition.items}
                 hasMore={postsStore.postsPosition.cursorId !== 0}
