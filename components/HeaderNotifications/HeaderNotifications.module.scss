@@ -24,7 +24,7 @@
     overflow: hidden;
     margin-left: -40px;
     padding: 1em;
-    border-bottom: 1px solid #EEEEEE;
+    border-bottom: 1px solid #eeeeee;
 
     &:last-of-type {
         padding-bottom: 0;
@@ -33,10 +33,10 @@
 }
 
 .bottomBar {
-    border-top: 1px solid #EEEEEE;
+    border-top: 1px solid #eeeeee;
     height: 46px;
 
-    span {
+    a {
         display: flex;
         align-items: center;
         justify-content: center;
@@ -48,7 +48,7 @@
             width: 100%;
         }
         &:not(:only-child):last-child {
-            border-left: 1px solid #EEEEEE;
+            border-left: 1px solid #eeeeee;
         }
     }
 }

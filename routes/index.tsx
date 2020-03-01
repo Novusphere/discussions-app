@@ -15,6 +15,7 @@ const TagViewPage = lazy(() => import('@containers/tag'))
 const ThreadViewPage = lazy(() => import('@containers/tag/post'))
 const TagsViewPage = lazy(() => import('@containers/tags'))
 const UserViewPage = lazy(() => import('@containers/u'))
+const NotificationsPage = lazy(() => import('@containers/notifications'))
 
 export const routes = [
     {
@@ -67,10 +68,21 @@ export const routes = [
         exact: true,
         component: UserViewPage,
     },
+    {
+        path: '/notifications',
+        exact: true,
+        component: NotificationsPage,
+    },
 ]
 
 const Routes = () => (
-    <Suspense fallback={<Layout><Icon type="loading" /></Layout>}>
+    <Suspense
+        fallback={
+            <Layout>
+                <Icon type="loading" />
+            </Layout>
+        }
+    >
         <Switch>
             <Layout>
                 {routes.map(({ path, exact, component: LazyComponent }) => (

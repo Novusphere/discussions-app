@@ -1,4 +1,4 @@
-import React, { FunctionComponent, useCallback, useState } from 'react'
+import React, { FunctionComponent, useCallback } from 'react'
 import cx from 'classnames'
 import styles from './Sorter.module.scss'
 import { SORTER_OPTIONS } from '@utils'

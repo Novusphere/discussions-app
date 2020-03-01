@@ -75,10 +75,12 @@ const NotificationContainer = () => {
                         'flex flex-row items-center justify-between tc',
                     ])}
                 >
-                    <span className={'dim pointer'} onClick={userStore.clearNotifications}>
+                    <a className={'dim pointer'} onClick={userStore.clearNotifications}>
                         Clear Notifications
-                    </span>
-                    <span className={'dim pointer'}>View All</span>
+                    </a>
+                    <Link to={'/notifications'} className={'dim pointer'}>
+                        View All
+                    </Link>
                 </div>
             }
         />
