@@ -1,28 +1,8 @@
 {
     "exclude": ["node_modules"],
-    "baseUrl": ".",
     "compileOnSave": false,
-    "paths": {
-        "@components": ["./components/index"],
-        "@models/*": ["./models/*"],
-        "@pages/": ["./pages/*"],
-        "@d.ts/*": ["./types/*"],
-        "@constants/*": ["./constants/*"],
-        "@novuspherejs": ["./novusphere-js/index"],
-        "@novuspherejs/*": ["./novusphere-js/*"],
-        "@stores": ["./stores/index.tsx"],
-        "@stores/*": ["./stores/*"],
-        "@modules/*": ["./modules/*"],
-        "@styles/*": ["./styles/*"],
-        "@assets/*": ["./assets/*"],
-        "@utils": ["./utils/index"],
-        "@router": ["./routes.ts"],
-        "@globals": ["./constants/globals.ts"],
-        "@containers/*": ["./containers/*"],
-        "@routes": ["./routes/index"],
-        "@static/*": ["./static/*"]
-    },
     "compilerOptions": {
+        "baseUrl": ".",
         "noUnusedLocals": false,
         "noUnusedParameters": false,
         "preserveConstEnums": true,
@@ -39,7 +19,7 @@
         "emitDecoratorMetadata": true,
         "experimentalDecorators": true,
         "removeComments": false,
-        "noImplicitAny": true,
+        "noImplicitAny": false,
         "suppressImplicitAnyIndexErrors": true,
         "allowSyntheticDefaultImports": true,
         "outDir": "./dist/",
@@ -48,6 +28,26 @@
         "moduleResolution": "node",
         "target": "es5",
         "module": "commonjs",
-        "sourceMap": true
+        "sourceMap": true,
+        "paths": {
+            "@components": ["./components/index"],
+            "@models/*": ["./models/*"],
+            "@pages/": ["./pages/*"],
+            "@d.ts/*": ["./types/*"],
+            "@constants/*": ["./constants/*"],
+            "@novuspherejs": ["./novusphere-js/index"],
+            "@novuspherejs/*": ["./novusphere-js/*"],
+            "@stores": ["./stores/index.tsx"],
+            "@stores/*": ["./stores/*"],
+            "@modules/*": ["./modules/*"],
+            "@styles/*": ["./styles/*"],
+            "@assets/*": ["./assets/*"],
+            "@utils": ["./utils/index"],
+            "@router": ["./routes.ts"],
+            "@globals": ["./constants/globals.ts"],
+            "@containers/*": ["./containers/*"],
+            "@routes": ["./routes/index"],
+            "@static/*": ["./static/*"]
+        }
     }
 }

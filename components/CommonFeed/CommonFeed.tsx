@@ -9,12 +9,13 @@ import { InfiniteScrollFeed, Sorter } from '@components'
 import { observer } from 'mobx-react-lite'
 
 interface ICommonFeedProps {
-    onFetch: ({ sort, postPub }: { sort: SORTER_OPTIONS; postPub: string }) => void
+    onFetch: ({ sort, postPub }: { sort: typeof SORTER_OPTIONS; postPub: string }) => void
     emptyDescription: string
     posts: Post[]
     dataLength: number
     cursorId: number | undefined
     tag?: string
+    hideSort?: boolean
 }
 
 const CommonFeed: FunctionComponent<ICommonFeedProps> = ({
@@ -24,6 +25,7 @@ const CommonFeed: FunctionComponent<ICommonFeedProps> = ({
     dataLength,
     cursorId,
     tag,
+    hideSort,
 }) => {
     const { authStore, postsStore }: RootStore = useStores()
     const [sort, setSort] = useState('popular')
@@ -50,7 +52,7 @@ const CommonFeed: FunctionComponent<ICommonFeedProps> = ({
 
     return (
         <>
-            <Sorter onChange={onChange} value={sort} />
+            {!hideSort && <Sorter onChange={onChange} value={sort} />}
             <InfiniteScrollFeed
                 withAnchorUid
                 dataLength={dataLength}
@@ -62,6 +64,8 @@ const CommonFeed: FunctionComponent<ICommonFeedProps> = ({
     )
 }
 
-CommonFeed.defaultProps = {}
+CommonFeed.defaultProps = {
+    hideSort: false,
+}
 
 export default observer(CommonFeed)

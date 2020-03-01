@@ -4,18 +4,18 @@ import styles from './Sorter.module.scss'
 import { SORTER_OPTIONS } from '@utils'
 
 interface ISorterProps {
-    value: SORTER_OPTIONS
-    onChange: (value: SORTER_OPTIONS) => void
+    value: string
+    onChange: (value: string) => void
 }
 
 const Sorter: FunctionComponent<ISorterProps> = ({ onChange, value }) => {
-    const onClick = useCallback((option: SORTER_OPTIONS) => {
+    const onClick = useCallback((option: string) => {
         onChange(option)
     }, [])
 
     return (
         <div className={'flex flex-row items-center justify-end mb3'}>
-            {Object.keys(SORTER_OPTIONS).map((OPTION: SORTER_OPTIONS) => {
+            {Object.keys(SORTER_OPTIONS).map((OPTION: string) => {
                 return (
                     <span
                         onClick={() => onClick(OPTION)}

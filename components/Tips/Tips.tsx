@@ -21,7 +21,13 @@ const Tips: FunctionComponent<ITipsProps> = ({ tips }) => {
         images = walletStore['supportedTokensImages']
     }
 
-    const [collapse, toggleCollapse] = useState(Object.keys(tips).length > 3)
+    const tipKeys = Object.keys(tips)
+
+    const [collapse, toggleCollapse] = useState(tipKeys.length > 3)
+
+    if (!tipKeys.length) {
+        return null
+    }
 
     const renderCollapsed = () => {
         if (!collapse) return null
@@ -32,7 +38,7 @@ const Tips: FunctionComponent<ITipsProps> = ({ tips }) => {
                 title={'Click to toggle tips'}
             >
                 <span className={'tiny gray'}>
-                    <span className={'pl2'}>{Object.keys(tips).length}</span>
+                    <span className={'pl2'}>{tipKeys.length}</span>
                 </span>
             </object>
         )
@@ -78,7 +84,7 @@ const Tips: FunctionComponent<ITipsProps> = ({ tips }) => {
             <CSSTransition timeout={200} classNames={'slide'} unmountOnExit in={!collapse}>
                 <div className={'flex flex-wrap'}>
                     {
-                        Object.keys(tips).map(symbol => {
+                        tipKeys.map(symbol => {
                             return renderTip(symbol)
                         }) as any
                     }
@@ -97,7 +103,7 @@ const Tips: FunctionComponent<ITipsProps> = ({ tips }) => {
             </Desktop>
             <Mobile>
                 {
-                    Object.keys(tips).map(symbol => {
+                    tipKeys.map(symbol => {
                         return renderTip(symbol, {
                             imgProps: { width: '20px' },
                             spanProps: { className: 'pr1 dib' },

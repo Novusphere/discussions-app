@@ -18,16 +18,16 @@ app.use(async (req, res, next) => {
 // https://github.com/nfl/react-helmet/blob/1d21159dbaf0638388c1a81e7e4a60c3fdd18ef9/src/HelmetUtils.js#L14
 const encodeSpecialCharacters = (str, encode = true) => {
     if (encode === false) {
-        return String(str);
+        return String(str)
     }
 
     return String(str)
-        .replace(/&/g, "&amp;")
-        .replace(/</g, "&lt;")
-        .replace(/>/g, "&gt;")
-        .replace(/"/g, "&quot;")
-        .replace(/'/g, "&#x27;");
-};
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;')
+        .replace(/'/g, '&#x27;')
+}
 
 const serveAndReplaceMeta = (res, { title, description, image }) => {
     return fs.readFile(filePath, 'utf8', (err, data) => {
@@ -72,6 +72,14 @@ app.get('/new', (req, res) => {
     serveAndReplaceMeta(res, {
         title: 'Create a new post',
         description: 'Create a new post',
+        image: res.genericTagUrl,
+    })
+})
+
+app.get('/notifications', (req, res) => {
+    serveAndReplaceMeta(res, {
+        title: 'Viewing notifications',
+        description: 'Viewing your notifications',
         image: res.genericTagUrl,
     })
 })

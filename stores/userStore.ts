@@ -428,7 +428,13 @@ export class UserStore {
             }))
 
             // we have to send the entire payload, not just the diff
-            const { uidwWalletPubKey, accountPrivKey, accountPubKey, postPub, displayName } = this.authStore
+            const {
+                uidwWalletPubKey,
+                accountPrivKey,
+                accountPubKey,
+                postPub,
+                displayName,
+            } = this.authStore
 
             const dataToSync = {
                 uidw: uidwWalletPubKey,
@@ -549,14 +555,34 @@ export class UserStore {
         this.notifications.splice(index, 1)
     }
 
+    fetchNotificationsAsync = async ({
+        publicKey,
+        lastCheckedNotifications,
+    }: {
+        publicKey: string
+        lastCheckedNotifications: number
+    }) => {
+        try {
+            const { payload } = await discussions.getPostsForNotifications(
+                publicKey,
+                lastCheckedNotifications,
+                undefined,
+                0,
+                250,
+            )
+
+            return payload
+        } catch (error) {
+            throw error
+        }
+    }
+
     fetchNotifications = async (publicKey: string): Promise<void> => {
         try {
-            let { payload } = await discussions.getPostsForNotifications(
+            const payload = await this.fetchNotificationsAsync({
                 publicKey,
-                this.lastCheckedNotifications,
-                undefined,
-                0
-            )
+                lastCheckedNotifications: this.lastCheckedNotifications,
+            })
 
             this.notificationCount = payload.length
             this.notifications = payload.filter((item: any, index: number) => index <= 5)

@@ -621,7 +621,7 @@ export default class DiscussionsService {
             response.payload = await Promise.all(
                 response.payload.map(async item => {
                     return {
-                        ...item,
+                        ...Post.fromDbObject(item),
                         url: await getThreadUrl(item, item.title === '' ? item.uuid : null),
                     }
                 })
