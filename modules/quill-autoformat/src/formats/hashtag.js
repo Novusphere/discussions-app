@@ -7,14 +7,15 @@ class Hashtag extends Embed {
         let node = super.create(value)
         let _value = value
 
-        if (_value.indexOf('/tag/') === -1) {
-            _value = `/tag/${value}`
-        }
+        const checkValueRegexResult = _value.match(/([a-zA-Z0-9])+/i)
 
-        node.setAttribute('href', _value)
-        node.setAttribute('spellcheck', false)
-        node.textContent = '#' + value
-        return node
+        if (checkValueRegexResult && checkValueRegexResult.length) {
+            _value = `/tag/${checkValueRegexResult[0]}`
+            node.setAttribute('href', _value)
+            node.setAttribute('spellcheck', false)
+            node.textContent = '#' + value
+            return node
+        }
     }
 
     static formats(domNode) {
