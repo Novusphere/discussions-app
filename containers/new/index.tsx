@@ -1,4 +1,4 @@
-import React, { useCallback, useState } from 'react'
+import React, { useCallback, useMemo, useState } from 'react'
 import { Button, Form, Input, Select } from 'antd'
 import { RootStore, useStores } from '@stores'
 import { useObserver } from 'mobx-react-lite'
@@ -15,7 +15,7 @@ import {
 } from '@utils'
 import { discussions } from '@novuspherejs'
 import Helmet from 'react-helmet'
-import { useHistory } from 'react-router-dom'
+import { useHistory, useParams } from 'react-router-dom'
 
 const { Option } = Select
 
@@ -26,9 +26,11 @@ const NewPageNoSSRUnwrapped = ({ form, prefilledTag }: any) => {
     const [isPreviewing, setPreview] = useState(false)
     const [options, setOptions] = useState(tagStore.tagsWithoutBaseOptions)
     const [newOption, setNewOption] = useState(null)
-    const togglePreview = useCallback(() => setPreview(!isPreviewing), [])
+    const setAndUpdatePreview = useCallback(() => {
+        setPreview(true)
+    }, [])
+    const contentPreview = useMemo(() => form.getFieldValue('content'), [form])
     const history = useHistory()
-
     const handleSubmit = useCallback(e => {
         setLoading(true)
         e.preventDefault()
@@ -132,7 +134,6 @@ const NewPageNoSSRUnwrapped = ({ form, prefilledTag }: any) => {
             }
         })
     }, [])
-
     const handleOnSearch = useCallback(value => {
         if (value && value.length > 0) {
             if (options.find(option => option.value === value)) {
@@ -220,14 +221,14 @@ const NewPageNoSSRUnwrapped = ({ form, prefilledTag }: any) => {
                 </Form.Item>
             </Form>
             <div className={'mt3 flex flex-row justify-end'}>
-                <Button className={'mr2'} onClick={togglePreview} disabled={loading}>
+                <Button className={'mr2'} onClick={setAndUpdatePreview} disabled={loading}>
                     Preview
                 </Button>
                 <Button type={'primary'} onClick={handleSubmit} loading={loading}>
                     Create new post
                 </Button>
             </div>
-            {form.getFieldValue('content') && isPreviewing && (
+            {contentPreview && isPreviewing && (
                 <div className={'mt3 w-100 ba b--light-gray pa4 br3 relative'}>
                     <div className={'flex flex-row items-center'}>
                         <UserNameWithIcon
@@ -241,7 +242,7 @@ const NewPageNoSSRUnwrapped = ({ form, prefilledTag }: any) => {
                         <span className={'db mt3 b f4'}>{form.getFieldValue('title')}</span>
                     )}
                     <RichTextPreview hideFade className={'mt3'}>
-                        {form.getFieldValue('content')}
+                        {contentPreview}
                     </RichTextPreview>
                 </div>
             )}
@@ -251,23 +252,16 @@ const NewPageNoSSRUnwrapped = ({ form, prefilledTag }: any) => {
 
 const NewPageNoSSR = Form.create({ name: 'NewPost' })(NewPageNoSSRUnwrapped) as any
 
-const NewPage: React.FC<any> = ({ prefilledTag }) => {
+const NewPage: React.FC<any> = () => {
+    const { tag } = useParams()
     return (
         <>
             <Helmet>
                 <title>{'Create a new post'}</title>
             </Helmet>
-            <NewPageNoSSR prefilledTag={prefilledTag} />
+            <NewPageNoSSR prefilledTag={tag} />
         </>
     )
 }
-
-// TODO: Move this to useEffect
-// NewPage.getInitialProps = async ({ query }) => {
-//     const prefilledTag = query.tag
-//     return {
-//         prefilledTag,
-//     }
-// }
 
 export default NewPage

@@ -364,7 +364,9 @@ export class UserStore {
 
                 if (data['watching']) this.watching.replace(data['watching'])
 
-                if (data['tags']) this.tagStore.subscribed.replace(data['tags'])
+                if (data['tags']) {
+                    this.tagStore.subscribed = data['tags'].map(tag => tag.trim())
+                }
 
                 if (data['following'])
                     this.following.replace(
@@ -444,7 +446,7 @@ export class UserStore {
                 lastCheckedNotifications: this.lastCheckedNotifications,
                 watching: [...this.watching.toJS()],
                 following: following,
-                tags: [...this.tagStore.subscribed.toJS()],
+                tags: [...this.tagStore.subscribed],
                 moderation: {
                     blockedPosts: [...this.blockedPosts.toJS()],
                     blockedUsers: [...this.blockedUsers.toJS()],
@@ -587,7 +589,6 @@ export class UserStore {
             this.notificationCount = payload.length
             this.notifications = payload.filter((item: any, index: number) => index <= 5)
 
-            this.watchAndUpdateWatchedPostsCount()
         } catch (error) {
             this.notifications = []
             return error

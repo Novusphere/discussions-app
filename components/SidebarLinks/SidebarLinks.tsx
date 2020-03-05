@@ -74,12 +74,12 @@ const SidebarLinks: FunctionComponent<ISidebarTopLevelLinksProps> = () => {
                     }}
                 />
             </div>
-            {![...tagStore.subscribed.toJS()].length && (
+            {![...tagStore.subscribed].length && (
                 <span className={'f6 light-silver ph3'}>Add a #tag to see more posts!</span>
             )}
             {useObserver(() => (
                 <div className={'mt3 db'}>
-                    {[...tagStore.subscribed.toJS()].map(subscribed => {
+                    {[...tagStore.subscribed].map(subscribed => {
                         const tag: any = tagStore.tagModelFromObservables(subscribed)
                         if (!tag) return null
                         return (

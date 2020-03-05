@@ -1,4 +1,4 @@
-import { action, computed, observable } from 'mobx'
+import { computed, observable } from 'mobx'
 import { RootStore } from '@stores/index'
 import { persist } from 'mobx-persist'
 import { task } from 'mobx-task'
@@ -7,7 +7,7 @@ import { nsdb } from '@novuspherejs'
 export class TagStore {
     @persist('list')
     @observable
-    subscribed = observable.array([])
+    subscribed = []
 
     @observable
     trendingTags: { tag: string }[] = []
@@ -45,10 +45,16 @@ export class TagStore {
             }))
     }
 
+    @computed get genericTagLogo() {
+        return this.tags.has('atmos')
+            ? this.tags.get('atmos').logo
+            : 'https://cdn.novusphere.io/static/atmos.png'
+    }
+
     getGenericTag(tagName: string) {
         return {
             name: tagName,
-            logo: 'https://cdn.novusphere.io/static/atmos.svg',
+            logo: this.genericTagLogo,
             url: `/tag/${tagName}`,
         }
     }
@@ -70,6 +76,7 @@ export class TagStore {
     }
 
     addSubscribed = (tagName: string) => {
+        tagName = tagName.trim()
         if (this.subscribed.indexOf(tagName) === -1) {
             this.subscribed.unshift(tagName)
             this.uiStore.showMessage(`You have subbed to #${tagName}`, 'success')

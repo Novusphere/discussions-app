@@ -16,6 +16,7 @@ const ThreadViewPage = lazy(() => import('@containers/tag/post'))
 const TagsViewPage = lazy(() => import('@containers/tags'))
 const UserViewPage = lazy(() => import('@containers/u'))
 const NotificationsPage = lazy(() => import('@containers/notifications'))
+const NotFoundPage = lazy(() => import('@containers/404'))
 
 export const routes = [
     {
@@ -34,7 +35,7 @@ export const routes = [
         component: FeedPage,
     },
     {
-        path: '/new',
+        path: '/new/:tag?',
         exact: true,
         component: NewPage,
     },
@@ -73,6 +74,11 @@ export const routes = [
         exact: true,
         component: NotificationsPage,
     },
+    {
+        path: '/404',
+        exact: true,
+        component: NotFoundPage,
+    }
 ]
 
 const Routes = () => (

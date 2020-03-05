@@ -68,7 +68,7 @@ app.get('/feed', (req, res) => {
     })
 })
 
-app.get('/new', (req, res) => {
+app.get('/new/:tag?', (req, res) => {
     serveAndReplaceMeta(res, {
         title: 'Create a new post',
         description: 'Create a new post',
@@ -169,6 +169,18 @@ app.get('/tag/:tag/:id/:title', async (req, res) => {
         description: description,
         image: tagModel.icon,
     })
+})
+
+app.get('/404', (req, res) => {
+    serveAndReplaceMeta(res, {
+        title: '404 Not Found',
+        description: 'This page is either broken or does not exist',
+        image: res.genericTagUrl,
+    })
+})
+
+app.get('*', (req, res) => {
+    res.redirect('/404')
 })
 
 const port = process.env.PORT || 3000

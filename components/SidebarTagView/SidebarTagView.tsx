@@ -52,7 +52,7 @@ const SidebarTagView: FunctionComponent<ISidebarTagViewProps> = () => {
                     </Button>
                 </div>
                 <div className={'mt3'}>
-                    <Button block type={'primary'} onClick={() => history.push('/new')}>
+                    <Button block type={'primary'} onClick={() => history.push(`/new/${tag}`)}>
                         Create Post
                     </Button>
                 </div>

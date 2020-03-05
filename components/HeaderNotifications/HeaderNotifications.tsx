@@ -94,11 +94,13 @@ const HeaderNotifications: FunctionComponent<IHeaderNotificationsProps> = () => 
         () => {
             if (authStore.hasAccount) {
                 userStore.pingServerForData()
+                userStore.watchAndUpdateWatchedPostsCount()
                 walletStore.refreshAllBalances()
             }
         },
         20000,
-        true
+        true,
+        [authStore.hasAccount],
     )
 
     return useObserver(() => (
@@ -131,4 +133,4 @@ const HeaderNotifications: FunctionComponent<IHeaderNotificationsProps> = () => 
 
 HeaderNotifications.defaultProps = {}
 
-export default observer(HeaderNotifications)
+export default HeaderNotifications

@@ -189,7 +189,7 @@ const RichTextPreview: FunctionComponent<IRichTextPreviewProps> = ({
                 {children}
             </Markdown>
         ),
-        []
+        [children]
     )
 
     return (

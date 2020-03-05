@@ -449,7 +449,7 @@ const Replies: FunctionComponent<IRepliesProps> = props => {
                         />
                     </div>
                 }
-                <div className={'tl pt2 w-100'}>
+                <div className={'tl pt2 w-100 overflow-hidden'}>
                     <div className={'flex flex-row items-center w-100 relative'}>
                         <div className={'flex flex-row items-center'}>
                             <div className={'pr2'}>
