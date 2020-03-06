@@ -2,7 +2,7 @@ import React, { FunctionComponent } from 'react'
 import { Icon, Badge, Button, List, Avatar, Dropdown } from 'antd'
 
 import styles from './HeaderNotifications.module.scss'
-import { useObserver, observer } from 'mobx-react-lite'
+import { observer } from 'mobx-react-lite'
 import { RootStore, useStores } from '@stores'
 import { getIdenticon, useInterval } from '@utils'
 import { RichTextPreview } from '@components'
@@ -94,16 +94,16 @@ const HeaderNotifications: FunctionComponent<IHeaderNotificationsProps> = () => 
         () => {
             if (authStore.hasAccount) {
                 userStore.pingServerForData()
-                userStore.watchAndUpdateWatchedPostsCount()
+                // userStore.watchAndUpdateWatchedPostsCount()
                 walletStore.refreshAllBalances()
             }
         },
         20000,
         true,
-        [authStore.hasAccount],
+        [authStore.hasAccount]
     )
 
-    return useObserver(() => (
+    return (
         <Dropdown
             overlay={NotificationContainer()}
             overlayClassName={styles.notificationsOverlayContainer}
@@ -128,9 +128,9 @@ const HeaderNotifications: FunctionComponent<IHeaderNotificationsProps> = () => 
                 </Button>
             </Badge>
         </Dropdown>
-    ))
+    )
 }
 
 HeaderNotifications.defaultProps = {}
 
-export default HeaderNotifications
+export default observer(HeaderNotifications)

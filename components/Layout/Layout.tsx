@@ -1,4 +1,4 @@
-import React, { FunctionComponent, useEffect } from 'react'
+import React, { FunctionComponent, useEffect, memo } from 'react'
 import { Layout as AntdLayout, message, notification } from 'antd'
 import styles from './Layout.module.scss'
 import {
@@ -68,7 +68,7 @@ const Layout: FunctionComponent<ILayoutProps> = ({ children }) => {
                 if (timesRun === 5) {
                     clearInterval(interval)
                 }
-            }, 2000)
+            }, 5000)
         }
 
         return () => {
@@ -139,4 +139,4 @@ const Layout: FunctionComponent<ILayoutProps> = ({ children }) => {
 
 Layout.defaultProps = {}
 
-export default Layout
+export default memo(Layout)

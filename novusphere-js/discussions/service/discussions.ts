@@ -128,7 +128,11 @@ export default class DiscussionsService {
 
     async bkToKeys(
         bk: string
-    ): Promise<{ post: { priv: string; pub: string }; uidwallet: { priv: string; pub: string }; account: { priv: string; pub: string } }> {
+    ): Promise<{
+        post: { priv: string; pub: string }
+        uidwallet: { priv: string; pub: string }
+        account: { priv: string; pub: string }
+    }> {
         const seed = await bip39.mnemonicToSeed(bk)
         const node = await bip32.fromSeed(seed)
 
@@ -476,7 +480,7 @@ export default class DiscussionsService {
         count = 0,
         limit = 20,
         key = '',
-        sort = 'popular',
+        sort = 'popular'
     ): Promise<{
         posts: Post[]
         cursorId: number
@@ -521,7 +525,7 @@ export default class DiscussionsService {
         count = 0,
         limit = 20,
         key = '',
-        sort = 'popular',
+        sort = 'popular'
     ): Promise<{
         posts: Post[]
         cursorId: number
@@ -600,15 +604,30 @@ export default class DiscussionsService {
         lastCheckedNotifications: number,
         cursorId = undefined,
         count = 0,
-        limit = 20
+        limit = 20,
+        watchedIds = []
     ): Promise<INSDBSearchQuery> {
         try {
             const response = await nsdb.search({
                 pipeline: [
                     {
                         $match: {
-                            createdAt: { $gte: lastCheckedNotifications },
-                            mentions: { $in: [postPublicKey] },
+                            $or: [
+                                {
+                                    createdAt: { $gte: lastCheckedNotifications },
+                                    mentions: { $in: [postPublicKey] },
+                                },
+                                ...watchedIds.map(wid => {
+                                    const dId = Post.decodeId(wid)
+                                    return {
+                                        createdAt: {
+                                            $gte: Math.max(dId.timeGte, lastCheckedNotifications),
+                                            $lte: dId.timeLte,
+                                        },
+                                        transaction: { $regex: `^${dId.txid32}` },
+                                    }
+                                }),
+                            ],
                         },
                     },
                     { $sort: { createdAt: -1 } },

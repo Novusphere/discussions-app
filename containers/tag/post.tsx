@@ -722,11 +722,6 @@ const PostPageComponentObserverable: React.FunctionComponent<IPostPageProps> = (
                                     title={'Share post'}
                                     className={'mh1'}
                                     icon={'share-alt'}
-                                    onClick={() =>
-                                        openInNewTab(
-                                            `https://bloks.io/transaction/${postStore.observableThread.openingPost.transaction}`
-                                        )
-                                    }
                                 />
                             </Popover>
                         </div>

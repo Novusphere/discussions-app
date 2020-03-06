@@ -496,7 +496,9 @@ export class UserStore {
                 (encodedThreadId: string, cb: any) => {
                     discussions
                         .getThreadReplyCount(encodedThreadId)
-                        .then(threadReplyCount => {
+                        .then(() => {
+                            const threadReplyCount = 10
+                        // .then(threadReplyCount => {
                             const [, diff] = this.watching.get(encodedThreadId)
                             if (threadReplyCount - diff > 0) {
                                 return cb(null, [
@@ -512,6 +514,7 @@ export class UserStore {
                         })
                 },
                 async (error: any, result: any) => {
+                    console.log(result)
                     // results is an array of objects [encodedId, diff]
                     if (result[0] !== undefined && result.length > 0) {
                         each(result, async (item: any, cb: any) => {
@@ -521,6 +524,8 @@ export class UserStore {
                             const tag: any = this.tagStore.tagModelFromObservables(
                                 thread.openingPost.sub
                             )
+
+                            console.log('thread: ', thread)
 
                             this.notifications.unshift({
                                 ...thread.openingPost,
@@ -534,7 +539,7 @@ export class UserStore {
                             } as any)
 
                             this.notificationCount += 1
-                            this.watching.set(threadId, [currentCount, currentCount])
+                            // this.watching.set(threadId, [currentCount, currentCount])
 
                             return cb()
                         })
@@ -560,9 +565,11 @@ export class UserStore {
     fetchNotificationsAsync = async ({
         publicKey,
         lastCheckedNotifications,
+        watchedIds,
     }: {
         publicKey: string
         lastCheckedNotifications: number
+        watchedIds: string[],
     }) => {
         try {
             const { payload } = await discussions.getPostsForNotifications(
@@ -571,6 +578,7 @@ export class UserStore {
                 undefined,
                 0,
                 250,
+                watchedIds,
             )
 
             return payload
@@ -581,9 +589,12 @@ export class UserStore {
 
     fetchNotifications = async (publicKey: string): Promise<void> => {
         try {
+            const threads = [...this.watching.keys()]
+
             const payload = await this.fetchNotificationsAsync({
                 publicKey,
                 lastCheckedNotifications: this.lastCheckedNotifications,
+                watchedIds: threads,
             })
 
             this.notificationCount = payload.length

@@ -33,6 +33,7 @@ const RtLink: FunctionComponent<any> = ({ children, href, index }) => {
                     case /https?:\/\/www.youtube.com\/watch\?feature=(.*?)&v=[a-zA-Z0-9-_]+/.test(
                         href
                     ):
+                    case /https?:\/\/www.youtube.com\/watch\?t=[0-9]+/.test(href):
                     case /https?:\/\/www.youtube.com\/watch\?v=[a-zA-Z0-9-_]+/.test(href):
                     case /https?:\/\/youtu.be\/[a-zA-Z0-9-_]+/.test(href):
                         embed = await nsdb.cors(
