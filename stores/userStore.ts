@@ -5,9 +5,7 @@ import axios from 'axios'
 import _ from 'lodash'
 import { discussions, nsdb, Post } from '@novuspherejs'
 import moment from 'moment'
-// @ts-ignore
 import mapSeries from 'async/mapSeries'
-// @ts-ignore
 import each from 'async/each'
 import { encodeId, getThreadTitle, getOrigin } from '@utils'
 
@@ -43,6 +41,16 @@ export class UserStore {
     @observable private tagStore: RootStore['tagStore']
     @observable private authStore: RootStore['authStore']
 
+    @observable
+    localStorageVersion = {
+        following: 1583628150,
+        watching: 1583628150,
+        blockedUsers: 1583628150,
+        blockedPosts: 1583628150,
+        delegated: 1583628150,
+        pinnedPosts: 1583628150,
+    }
+
     constructor(rootStore: RootStore) {
         this.uiStore = rootStore.uiStore
         this.tagStore = rootStore.tagStore
@@ -62,7 +70,7 @@ export class UserStore {
         )
     }
 
-    resetUserStore = () => {
+    resetPostObservables = () => {
         this.following.replace([])
         this.watching.replace([])
         this.blockedUsers.replace([])
@@ -70,6 +78,10 @@ export class UserStore {
         this.delegated.replace([])
         this.pinnedPosts.replace([])
         this.blockedByDelegation.replace([])
+    }
+
+    resetUserStore = () => {
+        this.resetPostObservables()
         this.notificationCount = 0
         this.lastCheckedNotifications = 0
         this.notifications = []
@@ -362,6 +374,25 @@ export class UserStore {
             data = data['data']
 
             if (data) {
+                /**
+                 * Check localStorageVersion for comparison
+                 * If version mismatch, reset users' local storage version
+                 *
+                 * This required to ensure we are able to reset LS when we change code or add features
+                 * that affect LS, otherwise there should be a way to migrate.
+                 */
+                if (
+                    typeof data['localStorageVersion'] === undefined ||
+                    data['localStorageVersion'] !== this.localStorageVersion
+                ) {
+                    // find mismatch versions
+
+                    this.resetPostObservables()
+                    this.syncDataFromLocalToServer()
+                    // exit out
+                    return
+                }
+
                 if (typeof data['lastCheckedNotifications'] !== 'undefined')
                     this.lastCheckedNotifications = data['lastCheckedNotifications']
 
@@ -442,6 +473,7 @@ export class UserStore {
             } = this.authStore
 
             const dataToSync = {
+                localStorageVersion: this.localStorageVersion,
                 uidw: uidwWalletPubKey,
                 displayName: displayName,
                 postPub: postPub,
