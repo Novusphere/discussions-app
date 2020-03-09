@@ -605,10 +605,11 @@ export default class DiscussionsService {
         cursorId = undefined,
         count = 0,
         limit = 20,
-        watchedIds = []
+        watchedIds = [],
+        viewAll = false
     ): Promise<INSDBSearchQuery> {
         try {
-            const response = await nsdb.search({
+            const sq = {
                 pipeline: [
                     {
                         $match: {
@@ -617,16 +618,12 @@ export default class DiscussionsService {
                                     createdAt: { $gte: lastCheckedNotifications },
                                     mentions: { $in: [postPublicKey] },
                                 },
-                                ...watchedIds.map(wid => {
-                                    const dId = Post.decodeId(wid)
-                                    return {
-                                        createdAt: {
-                                            $gte: Math.max(dId.timeGte, lastCheckedNotifications),
-                                            $lte: dId.timeLte,
-                                        },
-                                        transaction: { $regex: `^${dId.txid32}` },
-                                    }
-                                }),
+                                ...watchedIds.map(([id, post]) => ({
+                                    threadUuid: post.threadUuid,
+                                    createdAt: {
+                                        $gte: viewAll ? post.watchedAt : lastCheckedNotifications,
+                                    },
+                                })),
                             ],
                         },
                     },
@@ -635,18 +632,13 @@ export default class DiscussionsService {
                 cursorId,
                 count,
                 limit,
-            })
+            }
 
-            // response.payload = await Promise.all(
-            //     response.payload.map(async item => {
-            //         return {
-            //             ...Post.fromDbObject(item),
-            //             url: await getThreadUrl(item, item.title === '' ? item.uuid : null),
-            //         }
-            //     })
-            // )
-
-            return response
+            const response = await nsdb.search(sq)
+            return {
+                ...response,
+                payload: response.payload.map(p => Post.fromDbObject(p)),
+            }
         } catch (error) {
             throw error
         }

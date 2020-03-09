@@ -1,5 +1,5 @@
 import { persist } from 'mobx-persist'
-import { observable, when, computed } from 'mobx'
+import { observable, when, computed, ObservableMap } from 'mobx'
 import { RootStore } from '@stores/index'
 import axios from 'axios'
 import _ from 'lodash'
@@ -43,12 +43,12 @@ export class UserStore {
 
     @observable
     localStorageVersion = {
-        following: 1583628150,
-        watching: 1583628150,
-        blockedUsers: 1583628150,
-        blockedPosts: 1583628150,
-        delegated: 1583628150,
-        pinnedPosts: 1583628150,
+        following: 1583712275528,
+        watching: 1583712275528,
+        blockedUsers: 1583712275528,
+        blockedPosts: 1583712275528,
+        delegated: 1583712275528,
+        pinnedPosts: 1583712275528,
     }
 
     constructor(rootStore: RootStore) {
@@ -386,8 +386,18 @@ export class UserStore {
                     data['localStorageVersion'] !== this.localStorageVersion
                 ) {
                     // find mismatch versions
+                    let mismatchObservables = {}
+                    const serverVersions = data['localStorageVersion']
 
-                    this.resetPostObservables()
+                    Object.keys(serverVersions).forEach(version => {
+                        if (serverVersions[version] !== this.localStorageVersion[version]) {
+                            if (this[version] && this[version] instanceof ObservableMap) {
+                                console.log('clearing', version)
+                                this[version].replace([])
+                            }
+                        }
+                    })
+
                     this.syncDataFromLocalToServer()
                     // exit out
                     return
@@ -587,7 +597,7 @@ export class UserStore {
     }
 
     @computed get watchedThreadIds() {
-        return [...this.watching.keys()]
+        return [...this.watching.entries()]
     }
 
     /**
@@ -605,10 +615,12 @@ export class UserStore {
         publicKey,
         lastCheckedNotifications,
         watchedIds,
+        viewAll ,
     }: {
         publicKey: string
         lastCheckedNotifications: number
-        watchedIds: string[]
+        watchedIds: any[]
+        viewAll: boolean
     }) => {
         try {
             const { payload } = await discussions.getPostsForNotifications(
@@ -617,11 +629,9 @@ export class UserStore {
                 undefined,
                 0,
                 250,
-                watchedIds
+                watchedIds,
+                viewAll,
             )
-
-            console.log(payload)
-
             return payload
         } catch (error) {
             throw error
@@ -634,6 +644,7 @@ export class UserStore {
                 publicKey,
                 lastCheckedNotifications: this.lastCheckedNotifications,
                 watchedIds: this.watchedThreadIds,
+                viewAll: false,
             })
 
             this.notificationCount = payload.length

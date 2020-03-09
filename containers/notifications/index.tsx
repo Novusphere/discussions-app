@@ -16,6 +16,7 @@ const NotificationsPage = () => {
                 publicKey: postPub,
                 lastCheckedNotifications: 0,
                 watchedIds: userStore.watchedThreadIds,
+                viewAll: true,
             }),
         []
     )
@@ -35,8 +36,6 @@ const NotificationsPage = () => {
     if (!authStore.hasAccount) {
         return <Redirect to={'/'} />
     }
-
-    return null
 
     return (
         <>
