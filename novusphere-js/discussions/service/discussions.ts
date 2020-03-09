@@ -637,14 +637,14 @@ export default class DiscussionsService {
                 limit,
             })
 
-            response.payload = await Promise.all(
-                response.payload.map(async item => {
-                    return {
-                        ...Post.fromDbObject(item),
-                        url: await getThreadUrl(item, item.title === '' ? item.uuid : null),
-                    }
-                })
-            )
+            // response.payload = await Promise.all(
+            //     response.payload.map(async item => {
+            //         return {
+            //             ...Post.fromDbObject(item),
+            //             url: await getThreadUrl(item, item.title === '' ? item.uuid : null),
+            //         }
+            //     })
+            // )
 
             return response
         } catch (error) {

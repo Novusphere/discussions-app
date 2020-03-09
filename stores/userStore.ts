@@ -1,5 +1,5 @@
 import { persist } from 'mobx-persist'
-import { observable, when } from 'mobx'
+import { observable, when, computed } from 'mobx'
 import { RootStore } from '@stores/index'
 import axios from 'axios'
 import _ from 'lodash'
@@ -272,7 +272,7 @@ export class UserStore {
         this.syncDataFromLocalToServer()
     }
 
-    toggleThreadWatch = (id: string, count?: number, suppressToast = false) => {
+    toggleThreadWatch = (id: string, { post = null, suppressToast = false }) => {
         if (this.watching.has(id)) {
             this.watching.delete(id)
             this.syncDataFromLocalToServer()
@@ -281,8 +281,11 @@ export class UserStore {
             return
         }
 
-        if (this.watching.size <= 99) {
-            this.watching.set(id, [count, count])
+        if (post && this.watching.size <= 99) {
+            this.watching.set(id, {
+                ...post,
+                watchedAt: Date.now(),
+            })
             if (!suppressToast)
                 this.uiStore.showMessage('Success! You are watching this thread', 'success')
         } else {
@@ -498,7 +501,7 @@ export class UserStore {
                         .getThreadReplyCount(encodedThreadId)
                         .then(() => {
                             const threadReplyCount = 10
-                        // .then(threadReplyCount => {
+                            // .then(threadReplyCount => {
                             const [, diff] = this.watching.get(encodedThreadId)
                             if (threadReplyCount - diff > 0) {
                                 return cb(null, [
@@ -551,6 +554,10 @@ export class UserStore {
         }
     }
 
+    @computed get watchedThreadIds() {
+        return [...this.watching.keys()]
+    }
+
     /**
      * Delete a notification by index
      *
@@ -569,7 +576,7 @@ export class UserStore {
     }: {
         publicKey: string
         lastCheckedNotifications: number
-        watchedIds: string[],
+        watchedIds: string[]
     }) => {
         try {
             const { payload } = await discussions.getPostsForNotifications(
@@ -578,8 +585,10 @@ export class UserStore {
                 undefined,
                 0,
                 250,
-                watchedIds,
+                watchedIds
             )
+
+            console.log(payload)
 
             return payload
         } catch (error) {
@@ -589,17 +598,14 @@ export class UserStore {
 
     fetchNotifications = async (publicKey: string): Promise<void> => {
         try {
-            const threads = [...this.watching.keys()]
-
             const payload = await this.fetchNotificationsAsync({
                 publicKey,
                 lastCheckedNotifications: this.lastCheckedNotifications,
-                watchedIds: threads,
+                watchedIds: this.watchedThreadIds,
             })
 
             this.notificationCount = payload.length
             this.notifications = payload.filter((item: any, index: number) => index <= 5)
-
         } catch (error) {
             this.notifications = []
             return error
