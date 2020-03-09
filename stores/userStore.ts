@@ -386,8 +386,12 @@ export class UserStore {
                     data['localStorageVersion'] !== this.localStorageVersion
                 ) {
                     // find mismatch versions
-                    let mismatchObservables = {}
                     const serverVersions = data['localStorageVersion']
+
+                    if (!serverVersions || typeof serverVersions === 'undefined') {
+                        this.resetPostObservables()
+                        this.syncDataFromLocalToServer()
+                    }
 
                     Object.keys(serverVersions).forEach(version => {
                         if (serverVersions[version] !== this.localStorageVersion[version]) {
@@ -559,7 +563,6 @@ export class UserStore {
                         })
                 },
                 async (error: any, result: any) => {
-                    console.log(result)
                     // results is an array of objects [encodedId, diff]
                     if (result[0] !== undefined && result.length > 0) {
                         each(result, async (item: any, cb: any) => {
@@ -569,8 +572,6 @@ export class UserStore {
                             const tag: any = this.tagStore.tagModelFromObservables(
                                 thread.openingPost.sub
                             )
-
-                            console.log('thread: ', thread)
 
                             this.notifications.unshift({
                                 ...thread.openingPost,

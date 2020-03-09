@@ -11,6 +11,8 @@ export class SettingsStore {
     @observable private uiStore: RootStore['uiStore']
     @observable private tagStore: RootStore['tagStore']
 
+    @observable called = false
+
     constructor(rootStore: RootStore) {
         this.userStore = rootStore.userStore
         this.uiStore = rootStore.uiStore

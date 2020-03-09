@@ -8,7 +8,7 @@ import * as bip32 from 'bip32'
 import ecc from 'eosjs-ecc'
 import axios from 'axios'
 import { INSDBSearchQuery } from '../../nsdb'
-import { encodeId, getThreadTitle, getThreadUrl, isDev } from '@utils'
+import { encodeId, getSettings, getThreadTitle, getThreadUrl, isDev } from '@utils'
 //import { isDev } from '@utils'
 
 export interface IBrainKeyPair {
@@ -429,17 +429,7 @@ export default class DiscussionsService {
             thread.init(posts)
             thread.normalize()
 
-            const { data: setting } = await axios.get(`${nsdb.api}/discussions/site`)
-
-            // get icon for seo
-            // #196
-            let host
-
-            if (process.env.NODE_ENV === 'production' || isDev) host = 'discussions.app'
-
-            let settings = setting[host]
-
-            if (!settings) settings = setting['discussions.app']
+            let settings = await getSettings()
 
             if (
                 typeof thread !== 'undefined' &&
