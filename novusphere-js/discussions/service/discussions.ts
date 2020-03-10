@@ -8,7 +8,7 @@ import * as bip32 from 'bip32'
 import ecc from 'eosjs-ecc'
 import axios from 'axios'
 import { INSDBSearchQuery } from '../../nsdb'
-import { encodeId, getSettings, getThreadTitle, getThreadUrl, isDev } from '@utils'
+import { encodeId, getHostName, getSettings, getThreadTitle, getThreadUrl, isDev } from '@utils'
 //import { isDev } from '@utils'
 
 export interface IBrainKeyPair {
@@ -429,7 +429,7 @@ export default class DiscussionsService {
             thread.init(posts)
             thread.normalize()
 
-            let settings = await getSettings()
+            let settings = await getSettings(getHostName())
 
             if (
                 typeof thread !== 'undefined' &&

@@ -19,7 +19,7 @@ export const sleep = (milliseconds: number) => {
     return new Promise(resolve => setTimeout(resolve, milliseconds))
 }
 
-export const getSettings = async (host = getHostName()) => {
+export const getSettings = async (host) => {
     const { data: setting } = await axios.get(`${nsdb.api}/discussions/site`)
 
     let settings = setting[host]

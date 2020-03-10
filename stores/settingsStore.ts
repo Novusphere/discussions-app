@@ -1,7 +1,7 @@
 import { observable } from 'mobx'
 import { RootStore } from '@stores/index'
 import { nsdb } from '@novuspherejs'
-import { getSettings, isDev } from '@utils'
+import { getHostName, getSettings, isDev } from '@utils'
 import axios from 'axios'
 import _ from 'lodash'
 
@@ -20,7 +20,7 @@ export class SettingsStore {
     }
 
     loadSettings = async () => {
-        const settings = await getSettings()
+        const settings = await getSettings(getHostName())
 
         if (settings) {
             const tags = settings['tags']
