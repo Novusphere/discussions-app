@@ -1,6 +1,6 @@
 import axios from 'axios'
 import { ApiGetUnifiedId } from '../interfaces/ApiGet-UnifiedId'
-import { getHostName, isDev, getOrigin } from '@utils'
+import { getOrigin } from '@utils'
 const ecc = require('eosjs-ecc')
 export const DEFAULT_NSDB_ENDPOINT = 'https://atmosdb.novusphere.io'
 

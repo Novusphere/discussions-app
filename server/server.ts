@@ -151,7 +151,7 @@ app.get('/tag/:tag/:id/:title', async (req, res) => {
         }
     }
 
-    const thread = await discussions.getThread(id)
+    const thread = await discussions.getThread(id, '', req.hostname)
 
     let title = '',
         description = ''

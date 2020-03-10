@@ -396,7 +396,7 @@ export default class DiscussionsService {
         return searchQuery
     }
 
-    async getThread(_id: string, key = ''): Promise<Thread | null> {
+    async getThread(_id: string, key = '', hostname = getHostName()): Promise<Thread | null> {
         try {
             const searchQuery = this.convertEncodedThreadIdIntoQuery(_id, key)
 
@@ -429,7 +429,7 @@ export default class DiscussionsService {
             thread.init(posts)
             thread.normalize()
 
-            let settings = await getSettings(getHostName())
+            let settings = await getSettings(hostname)
 
             if (
                 typeof thread !== 'undefined' &&
