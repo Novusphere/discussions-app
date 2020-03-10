@@ -11,7 +11,7 @@ const Footer: FunctionComponent<IFooterProps> = () => {
         <>
             {useObserver(() => (
                 <p className={'b f6'}>
-                    Version: {getVersion()} (dev)
+                    Version {getVersion()}
                 </p>
             ))}
             <p>
