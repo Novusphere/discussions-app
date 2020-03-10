@@ -29,7 +29,7 @@ const WatchedThreads = () => {
 
     const unwatchThread = useCallback(
         (id: string, index: number) => {
-            userStore.toggleThreadWatch(id)
+            userStore.watching.delete(id)
             setThreads(prevState => prevState.filter((value, i) => i !== index))
         },
         [threads]

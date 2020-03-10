@@ -8,7 +8,7 @@ import * as bip32 from 'bip32'
 import ecc from 'eosjs-ecc'
 import axios from 'axios'
 import { INSDBSearchQuery } from '../../nsdb'
-import { encodeId, getThreadTitle, getThreadUrl, isDev } from '@utils'
+import { encodeId, getSettings, getThreadTitle, getThreadUrl, isDev } from '@utils'
 //import { isDev } from '@utils'
 
 export interface IBrainKeyPair {
@@ -429,17 +429,7 @@ export default class DiscussionsService {
             thread.init(posts)
             thread.normalize()
 
-            const { data: setting } = await axios.get(`${nsdb.api}/discussions/site`)
-
-            // get icon for seo
-            // #196
-            let host
-
-            if (process.env.NODE_ENV === 'production' || isDev) host = 'discussions.app'
-
-            let settings = setting[host]
-
-            if (!settings) settings = setting['discussions.app']
+            let settings = await getSettings()
 
             if (
                 typeof thread !== 'undefined' &&
@@ -605,10 +595,11 @@ export default class DiscussionsService {
         cursorId = undefined,
         count = 0,
         limit = 20,
-        watchedIds = []
+        watchedIds = [],
+        viewAll = false
     ): Promise<INSDBSearchQuery> {
         try {
-            const response = await nsdb.search({
+            const sq = {
                 pipeline: [
                     {
                         $match: {
@@ -617,16 +608,12 @@ export default class DiscussionsService {
                                     createdAt: { $gte: lastCheckedNotifications },
                                     mentions: { $in: [postPublicKey] },
                                 },
-                                ...watchedIds.map(wid => {
-                                    const dId = Post.decodeId(wid)
-                                    return {
-                                        createdAt: {
-                                            $gte: Math.max(dId.timeGte, lastCheckedNotifications),
-                                            $lte: dId.timeLte,
-                                        },
-                                        transaction: { $regex: `^${dId.txid32}` },
-                                    }
-                                }),
+                                ...watchedIds.map(([id, post]) => ({
+                                    threadUuid: post.threadUuid,
+                                    createdAt: {
+                                        $gte: viewAll ? post.watchedAt : lastCheckedNotifications,
+                                    },
+                                })),
                             ],
                         },
                     },
@@ -635,18 +622,13 @@ export default class DiscussionsService {
                 cursorId,
                 count,
                 limit,
-            })
+            }
 
-            response.payload = await Promise.all(
-                response.payload.map(async item => {
-                    return {
-                        ...Post.fromDbObject(item),
-                        url: await getThreadUrl(item, item.title === '' ? item.uuid : null),
-                    }
-                })
-            )
-
-            return response
+            const response = await nsdb.search(sq)
+            return {
+                ...response,
+                payload: response.payload.map(p => Post.fromDbObject(p)),
+            }
         } catch (error) {
             throw error
         }

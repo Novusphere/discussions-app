@@ -1,23 +1,31 @@
-import React, { FunctionComponent } from 'react'
+import React, { FunctionComponent, useCallback } from 'react'
 import { Icon, Badge, Button, List, Avatar, Dropdown } from 'antd'
 
 import styles from './HeaderNotifications.module.scss'
 import { observer } from 'mobx-react-lite'
 import { RootStore, useStores } from '@stores'
-import { getIdenticon, useInterval } from '@utils'
+import { getIdenticon, getThreadUrl, useInterval } from '@utils'
 import { RichTextPreview } from '@components'
 import moment from 'moment'
 import cx from 'classnames'
-import { Link } from 'react-router-dom'
+import { Link, useHistory } from 'react-router-dom'
 
 interface IHeaderNotificationsProps {}
 
 const NotificationContainer = () => {
     const { userStore, authStore }: RootStore = useStores()
+    const history = useHistory()
 
     if (!authStore.hasAccount) {
         return null
     }
+
+    const handleNotificationClick = useCallback(({ index, item }) => {
+        getThreadUrl(item, item.title === '' ? item.uuid : null).then(url => {
+            history.push(url)
+            userStore.deleteNotification(index)
+        })
+    }, [])
 
     return (
         <List
@@ -32,10 +40,14 @@ const NotificationContainer = () => {
             renderItem={(item, index) => {
                 return (
                     <List.Item className={styles.notificationItem}>
-                        <Link
-                            to={item['url']}
+                        <div
                             className={'dim w-100 relative'}
-                            onClick={() => userStore.deleteNotification(index)}
+                            onClick={() =>
+                                handleNotificationClick({
+                                    index,
+                                    item,
+                                })
+                            }
                         >
                             <List.Item.Meta
                                 {...(item.pub && {
@@ -64,7 +76,7 @@ const NotificationContainer = () => {
                                     </div>
                                 }
                             />
-                        </Link>
+                        </div>
                     </List.Item>
                 )
             }}

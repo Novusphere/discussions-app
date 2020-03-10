@@ -98,7 +98,10 @@ const NewPageNoSSRUnwrapped = ({ form, prefilledTag }: any) => {
                                         setLoading(false)
                                         const url = await pushToThread(submittedPost)
                                         const newId = encodeId(submittedPost.openingPost as any)
-                                        userStore.toggleThreadWatch(newId, 0, true)
+                                        userStore.toggleThreadWatch(newId, {
+                                            post,
+                                            suppressToast: true,
+                                        })
                                         uiStore.showToast(
                                             'Success',
                                             'Your post has been successfully created',

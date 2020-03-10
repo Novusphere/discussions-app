@@ -15,6 +15,8 @@ const NotificationsPage = () => {
             userStore.fetchNotificationsAsync({
                 publicKey: postPub,
                 lastCheckedNotifications: 0,
+                watchedIds: userStore.watchedThreadIds,
+                viewAll: true,
             }),
         []
     )

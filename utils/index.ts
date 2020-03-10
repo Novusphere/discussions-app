@@ -19,9 +19,8 @@ export const sleep = (milliseconds: number) => {
     return new Promise(resolve => setTimeout(resolve, milliseconds))
 }
 
-export const getSettings = async (host = window.location.host.toLowerCase()) => {
+export const getSettings = async (host = getHostName()) => {
     const { data: setting } = await axios.get(`${nsdb.api}/discussions/site`)
-    if (isDev) host = 'beta.discussions.app'
 
     let settings = setting[host]
 
@@ -39,12 +38,12 @@ export const SORTER_OPTIONS = {
 }
 
 export const getHostName = () => {
-    if (isDev) return 'discussions.app'
+    if (isDev) return 'beta.discussions.app'
     return window.location.hostname
 }
 
 export const getOrigin = () => {
-    if (isDev) return 'https://discussions.app'
+    if (isDev) return 'https://beta.discussions.app'
     return window.location.origin
 }
 

@@ -684,10 +684,9 @@ const PostPageComponentObserverable: React.FunctionComponent<IPostPageProps> = (
                                     }
                                     className={'mh1'}
                                     onClick={() =>
-                                        userStore.toggleThreadWatch(
-                                            id,
-                                            postStore.observableThread.openingPost.totalReplies
-                                        )
+                                        userStore.toggleThreadWatch(id, {
+                                            post: postStore.observableThread.openingPost,
+                                        })
                                     }
                                 >
                                     <Icon

@@ -1,13 +1,11 @@
 import { persist } from 'mobx-persist'
-import { observable, when } from 'mobx'
+import { observable, when, computed, ObservableMap } from 'mobx'
 import { RootStore } from '@stores/index'
 import axios from 'axios'
 import _ from 'lodash'
 import { discussions, nsdb, Post } from '@novuspherejs'
 import moment from 'moment'
-// @ts-ignore
 import mapSeries from 'async/mapSeries'
-// @ts-ignore
 import each from 'async/each'
 import { encodeId, getThreadTitle, getOrigin } from '@utils'
 
@@ -43,6 +41,16 @@ export class UserStore {
     @observable private tagStore: RootStore['tagStore']
     @observable private authStore: RootStore['authStore']
 
+    @observable
+    localStorageVersion = {
+        following: 1583712275528,
+        watching: 1583712275528,
+        blockedUsers: 1583712275528,
+        blockedPosts: 1583712275528,
+        delegated: 1583712275528,
+        pinnedPosts: 1583712275528,
+    }
+
     constructor(rootStore: RootStore) {
         this.uiStore = rootStore.uiStore
         this.tagStore = rootStore.tagStore
@@ -62,7 +70,7 @@ export class UserStore {
         )
     }
 
-    resetUserStore = () => {
+    resetPostObservables = () => {
         this.following.replace([])
         this.watching.replace([])
         this.blockedUsers.replace([])
@@ -70,6 +78,10 @@ export class UserStore {
         this.delegated.replace([])
         this.pinnedPosts.replace([])
         this.blockedByDelegation.replace([])
+    }
+
+    resetUserStore = () => {
+        this.resetPostObservables()
         this.notificationCount = 0
         this.lastCheckedNotifications = 0
         this.notifications = []
@@ -272,7 +284,7 @@ export class UserStore {
         this.syncDataFromLocalToServer()
     }
 
-    toggleThreadWatch = (id: string, count?: number, suppressToast = false) => {
+    toggleThreadWatch = (id: string, { post = null, suppressToast = false }) => {
         if (this.watching.has(id)) {
             this.watching.delete(id)
             this.syncDataFromLocalToServer()
@@ -281,8 +293,11 @@ export class UserStore {
             return
         }
 
-        if (this.watching.size <= 99) {
-            this.watching.set(id, [count, count])
+        if (post && this.watching.size <= 99) {
+            this.watching.set(id, {
+                ...post,
+                watchedAt: Date.now(),
+            })
             if (!suppressToast)
                 this.uiStore.showMessage('Success! You are watching this thread', 'success')
         } else {
@@ -359,42 +374,76 @@ export class UserStore {
             data = data['data']
 
             if (data) {
-                if (typeof data['lastCheckedNotifications'] !== 'undefined')
+                /**
+                 * Check localStorageVersion for comparison
+                 * If version mismatch, reset users' local storage version
+                 *
+                 * This required to ensure we are able to reset LS when we change code or add features
+                 * that affect LS, otherwise there should be a way to migrate.
+                 */
+                if (
+                    typeof data['localStorageVersion'] === undefined ||
+                    data['localStorageVersion'] !== this.localStorageVersion
+                ) {
+                    // find mismatch versions
+                    const serverVersions = data['localStorageVersion']
+
+                    if (_.isNil(serverVersions)) {
+                        this.resetPostObservables()
+                        this.syncDataFromLocalToServer()
+                        return
+                    }
+
+                    Object.keys(serverVersions).forEach(version => {
+                        if (serverVersions[version] !== this.localStorageVersion[version]) {
+                            if (this[version] && this[version] instanceof ObservableMap) {
+                                console.log('clearing', version)
+                                this[version].replace([])
+                            }
+                        }
+                    })
+
+                    this.syncDataFromLocalToServer()
+                    // exit out
+                    return
+                }
+
+                if (!_.isNil(data['lastCheckedNotifications']))
                     this.lastCheckedNotifications = data['lastCheckedNotifications']
 
-                if (data['watching']) this.watching.replace(data['watching'])
+                if (!_.isNil(data['watching'])) this.watching.replace(data['watching'])
 
-                if (data['tags']) {
+                if (!_.isNil(data['tags'])) {
                     this.tagStore.subscribed = data['tags'].map(tag => tag.trim())
                 }
 
-                if (data['following'])
+                if (!_.isNil(data['following']))
                     this.following.replace(
                         data['following'].map((obj: { pub: any; name: any }) => [obj.pub, obj.name])
                     )
 
-                if (data['moderation']['blockedPosts']) {
+                if (!_.isNil(data['moderation']['blockedPosts'])) {
                     const blockedPosts = data['moderation']['blockedPosts']
 
-                    if (data['legacy'] || typeof data['legacy'] === 'undefined') {
+                    if (!_.isNil(data['legacy'])) {
                         console.log('found legacy user, updating')
                         this.blockedPosts.replace({})
                     } else {
                         this.blockedPosts.replace(blockedPosts)
                     }
                 }
-                if (data['moderation']['delegated']) {
+                if (!_.isNil(data['moderation']['delegated'])) {
                     this.delegated.replace(data['moderation']['delegated'])
                     this.updateFromActiveDelegatedMembers()
                 }
 
-                if (data['moderation']['blockedUsers'])
+                if (!_.isNil(data['moderation']['blockedUsers']))
                     this.blockedUsers.replace(data['moderation']['blockedUsers'])
 
-                if (data['moderation']['pinnedPosts']) {
+                if (!_.isNil(data['moderation']['pinnedPosts'])) {
                     const pinnedPosts = data['moderation']['pinnedPosts']
 
-                    if (data['legacy'] || typeof data['legacy'] === 'undefined') {
+                    if (!_.isNil(data['legacy'])) {
                         console.log('found legacy user, updating')
                         this.pinnedPosts.replace({})
                     } else {
@@ -402,18 +451,16 @@ export class UserStore {
                     }
                 }
 
-                if (typeof data['moderation']['unsignedPostsIsSpam'] !== 'undefined')
+                if (!_.isNil(data['moderation']['unsignedPostsIsSpam']))
                     this.unsignedPostsIsSpam = data['moderation']['unsignedPostsIsSpam']
 
-                if (typeof data['moderation']['blockedContentSetting'] !== 'undefined')
+                if (!_.isNil(data['moderation']['blockedContentSetting']))
                     this.blockedContentSetting = data['moderation']['blockedContentSetting']
             }
         } catch (error) {
-            console.log(error)
-            this.uiStore.showToast(
-                'Unable to sync',
-                'We experienced some problems syncing your account data to your current browser',
-                'info'
+            console.error(
+                `Unable to sync: We experienced some problems syncing your account data to your current browser`,
+                error
             )
             return error
         }
@@ -439,6 +486,7 @@ export class UserStore {
             } = this.authStore
 
             const dataToSync = {
+                localStorageVersion: this.localStorageVersion,
                 uidw: uidwWalletPubKey,
                 displayName: displayName,
                 postPub: postPub,
@@ -498,7 +546,7 @@ export class UserStore {
                         .getThreadReplyCount(encodedThreadId)
                         .then(() => {
                             const threadReplyCount = 10
-                        // .then(threadReplyCount => {
+                            // .then(threadReplyCount => {
                             const [, diff] = this.watching.get(encodedThreadId)
                             if (threadReplyCount - diff > 0) {
                                 return cb(null, [
@@ -514,7 +562,6 @@ export class UserStore {
                         })
                 },
                 async (error: any, result: any) => {
-                    console.log(result)
                     // results is an array of objects [encodedId, diff]
                     if (result[0] !== undefined && result.length > 0) {
                         each(result, async (item: any, cb: any) => {
@@ -524,8 +571,6 @@ export class UserStore {
                             const tag: any = this.tagStore.tagModelFromObservables(
                                 thread.openingPost.sub
                             )
-
-                            console.log('thread: ', thread)
 
                             this.notifications.unshift({
                                 ...thread.openingPost,
@@ -551,6 +596,10 @@ export class UserStore {
         }
     }
 
+    @computed get watchedThreadIds() {
+        return [...this.watching.entries()]
+    }
+
     /**
      * Delete a notification by index
      *
@@ -566,10 +615,12 @@ export class UserStore {
         publicKey,
         lastCheckedNotifications,
         watchedIds,
+        viewAll,
     }: {
         publicKey: string
         lastCheckedNotifications: number
-        watchedIds: string[],
+        watchedIds: any[]
+        viewAll: boolean
     }) => {
         try {
             const { payload } = await discussions.getPostsForNotifications(
@@ -579,8 +630,8 @@ export class UserStore {
                 0,
                 250,
                 watchedIds,
+                viewAll
             )
-
             return payload
         } catch (error) {
             throw error
@@ -589,17 +640,15 @@ export class UserStore {
 
     fetchNotifications = async (publicKey: string): Promise<void> => {
         try {
-            const threads = [...this.watching.keys()]
-
             const payload = await this.fetchNotificationsAsync({
                 publicKey,
                 lastCheckedNotifications: this.lastCheckedNotifications,
-                watchedIds: threads,
+                watchedIds: this.watchedThreadIds,
+                viewAll: false,
             })
 
             this.notificationCount = payload.length
             this.notifications = payload.filter((item: any, index: number) => index <= 5)
-
         } catch (error) {
             this.notifications = []
             return error
