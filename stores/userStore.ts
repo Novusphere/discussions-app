@@ -388,9 +388,10 @@ export class UserStore {
                     // find mismatch versions
                     const serverVersions = data['localStorageVersion']
 
-                    if (!serverVersions || typeof serverVersions === 'undefined') {
+                    if (_.isNil(serverVersions)) {
                         this.resetPostObservables()
                         this.syncDataFromLocalToServer()
+                        return
                     }
 
                     Object.keys(serverVersions).forEach(version => {
@@ -407,42 +408,42 @@ export class UserStore {
                     return
                 }
 
-                if (typeof data['lastCheckedNotifications'] !== 'undefined')
+                if (!_.isNil(data['lastCheckedNotifications']))
                     this.lastCheckedNotifications = data['lastCheckedNotifications']
 
-                if (data['watching']) this.watching.replace(data['watching'])
+                if (!_.isNil(data['watching'])) this.watching.replace(data['watching'])
 
-                if (data['tags']) {
+                if (!_.isNil(data['tags'])) {
                     this.tagStore.subscribed = data['tags'].map(tag => tag.trim())
                 }
 
-                if (data['following'])
+                if (!_.isNil(data['following']))
                     this.following.replace(
                         data['following'].map((obj: { pub: any; name: any }) => [obj.pub, obj.name])
                     )
 
-                if (data['moderation']['blockedPosts']) {
+                if (!_.isNil(data['moderation']['blockedPosts'])) {
                     const blockedPosts = data['moderation']['blockedPosts']
 
-                    if (data['legacy'] || typeof data['legacy'] === 'undefined') {
+                    if (!_.isNil(data['legacy'])) {
                         console.log('found legacy user, updating')
                         this.blockedPosts.replace({})
                     } else {
                         this.blockedPosts.replace(blockedPosts)
                     }
                 }
-                if (data['moderation']['delegated']) {
+                if (!_.isNil(data['moderation']['delegated'])) {
                     this.delegated.replace(data['moderation']['delegated'])
                     this.updateFromActiveDelegatedMembers()
                 }
 
-                if (data['moderation']['blockedUsers'])
+                if (!_.isNil(data['moderation']['blockedUsers']))
                     this.blockedUsers.replace(data['moderation']['blockedUsers'])
 
-                if (data['moderation']['pinnedPosts']) {
+                if (!_.isNil(data['moderation']['pinnedPosts'])) {
                     const pinnedPosts = data['moderation']['pinnedPosts']
 
-                    if (data['legacy'] || typeof data['legacy'] === 'undefined') {
+                    if (!_.isNil(data['legacy'])) {
                         console.log('found legacy user, updating')
                         this.pinnedPosts.replace({})
                     } else {
@@ -450,18 +451,16 @@ export class UserStore {
                     }
                 }
 
-                if (typeof data['moderation']['unsignedPostsIsSpam'] !== 'undefined')
+                if (!_.isNil(data['moderation']['unsignedPostsIsSpam']))
                     this.unsignedPostsIsSpam = data['moderation']['unsignedPostsIsSpam']
 
-                if (typeof data['moderation']['blockedContentSetting'] !== 'undefined')
+                if (!_.isNil(data['moderation']['blockedContentSetting']))
                     this.blockedContentSetting = data['moderation']['blockedContentSetting']
             }
         } catch (error) {
-            console.log(error)
-            this.uiStore.showToast(
-                'Unable to sync',
-                'We experienced some problems syncing your account data to your current browser',
-                'info'
+            console.error(
+                `Unable to sync: We experienced some problems syncing your account data to your current browser`,
+                error
             )
             return error
         }
@@ -616,7 +615,7 @@ export class UserStore {
         publicKey,
         lastCheckedNotifications,
         watchedIds,
-        viewAll ,
+        viewAll,
     }: {
         publicKey: string
         lastCheckedNotifications: number
@@ -631,7 +630,7 @@ export class UserStore {
                 0,
                 250,
                 watchedIds,
-                viewAll,
+                viewAll
             )
             return payload
         } catch (error) {
