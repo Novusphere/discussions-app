@@ -44,7 +44,7 @@ export class UserStore {
     @observable
     localStorageVersion = {
         following: 1583712275528,
-        watching: 1583712275528,
+        watching: 1583893581788,
         blockedUsers: 1583712275528,
         blockedPosts: 1583712275528,
         delegated: 1583712275528,

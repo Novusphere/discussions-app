@@ -608,12 +608,16 @@ export default class DiscussionsService {
                                     createdAt: { $gte: lastCheckedNotifications },
                                     mentions: { $in: [postPublicKey] },
                                 },
-                                ...watchedIds.map(([id, post]) => ({
-                                    threadUuid: post.threadUuid,
-                                    createdAt: {
-                                        $gte: viewAll ? post.watchedAt : lastCheckedNotifications,
-                                    },
-                                })),
+                                ...watchedIds
+                                    .filter(([, post]) => post.threadUuid)
+                                    .map(([, post]) => ({
+                                        threadUuid: post.threadUuid,
+                                        createdAt: {
+                                            $gte: viewAll
+                                                ? post.watchedAt
+                                                : lastCheckedNotifications,
+                                        },
+                                    })),
                             ],
                         },
                     },
