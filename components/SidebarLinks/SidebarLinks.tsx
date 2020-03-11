@@ -130,7 +130,12 @@ const SidebarLinks: FunctionComponent<ISidebarTopLevelLinksProps> = () => {
                                             {tag.tagDescription && (
                                                 <>
                                                     <Divider />
-                                                    <Markdown className={'f6'}>
+                                                    <Markdown
+                                                        className={cx([
+                                                            'f6',
+                                                            styles.tagDescription,
+                                                        ])}
+                                                    >
                                                         {tag.tagDescription}
                                                     </Markdown>
                                                 </>
