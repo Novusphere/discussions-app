@@ -6,6 +6,7 @@ import { Button, Divider, Icon, Input, Popover } from 'antd'
 import { useObserver } from 'mobx-react-lite'
 import { RootStore, useStores } from '@stores'
 import { Link, useLocation } from 'react-router-dom'
+import Markdown from 'markdown-to-jsx'
 
 interface ISidebarTopLevelLinksProps {}
 
@@ -129,9 +130,9 @@ const SidebarLinks: FunctionComponent<ISidebarTopLevelLinksProps> = () => {
                                             {tag.tagDescription && (
                                                 <>
                                                     <Divider />
-                                                    <span className={'f6'}>
+                                                    <Markdown className={'f6'}>
                                                         {tag.tagDescription}
-                                                    </span>
+                                                    </Markdown>
                                                 </>
                                             )}
                                         </div>
