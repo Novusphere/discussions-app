@@ -13,7 +13,7 @@ interface IFooterProps {
 
 const Footer: FunctionComponent<IFooterProps> = ({ footerText, className }) => {
     return (
-        <div className={cx(className)}>
+        <div className={cx([className, styles.footer, 'tc'])}>
             {useObserver(() => (
                 <p className={'b f6'}>Version {getVersion()}</p>
             ))}

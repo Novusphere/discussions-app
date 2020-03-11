@@ -6,6 +6,7 @@ import { Avatar, Button, Divider, Icon } from 'antd'
 import { observer } from 'mobx-react-lite'
 import { Link, useHistory, useLocation } from 'react-router-dom'
 import Markdown from 'markdown-to-jsx'
+import cx from 'classnames'
 
 interface ISidebarTagViewProps {}
 
@@ -38,7 +39,9 @@ const SidebarTagView: FunctionComponent<ISidebarTagViewProps> = () => {
                 {tagObj.tagDescription && (
                     <>
                         <Divider />
-                        <Markdown className={'f6'}>{tagObj.tagDescription}</Markdown>
+                        <Markdown className={cx(['f6', styles.tagDescription])}>
+                            {tagObj.tagDescription}
+                        </Markdown>
                     </>
                 )}
                 <div className={'mt3'}>
