@@ -38,7 +38,7 @@ export const SORTER_OPTIONS = {
 }
 
 export const getHostName = () => {
-    if (isDev) return 'beta.discussions.app'
+    if (isDev) return 'discussions.app'
     return window.location.hostname
 }
 

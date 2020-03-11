@@ -5,6 +5,7 @@ import { useStores } from '@stores'
 import { Avatar, Button, Divider, Icon } from 'antd'
 import { observer } from 'mobx-react-lite'
 import { Link, useHistory, useLocation } from 'react-router-dom'
+import Markdown from 'markdown-to-jsx'
 
 interface ISidebarTagViewProps {}
 
@@ -37,7 +38,7 @@ const SidebarTagView: FunctionComponent<ISidebarTagViewProps> = () => {
                 {tagObj.tagDescription && (
                     <>
                         <Divider />
-                        <span className={'f6'}>{tagObj.tagDescription}</span>
+                        <Markdown className={'f6'}>{tagObj.tagDescription}</Markdown>
                     </>
                 )}
                 <div className={'mt3'}>

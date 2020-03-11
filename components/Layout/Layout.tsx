@@ -14,7 +14,7 @@ import { useObserver } from 'mobx-react-lite'
 import cx from 'classnames'
 import { RootStore, useStores } from '@stores'
 import { eos } from '@novuspherejs'
-import { refreshOEmbed } from '@utils'
+import { refreshOEmbed, Mobile, Desktop } from '@utils'
 
 const { Header: AntdLayoutHeader } = AntdLayout
 
@@ -79,7 +79,12 @@ const Layout: FunctionComponent<ILayoutProps> = ({ children }) => {
     }, [location])
 
     return (
-        <AntdLayout className={'overflow-x-hidden'}>
+        <AntdLayout
+            className={'overflow-x-hidden'}
+            style={{
+                minHeight: '100vh',
+            }}
+        >
             <Modals />
             <AntdLayoutHeader className={cx([styles.header, 'container bb b--light-gray'])}>
                 <Header />
@@ -113,6 +118,9 @@ const Layout: FunctionComponent<ILayoutProps> = ({ children }) => {
                         <SidebarTagView />
                         <SidebarLinks />
                         <SidebarTrendingTags />
+                        <Desktop>
+                            <Footer className={'o-60 f6'} footerText={uiStore.footerText} />
+                        </Desktop>
                     </div>
                 ))}
 
@@ -128,11 +136,14 @@ const Layout: FunctionComponent<ILayoutProps> = ({ children }) => {
                     {children}
                 </div>
             </div>
-            <footer className={cx([styles.footer, 'bg-white pv3 light-silver'])}>
-                <div className="tc lh-copy">
-                    <Footer />
-                </div>
-            </footer>
+            <Mobile>
+                <footer className={cx([styles.footer, 'bg-white pv3 light-silver'])}>
+                    <Footer
+                        className={'tc center lh-copy measure-wide'}
+                        footerText={uiStore.footerText}
+                    />
+                </footer>
+            </Mobile>
         </AntdLayout>
     )
 }

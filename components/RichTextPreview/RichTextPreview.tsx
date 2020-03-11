@@ -1,7 +1,5 @@
 import React, { FunctionComponent, useCallback, useEffect, useState } from 'react'
-// @ts-ignore
 import Markdown from 'markdown-to-jsx'
-// @ts-ignore
 import { LazyLoadImage } from 'react-lazy-load-image-component'
 import cx from 'classnames'
 

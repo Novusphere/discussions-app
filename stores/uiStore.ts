@@ -9,7 +9,7 @@ export class UIStore {
 
     @observable currentIndex = 0
     @observable banners = [baseImg]
-
+    @observable footerText = ''
     @observable hideSidebar = false
 
     rotateBannerImage = () => {
@@ -24,6 +24,10 @@ export class UIStore {
 
     @computed get activeBanner() {
         return this.banners[this.currentIndex]
+    }
+
+    setFooterText = (text: string) => {
+        this.footerText = text
     }
 
     setSidebarHidden = (value: boolean) => {

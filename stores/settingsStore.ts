@@ -5,7 +5,6 @@ import { getHostName, getSettings, isDev } from '@utils'
 import axios from 'axios'
 import _ from 'lodash'
 
-
 export class SettingsStore {
     @observable private userStore: RootStore['userStore']
     @observable private uiStore: RootStore['uiStore']
@@ -23,6 +22,10 @@ export class SettingsStore {
         const settings = await getSettings(getHostName())
 
         if (settings) {
+            if (!_.isNil(settings['footer'])) {
+                this.uiStore.setFooterText(settings['footer'])
+            }
+
             const tags = settings['tags']
             const tagGroups = settings['defaultTagsGroups']
             const moderators = settings['defaultModerators']
