@@ -317,7 +317,7 @@ const PostPreview: FunctionComponent<IPostPreviewProps> = ({
 
     return (
         <Link to={url}>
-            <span
+            <div
                 className={cx([
                     styles.postPreview,
                     'db bg-white mb0 mb2-ns w-100',
@@ -332,7 +332,7 @@ const PostPreview: FunctionComponent<IPostPreviewProps> = ({
             >
                 <div className={'flex flex-row'}>
                     <div className={'bg-light-gray w2 ph2 pv4 z-2'}>{renderVotingHandles()}</div>
-                    <div className={'flex flex-column bg-white pa2 pa4-ns'}>
+                    <div className={'flex flex-column bg-white pa2 pa4-ns w-100'}>
                         {shouldBeCollapsed && (
                             <span className={'silver'}>This post was marked as spam.</span>
                         )}
@@ -364,7 +364,7 @@ const PostPreview: FunctionComponent<IPostPreviewProps> = ({
                                 </Desktop>
 
                                 <Mobile>
-                                    <div className={'relative overflow-hidden'}>
+                                    <div className={'relative overflow-hidden pt3'}>
                                         <div
                                             className={
                                                 'w-20 fl flex items-center justify-center pt3'
@@ -397,14 +397,14 @@ const PostPreview: FunctionComponent<IPostPreviewProps> = ({
                                                 {postTips()}
                                             </div>
                                         </div>
-                                        <Divider style={{ margin: 0, padding: 0 }} />
                                     </div>
+                                    {/*<Divider style={{ margin: 0, padding: 0 }} />*/}
                                 </Mobile>
                             </>
                         )}
                     </div>
                 </div>
-            </span>
+            </div>
         </Link>
     )
 }
