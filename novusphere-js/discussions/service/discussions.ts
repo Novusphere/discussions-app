@@ -160,6 +160,7 @@ export default class DiscussionsService {
         cursorId: number
     }> {
         const { payload, cursorId } = await nsdb.search({
+            op: true,
             sort,
             key,
             cursorId: searchCursorId,
@@ -521,6 +522,7 @@ export default class DiscussionsService {
         cursorId: number
     }> {
         const query = await nsdb.search({
+            op: true,
             sort,
             key,
             cursorId,
@@ -600,6 +602,7 @@ export default class DiscussionsService {
     ): Promise<INSDBSearchQuery> {
         try {
             const sq = {
+                op: true,
                 pipeline: [
                     {
                         $match: {

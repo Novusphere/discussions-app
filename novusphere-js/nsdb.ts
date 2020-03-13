@@ -12,6 +12,7 @@ export interface INSDBSearchQuery {
     count?: number
     limit?: number
     key?: string
+    op?: boolean
 }
 
 export class NSDB {
