@@ -1,7 +1,6 @@
 import React, { FunctionComponent, useCallback, useEffect, useMemo, useState } from 'react'
 
 import styles from './CommonFeed.module.scss'
-import { SORTER_OPTIONS } from '@utils'
 import { Post } from '@novuspherejs'
 import { RootStore, useStores } from '@stores'
 import { Empty } from 'antd'
@@ -9,7 +8,7 @@ import { InfiniteScrollFeed, Sorter } from '@components'
 import { observer } from 'mobx-react-lite'
 
 interface ICommonFeedProps {
-    onFetch: ({ sort, postPub }: { sort: typeof SORTER_OPTIONS; postPub: string }) => void
+    onFetch: ({ sort, postPub }: { sort: string; postPub: string }) => void
     emptyDescription: string
     posts: Post[]
     dataLength: number
