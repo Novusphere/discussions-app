@@ -81,15 +81,15 @@ class Editor extends React.Component<IEditorProps> {
             simpleLineBreaks: true,
         })
 
-        this.turndownService.addRule('h1', {
-            filter: ['h1'],
-            replacement: (content: any) => `<p># ${content}</p>`,
-        })
-
-        this.turndownService.addRule('h2', {
-            filter: ['h2'],
-            replacement: (content: any) => `<p>## ${content}</p>`,
-        })
+        // this.turndownService.addRule('h1', {
+        //     filter: ['h1'],
+        //     replacement: (content: any) => `<p># ${content}</p>`,
+        // })
+        //
+        // this.turndownService.addRule('h2', {
+        //     filter: ['h2'],
+        //     replacement: (content: any) => `<p>## ${content}</p>`,
+        // })
 
         this.quillBase.Quill.register('modules/mention', Mention)
         this.quillBase.Quill.register('modules/autoformat', Autoformat)
@@ -142,7 +142,21 @@ class Editor extends React.Component<IEditorProps> {
         })
 
         if (this.props.value && this.props.value.length) {
-            this.updateContentByRef(this.showdownService.makeHtml(this.props.value))
+            /**
+             * We have to replace every <p># ... </p> tag (etc)
+             * so markdown can properly render.
+             */
+            const html = this.showdownService.makeHtml(
+                this.props.value
+                    .replace('<p># ', '#')
+                    .replace('<p>## ', '##')
+                    .replace('</p>', '<br />')
+            )
+            console.log({
+                markdown: this.props.value,
+                html,
+            })
+            this.updateContentByRef(this.sanitizeHTML(html))
         }
 
         if (this.props.disabled) {
@@ -153,7 +167,8 @@ class Editor extends React.Component<IEditorProps> {
     private updateContentByRef = (content: any) => {
         if (this.ref && this.ref.current && typeof this.props.value !== 'undefined') {
             const editor = this.ref.current.getEditor()
-            editor.pasteHTML(content)
+            editor.clipboard.dangerouslyPasteHTML(content)
+            // editor.pasteHTML(content)
         }
     }
 
@@ -169,15 +184,50 @@ class Editor extends React.Component<IEditorProps> {
         }
     }
 
-    public onChange = (text: string) => {
-        const clean = sanitizeHTML(text, {
-            allowedTags: [...sanitizeHTML.defaults.allowedTags, 'h1', 'h2'],
+    private sanitizeHTML = html => {
+        return sanitizeHTML(html, {
+            allowedTags: [
+                'h1',
+                'h2',
+                'h3',
+                'h4',
+                'h5',
+                'h6',
+                'blockquote',
+                'p',
+                'a',
+                'ul',
+                'ol',
+                'nl',
+                'li',
+                'b',
+                'i',
+                'strong',
+                'em',
+                'strike',
+                'code',
+                // 'hr',
+                'br',
+                // 'div',
+                // 'table',
+                // 'thead',
+                'caption',
+                // 'tbody',
+                // 'tr',
+                // 'th',
+                // 'td',
+                // 'pre',
+                // 'iframe',
+            ],
+            // allowedTags: [...sanitizeHTML.defaults.allowedTags, 'h1', 'h2'],
             allowedAttributes: {
                 ...sanitizeHTML.defaults.allowedAttributes,
             },
         })
+    }
 
-        const markdown = this.turndownService.turndown(clean)
+    public onChange = (text: string) => {
+        const markdown = this.turndownService.turndown(this.sanitizeHTML(text))
 
         // https://github.com/Novusphere/discussions-app/issues/169
         // this might have to be re-visited
@@ -245,7 +295,7 @@ class Editor extends React.Component<IEditorProps> {
                     ref={this.ref}
                     key={'editor'}
                     debug={'error'}
-                    placeholder={placeholder}
+                    // placeholder={placeholder}
                     onChange={this.onChange}
                     style={{
                         opacity: this.props.disabled ? 0.5 : 1,

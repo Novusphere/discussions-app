@@ -5,9 +5,7 @@ import axios from 'axios'
 import _ from 'lodash'
 import { discussions, nsdb, Post } from '@novuspherejs'
 import moment from 'moment'
-import mapSeries from 'async/mapSeries'
-import each from 'async/each'
-import { encodeId, getThreadTitle, getOrigin } from '@utils'
+import { getOrigin } from '@utils'
 
 export type BlockedContentSetting = 'hidden' | 'collapsed'
 
@@ -529,73 +527,6 @@ export class UserStore {
         }
     }
 
-    /**
-     * Update thread watch count by calling this method
-     * in an interval. Compare the threadReplyCounts [currentCount, previousCount]
-     */
-    watchAndUpdateWatchedPostsCount = async () => {
-        try {
-            if (!this.watching.size) return
-
-            const threads = [...this.watching.keys()]
-
-            mapSeries(
-                threads,
-                (encodedThreadId: string, cb: any) => {
-                    discussions
-                        .getThreadReplyCount(encodedThreadId)
-                        .then(() => {
-                            const threadReplyCount = 10
-                            // .then(threadReplyCount => {
-                            const [, diff] = this.watching.get(encodedThreadId)
-                            if (threadReplyCount - diff > 0) {
-                                return cb(null, [
-                                    encodedThreadId,
-                                    threadReplyCount - diff,
-                                    threadReplyCount,
-                                ])
-                            }
-                            return cb()
-                        })
-                        .catch(error => {
-                            return cb(null, error.message)
-                        })
-                },
-                async (error: any, result: any) => {
-                    // results is an array of objects [encodedId, diff]
-                    if (result[0] !== undefined && result.length > 0) {
-                        each(result, async (item: any, cb: any) => {
-                            const [threadId, diff, currentCount] = item
-                            const thread = await discussions.getThread(threadId)
-                            const id = encodeId(thread.openingPost)
-                            const tag: any = this.tagStore.tagModelFromObservables(
-                                thread.openingPost.sub
-                            )
-
-                            this.notifications.unshift({
-                                ...thread.openingPost,
-                                url: `/tag/${thread.openingPost.sub}/${id}/${getThreadTitle(
-                                    thread.openingPost
-                                )}`,
-                                displayName: `#${thread.openingPost.sub}`,
-                                content: `There are ${diff} new unread posts`,
-                                tag,
-                                createdAt: Date.now(),
-                            } as any)
-
-                            this.notificationCount += 1
-                            // this.watching.set(threadId, [currentCount, currentCount])
-
-                            return cb()
-                        })
-                    }
-                }
-            )
-        } catch (error) {
-            return error
-        }
-    }
-
     @computed get watchedThreadIds() {
         return [...this.watching.entries()]
     }
@@ -659,17 +590,5 @@ export class UserStore {
         this.notifications = []
         this.notificationCount = 0
         this.uiStore.showMessage('Notifications cleared', 'success')
-    }
-
-    /**
-     * We need to reset the thread watch counter when the user clicks the notification tray
-     * so the next time we fetch notifications we aren't showing them a new post.
-     * [encodedId]: [currentCount, previousCount]
-     *
-     */
-    resetThreadWatchCounts = () => {
-        this.watching.forEach(([curr, diff], encodedThread) => {
-            this.watching.set(encodedThread, [curr, curr])
-        })
     }
 }

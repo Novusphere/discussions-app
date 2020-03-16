@@ -9,7 +9,7 @@ class Hashtag extends Embed {
 
         const checkValueRegexResult = _value.match(/([a-zA-Z0-9])+/i)
 
-        if (checkValueRegexResult && checkValueRegexResult.length) {
+        if (value !== '#' && checkValueRegexResult && checkValueRegexResult.length) {
             _value = `/tag/${checkValueRegexResult[0]}`
             node.setAttribute('href', _value)
             node.setAttribute('spellcheck', false)
