@@ -37,7 +37,7 @@ const serveAndReplaceMeta = (res, { title, description, image }) => {
 
         const result = data
             .replace(/\$OG_TITLE/g, encodeSpecialCharacters(title))
-            .replace(/\$OG_DESCRIPTION/g, removeMD(encodeSpecialCharacters(description)))
+            .replace(/\$OG_DESCRIPTION/g, encodeSpecialCharacters(removeMD(description)))
             .replace(/\$OG_IMAGE/g, image)
 
         res.send(result)
