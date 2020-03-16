@@ -37,7 +37,7 @@ const serveAndReplaceMeta = (res, { title, description, image }) => {
 
         const result = data
             .replace(/\$OG_TITLE/g, encodeSpecialCharacters(title))
-            .replace(/\$OG_DESCRIPTION/g, encodeSpecialCharacters(description))
+            .replace(/\$OG_DESCRIPTION/g, removeMD(encodeSpecialCharacters(description)))
             .replace(/\$OG_IMAGE/g, image)
 
         res.send(result)
@@ -161,7 +161,7 @@ app.get('/tag/:tag/:id/:title', async (req, res) => {
         description = 'Thread not found'
     } else {
         title = `${thread.openingPost.title} - #${tag}`
-        description = removeMD(thread.openingPost.content).substring(0, 150)
+        description = (thread.openingPost.content).substring(0, 150)
     }
 
     serveAndReplaceMeta(res, {
