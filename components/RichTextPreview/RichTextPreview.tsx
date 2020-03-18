@@ -173,11 +173,11 @@ const RichTextPreview: FunctionComponent<IRichTextPreviewProps> = ({
                         a: {
                             component: RtLink,
                         },
-                        // blockquote: {
-                        //     component: ({ children }: any) => (
-                        //         <span className={'db pl3 bw2 bl b--light-gray'}>{children}</span>
-                        //     ),
-                        // },
+                        blockquote: {
+                            component: ({ children }: any) => (
+                                <span className={'db pl3 bw2 bl b--light-gray'}>{children}</span>
+                            ),
+                        },
                         h1: {
                             component: ({ children }: any) => (
                                 <span className={'f4 b'}>{children}</span>
