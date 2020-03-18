@@ -104,7 +104,7 @@ export class EOS {
         if (this._api) return this._api
 
         const net = DEFAULT_EOS_NETWORK
-        const rpc = new JsonRpc(`${net.protocol}://${net.host}:${net.port}`, { fetch: this.axiosFetch })
+        const rpc = new JsonRpc(`${net.protocol}://${net.host}:${net.port}`, { fetch: this.axiosFetch as any })
         const signatureProvider = new JsSignatureProvider([])
         const api = new Api({
             rpc,
