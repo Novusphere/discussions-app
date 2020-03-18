@@ -816,13 +816,16 @@ export const extractMentionHashesForRegEx = (matchedContentForMentions: any) => 
 }
 
 export const matchContentForTags = (content: string) => {
-    let results = matchAll(content, /\[\#([a-zA-Z0-9]*)\]/gim)
-
+    /**
+     * Hashtags with underscores (_) get parsed as `\_` by turndown
+     * Seems tricky to remove because unsure what it affects.
+     */
+    let results = matchAll(content, /\[\#([a-zA-Z0-9\\_]*)\]/gim)
     let tags = []
 
     for (let result of results) {
         const [, tag] = result
-        tags.push(tag)
+        tags.push(tag.replace('\\_', '_'))
     }
 
     return tags

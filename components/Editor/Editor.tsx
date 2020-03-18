@@ -152,10 +152,7 @@ class Editor extends React.Component<IEditorProps> {
                     .replace('<p>## ', '##')
                     .replace('</p>', '<br />')
             )
-            console.log({
-                markdown: this.props.value,
-                html,
-            })
+
             this.updateContentByRef(this.sanitizeHTML(html))
         }
 
@@ -228,15 +225,14 @@ class Editor extends React.Component<IEditorProps> {
 
     public onChange = (text: string) => {
         const markdown = this.turndownService.turndown(this.sanitizeHTML(text))
+        const replacedMarkdown = markdown
+            .replace(/[\u200B-\u200D\uFEFF]/g, '')
+            .replace('#tip[]', '[#tip]')
+            .replace('[](https://discussions.app/tag/tip)', '')
 
         // https://github.com/Novusphere/discussions-app/issues/169
         // this might have to be re-visited
-        this.props.onChange(
-            markdown
-                .replace(/[\u200B-\u200D\uFEFF]/g, '')
-                .replace('#tip[]', '[#tip]')
-                .replace('[](https://discussions.app/tag/tip)', '')
-        )
+        this.props.onChange(replacedMarkdown)
     }
 
     private handleImageUpload = async () => {
