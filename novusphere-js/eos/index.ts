@@ -4,6 +4,7 @@ import { JsSignatureProvider } from 'eosjs/dist/eosjs-jssig'
 import { DiscoveryData, WalletAuth, Wallet, WalletAccessContext, NetworkConfig } from 'eos-transit'
 import { IToken, getTokens, IAccountBalance, getAccountTokens } from './tokens'
 import ecc from 'eosjs-ecc'
+import axios from 'axios'
 
 const base58 = require('bs58')
 
@@ -103,7 +104,7 @@ export class EOS {
         if (this._api) return this._api
 
         const net = DEFAULT_EOS_NETWORK
-        const rpc = new JsonRpc(`${net.protocol}://${net.host}:${net.port}`, { fetch })
+        const rpc = new JsonRpc(`${net.protocol}://${net.host}:${net.port}`, { fetch: this.axiosFetch })
         const signatureProvider = new JsSignatureProvider([])
         const api = new Api({
             rpc,
@@ -116,6 +117,23 @@ export class EOS {
         this._api = api
 
         return api
+    }
+
+    async axiosFetch(url, args) {
+        let result = undefined;
+        if (args.method == 'GET') {
+            result = await axios.get(url);
+        }
+        else if (args.method == 'POST') {
+            const body = args.body;
+            result = await axios.post(url, body);
+        }
+        return {
+            ok: true,
+            json: async function() {
+                return result.data;
+            }
+        }
     }
 
     constructor() {}

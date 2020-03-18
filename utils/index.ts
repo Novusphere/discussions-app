@@ -825,7 +825,8 @@ export const matchContentForTags = (content: string) => {
 
     for (let result of results) {
         const [, tag] = result
-        tags.push(tag.replace('\\_', '_'))
+        const stripped = tag.replace(/\\/g, "")
+        tags.push(stripped)
     }
 
     return tags
