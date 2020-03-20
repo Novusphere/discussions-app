@@ -4,6 +4,7 @@ import styles from './UserBalances.module.scss'
 import { RootStore, useStores } from '@stores'
 import { observer } from 'mobx-react'
 import cx from 'classnames'
+import { Link } from 'react-router-dom'
 
 interface IUserBalancesProps {
     className?: string
@@ -41,7 +42,8 @@ const UserBalances: FunctionComponent<IUserBalancesProps> = ({ className }) => {
     return (
         <div className={className}>
             {Object.keys(balances).map(symbol => (
-                <span
+                <Link
+                    to={`/tag/${symbol}`}
                     key={symbol}
                     className={'flex flex-row items-center justify-between mt3'}
                     style={{ display: 'flex' }}
@@ -57,12 +59,12 @@ const UserBalances: FunctionComponent<IUserBalancesProps> = ({ className }) => {
                             {balances[symbol]} {symbol}
                         </span>
                         {walletStore.dailyEstimate.has(symbol) && (
-                            <span className={'f7 moon-gray'}>
-                                Generated {walletStore.dailyEstimate.get(symbol)} {symbol}
+                            <span className={'f7 silver'}>
+                                Earning ~{walletStore.dailyEstimate.get(symbol)} {symbol}/day
                             </span>
                         )}
                     </span>
-                </span>
+                </Link>
             ))}
         </div>
     )
