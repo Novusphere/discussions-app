@@ -104,7 +104,9 @@ export class EOS {
         if (this._api) return this._api
 
         const net = DEFAULT_EOS_NETWORK
-        const rpc = new JsonRpc(`${net.protocol}://${net.host}:${net.port}`, { fetch: this.axiosFetch as any })
+        const rpc = new JsonRpc(`${net.protocol}://${net.host}:${net.port}`, {
+            fetch: this.axiosFetch as any,
+        })
         const signatureProvider = new JsSignatureProvider([])
         const api = new Api({
             rpc,
@@ -120,19 +122,18 @@ export class EOS {
     }
 
     async axiosFetch(url, args) {
-        let result = undefined;
+        let result = undefined
         if (args.method == 'GET') {
-            result = await axios.get(url);
-        }
-        else if (args.method == 'POST') {
-            const body = args.body;
-            result = await axios.post(url, body);
+            result = await axios.get(url)
+        } else if (args.method == 'POST') {
+            const body = args.body
+            result = await axios.post(url, body)
         }
         return {
             ok: true,
             json: async function() {
-                return result.data;
-            }
+                return result.data
+            },
         }
     }
 
@@ -366,6 +367,34 @@ export class EOS {
                     amount,
                 }
             })
+        } catch (error) {
+            throw error
+        }
+    }
+
+    async getTotalSupplyAsync() {
+        try {
+            const chains = await this.api.rpc.get_table_rows({
+                json: true,
+                code: 'nsuidcntract',
+                scope: 'nsuidcntract',
+                table: 'stats',
+                limit: 100,
+            })
+
+            const data = {}
+
+            chains.rows.map(e => {
+                const symbol = e.symbol.split(',')[1]
+                data[symbol] = {
+                    chain_id: e.chain_id,
+                    token_contract: e.token_contract,
+                    symbol: symbol,
+                    supply: Number(e.supply.split(' ')[0]),
+                }
+            })
+
+            return data
         } catch (error) {
             throw error
         }

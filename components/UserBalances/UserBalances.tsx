@@ -13,7 +13,11 @@ const UserBalances: FunctionComponent<IUserBalancesProps> = ({ className }) => {
     const { walletStore, authStore }: RootStore = useStores()
 
     if (!authStore.hasAccount) {
-        return <span className={cx([className, 'mt3 ph4 db f6 light-silver'])}>Please sign in to view your balances</span>
+        return (
+            <span className={cx([className, 'mt3 ph4 db f6 light-silver'])}>
+                Please sign in to view your balances
+            </span>
+        )
     }
 
     let walletStoreLS = window.localStorage.getItem('walletStore')
@@ -27,7 +31,11 @@ const UserBalances: FunctionComponent<IUserBalancesProps> = ({ className }) => {
     const balances = walletStore.balances.toJSON()
 
     if (!balances || !Object.keys(balances).length) {
-        return <span className={cx('mt3 ph4 db f6 light-silver', className)}>You have no balances</span>
+        return (
+            <span className={cx('mt3 ph4 db f6 light-silver', className)}>
+                You have no balances
+            </span>
+        )
     }
 
     return (
@@ -44,8 +52,15 @@ const UserBalances: FunctionComponent<IUserBalancesProps> = ({ className }) => {
                         className={'dib'}
                         width={25}
                     />
-                    <span className={'ml3 tr dib'}>
-                        {balances[symbol]} {symbol}
+                    <span className={'ml3 tr dib flex flex-column justify-end'}>
+                        <span>
+                            {balances[symbol]} {symbol}
+                        </span>
+                        {walletStore.dailyEstimate.has(symbol) && (
+                            <span className={'f7 moon-gray'}>
+                                Generated {walletStore.dailyEstimate.get(symbol)} {symbol}
+                            </span>
+                        )}
                     </span>
                 </span>
             ))}

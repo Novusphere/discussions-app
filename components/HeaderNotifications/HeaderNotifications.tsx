@@ -106,7 +106,6 @@ const HeaderNotifications: FunctionComponent<IHeaderNotificationsProps> = () => 
         () => {
             if (authStore.hasAccount) {
                 userStore.pingServerForData()
-                // userStore.watchAndUpdateWatchedPostsCount()
                 walletStore.refreshAllBalances()
             }
         },

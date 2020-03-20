@@ -1,4 +1,4 @@
-import React, { FunctionComponent, useState } from 'react'
+import React, { FunctionComponent, useMemo, useState } from 'react'
 
 import styles from './Tips.module.scss'
 import { Badge } from 'antd'
@@ -12,7 +12,7 @@ interface ITipsProps {
 const Tips: FunctionComponent<ITipsProps> = ({ tips }) => {
     let images = []
 
-    let walletStore = window.localStorage.getItem('walletStore')
+    let walletStore = useMemo(() => window.localStorage.getItem('walletStore'), [])
 
     if (!walletStore || !tips) return null
 
@@ -21,7 +21,7 @@ const Tips: FunctionComponent<ITipsProps> = ({ tips }) => {
         images = walletStore['supportedTokensImages']
     }
 
-    const tipKeys = Object.keys(tips)
+    const tipKeys = useMemo(() => Object.keys(tips), [])
 
     const [collapse, toggleCollapse] = useState(tipKeys.length > 3)
 

@@ -1,12 +1,12 @@
-import React, { FunctionComponent } from 'react'
+import React, { FunctionComponent, useCallback } from 'react'
 
 import styles from './SidebarLinks.module.scss'
 import cx from 'classnames'
-import { Button, Divider, Icon, Input, Popover } from 'antd'
+import { SidebarLinkPopup } from '@components'
+import { Button, Divider, Icon, Input } from 'antd'
 import { useObserver } from 'mobx-react-lite'
 import { RootStore, useStores } from '@stores'
 import { Link, useLocation } from 'react-router-dom'
-import Markdown from 'markdown-to-jsx'
 
 interface ISidebarTopLevelLinksProps {}
 
@@ -22,6 +22,13 @@ const SidebarLinks: FunctionComponent<ISidebarTopLevelLinksProps> = () => {
                 'bg-near-white': link === location.pathname,
             },
         ])
+
+    const onUnsubscribe = useCallback(subscribed => {
+        tagStore.removeSubscribed(subscribed)
+        if (authStore.hasAccount) {
+            userStore.syncDataFromLocalToServer()
+        }
+    }, [])
 
     return (
         <div className={'bg-white list card mb3 pv3'}>
@@ -85,78 +92,11 @@ const SidebarLinks: FunctionComponent<ISidebarTopLevelLinksProps> = () => {
                         if (!tag) return null
                         return (
                             <li key={subscribed} className={linkClassName(`/tag/${tag.name}`)}>
-                                <Popover
-                                    content={
-                                        <div className={'pa1 w5'}>
-                                            <span
-                                                className={
-                                                    'f5 flex flex-row items-center justify-between'
-                                                }
-                                            >
-                                                <span className={'flex flex-row items-center'}>
-                                                    <img
-                                                        className={'dib'}
-                                                        src={tag.logo}
-                                                        alt={`${subscribed} icon`}
-                                                        width={45}
-                                                    />
-                                                    <span className={'ml3 dib'}>
-                                                        <span className={'b db'}>
-                                                            <Link to={`/tag/${subscribed}`}>
-                                                                <span className={'f5 black db'}>
-                                                                    #{subscribed}
-                                                                </span>
-                                                            </Link>
-                                                        </span>
-                                                        {typeof tag.memberCount !== 'undefined' && (
-                                                            <span className={'f6 db gray'}>
-                                                                {tag.memberCount} members
-                                                            </span>
-                                                        )}
-                                                    </span>
-                                                </span>
-                                                <Button
-                                                    onClick={() => {
-                                                        tagStore.removeSubscribed(subscribed)
-                                                        if (authStore.hasAccount) {
-                                                            userStore.syncDataFromLocalToServer()
-                                                        }
-                                                    }}
-                                                    shape="circle"
-                                                >
-                                                    <Icon type="delete" />
-                                                </Button>
-                                            </span>
-                                            {tag.tagDescription && (
-                                                <>
-                                                    <Divider />
-                                                    <Markdown
-                                                        className={cx([
-                                                            'f6',
-                                                            styles.tagDescription,
-                                                        ])}
-                                                    >
-                                                        {tag.tagDescription}
-                                                    </Markdown>
-                                                </>
-                                            )}
-                                        </div>
-                                    }
-                                    placement={'right'}
-                                    overlayClassName={styles.tagOverlay}
-                                >
-                                    <Link to={`/tag/${subscribed}`}>
-                                        <span className={'dib'}>
-                                            <img
-                                                className={'dib'}
-                                                src={tag.logo}
-                                                alt={`${subscribed} icon`}
-                                                width={25}
-                                            />
-                                            <span className={'dib mh2'}>#{subscribed}</span>
-                                        </span>
-                                    </Link>
-                                </Popover>
+                                <SidebarLinkPopup
+                                    subscribed={subscribed}
+                                    tag={tag}
+                                    onUnsubscribe={onUnsubscribe}
+                                />
                             </li>
                         )
                     })}
