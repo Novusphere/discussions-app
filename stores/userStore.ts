@@ -518,11 +518,6 @@ export class UserStore {
             })
         } catch (error) {
             console.log(error)
-            this.uiStore.showToast(
-                'Unable to sync',
-                'We were unable to sync your data to our servers.',
-                'info'
-            )
             return error
         }
     }
