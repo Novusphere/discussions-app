@@ -1,6 +1,7 @@
 import axios from 'axios'
 import { ApiGetUnifiedId } from '../interfaces/ApiGet-UnifiedId'
 import { getOrigin } from '@utils'
+
 const ecc = require('eosjs-ecc')
 export const DEFAULT_NSDB_ENDPOINT = 'https://atmosdb.novusphere.io'
 
@@ -71,10 +72,13 @@ export class NSDB {
     }: any) {
         const jsonData = JSON.stringify(accountData)
         const sig = ecc.sign(ecc.sha256(jsonData), accountPrivateKey)
-        const pub = accountPublicKey
-
-        const qs = `pub=${pub}&sig=${sig}&data=${encodeURIComponent(jsonData)}&domain=${getOrigin()}`
+        const qs = `pub=${accountPublicKey}&sig=${sig}&data=${encodeURIComponent(jsonData)}&domain=${getOrigin()}`
         const rurl = `${this.api}/account/save`
+
+        console.log({
+            qs,
+            rurl,
+        })
 
         const { data } = await axios.post(rurl, qs)
         if (data.error) {
