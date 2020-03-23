@@ -30,7 +30,7 @@ export class NSDB {
         try {
             const { data } = await axios.get(`${this.api}/discussions/search/trendingtags`)
             return data
-        } catch(error) {
+        } catch (error) {
             throw error
         }
     }
@@ -44,10 +44,7 @@ export class NSDB {
         }
     }
 
-    async getAccount({
-        accountPrivateKey,
-        accountPublicKey,
-    }: any) {
+    async getAccount({ accountPrivateKey, accountPublicKey }: any) {
         const time = new Date().getTime()
         const sig = ecc.sign(ecc.sha256(`${getOrigin()}-${time}`), accountPrivateKey)
         const pub = accountPublicKey
@@ -65,27 +62,24 @@ export class NSDB {
         return data.payload
     }
 
-    async saveAccount({
-        accountPrivateKey,
-        accountPublicKey,
-        accountData,
-    }: any) {
+    async saveAccount({ accountPrivateKey, accountPublicKey, accountData }: any) {
         const jsonData = JSON.stringify(accountData)
         const sig = ecc.sign(ecc.sha256(jsonData), accountPrivateKey)
-        const qs = `pub=${accountPublicKey}&sig=${sig}&data=${encodeURIComponent(jsonData)}&domain=${getOrigin()}`
+        const qs = `pub=${accountPublicKey}&sig=${sig}&data=${encodeURIComponent(
+            jsonData
+        )}&domain=${getOrigin()}`
         const rurl = `${this.api}/account/save`
 
-        console.log({
-            qs,
-            rurl,
-        })
+        try {
+            const { data } = await axios.post(rurl, qs)
+            if (data.error) {
+                throw new Error(data.message)
+            }
 
-        const { data } = await axios.post(rurl, qs)
-        if (data.error) {
-            throw new Error(data.error)
+            return data.payload
+        } catch (error) {
+            throw error
         }
-
-        return data.payload
     }
 
     async cors(url: string) {

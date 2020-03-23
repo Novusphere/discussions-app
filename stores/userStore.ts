@@ -517,7 +517,7 @@ export class UserStore {
                 accountData: dataToSync,
             })
         } catch (error) {
-            console.log(error)
+            console.error('ACCOUNT SYNC ERROR', error)
             return error
         }
     }
