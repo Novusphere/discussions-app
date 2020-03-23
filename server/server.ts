@@ -154,7 +154,17 @@ app.get('/tag/:tag/:id/:title', async (req, res) => {
         }
     }
 
+    let image = tagModel.icon
+
     const thread = await discussions.getThread(id, '', req.hostname)
+
+    const imageMatch = /https?:\/\/(www\.)?[-a-zA-Z0-9@:%._\+~#=]{1,256}\.[a-zA-Z0-9()]{1,6}\b([-a-zA-Z0-9()@:%_\+.~#?&//=]*.(jpg|jpeg|bmp|png|gif))/gi.exec(
+        thread.openingPost.content
+    );
+
+    if (imageMatch) {
+        image = imageMatch[0]
+    }
 
     let title = '',
         description = ''
@@ -170,7 +180,7 @@ app.get('/tag/:tag/:id/:title', async (req, res) => {
     serveAndReplaceMeta(res, {
         title: title,
         description: description,
-        image: tagModel.icon,
+        image: image,
     })
 })
 
