@@ -34,6 +34,8 @@ const Layout: FunctionComponent<ILayoutProps> = ({ children }) => {
 
     // fire some stuff
     useEffect(() => {
+        console.error('Layout loaded')
+
         settingStore.loadSettings()
 
         eos.initializeTokens().then(() => {
