@@ -14,18 +14,21 @@ const Tips: FunctionComponent<ITipsProps> = ({ tips }) => {
 
     let walletStore = useMemo(() => window.localStorage.getItem('walletStore'), [])
 
-    if (!walletStore || !tips) return null
-
     if (walletStore) {
         walletStore = JSON.parse(walletStore)
         images = walletStore['supportedTokensImages']
     }
 
-    const tipKeys = useMemo(() => Object.keys(tips), [])
+    const tipKeys = useMemo(() => {
+        if (tips) {
+            return Object.keys(tips)
+        }
+        return []
+    }, [])
 
     const [collapse, toggleCollapse] = useState(tipKeys.length > 3)
 
-    if (!tipKeys.length) {
+    if (!tips || !tipKeys.length) {
         return null
     }
 
