@@ -19,7 +19,7 @@ export const sleep = (milliseconds: number) => {
     return new Promise(resolve => setTimeout(resolve, milliseconds))
 }
 
-export const getSettings = async (host) => {
+export const getSettings = async host => {
     const { data: setting } = await axios.get(`${nsdb.api}/discussions/site`)
 
     let settings = setting[host]
@@ -126,7 +126,9 @@ export const getThreadUrl = async (post: Post, permalinkUuid?: string) => {
     let url = `/tag/${sub}/${id}/`
 
     // if a post is a comment not a opening post
-    if (post.title === '') {
+    if (post.op) {
+        url += `${getThreadTitle(post.op)}`
+    } else if (!post.op && post.title === '') {
         const thread = await discussions.getThread(id, '')
         if (!thread || !thread.openingPost) return ''
         const newId = encodeId(thread.openingPost as any)
@@ -814,13 +816,17 @@ export const extractMentionHashesForRegEx = (matchedContentForMentions: any) => 
 }
 
 export const matchContentForTags = (content: string) => {
-    let results = matchAll(content, /\[\#([a-zA-Z0-9]*)\]/gim)
-
+    /**
+     * Hashtags with underscores (_) get parsed as `\_` by turndown
+     * Seems tricky to remove because unsure what it affects.
+     */
+    let results = matchAll(content, /\[\#([a-zA-Z0-9\\_]*)\]/gim)
     let tags = []
 
     for (let result of results) {
         const [, tag] = result
-        tags.push(tag)
+        const stripped = tag.replace(/\\/g, "")
+        tags.push(stripped)
     }
 
     return tags

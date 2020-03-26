@@ -37,7 +37,10 @@ const serveAndReplaceMeta = (res, { title, description, image }) => {
 
         const result = data
             .replace(/\$OG_TITLE/g, encodeSpecialCharacters(title))
-            .replace(/\$OG_DESCRIPTION/g, encodeSpecialCharacters(description))
+            .replace(
+                /\$OG_DESCRIPTION/g,
+                encodeSpecialCharacters(removeMD(description)).substring(0, 150)
+            )
             .replace(/\$OG_IMAGE/g, image)
 
         res.send(result)
@@ -151,7 +154,17 @@ app.get('/tag/:tag/:id/:title', async (req, res) => {
         }
     }
 
+    let image = tagModel.icon
+
     const thread = await discussions.getThread(id, '', req.hostname)
+
+    const imageMatch = /https?:\/\/(www\.)?[-a-zA-Z0-9@:%._\+~#=]{1,256}\.[a-zA-Z0-9()]{1,6}\b([-a-zA-Z0-9()@:%_\+.~#?&//=]*.(jpg|jpeg|bmp|png|gif))/gi.exec(
+        thread.openingPost.content
+    );
+
+    if (imageMatch) {
+        image = imageMatch[0]
+    }
 
     let title = '',
         description = ''
@@ -161,13 +174,13 @@ app.get('/tag/:tag/:id/:title', async (req, res) => {
         description = 'Thread not found'
     } else {
         title = `${thread.openingPost.title} - #${tag}`
-        description = removeMD(thread.openingPost.content).substring(0, 150)
+        description = thread.openingPost.content
     }
 
     serveAndReplaceMeta(res, {
         title: title,
         description: description,
-        image: tagModel.icon,
+        image: image,
     })
 })
 

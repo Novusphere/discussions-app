@@ -75,8 +75,8 @@ const RtLink: FunctionComponent<any> = ({ children, href, index }) => {
                                 <a
                                     href={href}
                                     className={'pointer'}
-                                    onClick={() => openInNewTab(href)}
                                     title={'Open image in new tab'}
+                                    target={'_blank'}
                                 >
                                     <LazyLoadImage alt={'Viewing image'} src={href} effect="blur" />
                                 </a>
@@ -134,7 +134,13 @@ const RtLink: FunctionComponent<any> = ({ children, href, index }) => {
     if (!getEmbed || index > LINK_LIMIT) {
         return (
             <object>
-                <a data-indexer-set="true" data-index={index} href={href} title={`Open ${href}`}>
+                <a
+                    data-indexer-set="true"
+                    data-index={index}
+                    href={href}
+                    title={`Open ${href}`}
+                    target={'_blank'}
+                >
                     <object>{children}</object>
                 </a>
             </object>
@@ -167,11 +173,11 @@ const RichTextPreview: FunctionComponent<IRichTextPreviewProps> = ({
                         a: {
                             component: RtLink,
                         },
-                        // blockquote: {
-                        //     component: ({ children }: any) => (
-                        //         <span className={'db pl3 bw2 bl b--light-gray'}>{children}</span>
-                        //     ),
-                        // },
+                        blockquote: {
+                            component: ({ children }: any) => (
+                                <span className={'db pl3 bw2 bl b--light-gray'}>{children}</span>
+                            ),
+                        },
                         h1: {
                             component: ({ children }: any) => (
                                 <span className={'f4 b'}>{children}</span>

@@ -34,6 +34,8 @@ const Layout: FunctionComponent<ILayoutProps> = ({ children }) => {
 
     // fire some stuff
     useEffect(() => {
+        console.error('Layout loaded')
+
         settingStore.loadSettings()
 
         eos.initializeTokens().then(() => {
@@ -53,6 +55,7 @@ const Layout: FunctionComponent<ILayoutProps> = ({ children }) => {
         }
     }, [])
 
+    // TODO: Implement a better re-render https://github.com/facebook/react/issues/15156#issuecomment-474590693
     useEffect(() => {
         uiStore.rotateBannerImage()
 

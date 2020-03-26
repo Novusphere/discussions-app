@@ -14,13 +14,23 @@ export class WalletStore {
 
     @persist('object')
     @observable
-    supportedTokensImages: { [symbol: string]: string } = {}
+    supportedTokensImages: { [symbol: string]: [string, number] } = {}
 
     @observable supportedTokensForUnifiedWallet = []
     @observable selectedToken = null
     @observable eosTokens = [] // all the possible tokens we support
 
     balances = observable.map<string, string>()
+    supply = observable.map<
+        string,
+        {
+            chain_id: string
+            token_contract: string
+            symbol: string
+            supply: number
+        }
+    >()
+    dailyEstimate = observable.map<string, string>()
 
     @observable authStore: AuthStore
 
@@ -76,10 +86,33 @@ export class WalletStore {
         try {
             await this.supportedTokensForUnifiedWallet.map(async datum => {
                 await this.fetchBalanceForSelectedToken(datum)
+                await this.fetchTokenSupply()
+                this.calculateDailyEstimate()
             })
         } catch (error) {
             throw error
         }
+    }
+
+    fetchTokenSupply = async () => {
+        try {
+            this.supply.replace(await eos.getTotalSupplyAsync())
+        } catch (error) {
+            return error
+        }
+    }
+
+    // https://github.com/Novusphere/discussions-app/issues/270#issuecomment-601426400
+    calculateDailyEstimate = async () => {
+        this.balances.forEach((balance, symbol) => {
+            if (symbol !== 'ATMOS') return
+            this.dailyEstimate.set(
+                symbol,
+                ((Number(balance) / this.supply.get(symbol).supply) * 2740).toFixed(
+                    this.supportedTokensImages[symbol][1]
+                )
+            )
+        })
     }
 
     fetchBalanceForSelectedToken = async (token = this.selectedToken) => {

@@ -61,9 +61,9 @@ const SettingsPage: React.FC<any> = () => {
                 <title>{`Settings - ${setting}`}</title>
             </Helmet>
             <div className={'flex flex-row'}>
-                <div className={'w-30 vh-75 bg-white card'}>
+                <div className={'w-30 h-100 pv4 bg-white card'}>
                     <div className={'db'}>
-                        <span className={'db f6 b black ph4 pt4'}>Settings</span>
+                        <span className={'db f6 b black ph4'}>Settings</span>
 
                         <ul className={'list pa0 ma0 mt3'}>
                             <Link to={'/settings/connections'} className={'gray'}>

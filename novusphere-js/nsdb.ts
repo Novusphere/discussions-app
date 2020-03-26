@@ -1,6 +1,7 @@
 import axios from 'axios'
 import { ApiGetUnifiedId } from '../interfaces/ApiGet-UnifiedId'
 import { getOrigin } from '@utils'
+
 const ecc = require('eosjs-ecc')
 export const DEFAULT_NSDB_ENDPOINT = 'https://atmosdb.novusphere.io'
 
@@ -12,6 +13,7 @@ export interface INSDBSearchQuery {
     count?: number
     limit?: number
     key?: string
+    op?: boolean
 }
 
 export class NSDB {
@@ -28,7 +30,7 @@ export class NSDB {
         try {
             const { data } = await axios.get(`${this.api}/discussions/search/trendingtags`)
             return data
-        } catch(error) {
+        } catch (error) {
             throw error
         }
     }
@@ -42,10 +44,7 @@ export class NSDB {
         }
     }
 
-    async getAccount({
-        accountPrivateKey,
-        accountPublicKey,
-    }: any) {
+    async getAccount({ accountPrivateKey, accountPublicKey }: any) {
         const time = new Date().getTime()
         const sig = ecc.sign(ecc.sha256(`${getOrigin()}-${time}`), accountPrivateKey)
         const pub = accountPublicKey
@@ -63,24 +62,24 @@ export class NSDB {
         return data.payload
     }
 
-    async saveAccount({
-        accountPrivateKey,
-        accountPublicKey,
-        accountData,
-    }: any) {
+    async saveAccount({ accountPrivateKey, accountPublicKey, accountData }: any) {
         const jsonData = JSON.stringify(accountData)
         const sig = ecc.sign(ecc.sha256(jsonData), accountPrivateKey)
-        const pub = accountPublicKey
-
-        const qs = `pub=${pub}&sig=${sig}&data=${encodeURIComponent(jsonData)}&domain=${getOrigin()}`
+        const qs = `pub=${accountPublicKey}&sig=${sig}&data=${encodeURIComponent(
+            jsonData
+        )}&domain=${getOrigin()}`
         const rurl = `${this.api}/account/save`
 
-        const { data } = await axios.post(rurl, qs)
-        if (data.error) {
-            throw new Error(data.error)
-        }
+        try {
+            const { data } = await axios.post(rurl, qs)
+            if (data.error) {
+                throw new Error(data.message)
+            }
 
-        return data.payload
+            return data.payload
+        } catch (error) {
+            throw error
+        }
     }
 
     async cors(url: string) {

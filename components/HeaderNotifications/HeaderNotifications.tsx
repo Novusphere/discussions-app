@@ -106,7 +106,6 @@ const HeaderNotifications: FunctionComponent<IHeaderNotificationsProps> = () => 
         () => {
             if (authStore.hasAccount) {
                 userStore.pingServerForData()
-                // userStore.watchAndUpdateWatchedPostsCount()
                 walletStore.refreshAllBalances()
             }
         },
@@ -124,7 +123,6 @@ const HeaderNotifications: FunctionComponent<IHeaderNotificationsProps> = () => 
                 if (visible && authStore.hasAccount) {
                     userStore.lastCheckedNotifications = Date.now()
                     userStore.notificationCount = 0
-                    userStore.resetThreadWatchCounts()
                     userStore.syncDataFromLocalToServer()
                 }
             }}

@@ -26,6 +26,7 @@ module.exports = merge(baseWebpackConfig, {
         }),
     ],
     optimization: {
+        minimize: false,
         minimizer: [
             new OptimizeCSSAssetsPlugin(),
             new TerserPlugin({

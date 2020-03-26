@@ -45,6 +45,7 @@ export class Post {
     tips: PostTips
 
     imageData: string
+    op: Post | undefined
 
     transfers: any[]
 
@@ -170,6 +171,12 @@ export class Post {
                   return acc
               }, {})
             : null
+
+        if (o.op && o.op.length > 0) {
+            let op = o.op[0];
+            p.op = Post.fromDbObject(op);
+        }
+
         return p
     }
 
