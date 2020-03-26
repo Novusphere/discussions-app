@@ -1,4 +1,4 @@
-import React, { FunctionComponent, useCallback } from 'react'
+import React, { FunctionComponent, useCallback, useState } from 'react'
 
 import styles from './SidebarLinks.module.scss'
 import cx from 'classnames'
@@ -29,6 +29,25 @@ const SidebarLinks: FunctionComponent<ISidebarTopLevelLinksProps> = () => {
             userStore.syncDataFromLocalToServer()
         }
     }, [])
+
+    const [newTag, addNewTag] = useState(null)
+
+    const onPressEnter = useCallback(() => {
+        if (newTag) {
+            tagStore.addSubscribed(newTag)
+            if (authStore.hasAccount) {
+                userStore.syncDataFromLocalToServer()
+            }
+            addNewTag(null)
+        }
+    }, [newTag])
+
+    const onChange = useCallback(
+        e => {
+            addNewTag(e.target.value)
+        },
+        [newTag]
+    )
 
     return (
         <div className={'bg-white list card mb3 pv3'}>
@@ -72,14 +91,11 @@ const SidebarLinks: FunctionComponent<ISidebarTopLevelLinksProps> = () => {
                 <Input
                     size={'default'}
                     allowClear
-                    addonAfter={<Icon type="plus" theme={'outlined'} />}
-                    placeholder="Add a tag to subscribe"
-                    onPressEnter={(e: any) => {
-                        tagStore.addSubscribed(e.target.value)
-                        if (authStore.hasAccount) {
-                            userStore.syncDataFromLocalToServer()
-                        }
-                    }}
+                    addonAfter={<Icon type="plus" theme={'outlined'} onClick={onPressEnter} />}
+                    placeholder={'Add a tag to subscribe'}
+                    value={newTag}
+                    onChange={onChange}
+                    onPressEnter={onPressEnter}
                 />
             </div>
             {![...tagStore.subscribed].length && (
