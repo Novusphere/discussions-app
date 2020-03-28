@@ -333,26 +333,24 @@ const Replies: FunctionComponent<IRepliesProps> = props => {
 
                     postObject.sig = sig
 
-                    console.log(postObject)
+                    const { transaction } = await discussions.post(postObject)
 
-                    // const { transaction } = await discussions.post(postObject)
-                    //
-                    // postObject.myVote = [{ value: 1 }]
-                    // replyStore.reply.replies.push(postObject)
-                    // replyStore.submitReplyLoading = false
-                    // replyStore.setReplyContent('')
-                    // replyStore.toggleReply()
-                    //
-                    // uiStore.showToast('Success', 'Your reply has been submitted', 'success', {
-                    //     btn: (
-                    //         <Button
-                    //             size="small"
-                    //             onClick={() => openInNewTab(`https://bloks.io/transaction/${transaction}`)}
-                    //         >
-                    //             View transaction
-                    //         </Button>
-                    //     ),
-                    // })
+                    postObject.myVote = [{ value: 1 }]
+                    replyStore.reply.replies.push(postObject)
+                    replyStore.submitReplyLoading = false
+                    replyStore.setReplyContent('')
+                    replyStore.toggleReply()
+
+                    uiStore.showToast('Success', 'Your reply has been submitted', 'success', {
+                        btn: (
+                            <Button
+                                size="small"
+                                onClick={() => openInNewTab(`https://bloks.io/transaction/${transaction}`)}
+                            >
+                                View transaction
+                            </Button>
+                        ),
+                    })
                 } catch (error) {
                     let message = 'Your reply failed to submit'
 
