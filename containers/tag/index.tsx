@@ -7,7 +7,9 @@ import { observer } from 'mobx-react-lite'
 
 const TagPage: React.FC<any> = () => {
     const { postsStore, userStore }: RootStore = useStores()
-    const { tag } = useParams()
+    const { tag: paramTag } = useParams()
+    const tag = useMemo(() => paramTag.toLowerCase(), [])
+    console.log(tag)
     const pinnedPosts = useMemo(() => [...userStore.pinnedPosts.toJS()], [])
     const fetch = useCallback(
         ({ sort, postPub }) => {

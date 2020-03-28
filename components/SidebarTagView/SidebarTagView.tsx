@@ -18,7 +18,7 @@ const SidebarTagView: FunctionComponent<ISidebarTagViewProps> = () => {
     if (location.pathname.indexOf('/tag/') !== -1) {
         // get the name
         let [, , tag] = location.pathname.split('/')
-        tag = tag.trim()
+        tag = tag.trim().toLowerCase()
         const tagObj = tagStore.tagModelFromObservables(tag)
 
         return (
