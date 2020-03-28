@@ -117,7 +117,7 @@ export const encodeId = (post: Post) => {
 }
 
 export const getThreadTitle = (post: Post) => {
-    return decodeURIComponent(_.snakeCase(post.title))
+    return _.snakeCase(post.title.replace(/[^0-9a-z]/gi, ' '))
 }
 
 export const getThreadUrl = async (post: Post, permalinkUuid?: string) => {
