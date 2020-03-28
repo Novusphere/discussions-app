@@ -5,7 +5,7 @@ import axios from 'axios'
 import { nsdb } from '@novuspherejs'
 import { StoreContext } from '@stores'
 import cx from 'classnames'
-import { Icon } from 'antd'
+import { Icon, Spin, notification } from 'antd'
 
 import styles from './Editor.module.scss'
 
@@ -19,10 +19,16 @@ interface IEditorProps {
     threadUsers: any[]
 }
 
+interface IEditorState {
+    loaded: boolean
+    loading: boolean
+}
+
 @observer
-class Editor extends React.Component<IEditorProps> {
+class Editor extends React.Component<IEditorProps, IEditorState> {
     state = {
         loaded: false,
+        loading: false,
     }
 
     constructor(props) {
@@ -45,6 +51,12 @@ class Editor extends React.Component<IEditorProps> {
     private modules: any = null
 
     private ref = React.createRef<any>()
+
+    setLoading = loading => {
+        this.setState(prevState => ({
+            loading: loading,
+        }))
+    }
 
     async componentDidMount(): Promise<void> {
         /**
@@ -252,6 +264,7 @@ class Editor extends React.Component<IEditorProps> {
                 formData.append('image', file)
 
                 try {
+                    this.setLoading(true)
                     // Upload image to AWS via app route handler.
                     const { data } = await axios.post(`${nsdb.api}/discussions/upload`, formData, {
                         headers: {
@@ -268,7 +281,13 @@ class Editor extends React.Component<IEditorProps> {
                     ref.insertText(range.index, url, { link: url })
                     // Move the cursor past the image.
                     ref.setSelection(range.index + url.length)
+                    this.setLoading(false)
                 } catch (error) {
+                    notification.error({
+                        message: 'Your image failed to upload',
+                        description: 'Please try again',
+                    })
+                    this.setLoading(false)
                     return error
                 }
             }
@@ -284,7 +303,8 @@ class Editor extends React.Component<IEditorProps> {
         const { placeholder } = this.props
 
         return (
-            <>
+            <div className={styles.editorContainer}>
+                {this.state.loading && <Spin className={styles.editorSpin} />}
                 <Editor
                     disabled={this.props.disabled}
                     classNames={cx([this.props.className, 'bg-white'])}
@@ -313,7 +333,7 @@ class Editor extends React.Component<IEditorProps> {
                         },
                     }}
                 />
-            </>
+            </div>
         )
     }
 }
