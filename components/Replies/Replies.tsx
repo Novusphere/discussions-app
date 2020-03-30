@@ -23,11 +23,13 @@ import {
     openInNewTab,
     signPost,
     transformTipsToTransfers,
+    transformTipToMetadata,
     voteAsync,
 } from '@utils'
 import copy from 'clipboard-copy'
 import { MODAL_OPTIONS } from '@globals'
 import { useLocation, useHistory } from 'react-router-dom'
+import post from '@containers/tag/post'
 
 interface IRepliesProps {
     preview?: boolean
@@ -224,7 +226,9 @@ const Replies: FunctionComponent<IRepliesProps> = props => {
                         btn: (
                             <Button
                                 size="small"
-                                onClick={() => openInNewTab(`https://bloks.io/transaction/${transaction}`)}
+                                onClick={() =>
+                                    openInNewTab(`https://bloks.io/transaction/${transaction}`)
+                                }
                             >
                                 View transaction
                             </Button>
@@ -291,6 +295,15 @@ const Replies: FunctionComponent<IRepliesProps> = props => {
                     if (postObject.transfers.length > 0) {
                         // ask for password
                         uiStore.setActiveModal(MODAL_OPTIONS.walletActionPasswordReentry)
+                        const transferData = postObject.transfers.map(transfer => {
+                            return transformTipToMetadata({
+                                tip: transfer,
+                                tokens: walletStore.supportedTokensForUnifiedWallet,
+                                replyingToUIDW: props.reply.uidw,
+                            })
+                        })
+
+                        authStore.setTEMPTransfers(transferData)
 
                         replyStore.waitForUserInput(async walletPrivateKey => {
                             if (walletPrivateKey === 'incomplete') {
@@ -299,7 +312,8 @@ const Replies: FunctionComponent<IRepliesProps> = props => {
                                 return
                             }
                             const _cached = `${walletPrivateKey}`
-                            authStore.setTEMPPrivateKey('')
+
+                            authStore.clearTEMPVariables()
                             uiStore.clearActiveModal()
 
                             if (!replyStore.reply.tips) {
@@ -345,7 +359,9 @@ const Replies: FunctionComponent<IRepliesProps> = props => {
                         btn: (
                             <Button
                                 size="small"
-                                onClick={() => openInNewTab(`https://bloks.io/transaction/${transaction}`)}
+                                onClick={() =>
+                                    openInNewTab(`https://bloks.io/transaction/${transaction}`)
+                                }
                             >
                                 View transaction
                             </Button>

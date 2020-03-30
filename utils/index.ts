@@ -690,6 +690,49 @@ export const voteAsync = async ({ voter, uuid, value, nonce, pub, sig }: any) =>
     }
 }
 
+export const transformTipToMetadata = ({ tip, tokens, replyingToUIDW }) => {
+    let symbol = tip.symbol.toUpperCase()
+
+    // find token to get chain and contract
+    let token = tokens.find(t => t.label === symbol)
+
+    const {
+        label,
+        decimals,
+        chain: _chain,
+        fee: { flat, percent },
+    } = token
+
+    const chain = parseInt(String(_chain))
+    const nonce = new Date().getTime()
+    const amountasNumber = Number(tip.amount)
+    const totalFee = amountasNumber * percent + flat
+    const amount = `${Number(tip.amount - totalFee).toFixed(decimals)} ${label}`
+    const fee = `${Number(totalFee).toFixed(decimals)} ${label}`
+    const memo = ''
+
+    let to = replyingToUIDW
+
+    if (tip.username) {
+        const [, , uidwFromUrl] = tip.url.split('-')
+
+        if (uidwFromUrl) {
+            to = uidwFromUrl
+        }
+    }
+
+    return {
+        symbol,
+        token,
+        chain,
+        to,
+        amount,
+        fee,
+        nonce,
+        memo,
+    }
+}
+
 export const transformTipsToTransfers = (
     tips: any[],
     replyingToUIDW: string,
@@ -697,29 +740,14 @@ export const transformTipsToTransfers = (
     tokens: any[]
 ) => {
     return tips.map(tip => {
-        let symbol = tip.symbol.toUpperCase()
-
-        // find token to get chain and contract
-        let token = tokens.find(t => t.label === symbol)
+        let { token, chain, to, amount, fee, nonce, memo } = transformTipToMetadata({
+            tip,
+            tokens,
+            replyingToUIDW,
+        })
 
         if (token) {
-            const {
-                label,
-                decimals,
-                chain: _chain,
-                fee: { flat, percent },
-            } = token
-
-            const chain = parseInt(String(_chain))
             const from = ecc.privateToPublic(privateKey)
-            const nonce = new Date().getTime()
-            const amountasNumber = Number(tip.amount)
-            const totalFee = amountasNumber * percent + flat
-            const amount = `${Number(tip.amount - totalFee).toFixed(decimals)} ${label}`
-            const fee = `${Number(totalFee).toFixed(decimals)} ${label}`
-            const memo = ''
-
-            let to = replyingToUIDW
 
             if (tip.username) {
                 const [, , uidwFromUrl] = tip.url.split('-')
@@ -825,7 +853,7 @@ export const matchContentForTags = (content: string) => {
 
     for (let result of results) {
         const [, tag] = result
-        const stripped = tag.replace(/\\/g, "")
+        const stripped = tag.replace(/\\/g, '')
         tags.push(stripped)
     }
 

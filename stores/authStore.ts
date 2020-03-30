@@ -59,12 +59,24 @@ export class AuthStore {
 
     // used for password re-entry
     @observable TEMP_WalletPrivateKey = ''
+    @observable TEMP_TippingTransfers = []
 
     constructor(rootStore: RootStore) {}
 
     @action.bound
     setTEMPPrivateKey = (key: string) => {
         this.TEMP_WalletPrivateKey = key
+    }
+
+    @action.bound
+    setTEMPTransfers(transfers: any[]) {
+        this.TEMP_TippingTransfers = transfers
+    }
+
+    @action.bound
+    clearTEMPVariables() {
+        this.TEMP_TippingTransfers = []
+        this.TEMP_WalletPrivateKey = ''
     }
 
     @action.bound

@@ -36,6 +36,8 @@ const ModalsPasswordReEntry: FunctionComponent<IModalsPasswordReEntryProps> = ({
         ]
     }, [])
 
+    console.log(authStore.TEMP_TippingTransfers)
+
     const handlePasswordSubmit = useCallback(e => {
         e.preventDefault()
         form.validateFields(async (err, values) => {
@@ -66,30 +68,6 @@ const ModalsPasswordReEntry: FunctionComponent<IModalsPasswordReEntryProps> = ({
                     })
                     return error
                 }
-
-                // try {
-                //     await authStore.signInWithPassword(passwordRentry)
-                //     notification.success({
-                //         message: 'You have successfully signed in!',
-                //     })
-                //     uiStore.clearActiveModal()
-                // } catch (error) {
-                //     if (error.message === 'Incorrect brian key pasword') {
-                //         form.setFields({
-                //             passwordRentry: {
-                //                 value: passwordRentry,
-                //                 errors: [new Error(error.message)],
-                //             },
-                //         })
-                //     } else {
-                //         notification.error({
-                //             message: 'Failed to sign in!',
-                //             description: error.message,
-                //         })
-                //     }
-                //
-                //     return error
-                // }
             }
         })
     }, [])
