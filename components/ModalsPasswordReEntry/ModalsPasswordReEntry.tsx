@@ -2,7 +2,7 @@ import React, { FunctionComponent, useCallback } from 'react'
 
 import styles from './ModalsPasswordReEntry.module.scss'
 import { observer } from 'mobx-react'
-import { Button, Form, Icon, Input, Modal, Result } from 'antd'
+import { Button, Form, Icon, Input, Modal, Result, Table, Divider } from 'antd'
 import { hasErrors } from '@utils'
 import { RootStore, useStores } from '@stores'
 import { discussions } from '@novuspherejs'
@@ -35,8 +35,6 @@ const ModalsPasswordReEntry: FunctionComponent<IModalsPasswordReEntryProps> = ({
             </Button>,
         ]
     }, [])
-
-    console.log(authStore.TEMP_TippingTransfers)
 
     const handlePasswordSubmit = useCallback(e => {
         e.preventDefault()
@@ -93,6 +91,37 @@ const ModalsPasswordReEntry: FunctionComponent<IModalsPasswordReEntryProps> = ({
                         </span>
                     }
                 />
+
+                <Table
+                    pagination={false}
+                    className={'pb3'}
+                    dataSource={authStore.TEMP_TippingTransfers}
+                    columns={[
+                        {
+                            title: 'Amount',
+                            dataIndex: 'amount',
+                            key: 'amount',
+                            render: (text, record) => {
+                                const [amount] = text.split(' ')
+                                const [fee] = record.fee.split(' ')
+                                return `${Number(amount) + Number(fee)} ${record.token.label}`
+                            },
+                        },
+                        {
+                            title: 'Key',
+                            dataIndex: 'to',
+                            key: 'to',
+                        },
+                        {
+                            title: 'User',
+                            dataIndex: 'username',
+                            key: 'username',
+                            render: text => encodeURIComponent(text),
+                        },
+                    ]}
+                />
+
+
 
                 <Form
                     labelCol={{ span: 7 }}

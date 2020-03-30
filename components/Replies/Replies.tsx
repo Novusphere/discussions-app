@@ -46,6 +46,8 @@ const Replies: FunctionComponent<IRepliesProps> = props => {
     const location = useLocation()
     const history = useHistory()
 
+    uiStore.setActiveModal(MODAL_OPTIONS.walletActionPasswordReentry)
+
     const replyStore = useLocalStore(
         source => ({
             hover: false,
@@ -295,16 +297,17 @@ const Replies: FunctionComponent<IRepliesProps> = props => {
                     if (postObject.transfers.length > 0) {
                         // ask for password
                         uiStore.setActiveModal(MODAL_OPTIONS.walletActionPasswordReentry)
+
                         const transferData = postObject.transfers.map(transfer => {
                             return transformTipToMetadata({
                                 tip: transfer,
                                 tokens: walletStore.supportedTokensForUnifiedWallet,
                                 replyingToUIDW: props.reply.uidw,
+                                replyingToDisplayName: props.reply.displayName,
                             })
                         })
 
                         authStore.setTEMPTransfers(transferData)
-
                         replyStore.waitForUserInput(async walletPrivateKey => {
                             if (walletPrivateKey === 'incomplete') {
                                 replyStore.submitReplyLoading = false
@@ -320,12 +323,20 @@ const Replies: FunctionComponent<IRepliesProps> = props => {
                                 replyStore.reply.tips = {} as any
                             }
 
-                            postObject.transfers = transformTipsToTransfers(
-                                postObject.transfers,
-                                props.reply.uidw,
-                                _cached,
-                                walletStore.supportedTokensForUnifiedWallet
-                            )
+                            // postObject.transfers = transformTipsToTransfers(
+                            //     postObject.transfers,
+                            //     props.reply.uidw,
+                            //     _cached,
+                            //     walletStore.supportedTokensForUnifiedWallet
+                            // )
+
+                            postObject.transfers = transformTipsToTransfers({
+                                tips: postObject.transfers,
+                                replyingToUIDW: props.reply.uidw,
+                                replyingToDisplayName: props.reply.displayName,
+                                privateKey: _cached,
+                                tokens: walletStore.supportedTokensForUnifiedWallet,
+                            })
 
                             await replyStore.finishSubmitting(postObject)
                         })

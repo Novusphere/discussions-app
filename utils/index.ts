@@ -690,7 +690,7 @@ export const voteAsync = async ({ voter, uuid, value, nonce, pub, sig }: any) =>
     }
 }
 
-export const transformTipToMetadata = ({ tip, tokens, replyingToUIDW }) => {
+export const transformTipToMetadata = ({ tip, tokens, replyingToUIDW, replyingToDisplayName }) => {
     let symbol = tip.symbol.toUpperCase()
 
     // find token to get chain and contract
@@ -712,14 +712,17 @@ export const transformTipToMetadata = ({ tip, tokens, replyingToUIDW }) => {
     const memo = ''
 
     let to = replyingToUIDW
+    let username = replyingToDisplayName
 
     if (tip.username) {
         const [, , uidwFromUrl] = tip.url.split('-')
 
         if (uidwFromUrl) {
             to = uidwFromUrl
+            username = tip.username
         }
     }
+
 
     return {
         symbol,
@@ -730,20 +733,30 @@ export const transformTipToMetadata = ({ tip, tokens, replyingToUIDW }) => {
         fee,
         nonce,
         memo,
+        username,
     }
 }
 
 export const transformTipsToTransfers = (
-    tips: any[],
-    replyingToUIDW: string,
-    privateKey: string,
-    tokens: any[]
+    // tips: any[],
+    // replyingToUIDW: string,
+    // replyingToDisplayName: string,
+    // privateKey: string,
+    // tokens: any[]
+    {
+        tips,
+        replyingToUIDW,
+        replyingToDisplayName,
+        privateKey,
+        tokens,
+    }
 ) => {
     return tips.map(tip => {
         let { token, chain, to, amount, fee, nonce, memo } = transformTipToMetadata({
             tip,
             tokens,
             replyingToUIDW,
+            replyingToDisplayName,
         })
 
         if (token) {
