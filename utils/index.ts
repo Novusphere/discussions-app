@@ -690,36 +690,78 @@ export const voteAsync = async ({ voter, uuid, value, nonce, pub, sig }: any) =>
     }
 }
 
+export const transformTipToMetadata = ({
+    tip,
+    tokens,
+    replyingToUIDW,
+    replyingToDisplayName,
+    replyingToPostPub,
+}) => {
+    let symbol = tip.symbol.toUpperCase()
+
+    // find token to get chain and contract
+    let token = tokens.find(t => t.label === symbol)
+
+    const {
+        label,
+        decimals,
+        chain: _chain,
+        fee: { flat, percent },
+    } = token
+
+    const chain = parseInt(String(_chain))
+    const nonce = new Date().getTime()
+    const amountasNumber = Number(tip.amount)
+    const totalFee = Number((amountasNumber * percent + flat).toFixed(decimals))
+    const amount = `${Number(tip.amount - totalFee).toFixed(decimals)} ${label}`
+    const fee = `${Number(totalFee).toFixed(decimals)} ${label}`
+    const memo = ''
+
+    let to = replyingToUIDW
+    let postPub = replyingToPostPub
+    let username = replyingToDisplayName
+
+    if (tip.username) {
+        const [usrname, postPublicKey, uidwFromUrl] = tip.url.replace('/u/', '').split('-')
+
+        if (uidwFromUrl) {
+            to = uidwFromUrl
+            username = usrname
+        }
+
+        if (postPublicKey) {
+            postPub = postPublicKey
+        }
+    }
+
+    return {
+        symbol,
+        token,
+        chain,
+        to,
+        amount,
+        fee,
+        nonce,
+        memo,
+        username,
+        postPub,
+    }
+}
+
 export const transformTipsToTransfers = (
-    tips: any[],
-    replyingToUIDW: string,
-    privateKey: string,
-    tokens: any[]
+    { tips, replyingToUIDW, replyingToDisplayName, replyingToPostPub, privateKey, tokens }
 ) => {
     return tips.map(tip => {
-        let symbol = tip.symbol.toUpperCase()
-
-        // find token to get chain and contract
-        let token = tokens.find(t => t.label === symbol)
+        let { token, chain, to, amount, fee, nonce, memo } = transformTipToMetadata({
+            tip,
+            tokens,
+            replyingToUIDW,
+            replyingToDisplayName,
+            replyingToPostPub,
+        })
 
         if (token) {
-            const {
-                label,
-                decimals,
-                chain: _chain,
-                fee: { flat, percent },
-            } = token
-
-            const chain = parseInt(String(_chain))
             const from = ecc.privateToPublic(privateKey)
-            const nonce = new Date().getTime()
-            const amountasNumber = Number(tip.amount)
-            const totalFee = amountasNumber * percent + flat
-            const amount = `${Number(tip.amount - totalFee).toFixed(decimals)} ${label}`
-            const fee = `${Number(totalFee).toFixed(decimals)} ${label}`
-            const memo = ''
-
-            let to = replyingToUIDW
 
             if (tip.username) {
                 const [, , uidwFromUrl] = tip.url.split('-')
@@ -825,7 +867,7 @@ export const matchContentForTags = (content: string) => {
 
     for (let result of results) {
         const [, tag] = result
-        const stripped = tag.replace(/\\/g, "")
+        const stripped = tag.replace(/\\/g, '')
         tags.push(stripped)
     }
 
