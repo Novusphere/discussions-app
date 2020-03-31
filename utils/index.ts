@@ -690,7 +690,13 @@ export const voteAsync = async ({ voter, uuid, value, nonce, pub, sig }: any) =>
     }
 }
 
-export const transformTipToMetadata = ({ tip, tokens, replyingToUIDW, replyingToDisplayName }) => {
+export const transformTipToMetadata = ({
+    tip,
+    tokens,
+    replyingToUIDW,
+    replyingToDisplayName,
+    replyingToPostPub,
+}) => {
     let symbol = tip.symbol.toUpperCase()
 
     // find token to get chain and contract
@@ -706,23 +712,27 @@ export const transformTipToMetadata = ({ tip, tokens, replyingToUIDW, replyingTo
     const chain = parseInt(String(_chain))
     const nonce = new Date().getTime()
     const amountasNumber = Number(tip.amount)
-    const totalFee = amountasNumber * percent + flat
+    const totalFee = Number((amountasNumber * percent + flat).toFixed(decimals))
     const amount = `${Number(tip.amount - totalFee).toFixed(decimals)} ${label}`
     const fee = `${Number(totalFee).toFixed(decimals)} ${label}`
     const memo = ''
 
     let to = replyingToUIDW
+    let postPub = replyingToPostPub
     let username = replyingToDisplayName
 
     if (tip.username) {
-        const [, , uidwFromUrl] = tip.url.split('-')
+        const [usrname, postPublicKey, uidwFromUrl] = tip.url.replace('/u/', '').split('-')
 
         if (uidwFromUrl) {
             to = uidwFromUrl
-            username = tip.username
+            username = usrname
+        }
+
+        if (postPublicKey) {
+            postPub = postPublicKey
         }
     }
-
 
     return {
         symbol,
@@ -734,22 +744,12 @@ export const transformTipToMetadata = ({ tip, tokens, replyingToUIDW, replyingTo
         nonce,
         memo,
         username,
+        postPub,
     }
 }
 
 export const transformTipsToTransfers = (
-    // tips: any[],
-    // replyingToUIDW: string,
-    // replyingToDisplayName: string,
-    // privateKey: string,
-    // tokens: any[]
-    {
-        tips,
-        replyingToUIDW,
-        replyingToDisplayName,
-        privateKey,
-        tokens,
-    }
+    { tips, replyingToUIDW, replyingToDisplayName, replyingToPostPub, privateKey, tokens }
 ) => {
     return tips.map(tip => {
         let { token, chain, to, amount, fee, nonce, memo } = transformTipToMetadata({
@@ -757,6 +757,7 @@ export const transformTipsToTransfers = (
             tokens,
             replyingToUIDW,
             replyingToDisplayName,
+            replyingToPostPub,
         })
 
         if (token) {

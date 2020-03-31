@@ -16,7 +16,7 @@ const UserNameWithIcon: FunctionComponent<IUserNameWithIconProps> = ({ imageData
             <Avatar icon={'user'} src={imageData} size={'small'} />
             <object className={'z-2 pl2'}>
                 <Link to={`/u/${name}-${pub}`}>
-                    <span className={'flex items-center dim pointer'}>{name}</span>
+                    <span className={'flex items-center dim pointer'}>{decodeURIComponent(name)}</span>
                 </Link>
             </object>
         </>

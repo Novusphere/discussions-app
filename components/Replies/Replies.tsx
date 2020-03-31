@@ -28,7 +28,7 @@ import {
 } from '@utils'
 import copy from 'clipboard-copy'
 import { MODAL_OPTIONS } from '@globals'
-import { useLocation, useHistory } from 'react-router-dom'
+import { useHistory, useLocation } from 'react-router-dom'
 
 interface IRepliesProps {
     preview?: boolean
@@ -301,6 +301,7 @@ const Replies: FunctionComponent<IRepliesProps> = props => {
                                 tokens: walletStore.supportedTokensForUnifiedWallet,
                                 replyingToUIDW: props.reply.uidw,
                                 replyingToDisplayName: props.reply.displayName,
+                                replyingToPostPub: props.reply.pub,
                             })
                         })
 
@@ -333,6 +334,7 @@ const Replies: FunctionComponent<IRepliesProps> = props => {
                                 replyingToDisplayName: props.reply.displayName,
                                 privateKey: _cached,
                                 tokens: walletStore.supportedTokensForUnifiedWallet,
+                                replyingToPostPub: props.reply.pub,
                             })
 
                             await replyStore.finishSubmitting(postObject)

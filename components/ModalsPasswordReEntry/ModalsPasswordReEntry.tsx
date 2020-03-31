@@ -2,11 +2,14 @@ import React, { FunctionComponent, useCallback } from 'react'
 
 import styles from './ModalsPasswordReEntry.module.scss'
 import { observer } from 'mobx-react'
-import { Button, Form, Icon, Input, Modal, Result, Table, Divider } from 'antd'
-import { hasErrors } from '@utils'
+import { Button, Form, Icon, Input, Modal, Result, Table, Typography } from 'antd'
+import { getIdenticon, hasErrors } from '@utils'
 import { RootStore, useStores } from '@stores'
 import { discussions } from '@novuspherejs'
 import _ from 'lodash'
+import { UserNameWithIcon } from '../index'
+
+const { Paragraph } = Typography
 
 interface IModalsPasswordReEntryProps {
     visible: boolean
@@ -21,7 +24,7 @@ const ModalsPasswordReEntry: FunctionComponent<IModalsPasswordReEntryProps> = ({
     handleOk,
     form,
 }) => {
-    const { authStore }: RootStore = useStores()
+    const { authStore, walletStore }: RootStore = useStores()
 
     const footer = useCallback(() => {
         return [
@@ -73,6 +76,8 @@ const ModalsPasswordReEntry: FunctionComponent<IModalsPasswordReEntryProps> = ({
 
     const { getFieldDecorator } = form
 
+    console.log(authStore.TEMP_TippingTransfers)
+
     return (
         <Modal
             width={window.innerWidth / 1.5}
@@ -104,19 +109,53 @@ const ModalsPasswordReEntry: FunctionComponent<IModalsPasswordReEntryProps> = ({
                             render: (text, record) => {
                                 const [amount] = text.split(' ')
                                 const [fee] = record.fee.split(' ')
-                                return `${Number(amount) + Number(fee)} ${record.token.label}`
+                                const [img, precision] = walletStore.supportedTokensImages[
+                                    record.symbol
+                                ]
+
+                                return (
+                                    <div className={'flex flex-row items-center'}>
+                                        <img
+                                            src={img}
+                                            alt={`${record.symbol} image`}
+                                            width={20}
+                                            className={'mr1'}
+                                        />
+                                        {`${Number(Number(amount) + Number(fee)).toFixed(
+                                            precision
+                                        )} ${record.token.label}`}
+                                    </div>
+                                )
                             },
                         },
                         {
                             title: 'Key',
                             dataIndex: 'to',
                             key: 'to',
+                            render: text => (
+                                <Paragraph
+                                    ellipsis
+                                    copyable
+                                    className={'w4'}
+                                    style={{ margin: 0, padding: 0 }}
+                                >
+                                    {text}
+                                </Paragraph>
+                            ),
                         },
                         {
                             title: 'User',
                             dataIndex: 'username',
                             key: 'username',
-                            render: text => text,
+                            render: (text, record) => (
+                                <div className={'flex flex-row items-center'}>
+                                    <UserNameWithIcon
+                                        imageData={getIdenticon(record.postPub)}
+                                        pub={record.postPub}
+                                        name={text}
+                                    />
+                                </div>
+                            ),
                         },
                     ]}
                 />
@@ -140,13 +179,29 @@ const ModalsPasswordReEntry: FunctionComponent<IModalsPasswordReEntryProps> = ({
                             title: 'Symbol',
                             dataIndex: 'symbol',
                             key: 'symbol',
-                            render: text => `Total ${text}`
+                            render: text => `Total ${text}`,
                         },
                         {
                             title: 'Amount',
                             dataIndex: 'amount',
                             key: 'amount',
-                            render: (text, record) => `${text} ${record.symbol}`
+                            render: (text, record) => {
+                                const [img, precision] = walletStore.supportedTokensImages[
+                                    record.symbol
+                                ]
+
+                                return (
+                                    <div className={'flex flex-row items-center'}>
+                                        <img
+                                            src={img}
+                                            alt={`${record.symbol} image`}
+                                            width={20}
+                                            className={'mr1'}
+                                        />
+                                        {`${Number(text).toFixed(precision)} ${record.symbol}`}
+                                    </div>
+                                )
+                            },
                         },
                     ]}
                 />
