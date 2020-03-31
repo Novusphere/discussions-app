@@ -59,52 +59,7 @@ export class AuthStore {
 
     // used for password re-entry
     @observable TEMP_WalletPrivateKey = ''
-    @observable TEMP_TippingTransfers = [
-        {
-            "symbol": "ATMOS",
-            "token": {
-                "label": "ATMOS",
-                "value": "novusphereio",
-                "contract": "nsuidcntract",
-                "chain": 0,
-                "decimals": 3,
-                "fee": {
-                    "flat": 0,
-                    "percent": 0.001
-                },
-                "min": 1
-            },
-            "chain": 0,
-            "to": "EOS8AgDT1hFD699511kaoPAXSpvqMJrngAnqG2JsxEdWUEDLcAC4s",
-            "amount": "0.999 ATMOS",
-            "fee": "0.001 ATMOS",
-            "nonce": 1585590097309,
-            "memo": "",
-            "username": "xiaxiaxia"
-        },
-        {
-            "symbol": "ATMOS",
-            "token": {
-                "label": "ATMOS",
-                "value": "novusphereio",
-                "contract": "nsuidcntract",
-                "chain": 0,
-                "decimals": 3,
-                "fee": {
-                    "flat": 0,
-                    "percent": 0.001
-                },
-                "min": 1
-            },
-            "chain": 0,
-            "to": "EOS5i7VWYsBNhfaAVfMSBbWCkPFYbbZF8nAEGQF685jRDrAfeWVVL",
-            "amount": "0.999 ATMOS",
-            "fee": "0.001 ATMOS",
-            "nonce": 1585590097309,
-            "memo": "",
-            "username": "Raining\_ATMOS"
-        }
-    ]
+    @observable TEMP_TippingTransfers = []
 
     constructor(rootStore: RootStore) {}
 

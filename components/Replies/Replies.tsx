@@ -29,7 +29,6 @@ import {
 import copy from 'clipboard-copy'
 import { MODAL_OPTIONS } from '@globals'
 import { useLocation, useHistory } from 'react-router-dom'
-import post from '@containers/tag/post'
 
 interface IRepliesProps {
     preview?: boolean
@@ -45,8 +44,6 @@ const Replies: FunctionComponent<IRepliesProps> = props => {
     const { userStore, uiStore, authStore, walletStore }: RootStore = useStores()
     const location = useLocation()
     const history = useHistory()
-
-    uiStore.setActiveModal(MODAL_OPTIONS.walletActionPasswordReentry)
 
     const replyStore = useLocalStore(
         source => ({

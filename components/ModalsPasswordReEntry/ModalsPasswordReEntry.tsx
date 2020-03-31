@@ -6,6 +6,7 @@ import { Button, Form, Icon, Input, Modal, Result, Table, Divider } from 'antd'
 import { hasErrors } from '@utils'
 import { RootStore, useStores } from '@stores'
 import { discussions } from '@novuspherejs'
+import _ from 'lodash'
 
 interface IModalsPasswordReEntryProps {
     visible: boolean
@@ -94,7 +95,6 @@ const ModalsPasswordReEntry: FunctionComponent<IModalsPasswordReEntryProps> = ({
 
                 <Table
                     pagination={false}
-                    className={'pb3'}
                     dataSource={authStore.TEMP_TippingTransfers}
                     columns={[
                         {
@@ -116,12 +116,40 @@ const ModalsPasswordReEntry: FunctionComponent<IModalsPasswordReEntryProps> = ({
                             title: 'User',
                             dataIndex: 'username',
                             key: 'username',
-                            render: text => encodeURIComponent(text),
+                            render: text => text,
                         },
                     ]}
                 />
 
-
+                <Table
+                    pagination={false}
+                    className={'pb3'}
+                    dataSource={_.map(
+                        _.groupBy(authStore.TEMP_TippingTransfers, 'symbol'),
+                        (objs, key) => ({
+                            symbol: key,
+                            amount: _.sumBy(objs, key => {
+                                return (
+                                    Number(key.amount.split(' ')[0]) + Number(key.fee.split(' ')[0])
+                                )
+                            }),
+                        })
+                    )}
+                    columns={[
+                        {
+                            title: 'Symbol',
+                            dataIndex: 'symbol',
+                            key: 'symbol',
+                            render: text => `Total ${text}`
+                        },
+                        {
+                            title: 'Amount',
+                            dataIndex: 'amount',
+                            key: 'amount',
+                            render: (text, record) => `${text} ${record.symbol}`
+                        },
+                    ]}
+                />
 
                 <Form
                     labelCol={{ span: 7 }}
