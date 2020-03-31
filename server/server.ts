@@ -142,7 +142,7 @@ app.get('/tag/:tag', (req, res) => {
     })
 })
 
-app.get('/tag/:tag/:id/:title', async (req, res) => {
+app.get('/tag/:tag/:id/:title?', async (req, res) => {
     const { tag, id } = req.params
 
     let tagModel = res.settings.tags[tag]

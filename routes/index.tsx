@@ -55,7 +55,7 @@ export const routes = [
         component: TagViewPage,
     },
     {
-        path: '/tag/:tag/:id/:title',
+        path: '/tag/:tag/:id/:title?',
         exact: true,
         component: ThreadViewPage,
     },
