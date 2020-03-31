@@ -22,6 +22,7 @@ import {
     openInNewTab,
     signPost,
     transformTipsToTransfers,
+    transformTipToMetadata,
     voteAsync,
 } from '@utils'
 import { RootStore, useStores } from '@stores'
@@ -244,6 +245,19 @@ const PostPageComponentObserverable: React.FunctionComponent<IPostPageProps> = (
                         // ask for password
                         uiStore.setActiveModal(MODAL_OPTIONS.walletActionPasswordReentry)
 
+                        const transferData = postObject.transfers.map(transfer => {
+                            return transformTipToMetadata({
+                                tip: transfer,
+                                tokens: walletStore.supportedTokensForUnifiedWallet,
+                                replyingToUIDW: postStore.observableThread.openingPost.uidw,
+                                replyingToDisplayName:
+                                    postStore.observableThread.openingPost.displayName,
+                                replyingToPostPub: postStore.observableThread.openingPost.pub,
+                            })
+                        })
+
+                        authStore.setTEMPTransfers(transferData)
+
                         postStore.waitForUserInput(async walletPrivateKey => {
                             if (walletPrivateKey === 'incomplete') {
                                 postStore.submitReplyLoading = false
@@ -258,12 +272,15 @@ const PostPageComponentObserverable: React.FunctionComponent<IPostPageProps> = (
                                 postStore.observableThread.openingPost.tips = {} as any
                             }
 
-                            postObject.transfers = transformTipsToTransfers(
-                                postObject.transfers,
-                                postStore.observableThread.openingPost.uidw,
-                                _cached,
-                                walletStore.supportedTokensForUnifiedWallet
-                            )
+                            postObject.transfers = transformTipsToTransfers({
+                                tips: postObject.transfers,
+                                replyingToUIDW: postStore.observableThread.openingPost.uidw,
+                                replyingToDisplayName:
+                                    postStore.observableThread.openingPost.displayName,
+                                privateKey: _cached,
+                                tokens: walletStore.supportedTokensForUnifiedWallet,
+                                replyingToPostPub: postStore.observableThread.openingPost.pub,
+                            })
 
                             await postStore.finishSubmitting(postObject)
                         })

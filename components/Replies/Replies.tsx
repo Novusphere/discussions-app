@@ -321,13 +321,6 @@ const Replies: FunctionComponent<IRepliesProps> = props => {
                                 replyStore.reply.tips = {} as any
                             }
 
-                            // postObject.transfers = transformTipsToTransfers(
-                            //     postObject.transfers,
-                            //     props.reply.uidw,
-                            //     _cached,
-                            //     walletStore.supportedTokensForUnifiedWallet
-                            // )
-
                             postObject.transfers = transformTipsToTransfers({
                                 tips: postObject.transfers,
                                 replyingToUIDW: props.reply.uidw,
