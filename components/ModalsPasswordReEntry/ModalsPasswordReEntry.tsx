@@ -76,8 +76,6 @@ const ModalsPasswordReEntry: FunctionComponent<IModalsPasswordReEntryProps> = ({
 
     const { getFieldDecorator } = form
 
-    console.log(authStore.TEMP_TippingTransfers)
-
     return (
         <Modal
             width={window.innerWidth / 1.5}
@@ -98,113 +96,120 @@ const ModalsPasswordReEntry: FunctionComponent<IModalsPasswordReEntryProps> = ({
                     }
                 />
 
-                <Table
-                    pagination={false}
-                    dataSource={authStore.TEMP_TippingTransfers}
-                    columns={[
-                        {
-                            title: 'Amount',
-                            dataIndex: 'amount',
-                            key: 'amount',
-                            render: (text, record) => {
-                                const [amount] = text.split(' ')
-                                const [fee] = record.fee.split(' ')
-                                const [img, precision] = walletStore.supportedTokensImages[
-                                    record.symbol
-                                ]
+                {authStore.TEMP_TippingTransfers.length > 1 && (
+                    <>
+                        <Table
+                            pagination={false}
+                            dataSource={authStore.TEMP_TippingTransfers}
+                            columns={[
+                                {
+                                    title: 'Amount',
+                                    dataIndex: 'amount',
+                                    key: 'amount',
+                                    render: (text, record) => {
+                                        const [amount] = text.split(' ')
+                                        const [fee] = record.fee.split(' ')
+                                        const [img, precision] = walletStore.supportedTokensImages[
+                                            record.symbol
+                                        ]
 
-                                return (
-                                    <div className={'flex flex-row items-center'}>
-                                        <img
-                                            src={img}
-                                            alt={`${record.symbol} image`}
-                                            width={20}
-                                            className={'mr1'}
-                                        />
-                                        {`${Number(Number(amount) + Number(fee)).toFixed(
-                                            precision
-                                        )} ${record.token.label}`}
-                                    </div>
-                                )
-                            },
-                        },
-                        {
-                            title: 'Key',
-                            dataIndex: 'to',
-                            key: 'to',
-                            render: text => (
-                                <Paragraph
-                                    ellipsis
-                                    copyable
-                                    className={'w4'}
-                                    style={{ margin: 0, padding: 0 }}
-                                >
-                                    {text}
-                                </Paragraph>
-                            ),
-                        },
-                        {
-                            title: 'User',
-                            dataIndex: 'username',
-                            key: 'username',
-                            render: (text, record) => (
-                                <div className={'flex flex-row items-center'}>
-                                    <UserNameWithIcon
-                                        imageData={getIdenticon(record.postPub)}
-                                        pub={record.postPub}
-                                        name={text}
-                                    />
-                                </div>
-                            ),
-                        },
-                    ]}
-                />
+                                        return (
+                                            <div className={'flex flex-row items-center'}>
+                                                <img
+                                                    src={img}
+                                                    alt={`${record.symbol} image`}
+                                                    width={20}
+                                                    className={'mr1'}
+                                                />
+                                                {`${Number(Number(amount) + Number(fee)).toFixed(
+                                                    precision
+                                                )} ${record.token.label}`}
+                                            </div>
+                                        )
+                                    },
+                                },
+                                {
+                                    title: 'Key',
+                                    dataIndex: 'to',
+                                    key: 'to',
+                                    render: text => (
+                                        <Paragraph
+                                            ellipsis
+                                            copyable
+                                            className={'w4'}
+                                            style={{ margin: 0, padding: 0 }}
+                                        >
+                                            {text}
+                                        </Paragraph>
+                                    ),
+                                },
+                                {
+                                    title: 'User',
+                                    dataIndex: 'username',
+                                    key: 'username',
+                                    render: (text, record) => (
+                                        <div className={'flex flex-row items-center'}>
+                                            <UserNameWithIcon
+                                                imageData={getIdenticon(record.postPub)}
+                                                pub={record.postPub}
+                                                name={text}
+                                            />
+                                        </div>
+                                    ),
+                                },
+                            ]}
+                        />
 
-                <Table
-                    pagination={false}
-                    className={'pb3'}
-                    dataSource={_.map(
-                        _.groupBy(authStore.TEMP_TippingTransfers, 'symbol'),
-                        (objs, key) => ({
-                            symbol: key,
-                            amount: _.sumBy(objs, key => {
-                                return (
-                                    Number(key.amount.split(' ')[0]) + Number(key.fee.split(' ')[0])
-                                )
-                            }),
-                        })
-                    )}
-                    columns={[
-                        {
-                            title: 'Symbol',
-                            dataIndex: 'symbol',
-                            key: 'symbol',
-                            render: text => `Total ${text}`,
-                        },
-                        {
-                            title: 'Amount',
-                            dataIndex: 'amount',
-                            key: 'amount',
-                            render: (text, record) => {
-                                const [img, precision] = walletStore.supportedTokensImages[
-                                    record.symbol
-                                ]
+                        <Table
+                            pagination={false}
+                            className={'pb3'}
+                            dataSource={_.map(
+                                _.groupBy(authStore.TEMP_TippingTransfers, 'symbol'),
+                                (objs, key) => ({
+                                    symbol: key,
+                                    amount: _.sumBy(objs, key => {
+                                        return (
+                                            Number(key.amount.split(' ')[0]) +
+                                            Number(key.fee.split(' ')[0])
+                                        )
+                                    }),
+                                })
+                            )}
+                            columns={[
+                                {
+                                    title: 'Symbol',
+                                    dataIndex: 'symbol',
+                                    key: 'symbol',
+                                    render: text => `Total ${text}`,
+                                },
+                                {
+                                    title: 'Amount',
+                                    dataIndex: 'amount',
+                                    key: 'amount',
+                                    render: (text, record) => {
+                                        const [img, precision] = walletStore.supportedTokensImages[
+                                            record.symbol
+                                        ]
 
-                                return (
-                                    <div className={'flex flex-row items-center'}>
-                                        <img
-                                            src={img}
-                                            alt={`${record.symbol} image`}
-                                            width={20}
-                                            className={'mr1'}
-                                        />
-                                        {`${Number(text).toFixed(precision)} ${record.symbol}`}
-                                    </div>
-                                )
-                            },
-                        },
-                    ]}
-                />
+                                        return (
+                                            <div className={'flex flex-row items-center'}>
+                                                <img
+                                                    src={img}
+                                                    alt={`${record.symbol} image`}
+                                                    width={20}
+                                                    className={'mr1'}
+                                                />
+                                                {`${Number(text).toFixed(precision)} ${
+                                                    record.symbol
+                                                }`}
+                                            </div>
+                                        )
+                                    },
+                                },
+                            ]}
+                        />
+                    </>
+                )}
 
                 <Form
                     labelCol={{ span: 7 }}
