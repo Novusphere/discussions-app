@@ -256,8 +256,22 @@ const UnwrappedTransfer = ({ form }) => {
                     // set the active modal
                     uiStore.setActiveModal(MODAL_OPTIONS.walletActionPasswordReentry)
 
-                    // now wait for user submission
+                    authStore.setTEMPTransfers([{
+                        symbol: label,
+                        token: {
+                            label,
+                            decimals,
+                        },
+                        chain,
+                        to,
+                        username: null,
+                        amount: `${Number(amount).toFixed(decimals)} ${label}`,
+                        fee: `${Number(fee).toFixed(decimals)} ${label}`,
+                        nonce: new Date().getTime(),
+                        memo: memo || '',
+                    }])
 
+                    // now wait for user submission
                     const int = setInterval(async () => {
                         if (uiStore.activeModal === MODAL_OPTIONS.none) {
                             setTransferSubmitLoading(false)
@@ -265,6 +279,7 @@ const UnwrappedTransfer = ({ form }) => {
                             clearInterval(int)
                             return
                         }
+
 
                         const { TEMP_WalletPrivateKey } = authStore
 
@@ -276,7 +291,7 @@ const UnwrappedTransfer = ({ form }) => {
                             try {
                                 // continue with the rest of the transaction
                                 const walletPrivateKey = `${TEMP_WalletPrivateKey}`
-                                authStore.setTEMPPrivateKey('')
+                                authStore.clearTEMPVariables()
 
                                 const robj = {
                                     chain: parseInt(String(chain)),
@@ -551,8 +566,22 @@ const UnwrappedWithdrawal = ({ form }) => {
                     // set the active modal
                     uiStore.setActiveModal(MODAL_OPTIONS.walletActionPasswordReentry)
 
-                    // now wait for user submission
+                    authStore.setTEMPTransfers([{
+                        symbol: label,
+                        token: {
+                            label,
+                            decimals,
+                        },
+                        chain,
+                        to: null,
+                        username: to,
+                        amount: `${Number(amount).toFixed(decimals)} ${label}`,
+                        fee: `${Number(fee).toFixed(decimals)} ${label}`,
+                        nonce: new Date().getTime(),
+                        memo: memo || '',
+                    }])
 
+                    // now wait for user submission
                     const int = setInterval(async () => {
                         if (uiStore.activeModal === MODAL_OPTIONS.none) {
                             setWithdrawalSubmitLoading(false)
