@@ -88,9 +88,10 @@ const UserPage: React.FC<any> = () => {
             setWallet(wallet)
             setImageData(getIdenticon(wallet))
 
-            discussions.getUser(wallet).then(({ followers, displayName }) => {
+            discussions.getUser(wallet).then(({ followers, displayName, uidw }) => {
                 setUsername(displayName)
                 setFollowers(followers)
+                setWallet(uidw)
 
                 postsStore.resetPostsAndPosition()
                 postsStore.getPostsForKeys(postPub, [wallet])
