@@ -121,7 +121,7 @@ const UserPage: React.FC<any> = () => {
     const followUser = useCallback(() => {
         userStore.toggleUserFollowing(username, usersPostPub)
 
-        if (userStore.following.has(wallet)) {
+        if (userStore.following.has(usersPostPub)) {
             setFollowers(followers + 1)
         } else {
             setFollowers(followers - 1)
