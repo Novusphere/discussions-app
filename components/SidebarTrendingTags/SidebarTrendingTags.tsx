@@ -1,10 +1,11 @@
 import React, { FunctionComponent, useCallback, useEffect } from 'react'
 
 import styles from './SidebarTrendingTags.module.scss'
-import { Icon } from 'antd'
+import { Icon, Spin } from 'antd'
 import { RootStore, useStores } from '@stores'
 import { observer } from 'mobx-react-lite'
 import { SidebarLinkPopup } from '@components'
+import { Link } from 'react-router-dom'
 
 interface ISidebarTrendingTagsProps {}
 
@@ -23,18 +24,23 @@ const SidebarTrendingTags: FunctionComponent<ISidebarTrendingTagsProps> = () => 
     }, [])
 
     if (tagStore.fetchTrendingTags['pending']) {
-        return <Icon type="loading" />
+        return <Spin />
     }
 
     return (
         <div className={'pa3 bg-white list card mb3'}>
-            <span className={'f5'}>
-                <Icon type="fire" theme="twoTone" twoToneColor={'#FF6300'} />
-                <span className={'ph2 orange'}>Trending Tags</span>
+            <span className={'f5 flex flex-row justify-between items-center'}>
+                <span>
+                    <Icon type="fire" theme="twoTone" twoToneColor={'#FF6300'} />
+                    <span className={'ph2 orange'}>Trending Tags</span>
+                </span>
+                <Link to={'/communities'} className={'f7 o-50 pointer'}>
+                    View All
+                </Link>
             </span>
 
             <div className={'mt3'}>
-                {tagStore.trendingTags.map(({ tag }, index) => {
+                {tagStore.trendingTags.slice(0, 9).map(({ tag }, index) => {
                     const tagModel: any = tagStore.tagModelFromObservables(tag)
 
                     return (

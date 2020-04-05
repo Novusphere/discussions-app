@@ -1,6 +1,6 @@
 import { RootStore, useStores } from '@stores'
 import React, { useCallback, useEffect, useState } from 'react'
-import { Avatar, Button, Icon, List, Typography } from 'antd'
+import { Avatar, Button, Spin, List, Typography } from 'antd'
 import { Link } from 'react-router-dom'
 import { getThreadTitle } from '@utils'
 import { useObserver } from 'mobx-react-lite'
@@ -36,7 +36,7 @@ const WatchedThreads = () => {
     )
 
     if (loading) {
-        return <Icon type="loading" />
+        return <Spin />
     }
 
     return (

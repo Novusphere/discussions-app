@@ -1,6 +1,6 @@
 import { RootStore, useStores } from '@stores'
 import { useObserver } from 'mobx-react-lite'
-import { Icon } from 'antd'
+import { Spin } from 'antd'
 import React from 'react'
 
 const Connections = () => {
@@ -33,7 +33,7 @@ const Connections = () => {
                                         '(connect)'
                                     )
                                 ) : (
-                                    <Icon type="loading" />
+                                    <Spin />
                                 )}
                             </span>
                             {authStore.eosWalletDisplayName && (

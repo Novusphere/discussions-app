@@ -3,7 +3,7 @@ import { observer } from 'mobx-react-lite'
 import { RootStore, useStores } from '@stores'
 import cx from 'classnames'
 import _ from 'lodash'
-import { Icon } from 'antd'
+import { Icon, Spin } from 'antd'
 import {
     UserBalances,
     SettingsAirdrop,
@@ -101,7 +101,7 @@ const SettingsPage: React.FC<any> = () => {
                             {!walletStore.refreshAllBalances['pending'] ? (
                                 <Icon type="reload" onClick={walletStore.refreshAllBalances} />
                             ) : (
-                                <Icon type="loading" />
+                                <Spin />
                             )}
                         </span>
 

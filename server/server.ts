@@ -192,6 +192,14 @@ app.get('/404', (req, res) => {
     })
 })
 
+app.get('/communities', (req, res) => {
+    serveAndReplaceMeta(res, {
+        title: 'Trending Tags',
+        description: 'View all of our trending tags!',
+        image: res.genericTagUrl,
+    })
+})
+
 app.get('*', (req, res) => {
     res.redirect('/404')
 })

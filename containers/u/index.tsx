@@ -1,7 +1,7 @@
 import React, { useCallback, useEffect, useMemo, useState } from 'react'
 import { observer, useObserver } from 'mobx-react-lite'
 import { RootStore, useStores } from '@stores'
-import { Avatar, Typography, Button, Dropdown, Menu, Icon, Select, List } from 'antd'
+import { Avatar, Typography, Button, Dropdown, Menu, Icon, Select, List, Spin } from 'antd'
 import { getIdenticon } from '@utils'
 import { InfiniteScrollFeed, Icons } from '@components'
 import { discussions } from '@novuspherejs'
@@ -150,7 +150,7 @@ const UserPage: React.FC<any> = () => {
     }, [username, wallet])
 
     if (postsStore.getPostsForKeys['pending']) {
-        return <Icon type="loading" />
+        return <Spin />
     }
 
     return (

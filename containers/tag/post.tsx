@@ -1,7 +1,7 @@
 import React, { useEffect, useCallback, useState, useLayoutEffect } from 'react'
 import { useLocalStore } from 'mobx-react-lite'
 import { discussions, Thread } from '@novuspherejs'
-import { Button, Divider, Dropdown, Icon, Menu, Popover, Tooltip, Result, Input, Empty } from 'antd'
+import { Button, Divider, Dropdown, Icon, Menu, Popover, Tooltip, Result, Input, Empty, Spin } from 'antd'
 import {
     UserNameWithIcon,
     Tips,
@@ -826,7 +826,7 @@ const PostPage: React.FC = () => {
         fetchThread()
     }, [query.id])
 
-    if (loading) return <Icon type="loading" />
+    if (loading) return <Spin />
 
     if (!thread) return <Empty description={'This is not the thread you were looking for...'} />
 

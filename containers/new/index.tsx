@@ -210,7 +210,7 @@ const NewPageNoSSRUnwrapped = ({ form, prefilledTag }: any) => {
                                 message: 'Please enter a title for your post',
                             },
                         ],
-                    })(<Input size={'large'} placeholder={'Post title'} />)}
+                    })(<Input size={'large'} placeholder={'Post title (optional)'} />)}
                 </Form.Item>
                 <Form.Item>
                     {getFieldDecorator('content', {
@@ -262,7 +262,7 @@ const NewPage: React.FC<any> = () => {
             <Helmet>
                 <title>{'Create a new post'}</title>
             </Helmet>
-            <NewPageNoSSR prefilledTag={tag} />
+            <NewPageNoSSR prefilledTag={tag || 'all'} />
         </>
     )
 }

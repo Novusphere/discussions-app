@@ -5,7 +5,7 @@ import axios from 'axios'
 import { nsdb } from '@novuspherejs'
 import { StoreContext } from '@stores'
 import cx from 'classnames'
-import { Icon, Spin, notification } from 'antd'
+import { Spin, notification } from 'antd'
 
 import styles from './Editor.module.scss'
 
@@ -296,7 +296,7 @@ class Editor extends React.Component<IEditorProps, IEditorState> {
 
     public render(): React.ReactNode {
         if (!this.state.loaded) {
-            return <Icon type="loading" />
+            return <Spin />
         }
 
         const { Editor } = this.quillBase

@@ -89,7 +89,7 @@ const Layout: FunctionComponent<ILayoutProps> = ({ children }) => {
             }}
         >
             <Modals />
-            <AntdLayoutHeader className={cx([styles.header, 'container bb b--light-gray'])}>
+            <AntdLayoutHeader className={cx([styles.header, 'bb b--light-gray'])}>
                 <Header />
             </AntdLayoutHeader>
             {useObserver(() => (
@@ -107,11 +107,11 @@ const Layout: FunctionComponent<ILayoutProps> = ({ children }) => {
             {/*    type={'warning'}*/}
             {/*    showIcon*/}
             {/*/>*/}
-            <div className={cx([styles.content, styles.container, 'center flex pa0 pa3-ns'])}>
+            <div className={cx([styles.content, styles.container, 'center flex pt1 pa0'])}>
                 {useObserver(() => (
                     <div
                         className={cx([
-                            'fl w-30 h-100 ph2',
+                            'fl w-30 h-100',
                             {
                                 dn: uiStore.hideSidebar,
                                 'dn db-ns': !uiStore.hideSidebar,
@@ -120,16 +120,12 @@ const Layout: FunctionComponent<ILayoutProps> = ({ children }) => {
                     >
                         <SidebarTagView />
                         <SidebarLinks />
-                        <SidebarTrendingTags />
-                        <Desktop>
-                            <Footer className={'o-60 f6'} footerText={uiStore.footerText} />
-                        </Desktop>
                     </div>
                 ))}
 
                 <div
                     className={cx([
-                        'fl ml4-ns ml0',
+                        'fl ml2-ns ml0 pb3',
                         {
                             'w-100': uiStore.hideSidebar,
                             'w-70-ns w-100': !uiStore.hideSidebar,
@@ -138,6 +134,23 @@ const Layout: FunctionComponent<ILayoutProps> = ({ children }) => {
                 >
                     {children}
                 </div>
+
+                {useObserver(() => (
+                    <div
+                        className={cx([
+                            'fl w-30 ml2-ns ml0',
+                            {
+                                dn: uiStore.hideSidebar,
+                                'dn db-ns': !uiStore.hideSidebar,
+                            },
+                        ])}
+                    >
+                        <SidebarTrendingTags />
+                        <Desktop>
+                            <Footer className={'o-60 f6'} footerText={uiStore.footerText} />
+                        </Desktop>
+                    </div>
+                ))}
             </div>
             <Mobile>
                 <footer className={cx([styles.footer, 'bg-white pv3 light-silver'])}>

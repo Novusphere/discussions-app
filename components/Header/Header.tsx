@@ -24,7 +24,7 @@ const Header: FunctionComponent<IHeaderDesktopProps> = () => {
     }, [])
 
     return (
-        <div className={cx([styles.container, 'w-100 flex flex-row items-center'])}>
+        <div className={cx([styles.container, 'center flex flex-row items-center'])}>
             <HeaderLogo />
             <HeaderSearch />
             {useObserver(() =>

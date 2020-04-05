@@ -31,7 +31,7 @@ module.exports = function(plop) {
                 actions.push({
                     type: 'add',
                     path: '../{{path}}/{{name}}.module.scss',
-                    templateFile: 'templates/style.scss',
+                    templateFile: 'templates/styles.module.scss',
                 })
             }
 
@@ -44,7 +44,7 @@ module.exports = function(plop) {
                 actions.push({
                     type: 'add',
                     path: '../{{path}}/{{name}}.module.scss',
-                    templateFile: 'templates/style.scss',
+                    templateFile: 'templates/styles.module.scss',
                 })
             }
 

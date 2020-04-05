@@ -26,9 +26,15 @@ export class NSDB {
         this.api = apiEndpoint
     }
 
-    async getTrendingsTags(): Promise<any> {
+    async getTrendingsTags(all = false): Promise<any> {
         try {
-            const { data } = await axios.get(`${this.api}/discussions/search/trendingtags`)
+            let url = `${this.api}/discussions/search/trendingtags`
+
+            if (all) {
+                url += '?days=30&count=100'
+            }
+
+            const { data } = await axios.get(url)
             return data
         } catch (error) {
             throw error
