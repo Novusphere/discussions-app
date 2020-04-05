@@ -38,14 +38,16 @@ export default () => {
             <Helmet>
                 <title>{'Trending Tags'}</title>
             </Helmet>
-            <div className={'w-100 pa3 bg-white card'}>
+            <div className={'w-100'}>
                 {useObserver(() =>
                     tags.map(({ tag, members }, index) => {
                         const tagModel: any = tagStore.tagModelFromObservables(tag)
                         return (
                             <div
                                 key={tag}
-                                className={'mb4 lh-copy flex flex-row items-center justify-between'}
+                                className={
+                                    'card bg-white pa2 mb2 lh-copy flex flex-row items-center justify-between'
+                                }
                             >
                                 <span className={'flex flex-row items-center w4'}>
                                     <img
@@ -74,7 +76,7 @@ export default () => {
                                         '--'
                                     )}
                                 </span>
-                                <span className={'w4'}>
+                                <span className={'w4 tr'}>
                                     {tagStore.subscribed.indexOf(tag) !== -1 ? (
                                         <Button
                                             type={'default'}

@@ -43,7 +43,7 @@ export const getHostName = () => {
 }
 
 export const getOrigin = () => {
-    if (isDev) return 'https://beta.discussions.app'
+    if (isDev) return 'https://discussions.app'
     return window.location.origin
 }
 

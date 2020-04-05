@@ -17,6 +17,7 @@ export class UserStore {
     @persist('map') delegated = observable.map<string, string>() // [name:pubKey:tagName, tagName]
     @persist('map') pinnedPosts = observable.map<string, string>() // [asPathURL, tagName]
 
+    pinnedByDelegation = observable.map<string, string>() // [asPathURL, tagName] for delegated users
     blockedByDelegation = observable.map<string, string>() // either blockedUsers or blockedPosts
 
     @observable notificationCount = 0
@@ -41,12 +42,12 @@ export class UserStore {
 
     @observable
     localStorageVersion = {
-        following: 1583712275528,
+        following: 1586119165124,
         watching: 1583893581788,
-        blockedUsers: 1583712275528,
-        blockedPosts: 1583712275528,
-        delegated: 1583712275528,
-        pinnedPosts: 1583712275528,
+        blockedUsers: 1586119165124,
+        blockedPosts: 1586119165124,
+        delegated: 1586119165124,
+        pinnedPosts: 1586119165124,
     }
 
     constructor(rootStore: RootStore) {
@@ -132,6 +133,7 @@ export class UserStore {
      * @param pub
      */
     activeModerationForCurrentUser = (username: string, pub: string) => {
+        if (!username || !pub) return []
         const vals = [...this.delegated.keys()]
         return vals
             .filter(val => val.indexOf(`${username}:${pub}`) !== -1)
@@ -141,7 +143,11 @@ export class UserStore {
     async setPinnedPosts(posts: any[], delegated = false, sync = true) {
         _.forEach(posts, pinnedPosts => {
             const [url, tag] = pinnedPosts
-            this.pinnedPosts.set(url, tag)
+            if (delegated) {
+                this.pinnedByDelegation.set(url, tag)
+            } else {
+                this.pinnedPosts.set(url, tag)
+            }
         })
 
         if (sync) this.syncDataFromLocalToServer()

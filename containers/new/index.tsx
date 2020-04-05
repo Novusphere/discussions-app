@@ -206,7 +206,7 @@ const NewPageNoSSRUnwrapped = ({ form, prefilledTag }: any) => {
                     {getFieldDecorator('title', {
                         rules: [
                             {
-                                required: true,
+                                required: false,
                                 message: 'Please enter a title for your post',
                             },
                         ],
