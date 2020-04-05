@@ -47,7 +47,7 @@ export class UserStore {
         blockedUsers: 1586119165124,
         blockedPosts: 1586119165124,
         delegated: 1586119165124,
-        pinnedPosts: 1586119165124,
+        pinnedPosts: 1583893581788,
     }
 
     @observable
@@ -174,6 +174,7 @@ export class UserStore {
                         const blockedPostsKeys = Object.keys(blockedPosts)
 
                         if (pinnedPosts) {
+                            console.log(pinnedPosts, delegatedMember)
                             this.setPinnedPosts(pinnedPosts, true, false)
                         }
 
@@ -405,6 +406,7 @@ export class UserStore {
                         this.blockedPosts.replace(blockedPosts)
                     }
                 }
+
                 if (!_.isNil(data['moderation']['delegated'])) {
                     this.delegated.replace(data['moderation']['delegated'])
                     this.updateFromActiveDelegatedMembers()
