@@ -398,6 +398,9 @@ export class UserStore {
                         return
                     }
 
+                    console.log('got server versions: ', serverVersions)
+                    console.log('expected versions: ', this.localStorageVersion)
+
                     Object.keys(serverVersions).forEach(version => {
                         if (serverVersions[version] !== this.localStorageVersion[version]) {
                             if (this[version] && this[version] instanceof ObservableMap) {
