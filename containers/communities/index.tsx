@@ -54,7 +54,7 @@ export default () => {
                                         alt={`${tag} icon`}
                                         width={25}
                                     />
-                                    <span className={'ml3 dib'}>
+                                    <span className={'ml2 dib'}>
                                         <span className={'db'}>
                                             <Link to={`/tag/${tag}`}>
                                                 <span className={'f5 black db'}>#{tag}</span>
