@@ -50,6 +50,9 @@ export class UserStore {
         pinnedPosts: 1586119165124,
     }
 
+    @observable
+    hasDataSyncedFromServer = false
+
     constructor(rootStore: RootStore) {
         this.uiStore = rootStore.uiStore
         this.tagStore = rootStore.tagStore
@@ -378,43 +381,6 @@ export class UserStore {
             data = data['data']
 
             if (data) {
-                /**
-                 * Check localStorageVersion for comparison
-                 * If version mismatch, reset users' local storage version
-                 *
-                 * This required to ensure we are able to reset LS when we change code or add features
-                 * that affect LS, otherwise there should be a way to migrate.
-                 */
-                if (
-                    typeof data['localStorageVersion'] === undefined ||
-                    data['localStorageVersion'] !== this.localStorageVersion
-                ) {
-                    // find mismatch versions
-                    const serverVersions = data['localStorageVersion']
-
-                    if (_.isNil(serverVersions)) {
-                        this.resetPostObservables()
-                        this.syncDataFromLocalToServer()
-                        return
-                    }
-
-                    console.log('got server versions: ', serverVersions)
-                    console.log('expected versions: ', this.localStorageVersion)
-
-                    Object.keys(serverVersions).forEach(version => {
-                        if (serverVersions[version] !== this.localStorageVersion[version]) {
-                            if (this[version] && this[version] instanceof ObservableMap) {
-                                console.log('clearing', version)
-                                this[version].replace([])
-                            }
-                        }
-                    })
-
-                    this.syncDataFromLocalToServer()
-                    // exit out
-                    return
-                }
-
                 if (!_.isNil(data['lastCheckedNotifications']))
                     this.lastCheckedNotifications = data['lastCheckedNotifications']
 
@@ -432,7 +398,7 @@ export class UserStore {
                 if (!_.isNil(data['moderation']['blockedPosts'])) {
                     const blockedPosts = data['moderation']['blockedPosts']
 
-                    if (!_.isNil(data['legacy'])) {
+                    if (_.isNil(data['legacy'])) {
                         console.log('found legacy user, updating')
                         this.blockedPosts.replace({})
                     } else {
@@ -450,7 +416,7 @@ export class UserStore {
                 if (!_.isNil(data['moderation']['pinnedPosts'])) {
                     const pinnedPosts = data['moderation']['pinnedPosts']
 
-                    if (!_.isNil(data['legacy'])) {
+                    if (_.isNil(data['legacy'])) {
                         console.log('found legacy user, updating')
                         this.pinnedPosts.replace({})
                     } else {
@@ -463,7 +429,45 @@ export class UserStore {
 
                 if (!_.isNil(data['moderation']['blockedContentSetting']))
                     this.blockedContentSetting = data['moderation']['blockedContentSetting']
+
+                /**
+                 * Check localStorageVersion for comparison
+                 * If version mismatch, reset users' local storage version
+                 *
+                 * This required to ensure we are able to reset LS when we change code or add features
+                 * that affect LS, otherwise there should be a way to migrate.
+                 */
+                if (
+                    typeof data['localStorageVersion'] === undefined ||
+                    data['localStorageVersion'] !== this.localStorageVersion
+                ) {
+                    // find mismatch versions
+                    const serverVersions = data['localStorageVersion']
+
+                    if (_.isNil(serverVersions)) {
+                        this.resetPostObservables()
+                        this.syncDataFromLocalToServer()
+                        this.hasDataSyncedFromServer = true
+                        return
+                    }
+
+                    Object.keys(serverVersions).forEach(version => {
+                        if (serverVersions[version] !== this.localStorageVersion[version]) {
+                            if (this[version] && this[version] instanceof ObservableMap) {
+                                console.log('clearing', version)
+                                this[version].replace([])
+                            }
+                        }
+                    })
+
+                    this.syncDataFromLocalToServer()
+                    this.hasDataSyncedFromServer = true
+                    // exit out
+                    return
+                }
             }
+
+            this.hasDataSyncedFromServer = true
         } catch (error) {
             console.error(
                 `Unable to sync: We experienced some problems syncing your account data to your current browser`,
@@ -478,6 +482,8 @@ export class UserStore {
      */
     syncDataFromLocalToServer = async () => {
         try {
+            if (!this.hasDataSyncedFromServer) return
+
             const following = [...this.following.toJS()].map(([pub, name]) => ({
                 pub,
                 name,
