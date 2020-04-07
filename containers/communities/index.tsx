@@ -37,7 +37,7 @@ export default observer(() => {
     return (
         <>
             <Helmet>
-                <title>{'Trending Tags'}</title>
+                <title>{'Discover Communities'}</title>
             </Helmet>
             <div className={'w-100'}>
                 {[...tagStore.tags.toJS()].map(([tag, tagModel]) => {
