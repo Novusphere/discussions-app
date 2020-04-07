@@ -203,6 +203,14 @@ app.get('/trending', (req, res) => {
     })
 })
 
+app.get('/communnities', (req, res) => {
+    serveAndReplaceMeta(res, {
+        title: 'Discover Communities',
+        description: 'View our official tags',
+        image: res.genericTagUrl,
+    })
+})
+
 app.get('*', (req, res) => {
     res.redirect('/404')
 })
