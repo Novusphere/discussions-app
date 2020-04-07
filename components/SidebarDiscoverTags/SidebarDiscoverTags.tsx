@@ -3,13 +3,13 @@ import React, { FunctionComponent, useCallback, useEffect } from 'react'
 import styles from './SidebarDiscoverTags.module.scss'
 import { Icon, Spin } from 'antd'
 import { RootStore, useStores } from '@stores'
-import { observer } from 'mobx-react-lite'
+import { observer } from 'mobx-react'
 import { SidebarLinkPopup } from '@components'
 import { Link } from 'react-router-dom'
 
 interface ISidebarTrendingTagsProps {}
 
-const SidebarDiscoverTags: FunctionComponent<ISidebarTrendingTagsProps> = () => {
+const SidebarDiscoverTags: FunctionComponent<ISidebarTrendingTagsProps> = observer(() => {
     const { tagStore, userStore, authStore, settingStore }: RootStore = useStores()
 
     const onSubscribe = useCallback(subscribed => {
@@ -52,8 +52,8 @@ const SidebarDiscoverTags: FunctionComponent<ISidebarTrendingTagsProps> = () => 
             </div>
         </div>
     )
-}
+})
 
 SidebarDiscoverTags.defaultProps = {}
 
-export default observer(SidebarDiscoverTags)
+export default SidebarDiscoverTags

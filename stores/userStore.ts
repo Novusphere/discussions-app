@@ -174,7 +174,6 @@ export class UserStore {
                         const blockedPostsKeys = Object.keys(blockedPosts)
 
                         if (pinnedPosts) {
-                            console.log(pinnedPosts, delegatedMember)
                             this.setPinnedPosts(pinnedPosts, true, false)
                         }
 
