@@ -244,6 +244,7 @@ class Editor extends React.Component<IEditorProps, IEditorState> {
 
         // https://github.com/Novusphere/discussions-app/issues/169
         // this might have to be re-visited
+
         this.props.onChange(replacedMarkdown)
     }
 

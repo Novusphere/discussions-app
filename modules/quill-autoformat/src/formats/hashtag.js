@@ -10,20 +10,28 @@ class Hashtag extends Embed {
         const checkValueRegexResult = _value.match(/([a-zA-Z0-9_])+/i)
 
         if (value !== '#' && checkValueRegexResult && checkValueRegexResult.length) {
-            _value = `/tag/${checkValueRegexResult[0]}`
+            let tagName = checkValueRegexResult[0]
+
+            if (tagName.indexOf('#') !== -1) {
+                tagName.replace('#', '')
+            }
+
+            _value = `/tag/${tagName}`
+
+            node.setAttribute('data-url', _value)
             node.setAttribute('href', _value)
             node.setAttribute('spellcheck', false)
-            node.textContent = '#' + value
+            node.textContent = '#' + tagName
             return node
         }
     }
 
     static formats(domNode) {
-        return domNode.getAttribute('href').substr(this.BASE_URL.length)
+        return domNode.getAttribute('data-url')
     }
 
     format(name, value) {
-        this.domNode.setAttribute('href', value)
+        this.domNode.setAttribute('href', this.domNode.getAttribute('data-url'))
     }
 
     static value(domNode) {
