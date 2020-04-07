@@ -82,16 +82,12 @@ const NewPageNoSSRUnwrapped = ({ form, prefilledTag }: any) => {
 
                 try {
                     const submittedPost = await discussions.post(post as any)
-
                     const isPostValid = discussions.checkIfPostIsValid(submittedPost)
-
                     return new Promise((resolve, reject) => {
                         if (isPostValid) {
                             const id = encodeId(submittedPost)
-
                             const int = setInterval(async () => {
                                 const getThread = await discussions.getThread(id, authStore.postPub)
-
                                 if (getThread) {
                                     if (int) {
                                         clearInterval(int)

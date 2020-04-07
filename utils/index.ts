@@ -117,6 +117,7 @@ export const encodeId = (post: Post) => {
 }
 
 export const getThreadTitle = (post: Post) => {
+    if (!post.title) return ''
     return _.snakeCase(post.title.replace(/[^0-9a-z]/gi, ' '))
 }
 
