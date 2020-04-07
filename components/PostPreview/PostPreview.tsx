@@ -328,9 +328,10 @@ const PostPreview: FunctionComponent<IPostPreviewProps> = ({
                 data-url={url}
                 style={{
                     opacity: shouldBeCollapsed ? 0.5 : 1,
+                    height: post.content.length > 300 ? '325px' : '100%',
                 }}
             >
-                <div className={'flex flex-row'}>
+                <div className={'flex flex-row h-100'}>
                     <div className={'bg-light-gray w2 ph2 pv4 z-2'}>{renderVotingHandles()}</div>
                     <div className={'flex flex-column bg-white pa2 pa4-ns'}>
                         {shouldBeCollapsed && (
@@ -352,7 +353,10 @@ const PostPreview: FunctionComponent<IPostPreviewProps> = ({
                                         </span>
                                     </div>
                                     <object>
-                                        <RichTextPreview className={'h4 gray'}>
+                                        <RichTextPreview
+                                            className={'h4 gray'}
+                                            hideFade={post.content.length < 300}
+                                        >
                                             {post.content}
                                         </RichTextPreview>
                                     </object>
