@@ -24,7 +24,11 @@ const SidebarTrendingTags: FunctionComponent<ISidebarTrendingTagsProps> = () => 
     }, [])
 
     if (tagStore.fetchTrendingTags['pending']) {
-        return <Spin />
+        return (
+            <div className={'bg-white card w-100 h5 flex justify-center items-center o-50 mb3'}>
+                <Spin />
+            </div>
+        )
     }
 
     return (
@@ -32,9 +36,9 @@ const SidebarTrendingTags: FunctionComponent<ISidebarTrendingTagsProps> = () => 
             <span className={'f5 flex flex-row justify-between items-center'}>
                 <span>
                     <Icon type="fire" theme="twoTone" twoToneColor={'#FF6300'} />
-                    <span className={'ph2 orange'}>Trending Tags</span>
+                    <span className={'ph2 orange b'}>Trending Tags</span>
                 </span>
-                <Link to={'/communities'} className={'f7 o-50 pointer'}>
+                <Link to={'/trending'} className={'f7 o-50 pointer'}>
                     View All
                 </Link>
             </span>

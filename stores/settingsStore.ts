@@ -10,7 +10,7 @@ export class SettingsStore {
     @observable private uiStore: RootStore['uiStore']
     @observable private tagStore: RootStore['tagStore']
 
-    @observable called = false
+    @observable settingsLoaded = false
 
     constructor(rootStore: RootStore) {
         this.userStore = rootStore.userStore
@@ -67,13 +67,17 @@ export class SettingsStore {
                             name: name,
                             logo: tag.icon,
                             tagDescription: tag.desc,
-                            memberCount: members.count,
+                            memberCount: members[0].count,
                         })
                     })
                 )
             }
 
+            this.settingsLoaded = true
+
             return settings
         }
+
+        this.settingsLoaded = true
     }
 }

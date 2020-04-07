@@ -195,7 +195,7 @@ app.get('/404', (req, res) => {
     })
 })
 
-app.get('/communities', (req, res) => {
+app.get('/trending', (req, res) => {
     serveAndReplaceMeta(res, {
         title: 'Trending Tags',
         description: 'View all of our trending tags!',

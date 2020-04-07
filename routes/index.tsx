@@ -17,6 +17,7 @@ const TagsViewPage = lazy(() => import('@containers/tags'))
 const UserViewPage = lazy(() => import('@containers/u'))
 const NotificationsPage = lazy(() => import('@containers/notifications'))
 const NotFoundPage = lazy(() => import('@containers/404'))
+const TrendingPage = lazy(() => import('@containers/trending'))
 const CommunitiesPage = lazy(() => import('@containers/communities'))
 
 export const routes = [
@@ -79,6 +80,11 @@ export const routes = [
         path: '/404',
         exact: true,
         component: NotFoundPage,
+    },
+    {
+        path: '/trending',
+        exact: true,
+        component: TrendingPage,
     },
     {
         path: '/communities',

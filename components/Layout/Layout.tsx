@@ -8,6 +8,7 @@ import {
     Footer,
     Header,
     SidebarTrendingTags,
+    SidebarDiscoverTags,
 } from '@components'
 import { useLocation } from 'react-router-dom'
 import { useObserver } from 'mobx-react-lite'
@@ -34,8 +35,6 @@ const Layout: FunctionComponent<ILayoutProps> = ({ children }) => {
 
     // fire some stuff
     useEffect(() => {
-        console.error('Layout loaded')
-
         settingStore.loadSettings()
 
         eos.initializeTokens().then(() => {
@@ -111,7 +110,7 @@ const Layout: FunctionComponent<ILayoutProps> = ({ children }) => {
                 {useObserver(() => (
                     <div
                         className={cx([
-                            'fl w-30 h-100',
+                            'fl w-30 h-100 overflow-hidden',
                             {
                                 dn: uiStore.hideSidebar,
                                 'dn db-ns': !uiStore.hideSidebar,
@@ -120,12 +119,13 @@ const Layout: FunctionComponent<ILayoutProps> = ({ children }) => {
                     >
                         <SidebarTagView />
                         <SidebarLinks />
+                        <SidebarDiscoverTags />
                     </div>
                 ))}
 
                 <div
                     className={cx([
-                        'fl ml2-ns ml0 pb3',
+                        'fl ml2-ns ml0 pb3 overflow-hidden',
                         {
                             'w-100': uiStore.hideSidebar,
                             'w-70-ns w-100': !uiStore.hideSidebar,
@@ -138,7 +138,7 @@ const Layout: FunctionComponent<ILayoutProps> = ({ children }) => {
                 {useObserver(() => (
                     <div
                         className={cx([
-                            'fl w-30 ml2-ns ml0',
+                            'fl w-30 ml2-ns ml0 overflow-hidden',
                             {
                                 dn: uiStore.hideSidebar,
                                 'dn db-ns': !uiStore.hideSidebar,
