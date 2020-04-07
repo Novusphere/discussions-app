@@ -203,7 +203,7 @@ app.get('/trending', (req, res) => {
     })
 })
 
-app.get('/communnities', (req, res) => {
+app.get('/communities', (req, res) => {
     serveAndReplaceMeta(res, {
         title: 'Discover Communities',
         description: 'View our official tags',
