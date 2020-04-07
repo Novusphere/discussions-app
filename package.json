@@ -1,6 +1,6 @@
 {
     "name": "discussions-app",
-    "version": "2.5.309",
+    "version": "2.5.310",
     "dependencies": {
         "@babel/runtime": "7.4.5",
         "aes-js": "3.1.2",
@@ -69,7 +69,7 @@
         "start:beta": "SET PORT=3001 && node dist/server.js",
         "prod": "npm run build && npm run start:prod",
         "beta": "npm run build && npm run start:beta",
-        "build": "npm run build:client && npm run build:server",
+        "build": "npm run build-editor && npm run build:client && npm run build:server",
         "build:client": "rm -rf dist && webpack --config webpack/webpack.prod.js",
         "build:server": "webpack --config webpack/webpack.server.js"
     },
