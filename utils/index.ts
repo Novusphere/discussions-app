@@ -124,22 +124,22 @@ export const getThreadTitle = (post: Post) => {
 export const getThreadUrl = async (post: Post, permalinkUuid?: string) => {
     const id = encodeId(post)
     let sub = _.trim(post.sub)
-    let url = `/tag/${sub}/${id}/`
+    let url = `/tag/${sub}/${id}`
 
     // if a post is a comment not a opening post
     if (post.op) {
-        url += `${getThreadTitle(post.op)}`
+        url += `/${getThreadTitle(post.op)}`
     } else if (!post.op && post.title === '') {
         const thread = await discussions.getThread(id, '')
         if (!thread || !thread.openingPost) return ''
         const newId = encodeId(thread.openingPost as any)
         url = `/tag/${thread.openingPost.sub}/${newId}/${getThreadTitle(thread as any)}`
     } else {
-        url += `${getThreadTitle(post)}`
+        url += `/${getThreadTitle(post)}`
     }
 
     if (permalinkUuid) {
-        url += `#${permalinkUuid}`
+        url += `/#${permalinkUuid}`
     }
 
     return url

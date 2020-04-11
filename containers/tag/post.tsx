@@ -622,62 +622,72 @@ const PostPageComponentObserverable: React.FunctionComponent<IPostPageProps> = (
 
                 <div
                     className={cx([
-                        'mv3 flex-row justify-between',
+                        'mv3 flex flex-row justify-between',
                         {
-                            dn: postStore.editing,
                             flex: !postStore.editing,
                         },
                     ])}
                 >
-                    <span className={'measure black b f4 flex-wrap'}>{postStore.titleContent}</span>
-                    <VotingHandles
-                        uuid={thread.openingPost.uuid}
-                        myVote={postStore.myVoteValue}
-                        upVotes={postStore.upvotes}
-                        downVotes={postStore.downvotes}
-                        handler={postStore.handleVoting}
-                    />
-                </div>
-
-                <div className={'mt2 db'}>
-                    {!postStore.editing && (
-                        <RichTextPreview
-                            hideFade
-                            className={'black f6 lh-copy overflow-break-word'}
+                    <div className={'flex flex-column w-100'}>
+                        <span
+                            className={cx([
+                                'measure black b f4 flex-wrap pb3',
+                                {
+                                    dn: postStore.editing,
+                                },
+                            ])}
                         >
-                            {postStore.editingContent}
-                        </RichTextPreview>
-                    )}
-                    {postStore.editing && (
-                        <>
-                            <div className={'mb3 db'}>
-                                <Input
-                                    autoCorrect={'none'}
-                                    allowClear
-                                    size={'large'}
-                                    defaultValue={postStore.titleContent}
-                                    onChange={postStore.setTitleContent}
+                            {postStore.titleContent}
+                        </span>
+                        {!postStore.editing && (
+                            <RichTextPreview
+                                hideFade
+                                className={'black f6 lh-copy overflow-break-word'}
+                            >
+                                {postStore.editingContent}
+                            </RichTextPreview>
+                        )}
+                        {postStore.editing && (
+                            <>
+                                <div className={'mb3 db'}>
+                                    <Input
+                                        autoCorrect={'none'}
+                                        allowClear
+                                        size={'large'}
+                                        defaultValue={postStore.titleContent}
+                                        onChange={postStore.setTitleContent}
+                                    />
+                                </div>
+                                <Editor
+                                    onChange={postStore.setEditingContent}
+                                    value={postStore.editingContent}
+                                    threadUsers={postStore.threadUsers}
                                 />
-                            </div>
-                            <Editor
-                                onChange={postStore.setEditingContent}
-                                value={postStore.editingContent}
-                                threadUsers={postStore.threadUsers}
-                            />
-                            <div className={'flex flex-row justify-end pt2'}>
-                                <Button onClick={postStore.toggleEdit} className={'mr2'}>
-                                    Cancel
-                                </Button>
-                                <Button
-                                    disabled={postStore.editingContent === ''}
-                                    type={'danger'}
-                                    onClick={postStore.submitEdit}
-                                    loading={postStore.submitEditLoading}
-                                >
-                                    Save Edit
-                                </Button>
-                            </div>
-                        </>
+                                <div className={'flex flex-row justify-end pt2'}>
+                                    <Button onClick={postStore.toggleEdit} className={'mr2'}>
+                                        Cancel
+                                    </Button>
+                                    <Button
+                                        disabled={postStore.editingContent === ''}
+                                        type={'danger'}
+                                        onClick={postStore.submitEdit}
+                                        loading={postStore.submitEditLoading}
+                                    >
+                                        Save Edit
+                                    </Button>
+                                </div>
+                            </>
+                        )}
+                    </div>
+
+                    {!postStore.editing && (
+                        <VotingHandles
+                            uuid={thread.openingPost.uuid}
+                            myVote={postStore.myVoteValue}
+                            upVotes={postStore.upvotes}
+                            downVotes={postStore.downvotes}
+                            handler={postStore.handleVoting}
+                        />
                     )}
                 </div>
 

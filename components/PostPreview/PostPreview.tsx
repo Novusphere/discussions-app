@@ -51,7 +51,7 @@ const PostPreview: FunctionComponent<IPostPreviewProps> = ({
         async function getUrl() {
             let uuid = undefined
 
-            if (!post.title) {
+            if (!post.title && post.threadUuid !== post.uuid) {
                 uuid = post.uuid
             }
 
@@ -333,7 +333,12 @@ const PostPreview: FunctionComponent<IPostPreviewProps> = ({
             >
                 <div className={'flex flex-row h-100'}>
                     <div className={'bg-light-gray w2 ph2 pv4 z-2'}>{renderVotingHandles()}</div>
-                    <div className={'flex flex-column bg-white pa2 pa4-ns'}>
+                    <div
+                        className={cx([
+                            'flex flex-column bg-white pa2 pa4-ns',
+                            styles.contentContainer,
+                        ])}
+                    >
                         {shouldBeCollapsed && (
                             <span className={'silver'}>This post was marked as spam.</span>
                         )}
