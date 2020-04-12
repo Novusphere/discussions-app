@@ -10,13 +10,9 @@ const TagPage: React.FC<any> = () => {
     const { tag: paramTag } = useParams()
     const tag = useMemo(() => paramTag.toLowerCase(), [paramTag])
     const pinnedPosts = [...userStore.pinnedPosts.toJS(), ...userStore.pinnedByDelegation.toJS()]
-
-    const fetch = useCallback(
-        ({ sort, postPub }) => {
-            postsStore.fetchPostsForTag(postPub, [tag], pinnedPosts, sort)
-        },
-        [tag, pinnedPosts]
-    )
+    const fetch = ({ sort, postPub }) => {
+        postsStore.fetchPostsForTag(postPub, [tag], pinnedPosts, sort)
+    }
 
     const { items, cursorId } = postsStore.postsPosition
 

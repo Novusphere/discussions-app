@@ -163,7 +163,8 @@ const UserPage: React.FC<any> = () => {
 
     const onModerationChange = useCallback(
         (tags: string[]) => {
-            return userStore.setModerationFromDropdown(username, usersPostPub, tags)
+            userStore.setModerationFromDropdown(username, usersPostPub, tags)
+            userStore.updateFromActiveDelegatedMembers()
         },
         [usersPostPub, username, wallet]
     )

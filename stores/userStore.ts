@@ -160,6 +160,9 @@ export class UserStore {
      * Sync the data from delegated members
      */
     async updateFromActiveDelegatedMembers() {
+        this.pinnedByDelegation.clear()
+        this.blockedByDelegation.clear()
+
         try {
             return await Promise.all(
                 [...this.delegated.keys()].map(async delegatedMember => {
@@ -238,6 +241,8 @@ export class UserStore {
                     if (!suppressAlert) {
                         this.uiStore.showMessage('Removed user as a moderator', 'success')
                     }
+
+                    this.updateFromActiveDelegatedMembers()
                 } else {
                     await this.setAndUpdateDelegatedPosts(mergedName, tagName, suppressAlert)
                 }

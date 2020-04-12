@@ -26,14 +26,14 @@ const CommonFeed: FunctionComponent<ICommonFeedProps> = ({
     tag,
     hideSort,
 }) => {
-    const { authStore, postsStore }: RootStore = useStores()
+    const { authStore, postsStore, userStore }: RootStore = useStores()
     const [sort, setSort] = useState('popular')
     const postPub = useMemo(() => authStore.postPub, [])
-    const resetAndFetch = useCallback(() => {
+    const resetAndFetch = () => {
+        userStore.updateFromActiveDelegatedMembers()
         postsStore.resetPostsAndPosition()
         onFetch({ sort, postPub })
-    }, [sort, tag])
-
+    }
     const onChange = useCallback(
         option => {
             setSort(option)
@@ -43,7 +43,7 @@ const CommonFeed: FunctionComponent<ICommonFeedProps> = ({
 
     useEffect(() => {
         resetAndFetch()
-    }, [sort, tag])
+    }, [sort, tag, userStore])
 
     if (cursorId === 0 && !posts.length) {
         return <Empty description={emptyDescription} />

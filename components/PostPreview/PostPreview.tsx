@@ -184,6 +184,7 @@ const PostPreview: FunctionComponent<IPostPreviewProps> = ({
         blockedByDelegation.has(post.pub) ||
         (unsignedPostsIsSpam && !post.pub)
 
+    const isPinned = post.pinned
     const shouldBeHidden = blockedContentSetting === 'hidden' && isSpam
     const shouldBeCollapsed = blockedContentSetting === 'collapsed' && isSpam
 
@@ -344,7 +345,7 @@ const PostPreview: FunctionComponent<IPostPreviewProps> = ({
                         )}
                         {!shouldBeCollapsed && (
                             <>
-                                {post.pinned && (
+                                {isPinned && (
                                     <span className={'db f6 b red mb2 flex flex-row items-center'}>
                                         PINNED
                                     </span>
