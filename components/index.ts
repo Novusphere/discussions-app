@@ -1,6 +1,7 @@
 export { default as Layout } from './Layout/Layout'
 export { default as Header } from './Header/Header'
 export { default as PostPreview } from './PostPreview/PostPreview'
+export { default as PostPreviewLoading } from './PostPreviewLoading/PostPreviewLoading'
 export { default as RichTextPreview } from './RichTextPreview/RichTextPreview'
 export { default as InfiniteScrollFeed } from './InfiniteScrollFeed/InfiniteScrollFeed'
 export { default as UserNameWithIcon } from './UserNameWithIcon/UserNameWithIcon'

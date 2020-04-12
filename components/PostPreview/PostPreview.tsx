@@ -1,5 +1,5 @@
 import React, { FunctionComponent, useCallback, useEffect, useState } from 'react'
-import { Divider, Popover, Tooltip } from 'antd'
+import { Divider, Popover, Skeleton, Tooltip } from 'antd'
 import cx from 'classnames'
 import styles from './PostPreview.module.scss'
 import { observer, useLocalStore } from 'mobx-react-lite'
@@ -14,6 +14,7 @@ import {
     Tips,
     SharePostPopover,
     Icons,
+    PostPreviewLoading,
 } from '@components'
 import { Link } from 'react-router-dom'
 
@@ -177,12 +178,17 @@ const PostPreview: FunctionComponent<IPostPreviewProps> = ({
         }
     )
 
-    const isSpam =
-        blockedPosts.has(url) ||
-        blockedUsers.has(post.pub) ||
-        blockedByDelegation.has(url) ||
-        blockedByDelegation.has(post.pub) ||
-        (unsignedPostsIsSpam && !post.pub)
+    const [isSpam, setSpamStatus] = useState(null)
+
+    useEffect(() => {
+        setSpamStatus(
+            blockedPosts.has(url) ||
+                blockedUsers.has(post.pub) ||
+                blockedByDelegation.has(url) ||
+                blockedByDelegation.has(post.pub) ||
+                (unsignedPostsIsSpam && !post.pub)
+        )
+    }, [blockedPosts, blockedUsers, blockedByDelegation, unsignedPostsIsSpam])
 
     const isPinned = post.pinned
     const shouldBeHidden = blockedContentSetting === 'hidden' && isSpam
@@ -310,6 +316,10 @@ const PostPreview: FunctionComponent<IPostPreviewProps> = ({
                       {...props}
                   />
               )
+    }
+
+    if (isSpam === null) {
+        return <PostPreviewLoading />
     }
 
     if (shouldBeHidden) {
