@@ -91,66 +91,76 @@ const Layout: FunctionComponent<ILayoutProps> = ({ children }) => {
             <AntdLayoutHeader className={cx([styles.header, 'bb b--light-gray'])}>
                 <Header />
             </AntdLayoutHeader>
-            {useObserver(() => (
-                <span className={styles.banner}>
-                    <img
-                        src={uiStore.activeBanner}
-                        title={'Active banner'}
-                        alt={'Active banner image'}
-                    />
-                </span>
-            ))}
             {/*<Alert*/}
             {/*    message={'Alert'}*/}
             {/*    description={'Sign in has been disabled temporarily.'}*/}
             {/*    type={'warning'}*/}
             {/*    showIcon*/}
             {/*/>*/}
-            <div className={cx([styles.content, styles.container, 'center flex pt1 pa0'])}>
+            <div className={cx([styles.container, styles.mainContainer, 'center flex pt1 pa0'])}>
                 {useObserver(() => (
                     <div
                         className={cx([
-                            'fl w-30 h-100 overflow-hidden',
+                            'fl w-20 h-100 overflow-hidden',
                             {
                                 dn: uiStore.hideSidebar,
                                 'dn db-ns': !uiStore.hideSidebar,
                             },
                         ])}
                     >
-                        <SidebarTagView />
                         <SidebarLinks />
                         <SidebarDiscoverTags />
                     </div>
                 ))}
 
-                <div
-                    className={cx([
-                        'fl ml2-ns ml0 pb3 overflow-hidden',
-                        {
-                            'w-100': uiStore.hideSidebar,
-                            'w-70-ns w-100': !uiStore.hideSidebar,
-                        },
-                    ])}
-                >
-                    {children}
-                </div>
+                <div className={cx([
+                    'ml2-ns ml0',
+                    {
+                        'w-100': uiStore.hideSidebar,
+                        'w-80-ns w-100': !uiStore.hideSidebar,
+                    },
+                ])}>
+                    {useObserver(() => (
+                        <div className={styles.banner}>
+                            <img
+                                src={uiStore.activeBanner}
+                                title={'Active banner'}
+                                alt={'Active banner image'}
+                            />
+                        </div>
+                    ))}
+                    <SidebarTagView />
 
-                {useObserver(() => (
-                    <div
-                        className={cx([
-                            'fl w-30 ml2-ns ml0 overflow-hidden',
-                            {
-                                dn: uiStore.hideSidebar,
-                                'dn db-ns': !uiStore.hideSidebar,
-                            },
-                        ])}
-                    >
-                        <SidebarTrendingTags />
-                        <Desktop>
-                            <Footer className={'o-60 f6'} footerText={uiStore.footerText} />
-                        </Desktop>
+                    <div className={'flex flex-row w-100'}>
+                        <div
+                            className={cx([
+                                {
+                                    'w-100': uiStore.hideSidebar,
+                                    'w-70-ns w-100': !uiStore.hideSidebar,
+                                },
+                            ])}
+                        >
+                            {children}
+                        </div>
+
+                        {useObserver(() => (
+                            <div
+                                className={cx([
+                                    'fl w-30 ml2-ns ml0',
+                                    {
+                                        dn: uiStore.hideSidebar,
+                                        'dn db-ns': !uiStore.hideSidebar,
+                                    },
+                                ])}
+                            >
+                                <SidebarTrendingTags />
+                                <Desktop>
+                                    <Footer className={'o-60 f6'} footerText={uiStore.footerText} />
+                                </Desktop>
+                            </div>
+                        ))}
                     </div>
-                ))}
+                </div>
             </div>
             <Mobile>
                 <footer className={cx([styles.footer, 'bg-white pv3 light-silver'])}>

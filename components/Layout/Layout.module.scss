@@ -9,20 +9,23 @@
 }
 
 .banner {
-    margin-top: 55px;
-    width: 100vw;
-    height: 75px;
+    display: block;
+    width: 100%;
+    height: 150px;
     background: #101011;
+    border-top-left-radius: 5px;
+    border-top-right-radius: 5px;
 
     img {
+        border-top-left-radius: 5px;
+        border-top-right-radius: 5px;
         width: 100%;
         object-fit: contain;
-        height: 75px;
     }
 }
 
-.content {
-    margin-top: 5px;
+.mainContainer {
+    margin-top: 60px;
 }
 
 .footer {
