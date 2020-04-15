@@ -60,9 +60,13 @@ export class SettingsStore {
                 try {
                     await Promise.all(
                         _.map(tags, async (tag, name) => {
-                            const { data: members } = await axios.get(
+                            let { data: members } = await axios.get(
                                 `${nsdb.api}/discussions/site/members/${name}`
                             )
+
+                            if (!members) {
+                                members = [{ count: 0 }]
+                            }
 
                             this.tagStore.tags.set(name, {
                                 name: name,

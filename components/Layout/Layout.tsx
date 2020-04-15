@@ -9,6 +9,7 @@ import {
     Header,
     SidebarTrendingTags,
     SidebarDiscoverTags,
+    TagViewTabs,
 } from '@components'
 import { useLocation } from 'react-router-dom'
 import { useObserver } from 'mobx-react-lite'
@@ -113,13 +114,15 @@ const Layout: FunctionComponent<ILayoutProps> = ({ children }) => {
                     </div>
                 ))}
 
-                <div className={cx([
-                    'ml2-ns ml0',
-                    {
-                        'w-100': uiStore.hideSidebar,
-                        'w-80-ns w-100': !uiStore.hideSidebar,
-                    },
-                ])}>
+                <div
+                    className={cx([
+                        'ml2-ns ml0',
+                        {
+                            'w-100': uiStore.hideSidebar,
+                            'w-80-ns w-100': !uiStore.hideSidebar,
+                        },
+                    ])}
+                >
                     {useObserver(() => (
                         <div className={styles.banner}>
                             <img
@@ -130,36 +133,17 @@ const Layout: FunctionComponent<ILayoutProps> = ({ children }) => {
                         </div>
                     ))}
                     <SidebarTagView />
-
-                    <div className={'flex flex-row w-100'}>
-                        <div
-                            className={cx([
-                                {
-                                    'w-100': uiStore.hideSidebar,
-                                    'w-70-ns w-100': !uiStore.hideSidebar,
-                                },
-                            ])}
-                        >
-                            {children}
-                        </div>
-
-                        {useObserver(() => (
-                            <div
-                                className={cx([
-                                    'fl w-30 ml2-ns ml0',
-                                    {
-                                        dn: uiStore.hideSidebar,
-                                        'dn db-ns': !uiStore.hideSidebar,
-                                    },
-                                ])}
-                            >
+                    <TagViewTabs
+                        sidebar={
+                            <>
                                 <SidebarTrendingTags />
                                 <Desktop>
                                     <Footer className={'o-60 f6'} footerText={uiStore.footerText} />
                                 </Desktop>
-                            </div>
-                        ))}
-                    </div>
+                            </>
+                        }
+                        content={children}
+                    />
                 </div>
             </div>
             <Mobile>

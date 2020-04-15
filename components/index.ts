@@ -20,6 +20,7 @@ export { default as SidebarDiscoverTags } from './SidebarDiscoverTags/SidebarDis
 export { default as Footer } from './Footer/Footer'
 export { default as Sorter } from './Sorter/Sorter'
 export { default as CommonFeed } from './CommonFeed/CommonFeed'
+export { default as TagViewTabs } from './TagViewTabs/TagViewTabs'
 
 // header
 export { default as HeaderLogo } from './HeaderLogo/HeaderLogo'

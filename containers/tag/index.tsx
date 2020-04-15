@@ -1,4 +1,4 @@
-import React, { useCallback, useMemo } from 'react'
+import React, { useMemo } from 'react'
 import { CommonFeed } from '@components'
 import { RootStore, useStores } from '@stores'
 import Helmet from 'react-helmet'

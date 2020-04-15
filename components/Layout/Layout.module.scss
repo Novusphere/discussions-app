@@ -13,13 +13,12 @@
     width: 100%;
     height: 150px;
     background: #101011;
-    border-top-left-radius: 5px;
-    border-top-right-radius: 5px;
+    border-radius: 5px;
 
     img {
-        border-top-left-radius: 5px;
-        border-top-right-radius: 5px;
+        border-radius: 5px;
         width: 100%;
+        height: 150px;
         object-fit: contain;
     }
 }

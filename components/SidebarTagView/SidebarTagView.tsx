@@ -22,7 +22,7 @@ const SidebarTagView: FunctionComponent<ISidebarTagViewProps> = () => {
         const tagObj = tagStore.tagModelFromObservables(tag)
 
         return (
-            <div className={'pa4 bg-white list card mb3'}>
+            <div className={cx(['pa4 bg-white list card', styles.container])}>
                 <div className={'flex flex-row items-center justify-between'}>
                     <div className={'flex flex-row items-center'}>
                         <span className={'pr3 dib'}>
