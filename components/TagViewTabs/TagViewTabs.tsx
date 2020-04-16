@@ -4,9 +4,10 @@ import styles from './TagViewTabs.module.scss'
 import { Avatar, Button, Tabs } from 'antd'
 import cx from 'classnames'
 import { RootStore, useStores } from '@stores'
-import { observer, useObserver } from 'mobx-react-lite'
+import { observer } from 'mobx-react-lite'
 import { useLocation } from 'react-router-dom'
-import { getIdenticon } from '@utils'
+import { Desktop, getIdenticon } from '@utils'
+import { Footer } from '@components'
 
 interface ITagViewTabsProps {
     sidebar: any
@@ -31,9 +32,13 @@ const TagViewTabs: FunctionComponent<ITagViewTabsProps> = ({ sidebar, content })
                 ])}
             >
                 {sidebar}
+
+                <Desktop>
+                    <Footer className={'o-60 f6'} footerText={uiStore.footerText} />
+                </Desktop>
             </div>
         )
-    }, [])
+    }, [uiStore.footerText])
 
     const WrapComponent = useCallback(({ children }) => {
         return (

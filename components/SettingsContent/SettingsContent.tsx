@@ -80,6 +80,49 @@ const WatchedThreads = () => {
     )
 }
 
+const PinnedThreads = () => {
+    const { userStore, tagStore }: RootStore = useStores()
+
+    return (
+        <List
+            locale={{
+                emptyText: <span>You have no pinned threads</span>,
+            }}
+            itemLayout="horizontal"
+            dataSource={[...userStore.pinnedPosts.toJS()]}
+            renderItem={([path]) => {
+                const [, tagName] = path.split('/')
+                const tag = tagStore.tagModelFromObservables(tagName)
+                if (!tag) return null
+                return (
+                    <List.Item className={'flex flex-row items-center justify-between'}>
+                        <>
+                            <span className={'flex flex-row items-center'}>
+                                <span className={'pr3'}>
+                                    <Avatar src={tag.logo} size={'large'} />
+                                </span>
+                                <Link to={path}>
+                                    <Text ellipsis style={{ maxWidth: '20vw' }}>
+                                        {path}
+                                    </Text>
+                                </Link>
+                            </span>
+                            <Button
+                                size={'small'}
+                                type={'danger'}
+                                key={'unpin'}
+                                onClick={() => userStore.togglePinPost(tagName, path)}
+                            >
+                                unpin
+                            </Button>
+                        </>
+                    </List.Item>
+                )
+            }}
+        />
+    )
+}
+
 const SettingsContent = () => {
     const { userStore }: RootStore = useStores()
     const clearWatchedThreads = useCallback(() => {
@@ -112,6 +155,19 @@ const SettingsContent = () => {
                     }
 
                     return <WatchedThreads />
+                })}
+            </div>
+
+            <div className={'mt4'}>
+                <span className={'flex flex-row items-center justify-between'}>
+                    <span className={'f4 b black db mb3'}>Pinned Threads</span>
+                </span>
+                {useObserver(() => {
+                    if (!userStore.pinnedPosts.size) {
+                        return <span className={'f6 gray'}>You have no pinned threads</span>
+                    }
+
+                    return <PinnedThreads />
                 })}
             </div>
         </>

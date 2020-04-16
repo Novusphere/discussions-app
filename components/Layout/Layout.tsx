@@ -134,14 +134,7 @@ const Layout: FunctionComponent<ILayoutProps> = ({ children }) => {
                     ))}
                     <SidebarTagView />
                     <TagViewTabs
-                        sidebar={
-                            <>
-                                <SidebarTrendingTags />
-                                <Desktop>
-                                    <Footer className={'o-60 f6'} footerText={uiStore.footerText} />
-                                </Desktop>
-                            </>
-                        }
+                        sidebar={<SidebarTrendingTags />}
                         content={children}
                     />
                 </div>
