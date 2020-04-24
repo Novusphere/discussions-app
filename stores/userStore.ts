@@ -591,8 +591,7 @@ export class UserStore {
         try {
             const payload = await this.fetchNotificationsAsync({
                 publicKey,
-                lastCheckedNotifications: 1585688972823,
-                // lastCheckedNotifications: this.lastCheckedNotifications,
+                lastCheckedNotifications: this.lastCheckedNotifications,
                 watchedIds: this.watchedThreadIds,
                 viewAll: false,
             })
