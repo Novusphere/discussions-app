@@ -5,7 +5,7 @@ import axios from 'axios'
 import _ from 'lodash'
 import { discussions, nsdb, Post } from '@novuspherejs'
 import moment from 'moment'
-import { getOrigin } from '@utils'
+import { getOrigin, removeMD } from '@utils'
 
 export type BlockedContentSetting = 'hidden' | 'collapsed'
 
@@ -27,6 +27,8 @@ export class UserStore {
     lastCheckedNotifications = 0
 
     @observable notifications: Post[] = []
+
+    desktopNotifications = observable.map<number, Notification>()
 
     @persist
     @observable
@@ -589,13 +591,23 @@ export class UserStore {
         try {
             const payload = await this.fetchNotificationsAsync({
                 publicKey,
-                lastCheckedNotifications: this.lastCheckedNotifications,
+                lastCheckedNotifications: 1585688972823,
+                // lastCheckedNotifications: this.lastCheckedNotifications,
                 watchedIds: this.watchedThreadIds,
                 viewAll: false,
             })
 
             this.notificationCount = payload.length
             this.notifications = payload.filter((item: any, index: number) => index <= 5)
+
+            if (Notification.permission === 'granted') {
+                payload.map(notification => {
+                    if (!this.desktopNotifications.has(notification.id)) {
+                        const desktopNotification = new Notification(removeMD(notification.content))
+                        this.desktopNotifications.set(notification.id, desktopNotification)
+                    }
+                })
+            }
         } catch (error) {
             this.notifications = []
             return error

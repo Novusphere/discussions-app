@@ -1,4 +1,4 @@
-import { action, observable } from 'mobx'
+import { action, observable, reaction, when } from 'mobx'
 import { SIGN_IN_OPTIONS } from '@globals'
 import { RootStore } from '@stores'
 import { bkToStatusJson } from '@utils'
@@ -61,7 +61,14 @@ export class AuthStore {
     @observable TEMP_WalletPrivateKey = ''
     @observable TEMP_TippingTransfers = []
 
-    constructor(rootStore: RootStore) {}
+    constructor(rootStore: RootStore) {
+        when(
+            () => this.hasAccount,
+            () => {
+                this.checkAndAskForNotificationPermission()
+            }
+        )
+    }
 
     @action.bound
     setTEMPPrivateKey = (key: string) => {
@@ -225,4 +232,11 @@ export class AuthStore {
             throw error
         }
     })
+
+    checkAndAskForNotificationPermission = () => {
+        console.log('asking for notifications')
+        if (Notification.permission !== 'denied') {
+            Notification.requestPermission()
+        }
+    }
 }
