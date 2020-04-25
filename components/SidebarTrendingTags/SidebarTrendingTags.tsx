@@ -48,7 +48,7 @@ const SidebarTrendingTags: FunctionComponent<ISidebarTrendingTagsProps> = () => 
                     const tagModel: any = tagStore.tagModelFromObservables(tag)
 
                     return (
-                        <span key={tag} className={'f6 dark-gray db pb2'}>
+                        <span key={tag} className={'f6 dark-gray flex flex-row items-center pb2'}>
                             <span className={styles.indexContainer}>
                                 <span className={'gray f6 mr2'}>{index + 1}</span>
                                 <Icon type="caret-up" theme="filled" style={{ color: '#19A974' }} />
