@@ -9,7 +9,7 @@ import { Spin, notification, Select, Popconfirm, InputNumber, Icon } from 'antd'
 const { Option } = Select
 
 import styles from './Editor.module.scss'
-import { useCallback } from 'react'
+import { useCallback, useState } from 'react'
 import { useMemo } from 'react'
 
 interface IEditorProps {
@@ -27,10 +27,19 @@ interface IEditorState {
     loading: boolean
 }
 
-const CustomToolbar = () => {
+const CustomToolbar = ({ addTip }) => {
+    const [amount, setAmount] = useState(0)
+    const [symbol, setSymbol] = useState('')
+
     const onAmountChange = useCallback(value => {
-        console.log(value)
+        setAmount(value)
     }, [])
+
+    const onTokenChange = useCallback(symbol => {
+        setSymbol(symbol)
+    }, [])
+
+    const onConfirm = useCallback(() => addTip({ amount, symbol }), [amount, symbol])
 
     let walletStore = useMemo(() => window.localStorage.getItem('walletStore'), [])
     let tokens = {}
@@ -175,7 +184,7 @@ const CustomToolbar = () => {
                             </span>
                             <span className={'flex flex-row items-center justify-between'}>
                                 Token
-                                <Select className={styles.tipInput}>
+                                <Select className={styles.tipInput} onChange={onTokenChange}>
                                     {Object.keys(tokens).length > 0
                                         ? Object.keys(tokens).map(token => (
                                               <Option value={token} key={token}>
@@ -187,11 +196,11 @@ const CustomToolbar = () => {
                             </span>
                         </div>
                     }
-                    onConfirm={() => console.log('hey')}
+                    onConfirm={onConfirm}
                     okText="Add Tip"
                     cancelText="Close"
                 >
-                    <button type="button" className="ql-inline-tip">
+                    <button type="button" className="ql-inline-tip" onMouseDown={e => e.preventDefault()}>
                         <svg
                             aria-hidden="true"
                             focusable="false"
@@ -486,6 +495,19 @@ class Editor extends React.Component<IEditorProps, IEditorState> {
         }
     }
 
+    addTip = ({ amount, symbol }) => {
+        if (amount > 0 && symbol.length) {
+            const ref = this.ref.current.getEditor()
+            ref.focus()
+            const range = ref.getSelection()
+            let position = range ? range.index : 0
+            ref.insertText(position, ' ')
+            ref.insertText(ref.getSelection().index, '#tip', { link: '/tag/tip' })
+            ref.insertText(ref.getSelection().index, ' ', { link: false })
+            ref.insertText(ref.getSelection().index, `${amount} ${symbol}`, { link: false })
+        }
+    }
+
     public render(): React.ReactNode {
         if (!this.state.loaded) {
             return <Spin />
@@ -497,7 +519,7 @@ class Editor extends React.Component<IEditorProps, IEditorState> {
         return (
             <div className={styles.editorContainer}>
                 {this.state.loading && <Spin className={styles.editorSpin} />}
-                <CustomToolbar />
+                <CustomToolbar addTip={this.addTip} />
                 <Editor
                     disabled={this.props.disabled}
                     classNames={cx([this.props.className, 'bg-white'])}
