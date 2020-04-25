@@ -1,10 +1,12 @@
 import React, { FunctionComponent, memo } from 'react'
 
 import styles from './SidebarLinkPopup.module.scss'
-import { Popover, Button, Icon, Divider } from 'antd'
+import { Popover, Button, Icon, Divider, Typography } from 'antd'
 import { Link } from 'react-router-dom'
 import Markdown from 'markdown-to-jsx'
 import cx from 'classnames'
+
+const { Text } = Typography
 
 interface ISidebarLinkPopupProps {
     subscribed: string
@@ -31,7 +33,7 @@ const SidebarLinkPopup: FunctionComponent<ISidebarLinkPopupProps> = ({
                                 alt={`${subscribed} icon`}
                                 width={45}
                             />
-                            <span className={'ml3 dib'}>
+                            <span className={'mh3 dib'}>
                                 <span className={'b db'}>
                                     <Link to={`/tag/${subscribed}`}>
                                         <span className={'f5 black db'}>#{subscribed}</span>
@@ -67,9 +69,13 @@ const SidebarLinkPopup: FunctionComponent<ISidebarLinkPopupProps> = ({
             overlayClassName={styles.tagOverlay}
         >
             <Link to={`/tag/${subscribed}`}>
-                <span className={'dib'}>
-                    <img className={'dib'} src={tag.logo} alt={`${subscribed} icon`} width={25} />
-                    <span className={'dib mh2'}>#{subscribed}</span>
+                <span className={'flex flex-row items-center'}>
+                    <img src={tag.logo} alt={`${subscribed} icon`} width={25} />
+                    <span className={'mh2 flex flex-row items-center'}>
+                        <Text ellipsis style={{ maxWidth: '100px' }}>
+                            #{subscribed}
+                        </Text>
+                    </span>
                 </span>
             </Link>
         </Popover>
