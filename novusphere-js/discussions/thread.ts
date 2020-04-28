@@ -1,11 +1,14 @@
 import { Post } from './post'
 import { REDDIT_URL } from './attachment'
 import { RedditService } from './service/reddit'
+import moment from 'moment'
 
 export default class Thread {
     icon: string | undefined
     openingPost: Post | undefined
     map: { [uuid: string]: Post }
+
+    lastQueryTime: Date | number = new Date(Date.now())
 
     get title(): string | undefined {
         return this.openingPost ? this.openingPost.title : undefined
@@ -16,7 +19,7 @@ export default class Thread {
     }
 
     get totalReplies(): number {
-        return this.openingPost.totalReplies
+        return this.openingPost ? this.openingPost.totalReplies : 0
     }
 
     init(posts: Post[]) {
@@ -42,6 +45,11 @@ export default class Thread {
             //        parent.applyEdit(p)
             //    }
             //}
+
+            this.lastQueryTime =
+                p.createdAt > this.lastQueryTime
+                    ? p.createdAt
+                    : this.lastQueryTime
         }
     }
 
@@ -77,7 +85,7 @@ export default class Thread {
             if (post.parentUuid) {
                 const parent: Post = this.map[post.parentUuid]
                 if (parent) {
-                    post.depth = parent.depth + 1;
+                    post.depth = parent.depth + 1
                     parent.replies.push(post)
                 }
             }

@@ -35,6 +35,7 @@ import {
     signPost,
     transformTipsToTransfers,
     transformTipToMetadata,
+    useInterval,
     voteAsync,
 } from '@utils'
 import { RootStore, useStores } from '@stores'
@@ -444,6 +445,10 @@ const PostPageComponentObserverable: React.FunctionComponent<IPostPageProps> = (
 
     const location = useLocation()
 
+    useEffect(() => {
+        postStore.observableThread = thread
+    }, [thread])
+
     useLayoutEffect(() => {
         setTimeout(() => {
             if (location.hash) {
@@ -844,13 +849,35 @@ const PostPage: React.FC = () => {
             })
     }, [query.id])
 
+    const refreshThread = useCallback(() => {
+        if (thread) {
+            postsStore
+                .refreshThread(query.id, authStore.postPub, thread.lastQueryTime)
+                .then(refreshedThreadDiff => {
+                    if (refreshedThreadDiff && refreshedThreadDiff.openingPost) {
+                        setThread(refreshedThreadDiff)
+                    }
+                })
+        }
+    }, [thread, query.id])
+
     useEffect(() => {
         fetchThread()
     }, [query.id])
 
+    useInterval(
+        () => {
+            refreshThread()
+        },
+        2000,
+        false,
+        [query.id]
+    )
+
     if (loading) return <Spin />
 
-    if (!thread) return <Empty description={'This is not the thread you were looking for...'} />
+    if (!thread || !thread.openingPost)
+        return <Empty description={'This is not the thread you were looking for...'} />
 
     return (
         <>

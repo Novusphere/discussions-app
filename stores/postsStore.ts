@@ -104,7 +104,6 @@ export class PostsStore {
                 keys = [...this.userStore.following.keys()]
             }
 
-
             const { posts, cursorId } = await discussions.getPostsForKeys(
                 keys,
                 this.postsPosition.cursorId,
@@ -132,7 +131,15 @@ export class PostsStore {
 
     getThreadById = async (id: string, key = ''): Promise<Thread> => {
         try {
-            return await discussions.getThread(id, key)
+            return await discussions.getThread(id, key, undefined)
+        } catch (error) {
+            throw error
+        }
+    }
+
+    refreshThread = async (id: string, key = '', time): Promise<Thread> => {
+        try {
+            return await discussions.getThread(id, key, undefined, time)
         } catch (error) {
             throw error
         }
@@ -145,7 +152,7 @@ export class PostsStore {
                 this.postsPosition.cursorId,
                 this.postsPosition.items,
                 key,
-                sort,
+                sort
             )
 
             this.posts = [...this.posts, ...posts]

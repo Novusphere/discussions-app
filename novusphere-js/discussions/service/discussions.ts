@@ -10,6 +10,7 @@ import axios from 'axios'
 import { INSDBSearchQuery } from '../../nsdb'
 import { encodeId, getHostName, getSettings, getThreadTitle, getThreadUrl, isDev } from '@utils'
 //import { isDev } from '@utils'
+import moment from 'moment'
 
 export interface IBrainKeyPair {
     priv: string
@@ -397,7 +398,12 @@ export default class DiscussionsService {
         return searchQuery
     }
 
-    async getThread(_id: string, key = '', hostname = getHostName()): Promise<Thread | null> {
+    async getThread(
+        _id: string,
+        key = '',
+        hostname = getHostName(),
+        lastQueryTime: number | Date = 0
+    ): Promise<Thread | null> {
         try {
             const searchQuery = this.convertEncodedThreadIdIntoQuery(_id, key)
 
@@ -406,15 +412,34 @@ export default class DiscussionsService {
             if (sq.payload.length == 0) return null
 
             let posts: Post[] = []
-            let op = Post.fromDbObject(sq.payload[0])
+            let op: any = Post.fromDbObject(sq.payload[0])
 
             sq = {
                 key: key,
                 pipeline: [
                     {
+                        // $match: {
+                        //     threadUuid: op.threadUuid,
+                        //     sub: op.sub,
+                        // },
                         $match: {
-                            threadUuid: op.threadUuid,
-                            sub: op.sub,
+                            $or: [
+                                {
+                                    threadUuid: op.threadUuid,
+                                    sub: op.sub,
+                                    createdAt: {
+                                        $gt:
+                                            lastQueryTime instanceof Date
+                                                ? moment(lastQueryTime).unix()
+                                                : lastQueryTime,
+                                    },
+                                },
+                                {
+                                    uuid: op.threadUuid,
+                                    threadUuid: op.threadUuid,
+                                    sub: op.sub,
+                                },
+                            ],
                         },
                     },
                 ],

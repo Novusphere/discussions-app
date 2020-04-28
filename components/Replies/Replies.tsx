@@ -1,4 +1,4 @@
-import React, { FunctionComponent } from 'react'
+import React, { FunctionComponent, useEffect } from 'react'
 
 import styles from './Replies.module.scss'
 import { discussions, Post } from '@novuspherejs'
@@ -388,6 +388,10 @@ const Replies: FunctionComponent<IRepliesProps> = props => {
             reply: props.reply,
         }
     )
+
+    useEffect(() => {
+        replyStore.reply = props.reply
+    }, [props.reply])
 
     const isSameUser = props.reply.pub == authStore.postPub
     const isSpamPost = userStore.blockedPosts.has(replyStore.permaLinkURL)
