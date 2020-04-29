@@ -46,3 +46,4 @@ export { default as SettingsConnections } from './SettingsConnections/SettingsCo
 export { default as SettingsModeration } from './SettingsModeration/SettingsModeration'
 export { default as SettingsWallet } from './SettingsWallet/SettingsWallet'
 export { default as SettingsContent } from './SettingsContent/SettingsContent'
+export { default as SettingsAmbassadors } from './SettingsAmbassadors/SettingsAmbassadors'

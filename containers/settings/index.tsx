@@ -12,6 +12,7 @@ import {
     SettingsModeration,
     SettingsWallet,
     SettingsContent,
+    SettingsAmbassadors,
 } from '@components'
 import { Link, useParams } from 'react-router-dom'
 import Helmet from 'react-helmet'
@@ -30,6 +31,8 @@ const Index = ({ setting }: any) => {
             return <SettingsAirdrop />
         case 'content':
             return <SettingsContent />
+        case 'ambassador':
+            return <SettingsAmbassadors />
         default:
             return null
     }
@@ -88,6 +91,10 @@ const SettingsPage: React.FC<any> = () => {
 
                             <Link to={'/settings/content'} className={'gray'}>
                                 <li className={className(setting, 'content')}>Content</li>
+                            </Link>
+
+                            <Link to={'/settings/ambassador'} className={'gray'}>
+                                <li className={className(setting, 'ambassador')}>Ambassador</li>
                             </Link>
                         </ul>
                     </div>
