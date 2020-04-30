@@ -212,7 +212,7 @@ const ModalsSignIn: FunctionComponent<IModalsSignInProps> = ({
             case STEP_OPTIONS.METHOD:
                 return (
                     <div className={'tc pt2'}>
-                        <Title level={2}>Sign in with your EOS account</Title>
+                        <Title level={2}>Sign in with your brain key</Title>
                         <Text className={'light-content'}>
                             Choose an account type from below to continue
                         </Text>
