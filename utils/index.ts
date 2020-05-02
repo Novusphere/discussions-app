@@ -139,7 +139,7 @@ export const getThreadUrl = async (post: Post, permalinkUuid?: string) => {
     }
 
     if (permalinkUuid) {
-        url += `/#${permalinkUuid}`
+        url += `#${permalinkUuid}`
     }
 
     return url
@@ -749,9 +749,14 @@ export const transformTipToMetadata = ({
     }
 }
 
-export const transformTipsToTransfers = (
-    { tips, replyingToUIDW, replyingToDisplayName, replyingToPostPub, privateKey, tokens }
-) => {
+export const transformTipsToTransfers = ({
+    tips,
+    replyingToUIDW,
+    replyingToDisplayName,
+    replyingToPostPub,
+    privateKey,
+    tokens,
+}) => {
     return tips.map(tip => {
         let { token, chain, to, amount, fee, nonce, memo } = transformTipToMetadata({
             tip,

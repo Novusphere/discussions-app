@@ -32,7 +32,7 @@ const RtLink: FunctionComponent<any> = ({ children, href, index }) => {
                         href
                     ):
                     case /https?:\/\/www.youtube.com\/watch\?t=[0-9]+/.test(href):
-                    case /https?:\/\/www.youtube.com\/watch\?v=[a-zA-Z0-9-_]+/.test(href):
+                    case /https?:\/\/(www|m)?.youtube.com\/watch\?v=[a-zA-Z0-9-_]+/.test(href):
                     case /https?:\/\/youtu.be\/[a-zA-Z0-9-_]+/.test(href):
                         embed = await nsdb.cors(
                             `https://www.youtube.com/oembed?format=json&url=${href.replace(
@@ -88,6 +88,11 @@ const RtLink: FunctionComponent<any> = ({ children, href, index }) => {
                         if (ids) {
                             embed = `<span data-telegram-rn="${generateUuid()}" data-telegram-post="${ids}" data-width="100%"></span>`
                         }
+                        break
+                    case /https:\/\/www\.bilibili\.com\/video/.test(href):
+                        const [, biliVideoIdFromURL] = href.split('https://www.bilibili.com/video/')
+                        const [biliVideoId] = biliVideoIdFromURL.split('?')
+                        embed = `<iframe src="https://player.bilibili.com/player.html?bvid=${biliVideoId}" width="560px" height="315px" scrolling="no" border="0" frameborder="no" framespacing="0" allowfullscreen="true"> </iframe>`
                         break
                     default:
                         embed = null
