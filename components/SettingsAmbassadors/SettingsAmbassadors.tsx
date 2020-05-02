@@ -143,7 +143,7 @@ const CompanyInfo = Form.create({ name: 'company_info' })(({ form }: any) => {
                     initialValue: userStore.ambassador.companyInfo.firstName,
                     rules: [
                         {
-                            required: false,
+                            required: true,
                             message: 'Please enter a first name',
                         },
                     ],
@@ -154,7 +154,7 @@ const CompanyInfo = Form.create({ name: 'company_info' })(({ form }: any) => {
                     initialValue: userStore.ambassador.companyInfo.lastName,
                     rules: [
                         {
-                            required: false,
+                            required: true,
                             message: 'Please enter a last name',
                         },
                     ],
@@ -292,7 +292,7 @@ const CompanyInfo = Form.create({ name: 'company_info' })(({ form }: any) => {
                         initialValue: userStore.ambassador.companyInfo.phoneNumber,
                         rules: [
                             {
-                                required: false,
+                                required: true,
                                 message: 'Please enter a valid phone number',
                             },
                         ],
@@ -303,7 +303,7 @@ const CompanyInfo = Form.create({ name: 'company_info' })(({ form }: any) => {
                         initialValue: userStore.ambassador.companyInfo.email,
                         rules: [
                             {
-                                required: false,
+                                required: true,
                                 message: 'Please enter a valid email address',
                             },
                         ],
@@ -315,10 +315,12 @@ const CompanyInfo = Form.create({ name: 'company_info' })(({ form }: any) => {
                 <span className={'flex flex-row items-center justify-between'}>
                     <span className={'f4 b black db mb3'}>Availability Status</span>
                 </span>
-                <Switch
-                    checked={userStore.ambassador.companyInfo.available}
-                    onChange={change => (userStore.ambassador.companyInfo.available = change)}
-                />
+                <Form.Item>
+                    {getFieldDecorator('available', {
+                        initialValue: userStore.ambassador.companyInfo.available,
+                        valuePropName: 'checked',
+                    })(<Switch />)}
+                </Form.Item>
             </div>
 
             <div className={'mt4'}>
