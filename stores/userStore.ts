@@ -1,11 +1,12 @@
 import { persist } from 'mobx-persist'
-import { observable, when, computed, ObservableMap } from 'mobx'
+import { observable, when, computed, ObservableMap, action } from 'mobx'
 import { RootStore } from '@stores/index'
 import axios from 'axios'
 import _ from 'lodash'
 import { discussions, nsdb, Post } from '@novuspherejs'
 import moment from 'moment'
-import { getOrigin, removeMD } from '@utils'
+import { getOrigin, removeMD, sleep } from '@utils'
+import { task } from 'mobx-task';
 
 export type BlockedContentSetting = 'hidden' | 'collapsed'
 
@@ -50,10 +51,35 @@ export class UserStore {
         blockedPosts: 1586119165124,
         delegated: 1586119165124,
         pinnedPosts: 1583893581788,
+        ambassador: 1588431408650,
     }
 
     @observable
     hasDataSyncedFromServer = false
+
+    @observable
+    ambassador = {
+        personalInfo: {
+            username: '',
+            email: '',
+        },
+        companyInfo: {
+            companyName: '',
+            firstName: '',
+            lastName: '',
+            street: '',
+            buildingNumber: '',
+            areaCode: '',
+            city: '',
+            twitterUsername: '',
+            twitterProfileURL: '',
+            facebookUsername: '',
+            facebookProfileURL: '',
+            phoneNumber: '',
+            email: '',
+            available: false,
+        },
+    }
 
     constructor(rootStore: RootStore) {
         this.uiStore = rootStore.uiStore
@@ -438,6 +464,10 @@ export class UserStore {
                 if (!_.isNil(data['moderation']['blockedContentSetting']))
                     this.blockedContentSetting = data['moderation']['blockedContentSetting']
 
+                if (!_.isNil(data['ambassador'])) {
+                    this.ambassador = data['ambassador']
+                }
+
                 /**
                  * Check localStorageVersion for comparison
                  * If version mismatch, reset users' local storage version
@@ -524,6 +554,7 @@ export class UserStore {
                     blockedContentSetting: this.blockedContentSetting,
                     unsignedPostsIsSpam: this.unsignedPostsIsSpam,
                 },
+                ambassador: this.ambassador,
             }
 
             if (!accountPubKey) {
@@ -617,5 +648,16 @@ export class UserStore {
         this.notifications = []
         this.notificationCount = 0
         this.uiStore.showMessage('Notifications cleared', 'success')
+    }
+
+    @task.resolved
+    @action.bound
+    async saveAmbassadors() {
+        try {
+            await this.syncDataFromLocalToServer()
+            this.uiStore.showToast('Success', 'Your ambassador settings have been saved', 'success')
+        } catch (error) {
+            this.uiStore.showToast('Error', 'Something went wrong while trying to save, please try again', 'error')
+        }
     }
 }

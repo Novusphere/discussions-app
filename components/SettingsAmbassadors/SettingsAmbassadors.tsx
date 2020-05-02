@@ -17,20 +17,21 @@ import {
 } from 'antd'
 import { Tab, TabList } from 'react-tabs'
 import { useObserver } from 'mobx-react-lite'
+import { RootStore, useStores } from '@stores'
 
 const { TabPane } = Tabs
 const { Panel } = Collapse
 
 interface ISettingsAmbassadorsProps {}
 
-const SaveButton = ({ onSave, loading = false }) => {
-    return (
+const SaveButton = ({ onSave, loading = false, title = 'Save' }) => {
+    return useObserver(() => (
         <div className={'pt3 flex flex-row justify-end w-100'}>
             <Button type={'primary'} onMouseDown={onSave} loading={loading}>
-                Save
+                {title}
             </Button>
         </div>
-    )
+    ))
 }
 
 const Ambassador = ({ icon = <Avatar icon="user" />, companyName, score }) => {
@@ -58,28 +59,32 @@ const Ambassador = ({ icon = <Avatar icon="user" />, companyName, score }) => {
 
 const PersonalInfo = Form.create({ name: 'personal_info' })(({ form }: any) => {
     const { getFieldDecorator } = form
+    const { userStore }: RootStore = useStores()
     const onSave = () => {
         form.validateFields(async (err, values) => {
             if (!err) {
-                const { username, email } = values
+                userStore.ambassador.personalInfo = values
+                userStore.saveAmbassadors()
             }
         })
     }
 
-    return (
+    return useObserver(() => (
         <>
             <Form.Item label="Name">
                 {getFieldDecorator('username', {
+                    initialValue: userStore.ambassador.personalInfo.username,
                     rules: [
                         {
                             required: true,
-                            message: 'Please input your name',
+                            message: 'Please input your username',
                         },
                     ],
-                })(<Input placeholder="Please input your name" size={'large'} />)}
+                })(<Input size={'large'} />)}
             </Form.Item>
             <Form.Item label="Email">
                 {getFieldDecorator('email', {
+                    initialValue: userStore.ambassador.personalInfo.email,
                     rules: [
                         {
                             required: false,
@@ -100,18 +105,31 @@ const PersonalInfo = Form.create({ name: 'personal_info' })(({ form }: any) => {
                 </div>
             </div>
 
-            <SaveButton onSave={onSave} />
+            <SaveButton
+                onSave={onSave}
+                title={'Save Personal Info'}
+                loading={userStore.saveAmbassadors.bind(userStore)['pending']}
+            />
         </>
-    )
+    ))
 })
 
 const CompanyInfo = Form.create({ name: 'company_info' })(({ form }: any) => {
     const { getFieldDecorator } = form
-
-    return (
+    const { userStore }: RootStore = useStores()
+    const onSave = () => {
+        form.validateFields(async (err, values) => {
+            if (!err) {
+                userStore.ambassador.companyInfo = values
+                userStore.saveAmbassadors()
+            }
+        })
+    }
+    return useObserver(() => (
         <>
             <Form.Item label="Company Name">
                 {getFieldDecorator('companyName', {
+                    initialValue: userStore.ambassador.companyInfo.companyName,
                     rules: [
                         {
                             required: true,
@@ -121,7 +139,8 @@ const CompanyInfo = Form.create({ name: 'company_info' })(({ form }: any) => {
                 })(<Input size={'large'} />)}
             </Form.Item>
             <Form.Item label="Owner's first name">
-                {getFieldDecorator('ownerFirstName', {
+                {getFieldDecorator('firstName', {
+                    initialValue: userStore.ambassador.companyInfo.firstName,
                     rules: [
                         {
                             required: false,
@@ -131,7 +150,8 @@ const CompanyInfo = Form.create({ name: 'company_info' })(({ form }: any) => {
                 })(<Input size={'large'} />)}
             </Form.Item>
             <Form.Item label="Owner's last name">
-                {getFieldDecorator('ownerLastName', {
+                {getFieldDecorator('lastName', {
+                    initialValue: userStore.ambassador.companyInfo.lastName,
                     rules: [
                         {
                             required: false,
@@ -147,6 +167,7 @@ const CompanyInfo = Form.create({ name: 'company_info' })(({ form }: any) => {
                 </span>
                 <Form.Item label="Street">
                     {getFieldDecorator('street', {
+                        initialValue: userStore.ambassador.companyInfo.street,
                         rules: [
                             {
                                 required: false,
@@ -157,6 +178,7 @@ const CompanyInfo = Form.create({ name: 'company_info' })(({ form }: any) => {
                 </Form.Item>
                 <Form.Item label="Building Number">
                     {getFieldDecorator('buildingNumber', {
+                        initialValue: userStore.ambassador.companyInfo.buildingNumber,
                         rules: [
                             {
                                 required: false,
@@ -167,6 +189,7 @@ const CompanyInfo = Form.create({ name: 'company_info' })(({ form }: any) => {
                 </Form.Item>
                 <Form.Item label="Area Code">
                     {getFieldDecorator('areaCode', {
+                        initialValue: userStore.ambassador.companyInfo.areaCode,
                         rules: [
                             {
                                 required: false,
@@ -177,6 +200,7 @@ const CompanyInfo = Form.create({ name: 'company_info' })(({ form }: any) => {
                 </Form.Item>
                 <Form.Item label="City">
                     {getFieldDecorator('city', {
+                        initialValue: userStore.ambassador.companyInfo.city,
                         rules: [
                             {
                                 required: false,
@@ -203,6 +227,7 @@ const CompanyInfo = Form.create({ name: 'company_info' })(({ form }: any) => {
                     >
                         <Form.Item label="Twitter Username">
                             {getFieldDecorator('twitterUsername', {
+                                initialValue: userStore.ambassador.companyInfo.twitterUsername,
                                 rules: [
                                     {
                                         required: false,
@@ -213,6 +238,7 @@ const CompanyInfo = Form.create({ name: 'company_info' })(({ form }: any) => {
                         </Form.Item>
                         <Form.Item label="Profile URL">
                             {getFieldDecorator('twitterProfileURL', {
+                                initialValue: userStore.ambassador.companyInfo.twitterProfileURL,
                                 rules: [
                                     {
                                         required: false,
@@ -233,6 +259,7 @@ const CompanyInfo = Form.create({ name: 'company_info' })(({ form }: any) => {
                     >
                         <Form.Item label="Facebook Username">
                             {getFieldDecorator('facebookUsername', {
+                                initialValue: userStore.ambassador.companyInfo.facebookUsername,
                                 rules: [
                                     {
                                         required: false,
@@ -243,6 +270,7 @@ const CompanyInfo = Form.create({ name: 'company_info' })(({ form }: any) => {
                         </Form.Item>
                         <Form.Item label="Profile URL">
                             {getFieldDecorator('facebookProfileURL', {
+                                initialValue: userStore.ambassador.companyInfo.facebookProfileURL,
                                 rules: [
                                     {
                                         required: false,
@@ -260,7 +288,8 @@ const CompanyInfo = Form.create({ name: 'company_info' })(({ form }: any) => {
                     <span className={'f4 b black db mb3'}>Contact</span>
                 </span>
                 <Form.Item label="Phone">
-                    {getFieldDecorator('phone', {
+                    {getFieldDecorator('phoneNumber', {
+                        initialValue: userStore.ambassador.companyInfo.phoneNumber,
                         rules: [
                             {
                                 required: false,
@@ -271,6 +300,7 @@ const CompanyInfo = Form.create({ name: 'company_info' })(({ form }: any) => {
                 </Form.Item>
                 <Form.Item label="Email">
                     {getFieldDecorator('email', {
+                        initialValue: userStore.ambassador.companyInfo.email,
                         rules: [
                             {
                                 required: false,
@@ -285,7 +315,10 @@ const CompanyInfo = Form.create({ name: 'company_info' })(({ form }: any) => {
                 <span className={'flex flex-row items-center justify-between'}>
                     <span className={'f4 b black db mb3'}>Availability Status</span>
                 </span>
-                <Switch checked={true} onChange={change => console.log(change)} />
+                <Switch
+                    checked={userStore.ambassador.companyInfo.available}
+                    onChange={change => (userStore.ambassador.companyInfo.available = change)}
+                />
             </div>
 
             <div className={'mt4'}>
@@ -298,8 +331,14 @@ const CompanyInfo = Form.create({ name: 'company_info' })(({ form }: any) => {
                     <Ambassador companyName={'Company Name'} score={1234} />
                 </div>
             </div>
+
+            <SaveButton
+                onSave={onSave}
+                title={'Save Company Info'}
+                loading={userStore.saveAmbassadors.bind(userStore)['pending']}
+            />
         </>
-    )
+    ))
 })
 
 const Applicants = () => {
@@ -324,6 +363,7 @@ const Applicants = () => {
             personalInfo: {
                 username: 'hellodarknes',
                 email: 'hello@eos.com',
+                available: false,
             },
             companyInfo: {
                 firstName: 'John',
@@ -338,6 +378,7 @@ const Applicants = () => {
                 facebookProfileURL: 'https://www.discussions.app',
                 phoneNumber: '+48 689 67 76 76',
                 email: 'hello@apple.com',
+                available: false,
             },
             totalScore: 645765,
             ambassadors: [
