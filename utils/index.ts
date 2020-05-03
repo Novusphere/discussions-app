@@ -38,12 +38,12 @@ export const SORTER_OPTIONS = {
 }
 
 export const getHostName = () => {
-    if (isDev) return 'discussions.app'
+    if (isDev) return 'beta.discussions.app'
     return window.location.hostname
 }
 
 export const getOrigin = () => {
-    if (isDev) return 'https://discussions.app'
+    if (isDev) return 'https://beta.discussions.app'
     return window.location.origin
 }
 

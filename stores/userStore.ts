@@ -6,7 +6,7 @@ import _ from 'lodash'
 import { discussions, nsdb, Post } from '@novuspherejs'
 import moment from 'moment'
 import { getOrigin, removeMD, sleep } from '@utils'
-import { task } from 'mobx-task';
+import { task } from 'mobx-task'
 
 export type BlockedContentSetting = 'hidden' | 'collapsed'
 
@@ -79,6 +79,8 @@ export class UserStore {
             email: '',
             available: false,
         },
+        joinedCompanies: [],
+        acceptedAmbassadors: [],
     }
 
     constructor(rootStore: RootStore) {
@@ -655,9 +657,59 @@ export class UserStore {
     async saveAmbassadors() {
         try {
             await this.syncDataFromLocalToServer()
+            await sleep(500)
             this.uiStore.showToast('Success', 'Your ambassador settings have been saved', 'success')
         } catch (error) {
-            this.uiStore.showToast('Error', 'Something went wrong while trying to save, please try again', 'error')
+            this.uiStore.showToast(
+                'Error',
+                'Something went wrong while trying to save, please try again',
+                'error'
+            )
         }
     }
+
+    @task
+    async getCompaniesLookingForAmbassadors() {
+        try {
+            return await nsdb.getAmbassadorCompanies()
+        } catch (error) {
+            throw error
+        }
+    }
+
+    @task
+    async getApplicantsForAmbassadors() {
+        try {
+            const key = this.authStore.postPub
+            return await nsdb.getAmbassadorApplicants(key)
+        } catch (error) {
+            throw error
+        }
+    }
+
+    @task.resolved
+    @action.bound
+    async toggleApplyUserToCompany(key: string) {
+        try {
+            if (this.ambassador.joinedCompanies.indexOf(key) !== -1) {
+                this.ambassador.joinedCompanies = _.reject(
+                    this.ambassador.joinedCompanies,
+                    companyPub => companyPub === key
+                )
+            } else {
+                this.ambassador.joinedCompanies.push(key)
+            }
+            await this.syncDataFromLocalToServer()
+            await sleep(500)
+            this.uiStore.showToast('Success', 'Your ambassador settings have been saved', 'success')
+        } catch (error) {
+            this.uiStore.showToast(
+                'Error',
+                'Something went wrong while trying to save, please try again',
+                'error'
+            )
+        }
+    }
+
+
 }

@@ -1,4 +1,4 @@
-import React, { FunctionComponent, useState } from 'react'
+import React, { FunctionComponent, useEffect, useState } from 'react'
 
 import styles from './SettingsAmbassadors.module.scss'
 import cx from 'classnames'
@@ -14,10 +14,13 @@ import {
     Icon,
     Menu,
     Button,
+    Spin,
 } from 'antd'
 import { Tab, TabList } from 'react-tabs'
-import { useObserver } from 'mobx-react-lite'
+import { useObserver, Observer } from 'mobx-react-lite'
 import { RootStore, useStores } from '@stores'
+import { IAmbassadorResponse } from '@novuspherejs/nsdb'
+import { getIdenticon } from '@utils'
 
 const { TabPane } = Tabs
 const { Panel } = Collapse
@@ -344,53 +347,52 @@ const CompanyInfo = Form.create({ name: 'company_info' })(({ form }: any) => {
 })
 
 const Applicants = () => {
+    const { userStore }: RootStore = useStores()
+    const [data, setData] = useState<any>({ companies: [] })
     const columns = [
-        { title: '#', dataIndex: 'key', key: 'key' },
+        { title: '#', dataIndex: 'key', key: 'key', render: (text, record, index) => index + 1 },
         {
-            title: "Ambassador's Username",
-            dataIndex: 'personalInfo.username',
-            key: 'username',
-            render: text => (
+            title: "Applicants Name",
+            dataIndex: 'firstName',
+            key: 'firstName',
+            render: (text, record) => (
                 <span className={'flex flex-row items-center'}>
-                    <Avatar />
+                    <Avatar icon={'user'} src={getIdenticon(record.pub)} />
                     <span className={'primary f6 ph2'}>{text}</span>
                 </span>
             ),
         },
-    ]
-
-    const data = [
         {
-            key: 1,
-            personalInfo: {
-                username: 'hellodarknes',
-                email: 'hello@eos.com',
-                available: false,
-            },
-            companyInfo: {
-                firstName: 'John',
-                lastName: 'Smith',
-                street: '5th Avenue',
-                buildingNumber: '234/45',
-                areaCode: '768765',
-                city: 'New York',
-                twitterUsername: 'Discussion_Guru',
-                twitterProfileURL: 'https://www.discussions.app',
-                facebookUsername: 'Discussion_Guru',
-                facebookProfileURL: 'https://www.discussions.app',
-                phoneNumber: '+48 689 67 76 76',
-                email: 'hello@apple.com',
-                available: false,
-            },
-            totalScore: 645765,
-            ambassadors: [
-                {
-                    companyName: 'Company Name',
-                    score: 5643,
-                },
-            ],
+            key: 'action',
+            render: (text, record) => (
+                <Observer>
+                    {() => (
+                        <Button
+                            loading={userStore.toggleApplyUserToCompany['pending']}
+                            onMouseDown={() => userStore.toggleApplyUserToCompany(record.pub)}
+                        >
+                            {userStore.ambassador.joinedCompanies.indexOf(record.pub) !== -1
+                                ? 'Unapply'
+                                : 'Apply'}
+                        </Button>
+                    )}
+                </Observer>
+            ),
         },
     ]
+
+    useEffect(() => {
+        userStore.getApplicantsForAmbassadors().then(result => {
+            console.log(result)
+            setData(result)
+        })
+    }, [])
+
+    if (userStore.getApplicantsForAmbassadors['pending']) {
+        return <Spin />
+    }
+
+    return null
 
     return (
         <Table
@@ -503,6 +505,131 @@ const Applicants = () => {
     )
 }
 
+const CompaniesLookingForAmbassadors = () => {
+    const { userStore }: RootStore = useStores()
+    const [data, setData] = useState<IAmbassadorResponse>({ companies: [] })
+    const columns = [
+        { title: '#', dataIndex: 'key', key: 'key', render: (text, record, index) => index + 1 },
+        {
+            title: "Ambassador's Company Name",
+            dataIndex: 'companyName',
+            key: 'companyName',
+            render: (text, record) => (
+                <span className={'flex flex-row items-center'}>
+                    <Avatar icon={'user'} src={getIdenticon(record.pub)} />
+                    <span className={'primary f6 ph2'}>{text}</span>
+                </span>
+            ),
+        },
+        {
+            key: 'action',
+            render: (text, record) => (
+                <Observer>
+                    {() => (
+                        <Button
+                            loading={userStore.toggleApplyUserToCompany['pending']}
+                            onMouseDown={() => userStore.toggleApplyUserToCompany(record.pub)}
+                        >
+                            {userStore.ambassador.joinedCompanies.indexOf(record.pub) !== -1
+                                ? 'Unapply'
+                                : 'Apply'}
+                        </Button>
+                    )}
+                </Observer>
+            ),
+        },
+    ]
+
+    useEffect(() => {
+        userStore.getCompaniesLookingForAmbassadors().then(result => setData(result))
+    }, [])
+
+    if (userStore.getCompaniesLookingForAmbassadors['pending']) {
+        return <Spin />
+    }
+
+    return (
+        <Table
+            columns={columns}
+            expandedRowRender={record => {
+                return (
+                    <>
+                        <div className={'flex flex-row items-center flex-wrap'}>
+                            <span className={'db pr3 pb3 w5'}>
+                                <span className={'db f6 black gray'}>Ambassador's First Name</span>
+                                <span className={'db f5 black'}>{record.firstName || '--'}</span>
+                            </span>
+                            <span className={'db pr3 pb3 w5'}>
+                                <span className={'db f6 black gray'}>Ambassador's Last Name</span>
+                                <span className={'db f5 black'}>{record.lastName || '--'}</span>
+                            </span>
+                            <span className={'db pr3 pb3 w5'}>
+                                <span className={'db f6 black gray'}>Street</span>
+                                <span className={'db f5 black'}>{record.street || '--'}</span>
+                            </span>
+                            <span className={'db pr3 pb3 w5'}>
+                                <span className={'db f6 black gray'}>Building Number</span>
+                                <span className={'db f5 black'}>
+                                    {record.buildingNumber || '--'}
+                                </span>
+                            </span>
+                            <span className={'db pr3 pb3 w5'}>
+                                <span className={'db f6 black gray'}>Area Code</span>
+                                <span className={'db f5 black'}>{record.areaCode || '--'}</span>
+                            </span>
+                            <span className={'db pr3 pb3 w5'}>
+                                <span className={'db f6 black gray'}>City</span>
+                                <span className={'db f5 black'}>{record.city || '--'}</span>
+                            </span>
+                        </div>
+
+                        <div className={'mt3'}>
+                            <span className={cx(['f5 b black'])}>Social</span>
+                            <span className={styles.ornament} />
+                            <div className={'mt2 flex flex-row items-center flex-wrap'}>
+                                <span className={'db pr3 pb3 w5'}>
+                                    <span className={'db f6 black gray'}>Twitter</span>
+                                    <span className={'db f5 black'}>
+                                        <a href={record.twitterProfileURL} target={'_blank'}>
+                                            {record.twitterUsername || '--'}
+                                        </a>
+                                    </span>
+                                </span>
+                                <span className={'db pr3 pb3 w5'}>
+                                    <span className={'db f6 black gray'}>Facebook</span>
+                                    <span className={'db f5 black'}>
+                                        <a href={record.facebookProfileURL} target={'_blank'}>
+                                            {record.facebookUsername || '--'}
+                                        </a>
+                                    </span>
+                                </span>
+                            </div>
+                        </div>
+
+                        <div className={'mt3'}>
+                            <span className={cx(['f5 b black'])}>Contact</span>
+                            <span className={styles.ornament} />
+                            <div className={'mt2 flex flex-row items-center flex-wrap'}>
+                                <span className={'db pr3 pb3 w5'}>
+                                    <span className={'db f6 black gray'}>Phone</span>
+                                    <span className={'db f5 black'}>
+                                        {record.phoneNumber || '--'}
+                                    </span>
+                                </span>
+                                <span className={'db pr3 pb3 w5'}>
+                                    <span className={'db f6 black gray'}>E-mail</span>
+                                    <span className={'db f5 black'}>{record.email || '--'}</span>
+                                </span>
+                            </div>
+                        </div>
+                    </>
+                )
+            }}
+            dataSource={data.companies}
+        />
+    )
+}
+
 const SettingsAmbassadors: FunctionComponent<ISettingsAmbassadorsProps> = () => {
     const [activeKey, setActiveKey] = useState('1')
     return (
@@ -544,7 +671,7 @@ const SettingsAmbassadors: FunctionComponent<ISettingsAmbassadorsProps> = () => 
                     <Applicants />
                 </TabPane>
                 <TabPane tab="Companies Looking for Ambassadors" key="4">
-                    XD
+                    <CompaniesLookingForAmbassadors />
                 </TabPane>
             </Tabs>
         </>

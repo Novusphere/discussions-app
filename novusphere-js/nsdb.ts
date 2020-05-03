@@ -16,6 +16,30 @@ export interface INSDBSearchQuery {
     op?: boolean
 }
 
+export interface IAmbassadorCompany {
+    pub: string
+    postPub: string
+    uidw: string
+    companyName: string
+    firstName: string
+    lastName: string
+    street: string
+    buildingNumber: string
+    areaCode: string
+    city: string
+    twitterUsername: string
+    twitterProfileURL: string
+    facebookUsername: string
+    facebookProfileURL: string
+    phoneNumber: string
+    email: string
+    available: boolean
+}
+
+export interface IAmbassadorResponse {
+    companies: IAmbassadorCompany[]
+}
+
 export class NSDB {
     api: string
     constructor() {
@@ -55,7 +79,7 @@ export class NSDB {
         const sig = ecc.sign(ecc.sha256(`${getOrigin()}-${time}`), accountPrivateKey)
         const pub = accountPublicKey
 
-        const qs = `time=${Date.now()}&pub=${pub}&sig=${sig}&time=${time}&domain=${getOrigin()}`
+        const qs = `pub=${pub}&sig=${sig}&time=${time}&domain=${getOrigin()}`
         const rurl = `${this.api}/account/data`
 
         const { data } = await axios.post(rurl, qs)
@@ -116,6 +140,33 @@ export class NSDB {
             return sq
         } catch (error) {
             console.error('Search error: \n', error)
+            throw error
+        }
+    }
+
+    async getAmbassadorCompanies() {
+        try {
+            try {
+                const { data } = await axios.get<IAmbassadorResponse>(
+                    `${this.api}/discussions/ambassador/companies?domain=${getOrigin()}`
+                )
+                return data
+            } catch (error) {
+                throw error
+            }
+        } catch (error) {}
+    }
+
+    async getAmbassadorApplicants(pubKey: string) {
+        try {
+            const time = new Date().getTime()
+            const { data } = await axios.post(
+                `${
+                    this.api
+                }/discussions/ambassador/applicants?domain=${getOrigin()}&time=${time}&pub=${pubKey}`
+            )
+            return data
+        } catch (error) {
             throw error
         }
     }
