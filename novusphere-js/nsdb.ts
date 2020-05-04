@@ -55,7 +55,7 @@ export class NSDB {
         const sig = ecc.sign(ecc.sha256(`${getOrigin()}-${time}`), accountPrivateKey)
         const pub = accountPublicKey
 
-        const qs = `time=${Date.now()}&pub=${pub}&sig=${sig}&time=${time}&domain=${getOrigin()}`
+        const qs = `pub=${pub}&sig=${sig}&time=${time}&domain=${getOrigin()}`
         const rurl = `${this.api}/account/data`
 
         const { data } = await axios.post(rurl, qs)

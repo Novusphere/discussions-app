@@ -11,6 +11,7 @@ const { Option } = Select
 import styles from './Editor.module.scss'
 import { useCallback, useState } from 'react'
 import { useMemo } from 'react'
+import { generateUuid } from '@utils'
 
 interface IEditorProps {
     onChange: (html: any) => void // passed in via spread (bind) in form.tsx
@@ -23,11 +24,14 @@ interface IEditorProps {
 }
 
 interface IEditorState {
+    toolbarId: string
     loaded: boolean
     loading: boolean
 }
 
-const CustomToolbar = ({ addTip }) => {
+const prefix = 'toolbar-'
+
+const CustomToolbar = ({ addTip, toolbarId }) => {
     const [amount, setAmount] = useState(0)
     const [symbol, setSymbol] = useState('')
 
@@ -50,7 +54,7 @@ const CustomToolbar = ({ addTip }) => {
     }
 
     return (
-        <div id="toolbar" className="ql-toolbar ql-snow">
+        <div id={`${prefix}${toolbarId}`} className="ql-toolbar ql-snow">
             <span className="ql-formats">
                 <button type="button" className="ql-header" value="1">
                     <svg viewBox="0 0 18 18">
@@ -227,6 +231,7 @@ const CustomToolbar = ({ addTip }) => {
 @observer
 class Editor extends React.Component<IEditorProps, IEditorState> {
     state = {
+        toolbarId: `${prefix}${generateUuid()}`,
         loaded: false,
         loading: false,
     }
@@ -509,18 +514,20 @@ class Editor extends React.Component<IEditorProps, IEditorState> {
     }
 
     public render(): React.ReactNode {
-        if (!this.state.loaded) {
+        const { toolbarId } = this.state
+
+        if (!this.state.loaded || !toolbarId) {
             return <Spin />
         }
 
-        const { Editor } = this.quillBase
+        const { Editor: QuillEditor } = this.quillBase
         const { placeholder } = this.props
 
         return (
             <div className={styles.editorContainer}>
                 {this.state.loading && <Spin className={styles.editorSpin} />}
-                <CustomToolbar addTip={this.addTip} />
-                <Editor
+                <CustomToolbar addTip={this.addTip} toolbarId={toolbarId} />
+                <QuillEditor
                     disabled={this.props.disabled}
                     classNames={cx([this.props.className, 'bg-white'])}
                     ref={this.ref}
@@ -537,7 +544,7 @@ class Editor extends React.Component<IEditorProps, IEditorState> {
                         mention: this.modules.mention,
                         magicUrl: true,
                         toolbar: {
-                            container: '#toolbar',
+                            container: `#${prefix}${toolbarId}`,
                             // container: [
                             //     [{ header: 1 }, { header: 2 }], // custom button values
                             //     [{ list: 'ordered' }, { list: 'bullet' }],

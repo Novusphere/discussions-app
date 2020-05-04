@@ -1,6 +1,5 @@
 import React, { FunctionComponent, useCallback, useEffect, useState } from 'react'
 import Markdown from 'markdown-to-jsx'
-import { LazyLoadImage } from 'react-lazy-load-image-component'
 import cx from 'classnames'
 
 import styles from './RichTextPreview.module.scss'
@@ -69,19 +68,7 @@ const RtLink: FunctionComponent<any> = ({ children, href, index }) => {
                     case /(.|)http[s]?:\/\/(\w|[:\/.%-])+\.(png|jpg|jpeg|gif)(\?(\w|[:\/.%-])+)?(.|)/.test(
                         href
                     ):
-                        // embed = `<img src="${href}" alt="Viewing image" />`
-                        embed = {
-                            html: (
-                                <a
-                                    href={href}
-                                    className={'pointer'}
-                                    title={'Open image in new tab'}
-                                    target={'_blank'}
-                                >
-                                    <LazyLoadImage alt={'Viewing image'} src={href} effect="blur" />
-                                </a>
-                            ),
-                        }
+                        embed = `<img src="${href}" alt="Viewing image" />`
                         break
                     case /t.me\/([a-zA-Z0-9\_\!\@\+]+)\/([a-zA-Z0-9]+)/.test(href):
                         const [, ids] = href.split('t.me/')
