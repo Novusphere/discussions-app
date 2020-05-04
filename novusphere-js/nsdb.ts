@@ -159,11 +159,10 @@ export class NSDB {
 
     async getAmbassadorApplicants(pubKey: string) {
         try {
-            const time = new Date().getTime()
             const { data } = await axios.post(
                 `${
                     this.api
-                }/discussions/ambassador/applicants?domain=${getOrigin()}&time=${time}&pub=${pubKey}`
+                }/discussions/ambassador/applicants?domain=${getOrigin()}&pub=${pubKey}`
             )
             return data
         } catch (error) {

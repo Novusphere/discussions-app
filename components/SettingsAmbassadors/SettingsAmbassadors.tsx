@@ -551,6 +551,7 @@ const CompaniesLookingForAmbassadors = () => {
     return (
         <Table
             columns={columns}
+            rowKey={'pub'}
             expandedRowRender={record => {
                 return (
                     <>
