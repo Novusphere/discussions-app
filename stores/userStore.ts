@@ -1,5 +1,5 @@
 import { persist } from 'mobx-persist'
-import { observable, when, computed, ObservableMap, action } from 'mobx'
+import { action, computed, observable, ObservableMap, when } from 'mobx'
 import { RootStore } from '@stores/index'
 import axios from 'axios'
 import _ from 'lodash'
@@ -656,9 +656,7 @@ export class UserStore {
     @action.bound
     async saveAmbassadors() {
         try {
-            await this.syncDataFromLocalToServer()
-            await sleep(500)
-            this.uiStore.showToast('Success', 'Your ambassador settings have been saved', 'success')
+            this.showAmbassadorToastAndSync()
         } catch (error) {
             this.uiStore.showToast(
                 'Error',
@@ -680,11 +678,32 @@ export class UserStore {
     @task
     async getApplicantsForAmbassadors() {
         try {
-            const key = this.authStore.postPub
-            return await nsdb.getAmbassadorApplicants(key)
+            const { accountPrivKey } = this.authStore
+            return await nsdb.getAmbassadorApplicants({
+                privateKey: accountPrivKey,
+            })
         } catch (error) {
             throw error
         }
+    }
+
+    @task
+    async getMyCompaniesForAmbassadors() {
+        try {
+            const { accountPrivKey } = this.authStore
+            return await nsdb.getAmbassadorMyCompanies({
+                privateKey: accountPrivKey,
+            })
+        } catch (error) {
+            throw error
+        }
+    }
+
+    @task.resolved
+    async showAmbassadorToastAndSync() {
+        await this.syncDataFromLocalToServer()
+        await sleep(500)
+        this.uiStore.showToast('Success', 'Your ambassador settings have been saved', 'success')
     }
 
     @task.resolved
@@ -699,9 +718,7 @@ export class UserStore {
             } else {
                 this.ambassador.joinedCompanies.push(key)
             }
-            await this.syncDataFromLocalToServer()
-            await sleep(500)
-            this.uiStore.showToast('Success', 'Your ambassador settings have been saved', 'success')
+            this.showAmbassadorToastAndSync()
         } catch (error) {
             this.uiStore.showToast(
                 'Error',
@@ -711,5 +728,39 @@ export class UserStore {
         }
     }
 
+    @task.resolved
+    @action.bound
+    async toggleApproveApplicant(key: string) {
+        try {
+            if (this.ambassador.acceptedAmbassadors.indexOf(key) !== -1) {
+                this.ambassador.acceptedAmbassadors = _.reject(
+                    this.ambassador.acceptedAmbassadors,
+                    companyPub => companyPub === key
+                )
+            } else {
+                this.ambassador.acceptedAmbassadors.push(key)
+            }
+            this.showAmbassadorToastAndSync()
+        } catch (error) {
+            this.uiStore.showToast(
+                'Error',
+                'Something went wrong while trying to save, please try again',
+                'error'
+            )
+        }
+    }
 
+    @task.resolved
+    @action.bound
+    async deleteCompanyFromMyAmbassador(key: string) {
+        try {
+            this.toggleApplyUserToCompany(key)
+        } catch (error) {
+            this.uiStore.showToast(
+                'Error',
+                'Something went wrong while trying to save, please try again',
+                'error'
+            )
+        }
+    }
 }

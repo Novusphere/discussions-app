@@ -1,4 +1,4 @@
-import React, { FunctionComponent, useEffect, useState } from 'react'
+import React, { FunctionComponent, useCallback, useEffect, useState } from 'react'
 
 import styles from './SettingsAmbassadors.module.scss'
 import cx from 'classnames'
@@ -8,22 +8,23 @@ import {
     Input,
     Dropdown,
     Table,
-    Collapse,
     Avatar,
     Switch,
     Icon,
     Menu,
     Button,
     Spin,
+    Tag,
 } from 'antd'
 import { Tab, TabList } from 'react-tabs'
 import { useObserver, Observer } from 'mobx-react-lite'
 import { RootStore, useStores } from '@stores'
 import { IAmbassadorResponse } from '@novuspherejs/nsdb'
 import { getIdenticon } from '@utils'
+import { UserNameWithIcon } from '../index'
+import _ from 'lodash'
 
 const { TabPane } = Tabs
-const { Panel } = Collapse
 
 interface ISettingsAmbassadorsProps {}
 
@@ -37,10 +38,17 @@ const SaveButton = ({ onSave, loading = false, title = 'Save' }) => {
     ))
 }
 
-const Ambassador = ({ icon = <Avatar icon="user" />, companyName, score }) => {
+const Ambassador = ({
+    icon = '',
+    companyName,
+    score,
+    pub,
+    approved = false,
+    onDelete = (pub: string) => null,
+}) => {
     const menu = (
         <Menu>
-            <Menu.Item key="1">
+            <Menu.Item key="1" onMouseDown={() => onDelete(pub)}>
                 <Icon type="delete" />
                 Delete
             </Menu.Item>
@@ -50,10 +58,17 @@ const Ambassador = ({ icon = <Avatar icon="user" />, companyName, score }) => {
     return (
         <Dropdown overlay={menu}>
             <div className={'pointer ba b--light-gray br3 pa2 flex flex-row items-center'}>
-                {icon}
+                <Avatar icon={'user'} src={icon} />
                 <div className={'flex flex-column mh2'}>
-                    <span className={'f6 primary'}>{companyName}</span>
-                    <span className={'f6 gray'}>Score: {score}</span>
+                    <span className={'f6 primary'}>{companyName || '--'}</span>
+                    <span className={'f6 gray'}>Score: {score || '--'}</span>
+                    <span className={'pv1'}>
+                        {approved ? (
+                            <Tag color="green">Approved</Tag>
+                        ) : (
+                            <Tag color="volcano">Pending Approval</Tag>
+                        )}
+                    </span>
                 </div>
             </div>
         </Dropdown>
@@ -63,6 +78,8 @@ const Ambassador = ({ icon = <Avatar icon="user" />, companyName, score }) => {
 const PersonalInfo = Form.create({ name: 'personal_info' })(({ form }: any) => {
     const { getFieldDecorator } = form
     const { userStore }: RootStore = useStores()
+    const [loading, setLoading] = useState(true)
+    const [myCompanies, setMyCompanies] = useState({ companies: [] })
     const onSave = () => {
         form.validateFields(async (err, values) => {
             if (!err) {
@@ -71,6 +88,23 @@ const PersonalInfo = Form.create({ name: 'personal_info' })(({ form }: any) => {
             }
         })
     }
+
+    useEffect(() => {
+        userStore.getMyCompaniesForAmbassadors().then(data => {
+            setMyCompanies(data)
+            setLoading(false)
+        })
+    }, [])
+
+    const handleDelete = useCallback(
+        (pub: string) => {
+            setMyCompanies({
+                companies: _.reject(myCompanies.companies, company => company.pub === pub),
+            })
+            userStore.deleteCompanyFromMyAmbassador(pub)
+        },
+        [myCompanies]
+    )
 
     return useObserver(() => (
         <>
@@ -103,9 +137,31 @@ const PersonalInfo = Form.create({ name: 'personal_info' })(({ form }: any) => {
                         Ambassador of the following companies
                     </span>
                 </span>
-                <div className={'flex flex-row flex-wrap items-center'}>
-                    <Ambassador companyName={'Company Name'} score={1234} />
-                </div>
+                <Observer>
+                    {() =>
+                        loading ? (
+                            <Spin />
+                        ) : (
+                            <div className={'flex flex-row flex-wrap items-center'}>
+                                {myCompanies.companies.length ? (
+                                    myCompanies.companies.map(company => (
+                                        <Ambassador
+                                            key={company.pub}
+                                            icon={getIdenticon(company.pub)}
+                                            companyName={company.companyName}
+                                            pub={company.pub}
+                                            score={'--'}
+                                            approved={company.approved}
+                                            onDelete={handleDelete}
+                                        />
+                                    ))
+                                ) : (
+                                    <span className={'f6 gray'}>You have no applications.</span>
+                                )}
+                            </div>
+                        )
+                    }
+                </Observer>
             </div>
 
             <SaveButton
@@ -326,17 +382,6 @@ const CompanyInfo = Form.create({ name: 'company_info' })(({ form }: any) => {
                 </Form.Item>
             </div>
 
-            <div className={'mt4'}>
-                <span className={'flex flex-row items-center justify-between'}>
-                    <span className={'f4 b black db mb3'}>
-                        Ambassador of the following companies
-                    </span>
-                </span>
-                <div className={'flex flex-row flex-wrap items-center'}>
-                    <Ambassador companyName={'Company Name'} score={1234} />
-                </div>
-            </div>
-
             <SaveButton
                 onSave={onSave}
                 title={'Save Company Info'}
@@ -348,18 +393,35 @@ const CompanyInfo = Form.create({ name: 'company_info' })(({ form }: any) => {
 
 const Applicants = () => {
     const { userStore }: RootStore = useStores()
-    const [data, setData] = useState<any>({ companies: [] })
+    const [data, setData] = useState<any>({ applicants: [] })
     const columns = [
         { title: '#', dataIndex: 'key', key: 'key', render: (text, record, index) => index + 1 },
         {
-            title: "Applicants Name",
-            dataIndex: 'firstName',
-            key: 'firstName',
+            title: 'Applicants Username',
+            dataIndex: 'displayName',
+            key: 'displayName',
             render: (text, record) => (
-                <span className={'flex flex-row items-center'}>
-                    <Avatar icon={'user'} src={getIdenticon(record.pub)} />
-                    <span className={'primary f6 ph2'}>{text}</span>
-                </span>
+                <div className={'flex flex-row items-center'}>
+                    <UserNameWithIcon
+                        imageData={getIdenticon(record.postPub)}
+                        pub={record.pub}
+                        name={text}
+                    />
+                </div>
+            ),
+        },
+        {
+            title: 'Status',
+            render: (text, record) => (
+                <Observer>
+                    {() =>
+                        userStore.ambassador.acceptedAmbassadors.indexOf(record.pub) !== -1 ? (
+                            <Tag color="green">Approved</Tag>
+                        ) : (
+                            <Tag color="volcano">Pending Approval</Tag>
+                        )
+                    }
+                </Observer>
             ),
         },
         {
@@ -368,12 +430,13 @@ const Applicants = () => {
                 <Observer>
                     {() => (
                         <Button
-                            loading={userStore.toggleApplyUserToCompany['pending']}
-                            onMouseDown={() => userStore.toggleApplyUserToCompany(record.pub)}
+                            disabled={
+                                userStore.ambassador.acceptedAmbassadors.indexOf(record.pub) !== -1
+                            }
+                            loading={userStore.toggleApproveApplicant['pending']}
+                            onMouseDown={() => userStore.toggleApproveApplicant(record.pub)}
                         >
-                            {userStore.ambassador.joinedCompanies.indexOf(record.pub) !== -1
-                                ? 'Unapply'
-                                : 'Apply'}
+                            Approve
                         </Button>
                     )}
                 </Observer>
@@ -383,7 +446,6 @@ const Applicants = () => {
 
     useEffect(() => {
         userStore.getApplicantsForAmbassadors().then(result => {
-            console.log(result)
             setData(result)
         })
     }, [])
@@ -392,117 +454,7 @@ const Applicants = () => {
         return <Spin />
     }
 
-    return null
-
-    return (
-        <Table
-            columns={columns}
-            expandedRowRender={record => {
-                return (
-                    <>
-                        <div className={'flex flex-row items-center flex-wrap'}>
-                            <span className={'db pr3 pb3 w5'}>
-                                <span className={'db f6 black gray'}>Ambassador's First Name</span>
-                                <span className={'db f5 black'}>
-                                    {record.companyInfo.firstName}
-                                </span>
-                            </span>
-                            <span className={'db pr3 pb3 w5'}>
-                                <span className={'db f6 black gray'}>Ambassador's Last Name</span>
-                                <span className={'db f5 black'}>{record.companyInfo.lastName}</span>
-                            </span>
-                            <span className={'db pr3 pb3 w5'}>
-                                <span className={'db f6 black gray'}>Street</span>
-                                <span className={'db f5 black'}>{record.companyInfo.street}</span>
-                            </span>
-                            <span className={'db pr3 pb3 w5'}>
-                                <span className={'db f6 black gray'}>Building Number</span>
-                                <span className={'db f5 black'}>
-                                    {record.companyInfo.buildingNumber}
-                                </span>
-                            </span>
-                            <span className={'db pr3 pb3 w5'}>
-                                <span className={'db f6 black gray'}>Area Code</span>
-                                <span className={'db f5 black'}>{record.companyInfo.areaCode}</span>
-                            </span>
-                            <span className={'db pr3 pb3 w5'}>
-                                <span className={'db f6 black gray'}>City</span>
-                                <span className={'db f5 black'}>{record.companyInfo.city}</span>
-                            </span>
-                        </div>
-
-                        <div className={'mt3'}>
-                            <span className={cx(['f5 b black'])}>Social</span>
-                            <span className={styles.ornament} />
-                            <div className={'mt2 flex flex-row items-center flex-wrap'}>
-                                <span className={'db pr3 pb3 w5'}>
-                                    <span className={'db f6 black gray'}>Twitter</span>
-                                    <span className={'db f5 black'}>
-                                        <a
-                                            href={record.companyInfo.twitterProfileURL}
-                                            target={'_blank'}
-                                        >
-                                            {record.companyInfo.twitterUsername}
-                                        </a>
-                                    </span>
-                                </span>
-                                <span className={'db pr3 pb3 w5'}>
-                                    <span className={'db f6 black gray'}>Facebook</span>
-                                    <span className={'db f5 black'}>
-                                        <a
-                                            href={record.companyInfo.facebookProfileURL}
-                                            target={'_blank'}
-                                        >
-                                            {record.companyInfo.facebookUsername}
-                                        </a>
-                                    </span>
-                                </span>
-                            </div>
-                        </div>
-
-                        <div className={'mt3'}>
-                            <span className={cx(['f5 b black'])}>Contact</span>
-                            <span className={styles.ornament} />
-                            <div className={'mt2 flex flex-row items-center flex-wrap'}>
-                                <span className={'db pr3 pb3 w5'}>
-                                    <span className={'db f6 black gray'}>Phone</span>
-                                    <span className={'db f5 black'}>
-                                        {record.companyInfo.phoneNumber}
-                                    </span>
-                                </span>
-                                <span className={'db pr3 pb3 w5'}>
-                                    <span className={'db f6 black gray'}>E-mail</span>
-                                    <span className={'db f5 black'}>
-                                        {record.companyInfo.email}
-                                    </span>
-                                </span>
-                            </div>
-                        </div>
-
-                        <div className={'mt3'}>
-                            <span className={cx(['f5 b black'])}>
-                                Ambassador of the following companies
-                            </span>
-                            <span className={styles.ornament} />
-                            <div className={'mt2 flex flex-row items-center flex-wrap'}>
-                                <Ambassador companyName={'Company Name'} score={1234} />
-                            </div>
-                        </div>
-                        <div className={'mt3'}>
-                            <span className={cx(['f5 b black'])}>Total Score</span>
-                            <span className={styles.ornament} />
-                            <div className={'mt2 flex flex-row items-center flex-wrap'}>
-                                <span className={'db pr3 pb3 w5'}>
-                                    <span className={'db f5 black'}>{record.totalScore}</span>
-                                </span>
-                            </div>
-                        </div>
-                    </>
-                )
-            }}
-            dataSource={data}
-        />
-    )
+    return <Table columns={columns} dataSource={data.applicants} />
 }
 
 const CompaniesLookingForAmbassadors = () => {

@@ -157,13 +157,28 @@ export class NSDB {
         } catch (error) {}
     }
 
-    async getAmbassadorApplicants(pubKey: string) {
+    async getAmbassadorApplicants({ privateKey }) {
         try {
-            const { data } = await axios.post(
-                `${
-                    this.api
-                }/discussions/ambassador/applicants?domain=${getOrigin()}&pub=${pubKey}`
-            )
+            const domain = getOrigin()
+            const time = Date.now()
+            const sig = ecc.sign(ecc.sha256(`${domain}-${time}`), privateKey)
+            const pubKey = ecc.privateToPublic(privateKey)
+            const qs = `domain=${domain}&pub=${pubKey}&sig=${sig}&time=${time}`
+            const { data } = await axios.post(`${this.api}/discussions/ambassador/applicants`, qs)
+            return data
+        } catch (error) {
+            throw error
+        }
+    }
+
+    async getAmbassadorMyCompanies({ privateKey }) {
+        try {
+            const domain = getOrigin()
+            const time = Date.now()
+            const sig = ecc.sign(ecc.sha256(`${domain}-${time}`), privateKey)
+            const pubKey = ecc.privateToPublic(privateKey)
+            const qs = `domain=${domain}&pub=${pubKey}&sig=${sig}&time=${time}`
+            const { data } = await axios.post(`${this.api}/discussions/ambassador/mycompanies`, qs)
             return data
         } catch (error) {
             throw error
