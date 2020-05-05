@@ -83,6 +83,9 @@ export class UserStore {
         acceptedAmbassadors: [],
     }
 
+    // used internally to update via useEffect
+    @observable ambassadorTabActiveKey = '1'
+
     constructor(rootStore: RootStore) {
         this.uiStore = rootStore.uiStore
         this.tagStore = rootStore.tagStore

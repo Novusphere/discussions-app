@@ -94,7 +94,7 @@ const PersonalInfo = Form.create({ name: 'personal_info' })(({ form }: any) => {
             setMyCompanies(data)
             setLoading(false)
         })
-    }, [])
+    }, [userStore.ambassadorTabActiveKey])
 
     const handleDelete = useCallback(
         (pub: string) => {
@@ -448,7 +448,7 @@ const Applicants = () => {
         userStore.getApplicantsForAmbassadors().then(result => {
             setData(result)
         })
-    }, [])
+    }, [userStore.ambassadorTabActiveKey])
 
     if (userStore.getApplicantsForAmbassadors['pending']) {
         return <Spin />
@@ -494,7 +494,7 @@ const CompaniesLookingForAmbassadors = () => {
 
     useEffect(() => {
         userStore.getCompaniesLookingForAmbassadors().then(result => setData(result))
-    }, [])
+    }, [userStore.ambassadorTabActiveKey])
 
     if (userStore.getCompaniesLookingForAmbassadors['pending']) {
         return <Spin />
@@ -584,12 +584,13 @@ const CompaniesLookingForAmbassadors = () => {
 }
 
 const SettingsAmbassadors: FunctionComponent<ISettingsAmbassadorsProps> = () => {
-    const [activeKey, setActiveKey] = useState('1')
+    const { userStore }: RootStore = useStores()
     return (
         <>
             <Tabs
-                onChange={key => setActiveKey(key)}
-                defaultActiveKey={'1'}
+                onChange={key => userStore.ambassadorTabActiveKey = key}
+                defaultActiveKey={userStore.ambassadorTabActiveKey}
+                destroyInactiveTabPane={true}
                 renderTabBar={props => {
                     return (
                         <TabList
