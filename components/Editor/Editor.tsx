@@ -54,7 +54,7 @@ const CustomToolbar = ({ addTip, toolbarId }) => {
     }
 
     return (
-        <div id={`${prefix}${toolbarId}`} className="ql-toolbar ql-snow">
+        <div id={toolbarId} className="ql-toolbar ql-snow">
             <span className="ql-formats">
                 <button type="button" className="ql-header" value="1">
                     <svg viewBox="0 0 18 18">
@@ -544,7 +544,7 @@ class Editor extends React.Component<IEditorProps, IEditorState> {
                         mention: this.modules.mention,
                         magicUrl: true,
                         toolbar: {
-                            container: `#${prefix}${toolbarId}`,
+                            container: `#${toolbarId}`,
                             // container: [
                             //     [{ header: 1 }, { header: 2 }], // custom button values
                             //     [{ list: 'ordered' }, { list: 'bullet' }],
