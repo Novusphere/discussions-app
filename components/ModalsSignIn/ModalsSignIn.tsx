@@ -266,7 +266,7 @@ const ModalsSignIn: FunctionComponent<IModalsSignInProps> = ({
                                     rules: [
                                         { required: true, message: 'Please enter your brain key.' },
                                     ],
-                                })(<TextArea rows={4} />)}
+                                })(<TextArea rows={4} /> <Input placeholder='Enter your 12 word brain key' />)}
                             </Form.Item>
                             <Form.Item label="Display Name">
                                 {getFieldDecorator('displayName', {
