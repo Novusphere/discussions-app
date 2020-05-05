@@ -482,7 +482,8 @@ const CompaniesLookingForAmbassadors = () => {
                             loading={userStore.toggleApplyUserToCompany['pending']}
                             onMouseDown={() => userStore.toggleApplyUserToCompany(record.pub)}
                         >
-                            {userStore.ambassador.joinedCompanies.indexOf(record.pub) !== -1
+                            {userStore.ambassador &&
+                            userStore.ambassador.joinedCompanies.indexOf(record.pub) !== -1
                                 ? 'Unapply'
                                 : 'Apply'}
                         </Button>
@@ -584,11 +585,16 @@ const CompaniesLookingForAmbassadors = () => {
 }
 
 const SettingsAmbassadors: FunctionComponent<ISettingsAmbassadorsProps> = () => {
-    const { userStore }: RootStore = useStores()
+    const { userStore, authStore }: RootStore = useStores()
+
+    if (!authStore.hasAccount) {
+        return <span className={'f6 gray'}>Please sign in to view this option</span>
+    }
+
     return (
         <>
             <Tabs
-                onChange={key => userStore.ambassadorTabActiveKey = key}
+                onChange={key => (userStore.ambassadorTabActiveKey = key)}
                 defaultActiveKey={userStore.ambassadorTabActiveKey}
                 destroyInactiveTabPane={true}
                 renderTabBar={props => {
