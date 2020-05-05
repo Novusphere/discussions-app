@@ -107,7 +107,7 @@ const ModalsSignIn: FunctionComponent<IModalsSignInProps> = ({
                         onClick={handleSignInWithAnotherBKSubmit}
                         disabled={hasErrors(form.getFieldsError())}
                     >
-                        Login with new account
+                        Login 
                     </Button>,
                 ]
             case STEP_OPTIONS.SIGN_IN_WITH_CURRENT_BK:
