@@ -1,29 +1,29 @@
-import React, { useEffect, useCallback, useState, useLayoutEffect } from 'react'
-import { useLocalStore } from 'mobx-react-lite'
+import React, { useCallback, useEffect, useLayoutEffect, useMemo, useState } from 'react'
+import { useLocalStore, useComputed } from 'mobx-react-lite'
 import { discussions, Thread } from '@novuspherejs'
 import {
     Button,
     Divider,
     Dropdown,
+    Empty,
     Icon,
+    Input,
     Menu,
     Popover,
-    Tooltip,
     Result,
-    Input,
-    Empty,
     Spin,
+    Tooltip,
 } from 'antd'
 import {
-    UserNameWithIcon,
-    Tips,
-    VotingHandles,
-    RichTextPreview,
-    Replies,
-    Icons,
-    SharePostPopover,
     Editor,
+    Icons,
+    Replies,
     ReplyingPostPreview,
+    RichTextPreview,
+    SharePostPopover,
+    Tips,
+    UserNameWithIcon,
+    VotingHandles,
 } from '@components'
 import moment from 'moment'
 import _ from 'lodash'
@@ -45,7 +45,7 @@ import { observer } from 'mobx-react'
 import Helmet from 'react-helmet'
 import { Link, useLocation, useParams } from 'react-router-dom'
 
-import { animateScroll, scroller } from 'react-scroll'
+import { scroller } from 'react-scroll'
 
 interface IPostPageProps {
     thread: Thread
@@ -467,73 +467,79 @@ const PostPageComponentObserverable: React.FunctionComponent<IPostPageProps> = (
         }
     }, [location])
 
-    const isSameUser = postStore.observableThread.openingPost.pub == authStore.postPub
-    const menu = (
-        <Menu>
-            <Menu.Item>
-                <a
-                    className={'flex flex-row items-center'}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    onClick={() => userStore.toggleBlockPost(url)}
-                >
-                    <Icon
-                        type="delete"
-                        className={'mr2'}
-                        theme="twoTone"
-                        twoToneColor={'#E7040F'}
-                    />
-                    {userStore.blockedPosts.has(url) ? 'Unblock post' : 'Block post'}
-                </a>
-            </Menu.Item>
-            {!isSameUser && (
+    const isSameUser = useComputed(
+        () => postStore.observableThread.openingPost.pub == authStore.postPub,
+        [postStore.observableThread.openingPost.pub, authStore.postPub]
+    )
+    const menu = useComputed(
+        () => (
+            <Menu>
                 <Menu.Item>
                     <a
                         className={'flex flex-row items-center'}
                         target="_blank"
                         rel="noopener noreferrer"
-                        onClick={() =>
-                            userStore.setModerationMemberByTag(
-                                `${thread.openingPost.displayName}:${thread.openingPost.pub}`,
-                                thread.openingPost.sub
-                            )
-                        }
+                        onClick={() => userStore.toggleBlockPost(url)}
                     >
                         <Icon
-                            type="safety-certificate"
-                            theme="twoTone"
+                            type="delete"
                             className={'mr2'}
-                            twoToneColor={'#D5008F'}
+                            theme="twoTone"
+                            twoToneColor={'#E7040F'}
                         />
-                        {userStore.delegated.has(
-                            `${thread.openingPost.displayName}:${thread.openingPost.pub}:${thread.openingPost.sub}`
-                        )
-                            ? 'Remove'
-                            : 'Add'}{' '}
-                        {thread.openingPost.displayName} as moderator
+                        {userStore.blockedPosts.has(url) ? 'Unblock post' : 'Block post'}
                     </a>
                 </Menu.Item>
-            )}
-            <Menu.Item>
-                <a
-                    className={'flex flex-row items-center'}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    onClick={() => userStore.togglePinPost(name, url)}
-                >
-                    <Icon
-                        type="pushpin"
-                        className={'mr2'}
-                        theme="twoTone"
-                        twoToneColor={'#FFD700'}
-                    />
-                    {userStore.pinnedPosts.has(url) ? 'Un-pin thread' : 'Pin this thread'}
-                </a>
-            </Menu.Item>
-        </Menu>
+                {!isSameUser && (
+                    <Menu.Item>
+                        <a
+                            className={'flex flex-row items-center'}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            onClick={() =>
+                                userStore.setModerationMemberByTag(
+                                    `${thread.openingPost.displayName}:${thread.openingPost.pub}`,
+                                    thread.openingPost.sub
+                                )
+                            }
+                        >
+                            <Icon
+                                type="safety-certificate"
+                                theme="twoTone"
+                                className={'mr2'}
+                                twoToneColor={'#D5008F'}
+                            />
+                            {userStore.delegated.has(
+                                `${thread.openingPost.displayName}:${thread.openingPost.pub}:${thread.openingPost.sub}`
+                            )
+                                ? 'Remove'
+                                : 'Add'}{' '}
+                            {thread.openingPost.displayName} as moderator
+                        </a>
+                    </Menu.Item>
+                )}
+                <Menu.Item>
+                    <a
+                        className={'flex flex-row items-center'}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        onClick={() => userStore.togglePinPost(name, url)}
+                    >
+                        <Icon
+                            type="pushpin"
+                            className={'mr2'}
+                            theme="twoTone"
+                            twoToneColor={'#FFD700'}
+                        />
+                        {userStore.pinnedPosts.has(url) ? 'Un-pin thread' : 'Pin this thread'}
+                    </a>
+                </Menu.Item>
+            </Menu>
+        ),
+        [userStore, isSameUser]
     )
 
-    const DropdownMenu = () => {
+    const DropdownMenu = useCallback(() => {
         return (
             <Dropdown key="more" overlay={menu}>
                 <Button
@@ -544,7 +550,7 @@ const PostPageComponentObserverable: React.FunctionComponent<IPostPageProps> = (
                 />
             </Dropdown>
         )
-    }
+    }, [menu])
 
     const shouldBeHidden =
         userStore.blockedPosts.has(url) && userStore.blockedContentSetting === 'hidden'
@@ -572,7 +578,32 @@ const PostPageComponentObserverable: React.FunctionComponent<IPostPageProps> = (
         )
     }
 
-    const tag = tagStore.tagModelFromObservables(thread.openingPost.sub)
+    const tag = useMemo(() => tagStore.tagModelFromObservables(thread.openingPost.sub), [])
+
+    const PostReplies = useCallback(() => {
+        const { totalReplies, replies } = postStore.observableThread.openingPost
+
+        if (totalReplies > 0) {
+            return (
+                <div className={'mt3'} id={'comments'}>
+                    <span className={'silver'}>viewing all {totalReplies} comments</span>
+                    <div className={'mt2 bg-white pv2 card'}>
+                        {replies.map(reply => (
+                            <Replies
+                                key={reply.uuid}
+                                reply={reply}
+                                threadUsers={postStore.threadUsers}
+                                highlightedPostUUID={postStore.highlightedPostUUID}
+                                setHighlightedPosUUID={postStore.setHighlightedPosUUID}
+                            />
+                        ))}
+                    </div>
+                </div>
+            )
+        }
+
+        return null
+    }, [postStore.observableThread])
 
     if (!tag) return null
 
@@ -804,24 +835,7 @@ const PostPageComponentObserverable: React.FunctionComponent<IPostPageProps> = (
             {postStore.showPreview && <ReplyingPostPreview content={postStore.replyingContent} />}
 
             {/*Render Replies*/}
-            {postStore.observableThread.openingPost.totalReplies > 0 && (
-                <div className={'mt3'} id={'comments'}>
-                    <span className={'silver'}>
-                        viewing all {postStore.observableThread.openingPost.totalReplies} comments
-                    </span>
-                    <div className={'mt2 bg-white pv2 card'}>
-                        {postStore.observableThread.openingPost.replies.map(reply => (
-                            <Replies
-                                key={reply.uuid}
-                                reply={reply}
-                                threadUsers={postStore.threadUsers}
-                                highlightedPostUUID={postStore.highlightedPostUUID}
-                                setHighlightedPosUUID={postStore.setHighlightedPosUUID}
-                            />
-                        ))}
-                    </div>
-                </div>
-            )}
+            <PostReplies />
         </div>
     )
 }
