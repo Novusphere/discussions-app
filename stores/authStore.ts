@@ -2,7 +2,7 @@ import { action, observable, reaction, when } from 'mobx'
 import { SIGN_IN_OPTIONS } from '@globals'
 import { RootStore } from '@stores'
 import { bkToStatusJson } from '@utils'
-import { discussions, init, eos } from '@novuspherejs'
+import { discussions, init, eos, nsdb } from '@novuspherejs'
 import { task } from 'mobx-task'
 import { notification } from 'antd'
 import { persist } from 'mobx-persist'
@@ -232,6 +232,15 @@ export class AuthStore {
             throw error
         }
     })
+
+    @task.resolved
+    async connectTwitter({ accountPrivateKey, accountPublicKey }: any) {
+        try {
+            await nsdb.connectTwitter({ accountPrivateKey, accountPublicKey })
+        } catch (error) {
+            throw error
+        }
+    }
 
     checkAndAskForNotificationPermission = () => {
         console.log('asking for notifications')

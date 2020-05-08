@@ -119,4 +119,19 @@ export class NSDB {
             throw error
         }
     }
+
+    async connectTwitter({ accountPrivateKey, accountPublicKey }: any) {
+        try {
+            const time = new Date().getTime()
+            const sig = ecc.sign(ecc.sha256(`${getOrigin()}-${time}`), accountPrivateKey)
+            const pub = accountPublicKey
+            const redirect = window.location.href
+
+            const qs = `pub=${pub}&sig=${sig}&time=${time}&domain=${getOrigin()}&redirect=${redirect}`
+            const rurl = `${this.api}/account/auth/twitter`
+            window.location.replace(`${rurl}?${qs}`)
+        } catch (error) {
+            throw error
+        }
+    }
 }

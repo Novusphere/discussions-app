@@ -55,6 +55,11 @@ export class UserStore {
     @observable
     hasDataSyncedFromServer = false
 
+    @observable
+    socialAuthLinks = {
+        twitter: null,
+    }
+
     constructor(rootStore: RootStore) {
         this.uiStore = rootStore.uiStore
         this.tagStore = rootStore.tagStore
@@ -72,6 +77,14 @@ export class UserStore {
                 timeout: 500,
             }
         )
+    }
+
+    @computed get twitterUsername() {
+        if (!this.socialAuthLinks.twitter) {
+            return ''
+        }
+
+        return this.socialAuthLinks.twitter.username
     }
 
     resetPostObservables = () => {
@@ -384,6 +397,12 @@ export class UserStore {
             })
 
             if (!data) return
+
+            if (data['auth']) {
+                if (data['auth']['twitter']) {
+                    this.socialAuthLinks.twitter = data['auth']['twitter']
+                }
+            }
 
             data = data['data']
 
