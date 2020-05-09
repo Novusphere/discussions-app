@@ -2,7 +2,7 @@ import { action, observable, reaction, when } from 'mobx'
 import { SIGN_IN_OPTIONS } from '@globals'
 import { RootStore } from '@stores'
 import { bkToStatusJson } from '@utils'
-import { discussions, init, eos } from '@novuspherejs'
+import { discussions, init, eos, nsdb } from '@novuspherejs'
 import { task } from 'mobx-task'
 import { notification } from 'antd'
 import { persist } from 'mobx-persist'
@@ -61,6 +61,11 @@ export class AuthStore {
     @observable TEMP_WalletPrivateKey = ''
     @observable TEMP_TippingTransfers = []
 
+    @observable
+    socialAuthLinks = {
+        twitter: null,
+    }
+
     constructor(rootStore: RootStore) {
         when(
             () => this.hasAccount,
@@ -116,6 +121,9 @@ export class AuthStore {
         this.accountPubKey = ''
         this.accountPrivKey = ''
         this.uidwWalletPubKey = ''
+        this.socialAuthLinks = {
+            twitter: null,
+        }
     }
 
     setUidWalletKey = (value: string) => {
@@ -232,6 +240,20 @@ export class AuthStore {
             throw error
         }
     })
+
+    @task.resolved
+    async connectTwitter({ accountPrivateKey, accountPublicKey, connected }: any) {
+        try {
+            if (!connected) {
+                await nsdb.connectTwitter({ accountPrivateKey, accountPublicKey })
+            } else {
+                await nsdb.disconnectTwitter({ accountPrivateKey, accountPublicKey })
+                this.socialAuthLinks.twitter = null
+            }
+        } catch (error) {
+            throw error
+        }
+    }
 
     checkAndAskForNotificationPermission = () => {
         console.log('asking for notifications')
