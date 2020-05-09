@@ -28,11 +28,8 @@ export class EOS {
         // expect quantity inputs for amount and fee that look like:
         // 1.2000 EOS
         function quantity(q) {
-            const qfs = q.split(' ')[0]
-            const qf = parseFloat(qfs)
-            const p = qfs.length - (qfs.indexOf('.') + 1)
-            const qi = parseInt(String(qf * Math.pow(10, p)))
-            return qi
+            q = q.replace('.', '');
+            return parseInt(q);
         }
 
         // due to JS limitaitons, this only has 48-bit precision,
