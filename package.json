@@ -1,6 +1,6 @@
 {
     "name": "discussions-app",
-    "version": "2.5.313",
+    "version": "2.5.314",
     "dependencies": {
         "@babel/runtime": "7.4.5",
         "aes-js": "3.1.2",
