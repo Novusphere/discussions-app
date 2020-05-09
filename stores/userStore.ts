@@ -104,6 +104,9 @@ export class UserStore {
         this.notifications = []
         this.unsignedPostsIsSpam = true
         this.blockedContentSetting = 'hidden'
+        this.socialAuthLinks = {
+            twitter: null,
+        }
     }
 
     setBlockedContent = (type: BlockedContentSetting) => {
