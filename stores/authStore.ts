@@ -61,6 +61,11 @@ export class AuthStore {
     @observable TEMP_WalletPrivateKey = ''
     @observable TEMP_TippingTransfers = []
 
+    @observable
+    socialAuthLinks = {
+        twitter: null,
+    }
+
     constructor(rootStore: RootStore) {
         when(
             () => this.hasAccount,
@@ -116,6 +121,9 @@ export class AuthStore {
         this.accountPubKey = ''
         this.accountPrivKey = ''
         this.uidwWalletPubKey = ''
+        this.socialAuthLinks = {
+            twitter: null,
+        }
     }
 
     setUidWalletKey = (value: string) => {

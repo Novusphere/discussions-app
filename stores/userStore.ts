@@ -55,11 +55,6 @@ export class UserStore {
     @observable
     hasDataSyncedFromServer = false
 
-    @observable
-    socialAuthLinks = {
-        twitter: null,
-    }
-
     constructor(rootStore: RootStore) {
         this.uiStore = rootStore.uiStore
         this.tagStore = rootStore.tagStore
@@ -80,11 +75,11 @@ export class UserStore {
     }
 
     @computed get twitterUsername() {
-        if (!this.socialAuthLinks.twitter) {
+        if (!this.authStore.socialAuthLinks.twitter) {
             return ''
         }
 
-        return this.socialAuthLinks.twitter.username
+        return this.authStore.socialAuthLinks.twitter.username
     }
 
     resetPostObservables = () => {
@@ -104,9 +99,6 @@ export class UserStore {
         this.notifications = []
         this.unsignedPostsIsSpam = true
         this.blockedContentSetting = 'hidden'
-        this.socialAuthLinks = {
-            twitter: null,
-        }
     }
 
     setBlockedContent = (type: BlockedContentSetting) => {
@@ -403,7 +395,7 @@ export class UserStore {
 
             if (data['auth']) {
                 if (data['auth']['twitter']) {
-                    this.socialAuthLinks.twitter = data['auth']['twitter']
+                    this.authStore.socialAuthLinks.twitter = data['auth']['twitter']
                 }
             }
 
