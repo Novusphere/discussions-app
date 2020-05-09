@@ -879,14 +879,14 @@ const PostPage: React.FC = () => {
         fetchThread()
     }, [query.id])
 
-    useInterval(
-        () => {
-            refreshThread()
-        },
-        2000,
-        false,
-        [query.id]
-    )
+    // useInterval(
+    //     () => {
+    //         refreshThread()
+    //     },
+    //     2000,
+    //     false,
+    //     [query.id]
+    // )
 
     if (loading) return <Spin />
 
