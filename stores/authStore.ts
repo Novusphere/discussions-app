@@ -242,9 +242,14 @@ export class AuthStore {
     })
 
     @task.resolved
-    async connectTwitter({ accountPrivateKey, accountPublicKey }: any) {
+    async connectTwitter({ accountPrivateKey, accountPublicKey, connected }: any) {
         try {
-            await nsdb.connectTwitter({ accountPrivateKey, accountPublicKey })
+            if (!connected) {
+                await nsdb.connectTwitter({ accountPrivateKey, accountPublicKey })
+            } else {
+                await nsdb.disconnectTwitter({ accountPrivateKey, accountPublicKey })
+                this.socialAuthLinks.twitter = null
+            }
         } catch (error) {
             throw error
         }

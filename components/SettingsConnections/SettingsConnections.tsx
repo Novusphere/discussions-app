@@ -24,16 +24,16 @@ const Connections = () => {
                     onClick={() => authStore.connectScatterWallet(authStore.hasEOSWallet)}
                 >
                     <span className={'db'}>
-                                {!authStore.connectScatterWallet['pending'] ? (
-                                    authStore.hasEOSWallet ? (
-                                        '(disconnect)'
-                                    ) : (
-                                        '(connect)'
-                                    )
-                                ) : (
-                                    <Spin />
-                                )}
-                            </span>
+                        {!authStore.connectScatterWallet['pending'] ? (
+                            authStore.hasEOSWallet ? (
+                                '(disconnect)'
+                            ) : (
+                                '(connect)'
+                            )
+                        ) : (
+                            <Spin />
+                        )}
+                    </span>
                     {authStore.eosWalletDisplayName && (
                         <span className={'red db'}>{authStore.eosWalletDisplayName}</span>
                     )}
@@ -53,20 +53,21 @@ const Connections = () => {
                         authStore.connectTwitter({
                             accountPrivateKey: authStore.accountPrivKey,
                             accountPublicKey: authStore.accountPubKey,
+                            connected: userStore.twitterUsername,
                         })
                     }
                 >
-                   <span className={'db'}>
-                                {!authStore.connectTwitter['pending'] ? (
-                                    userStore.twitterUsername ? (
-                                        '(disconnect)'
-                                    ) : (
-                                        '(connect)'
-                                    )
-                                ) : (
-                                    <Spin />
-                                )}
-                            </span>
+                    <span className={'db'}>
+                        {!authStore.connectTwitter['pending'] ? (
+                            userStore.twitterUsername ? (
+                                '(disconnect)'
+                            ) : (
+                                '(connect)'
+                            )
+                        ) : (
+                            <Spin />
+                        )}
+                    </span>
                     {userStore.twitterUsername && (
                         <span className={'red db'}>{userStore.twitterUsername}</span>
                     )}

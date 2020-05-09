@@ -79,7 +79,7 @@ export class UserStore {
 
     @computed get twitterUsername() {
         if (!this.authStore.socialAuthLinks.twitter) {
-            return ''
+            return false
         }
 
         return this.authStore.socialAuthLinks.twitter.username
