@@ -1,5 +1,12 @@
 import React, { useCallback, useEffect, useLayoutEffect, useMemo, useState } from 'react'
-import { useLocalStore, useComputed } from 'mobx-react-lite'
+import {
+    useLocalStore,
+    useComputed,
+    observer,
+    useObservable,
+    useObserver,
+    Observer,
+} from 'mobx-react-lite'
 import { discussions, Thread } from '@novuspherejs'
 import {
     Button,
@@ -41,11 +48,11 @@ import {
 import { RootStore, useStores } from '@stores'
 import { MODAL_OPTIONS } from '@globals'
 import cx from 'classnames'
-import { observer } from 'mobx-react'
 import Helmet from 'react-helmet'
 import { Link, useLocation, useParams } from 'react-router-dom'
 
 import { scroller } from 'react-scroll'
+import PostReplies from './PostReplies'
 
 interface IPostPageProps {
     thread: Thread
@@ -64,12 +71,14 @@ const PostPageComponentObserverable: React.FunctionComponent<IPostPageProps> = (
 }) => {
     const {
         userStore,
-        settingStore,
+        postsStore,
         authStore,
         uiStore,
         walletStore,
         tagStore,
     }: RootStore = useStores()
+
+    const location = useLocation()
 
     const postStore = useLocalStore(
         source => ({
@@ -79,6 +88,8 @@ const PostPageComponentObserverable: React.FunctionComponent<IPostPageProps> = (
             upvotes: source.thread.openingPost.upvotes,
             highlightedPostUUID: '',
             showPreview: false,
+            totalReplies: source.thread.openingPost.totalReplies,
+            replies: source.thread.openingPost.replies,
 
             get myVoteValue() {
                 if (postStore.myVote && postStore.myVote.length) {
@@ -318,11 +329,10 @@ const PostPageComponentObserverable: React.FunctionComponent<IPostPageProps> = (
                     const { transaction } = await discussions.post(postObject)
 
                     postObject.myVote = [{ value: 1 }]
-                    postStore.observableThread.openingPost.replies.push(postObject)
-                    postStore.observableThread.openingPost.totalReplies += 1
+                    postStore.replies.push(postObject)
+                    postStore.totalReplies += 1
                     postStore.submitReplyLoading = false
                     postStore.setReplyContent('')
-                    postStore.toggleReply()
 
                     uiStore.showToast('Success', 'Your reply has been submitted', 'success', {
                         btn: (
@@ -443,11 +453,27 @@ const PostPageComponentObserverable: React.FunctionComponent<IPostPageProps> = (
         }
     )
 
-    const location = useLocation()
+    const refreshThread = useCallback(() => {
+        if (thread) {
+            postsStore
+                .refreshThread(id, authStore.postPub, thread.lastQueryTime)
+                .then(refreshedThreadDiff => {
+                    if (refreshedThreadDiff && refreshedThreadDiff.openingPost) {
+                        postStore.replies = refreshedThreadDiff.openingPost.replies
+                        postStore.totalReplies = refreshedThreadDiff.openingPost.totalReplies
+                    }
+                })
+        }
+    }, [thread, id])
 
-    useEffect(() => {
-        postStore.observableThread = thread
-    }, [thread])
+    useInterval(
+        () => {
+            refreshThread()
+        },
+        2000,
+        false,
+        [id]
+    )
 
     useLayoutEffect(() => {
         setTimeout(() => {
@@ -580,31 +606,6 @@ const PostPageComponentObserverable: React.FunctionComponent<IPostPageProps> = (
 
     const tag = useMemo(() => tagStore.tagModelFromObservables(thread.openingPost.sub), [])
 
-    const PostReplies = useCallback(() => {
-        const { totalReplies, replies } = postStore.observableThread.openingPost
-
-        if (totalReplies > 0) {
-            return (
-                <div className={'mt3'} id={'comments'}>
-                    <span className={'silver'}>viewing all {totalReplies} comments</span>
-                    <div className={'mt2 bg-white pv2 card'}>
-                        {replies.map(reply => (
-                            <Replies
-                                key={reply.uuid}
-                                reply={reply}
-                                threadUsers={postStore.threadUsers}
-                                highlightedPostUUID={postStore.highlightedPostUUID}
-                                setHighlightedPosUUID={postStore.setHighlightedPosUUID}
-                            />
-                        ))}
-                    </div>
-                </div>
-            )
-        }
-
-        return null
-    }, [postStore.observableThread])
-
     if (!tag) return null
 
     return (
@@ -664,183 +665,232 @@ const PostPageComponentObserverable: React.FunctionComponent<IPostPageProps> = (
                         },
                     ])}
                 >
-                    <div className={'flex flex-column w-100'}>
-                        <span
-                            className={cx([
-                                'measure black b f4 flex-wrap pb3',
-                                {
-                                    dn: postStore.editing,
-                                },
-                            ])}
-                        >
-                            {postStore.titleContent}
-                        </span>
-                        {!postStore.editing && (
-                            <RichTextPreview
-                                hideFade
-                                className={'black f6 lh-copy overflow-break-word'}
-                            >
-                                {postStore.editingContent}
-                            </RichTextPreview>
-                        )}
-                        {postStore.editing && (
-                            <>
-                                <div className={'mb3 db'}>
-                                    <Input
-                                        autoCorrect={'none'}
-                                        allowClear
-                                        size={'large'}
-                                        defaultValue={postStore.titleContent}
-                                        onChange={postStore.setTitleContent}
-                                    />
-                                </div>
-                                <Editor
-                                    onChange={postStore.setEditingContent}
-                                    value={postStore.editingContent}
-                                    threadUsers={postStore.threadUsers}
-                                />
-                                <div className={'flex flex-row justify-end pt2'}>
-                                    <Button onClick={postStore.toggleEdit} className={'mr2'}>
-                                        Cancel
-                                    </Button>
-                                    <Button
-                                        disabled={postStore.editingContent === ''}
-                                        type={'danger'}
-                                        onClick={postStore.submitEdit}
-                                        loading={postStore.submitEditLoading}
+                    <Observer>
+                        {() => (
+                            <div className={'flex flex-column w-100'}>
+                                <span
+                                    className={cx([
+                                        'measure black b f4 flex-wrap pb3',
+                                        {
+                                            dn: postStore.editing,
+                                        },
+                                    ])}
+                                >
+                                    {postStore.titleContent}
+                                </span>
+                                {!postStore.editing && (
+                                    <RichTextPreview
+                                        hideFade
+                                        className={'black f6 lh-copy overflow-break-word'}
                                     >
-                                        Save Edit
-                                    </Button>
-                                </div>
-                            </>
+                                        {postStore.editingContent}
+                                    </RichTextPreview>
+                                )}
+                                {postStore.editing && (
+                                    <>
+                                        <div className={'mb3 db'}>
+                                            <Input
+                                                autoCorrect={'none'}
+                                                allowClear
+                                                size={'large'}
+                                                defaultValue={postStore.titleContent}
+                                                onChange={postStore.setTitleContent}
+                                            />
+                                        </div>
+                                        <Editor
+                                            onChange={postStore.setEditingContent}
+                                            value={postStore.editingContent}
+                                            threadUsers={postStore.threadUsers}
+                                        />
+                                        <div className={'flex flex-row justify-end pt2'}>
+                                            <Button
+                                                onClick={postStore.toggleEdit}
+                                                className={'mr2'}
+                                            >
+                                                Cancel
+                                            </Button>
+                                            <Button
+                                                disabled={postStore.editingContent === ''}
+                                                type={'danger'}
+                                                onClick={postStore.submitEdit}
+                                                loading={postStore.submitEditLoading}
+                                            >
+                                                Save Edit
+                                            </Button>
+                                        </div>
+                                    </>
+                                )}
+                            </div>
                         )}
-                    </div>
+                    </Observer>
 
                     {!postStore.editing && (
-                        <VotingHandles
-                            uuid={thread.openingPost.uuid}
-                            myVote={postStore.myVoteValue}
-                            upVotes={postStore.upvotes}
-                            downVotes={postStore.downvotes}
-                            handler={postStore.handleVoting}
-                        />
+                        <Observer>
+                            {() => (
+                                <VotingHandles
+                                    uuid={thread.openingPost.uuid}
+                                    myVote={postStore.myVoteValue}
+                                    upVotes={postStore.upvotes}
+                                    downVotes={postStore.downvotes}
+                                    handler={postStore.handleVoting}
+                                />
+                            )}
+                        </Observer>
                     )}
                 </div>
 
                 {!postStore.editing && (
-                    <div className={'mt2 flex flex-row justify-between'}>
-                        <div className={'flex flex-row items-center'}>
-                            <Button
-                                disabled={postStore.editing}
-                                size={'small'}
-                                type={'primary'}
-                                className={'mr1'}
-                                onClick={postStore.toggleReply}
-                            >
-                                <Icons.ReplyIcon />
-                                Reply
-                            </Button>
-                            {isSameUser && (
-                                <Button
-                                    type={postStore.editing ? 'danger' : 'default'}
-                                    size={'small'}
-                                    className={'mr1'}
-                                    onClick={postStore.toggleEdit}
-                                >
-                                    <Icon type="edit" theme={'filled'} />
-                                    Edit
-                                </Button>
-                            )}
-                            {authStore.hasAccount && (
-                                <Button
-                                    size={'small'}
-                                    title={
-                                        userStore.watching.has(id) ? 'Unwatch post' : 'Watch post'
-                                    }
-                                    className={'mh1'}
-                                    onClick={() =>
-                                        userStore.toggleThreadWatch(id, {
-                                            post: postStore.observableThread.openingPost,
-                                        })
-                                    }
-                                >
-                                    <Icon
-                                        type={userStore.watching.has(id) ? 'eye' : 'eye-invisible'}
-                                        theme={userStore.watching.has(id) ? 'filled' : 'outlined'}
-                                        style={{
-                                            color: userStore.watching.has(id)
-                                                ? '#079e99'
-                                                : 'inherit',
-                                        }}
+                    <Observer>
+                        {() => (
+                            <div className={'mt2 flex flex-row justify-between'}>
+                                <div className={'flex flex-row items-center'}>
+                                    <Button
+                                        disabled={postStore.editing}
+                                        size={'small'}
+                                        type={'primary'}
+                                        className={'mr1'}
+                                        onClick={postStore.toggleReply}
+                                    >
+                                        <Icons.ReplyIcon />
+                                        Reply
+                                    </Button>
+                                    {isSameUser && (
+                                        <Button
+                                            type={postStore.editing ? 'danger' : 'default'}
+                                            size={'small'}
+                                            className={'mr1'}
+                                            onClick={postStore.toggleEdit}
+                                        >
+                                            <Icon type="edit" theme={'filled'} />
+                                            Edit
+                                        </Button>
+                                    )}
+                                    {authStore.hasAccount && (
+                                        <Button
+                                            size={'small'}
+                                            title={
+                                                userStore.watching.has(id)
+                                                    ? 'Unwatch post'
+                                                    : 'Watch post'
+                                            }
+                                            className={'mh1'}
+                                            onClick={() =>
+                                                userStore.toggleThreadWatch(id, {
+                                                    post: postStore.observableThread.openingPost,
+                                                })
+                                            }
+                                        >
+                                            <Icon
+                                                type={
+                                                    userStore.watching.has(id)
+                                                        ? 'eye'
+                                                        : 'eye-invisible'
+                                                }
+                                                theme={
+                                                    userStore.watching.has(id)
+                                                        ? 'filled'
+                                                        : 'outlined'
+                                                }
+                                                style={{
+                                                    color: userStore.watching.has(id)
+                                                        ? '#079e99'
+                                                        : 'inherit',
+                                                }}
+                                            />
+                                        </Button>
+                                    )}
+                                    <Button
+                                        size={'small'}
+                                        title={'View block'}
+                                        className={'mh1'}
+                                        icon={'link'}
+                                        onClick={() =>
+                                            openInNewTab(
+                                                `https://bloks.io/transaction/${postStore.observableThread.openingPost.transaction}`
+                                            )
+                                        }
                                     />
-                                </Button>
-                            )}
-                            <Button
-                                size={'small'}
-                                title={'View block'}
-                                className={'mh1'}
-                                icon={'link'}
-                                onClick={() =>
-                                    openInNewTab(
-                                        `https://bloks.io/transaction/${postStore.observableThread.openingPost.transaction}`
-                                    )
-                                }
-                            />
-                            <Popover
-                                title={'Share this post'}
-                                content={<SharePostPopover url={url} />}
-                                placement={'bottom'}
-                            >
-                                <Button
-                                    size={'small'}
-                                    title={'Share post'}
-                                    className={'mh1'}
-                                    icon={'share-alt'}
-                                />
-                            </Popover>
-                        </div>
-                        {authStore.hasAccount && <DropdownMenu key="more" />}
-                    </div>
+                                    <Popover
+                                        title={'Share this post'}
+                                        content={<SharePostPopover url={url} />}
+                                        placement={'bottom'}
+                                    >
+                                        <Button
+                                            size={'small'}
+                                            title={'Share post'}
+                                            className={'mh1'}
+                                            icon={'share-alt'}
+                                        />
+                                    </Popover>
+                                </div>
+                                {authStore.hasAccount && <DropdownMenu key="more" />}
+                            </div>
+                        )}
+                    </Observer>
                 )}
             </div>
 
             {/*Render Opening Post Reply Box*/}
-            {postStore.replying && (
-                <div className={'mt3'} id={'reply'}>
-                    <Editor
-                        disabled={postStore.editing}
-                        onChange={postStore.setReplyContent}
-                        threadUsers={postStore.threadUsers}
-                    />
-                    <div className={'flex flex-row justify-end pt2'}>
-                        <Button
-                            disabled={postStore.replyingContent === '' || !authStore.hasAccount}
-                            onClick={postStore.togglePreview}
-                            className={'mr2'}
-                        >
-                            Preview
-                        </Button>
-                        <Button
-                            disabled={postStore.replyingContent === '' || !authStore.hasAccount}
-                            type={'primary'}
-                            onClick={postStore.submitReply}
-                            loading={postStore.submitReplyLoading}
-                        >
-                            Post Reply
-                        </Button>
-                    </div>
-                </div>
-            )}
+            <Observer>
+                {() =>
+                    postStore.replying && (
+                        <div className={'mt3'} id={'reply'}>
+                            <Editor
+                                disabled={postStore.editing}
+                                onChange={postStore.setReplyContent}
+                                threadUsers={postStore.threadUsers}
+                            />
+                            <div className={'flex flex-row justify-end pt2'}>
+                                <Button
+                                    disabled={
+                                        postStore.replyingContent === '' || !authStore.hasAccount
+                                    }
+                                    onClick={postStore.togglePreview}
+                                    className={'mr2'}
+                                >
+                                    Preview
+                                </Button>
+                                <Button
+                                    disabled={
+                                        postStore.replyingContent === '' || !authStore.hasAccount
+                                    }
+                                    type={'primary'}
+                                    onClick={postStore.submitReply}
+                                    loading={postStore.submitReplyLoading}
+                                >
+                                    Post Reply
+                                </Button>
+                            </div>
+                        </div>
+                    )
+                }
+            </Observer>
 
-            {postStore.showPreview && <ReplyingPostPreview content={postStore.replyingContent} />}
+            <Observer>
+                {() =>
+                    postStore.showPreview && (
+                        <ReplyingPostPreview content={postStore.replyingContent} />
+                    )
+                }
+            </Observer>
 
             {/*Render Replies*/}
-            <PostReplies />
+            <Observer>
+                {() => (
+                    <PostReplies
+                        highlightedPostUUID={postStore.highlightedPostUUID}
+                        totalReplies={postStore.totalReplies}
+                        replies={postStore.replies}
+                        setHighlightedPosUUID={postStore.setHighlightedPosUUID}
+                        threadUsers={postStore.threadUsers}
+                    />
+                )}
+            </Observer>
         </div>
     )
 }
 
-const PostPageComponent = observer(PostPageComponentObserverable)
+const PostPageComponent = PostPageComponentObserverable
 
 const PostPage: React.FC = () => {
     const { postsStore, authStore }: RootStore = useStores()
@@ -863,30 +913,9 @@ const PostPage: React.FC = () => {
             })
     }, [query.id])
 
-    const refreshThread = useCallback(() => {
-        if (thread) {
-            postsStore
-                .refreshThread(query.id, authStore.postPub, thread.lastQueryTime)
-                .then(refreshedThreadDiff => {
-                    if (refreshedThreadDiff && refreshedThreadDiff.openingPost) {
-                        setThread(refreshedThreadDiff)
-                    }
-                })
-        }
-    }, [thread, query.id])
-
     useEffect(() => {
         fetchThread()
     }, [query.id])
-
-    // useInterval(
-    //     () => {
-    //         refreshThread()
-    //     },
-    //     2000,
-    //     false,
-    //     [query.id]
-    // )
 
     if (loading) return <Spin />
 

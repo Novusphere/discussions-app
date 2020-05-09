@@ -393,11 +393,16 @@ const Replies: FunctionComponent<IRepliesProps> = props => {
         replyStore.reply = props.reply
     }, [props.reply])
 
-    const isSameUser = props.reply.pub == authStore.postPub
-    const isSpamPost = userStore.blockedPosts.has(replyStore.permaLinkURL)
+    const isSameUser = useComputed(() => props.reply.pub == authStore.postPub, [
+        props.reply.pub,
+        authStore.postPub,
+    ])
+    const isSpamPost = useComputed(() => userStore.blockedPosts.has(replyStore.permaLinkURL), [
+        userStore.blockedPosts,
+    ])
 
-    const menu = useComputed(
-        () => (
+    const menu = useComputed(() => {
+        return (
             <Menu>
                 <Menu.Item>
                     <a
@@ -409,7 +414,15 @@ const Replies: FunctionComponent<IRepliesProps> = props => {
                         }
                     >
                         <Icon type="user-add" className={'mr2'} />
-                        {userStore.following.has(props.reply.pub) ? 'Unfollow User' : 'Follow User'}
+                        <Observer>
+                            {() => (
+                                <span>
+                                    {userStore.following.has(props.reply.pub)
+                                        ? 'Unfollow User'
+                                        : 'Follow User'}
+                                </span>
+                            )}
+                        </Observer>
                     </a>
                 </Menu.Item>
                 <Menu.Item>
@@ -420,15 +433,20 @@ const Replies: FunctionComponent<IRepliesProps> = props => {
                         onClick={() => userStore.toggleBlockPost(replyStore.permaLinkURL)}
                     >
                         <Icon type="stop" className={'mr2'} />
-                        {userStore.blockedPosts.has(replyStore.permaLinkURL)
-                            ? 'Unblock Post'
-                            : 'Block Post'}
+                        <Observer>
+                            {() => (
+                                <span>
+                                    {userStore.blockedPosts.has(replyStore.permaLinkURL)
+                                        ? 'Unblock Post'
+                                        : 'Block Post'}
+                                </span>
+                            )}
+                        </Observer>
                     </a>
                 </Menu.Item>
             </Menu>
-        ),
-        [userStore.following, userStore.blockedPosts]
-    )
+        )
+    }, [userStore.following, userStore.blockedPosts])
 
     const DropdownMenu = useCallback(() => {
         if (isSameUser || !authStore.hasAccount) {
@@ -440,7 +458,7 @@ const Replies: FunctionComponent<IRepliesProps> = props => {
                 <Button icon={'ellipsis'} title={'View more options'} />
             </Dropdown>
         )
-    }, [menu, isSameUser, authStore.hasAccount])
+    }, [isSameUser, authStore.hasAccount])
 
     return (
         <Observer>
