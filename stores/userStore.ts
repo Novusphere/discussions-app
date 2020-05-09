@@ -1,11 +1,11 @@
 import { persist } from 'mobx-persist'
-import { observable, when, computed, ObservableMap } from 'mobx'
+import { observable, when, computed, ObservableMap, reaction } from 'mobx'
 import { RootStore } from '@stores/index'
 import axios from 'axios'
 import _ from 'lodash'
 import { discussions, nsdb, Post } from '@novuspherejs'
 import moment from 'moment'
-import { getOrigin, removeMD } from '@utils'
+import { getOrigin, removeMD, sleep } from '@utils'
 
 export type BlockedContentSetting = 'hidden' | 'collapsed'
 
@@ -60,16 +60,19 @@ export class UserStore {
         this.tagStore = rootStore.tagStore
         this.authStore = rootStore.authStore
 
-        when(
+        reaction(
             () => this.authStore.hasAccount,
-            () => {
-                this.syncDataFromServerToLocal({
-                    accountPrivKey: this.authStore.accountPrivKey,
-                    accountPubKey: this.authStore.accountPubKey,
-                })
-            },
-            {
-                timeout: 500,
+            hasAccount => {
+                if (hasAccount) {
+                    sleep(500).then(() => {
+                        this.syncDataFromServerToLocal({
+                            accountPrivKey: this.authStore.accountPrivKey,
+                            accountPubKey: this.authStore.accountPubKey,
+                        })
+                    })
+                } else {
+                    this.resetUserStore()
+                }
             }
         )
     }

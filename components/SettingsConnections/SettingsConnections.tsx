@@ -1,5 +1,5 @@
 import { RootStore, useStores } from '@stores'
-import { useObserver } from 'mobx-react-lite'
+import { observer } from 'mobx-react-lite'
 import { Spin } from 'antd'
 import React from 'react'
 
@@ -23,9 +23,7 @@ const Connections = () => {
                     className={'db flex flex-column tr justify-end primary pointer'}
                     onClick={() => authStore.connectScatterWallet(authStore.hasEOSWallet)}
                 >
-                    {useObserver(() => (
-                        <>
-                            <span className={'db'}>
+                    <span className={'db'}>
                                 {!authStore.connectScatterWallet['pending'] ? (
                                     authStore.hasEOSWallet ? (
                                         '(disconnect)'
@@ -36,11 +34,9 @@ const Connections = () => {
                                     <Spin />
                                 )}
                             </span>
-                            {authStore.eosWalletDisplayName && (
-                                <span className={'red db'}>{authStore.eosWalletDisplayName}</span>
-                            )}
-                        </>
-                    ))}
+                    {authStore.eosWalletDisplayName && (
+                        <span className={'red db'}>{authStore.eosWalletDisplayName}</span>
+                    )}
                 </span>
             </div>
 
@@ -60,9 +56,7 @@ const Connections = () => {
                         })
                     }
                 >
-                    {useObserver(() => (
-                        <>
-                            <span className={'db'}>
+                   <span className={'db'}>
                                 {!authStore.connectTwitter['pending'] ? (
                                     userStore.twitterUsername ? (
                                         '(disconnect)'
@@ -73,15 +67,13 @@ const Connections = () => {
                                     <Spin />
                                 )}
                             </span>
-                            {userStore.twitterUsername && (
-                                <span className={'red db'}>{userStore.twitterUsername}</span>
-                            )}
-                        </>
-                    ))}
+                    {userStore.twitterUsername && (
+                        <span className={'red db'}>{userStore.twitterUsername}</span>
+                    )}
                 </span>
             </div>
         </>
     )
 }
 
-export default Connections
+export default observer(Connections)
