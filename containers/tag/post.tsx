@@ -513,7 +513,15 @@ const PostPageComponentObserverable: React.FunctionComponent<IPostPageProps> = (
                             theme="twoTone"
                             twoToneColor={'#E7040F'}
                         />
-                        {userStore.blockedPosts.has(url) ? 'Unblock post' : 'Block post'}
+                        <Observer>
+                            {() => (
+                                <span>
+                                    {userStore.blockedPosts.has(url)
+                                        ? 'Unblock post'
+                                        : 'Block post'}
+                                </span>
+                            )}
+                        </Observer>
                     </a>
                 </Menu.Item>
                 {!isSameUser && (
@@ -535,12 +543,18 @@ const PostPageComponentObserverable: React.FunctionComponent<IPostPageProps> = (
                                 className={'mr2'}
                                 twoToneColor={'#D5008F'}
                             />
-                            {userStore.delegated.has(
-                                `${thread.openingPost.displayName}:${thread.openingPost.pub}:${thread.openingPost.sub}`
-                            )
-                                ? 'Remove'
-                                : 'Add'}{' '}
-                            {thread.openingPost.displayName} as moderator
+                            <Observer>
+                                {() => (
+                                    <span>
+                                        {userStore.delegated.has(
+                                            `${thread.openingPost.displayName}:${thread.openingPost.pub}:${thread.openingPost.sub}`
+                                        )
+                                            ? 'Remove'
+                                            : 'Add'}{' '}
+                                        {thread.openingPost.displayName} as moderator
+                                    </span>
+                                )}
+                            </Observer>
                         </a>
                     </Menu.Item>
                 )}
@@ -557,7 +571,15 @@ const PostPageComponentObserverable: React.FunctionComponent<IPostPageProps> = (
                             theme="twoTone"
                             twoToneColor={'#FFD700'}
                         />
-                        {userStore.pinnedPosts.has(url) ? 'Un-pin thread' : 'Pin this thread'}
+                        <Observer>
+                            {() => (
+                                <span>
+                                    {userStore.pinnedPosts.has(url)
+                                        ? 'Un-pin thread'
+                                        : 'Pin this thread'}
+                                </span>
+                            )}
+                        </Observer>
                     </a>
                 </Menu.Item>
             </Menu>
