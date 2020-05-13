@@ -36,8 +36,9 @@ const ModalsNewCampaign: FunctionComponent<IModalsNewCampaignProps> = ({
             onCancel={handleCancel}
             footer={footer()}
         >
-            <Form onSubmit={() => console.log('hey')} className={'w-80'}>
-                <Form.Item>
+            <span className={'db f4 b black'}>Create a campaign</span>
+            <Form onSubmit={() => console.log('hey')} className={'w-90'}>
+                <Form.Item label={'Token'}>
                     {getFieldDecorator('token', {
                         rules: [
                             {
@@ -47,7 +48,7 @@ const ModalsNewCampaign: FunctionComponent<IModalsNewCampaignProps> = ({
                         ],
                     })(<TokenSelect handleTokenChange={handleTokenChange} />)}
                 </Form.Item>
-                <Form.Item>
+                <Form.Item label={'Title'}>
                     {getFieldDecorator('name', {
                         rules: [
                             {
@@ -57,7 +58,7 @@ const ModalsNewCampaign: FunctionComponent<IModalsNewCampaignProps> = ({
                         ],
                     })(<Input size={'large'} placeholder={'Name your campaign'} />)}
                 </Form.Item>
-                <Form.Item>
+                <Form.Item label={'Content'}>
                     {getFieldDecorator('content', {
                         rules: [
                             {
@@ -66,6 +67,27 @@ const ModalsNewCampaign: FunctionComponent<IModalsNewCampaignProps> = ({
                             },
                         ],
                     })(<Editor />)}
+                </Form.Item>
+                <span className={'db f5 b black pv3'}>Set your reward</span>
+                <Form.Item label={'Amount'}>
+                    {getFieldDecorator('rewardAmount', {
+                        rules: [
+                            {
+                                required: true,
+                                message: 'Please set an amount',
+                            },
+                        ],
+                    })(<Input size={'large'} />)}
+                </Form.Item>
+                <Form.Item label={'Token'}>
+                    {getFieldDecorator('rewardToken', {
+                        rules: [
+                            {
+                                required: true,
+                                message: 'Please select a token',
+                            },
+                        ],
+                    })(<TokenSelect handleTokenChange={handleTokenChange} />)}
                 </Form.Item>
             </Form>
         </Modal>
