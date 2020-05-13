@@ -591,47 +591,68 @@ const SettingsAmbassadors: FunctionComponent<ISettingsAmbassadorsProps> = () => 
         return <span className={'f6 gray'}>Please sign in to view this option</span>
     }
 
+    const onChange = key => (userStore.ambassadorTabActiveKey = key)
+
+    const renderTabBar = useCallback(props => {
+        return (
+            <TabList className={'list ma0 pa0 flex flex-row justify-stretch card mb3 mh1'}>
+                {props['panels'].map(panel => (
+                    <Tab
+                        key={panel.key}
+                        className={cx([
+                            'w-100 bg-white flex items-center justify-center pa3 tc b pointer',
+                            {
+                                'bg-primary white': props['activeKey'] === panel.key,
+                            },
+                        ])}
+                        {...panel.props}
+                        onClick={e => props.onTabClick(panel.key, e)}
+                    >
+                        {panel.props.tab}
+                    </Tab>
+                ))}
+            </TabList>
+        )
+    }, [])
+
     return (
         <>
             <Tabs
-                onChange={key => (userStore.ambassadorTabActiveKey = key)}
-                defaultActiveKey={userStore.ambassadorTabActiveKey}
-                destroyInactiveTabPane={true}
-                renderTabBar={props => {
-                    return (
-                        <TabList
-                            className={'list ma0 pa0 flex flex-row justify-stretch card mb3 mh1'}
-                        >
-                            {props['panels'].map(panel => (
-                                <Tab
-                                    key={panel.key}
-                                    className={cx([
-                                        'w-100 bg-white flex items-center justify-center pa3 tc b pointer',
-                                        {
-                                            'bg-primary white': props['activeKey'] === panel.key,
-                                        },
-                                    ])}
-                                    {...panel.props}
-                                    onClick={e => props.onTabClick(panel.key, e)}
-                                >
-                                    {panel.props.tab}
-                                </Tab>
-                            ))}
-                        </TabList>
-                    )
-                }}
+                defaultActiveKey="1"
+                onChange={onChange}
+                renderTabBar={(props, DefaultTabBar) => (
+                    <DefaultTabBar {...props} className={styles.customTab} />
+                )}
             >
-                <TabPane tab="Personal Info" key="1">
-                    <PersonalInfo />
+                <TabPane tab="Become Ambassador" key="1">
+                    <Tabs
+                        onChange={onChange}
+                        defaultActiveKey={userStore.ambassadorTabActiveKey}
+                        destroyInactiveTabPane={true}
+                        renderTabBar={renderTabBar}
+                    >
+                        <TabPane tab="Your Info" key="2">
+                            <PersonalInfo />
+                        </TabPane>
+                        <TabPane tab="Companies" key="3">
+                            <CompanyInfo />
+                        </TabPane>
+                    </Tabs>
                 </TabPane>
-                <TabPane tab="Company Info" key="2">
-                    <CompanyInfo />
-                </TabPane>
-                <TabPane tab="Applicants" key="3">
-                    <Applicants />
-                </TabPane>
-                <TabPane tab="Companies Looking for Ambassadors" key="4">
-                    <CompaniesLookingForAmbassadors />
+                <TabPane tab="Rally Ambassadors" key="4">
+                    <Tabs
+                        onChange={onChange}
+                        defaultActiveKey={userStore.ambassadorTabActiveKey}
+                        destroyInactiveTabPane={true}
+                        renderTabBar={renderTabBar}
+                    >
+                        <TabPane tab="Applicants" key="5">
+                            <Applicants />
+                        </TabPane>
+                        <TabPane tab="Companies Looking for Ambassadors" key="6">
+                            <CompaniesLookingForAmbassadors />
+                        </TabPane>
+                    </Tabs>
                 </TabPane>
             </Tabs>
         </>

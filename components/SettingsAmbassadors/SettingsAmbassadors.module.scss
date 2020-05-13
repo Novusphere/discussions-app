@@ -1,7 +1,14 @@
 .ornament {
-  margin-top: 0.25em;
-  display: block;
-  width: 40px;
-  height: 3px;
-  border-bottom: 2.5px solid #079e99;
+    margin-top: 0.25em;
+    display: block;
+    width: 40px;
+    height: 3px;
+    border-bottom: 2.5px solid #079e99;
+}
+
+.customTab {
+    div[role='tab'] {
+        width: 95%;
+        text-align: center;
+    }
 }
