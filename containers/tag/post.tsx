@@ -861,6 +861,7 @@ const PostPageComponentObserverable: React.FunctionComponent<IPostPageProps> = (
                                 disabled={postStore.editing}
                                 onChange={postStore.setReplyContent}
                                 threadUsers={postStore.threadUsers}
+                                value={postStore.replyingContent}
                             />
                             <div className={'flex flex-row justify-end pt2'}>
                                 <Button

@@ -326,7 +326,23 @@ class Editor extends React.Component<IEditorProps, IEditorState> {
                 fixMentionsToQuill: true,
                 mentionDenotationChars: ['@'],
                 source: async (searchTerm: string, renderList: any, mentionChar: any) => {
-                    const accounts = this.props.threadUsers
+                    const userStore: any = localStorage.getItem('userStore')
+                    const following = JSON.parse(userStore).following
+
+                    let accounts = this.props.threadUsers
+
+                    console.log(accounts)
+
+                    if (Object.keys(following).length) {
+                        Object.keys(following).map((pub) => {
+                            accounts.push({
+                                icon: `https://atmosdb.novusphere.io/discussions/keyicon/${pub}`,
+                                id: pub,
+                                value: following[pub],
+                            })
+                        })
+                    }
+
 
                     if (searchTerm.length === 0) {
                         renderList(accounts, searchTerm)
