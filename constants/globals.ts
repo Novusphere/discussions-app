@@ -8,6 +8,7 @@ export enum MODAL_OPTIONS {
     signIn = 'signIn',
     postWarningClose = 'postWarningClose',
     walletActionPasswordReentry = 'walletActionPasswordReentry',
+    createNewCampaign = 'createNewCampaign',
 }
 
 export const Messages = {

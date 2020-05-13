@@ -1,7 +1,7 @@
 import React, { FunctionComponent, useCallback } from 'react'
 import { observer } from 'mobx-react'
 import { MODAL_OPTIONS } from '@globals'
-import { ModalsPasswordReEntry, ModalsSignIn, ModalsSignUp } from '@components'
+import { ModalsNewCampaign, ModalsPasswordReEntry, ModalsSignIn, ModalsSignUp } from '@components'
 import { useStores } from '@stores'
 
 interface IModalsProps {}
@@ -40,6 +40,14 @@ const Modals: FunctionComponent<IModalsProps> = () => {
             return (
                 <ModalsPasswordReEntry
                     visible={uiStore.activeModal === MODAL_OPTIONS.walletActionPasswordReentry}
+                    handleOk={handleOk}
+                    handleCancel={handleCancel}
+                />
+            )
+        case MODAL_OPTIONS.createNewCampaign:
+            return (
+                <ModalsNewCampaign
+                    visible={uiStore.activeModal === MODAL_OPTIONS.createNewCampaign}
                     handleOk={handleOk}
                     handleCancel={handleCancel}
                 />

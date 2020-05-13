@@ -21,6 +21,7 @@ export { default as Footer } from './Footer/Footer'
 export { default as Sorter } from './Sorter/Sorter'
 export { default as CommonFeed } from './CommonFeed/CommonFeed'
 export { default as TagViewTabs } from './TagViewTabs/TagViewTabs'
+export { default as TokenSelect } from './TokenSelect/TokenSelect'
 
 // header
 export { default as HeaderLogo } from './HeaderLogo/HeaderLogo'
@@ -35,6 +36,7 @@ export { default as Modals } from './Modals/Modals'
 export { default as ModalsSignIn } from './ModalsSignIn/ModalsSignIn'
 export { default as ModalsSignUp } from './ModalsSignUp/ModalsSignUp'
 export { default as ModalsPasswordReEntry } from './ModalsPasswordReEntry/ModalsPasswordReEntry'
+export { default as ModalsNewCampaign } from './ModalsNewCampaign/ModalsNewCampaign'
 
 //icons
 export { default as Icons } from './Icons/Icons'

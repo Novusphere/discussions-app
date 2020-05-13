@@ -3,34 +3,36 @@ import React, { FunctionComponent, useCallback, useEffect, useState } from 'reac
 import styles from './SettingsAmbassadors.module.scss'
 import cx from 'classnames'
 import {
-    Tabs,
-    Form,
-    Input,
-    Dropdown,
-    Table,
     Avatar,
-    Switch,
-    Icon,
-    Menu,
     Button,
+    Dropdown,
+    Form,
+    Icon,
+    Input,
+    Menu,
     Spin,
+    Switch,
+    Table,
+    Tabs,
     Tag,
 } from 'antd'
 import { Tab, TabList } from 'react-tabs'
-import { useObserver, Observer } from 'mobx-react-lite'
+import { Observer, useObserver } from 'mobx-react-lite'
 import { RootStore, useStores } from '@stores'
 import { IAmbassadorResponse } from '@novuspherejs/nsdb'
 import { getIdenticon } from '@utils'
 import { UserNameWithIcon } from '../index'
 import _ from 'lodash'
+import { MODAL_OPTIONS } from '@globals'
 
 const { TabPane } = Tabs
 
 interface ISettingsAmbassadorsProps {}
 
-const SaveButton = ({ onSave, loading = false, title = 'Save' }) => {
+const SaveButton = ({ onSave, loading = false, title = 'Save', children = null }) => {
     return useObserver(() => (
         <div className={'pt3 flex flex-row justify-end w-100'}>
+            {children}
             <Button type={'primary'} onMouseDown={onSave} loading={loading}>
                 {title}
             </Button>
@@ -175,7 +177,7 @@ const PersonalInfo = Form.create({ name: 'personal_info' })(({ form }: any) => {
 
 const CompanyInfo = Form.create({ name: 'company_info' })(({ form }: any) => {
     const { getFieldDecorator } = form
-    const { userStore }: RootStore = useStores()
+    const { userStore, uiStore }: RootStore = useStores()
     const onSave = () => {
         form.validateFields(async (err, values) => {
             if (!err) {
@@ -386,7 +388,15 @@ const CompanyInfo = Form.create({ name: 'company_info' })(({ form }: any) => {
                 onSave={onSave}
                 title={'Save Company Info'}
                 loading={userStore.saveAmbassadors.bind(userStore)['pending']}
-            />
+            >
+                <Button
+                    type="danger"
+                    className={'mr2'}
+                    onClick={() => uiStore.setActiveModal(MODAL_OPTIONS.createNewCampaign)}
+                >
+                    Create Campaign
+                </Button>
+            </SaveButton>
         </>
     ))
 })

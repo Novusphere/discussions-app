@@ -1,7 +1,6 @@
-import { Button, Form, Input, InputNumber, Select, Tabs, Typography } from 'antd'
-import cx from 'classnames'
 import React, { useCallback, useState } from 'react'
-const { TabPane } = Tabs
+import { Button, Form, Input, InputNumber, Select, Tabs, Typography } from 'antd'
+import { TokenSelect } from '@components'
 import { Tab, TabList } from 'react-tabs'
 import { RootStore, useStores } from '@stores'
 import { eos } from '@novuspherejs'
@@ -9,7 +8,9 @@ import { getSignatureAndSubmit, openInNewTab } from '@utils'
 import { useObserver } from 'mobx-react-lite'
 import { MODAL_OPTIONS } from '@globals'
 import ecc from 'eosjs-ecc'
+import cx from 'classnames'
 
+const { TabPane } = Tabs
 const { Text } = Typography
 const { Option } = Select
 
@@ -38,6 +39,9 @@ const UnwrappedDeposit = ({ form }) => {
     const handleTokenChange = useCallback(val => {
         if (val) {
             setTokenVals(walletStore.tokenFromSupportedUIDWallet(val))
+            form.setFieldsValue({
+                token: val,
+            })
         } else {
             setTokenVals(null)
         }
@@ -126,34 +130,7 @@ const UnwrappedDeposit = ({ form }) => {
                                 message: 'Please select a token',
                             },
                         ],
-                    })(
-                        <Select
-                            size={'large'}
-                            showSearch
-                            className={'w-100'}
-                            placeholder={'Select a token'}
-                            onChange={handleTokenChange}
-                        >
-                            {walletStore.supportedTokensAsSelectable.map(option => {
-                                return (
-                                    <Option
-                                        key={option.value}
-                                        value={option.value}
-                                        className={'flex flex-row items-center'}
-                                    >
-                                        {images[option.label] && (
-                                            <img
-                                                src={images[option.label][0]}
-                                                className={'mr2 dib'}
-                                                width={15}
-                                            />
-                                        )}
-                                        {option.label}
-                                    </Option>
-                                )
-                            })}
-                        </Select>
-                    )}
+                    })(<TokenSelect handleTokenChange={handleTokenChange} />)}
                 </Form.Item>
                 <Form.Item label="Amount">
                     {getFieldDecorator('amount', {
@@ -256,20 +233,22 @@ const UnwrappedTransfer = ({ form }) => {
                     // set the active modal
                     uiStore.setActiveModal(MODAL_OPTIONS.walletActionPasswordReentry)
 
-                    authStore.setTEMPTransfers([{
-                        symbol: label,
-                        token: {
-                            label,
-                            decimals,
+                    authStore.setTEMPTransfers([
+                        {
+                            symbol: label,
+                            token: {
+                                label,
+                                decimals,
+                            },
+                            chain,
+                            to,
+                            username: null,
+                            amount: `${Number(amount).toFixed(decimals)} ${label}`,
+                            fee: `${Number(fee).toFixed(decimals)} ${label}`,
+                            nonce: new Date().getTime(),
+                            memo: memo || '',
                         },
-                        chain,
-                        to,
-                        username: null,
-                        amount: `${Number(amount).toFixed(decimals)} ${label}`,
-                        fee: `${Number(fee).toFixed(decimals)} ${label}`,
-                        nonce: new Date().getTime(),
-                        memo: memo || '',
-                    }])
+                    ])
 
                     // now wait for user submission
                     const int = setInterval(async () => {
@@ -279,7 +258,6 @@ const UnwrappedTransfer = ({ form }) => {
                             clearInterval(int)
                             return
                         }
-
 
                         const { TEMP_WalletPrivateKey } = authStore
 
@@ -354,6 +332,9 @@ const UnwrappedTransfer = ({ form }) => {
     const handleTokenChange = useCallback(val => {
         if (val) {
             setTokenVals(walletStore.tokenFromSupportedUIDWallet(val))
+            form.setFieldsValue({
+                token: val,
+            })
         } else {
             setTokenVals(null)
         }
@@ -566,20 +547,22 @@ const UnwrappedWithdrawal = ({ form }) => {
                     // set the active modal
                     uiStore.setActiveModal(MODAL_OPTIONS.walletActionPasswordReentry)
 
-                    authStore.setTEMPTransfers([{
-                        symbol: label,
-                        token: {
-                            label,
-                            decimals,
+                    authStore.setTEMPTransfers([
+                        {
+                            symbol: label,
+                            token: {
+                                label,
+                                decimals,
+                            },
+                            chain,
+                            to: null,
+                            username: to,
+                            amount: `${Number(amount).toFixed(decimals)} ${label}`,
+                            fee: `${Number(fee).toFixed(decimals)} ${label}`,
+                            nonce: new Date().getTime(),
+                            memo: memo || '',
                         },
-                        chain,
-                        to: null,
-                        username: to,
-                        amount: `${Number(amount).toFixed(decimals)} ${label}`,
-                        fee: `${Number(fee).toFixed(decimals)} ${label}`,
-                        nonce: new Date().getTime(),
-                        memo: memo || '',
-                    }])
+                    ])
 
                     // now wait for user submission
                     const int = setInterval(async () => {
@@ -663,6 +646,9 @@ const UnwrappedWithdrawal = ({ form }) => {
     const handleTokenChange = useCallback(val => {
         if (val) {
             setTokenVals(walletStore.tokenFromSupportedUIDWallet(val))
+            form.setFieldsValue({
+                token: val,
+            })
         } else {
             setTokenVals(null)
         }
