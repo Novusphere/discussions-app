@@ -244,6 +244,11 @@ const PostPreview: FunctionComponent<IPostPreviewProps> = ({
                     {postUsername()}
                     <Divider type={'vertical'} />
                     {postDate()}
+                    {isPinned && (
+                        <Tag color="red" style={{ marginLeft: '1em' }}>
+                            Pinned
+                        </Tag>
+                    )}
                 </span>
                 {postTips()}
             </div>
@@ -355,8 +360,6 @@ const PostPreview: FunctionComponent<IPostPreviewProps> = ({
                         )}
                         {!shouldBeCollapsed && (
                             <>
-                                {isPinned && <Tag color="red">Pinned</Tag>}
-
                                 <Desktop>
                                     {postMetaData()}
                                     <div className={'db pt1 mv2'}>
