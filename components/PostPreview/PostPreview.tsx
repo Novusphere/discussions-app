@@ -1,5 +1,5 @@
 import React, { FunctionComponent, useCallback, useEffect, useState } from 'react'
-import { Divider, Popover, Skeleton, Tooltip } from 'antd'
+import { Divider, Popover, Skeleton, Tag, Tooltip } from 'antd'
 import cx from 'classnames'
 import styles from './PostPreview.module.scss'
 import { observer, useLocalStore } from 'mobx-react-lite'
@@ -355,11 +355,7 @@ const PostPreview: FunctionComponent<IPostPreviewProps> = ({
                         )}
                         {!shouldBeCollapsed && (
                             <>
-                                {isPinned && (
-                                    <span className={'db f6 b red mb2 flex flex-row items-center'}>
-                                        PINNED
-                                    </span>
-                                )}
+                                {isPinned && <Tag color="red">Pinned</Tag>}
 
                                 <Desktop>
                                     {postMetaData()}

@@ -1,4 +1,4 @@
-import React, { FunctionComponent, useCallback, useEffect, useMemo } from 'react'
+import React, { FunctionComponent, useCallback, useEffect } from 'react'
 
 import styles from './Replies.module.scss'
 import { discussions, Post } from '@novuspherejs'
@@ -12,14 +12,13 @@ import {
     VotingHandles,
 } from '@components'
 import moment from 'moment'
-import { Button, Dropdown, Icon, Menu, message, Tooltip } from 'antd'
-import { observer, useLocalStore, useObserver, Observer, useComputed } from 'mobx-react-lite'
+import { Button, Dropdown, Icon, Menu, message, Tooltip, Tag } from 'antd'
+import { useLocalStore, Observer, useComputed } from 'mobx-react-lite'
 import cx from 'classnames'
 import { RootStore, useStores } from '@stores'
 import {
     createPostObject,
     generateVoteObject,
-    getPermaLink,
     openInNewTab,
     signPost,
     transformTipsToTransfers,
@@ -28,7 +27,7 @@ import {
 } from '@utils'
 import copy from 'clipboard-copy'
 import { MODAL_OPTIONS } from '@globals'
-import { useHistory, useLocation } from 'react-router-dom'
+import { useHistory } from 'react-router-dom'
 
 interface IRepliesProps {
     preview?: boolean
@@ -42,7 +41,6 @@ const ButtonGroup = Button.Group
 
 const Replies: FunctionComponent<IRepliesProps> = props => {
     const { userStore, uiStore, authStore, walletStore }: RootStore = useStores()
-    const location = useLocation()
     const history = useHistory()
 
     const replyStore = useLocalStore(
@@ -67,8 +65,7 @@ const Replies: FunctionComponent<IRepliesProps> = props => {
             },
 
             get permaLinkURL() {
-                if (typeof location.pathname === 'undefined') return ''
-                return getPermaLink(location.pathname.split('#')[0], props.reply.uuid)
+                return props.reply.permaLinkURL
             },
 
             toggleShowPreview: () => {
@@ -393,14 +390,6 @@ const Replies: FunctionComponent<IRepliesProps> = props => {
         replyStore.reply = props.reply
     }, [props.reply])
 
-    const isSameUser = useComputed(() => props.reply.pub == authStore.postPub, [
-        props.reply.pub,
-        authStore.postPub,
-    ])
-    const isSpamPost = useComputed(() => userStore.blockedPosts.has(replyStore.permaLinkURL), [
-        userStore.blockedPosts,
-    ])
-
     const menu = useComputed(() => {
         return (
             <Menu>
@@ -444,12 +433,39 @@ const Replies: FunctionComponent<IRepliesProps> = props => {
                         </Observer>
                     </a>
                 </Menu.Item>
+                {replyStore.reply.depth === 1 && (
+                    <Menu.Item>
+                        <a
+                            className={'flex flex-row items-center'}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            onClick={() =>
+                                userStore.togglePinPost(
+                                    replyStore.reply.sub,
+                                    replyStore.permaLinkURL
+                                )
+                            }
+                        >
+                            <Icon type="pushpin" className={'mr2'} />
+                            <Observer>
+                                {() => (
+                                    <span>
+                                        {userStore.pinnedPosts.has(replyStore.permaLinkURL) ||
+                                        userStore.pinnedByDelegation.has(replyStore.permaLinkURL)
+                                            ? 'Unpin Reply'
+                                            : 'Pin Reply'}
+                                    </span>
+                                )}
+                            </Observer>
+                        </a>
+                    </Menu.Item>
+                )}
             </Menu>
         )
     }, [userStore.following, userStore.blockedPosts])
 
     const DropdownMenu = useCallback(() => {
-        if (isSameUser || !authStore.hasAccount) {
+        if (props.reply.pub == authStore.postPub || !authStore.hasAccount) {
             return null
         }
 
@@ -458,7 +474,7 @@ const Replies: FunctionComponent<IRepliesProps> = props => {
                 <Button icon={'ellipsis'} title={'View more options'} />
             </Dropdown>
         )
-    }, [isSameUser, authStore.hasAccount])
+    }, [props.reply.pub == authStore.postPub, authStore.hasAccount])
 
     return (
         <Observer>
@@ -466,7 +482,14 @@ const Replies: FunctionComponent<IRepliesProps> = props => {
                 <div
                     name={props.reply.uuid}
                     data-post-uuid={props.reply.uuid}
-                    className={cx(['w-100'])}
+                    className={cx([
+                        'w-100',
+                        {
+                            [styles.pinnedReply]: userStore.pinnedPosts.has(
+                                replyStore.permaLinkURL
+                            ),
+                        },
+                    ])}
                     onMouseEnter={() => replyStore.setHover(true)}
                     onMouseLeave={() => replyStore.setHover(false)}
                 >
@@ -532,6 +555,10 @@ const Replies: FunctionComponent<IRepliesProps> = props => {
                                             ).fromNow()}
                                         </span>
                                     </Tooltip>
+                                    {(userStore.pinnedPosts.has(replyStore.permaLinkURL) ||
+                                        userStore.pinnedByDelegation.has(
+                                            replyStore.permaLinkURL
+                                        )) && <Tag color="red">Pinned</Tag>}
                                     {replyStore.collapsed && (
                                         <span className={'light-silver f6 i'}>
                                             ({replyStore.reply.replies.length} children)
@@ -540,74 +567,104 @@ const Replies: FunctionComponent<IRepliesProps> = props => {
                                 </div>
                                 <Tips tips={replyStore.reply.tips} />
 
-                                {!props.preview && !isSpamPost && (
-                                    <div
-                                        className={cx([
-                                            'absolute top-0 right-1',
-                                            {
-                                                db: replyStore.hover || replyStore.editing,
-                                                dn: !replyStore.hover,
-                                            },
-                                        ])}
-                                    >
-                                        <ButtonGroup size={'small'}>
-                                            <Button
-                                                disabled={replyStore.editing}
-                                                title={'Reply to this post'}
-                                                onClick={replyStore.toggleReply}
-                                            >
-                                                <Icons.ReplyIcon />
-                                            </Button>
-                                            <Button
-                                                title={'Copy permalink'}
-                                                onClick={() => {
-                                                    copy(
-                                                        `${window.location.origin}${replyStore.permaLinkURL}`
-                                                    )
-                                                    message.success('Copied to your clipboard')
-                                                    props.setHighlightedPosUUID(props.reply.uuid)
-                                                    history.replace(replyStore.permaLinkURL)
-                                                }}
-                                            >
-                                                <Icons.ShareIcon />
-                                            </Button>
-                                            <Button
-                                                title={'Open transaction'}
-                                                onClick={() =>
-                                                    openInNewTab(
-                                                        `https://bloks.io/transaction/${props.reply.transaction}`
-                                                    )
-                                                }
-                                            >
-                                                <Icons.LinkIcon />
-                                            </Button>
-                                            <DropdownMenu key="more" />
-                                            {isSameUser && (
+                                {!props.preview &&
+                                    !userStore.blockedPosts.has(replyStore.permaLinkURL) && (
+                                        <div
+                                            className={cx([
+                                                'absolute top-0 right-1',
+                                                {
+                                                    db: replyStore.hover || replyStore.editing,
+                                                    dn: !replyStore.hover,
+                                                },
+                                            ])}
+                                        >
+                                            <ButtonGroup size={'small'}>
                                                 <Button
-                                                    type={replyStore.editing ? 'danger' : 'default'}
-                                                    title={'Edit post'}
-                                                    onClick={replyStore.toggleEditing}
+                                                    disabled={replyStore.editing}
+                                                    title={'Reply to this post'}
+                                                    onClick={replyStore.toggleReply}
                                                 >
-                                                    <Icon type={'edit'} theme={'filled'} />
+                                                    <Icons.ReplyIcon />
                                                 </Button>
-                                            )}
-                                        </ButtonGroup>
-                                    </div>
-                                )}
+                                                <Button
+                                                    title={'Copy permalink'}
+                                                    onClick={() => {
+                                                        copy(
+                                                            `${window.location.origin}${replyStore.permaLinkURL}`
+                                                        )
+                                                        message.success('Copied to your clipboard')
+                                                        props.setHighlightedPosUUID(
+                                                            props.reply.uuid
+                                                        )
+                                                        history.replace(replyStore.permaLinkURL)
+                                                    }}
+                                                >
+                                                    <Icons.ShareIcon />
+                                                </Button>
+                                                <Button
+                                                    title={'Open transaction'}
+                                                    onClick={() =>
+                                                        openInNewTab(
+                                                            `https://bloks.io/transaction/${props.reply.transaction}`
+                                                        )
+                                                    }
+                                                >
+                                                    <Icons.LinkIcon />
+                                                </Button>
+                                                <DropdownMenu key="more" />
+                                                {props.reply.pub == authStore.postPub && (
+                                                    <>
+                                                        <Button
+                                                            title={'Toggle pin reply'}
+                                                            onClick={() =>
+                                                                userStore.togglePinPost(
+                                                                    replyStore.reply.sub,
+                                                                    replyStore.permaLinkURL
+                                                                )
+                                                            }
+                                                        >
+                                                            <Icon
+                                                                type={'pushpin'}
+                                                                theme={'filled'}
+                                                            />
+                                                        </Button>
+                                                        <Button
+                                                            type={
+                                                                replyStore.editing
+                                                                    ? 'danger'
+                                                                    : 'default'
+                                                            }
+                                                            title={'Edit post'}
+                                                            onClick={replyStore.toggleEditing}
+                                                        >
+                                                            <Icon type={'edit'} theme={'filled'} />
+                                                        </Button>
+                                                    </>
+                                                )}
+                                            </ButtonGroup>
+                                        </div>
+                                    )}
                             </div>
 
-                            {isSpamPost && (
+                            {userStore.blockedPosts.has(replyStore.permaLinkURL) && (
                                 <span className={'f6 moon-gray pv1 i'}>
                                     This post is hidden as it was marked as spam
                                 </span>
                             )}
 
                             {/*Render Content*/}
-                            {!replyStore.collapsed && !isSpamPost && !replyStore.editing && (
-                                <RichTextPreview hideFade className={'lh-copy pt2 mr3 dark-gray'}>
-                                    {props.preview ? props.reply.content : replyStore.reply.content}
-                                </RichTextPreview>
-                            )}
+                            {!replyStore.collapsed &&
+                                !userStore.blockedPosts.has(replyStore.permaLinkURL) &&
+                                !replyStore.editing && (
+                                    <RichTextPreview
+                                        hideFade
+                                        className={'lh-copy pt2 mr3 dark-gray'}
+                                    >
+                                        {props.preview
+                                            ? props.reply.content
+                                            : replyStore.reply.content}
+                                    </RichTextPreview>
+                                )}
 
                             {replyStore.editing && (
                                 <div className={'pa2'}>

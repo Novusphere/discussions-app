@@ -1,7 +1,7 @@
 //@ts-ignore
 import ecc from 'eosjs-ecc'
 import { Attachment } from './attachment'
-import { getIdenticon } from '@utils'
+import { encodeId, getIdenticon, getThreadTitle } from '@utils'
 const BigInt = require('big-integer')
 const TIME_ENCODE_GENESIS = 1483246800000 // 2017-1-1
 
@@ -43,6 +43,7 @@ export class Post {
     edit: boolean
     uidw: string
     tips: PostTips
+    permaLinkURL: string // created inside post.tsx
 
     imageData: string
     op: Post | undefined

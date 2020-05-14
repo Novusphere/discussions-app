@@ -331,15 +331,15 @@ class Editor extends React.Component<IEditorProps, IEditorState> {
 
                     let accounts = this.props.threadUsers
 
-                    console.log(accounts)
-
                     if (Object.keys(following).length) {
                         Object.keys(following).map((pub) => {
-                            accounts.push({
-                                icon: `https://atmosdb.novusphere.io/discussions/keyicon/${pub}`,
-                                id: pub,
-                                value: following[pub],
-                            })
+                            if (!accounts.some(account => account.value === following[pub])) {
+                                accounts.push({
+                                    icon: `https://atmosdb.novusphere.io/discussions/keyicon/${pub}`,
+                                    id: pub,
+                                    value: following[pub],
+                                })
+                            }
                         })
                     }
 

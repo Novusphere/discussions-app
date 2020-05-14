@@ -14,15 +14,17 @@ const PostReplies = ({
             <div className={'mt3'} id={'comments'}>
                 <span className={'silver'}>viewing all {totalReplies} comments</span>
                 <div className={'mt2 bg-white pv2 card'}>
-                    {replies.map(reply => (
-                        <Replies
-                            key={reply.uuid}
-                            reply={reply}
-                            threadUsers={threadUsers}
-                            highlightedPostUUID={highlightedPostUUID}
-                            setHighlightedPosUUID={setHighlightedPosUUID}
-                        />
-                    ))}
+                    {replies.map(reply => {
+                        return (
+                            <Replies
+                                key={reply.uuid}
+                                reply={reply}
+                                threadUsers={threadUsers}
+                                highlightedPostUUID={highlightedPostUUID}
+                                setHighlightedPosUUID={setHighlightedPosUUID}
+                            />
+                        )
+                    })}
                 </div>
             </div>
         )

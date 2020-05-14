@@ -37,6 +37,7 @@ import _ from 'lodash'
 import {
     createPostObject,
     generateVoteObject,
+    getPermaLink,
     getThreadUrl,
     openInNewTab,
     signPost,
@@ -493,10 +494,15 @@ const PostPageComponentObserverable: React.FunctionComponent<IPostPageProps> = (
         }
     }, [location])
 
+    const togglePinPost = useCallback(() => {
+        userStore.togglePinPost(name, url)
+    }, [name, url])
+
     const isSameUser = useComputed(
         () => postStore.observableThread.openingPost.pub == authStore.postPub,
         [postStore.observableThread.openingPost.pub, authStore.postPub]
     )
+
     const menu = useComputed(
         () => (
             <Menu>
@@ -563,7 +569,7 @@ const PostPageComponentObserverable: React.FunctionComponent<IPostPageProps> = (
                         className={'flex flex-row items-center'}
                         target="_blank"
                         rel="noopener noreferrer"
-                        onClick={() => userStore.togglePinPost(name, url)}
+                        onClick={togglePinPost}
                     >
                         <Icon
                             type="pushpin"
@@ -903,7 +909,24 @@ const PostPageComponentObserverable: React.FunctionComponent<IPostPageProps> = (
                     <PostReplies
                         highlightedPostUUID={postStore.highlightedPostUUID}
                         totalReplies={postStore.totalReplies}
-                        replies={postStore.replies}
+                        replies={_.sortBy(postStore.replies, reply => {
+                            let permaLinkURL = ''
+                            if (typeof location.pathname !== 'undefined') {
+                                permaLinkURL = getPermaLink(
+                                    location.pathname.split('#')[0],
+                                    reply.uuid
+                                )
+                            }
+
+                            reply.permaLinkURL = permaLinkURL
+
+                            if (
+                                userStore.pinnedPosts.has(permaLinkURL) ||
+                                userStore.pinnedByDelegation.has(permaLinkURL)
+                            ) {
+                                return reply
+                            }
+                        })}
                         setHighlightedPosUUID={postStore.setHighlightedPosUUID}
                         threadUsers={postStore.threadUsers}
                     />
@@ -940,7 +963,7 @@ const PostPage: React.FC = () => {
         fetchThread()
     }, [query.id])
 
-    if (loading) return <Spin />
+    if (loading || !url) return <Spin />
 
     if (!thread || !thread.openingPost)
         return <Empty description={'This is not the thread you were looking for...'} />
