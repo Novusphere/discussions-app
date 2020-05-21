@@ -180,6 +180,12 @@ const RichTextPreview: FunctionComponent<IRichTextPreviewProps> = ({
                                 <span className={'f5 b'}>{children}</span>
                             ),
                         },
+                        // specifically for: https://github.com/Novusphere/discussions-app/issues/330
+                        br: {
+                            component: () => (
+                                <br />
+                            )
+                        }
                     },
                 }}
             >
