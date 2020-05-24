@@ -112,17 +112,21 @@ const ModalsSignIn: FunctionComponent<IModalsSignInProps> = ({
                 ]
             case STEP_OPTIONS.SIGN_IN_WITH_CURRENT_BK:
                 return [
-                    <Button key="prev" onClick={() => setStep(STEP_OPTIONS.METHOD)}>
-                        Go Back
-                    </Button>,
-                    <Button
-                        key="submit"
-                        type="danger"
-                        onClick={handleLoginWithExistingBKSubmit}
-                        disabled={hasErrors(form.getFieldsError())}
-                    >
-                        Login
-                    </Button>,
+                    <div key={'prevSubmit'} className={'flex flex-row items-center justify-end'}>
+                        <Button key="prev" onClick={() => setStep(STEP_OPTIONS.METHOD)}>
+                            Go Back
+                        </Button>
+                        <Form.Item key="submit" style={{ margin: 0, marginLeft: '1em' }}>
+                            <Button
+                                type="danger"
+                                onClick={handleLoginWithExistingBKSubmit}
+                                disabled={hasErrors(form.getFieldsError())}
+                                htmlType="submit"
+                            >
+                                Login
+                            </Button>
+                        </Form.Item>
+                    </div>,
                 ]
         }
     }, [step])
@@ -308,7 +312,7 @@ const ModalsSignIn: FunctionComponent<IModalsSignInProps> = ({
                         <Form
                             labelCol={{ span: 7 }}
                             wrapperCol={{ span: 12 }}
-                            onSubmit={handleSignInWithAnotherBKSubmit}
+                            onSubmit={handleLoginWithExistingBKSubmit}
                             className={'center'}
                         >
                             <Form.Item label="Password">
