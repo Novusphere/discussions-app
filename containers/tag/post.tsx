@@ -636,6 +636,26 @@ const PostPageComponentObserverable: React.FunctionComponent<IPostPageProps> = (
 
     if (!tag) return null
 
+    const replies = useComputed(
+        () =>
+            _.sortBy(postStore.replies, reply => {
+                let permaLinkURL = ''
+                if (typeof location.pathname !== 'undefined') {
+                    permaLinkURL = getPermaLink(location.pathname.split('#')[0], reply.uuid)
+                }
+
+                reply.permaLinkURL = permaLinkURL
+
+                if (
+                    userStore.pinnedPosts.has(permaLinkURL) ||
+                    userStore.pinnedByDelegation.has(permaLinkURL)
+                ) {
+                    return reply
+                }
+            }),
+        [userStore]
+    )
+
     return (
         <div id={'thread'}>
             <Link to={`/tag/${thread.openingPost.sub}`}>
@@ -909,24 +929,7 @@ const PostPageComponentObserverable: React.FunctionComponent<IPostPageProps> = (
                     <PostReplies
                         highlightedPostUUID={postStore.highlightedPostUUID}
                         totalReplies={postStore.totalReplies}
-                        replies={_.sortBy(postStore.replies, reply => {
-                            let permaLinkURL = ''
-                            if (typeof location.pathname !== 'undefined') {
-                                permaLinkURL = getPermaLink(
-                                    location.pathname.split('#')[0],
-                                    reply.uuid
-                                )
-                            }
-
-                            reply.permaLinkURL = permaLinkURL
-
-                            if (
-                                userStore.pinnedPosts.has(permaLinkURL) ||
-                                userStore.pinnedByDelegation.has(permaLinkURL)
-                            ) {
-                                return reply
-                            }
-                        })}
+                        replies={replies}
                         setHighlightedPosUUID={postStore.setHighlightedPosUUID}
                         threadUsers={postStore.threadUsers}
                     />

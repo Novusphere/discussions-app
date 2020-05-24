@@ -160,7 +160,9 @@ export class UserStore {
         _.forEach(posts, pinnedPosts => {
             const [url, tag] = pinnedPosts
             if (delegated) {
-                this.pinnedByDelegation.set(url, tag)
+                if (!this.pinnedByDelegation.has(url)) {
+                    this.pinnedByDelegation.set(url, tag)
+                }
             } else {
                 this.pinnedPosts.set(url, tag)
             }

@@ -108,6 +108,8 @@ const HeaderNotifications: FunctionComponent<IHeaderNotificationsProps> = () => 
                 userStore.pingServerForData()
                 walletStore.refreshAllBalances()
             }
+
+            return false
         },
         20000,
         true,

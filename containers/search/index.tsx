@@ -4,11 +4,12 @@ import { CommonFeed } from '@components'
 import { observer } from 'mobx-react-lite'
 import { RootStore, useStores } from '@stores'
 import Helmet from 'react-helmet'
-import { useParams } from 'react-router-dom'
+import { useParams, useLocation, useHistory, useRouteMatch } from 'react-router-dom'
 
 const SearchPage: React.FC<any> = () => {
     const { postsStore }: RootStore = useStores()
-    const { query } = useParams()
+    let { query } = useParams()
+    query = decodeURIComponent(query)
     const fetch = useCallback(
         ({ postPub, sort }) => postsStore.getSearchResults(query, postPub, sort),
         [query]
