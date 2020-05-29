@@ -8,6 +8,7 @@ import { SignInOptions } from '@constants/sign-in-options'
 import cx from 'classnames'
 import { RootStore, StoreContext } from '@stores'
 import { hasErrors } from '@utils'
+import { useMediaQuery } from 'react-responsive'
 
 const { Title, Text } = Typography
 
@@ -33,6 +34,7 @@ const ModalsSignIn: FunctionComponent<IModalsSignInProps> = ({
     handleOk,
     form,
 }) => {
+    const isMobile = useMediaQuery({ maxWidth: 767 })
     const { authStore, uiStore }: RootStore = useContext(StoreContext)
     const [remember, setRemember] = useState(
         authStore.preferredSignInMethod === SIGN_IN_OPTIONS.brainKey
@@ -112,17 +114,19 @@ const ModalsSignIn: FunctionComponent<IModalsSignInProps> = ({
                 ]
             case STEP_OPTIONS.SIGN_IN_WITH_CURRENT_BK:
                 return [
-                    <Button key="prev" onClick={() => setStep(STEP_OPTIONS.METHOD)}>
-                        Go Back
-                    </Button>,
-                    <Button
-                        key="submit"
-                        type="danger"
-                        onClick={handleLoginWithExistingBKSubmit}
-                        disabled={hasErrors(form.getFieldsError())}
-                    >
-                        Login
-                    </Button>,
+                    <React.Fragment key={'prevSubmit'}>
+                        <Button key="prev" onClick={() => setStep(STEP_OPTIONS.METHOD)}>
+                            Go Back
+                        </Button>
+                        <Button
+                            type="danger"
+                            onClick={handleLoginWithExistingBKSubmit}
+                            disabled={hasErrors(form.getFieldsError())}
+                            htmlType="submit"
+                        >
+                            Login
+                        </Button>
+                    </React.Fragment>,
                 ]
         }
     }, [step])
@@ -212,7 +216,7 @@ const ModalsSignIn: FunctionComponent<IModalsSignInProps> = ({
             case STEP_OPTIONS.METHOD:
                 return (
                     <div className={'tc pt2'}>
-                        <Title level={2}>Sign in with your EOS account</Title>
+                        <Title level={2}>Sign in with your brain key</Title>
                         <Text className={'light-content'}>
                             Choose an account type from below to continue
                         </Text>
@@ -308,7 +312,7 @@ const ModalsSignIn: FunctionComponent<IModalsSignInProps> = ({
                         <Form
                             labelCol={{ span: 7 }}
                             wrapperCol={{ span: 12 }}
-                            onSubmit={handleSignInWithAnotherBKSubmit}
+                            onSubmit={handleLoginWithExistingBKSubmit}
                             className={'center'}
                         >
                             <Form.Item label="Password">

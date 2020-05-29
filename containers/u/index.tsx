@@ -1,8 +1,8 @@
 import React, { useCallback, useEffect, useMemo, useState } from 'react'
-import { observer, useObserver } from 'mobx-react-lite'
+import { observer, useObserver, Observer } from 'mobx-react-lite'
 import { RootStore, useStores } from '@stores'
-import { Avatar, Typography, Button, Dropdown, Menu, Icon, Select, List } from 'antd'
-import { getIdenticon } from '@utils'
+import { Avatar, Typography, Button, Dropdown, Menu, Icon, Select, List, Spin } from 'antd'
+import { getIdenticon, sleep } from '@utils'
 import { InfiniteScrollFeed, Icons } from '@components'
 import { discussions } from '@novuspherejs'
 import Helmet from 'react-helmet'
@@ -11,34 +11,50 @@ import { useParams } from 'react-router-dom'
 const { Paragraph } = Typography
 const { Option } = Select
 
-const Moderation = ({ onModerationChange, defaultValue, options, tagModelFromObservables }: any) =>
-    useObserver(() => (
-        <Select
-            mode={'tags'}
-            size={'default'}
-            showSearch
-            className={'w-100'}
-            placeholder={'Select a tag to assign as moderator'}
-            onChange={onModerationChange}
-            defaultValue={defaultValue}
-        >
-            {options.map((option: any) => {
-                const tag = tagModelFromObservables(option.value)
-                if (!tag) return null
-                return (
-                    <Option key={option.value} value={option.value}>
-                        <img
-                            src={tag.logo}
-                            title={`${tag.name} icon`}
-                            className={'mr2 dib'}
-                            width={15}
-                        />
-                        {option.label}
-                    </Option>
-                )
-            })}
-        </Select>
-    ))
+const Moderation = ({
+    onModerationChange,
+    defaultValue,
+    options,
+    tagModelFromObservables,
+}: any) => {
+    const [loading, setLoading] = useState(true)
+
+    useEffect(() => {
+        sleep(1500).then(() => {
+            setLoading(false)
+        })
+    }, [])
+
+    if (loading) {
+        return <Spin className={'db'} />
+    }
+
+    return <Select
+        mode={'tags'}
+        size={'default'}
+        showSearch
+        className={'w-100'}
+        placeholder={'Select a tag to assign as moderator'}
+        onChange={onModerationChange}
+        defaultValue={defaultValue}
+    >
+        {options.map((option: any) => {
+            const tag = tagModelFromObservables(option.value)
+            if (!tag) return null
+            return (
+                <Option key={option.value} value={option.value}>
+                    <img
+                        src={tag.logo}
+                        title={`${tag.name} icon`}
+                        className={'mr2 dib'}
+                        width={15}
+                    />
+                    {option.label}
+                </Option>
+            )
+        })}
+    </Select>
+}
 
 const Following = ({ data, handleRemoveUser }: any) => {
     if (data && data.length) {
@@ -75,41 +91,42 @@ const UserPage: React.FC<any> = () => {
     const params: { username?: string } = useParams()
     const [username, setUsername] = useState('')
     const [wallet, setWallet] = useState('')
+    const [usersPostPub, setPostPub] = useState('')
     const [imageData, setImageData] = useState('')
-    const postPub = useMemo(() => authStore.postPub, [])
+    const myPostPub = useMemo(() => authStore.postPub, [])
 
     useEffect(() => {
         uiStore.setSidebarHidden(true)
         const username = params.username
 
         if (username) {
-            const [name, wallet] = username.split('-')
-            setUsername(name)
-            setWallet(wallet)
-            setImageData(getIdenticon(wallet))
+            const [name, postPub] = username.split('-')
+            setImageData(getIdenticon(postPub))
 
-            discussions.getUser(wallet).then(({ followers, displayName }) => {
+            discussions.getUser(postPub).then(({ followers, displayName, uidw, pub }) => {
                 setUsername(displayName)
                 setFollowers(followers)
+                setWallet(uidw)
+                setPostPub(pub)
 
                 postsStore.resetPostsAndPosition()
-                postsStore.getPostsForKeys(postPub, [wallet])
+                postsStore.getPostsForKeys(myPostPub, [postPub])
             })
         }
         return () => {
             uiStore.setSidebarHidden(false)
         }
-    }, [postPub])
+    }, [myPostPub])
 
     const followUser = useCallback(() => {
-        userStore.toggleUserFollowing(username, wallet)
+        userStore.toggleUserFollowing(username, usersPostPub)
 
-        if (userStore.following.has(wallet)) {
+        if (userStore.following.has(usersPostPub)) {
             setFollowers(followers + 1)
         } else {
             setFollowers(followers - 1)
         }
-    }, [followers])
+    }, [followers, usersPostPub, username])
 
     const isSameUser = useMemo(() => username == authStore.displayName, [username])
 
@@ -120,7 +137,7 @@ const UserPage: React.FC<any> = () => {
                     className={'flex flex-row items-center'}
                     target="_blank"
                     rel="noopener noreferrer"
-                    onClick={() => userStore.toggleBlockUser(username, wallet)}
+                    onClick={() => userStore.toggleBlockUser(username, usersPostPub)}
                 >
                     <Icon
                         type="delete"
@@ -128,7 +145,7 @@ const UserPage: React.FC<any> = () => {
                         theme="twoTone"
                         twoToneColor={'#E7040F'}
                     />
-                    {userStore.blockedUsers.has(wallet) ? 'Unblock' : 'Block'} {username}
+                    {userStore.blockedUsers.has(usersPostPub) ? 'Unblock' : 'Block'} {username}
                 </a>
             </Menu.Item>
         </Menu>
@@ -144,12 +161,16 @@ const UserPage: React.FC<any> = () => {
         )
     }
 
-    const onModerationChange = useCallback((tags: string[]) => {
-        return userStore.setModerationFromDropdown(username, wallet, tags)
-    }, [username, wallet])
+    const onModerationChange = useCallback(
+        (tags: string[]) => {
+            userStore.setModerationFromDropdown(username, usersPostPub, tags)
+            userStore.updateFromActiveDelegatedMembers()
+        },
+        [usersPostPub, username, wallet]
+    )
 
     if (postsStore.getPostsForKeys['pending']) {
-        return <Icon type="loading" />
+        return <Spin />
     }
 
     return (
@@ -172,7 +193,7 @@ const UserPage: React.FC<any> = () => {
                                         type={'primary'}
                                         onClick={followUser}
                                     >
-                                        {userStore.following.has(wallet) ? 'Unfollow' : 'Follow'}
+                                        {userStore.following.has(usersPostPub) ? 'Unfollow' : 'Follow'}
                                     </Button>
                                     <DropdownMenu key="more" />
                                 </div>
@@ -222,7 +243,7 @@ const UserPage: React.FC<any> = () => {
                                 onModerationChange={onModerationChange}
                                 defaultValue={userStore.activeModerationForCurrentUser(
                                     username,
-                                    wallet
+                                    usersPostPub
                                 )}
                                 options={tagStore.tagsWithoutBaseOptions}
                                 tagModelFromObservables={tagStore.tagModelFromObservables}
@@ -234,7 +255,7 @@ const UserPage: React.FC<any> = () => {
                     <InfiniteScrollFeed
                         dataLength={postsStore.postsPosition.items}
                         hasMore={postsStore.postsPosition.cursorId !== 0}
-                        next={() => postsStore.getPostsForKeys(postPub, [wallet])}
+                        next={() => postsStore.getPostsForKeys(myPostPub, [usersPostPub])}
                         posts={postsStore.posts}
                     />
                 </div>

@@ -1,11 +1,11 @@
 import { persist } from 'mobx-persist'
-import { observable, when, computed, ObservableMap } from 'mobx'
+import { observable, when, computed, ObservableMap, reaction } from 'mobx'
 import { RootStore } from '@stores/index'
 import axios from 'axios'
 import _ from 'lodash'
 import { discussions, nsdb, Post } from '@novuspherejs'
 import moment from 'moment'
-import { getOrigin } from '@utils'
+import { getOrigin, removeMD, sleep } from '@utils'
 
 export type BlockedContentSetting = 'hidden' | 'collapsed'
 
@@ -17,6 +17,7 @@ export class UserStore {
     @persist('map') delegated = observable.map<string, string>() // [name:pubKey:tagName, tagName]
     @persist('map') pinnedPosts = observable.map<string, string>() // [asPathURL, tagName]
 
+    pinnedByDelegation = observable.map<string, string>() // [asPathURL, tagName] for delegated users
     blockedByDelegation = observable.map<string, string>() // either blockedUsers or blockedPosts
 
     @observable notificationCount = 0
@@ -26,6 +27,8 @@ export class UserStore {
     lastCheckedNotifications = 0
 
     @observable notifications: Post[] = []
+
+    desktopNotifications = observable.map<number, Notification>()
 
     @persist
     @observable
@@ -41,31 +44,45 @@ export class UserStore {
 
     @observable
     localStorageVersion = {
-        following: 1583712275528,
+        following: 1586119165124,
         watching: 1583893581788,
-        blockedUsers: 1583712275528,
-        blockedPosts: 1583712275528,
-        delegated: 1583712275528,
-        pinnedPosts: 1583712275528,
+        blockedUsers: 1586119165124,
+        blockedPosts: 1586119165124,
+        delegated: 1586119165124,
+        pinnedPosts: 1583893581788,
     }
+
+    @observable
+    hasDataSyncedFromServer = false
 
     constructor(rootStore: RootStore) {
         this.uiStore = rootStore.uiStore
         this.tagStore = rootStore.tagStore
         this.authStore = rootStore.authStore
 
-        when(
+        reaction(
             () => this.authStore.hasAccount,
-            () => {
-                this.syncDataFromServerToLocal({
-                    accountPrivKey: this.authStore.accountPrivKey,
-                    accountPubKey: this.authStore.accountPubKey,
-                })
-            },
-            {
-                timeout: 500,
+            hasAccount => {
+                if (hasAccount) {
+                    sleep(500).then(() => {
+                        this.syncDataFromServerToLocal({
+                            accountPrivKey: this.authStore.accountPrivKey,
+                            accountPubKey: this.authStore.accountPubKey,
+                        })
+                    })
+                } else {
+                    this.resetUserStore()
+                }
             }
         )
+    }
+
+    @computed get twitterUsername() {
+        if (!this.authStore.socialAuthLinks.twitter) {
+            return false
+        }
+
+        return this.authStore.socialAuthLinks.twitter.username
     }
 
     resetPostObservables = () => {
@@ -132,6 +149,7 @@ export class UserStore {
      * @param pub
      */
     activeModerationForCurrentUser = (username: string, pub: string) => {
+        if (!username || !pub) return []
         const vals = [...this.delegated.keys()]
         return vals
             .filter(val => val.indexOf(`${username}:${pub}`) !== -1)
@@ -141,7 +159,13 @@ export class UserStore {
     async setPinnedPosts(posts: any[], delegated = false, sync = true) {
         _.forEach(posts, pinnedPosts => {
             const [url, tag] = pinnedPosts
-            this.pinnedPosts.set(url, tag)
+            if (delegated) {
+                if (!this.pinnedByDelegation.has(url)) {
+                    this.pinnedByDelegation.set(url, tag)
+                }
+            } else {
+                this.pinnedPosts.set(url, tag)
+            }
         })
 
         if (sync) this.syncDataFromLocalToServer()
@@ -151,6 +175,9 @@ export class UserStore {
      * Sync the data from delegated members
      */
     async updateFromActiveDelegatedMembers() {
+        this.pinnedByDelegation.clear()
+        this.blockedByDelegation.clear()
+
         try {
             return await Promise.all(
                 [...this.delegated.keys()].map(async delegatedMember => {
@@ -229,6 +256,8 @@ export class UserStore {
                     if (!suppressAlert) {
                         this.uiStore.showMessage('Removed user as a moderator', 'success')
                     }
+
+                    this.updateFromActiveDelegatedMembers()
                 } else {
                     await this.setAndUpdateDelegatedPosts(mergedName, tagName, suppressAlert)
                 }
@@ -369,43 +398,15 @@ export class UserStore {
 
             if (!data) return
 
+            if (data['auth']) {
+                if (data['auth']['twitter']) {
+                    this.authStore.socialAuthLinks.twitter = data['auth']['twitter']
+                }
+            }
+
             data = data['data']
 
             if (data) {
-                /**
-                 * Check localStorageVersion for comparison
-                 * If version mismatch, reset users' local storage version
-                 *
-                 * This required to ensure we are able to reset LS when we change code or add features
-                 * that affect LS, otherwise there should be a way to migrate.
-                 */
-                if (
-                    typeof data['localStorageVersion'] === undefined ||
-                    data['localStorageVersion'] !== this.localStorageVersion
-                ) {
-                    // find mismatch versions
-                    const serverVersions = data['localStorageVersion']
-
-                    if (_.isNil(serverVersions)) {
-                        this.resetPostObservables()
-                        this.syncDataFromLocalToServer()
-                        return
-                    }
-
-                    Object.keys(serverVersions).forEach(version => {
-                        if (serverVersions[version] !== this.localStorageVersion[version]) {
-                            if (this[version] && this[version] instanceof ObservableMap) {
-                                console.log('clearing', version)
-                                this[version].replace([])
-                            }
-                        }
-                    })
-
-                    this.syncDataFromLocalToServer()
-                    // exit out
-                    return
-                }
-
                 if (!_.isNil(data['lastCheckedNotifications']))
                     this.lastCheckedNotifications = data['lastCheckedNotifications']
 
@@ -423,13 +424,14 @@ export class UserStore {
                 if (!_.isNil(data['moderation']['blockedPosts'])) {
                     const blockedPosts = data['moderation']['blockedPosts']
 
-                    if (!_.isNil(data['legacy'])) {
+                    if (_.isNil(data['legacy'])) {
                         console.log('found legacy user, updating')
                         this.blockedPosts.replace({})
                     } else {
                         this.blockedPosts.replace(blockedPosts)
                     }
                 }
+
                 if (!_.isNil(data['moderation']['delegated'])) {
                     this.delegated.replace(data['moderation']['delegated'])
                     this.updateFromActiveDelegatedMembers()
@@ -441,7 +443,7 @@ export class UserStore {
                 if (!_.isNil(data['moderation']['pinnedPosts'])) {
                     const pinnedPosts = data['moderation']['pinnedPosts']
 
-                    if (!_.isNil(data['legacy'])) {
+                    if (_.isNil(data['legacy'])) {
                         console.log('found legacy user, updating')
                         this.pinnedPosts.replace({})
                     } else {
@@ -454,7 +456,45 @@ export class UserStore {
 
                 if (!_.isNil(data['moderation']['blockedContentSetting']))
                     this.blockedContentSetting = data['moderation']['blockedContentSetting']
+
+                /**
+                 * Check localStorageVersion for comparison
+                 * If version mismatch, reset users' local storage version
+                 *
+                 * This required to ensure we are able to reset LS when we change code or add features
+                 * that affect LS, otherwise there should be a way to migrate.
+                 */
+                if (
+                    typeof data['localStorageVersion'] === undefined ||
+                    data['localStorageVersion'] !== this.localStorageVersion
+                ) {
+                    // find mismatch versions
+                    const serverVersions = data['localStorageVersion']
+
+                    if (_.isNil(serverVersions)) {
+                        this.resetPostObservables()
+                        this.syncDataFromLocalToServer()
+                        this.hasDataSyncedFromServer = true
+                        return
+                    }
+
+                    Object.keys(serverVersions).forEach(version => {
+                        if (serverVersions[version] !== this.localStorageVersion[version]) {
+                            if (this[version] && this[version] instanceof ObservableMap) {
+                                console.log('clearing', version)
+                                this[version].replace([])
+                            }
+                        }
+                    })
+
+                    this.syncDataFromLocalToServer()
+                    this.hasDataSyncedFromServer = true
+                    // exit out
+                    return
+                }
             }
+
+            this.hasDataSyncedFromServer = true
         } catch (error) {
             console.error(
                 `Unable to sync: We experienced some problems syncing your account data to your current browser`,
@@ -469,6 +509,8 @@ export class UserStore {
      */
     syncDataFromLocalToServer = async () => {
         try {
+            if (!this.hasDataSyncedFromServer) return
+
             const following = [...this.following.toJS()].map(([pub, name]) => ({
                 pub,
                 name,
@@ -575,6 +617,15 @@ export class UserStore {
 
             this.notificationCount = payload.length
             this.notifications = payload.filter((item: any, index: number) => index <= 5)
+
+            if (Notification.permission === 'granted') {
+                payload.map(notification => {
+                    if (!this.desktopNotifications.has(notification.id)) {
+                        const desktopNotification = new Notification(removeMD(notification.content))
+                        this.desktopNotifications.set(notification.id, desktopNotification)
+                    }
+                })
+            }
         } catch (error) {
             this.notifications = []
             return error

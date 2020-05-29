@@ -82,16 +82,12 @@ const NewPageNoSSRUnwrapped = ({ form, prefilledTag }: any) => {
 
                 try {
                     const submittedPost = await discussions.post(post as any)
-
                     const isPostValid = discussions.checkIfPostIsValid(submittedPost)
-
                     return new Promise((resolve, reject) => {
                         if (isPostValid) {
                             const id = encodeId(submittedPost)
-
                             const int = setInterval(async () => {
                                 const getThread = await discussions.getThread(id, authStore.postPub)
-
                                 if (getThread) {
                                     if (int) {
                                         clearInterval(int)
@@ -206,11 +202,11 @@ const NewPageNoSSRUnwrapped = ({ form, prefilledTag }: any) => {
                     {getFieldDecorator('title', {
                         rules: [
                             {
-                                required: true,
+                                required: false,
                                 message: 'Please enter a title for your post',
                             },
                         ],
-                    })(<Input size={'large'} placeholder={'Post title'} />)}
+                    })(<Input size={'large'} placeholder={'Post title (optional)'} />)}
                 </Form.Item>
                 <Form.Item>
                     {getFieldDecorator('content', {
@@ -262,7 +258,7 @@ const NewPage: React.FC<any> = () => {
             <Helmet>
                 <title>{'Create a new post'}</title>
             </Helmet>
-            <NewPageNoSSR prefilledTag={tag} />
+            <NewPageNoSSR prefilledTag={tag || 'all'} />
         </>
     )
 }

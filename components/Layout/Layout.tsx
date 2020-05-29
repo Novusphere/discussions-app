@@ -8,13 +8,17 @@ import {
     Footer,
     Header,
     SidebarTrendingTags,
+    SidebarDiscoverTags,
+    TagViewTabs,
+    HeaderSearch,
 } from '@components'
 import { useLocation } from 'react-router-dom'
 import { useObserver } from 'mobx-react-lite'
 import cx from 'classnames'
 import { RootStore, useStores } from '@stores'
 import { eos } from '@novuspherejs'
-import { refreshOEmbed, Mobile, Desktop } from '@utils'
+import { refreshOEmbed, Mobile } from '@utils'
+import { useMediaQuery } from 'react-responsive'
 
 const { Header: AntdLayoutHeader } = AntdLayout
 
@@ -23,6 +27,7 @@ interface ILayoutProps {}
 const Layout: FunctionComponent<ILayoutProps> = ({ children }) => {
     const { authStore, uiStore, settingStore, walletStore }: RootStore = useStores()
     const location = useLocation()
+    const isMobile = useMediaQuery({ maxWidth: 767 })
 
     message.config({
         top: 75,
@@ -34,8 +39,6 @@ const Layout: FunctionComponent<ILayoutProps> = ({ children }) => {
 
     // fire some stuff
     useEffect(() => {
-        console.error('Layout loaded')
-
         settingStore.loadSettings()
 
         eos.initializeTokens().then(() => {
@@ -83,60 +86,62 @@ const Layout: FunctionComponent<ILayoutProps> = ({ children }) => {
 
     return (
         <AntdLayout
-            className={'overflow-x-hidden'}
+            className={cx([styles.layout, 'overflow-x-hidden'])}
             style={{
                 minHeight: '100vh',
             }}
         >
             <Modals />
-            <AntdLayoutHeader className={cx([styles.header, 'container bb b--light-gray'])}>
+            <AntdLayoutHeader className={cx([styles.header, 'bb b--light-gray'])}>
                 <Header />
             </AntdLayoutHeader>
-            {useObserver(() => (
-                <span className={styles.banner}>
-                    <img
-                        src={uiStore.activeBanner}
-                        title={'Active banner'}
-                        alt={'Active banner image'}
-                    />
-                </span>
-            ))}
             {/*<Alert*/}
             {/*    message={'Alert'}*/}
             {/*    description={'Sign in has been disabled temporarily.'}*/}
             {/*    type={'warning'}*/}
             {/*    showIcon*/}
             {/*/>*/}
-            <div className={cx([styles.content, styles.container, 'center flex pa0 pa3-ns'])}>
+            <Mobile>
+                <div className={cx([styles.searchContainerMobile, 'db card bg-white pa2'])}>
+                    <HeaderSearch />
+                </div>
+            </Mobile>
+            <div className={cx([styles.container, styles.mainContainer, 'center flex pt1 pa0'])}>
                 {useObserver(() => (
                     <div
                         className={cx([
-                            'fl w-30 h-100 ph2',
+                            'fl w-20 h-100 overflow-hidden',
                             {
                                 dn: uiStore.hideSidebar,
                                 'dn db-ns': !uiStore.hideSidebar,
                             },
                         ])}
                     >
-                        <SidebarTagView />
                         <SidebarLinks />
-                        <SidebarTrendingTags />
-                        <Desktop>
-                            <Footer className={'o-60 f6'} footerText={uiStore.footerText} />
-                        </Desktop>
+                        <SidebarDiscoverTags />
                     </div>
                 ))}
 
                 <div
                     className={cx([
-                        'fl ml4-ns ml0',
+                        'ml2-ns ml0',
                         {
                             'w-100': uiStore.hideSidebar,
-                            'w-70-ns w-100': !uiStore.hideSidebar,
+                            'w-80-ns w-100': !uiStore.hideSidebar,
                         },
                     ])}
                 >
-                    {children}
+                    {useObserver(() => (
+                        <div className={styles.banner}>
+                            <img
+                                src={uiStore.activeBanner}
+                                title={'Active banner'}
+                                alt={'Active banner image'}
+                            />
+                        </div>
+                    ))}
+                    <SidebarTagView />
+                    <TagViewTabs sidebar={<SidebarTrendingTags />} content={children} />
                 </div>
             </div>
             <Mobile>

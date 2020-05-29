@@ -22,7 +22,7 @@ const HeaderNewPost: FunctionComponent<IHeaderNewPostProps> = () => {
         if (location.pathname.indexOf('/tag/') !== -1) {
             setTag(location.pathname.split('/')[2])
         }
-    }, [])
+    }, [location])
 
     return (
         <Button

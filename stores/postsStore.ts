@@ -63,9 +63,12 @@ export class PostsStore {
                 await Promise.all(
                     _.map(pinnedPosts, async ([url, name]) => {
                         if (tagNames[0] === name) {
-                            const post = await discussions.getPostsByAsPathURL(url, key)
-                            post.pinned = true
-                            _pinnedPosts.push(post)
+                            if (url.indexOf('#') === -1) {
+                                const post = await discussions.getPostsByAsPathURL(url, key)
+                                post.pinned = true
+                                _pinnedPosts.push(post)
+                            }
+
                         }
                     })
                 )
@@ -104,7 +107,6 @@ export class PostsStore {
                 keys = [...this.userStore.following.keys()]
             }
 
-
             const { posts, cursorId } = await discussions.getPostsForKeys(
                 keys,
                 this.postsPosition.cursorId,
@@ -132,7 +134,15 @@ export class PostsStore {
 
     getThreadById = async (id: string, key = ''): Promise<Thread> => {
         try {
-            return await discussions.getThread(id, key)
+            return await discussions.getThread(id, key, undefined)
+        } catch (error) {
+            throw error
+        }
+    }
+
+    refreshThread = async (id: string, key = '', time): Promise<Thread> => {
+        try {
+            return await discussions.getThread(id, key, undefined, time)
         } catch (error) {
             throw error
         }
@@ -145,7 +155,7 @@ export class PostsStore {
                 this.postsPosition.cursorId,
                 this.postsPosition.items,
                 key,
-                sort,
+                sort
             )
 
             this.posts = [...this.posts, ...posts]

@@ -15,9 +15,11 @@ const Footer: FunctionComponent<IFooterProps> = ({ footerText, className }) => {
     return (
         <div className={cx([className, styles.footer, 'tc'])}>
             {useObserver(() => (
-                <p className={'b f6'}>Version {getVersion()}</p>
+                <>
+                    <p className={'b f6'}>Version {getVersion()}</p>
+                    <Markdown>{footerText}</Markdown>
+                </>
             ))}
-            <Markdown>{footerText}</Markdown>
         </div>
     )
 }

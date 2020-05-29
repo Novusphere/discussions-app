@@ -1,8 +1,8 @@
-import { action, observable } from 'mobx'
+import { action, observable, reaction, when } from 'mobx'
 import { SIGN_IN_OPTIONS } from '@globals'
 import { RootStore } from '@stores'
 import { bkToStatusJson } from '@utils'
-import { discussions, init, eos } from '@novuspherejs'
+import { discussions, init, eos, nsdb } from '@novuspherejs'
 import { task } from 'mobx-task'
 import { notification } from 'antd'
 import { persist } from 'mobx-persist'
@@ -59,12 +59,36 @@ export class AuthStore {
 
     // used for password re-entry
     @observable TEMP_WalletPrivateKey = ''
+    @observable TEMP_TippingTransfers = []
 
-    constructor(rootStore: RootStore) {}
+    @observable
+    socialAuthLinks = {
+        twitter: null,
+    }
+
+    constructor(rootStore: RootStore) {
+        when(
+            () => this.hasAccount,
+            () => {
+                this.checkAndAskForNotificationPermission()
+            }
+        )
+    }
 
     @action.bound
     setTEMPPrivateKey = (key: string) => {
         this.TEMP_WalletPrivateKey = key
+    }
+
+    @action.bound
+    setTEMPTransfers(transfers: any[]) {
+        this.TEMP_TippingTransfers = transfers
+    }
+
+    @action.bound
+    clearTEMPVariables() {
+        this.TEMP_TippingTransfers = []
+        this.TEMP_WalletPrivateKey = ''
     }
 
     @action.bound
@@ -97,6 +121,9 @@ export class AuthStore {
         this.accountPubKey = ''
         this.accountPrivKey = ''
         this.uidwWalletPubKey = ''
+        this.socialAuthLinks = {
+            twitter: null,
+        }
     }
 
     setUidWalletKey = (value: string) => {
@@ -213,4 +240,25 @@ export class AuthStore {
             throw error
         }
     })
+
+    @task.resolved
+    async connectTwitter({ accountPrivateKey, accountPublicKey, connected }: any) {
+        try {
+            if (!connected) {
+                await nsdb.connectTwitter({ accountPrivateKey, accountPublicKey })
+            } else {
+                await nsdb.disconnectTwitter({ accountPrivateKey, accountPublicKey })
+                this.socialAuthLinks.twitter = null
+            }
+        } catch (error) {
+            throw error
+        }
+    }
+
+    checkAndAskForNotificationPermission = () => {
+        console.log('asking for notifications')
+        if (Notification.permission !== 'denied') {
+            Notification.requestPermission()
+        }
+    }
 }

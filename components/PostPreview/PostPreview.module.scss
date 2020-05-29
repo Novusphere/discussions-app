@@ -2,7 +2,7 @@
     transition: 0.1s all ease-in-out;
     //box-shadow: 0px 0px 6px 1px rgba(0, 0, 0, 0.1);
     min-height: 25px;
-    max-height: 325px;
+    //max-height: 325px;
     overflow: hidden;
     position: relative;
     text-overflow: ellipsis;
@@ -10,7 +10,7 @@
     border-radius: 3px;
     border: 1px solid white;
 
-    @media only screen and (min-device-width : 320px) and (max-device-width : 480px) {
+    @media only screen and (min-device-width : 320px) and (max-device-width : 767px) {
         border: none;
         border-bottom: 1px solid #dadada;
     }
@@ -34,4 +34,8 @@
 
 .pinnedPost {
     border: 1px solid #ff4136;
+}
+
+.contentContainer {
+    width: 95%;
 }

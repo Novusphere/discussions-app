@@ -2,10 +2,14 @@ import React, { FunctionComponent, useCallback } from 'react'
 
 import styles from './ModalsPasswordReEntry.module.scss'
 import { observer } from 'mobx-react'
-import { Button, Form, Icon, Input, Modal, Result } from 'antd'
-import { hasErrors } from '@utils'
+import { Button, Form, Icon, Input, Modal, Result, Table, Typography } from 'antd'
+import { getIdenticon, hasErrors } from '@utils'
 import { RootStore, useStores } from '@stores'
 import { discussions } from '@novuspherejs'
+import _ from 'lodash'
+import { UserNameWithIcon } from '../index'
+
+const { Paragraph } = Typography
 
 interface IModalsPasswordReEntryProps {
     visible: boolean
@@ -20,7 +24,7 @@ const ModalsPasswordReEntry: FunctionComponent<IModalsPasswordReEntryProps> = ({
     handleOk,
     form,
 }) => {
-    const { authStore }: RootStore = useStores()
+    const { authStore, walletStore }: RootStore = useStores()
 
     const footer = useCallback(() => {
         return [
@@ -66,30 +70,6 @@ const ModalsPasswordReEntry: FunctionComponent<IModalsPasswordReEntryProps> = ({
                     })
                     return error
                 }
-
-                // try {
-                //     await authStore.signInWithPassword(passwordRentry)
-                //     notification.success({
-                //         message: 'You have successfully signed in!',
-                //     })
-                //     uiStore.clearActiveModal()
-                // } catch (error) {
-                //     if (error.message === 'Incorrect brian key pasword') {
-                //         form.setFields({
-                //             passwordRentry: {
-                //                 value: passwordRentry,
-                //                 errors: [new Error(error.message)],
-                //             },
-                //         })
-                //     } else {
-                //         notification.error({
-                //             message: 'Failed to sign in!',
-                //             description: error.message,
-                //         })
-                //     }
-                //
-                //     return error
-                // }
             }
         })
     }, [])
@@ -116,11 +96,147 @@ const ModalsPasswordReEntry: FunctionComponent<IModalsPasswordReEntryProps> = ({
                     }
                 />
 
+                {authStore.TEMP_TippingTransfers.length > 0 && (
+                    <>
+                        <Table
+                            pagination={false}
+                            dataSource={authStore.TEMP_TippingTransfers}
+                            columns={[
+                                {
+                                    title: 'Amount',
+                                    dataIndex: 'amount',
+                                    key: 'amount',
+                                    render: (text, record) => {
+                                        const [amount] = text.split(' ')
+                                        const [fee] = record.fee.split(' ')
+                                        const [img, precision] = walletStore.supportedTokensImages[
+                                            record.symbol
+                                        ]
+
+                                        return (
+                                            <div className={'flex flex-row items-center'}>
+                                                <img
+                                                    src={img}
+                                                    alt={`${record.symbol} image`}
+                                                    width={20}
+                                                    className={'mr1'}
+                                                />
+                                                {`${Number(Number(amount) + Number(fee)).toFixed(
+                                                    precision
+                                                )} ${record.token.label}`}
+                                            </div>
+                                        )
+                                    },
+                                },
+                                {
+                                    title: 'Key',
+                                    dataIndex: 'to',
+                                    key: 'to',
+                                    render: text => {
+                                        if (!text) {
+                                            return '--'
+                                        }
+
+                                        return (
+                                            <Paragraph
+                                                ellipsis
+                                                copyable
+                                                className={'w4'}
+                                                style={{ margin: 0, padding: 0 }}
+                                            >
+                                                {text}
+                                            </Paragraph>
+                                        )
+                                    },
+                                },
+                                {
+                                    title: 'User',
+                                    dataIndex: 'username',
+                                    key: 'username',
+                                    render: (text, record) => {
+                                        if (!text) {
+                                            return '--'
+                                        }
+
+                                        if (!record.postPub) {
+                                            return text
+                                        }
+
+                                        return (
+                                            <div className={'flex flex-row items-center'}>
+                                                <UserNameWithIcon
+                                                    imageData={getIdenticon(record.postPub)}
+                                                    pub={record.postPub}
+                                                    name={text}
+                                                />
+                                            </div>
+                                        )
+                                    },
+                                },
+                            ]}
+                        />
+
+                        {authStore.TEMP_TippingTransfers.length > 1 && (
+                            <Table
+                                pagination={false}
+                                dataSource={_.map(
+                                    _.groupBy(authStore.TEMP_TippingTransfers, 'symbol'),
+                                    (objs, key) => ({
+                                        symbol: key,
+                                        amount: _.sumBy(objs, key => {
+                                            return (
+                                                Number(key.amount.split(' ')[0]) +
+                                                Number(key.fee.split(' ')[0])
+                                            )
+                                        }),
+                                    })
+                                )}
+                                columns={[
+                                    {
+                                        title: 'Symbol',
+                                        dataIndex: 'symbol',
+                                        key: 'symbol',
+                                        render: text => `Total ${text}`,
+                                    },
+                                    {
+                                        title: 'Amount',
+                                        dataIndex: 'amount',
+                                        key: 'amount',
+                                        render: (text, record) => {
+                                            const [
+                                                img,
+                                                precision,
+                                            ] = walletStore.supportedTokensImages[record.symbol]
+
+                                            return (
+                                                <div className={'flex flex-row items-center'}>
+                                                    <img
+                                                        src={img}
+                                                        alt={`${record.symbol} image`}
+                                                        width={20}
+                                                        className={'mr1'}
+                                                    />
+                                                    {`${Number(text).toFixed(precision)} ${
+                                                        record.symbol
+                                                    }`}
+                                                </div>
+                                            )
+                                        },
+                                    },
+                                ]}
+                            />
+                        )}
+                    </>
+                )}
+
                 <Form
                     labelCol={{ span: 7 }}
                     wrapperCol={{ span: 12 }}
                     onSubmit={handlePasswordSubmit}
                     className={'center'}
+                    style={{
+                        marginTop: authStore.TEMP_TippingTransfers.length > 0 ? '1em' : 0,
+                    }}
                 >
                     <Form.Item label="Password">
                         {getFieldDecorator('passwordRentry', {

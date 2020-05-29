@@ -1,6 +1,5 @@
 import React, { FunctionComponent, useCallback, useEffect, useState } from 'react'
 import Markdown from 'markdown-to-jsx'
-import { LazyLoadImage } from 'react-lazy-load-image-component'
 import cx from 'classnames'
 
 import styles from './RichTextPreview.module.scss'
@@ -32,7 +31,7 @@ const RtLink: FunctionComponent<any> = ({ children, href, index }) => {
                         href
                     ):
                     case /https?:\/\/www.youtube.com\/watch\?t=[0-9]+/.test(href):
-                    case /https?:\/\/www.youtube.com\/watch\?v=[a-zA-Z0-9-_]+/.test(href):
+                    case /https?:\/\/(www|m)?.youtube.com\/watch\?v=[a-zA-Z0-9-_]+/.test(href):
                     case /https?:\/\/youtu.be\/[a-zA-Z0-9-_]+/.test(href):
                         embed = await nsdb.cors(
                             `https://www.youtube.com/oembed?format=json&url=${href.replace(
@@ -69,25 +68,18 @@ const RtLink: FunctionComponent<any> = ({ children, href, index }) => {
                     case /(.|)http[s]?:\/\/(\w|[:\/.%-])+\.(png|jpg|jpeg|gif)(\?(\w|[:\/.%-])+)?(.|)/.test(
                         href
                     ):
-                        // embed = `<img src="${href}" alt="Viewing image" />`
-                        embed = {
-                            html: (
-                                <a
-                                    href={href}
-                                    className={'pointer'}
-                                    title={'Open image in new tab'}
-                                    target={'_blank'}
-                                >
-                                    <LazyLoadImage alt={'Viewing image'} src={href} effect="blur" />
-                                </a>
-                            ),
-                        }
+                        embed = `<img src="${href}" alt="Viewing image" />`
                         break
                     case /t.me\/([a-zA-Z0-9\_\!\@\+]+)\/([a-zA-Z0-9]+)/.test(href):
                         const [, ids] = href.split('t.me/')
                         if (ids) {
                             embed = `<span data-telegram-rn="${generateUuid()}" data-telegram-post="${ids}" data-width="100%"></span>`
                         }
+                        break
+                    case /https:\/\/www\.bilibili\.com\/video/.test(href):
+                        const [, biliVideoIdFromURL] = href.split('https://www.bilibili.com/video/')
+                        const [biliVideoId] = biliVideoIdFromURL.split('?')
+                        embed = `<iframe src="https://player.bilibili.com/player.html?bvid=${biliVideoId}" width="560px" height="315px" scrolling="no" border="0" frameborder="no" framespacing="0" allowfullscreen="true"> </iframe>`
                         break
                     default:
                         embed = null
@@ -188,6 +180,12 @@ const RichTextPreview: FunctionComponent<IRichTextPreviewProps> = ({
                                 <span className={'f5 b'}>{children}</span>
                             ),
                         },
+                        // specifically for: https://github.com/Novusphere/discussions-app/issues/330
+                        br: {
+                            component: () => (
+                                <br />
+                            )
+                        }
                     },
                 }}
             >

@@ -1,4 +1,4 @@
-import React, { FunctionComponent } from 'react'
+import React, { FunctionComponent, useCallback, useEffect } from 'react'
 
 import styles from './Replies.module.scss'
 import { discussions, Post } from '@novuspherejs'
@@ -12,22 +12,22 @@ import {
     VotingHandles,
 } from '@components'
 import moment from 'moment'
-import { Button, Dropdown, Icon, Menu, message, Tooltip } from 'antd'
-import { observer, useLocalStore, useObserver } from 'mobx-react-lite'
+import { Button, Dropdown, Icon, Menu, message, Tooltip, Tag } from 'antd'
+import { useLocalStore, Observer, useComputed } from 'mobx-react-lite'
 import cx from 'classnames'
 import { RootStore, useStores } from '@stores'
 import {
     createPostObject,
     generateVoteObject,
-    getPermaLink,
     openInNewTab,
     signPost,
     transformTipsToTransfers,
+    transformTipToMetadata,
     voteAsync,
 } from '@utils'
 import copy from 'clipboard-copy'
 import { MODAL_OPTIONS } from '@globals'
-import { useLocation, useHistory } from 'react-router-dom'
+import { useHistory } from 'react-router-dom'
 
 interface IRepliesProps {
     preview?: boolean
@@ -41,7 +41,6 @@ const ButtonGroup = Button.Group
 
 const Replies: FunctionComponent<IRepliesProps> = props => {
     const { userStore, uiStore, authStore, walletStore }: RootStore = useStores()
-    const location = useLocation()
     const history = useHistory()
 
     const replyStore = useLocalStore(
@@ -66,8 +65,7 @@ const Replies: FunctionComponent<IRepliesProps> = props => {
             },
 
             get permaLinkURL() {
-                if (typeof location.pathname === 'undefined') return ''
-                return getPermaLink(location.pathname.split('#')[0], props.reply.uuid)
+                return props.reply.permaLinkURL
             },
 
             toggleShowPreview: () => {
@@ -224,7 +222,9 @@ const Replies: FunctionComponent<IRepliesProps> = props => {
                         btn: (
                             <Button
                                 size="small"
-                                onClick={() => openInNewTab(`https://bloks.io/transaction/${transaction}`)}
+                                onClick={() =>
+                                    openInNewTab(`https://bloks.io/transaction/${transaction}`)
+                                }
                             >
                                 View transaction
                             </Button>
@@ -292,6 +292,17 @@ const Replies: FunctionComponent<IRepliesProps> = props => {
                         // ask for password
                         uiStore.setActiveModal(MODAL_OPTIONS.walletActionPasswordReentry)
 
+                        const transferData = postObject.transfers.map(transfer => {
+                            return transformTipToMetadata({
+                                tip: transfer,
+                                tokens: walletStore.supportedTokensForUnifiedWallet,
+                                replyingToUIDW: props.reply.uidw,
+                                replyingToDisplayName: props.reply.displayName,
+                                replyingToPostPub: props.reply.pub,
+                            })
+                        })
+
+                        authStore.setTEMPTransfers(transferData)
                         replyStore.waitForUserInput(async walletPrivateKey => {
                             if (walletPrivateKey === 'incomplete') {
                                 replyStore.submitReplyLoading = false
@@ -299,19 +310,22 @@ const Replies: FunctionComponent<IRepliesProps> = props => {
                                 return
                             }
                             const _cached = `${walletPrivateKey}`
-                            authStore.setTEMPPrivateKey('')
+
+                            authStore.clearTEMPVariables()
                             uiStore.clearActiveModal()
 
                             if (!replyStore.reply.tips) {
                                 replyStore.reply.tips = {} as any
                             }
 
-                            postObject.transfers = transformTipsToTransfers(
-                                postObject.transfers,
-                                props.reply.uidw,
-                                _cached,
-                                walletStore.supportedTokensForUnifiedWallet
-                            )
+                            postObject.transfers = transformTipsToTransfers({
+                                tips: postObject.transfers,
+                                replyingToUIDW: props.reply.uidw,
+                                replyingToDisplayName: props.reply.displayName,
+                                privateKey: _cached,
+                                tokens: walletStore.supportedTokensForUnifiedWallet,
+                                replyingToPostPub: props.reply.pub,
+                            })
 
                             await replyStore.finishSubmitting(postObject)
                         })
@@ -345,7 +359,9 @@ const Replies: FunctionComponent<IRepliesProps> = props => {
                         btn: (
                             <Button
                                 size="small"
-                                onClick={() => openInNewTab(`https://bloks.io/transaction/${transaction}`)}
+                                onClick={() =>
+                                    openInNewTab(`https://bloks.io/transaction/${transaction}`)
+                                }
                             >
                                 View transaction
                             </Button>
@@ -370,279 +386,373 @@ const Replies: FunctionComponent<IRepliesProps> = props => {
         }
     )
 
-    const isSameUser = props.reply.pub == authStore.postPub
-    const isSpamPost = userStore.blockedPosts.has(replyStore.permaLinkURL)
+    useEffect(() => {
+        replyStore.reply = props.reply
+    }, [props.reply])
 
-    const menu = (
-        <Menu>
-            <Menu.Item>
-                <a
-                    className={'flex flex-row items-center'}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    onClick={() =>
-                        userStore.toggleUserFollowing(props.reply.displayName, props.reply.pub)
-                    }
-                >
-                    <Icon type="user-add" className={'mr2'} />
-                    {useObserver(() =>
-                        userStore.following.has(props.reply.pub) ? 'Unfollow User' : 'Follow User'
-                    )}
-                </a>
-            </Menu.Item>
-            <Menu.Item>
-                <a
-                    className={'flex flex-row items-center'}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    onClick={() => userStore.toggleBlockPost(replyStore.permaLinkURL)}
-                >
-                    <Icon type="stop" className={'mr2'} />
-                    {useObserver(() =>
-                        userStore.blockedPosts.has(replyStore.permaLinkURL)
-                            ? 'Unblock Post'
-                            : 'Block Post'
-                    )}
-                </a>
-            </Menu.Item>
-        </Menu>
-    )
+    const menu = useComputed(() => {
+        return (
+            <Menu>
+                <Menu.Item>
+                    <a
+                        className={'flex flex-row items-center'}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        onClick={() =>
+                            userStore.toggleUserFollowing(props.reply.displayName, props.reply.pub)
+                        }
+                    >
+                        <Icon type="user-add" className={'mr2'} />
+                        <Observer>
+                            {() => (
+                                <span>
+                                    {userStore.following.has(props.reply.pub)
+                                        ? 'Unfollow User'
+                                        : 'Follow User'}
+                                </span>
+                            )}
+                        </Observer>
+                    </a>
+                </Menu.Item>
+                <Menu.Item>
+                    <a
+                        className={'flex flex-row items-center'}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        onClick={() => userStore.toggleBlockPost(replyStore.permaLinkURL)}
+                    >
+                        <Icon type="stop" className={'mr2'} />
+                        <Observer>
+                            {() => (
+                                <span>
+                                    {userStore.blockedPosts.has(replyStore.permaLinkURL)
+                                        ? 'Unblock Post'
+                                        : 'Block Post'}
+                                </span>
+                            )}
+                        </Observer>
+                    </a>
+                </Menu.Item>
+                {replyStore.reply.depth === 1 && (
+                    <Menu.Item>
+                        <a
+                            className={'flex flex-row items-center'}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            onClick={() =>
+                                userStore.togglePinPost(
+                                    replyStore.reply.sub,
+                                    replyStore.permaLinkURL
+                                )
+                            }
+                        >
+                            <Icon type="pushpin" className={'mr2'} />
+                            <Observer>
+                                {() => (
+                                    <span>
+                                        {userStore.pinnedPosts.has(replyStore.permaLinkURL) ||
+                                        userStore.pinnedByDelegation.has(replyStore.permaLinkURL)
+                                            ? 'Unpin Reply'
+                                            : 'Pin Reply'}
+                                    </span>
+                                )}
+                            </Observer>
+                        </a>
+                    </Menu.Item>
+                )}
+            </Menu>
+        )
+    }, [userStore.following, userStore.blockedPosts])
 
-    const DropdownMenu = () => {
+    const DropdownMenu = useCallback(() => {
+        if (props.reply.pub == authStore.postPub || !authStore.hasAccount) {
+            return null
+        }
+
         return (
             <Dropdown key="more" overlay={menu}>
                 <Button icon={'ellipsis'} title={'View more options'} />
             </Dropdown>
         )
-    }
+    }, [props.reply.pub == authStore.postPub, authStore.hasAccount])
 
-    return useObserver(() => (
-        <div
-            name={props.reply.uuid}
-            data-post-uuid={props.reply.uuid}
-            className={cx(['w-100'])}
-            onMouseEnter={() => replyStore.setHover(true)}
-            onMouseLeave={() => replyStore.setHover(false)}
-        >
-            <div
-                className={cx('flex flex-row items-start justify-start bl b--near-white w-100', [
-                    {
-                        'bg-washed-yellow': props.highlightedPostUUID === props.reply.uuid,
-                        [styles.postHover]: replyStore.hover,
-                        [styles.postHoverTransparent]: !replyStore.hover,
-                    },
-                ])}
-            >
-                {
+    return (
+        <Observer>
+            {() => (
+                <div
+                    name={props.reply.uuid}
+                    data-post-uuid={props.reply.uuid}
+                    className={cx([
+                        'w-100',
+                        {
+                            [styles.pinnedReply]: userStore.pinnedPosts.has(
+                                replyStore.permaLinkURL
+                            ),
+                        },
+                    ])}
+                    onMouseEnter={() => replyStore.setHover(true)}
+                    onMouseLeave={() => replyStore.setHover(false)}
+                >
                     <div
-                        className={'flex flex-1 pr2 pt1 pl2'}
-                        style={{
-                            visibility: replyStore.collapsed ? 'hidden' : 'visible',
-                        }}
+                        className={cx(
+                            'flex flex-row items-start justify-start bl b--near-white w-100',
+                            [
+                                {
+                                    'bg-washed-yellow':
+                                        props.highlightedPostUUID === props.reply.uuid,
+                                    [styles.postHover]: replyStore.hover,
+                                    [styles.postHoverTransparent]: !replyStore.hover,
+                                },
+                            ]
+                        )}
                     >
-                        <VotingHandles
-                            uuid={replyStore.reply.uuid}
-                            myVote={props.preview ? 1 : replyStore.myVoteValue}
-                            upVotes={replyStore.upvotes}
-                            downVotes={replyStore.downvotes}
-                            handler={props.preview ? () => null : replyStore.handleVoting}
-                        />
-                    </div>
-                }
-                <div className={'tl pt2 w-100 overflow-hidden'}>
-                    <div className={'flex flex-row items-center w-100 relative'}>
-                        <div className={'flex flex-row items-center'}>
-                            <div className={'pr2'}>
-                                <span
-                                    className={'f6 pointer dim silver'}
-                                    onClick={replyStore.toggleCollapse}
-                                >
-                                    {replyStore.collapsed ? '[+]' : '[-]'}
-                                </span>
-                            </div>
-                            <UserNameWithIcon
-                                name={props.reply.displayName}
-                                imageData={props.reply.imageData}
-                                pub={props.reply.pub}
-                            />
-                            <Tooltip
-                                className={'ph2'}
-                                title={moment(
-                                    replyStore.reply.edit
-                                        ? replyStore.reply.editedAt
-                                        : replyStore.reply.createdAt
-                                ).format('YYYY-MM-DD HH:mm:ss')}
+                        {
+                            <div
+                                className={'flex flex-1 pr2 pt1 pl2'}
+                                style={{
+                                    visibility: replyStore.collapsed ? 'hidden' : 'visible',
+                                }}
                             >
-                                <span className={'light-silver f6'}>
-                                    {replyStore.reply.edit && 'edited '}{' '}
-                                    {moment(
-                                        replyStore.reply.edit
-                                            ? replyStore.reply.editedAt
-                                            : replyStore.reply.createdAt
-                                    ).fromNow()}
-                                </span>
-                            </Tooltip>
-                            {replyStore.collapsed && (
-                                <span className={'light-silver f6 i'}>
-                                    ({replyStore.reply.replies.length} children)
+                                <VotingHandles
+                                    uuid={replyStore.reply.uuid}
+                                    myVote={props.preview ? 1 : replyStore.myVoteValue}
+                                    upVotes={replyStore.upvotes}
+                                    downVotes={replyStore.downvotes}
+                                    handler={props.preview ? () => null : replyStore.handleVoting}
+                                />
+                            </div>
+                        }
+                        <div className={'tl pt2 w-100 overflow-hidden'}>
+                            <div className={'flex flex-row items-center w-100 relative'}>
+                                <div className={'flex flex-row items-center'}>
+                                    <div className={'pr2'}>
+                                        <span
+                                            className={'f6 pointer dim silver'}
+                                            onClick={replyStore.toggleCollapse}
+                                        >
+                                            {replyStore.collapsed ? '[+]' : '[-]'}
+                                        </span>
+                                    </div>
+                                    <UserNameWithIcon
+                                        name={props.reply.displayName}
+                                        imageData={props.reply.imageData}
+                                        pub={props.reply.pub}
+                                    />
+                                    <Tooltip
+                                        className={'ph2'}
+                                        title={moment(
+                                            replyStore.reply.edit
+                                                ? replyStore.reply.editedAt
+                                                : replyStore.reply.createdAt
+                                        ).format('YYYY-MM-DD HH:mm:ss')}
+                                    >
+                                        <span className={'light-silver f6'}>
+                                            {replyStore.reply.edit && 'edited '}{' '}
+                                            {moment(
+                                                replyStore.reply.edit
+                                                    ? replyStore.reply.editedAt
+                                                    : replyStore.reply.createdAt
+                                            ).fromNow()}
+                                        </span>
+                                    </Tooltip>
+                                    {(userStore.pinnedPosts.has(replyStore.permaLinkURL) ||
+                                        userStore.pinnedByDelegation.has(
+                                            replyStore.permaLinkURL
+                                        )) && <Tag color="red">Pinned</Tag>}
+                                    {replyStore.collapsed && (
+                                        <span className={'light-silver f6 i'}>
+                                            ({replyStore.reply.replies.length} children)
+                                        </span>
+                                    )}
+                                </div>
+                                <Tips tips={replyStore.reply.tips} />
+
+                                {!props.preview &&
+                                    !userStore.blockedPosts.has(replyStore.permaLinkURL) && (
+                                        <div
+                                            className={cx([
+                                                'absolute top-0 right-1',
+                                                {
+                                                    db: replyStore.hover || replyStore.editing,
+                                                    dn: !replyStore.hover,
+                                                },
+                                            ])}
+                                        >
+                                            <ButtonGroup size={'small'}>
+                                                <Button
+                                                    disabled={replyStore.editing}
+                                                    title={'Reply to this post'}
+                                                    onClick={replyStore.toggleReply}
+                                                >
+                                                    <Icons.ReplyIcon />
+                                                </Button>
+                                                <Button
+                                                    title={'Copy permalink'}
+                                                    onClick={() => {
+                                                        copy(
+                                                            `${window.location.origin}${replyStore.permaLinkURL}`
+                                                        )
+                                                        message.success('Copied to your clipboard')
+                                                        props.setHighlightedPosUUID(
+                                                            props.reply.uuid
+                                                        )
+                                                        history.replace(replyStore.permaLinkURL)
+                                                    }}
+                                                >
+                                                    <Icons.ShareIcon />
+                                                </Button>
+                                                <Button
+                                                    title={'Open transaction'}
+                                                    onClick={() =>
+                                                        openInNewTab(
+                                                            `https://bloks.io/transaction/${props.reply.transaction}`
+                                                        )
+                                                    }
+                                                >
+                                                    <Icons.LinkIcon />
+                                                </Button>
+                                                <DropdownMenu key="more" />
+                                                {props.reply.pub == authStore.postPub && (
+                                                    <>
+                                                        <Button
+                                                            title={'Toggle pin reply'}
+                                                            onClick={() =>
+                                                                userStore.togglePinPost(
+                                                                    replyStore.reply.sub,
+                                                                    replyStore.permaLinkURL
+                                                                )
+                                                            }
+                                                        >
+                                                            <Icon
+                                                                type={'pushpin'}
+                                                                theme={'filled'}
+                                                            />
+                                                        </Button>
+                                                        <Button
+                                                            type={
+                                                                replyStore.editing
+                                                                    ? 'danger'
+                                                                    : 'default'
+                                                            }
+                                                            title={'Edit post'}
+                                                            onClick={replyStore.toggleEditing}
+                                                        >
+                                                            <Icon type={'edit'} theme={'filled'} />
+                                                        </Button>
+                                                    </>
+                                                )}
+                                            </ButtonGroup>
+                                        </div>
+                                    )}
+                            </div>
+
+                            {userStore.blockedPosts.has(replyStore.permaLinkURL) && (
+                                <span className={'f6 moon-gray pv1 i'}>
+                                    This post is hidden as it was marked as spam
                                 </span>
                             )}
-                        </div>
-                        <Tips tips={replyStore.reply.tips} />
 
-                        {!props.preview && !isSpamPost && (
-                            <div
-                                className={cx([
-                                    'absolute top-0 right-1',
-                                    {
-                                        db: replyStore.hover || replyStore.editing,
-                                        dn: !replyStore.hover,
-                                    },
-                                ])}
-                            >
-                                <ButtonGroup size={'small'}>
-                                    <Button
-                                        disabled={replyStore.editing}
-                                        title={'Reply to this post'}
-                                        onClick={replyStore.toggleReply}
+                            {/*Render Content*/}
+                            {!replyStore.collapsed &&
+                                !userStore.blockedPosts.has(replyStore.permaLinkURL) &&
+                                !replyStore.editing && (
+                                    <RichTextPreview
+                                        hideFade
+                                        className={'lh-copy pt2 mr3 dark-gray'}
                                     >
-                                        <Icons.ReplyIcon />
-                                    </Button>
-                                    <Button
-                                        title={'Copy permalink'}
-                                        onClick={() => {
-                                            copy(
-                                                `${window.location.origin}${replyStore.permaLinkURL}`
-                                            )
-                                            message.success('Copied to your clipboard')
-                                            props.setHighlightedPosUUID(props.reply.uuid)
-                                            history.replace(replyStore.permaLinkURL)
-                                        }}
-                                    >
-                                        <Icons.ShareIcon />
-                                    </Button>
-                                    <Button
-                                        title={'Open transaction'}
-                                        onClick={() =>
-                                            openInNewTab(
-                                                `https://bloks.io/transaction/${props.reply.transaction}`
-                                            )
-                                        }
-                                    >
-                                        <Icons.LinkIcon />
-                                    </Button>
-                                    {!isSameUser && authStore.hasAccount && (
-                                        <DropdownMenu key="more" />
-                                    )}
-                                    {isSameUser && (
+                                        {props.preview
+                                            ? props.reply.content
+                                            : replyStore.reply.content}
+                                    </RichTextPreview>
+                                )}
+
+                            {replyStore.editing && (
+                                <div className={'pa2'}>
+                                    <Editor
+                                        onChange={replyStore.setEditContent}
+                                        value={replyStore.editingContent}
+                                        threadUsers={props.threadUsers}
+                                    />
+                                    <div className={'flex flex-row justify-end pt2'}>
                                         <Button
-                                            type={replyStore.editing ? 'danger' : 'default'}
-                                            title={'Edit post'}
                                             onClick={replyStore.toggleEditing}
+                                            className={'mr2'}
                                         >
-                                            <Icon type={'edit'} theme={'filled'} />
+                                            Cancel
                                         </Button>
-                                    )}
-                                </ButtonGroup>
-                            </div>
-                        )}
+                                        <Button
+                                            disabled={replyStore.editingContent === ''}
+                                            type={'danger'}
+                                            onClick={replyStore.submitEdit}
+                                            loading={replyStore.submitEditLoading}
+                                        >
+                                            Save Edit
+                                        </Button>
+                                    </div>
+                                </div>
+                            )}
+
+                            {!props.preview && replyStore.replying ? (
+                                <div className={'mr3 mb3'}>
+                                    <Editor
+                                        onChange={replyStore.setReplyContent}
+                                        threadUsers={props.threadUsers}
+                                    />
+                                    <div className={'flex flex-row justify-end pt2'}>
+                                        <Button
+                                            onClick={replyStore.toggleShowPreview}
+                                            disabled={replyStore.replyingContent === ''}
+                                            className={'mr2'}
+                                        >
+                                            Preview
+                                        </Button>
+                                        <Button
+                                            disabled={replyStore.replyingContent === ''}
+                                            type={'primary'}
+                                            onClick={replyStore.submitReply}
+                                            loading={replyStore.submitReplyLoading}
+                                        >
+                                            Post Reply
+                                        </Button>
+                                    </div>
+                                </div>
+                            ) : null}
+
+                            {replyStore.showPreview && (
+                                <ReplyingPostPreview
+                                    className={'mr3 mb3'}
+                                    content={replyStore.replyingContent}
+                                />
+                            )}
+                        </div>
                     </div>
 
-                    {isSpamPost && (
-                        <span className={'f6 moon-gray pv1 i'}>
-                            This post is hidden as it was marked as spam
-                        </span>
-                    )}
-
-                    {/*Render Content*/}
-                    {!replyStore.collapsed && !isSpamPost && !replyStore.editing && (
-                        <RichTextPreview hideFade className={'lh-copy pt2 mr3 dark-gray'}>
-                            {props.preview ? props.reply.content : replyStore.reply.content}
-                        </RichTextPreview>
-                    )}
-
-                    {replyStore.editing && (
-                        <div className={'pa2'}>
-                            <Editor
-                                onChange={replyStore.setEditContent}
-                                value={replyStore.editingContent}
-                                threadUsers={props.threadUsers}
-                            />
-                            <div className={'flex flex-row justify-end pt2'}>
-                                <Button onClick={replyStore.toggleEditing} className={'mr2'}>
-                                    Cancel
-                                </Button>
-                                <Button
-                                    disabled={replyStore.editingContent === ''}
-                                    type={'danger'}
-                                    onClick={replyStore.submitEdit}
-                                    loading={replyStore.submitEditLoading}
-                                >
-                                    Save Edit
-                                </Button>
+                    {/*Render Replies*/}
+                    {!props.preview &&
+                        !replyStore.collapsed &&
+                        replyStore.reply.replies.map(child => (
+                            <div
+                                key={child.uuid}
+                                className={'w-100 pl4'}
+                                onMouseEnter={() => replyStore.setHover(false)}
+                                onMouseLeave={() => replyStore.setHover(true)}
+                            >
+                                <Replies
+                                    reply={child}
+                                    threadUsers={props.threadUsers}
+                                    highlightedPostUUID={props.highlightedPostUUID}
+                                    setHighlightedPosUUID={props.setHighlightedPosUUID}
+                                />
                             </div>
-                        </div>
-                    )}
-
-                    {!props.preview && replyStore.replying ? (
-                        <div className={'mr3 mb3'}>
-                            <Editor
-                                onChange={replyStore.setReplyContent}
-                                threadUsers={props.threadUsers}
-                            />
-                            <div className={'flex flex-row justify-end pt2'}>
-                                <Button
-                                    onClick={replyStore.toggleShowPreview}
-                                    disabled={replyStore.replyingContent === ''}
-                                    className={'mr2'}
-                                >
-                                    Preview
-                                </Button>
-                                <Button
-                                    disabled={replyStore.replyingContent === ''}
-                                    type={'primary'}
-                                    onClick={replyStore.submitReply}
-                                    loading={replyStore.submitReplyLoading}
-                                >
-                                    Post Reply
-                                </Button>
-                            </div>
-                        </div>
-                    ) : null}
-
-                    {replyStore.showPreview && (
-                        <ReplyingPostPreview
-                            className={'mr3 mb3'}
-                            content={replyStore.replyingContent}
-                        />
-                    )}
+                        ))}
                 </div>
-            </div>
-
-            {/*Render Replies*/}
-            {!props.preview &&
-                !replyStore.collapsed &&
-                replyStore.reply.replies.map(child => (
-                    <div
-                        key={child.uuid}
-                        className={'w-100 pl4'}
-                        onMouseEnter={() => replyStore.setHover(false)}
-                        onMouseLeave={() => replyStore.setHover(true)}
-                    >
-                        <Replies
-                            reply={child}
-                            threadUsers={props.threadUsers}
-                            highlightedPostUUID={props.highlightedPostUUID}
-                            setHighlightedPosUUID={props.setHighlightedPosUUID}
-                        />
-                    </div>
-                ))}
-        </div>
-    ))
+            )}
+        </Observer>
+    )
 }
 
 Replies.defaultProps = {
     preview: false,
 }
 
-export default observer(Replies)
+export default Replies

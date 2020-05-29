@@ -10,7 +10,7 @@ export class TagStore {
     subscribed = []
 
     @observable
-    trendingTags: { tag: string }[] = []
+    trendingTags: { tag: string, members: number }[] = []
 
     tags = observable.map<
         string,
@@ -31,9 +31,10 @@ export class TagStore {
     }
 
     @task
-    fetchTrendingTags = async () => {
-        const tags = await nsdb.getTrendingsTags()
+    fetchTrendingTags = async (all = false) => {
+        const tags = await nsdb.getTrendingsTags(all)
         this.trendingTags = tags.payload.filter(({ tag }: { tag: string }) => tag !== 'tip')
+        return tags
     }
 
     @computed get tagsWithoutBaseOptions() {

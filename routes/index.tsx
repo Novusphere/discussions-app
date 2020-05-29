@@ -1,7 +1,7 @@
 import * as React from 'react'
 import { Route, Switch } from 'react-router-dom'
 import { Layout } from '@components'
-import { Icon } from 'antd'
+import { Spin } from 'antd'
 
 const { lazy, Suspense } = React
 
@@ -17,6 +17,8 @@ const TagsViewPage = lazy(() => import('@containers/tags'))
 const UserViewPage = lazy(() => import('@containers/u'))
 const NotificationsPage = lazy(() => import('@containers/notifications'))
 const NotFoundPage = lazy(() => import('@containers/404'))
+const TrendingPage = lazy(() => import('@containers/trending'))
+const CommunitiesPage = lazy(() => import('@containers/communities'))
 
 export const routes = [
     {
@@ -55,7 +57,7 @@ export const routes = [
         component: TagViewPage,
     },
     {
-        path: '/tag/:tag/:id/:title',
+        path: '/tag/:tag/:id/:title?',
         exact: true,
         component: ThreadViewPage,
     },
@@ -78,6 +80,16 @@ export const routes = [
         path: '/404',
         exact: true,
         component: NotFoundPage,
+    },
+    {
+        path: '/trending',
+        exact: true,
+        component: TrendingPage,
+    },
+    {
+        path: '/communities',
+        exact: true,
+        component: CommunitiesPage,
     }
 ]
 
@@ -85,7 +97,7 @@ const Routes = () => (
     <Suspense
         fallback={
             <Layout>
-                <Icon type="loading" />
+                <Spin />
             </Layout>
         }
     >

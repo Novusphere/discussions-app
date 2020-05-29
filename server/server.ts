@@ -35,12 +35,15 @@ const serveAndReplaceMeta = (res, { title, description, image }) => {
             return console.log(err)
         }
 
+        let encodedDescription = encodeSpecialCharacters(removeMD(description))
+
+        if (description.length >= 300) {
+            encodedDescription = encodedDescription.substring(0, 300)
+        }
+
         const result = data
             .replace(/\$OG_TITLE/g, encodeSpecialCharacters(title))
-            .replace(
-                /\$OG_DESCRIPTION/g,
-                encodeSpecialCharacters(removeMD(description)).substring(0, 150)
-            )
+            .replace(/\$OG_DESCRIPTION/g, encodedDescription)
             .replace(/\$OG_IMAGE/g, image)
 
         res.send(result)
@@ -142,7 +145,7 @@ app.get('/tag/:tag', (req, res) => {
     })
 })
 
-app.get('/tag/:tag/:id/:title', async (req, res) => {
+app.get('/tag/:tag/:id/:title?', async (req, res) => {
     const { tag, id } = req.params
 
     let tagModel = res.settings.tags[tag]
@@ -160,7 +163,7 @@ app.get('/tag/:tag/:id/:title', async (req, res) => {
 
     const imageMatch = /https?:\/\/(www\.)?[-a-zA-Z0-9@:%._\+~#=]{1,256}\.[a-zA-Z0-9()]{1,6}\b([-a-zA-Z0-9()@:%_\+.~#?&//=]*.(jpg|jpeg|bmp|png|gif))/gi.exec(
         thread.openingPost.content
-    );
+    )
 
     if (imageMatch) {
         image = imageMatch[0]
@@ -188,6 +191,22 @@ app.get('/404', (req, res) => {
     serveAndReplaceMeta(res, {
         title: '404 Not Found',
         description: 'This page is either broken or does not exist',
+        image: res.genericTagUrl,
+    })
+})
+
+app.get('/trending', (req, res) => {
+    serveAndReplaceMeta(res, {
+        title: 'Trending Tags',
+        description: 'View all of our trending tags!',
+        image: res.genericTagUrl,
+    })
+})
+
+app.get('/communities', (req, res) => {
+    serveAndReplaceMeta(res, {
+        title: 'Discover Communities',
+        description: 'View our official tags',
         image: res.genericTagUrl,
     })
 })

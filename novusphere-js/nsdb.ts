@@ -26,9 +26,15 @@ export class NSDB {
         this.api = apiEndpoint
     }
 
-    async getTrendingsTags(): Promise<any> {
+    async getTrendingsTags(all = false): Promise<any> {
         try {
-            const { data } = await axios.get(`${this.api}/discussions/search/trendingtags`)
+            let url = `${this.api}/discussions/search/trendingtags`
+
+            if (all) {
+                url += '?days=30&count=100'
+            }
+
+            const { data } = await axios.get(url)
             return data
         } catch (error) {
             throw error
@@ -110,6 +116,37 @@ export class NSDB {
             return sq
         } catch (error) {
             console.error('Search error: \n', error)
+            throw error
+        }
+    }
+
+    async connectTwitter({ accountPrivateKey, accountPublicKey }: any) {
+        try {
+            const time = new Date().getTime()
+            const sig = ecc.sign(ecc.sha256(`${getOrigin()}-${time}`), accountPrivateKey)
+            const pub = accountPublicKey
+            const redirect = window.location.href
+
+            const qs = `pub=${pub}&sig=${sig}&time=${time}&domain=${getOrigin()}&redirect=${redirect}`
+            const rurl = `${this.api}/account/auth/twitter`
+            window.location.replace(`${rurl}?${qs}`)
+        } catch (error) {
+            throw error
+        }
+    }
+
+    async disconnectTwitter({ accountPrivateKey, accountPublicKey }: any) {
+        try {
+            const time = new Date().getTime()
+            const sig = ecc.sign(ecc.sha256(`${getOrigin()}-${time}`), accountPrivateKey)
+            const pub = accountPublicKey
+            const qs = `pub=${pub}&sig=${sig}&time=${time}&domain=${getOrigin()}`
+            const rurl = `${this.api}/account/auth/twitter/unlink`
+            const { data } = await axios.get(`${rurl}?${qs}`)
+            if (!data.payload || data.error) {
+                throw new Error('Failed to disconnect Twitter account')
+            }
+        } catch (error) {
             throw error
         }
     }

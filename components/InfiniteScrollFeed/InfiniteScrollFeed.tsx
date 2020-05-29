@@ -1,6 +1,6 @@
 import React, { FunctionComponent, useCallback, useContext } from 'react'
 import InfiniteScroll from 'react-infinite-scroll-component'
-import { PostPreview } from '@components'
+import { PostPreview, PostPreviewLoading } from '@components'
 import { Post } from '@novuspherejs'
 import { Button, Skeleton } from 'antd'
 
@@ -12,6 +12,7 @@ import { RootStore, StoreContext } from '@stores'
 import { observer } from 'mobx-react-lite'
 import cx from 'classnames'
 import { useHistory } from 'react-router-dom'
+import { useMediaQuery } from 'react-responsive'
 
 interface IInfiniteScrollFeedProps {
     dataLength: number
@@ -30,6 +31,7 @@ const InfiniteScrollFeed: FunctionComponent<IInfiniteScrollFeedProps> = ({
     posts,
     children,
 }) => {
+    const isMobile = useMediaQuery({ maxWidth: 767 })
     const { uiStore, authStore, userStore, tagStore }: RootStore = useContext(StoreContext)
     const history = useHistory()
     const renderEndMessage = useCallback(() => {
@@ -40,15 +42,7 @@ const InfiniteScrollFeed: FunctionComponent<IInfiniteScrollFeedProps> = ({
         return (
             <>
                 {Array.from({ length: 5 }, (value, index) => (
-                    <div key={index} className={'flex flex-row items-center bg-white mh1 mb3'}>
-                        <div
-                            className={cx([
-                                'h-100 db bg-light-gray flex tc justify-center ph2 pv4 relative z-2 flex-auto',
-                            ])}
-                            style={{ height: '200px', width: '40px' }}
-                        />
-                        <Skeleton className={'ml3'} active />
-                    </div>
+                    <PostPreviewLoading key={index} />
                 ))}
             </>
         )
@@ -73,6 +67,11 @@ const InfiniteScrollFeed: FunctionComponent<IInfiniteScrollFeedProps> = ({
             hasMore={hasMore}
             loader={renderLoadingMessage()}
             endMessage={renderEndMessage()}
+            className={cx([
+                {
+                    mh1: isMobile,
+                },
+            ])}
         >
             {!children
                 ? posts

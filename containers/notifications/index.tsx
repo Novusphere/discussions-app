@@ -3,7 +3,7 @@ import Helmet from 'react-helmet'
 import { CommonFeed } from '@components'
 import { RootStore, useStores } from '@stores'
 import { observer } from 'mobx-react-lite'
-import { Icon } from 'antd'
+import { Spin } from 'antd'
 import { Redirect } from 'react-router'
 
 const NotificationsPage = () => {
@@ -43,7 +43,7 @@ const NotificationsPage = () => {
                 <title>{`Notifications`}</title>
             </Helmet>
             <span className={'db mb3 f6'}>Viewing all notifications</span>
-            {loading && <Icon type="loading" />}
+            {loading && <Spin />}
             {!loading && (
                 <CommonFeed
                     hideSort

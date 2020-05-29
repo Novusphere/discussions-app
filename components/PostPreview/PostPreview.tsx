@@ -1,5 +1,5 @@
 import React, { FunctionComponent, useCallback, useEffect, useState } from 'react'
-import { Divider, Popover, Tooltip } from 'antd'
+import { Divider, Popover, Skeleton, Tag, Tooltip } from 'antd'
 import cx from 'classnames'
 import styles from './PostPreview.module.scss'
 import { observer, useLocalStore } from 'mobx-react-lite'
@@ -14,8 +14,10 @@ import {
     Tips,
     SharePostPopover,
     Icons,
+    PostPreviewLoading,
 } from '@components'
 import { Link } from 'react-router-dom'
+import { useMediaQuery } from 'react-responsive'
 
 interface IPostPreviewProps {
     post: Post
@@ -46,12 +48,13 @@ const PostPreview: FunctionComponent<IPostPreviewProps> = ({
     hasAccount,
 }) => {
     const [url, setUrl] = useState('')
+    const isMobile = useMediaQuery({ maxWidth: 767 })
 
     useEffect(() => {
         async function getUrl() {
             let uuid = undefined
 
-            if (!post.title) {
+            if (!post.title && post.threadUuid !== post.uuid) {
                 uuid = post.uuid
             }
 
@@ -177,13 +180,19 @@ const PostPreview: FunctionComponent<IPostPreviewProps> = ({
         }
     )
 
-    const isSpam =
-        blockedPosts.has(url) ||
-        blockedUsers.has(post.pub) ||
-        blockedByDelegation.has(url) ||
-        blockedByDelegation.has(post.pub) ||
-        (unsignedPostsIsSpam && !post.pub)
+    const [isSpam, setSpamStatus] = useState(null)
 
+    useEffect(() => {
+        setSpamStatus(
+            blockedPosts.has(url) ||
+                blockedUsers.has(post.pub) ||
+                blockedByDelegation.has(url) ||
+                blockedByDelegation.has(post.pub) ||
+                (unsignedPostsIsSpam && !post.pub)
+        )
+    }, [blockedPosts, blockedUsers, blockedByDelegation, unsignedPostsIsSpam])
+
+    const isPinned = post.pinned
     const shouldBeHidden = blockedContentSetting === 'hidden' && isSpam
     const shouldBeCollapsed = blockedContentSetting === 'collapsed' && isSpam
 
@@ -237,6 +246,11 @@ const PostPreview: FunctionComponent<IPostPreviewProps> = ({
                     {postUsername()}
                     <Divider type={'vertical'} />
                     {postDate()}
+                    {isPinned && (
+                        <Tag color="red" style={{ marginLeft: '1em' }}>
+                            Pinned
+                        </Tag>
+                    )}
                 </span>
                 {postTips()}
             </div>
@@ -266,7 +280,7 @@ const PostPreview: FunctionComponent<IPostPreviewProps> = ({
                 >
                     <a
                         href={'#'}
-                        className={'f6 mh2 black'}
+                        className={'mh2 black'}
                         onClick={e => {
                             e.preventDefault()
                         }}
@@ -277,10 +291,10 @@ const PostPreview: FunctionComponent<IPostPreviewProps> = ({
                 {hasAccount && (
                     <>
                         <Link to={`${url}#reply`}>
-                            <span className={'f6 mh2 black'}>reply</span>
+                            <span className={'mh2 black'}>reply</span>
                         </Link>
                         <a
-                            className={'f6 mh2 black'}
+                            className={'mh2 black'}
                             onClick={e => {
                                 e.preventDefault()
                                 toggleBlockPost(url)
@@ -311,6 +325,10 @@ const PostPreview: FunctionComponent<IPostPreviewProps> = ({
               )
     }
 
+    if (isSpam === null) {
+        return <PostPreviewLoading />
+    }
+
     if (shouldBeHidden) {
         return null
     }
@@ -328,22 +346,37 @@ const PostPreview: FunctionComponent<IPostPreviewProps> = ({
                 data-url={url}
                 style={{
                     opacity: shouldBeCollapsed ? 0.5 : 1,
+                    height: !isMobile
+                        ? post.content.length > 300
+                            ? '325px'
+                            : '100%'
+                        : post.content.length > 300
+                        ? '225px'
+                        : '100%',
                 }}
             >
-                <div className={'flex flex-row'}>
-                    <div className={'bg-light-gray w2 ph2 pv4 z-2'}>{renderVotingHandles()}</div>
-                    <div className={'flex flex-column bg-white pa2 pa4-ns w-100'}>
+                <div className={'flex flex-row h-100'}>
+                    <div
+                        className={cx([
+                            'bg-light-gray w2 ph2 pv4 z-2',
+                            {
+                                dn: isMobile,
+                            },
+                        ])}
+                    >
+                        {renderVotingHandles()}
+                    </div>
+                    <div
+                        className={cx([
+                            'flex flex-column bg-white pa2 pa4-ns w-100',
+                            styles.contentContainer,
+                        ])}
+                    >
                         {shouldBeCollapsed && (
                             <span className={'silver'}>This post was marked as spam.</span>
                         )}
                         {!shouldBeCollapsed && (
                             <>
-                                {post.pinned && (
-                                    <span className={'db f6 b red mb2 flex flex-row items-center'}>
-                                        PINNED
-                                    </span>
-                                )}
-
                                 <Desktop>
                                     {postMetaData()}
                                     <div className={'db pt1 mv2'}>
@@ -352,7 +385,10 @@ const PostPreview: FunctionComponent<IPostPreviewProps> = ({
                                         </span>
                                     </div>
                                     <object>
-                                        <RichTextPreview className={'h4 gray'}>
+                                        <RichTextPreview
+                                            className={'h4 gray'}
+                                            hideFade={post.content.length < 300}
+                                        >
                                             {post.content}
                                         </RichTextPreview>
                                     </object>
@@ -381,19 +417,21 @@ const PostPreview: FunctionComponent<IPostPreviewProps> = ({
                                                 {post.title}
                                             </span>
 
-                                            {/*<RichTextPreview className={'h3 gray mb3'}>*/}
-                                            {/*    {post.content}*/}
-                                            {/*</RichTextPreview>*/}
+                                            <RichTextPreview className={'h3 gray mt3 mb3'}>
+                                                {post.content}
+                                            </RichTextPreview>
 
                                             <div
                                                 className={
-                                                    'mt2 w-100 left-0 bottom-0 z-2 db f7 flex flex-row items-center mb2'
+                                                    'absolute w-100 left-0 bottom-0 z-2 db f7 flex flex-row items-center mh2 mb2'
                                                 }
+                                                style={{ whiteSpace: 'pre' }}
                                             >
                                                 {renderVotingHandles(true, { className: 'f7' })}
                                                 <div className={'o-30 ml2'}>
                                                     {postTotalReplies()}
                                                 </div>
+                                                <div className={'f7 o-30 ml2'}>{postActions()}</div>
                                                 {postTips()}
                                             </div>
                                         </div>

@@ -8,7 +8,7 @@ import { useParams } from 'react-router-dom'
 const TagsPage: React.FC<any> = () => {
     const { postsStore }: RootStore = useStores()
     const { tags } = useParams()
-    const split = useMemo(() => tags.split(','), [tags])
+    const split = useMemo(() => tags.toLowerCase().split(','), [tags])
     const fetch = useCallback(
         ({ postPub, sort }) => postsStore.fetchPostsForTag(postPub, split, [], sort),
         [split]

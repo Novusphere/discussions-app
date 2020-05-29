@@ -1,4 +1,4 @@
-import React, { useCallback, useMemo } from 'react'
+import React, { useMemo } from 'react'
 import { CommonFeed } from '@components'
 import { RootStore, useStores } from '@stores'
 import Helmet from 'react-helmet'
@@ -7,14 +7,12 @@ import { observer } from 'mobx-react-lite'
 
 const TagPage: React.FC<any> = () => {
     const { postsStore, userStore }: RootStore = useStores()
-    const { tag } = useParams()
-    const pinnedPosts = useMemo(() => [...userStore.pinnedPosts.toJS()], [])
-    const fetch = useCallback(
-        ({ sort, postPub }) => {
-            postsStore.fetchPostsForTag(postPub, [tag], pinnedPosts, sort)
-        },
-        [tag, pinnedPosts]
-    )
+    const { tag: paramTag } = useParams()
+    const tag = useMemo(() => paramTag.toLowerCase(), [paramTag])
+    const pinnedPosts = [...userStore.pinnedPosts.toJS(), ...userStore.pinnedByDelegation.toJS()]
+    const fetch = ({ sort, postPub }) => {
+        postsStore.fetchPostsForTag(postPub, [tag], pinnedPosts, sort)
+    }
 
     const { items, cursorId } = postsStore.postsPosition
 

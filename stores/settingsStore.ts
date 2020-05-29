@@ -10,7 +10,7 @@ export class SettingsStore {
     @observable private uiStore: RootStore['uiStore']
     @observable private tagStore: RootStore['tagStore']
 
-    @observable called = false
+    @observable settingsLoaded = false
 
     constructor(rootStore: RootStore) {
         this.userStore = rootStore.userStore
@@ -57,20 +57,32 @@ export class SettingsStore {
             }
 
             if (tags) {
-                await Promise.all(
-                    _.map(tags, async (tag, name) => {
-                        const { data: members } = await axios.get(
-                            `${nsdb.api}/discussions/site/members/${name}`
-                        )
+                try {
+                    await Promise.all(
+                        _.map(tags, async (tag, name) => {
+                            let { data: members } = await axios.get(
+                                `${nsdb.api}/discussions/site/members/${name}`
+                            )
 
-                        this.tagStore.tags.set(name, {
-                            name: name,
-                            logo: tag.icon,
-                            tagDescription: tag.desc,
-                            memberCount: members.count,
+                            if (!members) {
+                                members = [{ count: 0 }]
+                            }
+
+                            this.tagStore.tags.set(name, {
+                                name: name,
+                                logo: tag.icon,
+                                tagDescription: tag.desc,
+                                memberCount: members[0].count,
+                            })
                         })
-                    })
-                )
+                    )
+                    this.settingsLoaded = true
+                } catch (error) {
+                    console.error('failed fetching', error)
+                    this.settingsLoaded = true
+                }
+            } else {
+                this.settingsLoaded = true
             }
 
             return settings

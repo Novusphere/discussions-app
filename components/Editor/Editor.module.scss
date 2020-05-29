@@ -8,7 +8,7 @@
         list-style-type: none;
 
         li {
-            padding: 1em;
+            padding: 0 1em;
         }
     }
 }
@@ -19,4 +19,38 @@
     &.selected {
         background: red !important;
     }
+}
+
+.editorContainer {
+    position: relative;
+
+    div[class*='ql-container ql-snow'],
+    div[class*='ql-toolbar ql-snow'] {
+        transition: 0.25s all ease-in-out;
+    }
+
+    &:focus-within {
+        div[class*='ql-toolbar ql-snow'] {
+            border-left-color: #079e99;
+            border-top-color: #079e99;
+            border-right-color: #079e99;
+        }
+        div[class*='ql-container ql-snow'] {
+            border-left-color: #079e99;
+            border-bottom-color: #079e99;
+            border-right-color: #079e99;
+        }
+    }
+}
+
+.editorSpin {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    bottom: 0;
+}
+
+.tipInput {
+    margin-left: 1em !important;
+    width: 8rem;
 }
