@@ -28,7 +28,7 @@ const Layout: FunctionComponent<ILayoutProps> = ({ children }) => {
     const { authStore, uiStore, settingStore, walletStore }: RootStore = useStores()
     const location = useLocation()
     const isMobile = useMediaQuery({ maxWidth: 767 })
-    const [activeMobileItem, setMobileItem] = useState('my')
+    const [activeMobileItem, setMobileItem] = useState('posts')
 
     message.config({
         top: 75,
