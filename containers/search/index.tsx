@@ -20,9 +20,10 @@ const SearchPage: React.FC<any> = () => {
             if (query.startsWith('@')) {
                 const [, name] = query.split('@')
                 postsStore.fetchUserByString(name).then(users => {
-                    console.log(users)
                     setUserSearch(users)
                 })
+            } else {
+                setUserSearch(false)
             }
             return postsStore.getSearchResults(query, postPub, sort)
         },
