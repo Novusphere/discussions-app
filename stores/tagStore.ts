@@ -10,7 +10,7 @@ export class TagStore {
     subscribed = []
 
     @observable
-    trendingTags: { tag: string, members: number }[] = []
+    trendingTags: { tag: string; members: number }[] = []
 
     tags = observable.map<
         string,

@@ -26,6 +26,16 @@ export class NSDB {
         this.api = apiEndpoint
     }
 
+    async searchForUserByName(name: string) {
+        try {
+            let url = `${this.api}/discussions/search/user?domain=${getOrigin()}&name=${name}`
+            const { data } = await axios.get(url)
+            return data
+        } catch (error) {
+            throw error
+        }
+    }
+
     async getTrendingsTags(all = false): Promise<any> {
         try {
             let url = `${this.api}/discussions/search/trendingtags`

@@ -1,7 +1,8 @@
 import { observable } from 'mobx'
 import { RootStore } from '@stores/index'
-import { discussions, Post, Thread } from '@novuspherejs'
+import { discussions, nsdb, Post, Thread } from '@novuspherejs'
 import _ from 'lodash'
+import { task } from 'mobx-task'
 
 export class PostsStore {
     @observable
@@ -26,6 +27,12 @@ export class PostsStore {
             items: 0,
         }
     }
+
+    @task
+    fetchUserByString = async (name: string) => {
+        return await nsdb.searchForUserByName(name)
+    }
+
 
     /**
      * For fetching posts inside a tag, home page or all.
