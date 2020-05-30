@@ -906,7 +906,7 @@ const UnwrappedAccountCreation = ({ form }) => {
 
     useEffect(() => {
         if (tempWalletKey) {
-            if (!isSubmitting) {
+            if (!isSubmitting && showTempWalletKey) {
                 form.setFields({
                     privateKey: {
                         value: tempWalletKey,
@@ -915,14 +915,13 @@ const UnwrappedAccountCreation = ({ form }) => {
             } else {
                 submitAccountCreation()
             }
+
             uiStore.clearActiveModal()
             authStore.clearTEMPVariables()
         }
-    }, [isSubmitting, tempWalletKey])
+    }, [isSubmitting, tempWalletKey, showTempWalletKey])
 
     const submitAccountCreation = () => {
-        console.log('got TEMP_WalletPrivateKey key', tempWalletKey)
-
         form.validateFields(async (err, values) => {
             if (!err) {
                 setWithdrawalSubmitLoading(true)
@@ -933,8 +932,12 @@ const UnwrappedAccountCreation = ({ form }) => {
                 if (accountName.length !== 12) {
                     form.setFields({
                         accountName: {
-                            errors: [new Error('Please make sure the account name is exactly 12 characters long')],
-                        }
+                            errors: [
+                                new Error(
+                                    'Please make sure the account name is exactly 12 characters long'
+                                ),
+                            ],
+                        },
                     })
                     setWithdrawalSubmitLoading(false)
                     return
@@ -943,8 +946,12 @@ const UnwrappedAccountCreation = ({ form }) => {
                 if (/[^(a-z|1-5)]/g.test(accountName)) {
                     form.setFields({
                         accountName: {
-                            errors: [new Error('Please make sure the account name is all lower case letters and only contains numbers 1 through 5.')],
-                        }
+                            errors: [
+                                new Error(
+                                    'Please make sure the account name is all lower case letters and only contains numbers 1 through 5.'
+                                ),
+                            ],
+                        },
                     })
                     setWithdrawalSubmitLoading(false)
                     return
