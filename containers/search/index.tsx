@@ -1,4 +1,4 @@
-import React, { useMemo, useState } from 'react'
+import React, { useEffect, useMemo, useState } from 'react'
 import { useCallback } from 'react'
 import { CommonFeed, UserNameWithIcon } from '@components'
 import { observer } from 'mobx-react-lite'
@@ -10,15 +10,13 @@ import { Button } from 'antd'
 import { getIdenticon } from '@utils'
 
 const SearchPage: React.FC<any> = () => {
-    const { postsStore, userStore }: RootStore = useStores()
+    const { postsStore, userStore, authStore }: RootStore = useStores()
     const [usersSearch, setUserSearch] = useState<boolean | any[]>(false)
     const params = useParams()
 
     const decodedQuery = useMemo(() => decodeURIComponent(params['query']), [params])
 
     const fetch = ({ postPub, sort }) => {
-        console.log(decodedQuery)
-
         if (decodedQuery.startsWith('@')) {
             const [, name] = decodedQuery.split('@')
             postsStore.fetchUserByString(name).then(users => {
@@ -40,6 +38,10 @@ const SearchPage: React.FC<any> = () => {
 
         return `Showing results for: "${decodedQuery}" (${usersSearch.length} users)`
     }
+
+    useEffect(() => {
+        fetch({ postPub: authStore.postPub, sort: 'popular' })
+    }, [decodedQuery])
 
     return (
         <>
@@ -116,6 +118,7 @@ const SearchPage: React.FC<any> = () => {
                 })
             ) : (
                 <CommonFeed
+                    preventRefetch
                     onFetch={fetch}
                     emptyDescription={'No results found for query'}
                     posts={postsStore.posts}
