@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import React, { useMemo, useState } from 'react'
 import { useCallback } from 'react'
 import { CommonFeed, UserNameWithIcon } from '@components'
 import { observer } from 'mobx-react-lite'
@@ -12,39 +12,39 @@ import { getIdenticon } from '@utils'
 const SearchPage: React.FC<any> = () => {
     const { postsStore, userStore }: RootStore = useStores()
     const [usersSearch, setUserSearch] = useState<boolean | any[]>(false)
-    let { query } = useParams()
-    query = decodeURIComponent(query)
+    const params = useParams()
 
-    const fetch = useCallback(
-        ({ postPub, sort }) => {
-            if (query.startsWith('@')) {
-                const [, name] = query.split('@')
-                postsStore.fetchUserByString(name).then(users => {
-                    setUserSearch(users)
-                })
-            } else {
-                setUserSearch(false)
-            }
-            return postsStore.getSearchResults(query, postPub, sort)
-        },
-        [query]
-    )
+    const decodedQuery = useMemo(() => decodeURIComponent(params['query']), [params])
+
+    const fetch = ({ postPub, sort }) => {
+        console.log(decodedQuery)
+
+        if (decodedQuery.startsWith('@')) {
+            const [, name] = decodedQuery.split('@')
+            postsStore.fetchUserByString(name).then(users => {
+                setUserSearch(users)
+            })
+        } else {
+            setUserSearch(false)
+            postsStore.getSearchResults(decodedQuery, postPub, sort)
+        }
+    }
 
     const { items, cursorId } = postsStore.postsPosition
 
     const renderShowResults = () => {
         if (typeof usersSearch === 'boolean') {
-            return `Showing results for: "${query}" (${postsStore.postsPosition.items}
+            return `Showing results for: "${decodedQuery}" (${postsStore.postsPosition.items}
                 ${postsStore.postsPosition.items === 1 ? 'result' : 'results'})`
         }
 
-        return `Showing results for: "${query}" (${usersSearch.length} users)`
+        return `Showing results for: "${decodedQuery}" (${usersSearch.length} users)`
     }
 
     return (
         <>
             <Helmet>
-                <title>{`Search results: ${query}`}</title>
+                <title>{`Search results: ${decodedQuery}`}</title>
             </Helmet>
             <span className={'db mb3 f6'}>{renderShowResults()}</span>
             {usersSearch && Array.isArray(usersSearch) ? (
@@ -64,7 +64,20 @@ const SearchPage: React.FC<any> = () => {
                                         name={user.displayName}
                                     />
                                 </span>
-                                <span className={'f6'}>{user.pub}</span>
+                                <span className={'pv1'}>
+                                    <span className={'flex flex-row items-center'}>
+                                        <span className={'mr2'}>
+                                            {user.followers} followers
+                                        </span>
+                                        <span className={'mr2'}>
+                                            {user.posts} posts
+                                        </span>
+                                        <span className={'mr2'}>
+                                            {user.threads} threads
+                                        </span>
+                                    </span>
+                                    <span className={'f6 pv1 o-80'}>{user.pub}</span>
+                                </span>
                             </span>
                             <span className={'w4 tr'}>
                                 {userStore.following.has(user.pub) ? (
@@ -108,7 +121,7 @@ const SearchPage: React.FC<any> = () => {
                     posts={postsStore.posts}
                     dataLength={items}
                     cursorId={cursorId}
-                    tag={query}
+                    tag={decodedQuery}
                 />
             )}
         </>
