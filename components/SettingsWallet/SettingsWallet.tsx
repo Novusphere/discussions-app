@@ -1,6 +1,6 @@
 import { Button, Form, Input, InputNumber, Select, Tabs, Typography } from 'antd'
 import cx from 'classnames'
-import React, { useCallback, useState } from 'react'
+import React, { useCallback, useEffect, useState } from 'react'
 const { TabPane } = Tabs
 import { Tab, TabList } from 'react-tabs'
 import { RootStore, useStores } from '@stores'
@@ -256,20 +256,22 @@ const UnwrappedTransfer = ({ form }) => {
                     // set the active modal
                     uiStore.setActiveModal(MODAL_OPTIONS.walletActionPasswordReentry)
 
-                    authStore.setTEMPTransfers([{
-                        symbol: label,
-                        token: {
-                            label,
-                            decimals,
+                    authStore.setTEMPTransfers([
+                        {
+                            symbol: label,
+                            token: {
+                                label,
+                                decimals,
+                            },
+                            chain,
+                            to,
+                            username: null,
+                            amount: `${Number(amount).toFixed(decimals)} ${label}`,
+                            fee: `${Number(fee).toFixed(decimals)} ${label}`,
+                            nonce: new Date().getTime(),
+                            memo: memo || '',
                         },
-                        chain,
-                        to,
-                        username: null,
-                        amount: `${Number(amount).toFixed(decimals)} ${label}`,
-                        fee: `${Number(fee).toFixed(decimals)} ${label}`,
-                        nonce: new Date().getTime(),
-                        memo: memo || '',
-                    }])
+                    ])
 
                     // now wait for user submission
                     const int = setInterval(async () => {
@@ -279,7 +281,6 @@ const UnwrappedTransfer = ({ form }) => {
                             clearInterval(int)
                             return
                         }
-
 
                         const { TEMP_WalletPrivateKey } = authStore
 
@@ -566,20 +567,22 @@ const UnwrappedWithdrawal = ({ form }) => {
                     // set the active modal
                     uiStore.setActiveModal(MODAL_OPTIONS.walletActionPasswordReentry)
 
-                    authStore.setTEMPTransfers([{
-                        symbol: label,
-                        token: {
-                            label,
-                            decimals,
+                    authStore.setTEMPTransfers([
+                        {
+                            symbol: label,
+                            token: {
+                                label,
+                                decimals,
+                            },
+                            chain,
+                            to: null,
+                            username: to,
+                            amount: `${Number(amount).toFixed(decimals)} ${label}`,
+                            fee: `${Number(fee).toFixed(decimals)} ${label}`,
+                            nonce: new Date().getTime(),
+                            memo: memo || '',
                         },
-                        chain,
-                        to: null,
-                        username: to,
-                        amount: `${Number(amount).toFixed(decimals)} ${label}`,
-                        fee: `${Number(fee).toFixed(decimals)} ${label}`,
-                        nonce: new Date().getTime(),
-                        memo: memo || '',
-                    }])
+                    ])
 
                     // now wait for user submission
                     const int = setInterval(async () => {
@@ -839,6 +842,379 @@ const UnwrappedWithdrawal = ({ form }) => {
 
 const Withdrawal = Form.create({ name: 'withdrawalForm' })(UnwrappedWithdrawal)
 
+const UnwrappedAccountCreation = ({ form }) => {
+    const { getFieldDecorator } = form
+    const { authStore, walletStore, uiStore }: RootStore = useStores()
+
+    let walletStoreLS = window.localStorage.getItem('walletStore')
+    let images: any = []
+
+    if (walletStoreLS) {
+        walletStoreLS = JSON.parse(walletStoreLS)
+        images = walletStoreLS['supportedTokensImages']
+    }
+
+    const [withdrawalSubmitLoading, setWithdrawalSubmitLoading] = useState(false)
+
+    /**
+     * Used so the component can get the current selected
+     * token's decimals and fee object.
+     *
+     * By default it is null.
+     */
+    const [tokenVals, setTokenVals] = useState(null)
+    const [tempWalletKey, setTempKey] = useState(null)
+    const [isSubmitting, setSubmitting] = useState(false)
+    const [showTempWalletKey, setShowStatus] = useState(false)
+
+    useEffect(() => {
+        const val = 'eosio.token'
+
+        form.setFields({
+            token: {
+                value: val,
+            },
+        })
+
+        setTokenVals(walletStore.tokenFromSupportedUIDWallet(val))
+        setAmount(0.5)
+    }, [tokenVals])
+
+    const getTempWalletKey = () => {
+        const int = setInterval(async () => {
+            if (uiStore.activeModal === MODAL_OPTIONS.none) {
+                setWithdrawalSubmitLoading(false)
+                uiStore.showToast('Failed', 'User cancelled transaction', 'error')
+                clearInterval(int)
+                setTempKey(null)
+            }
+
+            const { TEMP_WalletPrivateKey } = authStore
+
+            if (TEMP_WalletPrivateKey) {
+                clearInterval(int)
+                setTempKey(TEMP_WalletPrivateKey)
+            }
+        }, 250)
+    }
+
+    const handleShowPrivateKey = useCallback(() => {
+        setShowStatus(true)
+        uiStore.setActiveModal(MODAL_OPTIONS.walletActionPasswordReentry)
+        getTempWalletKey()
+    }, [tempWalletKey, showTempWalletKey])
+
+    useEffect(() => {
+        if (tempWalletKey) {
+            if (!isSubmitting) {
+                form.setFields({
+                    privateKey: {
+                        value: tempWalletKey,
+                    },
+                })
+            } else {
+                submitAccountCreation()
+            }
+            uiStore.clearActiveModal()
+            authStore.clearTEMPVariables()
+        }
+    }, [isSubmitting, tempWalletKey])
+
+    const submitAccountCreation = () => {
+        console.log('got TEMP_WalletPrivateKey key', tempWalletKey)
+
+        form.validateFields(async (err, values) => {
+            if (!err) {
+                setWithdrawalSubmitLoading(true)
+                const { amount, fee, accountName, publicKey } = values
+                const { chain, decimals, label } = tokenVals
+                const memo = `${accountName}-${publicKey}` || ''
+
+                authStore.setTEMPTransfers([
+                    {
+                        symbol: label,
+                        token: {
+                            label,
+                            decimals,
+                        },
+                        chain,
+                        to: null,
+                        username: accountName,
+                        amount: `${Number(amount).toFixed(decimals)} ${label}`,
+                        fee: `${Number(fee).toFixed(decimals)} ${label}`,
+                        nonce: new Date().getTime(),
+                        memo: memo,
+                    },
+                ])
+
+                if (tempWalletKey) {
+                    console.log(tempWalletKey)
+
+                    setWithdrawalSubmitLoading(false)
+                    uiStore.clearActiveModal()
+                    authStore.clearTEMPVariables()
+
+                    try {
+                        // continue with the rest of the transaction
+                        authStore.setTEMPPrivateKey('')
+
+                        const robj = {
+                            chain: parseInt(String(chain)),
+                            from: ecc.privateToPublic(tempWalletKey),
+                            to: 'EOS1111111111111111111111111111111114T1Anm', // special withdraw address
+                            amount: `${Number(amount).toFixed(decimals)} ${label}`,
+                            fee: `${Number(fee).toFixed(decimals)} ${label}`,
+                            nonce: new Date().getTime(),
+                            memo: `signupeoseos:${memo || ''}`,
+                            sig: '',
+                        }
+
+                        const data = await getSignatureAndSubmit(robj, tempWalletKey)
+
+                        if (data.error) {
+                            uiStore.showToast('Failed', data.message, 'error')
+                            setWithdrawalSubmitLoading(false)
+                            return
+                        }
+
+                        const { transaction_id } = data
+
+                        uiStore.showToast(
+                            'Success',
+                            'Your account creation was successfully submitted',
+                            'success',
+                            {
+                                btn: (
+                                    <Button
+                                        size="small"
+                                        onClick={() =>
+                                            openInNewTab(
+                                                `https://bloks.io/transaction/${transaction_id}`
+                                            )
+                                        }
+                                    >
+                                        View transaction
+                                    </Button>
+                                ),
+                            }
+                        )
+
+                        form.resetFields()
+                        walletStore.fetchBalanceForSelectedToken(label)
+                    } catch (error) {
+                        let message = error.message || 'Transfer failed to submit'
+                        uiStore.showToast('Failed', message, 'error')
+                        return error
+                    } finally {
+                        setSubmitting(false)
+                        setWithdrawalSubmitLoading(false)
+                    }
+                } else {
+                    // set the active modal
+                    uiStore.setActiveModal(MODAL_OPTIONS.walletActionPasswordReentry)
+                    getTempWalletKey()
+                }
+            }
+        })
+    }
+
+    const handleAccountCreationSubmit = useCallback(
+        e => {
+            e.preventDefault()
+            submitAccountCreation()
+        },
+        [tokenVals, tempWalletKey]
+    )
+
+    const handleTokenChange = useCallback(val => {
+        if (val) {
+            setTokenVals(walletStore.tokenFromSupportedUIDWallet(val))
+        } else {
+            setTokenVals(null)
+        }
+    }, [])
+
+    const setAmount = initialAmount => {
+        if (tokenVals) {
+            if (typeof initialAmount !== 'number' || !initialAmount) return
+
+            const {
+                fee: { percent, flat },
+                decimals,
+            } = tokenVals
+
+            const fee = initialAmount * percent + flat
+
+            form.setFieldsValue({
+                amount: initialAmount,
+                fee: Number(fee.toFixed(decimals)),
+            })
+        }
+    }
+
+    const handleAmountChange = useCallback(
+        (initialAmount: number) => {
+            setAmount(initialAmount)
+        },
+        [tokenVals]
+    )
+
+    return useObserver(() => (
+        <div className={'ba b--light-gray pa3 br3'}>
+            <Form
+                labelCol={{ span: 4 }}
+                wrapperCol={{ span: 16, offset: 4 }}
+                onSubmit={() => console.log('hey')}
+                className={'center'}
+            >
+                <Form.Item label="Token">
+                    {getFieldDecorator('token', {
+                        // initialValue: walletStore.supportedTokensAsSelectable.filter(option => option.label === 'EOS'),
+                        rules: [
+                            {
+                                required: true,
+                                message: 'Please select a token',
+                            },
+                        ],
+                    })(
+                        <Select
+                            disabled
+                            size={'large'}
+                            showSearch
+                            className={'w-100'}
+                            placeholder={'Select a token'}
+                            onChange={handleTokenChange}
+                        >
+                            {walletStore.supportedTokensAsSelectable.map(option => {
+                                return (
+                                    <Option
+                                        key={option.value}
+                                        value={option.value}
+                                        className={'flex flex-row items-center'}
+                                    >
+                                        {images[option.label] && (
+                                            <img
+                                                src={images[option.label][0]}
+                                                className={'mr2 dib'}
+                                                width={15}
+                                            />
+                                        )}
+                                        {option.label}
+                                    </Option>
+                                )
+                            })}
+                        </Select>
+                    )}
+                </Form.Item>
+                <Form.Item label="Amount">
+                    {getFieldDecorator('amount', {
+                        rules: [
+                            {
+                                required: true,
+                                message: 'Please enter an amount',
+                            },
+                        ],
+                    })(
+                        <InputNumber
+                            disabled
+                            placeholder={
+                                tokenVals ? `Min ${tokenVals.min} ${tokenVals.label}` : null
+                            }
+                            min={tokenVals ? tokenVals.min : 0}
+                            onChange={handleAmountChange}
+                            size={'large'}
+                            step={tokenVals ? tokenVals.fee.percent : 0.001}
+                            style={{ width: '100%' }}
+                        />
+                    )}
+                </Form.Item>
+                <Form.Item label="Fee">
+                    {getFieldDecorator('fee')(
+                        <InputNumber disabled size={'large'} style={{ width: '100%' }} />
+                    )}
+                </Form.Item>
+                <Form.Item label="Account Name">
+                    {getFieldDecorator('accountName', {
+                        rules: [
+                            {
+                                required: true,
+                                message: 'Please enter an EOS account name',
+                            },
+                        ],
+                    })(
+                        <Input
+                            placeholder={'An EOS account name'}
+                            size={'large'}
+                            style={{ width: '100%' }}
+                        />
+                    )}
+                    <p className={'f6 silver lh-copy pt1'}>
+                        EOS account name should be 12 characters long, all lowercase (a-z) and can
+                        only contain numbers 1-5.
+                    </p>
+                </Form.Item>
+                <Form.Item label="Public Key">
+                    {getFieldDecorator('publicKey', {
+                        initialValue: authStore.uidwWalletPubKey,
+                        rules: [
+                            {
+                                required: true,
+                                message: 'Please enter a valid EOS public key',
+                            },
+                        ],
+                    })(
+                        <Input
+                            placeholder={'A valid EOS public key'}
+                            size={'large'}
+                            style={{ width: '100%' }}
+                        />
+                    )}
+                </Form.Item>
+                <Form.Item label="Private Key">
+                    {tempWalletKey && showTempWalletKey ? (
+                        getFieldDecorator('privateKey')(
+                            <Input
+                                defaultValue={tempWalletKey}
+                                disabled={true}
+                                size={'large'}
+                                style={{ width: '100%' }}
+                            />
+                        )
+                    ) : (
+                        <Button type={'danger'} onClick={handleShowPrivateKey}>
+                            Reveal Private Key
+                        </Button>
+                    )}
+                </Form.Item>
+            </Form>
+
+            <div className="mt3 tc">
+                <span className="light-silver f6">
+                    <strong>Please note:</strong> The fee is used to pay for initial EOS resources
+                    (RAM, CPU, NET) and any excess from the fee will be forwarded to the your newly
+                    created EOS account. No commission is taken by Discussions for account creation.
+                </span>
+            </div>
+
+            <div className={'mt3 flex flex-row justify-end'}>
+                <Button
+                    type={'primary'}
+                    onClick={e => {
+                        setSubmitting(true)
+                        handleAccountCreationSubmit(e)
+                    }}
+                    disabled={!tokenVals}
+                    loading={withdrawalSubmitLoading}
+                >
+                    Submit
+                </Button>
+            </div>
+        </div>
+    ))
+}
+
+const AccountCreation = Form.create({ name: 'accountCreationForm' })(UnwrappedAccountCreation)
+
 const Wallet = () => {
     return (
         <>
@@ -880,6 +1256,9 @@ const Wallet = () => {
                     </TabPane>
                     <TabPane tab="Withdrawal" key="3">
                         <Withdrawal />
+                    </TabPane>
+                    <TabPane tab="Account Creation" key="4">
+                        <AccountCreation />
                     </TabPane>
                 </Tabs>
             </div>
