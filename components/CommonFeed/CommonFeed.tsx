@@ -15,6 +15,7 @@ interface ICommonFeedProps {
     cursorId: number | undefined
     tag?: string
     hideSort?: boolean
+    preventRefetch?: boolean
 }
 
 const CommonFeed: FunctionComponent<ICommonFeedProps> = ({
@@ -25,14 +26,17 @@ const CommonFeed: FunctionComponent<ICommonFeedProps> = ({
     cursorId,
     tag,
     hideSort,
+    preventRefetch,
 }) => {
     const { authStore, postsStore, userStore }: RootStore = useStores()
     const [sort, setSort] = useState('popular')
     const postPub = useMemo(() => authStore.postPub, [])
     const resetAndFetch = () => {
-        userStore.updateFromActiveDelegatedMembers()
-        postsStore.resetPostsAndPosition()
-        onFetch({ sort, postPub })
+        if (!preventRefetch) {
+            userStore.updateFromActiveDelegatedMembers()
+            postsStore.resetPostsAndPosition()
+            onFetch({ sort, postPub })
+        }
     }
     const onChange = useCallback(
         option => {
