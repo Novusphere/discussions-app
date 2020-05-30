@@ -930,6 +930,26 @@ const UnwrappedAccountCreation = ({ form }) => {
                 const { chain, decimals, label } = tokenVals
                 const memo = `${accountName}-${publicKey}` || ''
 
+                if (accountName.length !== 12) {
+                    form.setFields({
+                        accountName: {
+                            errors: [new Error('Please make sure the account name is exactly 12 characters long')],
+                        }
+                    })
+                    setWithdrawalSubmitLoading(false)
+                    return
+                }
+
+                if (/[^(a-z|1-5)]/g.test(accountName)) {
+                    form.setFields({
+                        accountName: {
+                            errors: [new Error('Please make sure the account name is all lower case letters and only contains numbers 1 through 5.')],
+                        }
+                    })
+                    setWithdrawalSubmitLoading(false)
+                    return
+                }
+
                 authStore.setTEMPTransfers([
                     {
                         symbol: label,
