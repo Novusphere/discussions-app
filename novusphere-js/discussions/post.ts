@@ -18,6 +18,11 @@ export interface PostMetaData {
 
 export type PostTips = { symbol: string; amount: number }
 
+interface ModPolicy {
+    mod: string
+    tags: string[]
+}
+
 export class Post {
     // Blockchain Specific
     id: number
@@ -46,6 +51,7 @@ export class Post {
     permaLinkURL: string // created inside post.tsx
 
     imageData: string
+    modPolicy: ModPolicy[]
     op: Post | undefined
 
     transfers: any[]
@@ -147,6 +153,7 @@ export class Post {
         p.tags = o.tags
         p.mentions = o.mentions
         p.imageData = getIdenticon(o.pub)
+        p.modPolicy = o.modPolicy || [];
         if (o.edit) {
             p.edit = true
             p.editUuid = o.edit
@@ -174,8 +181,8 @@ export class Post {
             : null
 
         if (o.op && o.op.length > 0) {
-            let op = o.op[0];
-            p.op = Post.fromDbObject(op);
+            let op = o.op[0]
+            p.op = Post.fromDbObject(op)
         }
 
         return p

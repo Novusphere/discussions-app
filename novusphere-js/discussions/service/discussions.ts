@@ -17,6 +17,12 @@ export interface IBrainKeyPair {
     pub: string
 }
 
+interface GetPostsByTransactionParams {
+    mods: string[]
+    transactions: string | string[]
+    key?: string
+}
+
 export default class DiscussionsService {
     constructor() {}
 
@@ -490,14 +496,23 @@ export default class DiscussionsService {
         }
     }
 
-    async getPostsForSubs(
-        subs: string[],
+    async getPostsForSubs({
+        subs,
         cursorId = undefined,
         count = 0,
         limit = 20,
         key = '',
-        sort = 'popular'
-    ): Promise<{
+        sort = 'popular',
+        mods = [],
+    }: {
+        subs: string[]
+        cursorId?: any
+        count?: number
+        limit?: number
+        key?: string
+        sort?: string
+        mods?: any[]
+    }): Promise<{
         posts: Post[]
         cursorId: number
     }> {
@@ -507,6 +522,7 @@ export default class DiscussionsService {
         }
 
         const query = await nsdb.search({
+            mods,
             sort,
             key,
             cursorId,
@@ -666,17 +682,27 @@ export default class DiscussionsService {
         }
     }
 
-    async getPostsByTransaction(transaction: string) {
+    async getPostsByTransaction({ mods, transactions, key = '' }: GetPostsByTransactionParams) {
         try {
-            return await nsdb.search({
+            if (typeof transactions == 'string') {
+                transactions = [transactions]
+            }
+
+            console.log('got transactions', JSON.stringify(transactions))
+
+            const { payload } = await nsdb.search({
+                mods,
+                key,
                 pipeline: [
                     {
                         $match: {
-                            transaction,
+                            transaction: { $in: transactions },
                         },
                     },
                 ],
             })
+
+            return payload.map(p => Post.fromDbObject(p))
         } catch (error) {
             throw error
         }

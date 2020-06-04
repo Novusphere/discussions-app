@@ -6,12 +6,13 @@ import { useParams } from 'react-router-dom'
 import { observer } from 'mobx-react-lite'
 
 const TagPage: React.FC<any> = () => {
-    const { postsStore, userStore }: RootStore = useStores()
+    const { postsStore, authStore }: RootStore = useStores()
     const { tag: paramTag } = useParams()
     const tag = useMemo(() => paramTag.toLowerCase(), [paramTag])
-    const pinnedPosts = [...userStore.pinnedPosts.toJS(), ...userStore.pinnedByDelegation.toJS()]
     const fetch = ({ sort, postPub }) => {
-        postsStore.fetchPostsForTag(postPub, [tag], pinnedPosts, sort)
+        postsStore.fetchPostsForTag(
+            { key: postPub, tagNames: [tag], sort: sort },
+        )
     }
 
     const { items, cursorId } = postsStore.postsPosition

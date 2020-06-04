@@ -206,7 +206,6 @@ export const getYouTubeIDFromUrl = (url: string) => {
     return null
 }
 
-
 export const refreshOEmbed = async () => {
     if ((window as any).FB) {
         ;(window as any).FB.XFBML.parse()
@@ -601,4 +600,11 @@ export const getSignatureAndSubmit = (robj: any, fromAddress: string) => {
     } catch (error) {
         throw error
     }
+}
+
+export const mapModsKeysToList = (mods: string[]) => {
+    return mods.map(mod => {
+        const [, pub] = mod.split(':')
+        return pub
+    })
 }

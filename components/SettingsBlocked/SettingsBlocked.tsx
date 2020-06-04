@@ -145,7 +145,7 @@ const Blocked = () => {
                                         size={'small'}
                                         type={'danger'}
                                         key={'unblock'}
-                                        onClick={() => userStore.toggleBlockPost(path)}
+                                        onClick={() => userStore.DEPRECATED_toggleBlockPost(path)}
                                     >
                                         unblock
                                     </Button>

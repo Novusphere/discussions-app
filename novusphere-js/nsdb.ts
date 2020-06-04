@@ -1,11 +1,14 @@
 import axios from 'axios'
 import { ApiGetUnifiedId } from '../interfaces/ApiGet-UnifiedId'
 import { getOrigin } from '@utils'
+import { discussions } from '@novuspherejs/index'
+import _ from 'lodash'
 
 const ecc = require('eosjs-ecc')
 export const DEFAULT_NSDB_ENDPOINT = 'https://atmosdb.novusphere.io'
 
 export interface INSDBSearchQuery {
+    mods?: string[]
     sort?: string
     cursorId?: number
     pipeline: any[]
@@ -156,6 +159,63 @@ export class NSDB {
             if (!data.payload || data.error) {
                 throw new Error('Failed to disconnect Twitter account')
             }
+        } catch (error) {
+            throw error
+        }
+    }
+
+    async setTagsAsync({
+        accountPrivateKey,
+        accountPublicKey,
+        uuid,
+        tags,
+    }: {
+        accountPrivateKey: string
+        accountPublicKey: string
+        uuid: string
+        tags: string
+    }) {
+        console.log('got tags: ', JSON.stringify(tags))
+        try {
+            const time = new Date().getTime()
+            const sig = ecc.sign(ecc.sha256(`${getOrigin()}-${time}`), accountPrivateKey)
+            const pub = accountPublicKey
+            const qs = `pub=${pub}&sig=${sig}&time=${time}&domain=${getOrigin()}&uuid=${uuid}&tags=${tags}`
+            const rurl = `${this.api}/discussions/moderation/settags`
+            const { data } = await axios.get(`${rurl}?${qs}`)
+            if (data.error) {
+                throw new Error('Failed to set tags for post')
+            }
+        } catch (error) {
+            throw error
+        }
+    }
+
+    async getPinnedPostByModAndTag({
+        mods,
+        tag,
+        key = '',
+    }: {
+        mods: string[]
+        tag: string
+        key?: string
+    }) {
+        try {
+            if (key) {
+                mods.push(key)
+            }
+
+            const { data } = await axios.get(
+                `${this.api}/discussions/moderation/pinned?mods=${mods
+                    .filter(Boolean)
+                    .join(',')}&tags=${tag}&domain=${getOrigin()}`
+            )
+
+            return await discussions.getPostsByTransaction({
+                mods: mods,
+                transactions: _.map(_.groupBy(data, "transaction"), (p, key) => key),
+                key,
+            })
         } catch (error) {
             throw error
         }

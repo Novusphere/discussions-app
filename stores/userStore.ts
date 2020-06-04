@@ -286,7 +286,7 @@ export class UserStore {
     /**
      * @param {string} asPathURL - i.e. /tag/test/1hx6xdq9iwehn/testt
      */
-    toggleBlockPost = (asPathURL: string) => {
+    DEPRECATED_toggleBlockPost = (asPathURL: string) => {
         if (asPathURL === '') return
 
         if (this.blockedPosts.has(asPathURL)) {
@@ -299,6 +299,26 @@ export class UserStore {
         }
 
         this.syncDataFromLocalToServer()
+    }
+
+    /**
+     * Set the mod policy. The tags array is expected to be correct.
+     * Components are responsible for ensuring there are no dupes and removal/addition is correct.
+     * @param {string} uuid - The post uuid
+     * @param {string[]} tags - The array of mod policy tags
+     * @return {void}
+     */
+    setModPolicyAsync = async ({ uuid, tags }) => {
+        try {
+            await nsdb.setTagsAsync({
+                accountPrivateKey: this.authStore.postPriv,
+                accountPublicKey: this.authStore.postPub,
+                uuid,
+                tags: tags.filter(Boolean).join(','),
+            })
+        } catch (error){
+            throw error
+        }
     }
 
     toggleBlockUser = (displayName: string, pubKey: string) => {

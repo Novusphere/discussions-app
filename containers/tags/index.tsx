@@ -10,7 +10,12 @@ const TagsPage: React.FC<any> = () => {
     const { tags } = useParams()
     const split = useMemo(() => tags.toLowerCase().split(','), [tags])
     const fetch = useCallback(
-        ({ postPub, sort }) => postsStore.fetchPostsForTag(postPub, split, [], sort),
+        ({ postPub, sort }) => postsStore.fetchPostsForTag({
+            key: postPub,
+            tagNames: split,
+            pinnedPosts: [],
+            sort: sort
+        }),
         [split]
     )
 

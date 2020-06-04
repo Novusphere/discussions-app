@@ -47,7 +47,7 @@ const CommonFeed: FunctionComponent<ICommonFeedProps> = ({
 
     useEffect(() => {
         resetAndFetch()
-    }, [sort, tag, userStore])
+    }, [sort, tag])
 
     if (cursorId === 0 && !posts.length) {
         return <Empty description={emptyDescription} />

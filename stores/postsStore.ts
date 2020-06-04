@@ -3,6 +3,13 @@ import { RootStore } from '@stores/index'
 import { discussions, nsdb, Post, Thread } from '@novuspherejs'
 import _ from 'lodash'
 import { task } from 'mobx-task'
+import { mapModsKeysToList } from '@utils'
+
+interface FetchPostsForTagParams {
+    key: string
+    tagNames: string[]
+    sort?: string
+}
 
 export class PostsStore {
     @observable
@@ -33,20 +40,18 @@ export class PostsStore {
         return await nsdb.searchForUserByName(name)
     }
 
-
     /**
      * For fetching posts inside a tag, home page or all.
      * @param key
-     * @param {string[]} tagNames
-     * @param {asPathURL, tagName[]} pinnedPosts
+     * @param tagNames
+     * @param postPub
      * @param sort
      */
-    fetchPostsForTag = async (
+    fetchPostsForTag = async ({
         key = '',
-        tagNames: string[],
-        pinnedPosts: any[] = [],
-        sort = 'popular'
-    ) => {
+        tagNames,
+        sort = 'popular',
+    }: FetchPostsForTagParams) => {
         if (sort === '') {
             sort = 'popular'
         }
@@ -54,34 +59,27 @@ export class PostsStore {
         try {
             if (!tagNames || !tagNames.length) tagNames = ['all']
 
-            const { posts, cursorId } = await discussions.getPostsForSubs(
-                tagNames,
-                this.postsPosition.cursorId,
-                this.postsPosition.items,
-                20,
+            const mods = mapModsKeysToList(Array.from(this.userStore.delegated.keys()))
+
+            const { posts, cursorId } = await discussions.getPostsForSubs({
+                subs: tagNames,
+                cursorId: this.postsPosition.cursorId,
+                count: this.postsPosition.items,
+                limit: 20,
+                key: key,
+                sort: sort,
+                mods: mods,
+            })
+
+            const pinnedPosts = await nsdb.getPinnedPostByModAndTag({
+                mods,
+                tag: tagNames[0],
                 key,
-                sort
-            )
+            })
 
-            let _pinnedPosts: any[] = []
+            console.log(pinnedPosts);
 
-            // get pinned posts to put at the front
-            if (!this.postsPosition.cursorId && pinnedPosts.length) {
-                await Promise.all(
-                    _.map(pinnedPosts, async ([url, name]) => {
-                        if (tagNames[0] === name) {
-                            if (url.indexOf('#') === -1) {
-                                const post = await discussions.getPostsByAsPathURL(url, key)
-                                post.pinned = true
-                                _pinnedPosts.push(post)
-                            }
-
-                        }
-                    })
-                )
-            }
-
-            this.posts = [..._pinnedPosts, ...this.posts, ...posts]
+            this.posts = [...pinnedPosts, ...this.posts, ...posts]
 
             this.postsPosition = {
                 items: this.posts.length,

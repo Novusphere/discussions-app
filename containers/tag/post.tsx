@@ -82,373 +82,457 @@ const PostPageComponentObserverable: React.FunctionComponent<IPostPageProps> = (
     const location = useLocation()
 
     const postStore = useLocalStore(
-        source => ({
-            observableThread: source.thread,
-            myVote: source.thread.openingPost.myVote,
-            downvotes: source.thread.openingPost.downvotes,
-            upvotes: source.thread.openingPost.upvotes,
-            highlightedPostUUID: '',
-            showPreview: false,
-            totalReplies: source.thread.openingPost.totalReplies,
-            replies: source.thread.openingPost.replies,
+        source =>
+            ({
+                observableThread: source.thread,
+                myVote: source.thread.openingPost.myVote,
+                downvotes: source.thread.openingPost.downvotes,
+                upvotes: source.thread.openingPost.upvotes,
+                highlightedPostUUID: '',
+                showPreview: false,
+                totalReplies: source.thread.openingPost.totalReplies,
+                replies: source.thread.openingPost.replies,
+                modPolicy: source.thread.openingPost.modPolicy,
 
-            get myVoteValue() {
-                if (postStore.myVote && postStore.myVote.length) {
-                    return postStore.myVote[0].value
-                }
+                get myVoteValue() {
+                    if (postStore.myVote && postStore.myVote.length) {
+                        return postStore.myVote[0].value
+                    }
 
-                return 0
-            },
+                    return 0
+                },
 
-            get threadUsers() {
-                return _.uniqBy(
-                    _.map(
-                        _.filter(postStore.observableThread.map, (posts: any) => posts.pub.length),
-                        posts => {
-                            let poster = posts.poster
+                get threadUsers() {
+                    return _.uniqBy(
+                        _.map(
+                            _.filter(
+                                postStore.observableThread.map,
+                                (posts: any) => posts.pub.length
+                            ),
+                            posts => {
+                                let poster = posts.poster
 
-                            if (poster === 'eosforumanon') {
-                                poster = posts.displayName
+                                if (poster === 'eosforumanon') {
+                                    poster = posts.displayName
+                                }
+
+                                return {
+                                    id: `${posts.pub}-${posts.uidw}`,
+                                    value: poster,
+                                    icon: posts.imageData,
+                                }
                             }
+                        ),
+                        option => option.id
+                    )
+                },
 
-                            return {
-                                id: `${posts.pub}-${posts.uidw}`,
-                                value: poster,
-                                icon: posts.imageData,
-                            }
-                        }
-                    ),
-                    option => option.id
-                )
-            },
+                setHighlightedPosUUID: (uuid: string) => {
+                    postStore.highlightedPostUUID = uuid
+                },
 
-            setHighlightedPosUUID: (uuid: string) => {
-                postStore.highlightedPostUUID = uuid
-            },
+                /**
+                 * Editing
+                 */
+                editing: false,
+                submitEditLoading: false,
+                titleContent: source.thread.openingPost.title,
+                editingContent: source.thread.openingPost.content,
 
-            /**
-             * Editing
-             */
-            editing: false,
-            submitEditLoading: false,
-            titleContent: source.thread.openingPost.title,
-            editingContent: source.thread.openingPost.content,
+                setTitleContent: (e: any) => {
+                    postStore.titleContent = e.target.value
+                },
 
-            setTitleContent: (e: any) => {
-                postStore.titleContent = e.target.value
-            },
+                setEditingContent: (content: string) => {
+                    postStore.editingContent = content
+                },
 
-            setEditingContent: (content: string) => {
-                postStore.editingContent = content
-            },
+                togglePreview: () => {
+                    postStore.showPreview = !postStore.showPreview
+                },
 
-            togglePreview: () => {
-                postStore.showPreview = !postStore.showPreview
-            },
+                toggleEdit: () => {
+                    postStore.editing = !postStore.editing
+                },
 
-            toggleEdit: () => {
-                postStore.editing = !postStore.editing
-            },
+                submitEdit: async () => {
+                    postStore.submitEditLoading = true
 
-            submitEdit: async () => {
-                postStore.submitEditLoading = true
-
-                const postObject = createPostObject({
-                    title: postStore.titleContent,
-                    content: postStore.editingContent,
-                    sub: thread.openingPost.sub,
-                    parentUuid: thread.openingPost.uuid,
-                    threadUuid: thread.openingPost.threadUuid,
-                    uidw: authStore.uidwWalletPubKey,
-                    pub: thread.openingPost.pub,
-                    posterName: authStore.displayName,
-                    postPub: authStore.postPub,
-                    postPriv: authStore.postPriv,
-                    isEdit: true,
-                })
-
-                try {
-                    const { sig } = signPost({
-                        privKey: authStore.postPriv,
-                        uuid: postObject.uuid,
-                        content: postObject.content,
-                    })
-
-                    postObject.sig = sig
-
-                    const { editedAt, uuid } = await discussions.post(postObject as any)
-
-                    return new Promise((resolve, reject) => {
-                        const int = setInterval(async () => {
-                            const submitted = await discussions.wasEditSubmitted(
-                                postStore.observableThread.openingPost.transaction,
-                                uuid
-                            )
-
-                            if (submitted) {
-                                clearInterval(int)
-                                postObject.myVote = [{ value: 1 }]
-                                postStore.toggleEdit()
-                                postStore.submitEditLoading = false
-                                postStore.titleContent = postObject.title
-                                postStore.setEditingContent(postObject.content)
-                                postStore.observableThread.openingPost.edit = true
-                                postStore.observableThread.openingPost.editedAt = editedAt
-
-                                uiStore.showToast('Success', 'Your edit was submitted', 'success')
-
-                                return resolve()
-                            }
-                        }, 2000)
-                    })
-                } catch (error) {
-                    let message = 'Your reply failed to submit'
-
-                    if (error.message) {
-                        message = error.message
-                    }
-
-                    postStore.submitEditLoading = false
-                    uiStore.showToast('Failed', message, 'error')
-                    return error
-                }
-            },
-
-            /**
-             * Replying
-             **/
-            replying: true,
-            submitReplyLoading: false,
-            replyingContent: '',
-            setReplyContent: (content: string) => {
-                postStore.replyingContent = content
-            },
-
-            toggleReply: () => {
-                postStore.replying = !postStore.replying
-            },
-
-            waitForUserInput: (cb: (walletPassword: string) => void) => {
-                const int = setInterval(() => {
-                    if (uiStore.activeModal === MODAL_OPTIONS.none) {
-                        clearInterval(int)
-                        return cb('incomplete')
-                    }
-
-                    const { TEMP_WalletPrivateKey } = authStore
-
-                    if (TEMP_WalletPrivateKey) {
-                        clearInterval(int)
-                        return cb(TEMP_WalletPrivateKey)
-                    }
-                }, 250)
-            },
-
-            submitReply: async () => {
-                try {
-                    if (!authStore.hasAccount) {
-                        return uiStore.showToast('Failed', 'Please log in to reply', 'error')
-                    }
-
-                    postStore.submitReplyLoading = true
-
-                    // create a post object
                     const postObject = createPostObject({
-                        title: '',
-                        content: postStore.replyingContent,
-                        sub: postStore.observableThread.openingPost.sub,
-                        parentUuid: postStore.observableThread.openingPost.uuid,
-                        threadUuid: postStore.observableThread.openingPost.threadUuid,
+                        title: postStore.titleContent,
+                        content: postStore.editingContent,
+                        sub: thread.openingPost.sub,
+                        parentUuid: thread.openingPost.uuid,
+                        threadUuid: thread.openingPost.threadUuid,
                         uidw: authStore.uidwWalletPubKey,
-                        pub: postStore.observableThread.openingPost.pub,
+                        pub: thread.openingPost.pub,
                         posterName: authStore.displayName,
                         postPub: authStore.postPub,
                         postPriv: authStore.postPriv,
+                        isEdit: true,
                     })
 
-                    if (postObject.transfers.length > 0) {
-                        // ask for password
-                        uiStore.setActiveModal(MODAL_OPTIONS.walletActionPasswordReentry)
-
-                        const transferData = postObject.transfers.map(transfer => {
-                            return transformTipToMetadata({
-                                tip: transfer,
-                                tokens: walletStore.supportedTokensForUnifiedWallet,
-                                replyingToUIDW: postStore.observableThread.openingPost.uidw,
-                                replyingToDisplayName:
-                                    postStore.observableThread.openingPost.displayName,
-                                replyingToPostPub: postStore.observableThread.openingPost.pub,
-                            })
+                    try {
+                        const { sig } = signPost({
+                            privKey: authStore.postPriv,
+                            uuid: postObject.uuid,
+                            content: postObject.content,
                         })
 
-                        authStore.setTEMPTransfers(transferData)
+                        postObject.sig = sig
 
-                        postStore.waitForUserInput(async walletPrivateKey => {
-                            if (walletPrivateKey === 'incomplete') {
-                                postStore.submitReplyLoading = false
-                                uiStore.showToast('Failed', 'User cancelled transaction', 'error')
-                                return
-                            }
-                            const _cached = `${walletPrivateKey}`
-                            authStore.setTEMPPrivateKey('')
-                            uiStore.clearActiveModal()
+                        const { editedAt, uuid } = await discussions.post(postObject as any)
 
-                            if (!postStore.observableThread.openingPost.tips) {
-                                postStore.observableThread.openingPost.tips = {} as any
-                            }
+                        return new Promise((resolve, reject) => {
+                            const int = setInterval(async () => {
+                                const submitted = await discussions.wasEditSubmitted(
+                                    postStore.observableThread.openingPost.transaction,
+                                    uuid
+                                )
 
-                            postObject.transfers = transformTipsToTransfers({
-                                tips: postObject.transfers,
-                                replyingToUIDW: postStore.observableThread.openingPost.uidw,
-                                replyingToDisplayName:
-                                    postStore.observableThread.openingPost.displayName,
-                                privateKey: _cached,
-                                tokens: walletStore.supportedTokensForUnifiedWallet,
-                                replyingToPostPub: postStore.observableThread.openingPost.pub,
-                            })
+                                if (submitted) {
+                                    clearInterval(int)
+                                    postObject.myVote = [{ value: 1 }]
+                                    postStore.toggleEdit()
+                                    postStore.submitEditLoading = false
+                                    postStore.titleContent = postObject.title
+                                    postStore.setEditingContent(postObject.content)
+                                    postStore.observableThread.openingPost.edit = true
+                                    postStore.observableThread.openingPost.editedAt = editedAt
 
-                            await postStore.finishSubmitting(postObject)
-                        })
-                    } else {
-                        await postStore.finishSubmitting(postObject)
-                    }
-                } catch (error) {
-                    throw error
-                }
-            },
+                                    uiStore.showToast(
+                                        'Success',
+                                        'Your edit was submitted',
+                                        'success'
+                                    )
 
-            finishSubmitting: async (postObject: any) => {
-                try {
-                    const { sig } = signPost({
-                        privKey: authStore.postPriv,
-                        uuid: postObject.uuid,
-                        content: postObject.content,
-                    })
-
-                    postObject.sig = sig
-
-                    const { transaction } = await discussions.post(postObject)
-
-                    postObject.myVote = [{ value: 1 }]
-                    postStore.replies.push(postObject)
-                    postStore.totalReplies += 1
-                    postStore.submitReplyLoading = false
-                    postStore.setReplyContent('')
-
-                    uiStore.showToast('Success', 'Your reply has been submitted', 'success', {
-                        btn: (
-                            <Button
-                                size="small"
-                                onClick={() =>
-                                    openInNewTab(`https://bloks.io/transaction/${transaction}`)
+                                    return resolve()
                                 }
-                            >
-                                View transaction
-                            </Button>
-                        ),
-                    })
-                } catch (error) {
-                    let message = 'Your reply failed to submit'
+                            }, 2000)
+                        })
+                    } catch (error) {
+                        let message = 'Your reply failed to submit'
 
-                    if (error.message) {
-                        message = error.message
+                        if (error.message) {
+                            message = error.message
+                        }
+
+                        postStore.submitEditLoading = false
+                        uiStore.showToast('Failed', message, 'error')
+                        return error
+                    }
+                },
+
+                /**
+                 * Replying
+                 **/
+                replying: true,
+                submitReplyLoading: false,
+                replyingContent: '',
+                setReplyContent: (content: string) => {
+                    postStore.replyingContent = content
+                },
+
+                toggleReply: () => {
+                    postStore.replying = !postStore.replying
+                },
+
+                waitForUserInput: (cb: (walletPassword: string) => void) => {
+                    const int = setInterval(() => {
+                        if (uiStore.activeModal === MODAL_OPTIONS.none) {
+                            clearInterval(int)
+                            return cb('incomplete')
+                        }
+
+                        const { TEMP_WalletPrivateKey } = authStore
+
+                        if (TEMP_WalletPrivateKey) {
+                            clearInterval(int)
+                            return cb(TEMP_WalletPrivateKey)
+                        }
+                    }, 250)
+                },
+
+                submitReply: async () => {
+                    try {
+                        if (!authStore.hasAccount) {
+                            return uiStore.showToast('Failed', 'Please log in to reply', 'error')
+                        }
+
+                        postStore.submitReplyLoading = true
+
+                        // create a post object
+                        const postObject = createPostObject({
+                            title: '',
+                            content: postStore.replyingContent,
+                            sub: postStore.observableThread.openingPost.sub,
+                            parentUuid: postStore.observableThread.openingPost.uuid,
+                            threadUuid: postStore.observableThread.openingPost.threadUuid,
+                            uidw: authStore.uidwWalletPubKey,
+                            pub: postStore.observableThread.openingPost.pub,
+                            posterName: authStore.displayName,
+                            postPub: authStore.postPub,
+                            postPriv: authStore.postPriv,
+                        })
+
+                        if (postObject.transfers.length > 0) {
+                            // ask for password
+                            uiStore.setActiveModal(MODAL_OPTIONS.walletActionPasswordReentry)
+
+                            const transferData = postObject.transfers.map(transfer => {
+                                return transformTipToMetadata({
+                                    tip: transfer,
+                                    tokens: walletStore.supportedTokensForUnifiedWallet,
+                                    replyingToUIDW: postStore.observableThread.openingPost.uidw,
+                                    replyingToDisplayName:
+                                        postStore.observableThread.openingPost.displayName,
+                                    replyingToPostPub: postStore.observableThread.openingPost.pub,
+                                })
+                            })
+
+                            authStore.setTEMPTransfers(transferData)
+
+                            postStore.waitForUserInput(async walletPrivateKey => {
+                                if (walletPrivateKey === 'incomplete') {
+                                    postStore.submitReplyLoading = false
+                                    uiStore.showToast(
+                                        'Failed',
+                                        'User cancelled transaction',
+                                        'error'
+                                    )
+                                    return
+                                }
+                                const _cached = `${walletPrivateKey}`
+                                authStore.setTEMPPrivateKey('')
+                                uiStore.clearActiveModal()
+
+                                if (!postStore.observableThread.openingPost.tips) {
+                                    postStore.observableThread.openingPost.tips = {} as any
+                                }
+
+                                postObject.transfers = transformTipsToTransfers({
+                                    tips: postObject.transfers,
+                                    replyingToUIDW: postStore.observableThread.openingPost.uidw,
+                                    replyingToDisplayName:
+                                        postStore.observableThread.openingPost.displayName,
+                                    privateKey: _cached,
+                                    tokens: walletStore.supportedTokensForUnifiedWallet,
+                                    replyingToPostPub: postStore.observableThread.openingPost.pub,
+                                })
+
+                                await postStore.finishSubmitting(postObject)
+                            })
+                        } else {
+                            await postStore.finishSubmitting(postObject)
+                        }
+                    } catch (error) {
+                        throw error
+                    }
+                },
+
+                finishSubmitting: async (postObject: any) => {
+                    try {
+                        const { sig } = signPost({
+                            privKey: authStore.postPriv,
+                            uuid: postObject.uuid,
+                            content: postObject.content,
+                        })
+
+                        postObject.sig = sig
+
+                        const { transaction } = await discussions.post(postObject)
+
+                        postObject.myVote = [{ value: 1 }]
+                        postStore.replies.push(postObject)
+                        postStore.totalReplies += 1
+                        postStore.submitReplyLoading = false
+                        postStore.setReplyContent('')
+
+                        uiStore.showToast('Success', 'Your reply has been submitted', 'success', {
+                            btn: (
+                                <Button
+                                    size="small"
+                                    onClick={() =>
+                                        openInNewTab(`https://bloks.io/transaction/${transaction}`)
+                                    }
+                                >
+                                    View transaction
+                                </Button>
+                            ),
+                        })
+                    } catch (error) {
+                        let message = 'Your reply failed to submit'
+
+                        if (error.message) {
+                            message = error.message
+                        }
+
+                        postStore.submitReplyLoading = false
+                        uiStore.showToast('Failed', message, 'error')
+                        return error
+                    }
+                },
+
+                handleVoting: async (e: any, uuid: string, value: any) => {
+                    if (!authStore.hasAccount) {
+                        return uiStore.showToast('Error', 'Please log in to vote', 'error')
                     }
 
-                    postStore.submitReplyLoading = false
-                    uiStore.showToast('Failed', message, 'error')
-                    return error
-                }
-            },
+                    let type
 
-            handleVoting: async (e: any, uuid: string, value: any) => {
-                if (!authStore.hasAccount) {
-                    return uiStore.showToast('Error', 'Please log in to vote', 'error')
-                }
+                    switch (value) {
+                        case 1:
+                            type = 'upvote'
+                            break
+                        case -1:
+                            type = 'downvote'
+                            break
+                    }
 
-                let type
+                    try {
+                        const myVoteValue = postStore.myVoteValue
 
-                switch (value) {
-                    case 1:
-                        type = 'upvote'
-                        break
-                    case -1:
-                        type = 'downvote'
-                        break
-                }
+                        // check if your prev vote was positive
+                        if (myVoteValue === 1) {
+                            // what type of vote are you doing
+                            if (type === 'downvote') {
+                                postStore.upvotes -= 1
+                                postStore.downvotes += 1
+                                postStore.myVote = [{ value: -1 }]
+                            }
 
-                try {
-                    const myVoteValue = postStore.myVoteValue
-
-                    // check if your prev vote was positive
-                    if (myVoteValue === 1) {
-                        // what type of vote are you doing
-                        if (type === 'downvote') {
-                            postStore.upvotes -= 1
-                            postStore.downvotes += 1
-                            postStore.myVote = [{ value: -1 }]
+                            if (type === 'upvote') {
+                                postStore.upvotes -= 1
+                                postStore.myVote = [{ value: 0 }]
+                            }
                         }
 
-                        if (type === 'upvote') {
-                            postStore.upvotes -= 1
-                            postStore.myVote = [{ value: 0 }]
+                        // check if your prev vote was negative
+                        if (myVoteValue === -1) {
+                            // what type of vote are you doing
+                            if (type === 'downvote') {
+                                postStore.upvotes += 1
+                                postStore.myVote = [{ value: 0 }]
+                            }
+
+                            if (type === 'upvote') {
+                                postStore.upvotes += 1
+                                postStore.downvotes -= 1
+                                postStore.myVote = [{ value: 1 }]
+                            }
+                        }
+
+                        // you never voted
+                        if (myVoteValue === 0) {
+                            if (type === 'downvote') {
+                                postStore.downvotes += 1
+                                postStore.myVote = [{ value: -1 }]
+                            }
+                            //
+                            if (type === 'upvote') {
+                                postStore.upvotes += 1
+                                postStore.myVote = [{ value: 1 }]
+                            }
+                        }
+
+                        const voteObject = generateVoteObject({
+                            uuid,
+                            postPriv: authStore.postPriv,
+                            value: postStore.myVoteValue,
+                        })
+
+                        const data = await voteAsync({
+                            voter: '',
+                            uuid,
+                            value: postStore.myVoteValue,
+                            nonce: voteObject.nonce,
+                            pub: voteObject.pub,
+                            sig: voteObject.sig,
+                        })
+
+                        if (data.error) {
+                            uiStore.showToast(
+                                'Failed',
+                                `Failed to ${type.split('s')[0]} this post`,
+                                'error'
+                            )
+                        }
+                    } catch (error) {
+                        uiStore.showToast('Failed', error.message, 'error')
+                    }
+                },
+
+                toggleModPolicy(policy: string) {
+                    let existedBefore = false
+
+                    if (!postStore.modPolicy.length) {
+                        // this post has had no mod policy, so it is an empty array
+                        postStore.modPolicy.push({
+                            mod: authStore.postPub,
+                            tags: [policy],
+                        })
+                        existedBefore = false
+                    } else {
+                        if (postStore.modPolicy.some(pol => pol.tags.indexOf(policy) !== -1)) {
+                            // policy exists, remove it
+                            postStore.modPolicy = _.map(postStore.modPolicy, pol => {
+                                let result = pol
+
+                                if (result.tags.indexOf(policy) !== -1) {
+                                    result.tags.splice(result.tags.indexOf(policy), 1)
+                                }
+
+                                return result
+                            })
+                            existedBefore = true
+                        } else {
+                            // policy doesn't exist, add it
+                            postStore.modPolicy = _.map(postStore.modPolicy, pol => {
+                                let result = pol
+
+                                if (result.tags.indexOf(policy) === -1) {
+                                    result.tags.push(policy)
+                                }
+
+                                return result
+                            })
+                            existedBefore = false
                         }
                     }
 
-                    // check if your prev vote was negative
-                    if (myVoteValue === -1) {
-                        // what type of vote are you doing
-                        if (type === 'downvote') {
-                            postStore.upvotes += 1
-                            postStore.myVote = [{ value: 0 }]
+                    if (existedBefore) {
+                        switch (policy) {
+                            case 'spam':
+                                uiStore.showToast(
+                                    'Success',
+                                    'This post has been unmarked as spam',
+                                    'success'
+                                )
+                                break
+                            case 'pinned':
+                                uiStore.showToast(
+                                    'Success',
+                                    'This post has been unmarked as spam',
+                                    'success'
+                                )
+                                break
                         }
-
-                        if (type === 'upvote') {
-                            postStore.upvotes += 1
-                            postStore.downvotes -= 1
-                            postStore.myVote = [{ value: 1 }]
+                    } else {
+                        switch (policy) {
+                            case 'spam':
+                                uiStore.showToast('Success', 'This post has been pinned', 'success')
+                                break
+                            case 'pinned':
+                                uiStore.showToast(
+                                    'Success',
+                                    'This post has been unpinned',
+                                    'success'
+                                )
+                                break
                         }
                     }
-
-                    // you never voted
-                    if (myVoteValue === 0) {
-                        if (type === 'downvote') {
-                            postStore.downvotes += 1
-                            postStore.myVote = [{ value: -1 }]
-                        }
-                        //
-                        if (type === 'upvote') {
-                            postStore.upvotes += 1
-                            postStore.myVote = [{ value: 1 }]
-                        }
-                    }
-
-                    const voteObject = generateVoteObject({
-                        uuid,
-                        postPriv: authStore.postPriv,
-                        value: postStore.myVoteValue,
-                    })
-
-                    const data = await voteAsync({
-                        voter: '',
-                        uuid,
-                        value: postStore.myVoteValue,
-                        nonce: voteObject.nonce,
-                        pub: voteObject.pub,
-                        sig: voteObject.sig,
-                    })
-
-                    if (data.error) {
-                        uiStore.showToast(
-                            'Failed',
-                            `Failed to ${type.split('s')[0]} this post`,
-                            'error'
-                        )
-                    }
-                } catch (error) {
-                    uiStore.showToast('Failed', error.message, 'error')
-                }
-            },
-        }),
+                },
+            } as any),
         {
             thread,
         }
@@ -494,14 +578,32 @@ const PostPageComponentObserverable: React.FunctionComponent<IPostPageProps> = (
         }
     }, [location])
 
-    const togglePinPost = useCallback(() => {
-        userStore.togglePinPost(name, url)
-    }, [name, url])
-
     const isSameUser = useComputed(
         () => postStore.observableThread.openingPost.pub == authStore.postPub,
         [postStore.observableThread.openingPost.pub, authStore.postPub]
     )
+
+    const toggleModPolicy = useCallback((e, type) => {
+        e.preventDefault()
+
+        postStore.toggleModPolicy(type)
+
+        console.log('toggled mod policy!', type, postStore.modPolicy)
+
+        let myPolicy = postStore.modPolicy.find(p => p.mod === authStore.postPub)
+
+        if (!myPolicy) {
+            myPolicy = { mod: authStore.postPub, tags: [] }
+        }
+
+        userStore.setModPolicyAsync({
+            uuid: postStore.observableThread.openingPost.uuid,
+            tags: myPolicy.tags,
+        })
+    }, [])
+
+    const hasModPolicy = (policy: string) =>
+        postStore.modPolicy.some(pol => pol.tags.indexOf(policy) !== -1)
 
     const menu = useComputed(
         () => (
@@ -511,7 +613,9 @@ const PostPageComponentObserverable: React.FunctionComponent<IPostPageProps> = (
                         className={'flex flex-row items-center'}
                         target="_blank"
                         rel="noopener noreferrer"
-                        onClick={() => userStore.toggleBlockPost(url)}
+                        onClick={e => {
+                            toggleModPolicy(e, 'spam')
+                        }}
                     >
                         <Icon
                             type="delete"
@@ -521,11 +625,7 @@ const PostPageComponentObserverable: React.FunctionComponent<IPostPageProps> = (
                         />
                         <Observer>
                             {() => (
-                                <span>
-                                    {userStore.blockedPosts.has(url)
-                                        ? 'Unblock post'
-                                        : 'Block post'}
-                                </span>
+                                <span>{hasModPolicy('spam') ? 'Unblock post' : 'Block post'}</span>
                             )}
                         </Observer>
                     </a>
@@ -569,7 +669,9 @@ const PostPageComponentObserverable: React.FunctionComponent<IPostPageProps> = (
                         className={'flex flex-row items-center'}
                         target="_blank"
                         rel="noopener noreferrer"
-                        onClick={togglePinPost}
+                        onClick={e => {
+                            toggleModPolicy(e, 'pinned')
+                        }}
                     >
                         <Icon
                             type="pushpin"
@@ -580,9 +682,7 @@ const PostPageComponentObserverable: React.FunctionComponent<IPostPageProps> = (
                         <Observer>
                             {() => (
                                 <span>
-                                    {userStore.pinnedPosts.has(url)
-                                        ? 'Un-pin thread'
-                                        : 'Pin this thread'}
+                                    {hasModPolicy('pinned') ? 'Un-pin thread' : 'Pin this thread'}
                                 </span>
                             )}
                         </Observer>
@@ -590,7 +690,7 @@ const PostPageComponentObserverable: React.FunctionComponent<IPostPageProps> = (
                 </Menu.Item>
             </Menu>
         ),
-        [userStore, isSameUser]
+        [postStore, userStore, isSameUser]
     )
 
     const DropdownMenu = useCallback(() => {
@@ -606,8 +706,13 @@ const PostPageComponentObserverable: React.FunctionComponent<IPostPageProps> = (
         )
     }, [menu])
 
-    const shouldBeHidden =
-        userStore.blockedPosts.has(url) && userStore.blockedContentSetting === 'hidden'
+    const shouldBeHidden = useComputed(() => {
+        return (
+            userStore.blockedContentSetting === 'hidden' &&
+            (userStore.blockedUsers.has(url) ||
+                postStore.modPolicy.some(pol => pol.tags.indexOf('spam') !== -1))
+        )
+    }, [postStore, userStore])
 
     if (shouldBeHidden) {
         return (

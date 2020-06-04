@@ -2,7 +2,7 @@ import React, { FunctionComponent, useCallback, useEffect, useState } from 'reac
 import { Divider, Popover, Skeleton, Tag, Tooltip } from 'antd'
 import cx from 'classnames'
 import styles from './PostPreview.module.scss'
-import { observer, useLocalStore } from 'mobx-react-lite'
+import { observer, useLocalStore, useComputed } from 'mobx-react-lite'
 import { Post } from '@novuspherejs'
 import { getThreadUrl, generateVoteObject, voteAsync, Desktop, Mobile } from '@utils'
 import { ObservableMap } from 'mobx'
@@ -17,33 +17,32 @@ import {
     PostPreviewLoading,
 } from '@components'
 import { Link } from 'react-router-dom'
+import _ from 'lodash'
 
 interface IPostPreviewProps {
     post: Post
     hasAccount: boolean
     showToast: (m: string, d: string, type: string) => void
     postPriv: string
+    postPub: string
 
     tag: any
     blockedContentSetting: any
-    blockedPosts: ObservableMap<string, string>
     blockedUsers: ObservableMap<string, string>
-    blockedByDelegation: ObservableMap<string, string>
     unsignedPostsIsSpam: boolean
-    toggleBlockPost: (url: string) => void
+    toggleModPolicy: ({ uuid, tags }: { uuid: string; tags: string[] }) => void
 }
 
 const PostPreview: FunctionComponent<IPostPreviewProps> = ({
     post,
     tag,
     blockedContentSetting,
-    blockedPosts,
     blockedUsers,
-    blockedByDelegation,
     unsignedPostsIsSpam,
     postPriv,
+    postPub,
     showToast,
-    toggleBlockPost,
+    toggleModPolicy,
     hasAccount,
 }) => {
     const [url, setUrl] = useState('')
@@ -75,6 +74,7 @@ const PostPreview: FunctionComponent<IPostPreviewProps> = ({
             myVote: post.myVote,
             downvotes: post.downvotes,
             upvotes: post.upvotes,
+            modPolicy: post.modPolicy,
 
             get myVoteValue() {
                 if (!source.hasAccount) return 0
@@ -84,6 +84,65 @@ const PostPreview: FunctionComponent<IPostPreviewProps> = ({
                 }
 
                 return 0
+            },
+
+            toggleModPolicy(policy: string) {
+                let existedBefore = false
+
+                if (!postStore.modPolicy.length) {
+                    // this post has had no mod policy, so it is an empty array
+                    postStore.modPolicy.push({
+                        mod: postPub,
+                        tags: [policy],
+                    })
+                    existedBefore = false
+                } else {
+                    if (postStore.modPolicy.some(pol => pol.tags.indexOf(policy) !== -1)) {
+                        // policy exists, remove it
+                        postStore.modPolicy = _.map(postStore.modPolicy, pol => {
+                            let result = pol
+
+                            if (result.tags.indexOf(policy) !== -1) {
+                                result.tags.splice(result.tags.indexOf(policy), 1)
+                            }
+
+                            return result
+                        })
+                        existedBefore = true
+                    } else {
+                        // policy doesn't exist, add it
+                        postStore.modPolicy = _.map(postStore.modPolicy, pol => {
+                            let result = pol
+
+                            if (result.tags.indexOf(policy) === -1) {
+                                result.tags.push(policy)
+                            }
+
+                            return result
+                        })
+                        existedBefore = false
+                    }
+                }
+
+                if (existedBefore) {
+                    switch (policy) {
+                        case 'spam':
+                            showToast('Success', 'This post has been unmarked as spam', 'success')
+                            break
+                        case 'pinned':
+                            showToast('Success', 'This post has been unmarked as spam', 'success')
+                            break
+                    }
+                } else {
+                    switch (policy) {
+                        case 'spam':
+                            showToast('Success', 'This post has been pinned', 'success')
+                            break
+                        case 'pinned':
+                            showToast('Success', 'This post has been unpinned', 'success')
+                            break
+                    }
+                }
             },
 
             async handleVote(e: any, uuid: string, value: number) {
@@ -178,21 +237,26 @@ const PostPreview: FunctionComponent<IPostPreviewProps> = ({
         }
     )
 
-    const [isSpam, setSpamStatus] = useState(null)
-
-    useEffect(() => {
-        setSpamStatus(
-            blockedPosts.has(url) ||
-                blockedUsers.has(post.pub) ||
-                blockedByDelegation.has(url) ||
-                blockedByDelegation.has(post.pub) ||
-                (unsignedPostsIsSpam && !post.pub)
+    const isSpam = useComputed(() => {
+        return (
+            blockedUsers.has(post.pub) ||
+            postStore.modPolicy.some(pol => pol.tags.indexOf('spam') !== -1) ||
+            (unsignedPostsIsSpam && !post.pub)
         )
-    }, [blockedPosts, blockedUsers, blockedByDelegation, unsignedPostsIsSpam])
+    }, [postStore, unsignedPostsIsSpam, blockedUsers])
 
-    const isPinned = post.pinned
-    const shouldBeHidden = blockedContentSetting === 'hidden' && isSpam
-    const shouldBeCollapsed = blockedContentSetting === 'collapsed' && isSpam
+    const isPinned = useComputed(
+        () => postStore.modPolicy.some(pol => pol.tags.indexOf('pinned') !== -1),
+        [postStore]
+    )
+    const shouldBeHidden = useComputed(() => blockedContentSetting === 'hidden' && isSpam, [
+        blockedContentSetting,
+        isSpam,
+    ])
+    const shouldBeCollapsed = useComputed(() => blockedContentSetting === 'collapsed' && isSpam, [
+        blockedContentSetting,
+        isSpam,
+    ])
 
     const postIcon = useCallback((size = 25) => {
         if (!tag) return null
@@ -295,7 +359,23 @@ const PostPreview: FunctionComponent<IPostPreviewProps> = ({
                             className={'f6 mh2 black'}
                             onClick={e => {
                                 e.preventDefault()
-                                toggleBlockPost(url)
+
+                                postStore.toggleModPolicy('spam')
+
+                                console.log('toggled mod policy!', postStore.modPolicy)
+
+                                let myPolicy = postStore.modPolicy.find(p => p.mod === postPub)
+
+                                if (!myPolicy) {
+                                    myPolicy = { mod: postPub, tags: [] }
+                                }
+
+                                toggleModPolicy({
+                                    uuid: post.uuid,
+                                    tags: myPolicy.tags,
+                                })
+
+                                console.log('sent blocked post')
                             }}
                         >
                             mark as spam

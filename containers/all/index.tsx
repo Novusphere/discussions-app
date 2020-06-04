@@ -7,7 +7,12 @@ import Helmet from 'react-helmet'
 const AllPage: React.FC<any> = () => {
     const { postsStore }: RootStore = useStores()
     const fetch = useCallback(
-        ({ sort, postPub }) => postsStore.fetchPostsForTag(postPub, ['all'], [], sort),
+        ({ sort, postPub }) => postsStore.fetchPostsForTag({
+            key: postPub,
+            tagNames: ['all'],
+            pinnedPosts: [],
+            sort: sort
+        }),
         []
     )
 

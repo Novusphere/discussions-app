@@ -8,7 +8,12 @@ const IndexPage: React.FC<any> = () => {
     const { postsStore, tagStore }: RootStore = useStores()
     const fetch = useCallback(
         ({ postPub, sort }) =>
-            postsStore.fetchPostsForTag(postPub, [...tagStore.subscribed], [], sort),
+            postsStore.fetchPostsForTag({
+                key: postPub,
+                tagNames: [...tagStore.subscribed],
+                pinnedPosts: [],
+                sort: sort
+            }),
         []
     )
 
