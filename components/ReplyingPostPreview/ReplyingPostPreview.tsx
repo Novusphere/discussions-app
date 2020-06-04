@@ -58,6 +58,7 @@ const ReplyingPostPreview: FunctionComponent<IReplyingPostPreviewProps> = ({ cla
                         depth: 1,
                         myVote: [],
                         pinned: false,
+                        modPolicy: [],
                     } as any
                 }
             />
