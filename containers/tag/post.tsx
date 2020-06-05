@@ -326,11 +326,13 @@ const PostPageComponentObserverable: React.FunctionComponent<IPostPageProps> = (
                     })
 
                     postObject.sig = sig
+                    const transaction = 'test'
 
-                    const { transaction } = await discussions.post(postObject)
+                    // const { transaction } = await discussions.post(postObject)
 
                     postObject.myVote = [{ value: 1 }]
                     postStore.replies.push(postObject)
+                    console.log(postStore.replies)
                     postStore.totalReplies += 1
                     postStore.submitReplyLoading = false
                     postStore.setReplyContent('')
@@ -454,27 +456,27 @@ const PostPageComponentObserverable: React.FunctionComponent<IPostPageProps> = (
         }
     )
 
-    const refreshThread = useCallback(() => {
-        if (thread) {
-            postsStore
-                .refreshThread(id, authStore.postPub, thread.lastQueryTime)
-                .then(refreshedThreadDiff => {
-                    if (refreshedThreadDiff && refreshedThreadDiff.openingPost) {
-                        postStore.replies = refreshedThreadDiff.openingPost.replies
-                        postStore.totalReplies = refreshedThreadDiff.openingPost.totalReplies
-                    }
-                })
-        }
-    }, [thread, id])
-
-    useInterval(
-        () => {
-            refreshThread()
-        },
-        2000,
-        false,
-        [id]
-    )
+    // const refreshThread = useCallback(() => {
+    //     if (thread) {
+    //         postsStore
+    //             .refreshThread(id, authStore.postPub, thread.lastQueryTime)
+    //             .then(refreshedThreadDiff => {
+    //                 if (refreshedThreadDiff && refreshedThreadDiff.openingPost) {
+    //                     postStore.replies = refreshedThreadDiff.openingPost.replies
+    //                     postStore.totalReplies = refreshedThreadDiff.openingPost.totalReplies
+    //                 }
+    //             })
+    //     }
+    // }, [thread, id])
+    //
+    // useInterval(
+    //     () => {
+    //         refreshThread()
+    //     },
+    //     2000,
+    //     false,
+    //     [id]
+    // )
 
     useLayoutEffect(() => {
         setTimeout(() => {
@@ -635,26 +637,6 @@ const PostPageComponentObserverable: React.FunctionComponent<IPostPageProps> = (
     const tag = useMemo(() => tagStore.tagModelFromObservables(thread.openingPost.sub), [])
 
     if (!tag) return null
-
-    const replies = useComputed(
-        () =>
-            _.sortBy(postStore.replies, reply => {
-                let permaLinkURL = ''
-                if (typeof location.pathname !== 'undefined') {
-                    permaLinkURL = getPermaLink(location.pathname.split('#')[0], reply.uuid)
-                }
-
-                reply.permaLinkURL = permaLinkURL
-
-                if (
-                    userStore.pinnedPosts.has(permaLinkURL) ||
-                    userStore.pinnedByDelegation.has(permaLinkURL)
-                ) {
-                    return reply
-                }
-            }),
-        [userStore]
-    )
 
     return (
         <div id={'thread'}>
@@ -929,7 +911,21 @@ const PostPageComponentObserverable: React.FunctionComponent<IPostPageProps> = (
                     <PostReplies
                         highlightedPostUUID={postStore.highlightedPostUUID}
                         totalReplies={postStore.totalReplies}
-                        replies={replies}
+                        replies={_.sortBy(postStore.replies, reply => {
+                            let permaLinkURL = ''
+                            if (typeof location.pathname !== 'undefined') {
+                                permaLinkURL = getPermaLink(location.pathname.split('#')[0], reply.uuid)
+                            }
+
+                            reply.permaLinkURL = permaLinkURL
+
+                            if (
+                                userStore.pinnedPosts.has(permaLinkURL) ||
+                                userStore.pinnedByDelegation.has(permaLinkURL)
+                            ) {
+                                return reply
+                            }
+                        })}
                         setHighlightedPosUUID={postStore.setHighlightedPosUUID}
                         threadUsers={postStore.threadUsers}
                     />
