@@ -326,9 +326,8 @@ const PostPageComponentObserverable: React.FunctionComponent<IPostPageProps> = (
                     })
 
                     postObject.sig = sig
-                    const transaction = 'test'
 
-                    // const { transaction } = await discussions.post(postObject)
+                    const { transaction } = await discussions.post(postObject)
 
                     postObject.myVote = [{ value: 1 }]
                     postStore.replies.push(postObject)
