@@ -27,7 +27,8 @@ interface IPostPreviewProps {
     postPub: string
 
     tag: any
-    blockedContentSetting: any
+    blockedContentSetting: string
+    nsfwContentSetting: boolean
     blockedUsers: ObservableMap<string, string>
     unsignedPostsIsSpam: boolean
     toggleModPolicy: ({ uuid, tags }: { uuid: string; tags: string[] }) => void
@@ -37,6 +38,7 @@ const PostPreview: FunctionComponent<IPostPreviewProps> = ({
     post,
     tag,
     blockedContentSetting,
+    nsfwContentSetting,
     blockedUsers,
     unsignedPostsIsSpam,
     postPriv,
@@ -249,6 +251,14 @@ const PostPreview: FunctionComponent<IPostPreviewProps> = ({
         () => postStore.modPolicy.some(pol => pol.tags.indexOf('pinned') !== -1),
         [postStore]
     )
+
+    const isNSFW = useComputed(
+        () =>
+            post.tags.indexOf('nsfw') !== -1 ||
+            postStore.modPolicy.some(pol => pol.tags.indexOf('nsfw') !== -1),
+        [postStore]
+    )
+
     const shouldBeHidden = useComputed(() => blockedContentSetting === 'hidden' && isSpam, [
         blockedContentSetting,
         isSpam,
@@ -308,11 +318,18 @@ const PostPreview: FunctionComponent<IPostPreviewProps> = ({
                     {postUsername()}
                     <Divider type={'vertical'} />
                     {postDate()}
-                    {isPinned && (
-                        <Tag color="red" style={{ marginLeft: '1em' }}>
-                            Pinned
-                        </Tag>
-                    )}
+                    <div className={'ml2 flex flex-row items-center'}>
+                        {isPinned && (
+                            <Tag color="cyan" className={'disable-user-select'}>
+                                Pinned
+                            </Tag>
+                        )}
+                        {isNSFW && (
+                            <Tag color="red" className={'disable-user-select ml1'}>
+                                NSFW
+                            </Tag>
+                        )}
+                    </div>
                 </span>
                 {postTips()}
             </div>
@@ -447,7 +464,29 @@ const PostPreview: FunctionComponent<IPostPreviewProps> = ({
                                             {post.title}
                                         </span>
                                     </div>
-                                    <object>
+                                    <object className={'relative'}>
+                                        {nsfwContentSetting && isNSFW && (
+                                            <div
+                                                className={
+                                                    'w-100 h-100 absolute z-999 left-0 right-0 flex flex-column justify-center items-center'
+                                                }
+                                                style={{
+                                                    height: '90%',
+                                                    'backdrop-filter': 'blur(5px)',
+                                                    'background-color': 'rgba(200, 200, 200, 0.5)',
+                                                }}
+                                            >
+                                                <span
+                                                    className={'f6 white'}
+                                                    style={{
+                                                        'text-shadow':
+                                                            '1px 1px 4px rgba(150, 150, 150, 1)',
+                                                    }}
+                                                >
+                                                    This post has been marked NSFW
+                                                </span>
+                                            </div>
+                                        )}
                                         <RichTextPreview
                                             className={'h4 gray'}
                                             hideFade={post.content.length < 300}

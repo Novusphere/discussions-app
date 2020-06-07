@@ -82,6 +82,7 @@ const InfiniteScrollFeed: FunctionComponent<IInfiniteScrollFeedProps> = ({
                                   postPriv={authStore.postPriv}
                                   postPub={authStore.postPub}
                                   blockedContentSetting={userStore.blockedContentSetting}
+                                  nsfwContentSetting={userStore.nsfwContentSetting}
                                   blockedUsers={userStore.blockedUsers}
                                   unsignedPostsIsSpam={userStore.unsignedPostsIsSpam}
                                   toggleModPolicy={userStore.setModPolicyAsync}

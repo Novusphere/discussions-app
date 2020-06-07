@@ -9,6 +9,8 @@ import { getOrigin, removeMD, sleep } from '@utils'
 
 export type BlockedContentSetting = 'hidden' | 'collapsed'
 
+export type NSFWContentSetting = true | false // true = enabled [nsfw are blocked]
+
 export class UserStore {
     @persist('map') following = observable.map<string, string>()
     @persist('map') watching = observable.map<string, [number, number]>() // [currentCount, prevCount]
@@ -33,6 +35,10 @@ export class UserStore {
     @persist
     @observable
     blockedContentSetting: BlockedContentSetting = 'collapsed'
+
+    @persist
+    @observable
+    nsfwContentSetting: NSFWContentSetting = true
 
     @persist
     @observable
@@ -106,6 +112,11 @@ export class UserStore {
 
     setBlockedContent = (type: BlockedContentSetting) => {
         this.blockedContentSetting = type
+        this.syncDataFromLocalToServer()
+    }
+
+    setNSFWContent = (type: NSFWContentSetting) => {
+        this.nsfwContentSetting = type
         this.syncDataFromLocalToServer()
     }
 
@@ -477,6 +488,9 @@ export class UserStore {
                 if (!_.isNil(data['moderation']['blockedContentSetting']))
                     this.blockedContentSetting = data['moderation']['blockedContentSetting']
 
+                if (!_.isNil(data['moderation']['nsfwContentSetting']))
+                    this.nsfwContentSetting = data['moderation']['nsfwContentSetting']
+
                 /**
                  * Check localStorageVersion for comparison
                  * If version mismatch, reset users' local storage version
@@ -561,6 +575,7 @@ export class UserStore {
                     pinnedPosts: [...this.pinnedPosts.toJS()],
                     delegated: [...this.delegated.toJS()],
                     blockedContentSetting: this.blockedContentSetting,
+                    nsfwContentSetting: this.nsfwContentSetting,
                     unsignedPostsIsSpam: this.unsignedPostsIsSpam,
                 },
             }

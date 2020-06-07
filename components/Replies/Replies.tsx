@@ -647,7 +647,7 @@ const Replies: FunctionComponent<IRepliesProps> = props => {
                                             ).fromNow()}
                                         </span>
                                     </Tooltip>
-                                    {hasModPolicy('pinned') && <Tag color="red">Pinned</Tag>}
+                                    {hasModPolicy('pinned') && <Tag color="cyan">Pinned</Tag>}
                                     {replyStore.collapsed && (
                                         <span className={'light-silver f6 i'}>
                                             ({replyStore.reply.replies.length} children)

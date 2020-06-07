@@ -26,6 +26,10 @@ const Blocked = () => {
         }
     }, [])
 
+    const handleNSFWOnChange = useCallback(val => {
+        userStore.setNSFWContent(val)
+    }, [])
+
     if (!authStore.hasAccount) {
         return <span className={'f6 gray'}>Please sign in to view this option</span>
     }
@@ -71,6 +75,15 @@ const Blocked = () => {
                         checked={userStore.unsignedPostsIsSpam}
                         onChange={userStore.toggleUnsignedPostsIsSpam}
                     />
+                </div>
+                <div className={'flex flex-row items-center justify-between mb4'}>
+                    <span className={'f6'}>
+                        <span className={'b db'}>Blur NSFW Content</span>
+                        <span className={'db silver'}>
+                            If a post has been marked NSFW, this will blur the content.
+                        </span>
+                    </span>
+                    <Switch checked={userStore.nsfwContentSetting} onChange={handleNSFWOnChange} />
                 </div>
             </div>
             <Divider />

@@ -877,7 +877,7 @@ const PostPageComponentObserverable: React.FunctionComponent<IPostPageProps> = (
                                 {!postStore.editing && (
                                     <div className={'relative w-100'}>
                                         <>
-                                            {isNSFW && hideNSFW && (
+                                            {userStore.nsfwContentSetting && isNSFW && hideNSFW && (
                                                 <div
                                                     className={
                                                         'w-100 h-100 absolute z-999 left-0 right-0 flex flex-column justify-center items-center'
