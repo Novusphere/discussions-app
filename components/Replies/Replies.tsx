@@ -701,35 +701,39 @@ const Replies: FunctionComponent<IRepliesProps> = props => {
                                                     <Icons.LinkIcon />
                                                 </Button>
                                                 <DropdownMenu key="more" />
-                                                {props.reply.pub == authStore.postPub && (
-                                                    <>
-                                                        <Button
-                                                            title={'Toggle pin reply'}
-                                                            onClick={() =>
-                                                                userStore.togglePinPost(
-                                                                    replyStore.reply.sub,
-                                                                    replyStore.permaLinkURL
-                                                                )
-                                                            }
-                                                        >
-                                                            <Icon
-                                                                type={'pushpin'}
-                                                                theme={'filled'}
-                                                            />
-                                                        </Button>
-                                                        <Button
-                                                            type={
-                                                                replyStore.editing
-                                                                    ? 'danger'
-                                                                    : 'default'
-                                                            }
-                                                            title={'Edit post'}
-                                                            onClick={replyStore.toggleEditing}
-                                                        >
-                                                            <Icon type={'edit'} theme={'filled'} />
-                                                        </Button>
-                                                    </>
-                                                )}
+                                                {props.reply.pub == authStore.postPub &&
+                                                    props.reply.depth === 1 && (
+                                                        <>
+                                                            <Button
+                                                                title={'Toggle pin reply'}
+                                                                onClick={() =>
+                                                                    userStore.togglePinPost(
+                                                                        replyStore.reply.sub,
+                                                                        replyStore.permaLinkURL
+                                                                    )
+                                                                }
+                                                            >
+                                                                <Icon
+                                                                    type={'pushpin'}
+                                                                    theme={'filled'}
+                                                                />
+                                                            </Button>
+                                                            <Button
+                                                                type={
+                                                                    replyStore.editing
+                                                                        ? 'danger'
+                                                                        : 'default'
+                                                                }
+                                                                title={'Edit post'}
+                                                                onClick={replyStore.toggleEditing}
+                                                            >
+                                                                <Icon
+                                                                    type={'edit'}
+                                                                    theme={'filled'}
+                                                                />
+                                                            </Button>
+                                                        </>
+                                                    )}
                                             </ButtonGroup>
                                         </div>
                                     )}
@@ -742,18 +746,11 @@ const Replies: FunctionComponent<IRepliesProps> = props => {
                             )}
 
                             {/*Render Content*/}
-                            {!replyStore.collapsed &&
-                                !hasModPolicy('spam') &&
-                                !replyStore.editing && (
-                                    <RichTextPreview
-                                        hideFade
-                                        className={'lh-copy pt2 mr3 dark-gray'}
-                                    >
-                                        {props.preview
-                                            ? props.reply.content
-                                            : replyStore.reply.content}
-                                    </RichTextPreview>
-                                )}
+                            {!replyStore.collapsed && !hasModPolicy('spam') && !replyStore.editing && (
+                                <RichTextPreview hideFade className={'lh-copy pt2 mr3 dark-gray'}>
+                                    {props.preview ? props.reply.content : replyStore.reply.content}
+                                </RichTextPreview>
+                            )}
 
                             {replyStore.editing && (
                                 <div className={'pa2'}>
