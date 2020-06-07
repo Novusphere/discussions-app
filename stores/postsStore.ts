@@ -1,9 +1,9 @@
 import { observable } from 'mobx'
 import { RootStore } from '@stores/index'
 import { discussions, nsdb, Post, Thread } from '@novuspherejs'
-import _ from 'lodash'
 import { task } from 'mobx-task'
 import { mapModsKeysToList } from '@utils'
+import _ from 'lodash'
 
 interface FetchPostsForTagParams {
     key: string
@@ -40,6 +40,18 @@ export class PostsStore {
         return await nsdb.searchForUserByName(name)
     }
 
+    fetchPinnedPostsByModAndTag = async ({ mods, tag, key }) => {
+        try {
+            return await nsdb.getPinnedPostByModAndTag({
+                mods,
+                tag,
+                key,
+            })
+        } catch (error) {
+            throw error
+        }
+    }
+
     /**
      * For fetching posts inside a tag, home page or all.
      * @param key
@@ -47,11 +59,7 @@ export class PostsStore {
      * @param postPub
      * @param sort
      */
-    fetchPostsForTag = async ({
-        key = '',
-        tagNames,
-        sort = 'popular',
-    }: FetchPostsForTagParams) => {
+    fetchPostsForTag = async ({ key = '', tagNames, sort = 'popular' }: FetchPostsForTagParams) => {
         if (sort === '') {
             sort = 'popular'
         }
@@ -66,20 +74,18 @@ export class PostsStore {
                 cursorId: this.postsPosition.cursorId,
                 count: this.postsPosition.items,
                 limit: 20,
-                key: key,
-                sort: sort,
-                mods: mods,
+                key,
+                sort,
+                mods,
             })
 
-            const pinnedPosts = await nsdb.getPinnedPostByModAndTag({
+            const pinnedPosts = await this.fetchPinnedPostsByModAndTag({
                 mods,
                 tag: tagNames[0],
                 key,
             })
 
-            console.log(pinnedPosts);
-
-            this.posts = [...pinnedPosts, ...this.posts, ...posts]
+            this.posts = _.uniqBy([...pinnedPosts, ...this.posts, ...posts], 'uuid')
 
             this.postsPosition = {
                 items: this.posts.length,

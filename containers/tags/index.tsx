@@ -13,7 +13,6 @@ const TagsPage: React.FC<any> = () => {
         ({ postPub, sort }) => postsStore.fetchPostsForTag({
             key: postPub,
             tagNames: split,
-            pinnedPosts: [],
             sort: sort
         }),
         [split]

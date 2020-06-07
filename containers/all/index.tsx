@@ -10,7 +10,6 @@ const AllPage: React.FC<any> = () => {
         ({ sort, postPub }) => postsStore.fetchPostsForTag({
             key: postPub,
             tagNames: ['all'],
-            pinnedPosts: [],
             sort: sort
         }),
         []

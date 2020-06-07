@@ -11,7 +11,6 @@ const IndexPage: React.FC<any> = () => {
             postsStore.fetchPostsForTag({
                 key: postPub,
                 tagNames: [...tagStore.subscribed],
-                pinnedPosts: [],
                 sort: sort
             }),
         []

@@ -37,8 +37,8 @@ import _ from 'lodash'
 import {
     createPostObject,
     generateVoteObject,
-    getPermaLink,
     getThreadUrl,
+    mapModsKeysToList,
     openInNewTab,
     signPost,
     transformTipsToTransfers,
@@ -54,10 +54,13 @@ import { Link, useLocation, useParams } from 'react-router-dom'
 
 import { scroller } from 'react-scroll'
 import PostReplies from './PostReplies'
+import styles from '../../components/HeaderNewPost/HeaderNewPost.module.scss'
 
 interface IPostPageProps {
     thread: Thread
     url: string
+    mods: string[]
+    pinnedPosts: any[]
     query: {
         tag: string
         id: string
@@ -68,6 +71,8 @@ interface IPostPageProps {
 const PostPageComponentObserverable: React.FunctionComponent<IPostPageProps> = ({
     thread,
     url,
+    mods,
+    pinnedPosts,
     query: { tag: name, id, title },
 }) => {
     const {
@@ -544,7 +549,10 @@ const PostPageComponentObserverable: React.FunctionComponent<IPostPageProps> = (
                 .refreshThread(id, authStore.postPub, thread.lastQueryTime)
                 .then(refreshedThreadDiff => {
                     if (refreshedThreadDiff && refreshedThreadDiff.openingPost) {
-                        postStore.replies = refreshedThreadDiff.openingPost.replies
+                        postStore.replies = sortReplies({
+                            replies: refreshedThreadDiff.openingPost.replies,
+                            pinnedPosts,
+                        })
                         postStore.totalReplies = refreshedThreadDiff.openingPost.totalReplies
                     }
                 })
@@ -630,6 +638,32 @@ const PostPageComponentObserverable: React.FunctionComponent<IPostPageProps> = (
                         </Observer>
                     </a>
                 </Menu.Item>
+                {postStore.observableThread.openingPost.tags.indexOf('nsfw') === -1 && (
+                    <Menu.Item>
+                        <a
+                            className={'flex flex-row items-center'}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            onClick={e => {
+                                toggleModPolicy(e, 'nsfw')
+                            }}
+                        >
+                            <Icon
+                                type="eye-invisible"
+                                className={'mr2'}
+                                theme="twoTone"
+                                twoToneColor={'#E7040F'}
+                            />
+                            <Observer>
+                                {() => (
+                                    <span>
+                                        {hasModPolicy('nsfw') ? 'Unmark as NSFW' : 'Mark NSFW'}
+                                    </span>
+                                )}
+                            </Observer>
+                        </a>
+                    </Menu.Item>
+                )}
                 {!isSameUser && (
                     <Menu.Item>
                         <a
@@ -714,6 +748,15 @@ const PostPageComponentObserverable: React.FunctionComponent<IPostPageProps> = (
         )
     }, [postStore, userStore])
 
+    const isNSFW = useComputed(
+        () =>
+            hasModPolicy('nsfw') ||
+            postStore.observableThread.openingPost.tags.indexOf('nsfw') !== -1,
+        [postStore]
+    )
+
+    const [hideNSFW, setNSFWVisibility] = useState(isNSFW)
+
     if (shouldBeHidden) {
         return (
             <Result
@@ -741,25 +784,25 @@ const PostPageComponentObserverable: React.FunctionComponent<IPostPageProps> = (
 
     if (!tag) return null
 
-    const replies = useComputed(
-        () =>
-            _.sortBy(postStore.replies, reply => {
-                let permaLinkURL = ''
-                if (typeof location.pathname !== 'undefined') {
-                    permaLinkURL = getPermaLink(location.pathname.split('#')[0], reply.uuid)
-                }
-
-                reply.permaLinkURL = permaLinkURL
-
-                if (
-                    userStore.pinnedPosts.has(permaLinkURL) ||
-                    userStore.pinnedByDelegation.has(permaLinkURL)
-                ) {
-                    return reply
-                }
-            }),
-        [userStore]
-    )
+    // const replies = useComputed(
+    //     () =>
+    //         _.sortBy(postStore.replies, reply => {
+    //             let permaLinkURL = ''
+    //             if (typeof location.pathname !== 'undefined') {
+    //                 permaLinkURL = getPermaLink(location.pathname.split('#')[0], reply.uuid)
+    //             }
+    //
+    //             reply.permaLinkURL = permaLinkURL
+    //
+    //             if (
+    //                 userStore.pinnedPosts.has(permaLinkURL) ||
+    //                 userStore.pinnedByDelegation.has(permaLinkURL)
+    //             ) {
+    //                 return reply
+    //             }
+    //         }),
+    //     [userStore]
+    // )
 
     return (
         <div id={'thread'}>
@@ -832,12 +875,48 @@ const PostPageComponentObserverable: React.FunctionComponent<IPostPageProps> = (
                                     {postStore.titleContent}
                                 </span>
                                 {!postStore.editing && (
-                                    <RichTextPreview
-                                        hideFade
-                                        className={'black f6 lh-copy overflow-break-word'}
-                                    >
-                                        {postStore.editingContent}
-                                    </RichTextPreview>
+                                    <div className={'relative w-100'}>
+                                        <>
+                                            {isNSFW && hideNSFW && (
+                                                <div
+                                                    className={
+                                                        'w-100 h-100 absolute z-999 left-0 right-0 flex flex-column justify-center items-center'
+                                                    }
+                                                    style={{
+                                                        'backdrop-filter': 'blur(5px)',
+                                                        'background-color':
+                                                            'rgba(200, 200, 200, 0.5)',
+                                                    }}
+                                                >
+                                                    <span
+                                                        className={'f6 white'}
+                                                        style={{
+                                                            'text-shadow':
+                                                                '1px 1px 4px rgba(150, 150, 150, 1)',
+                                                        }}
+                                                    >
+                                                        This post has been marked NSFW
+                                                    </span>
+                                                    <Button
+                                                        onClick={() => setNSFWVisibility(false)}
+                                                        className={'mt1'}
+                                                        type={'primary'}
+                                                        size={'small'}
+                                                    >
+                                                        Reveal
+                                                    </Button>
+                                                </div>
+                                            )}
+                                            <RichTextPreview
+                                                hideFade
+                                                className={
+                                                    'black f6 lh-copy overflow-break-word relative'
+                                                }
+                                            >
+                                                {postStore.editingContent}
+                                            </RichTextPreview>
+                                        </>
+                                    </div>
                                 )}
                                 {postStore.editing && (
                                     <>
@@ -1034,7 +1113,7 @@ const PostPageComponentObserverable: React.FunctionComponent<IPostPageProps> = (
                     <PostReplies
                         highlightedPostUUID={postStore.highlightedPostUUID}
                         totalReplies={postStore.totalReplies}
-                        replies={replies}
+                        replies={postStore.replies}
                         setHighlightedPosUUID={postStore.setHighlightedPosUUID}
                         threadUsers={postStore.threadUsers}
                     />
@@ -1046,20 +1125,48 @@ const PostPageComponentObserverable: React.FunctionComponent<IPostPageProps> = (
 
 const PostPageComponent = PostPageComponentObserverable
 
+function sortReplies({ replies, pinnedPosts }) {
+    return _.sortBy(replies, reply => {
+        if (_.some(pinnedPosts, p => p.uuid === reply.uuid)) {
+            return reply
+        }
+    })
+}
+
 const PostPage: React.FC = () => {
-    const { postsStore, authStore }: RootStore = useStores()
+    const { postsStore, authStore, userStore }: RootStore = useStores()
     const query: any = useParams()
     const [thread, setThread] = useState(null)
     const [loading, setLoading] = useState(false)
     const [url, setUrl] = useState('')
+    const mods = useMemo(() => mapModsKeysToList(Array.from(userStore.delegated.keys())), [])
+    const [pinnedPosts, setPinnedPosts] = useState([])
     const fetchThread = useCallback(() => {
         setLoading(true)
         postsStore
             .getThreadById(query.id, authStore.postPub)
             .then(thread => {
-                setThread(thread)
-                getThreadUrl(thread.openingPost).then((url: string) => setUrl(url))
-                setLoading(false)
+                postsStore
+                    .fetchPinnedPostsByModAndTag({
+                        mods,
+                        tag: thread.openingPost.sub,
+                        key: authStore.postPub,
+                    })
+                    .then(pinnedPosts => {
+                        setPinnedPosts(pinnedPosts)
+                        setThread({
+                            ...thread,
+                            openingPost: {
+                                ...thread.openingPost,
+                                replies: sortReplies({
+                                    replies: thread.openingPost.replies,
+                                    pinnedPosts,
+                                }),
+                            },
+                        })
+                        getThreadUrl(thread.openingPost).then((url: string) => setUrl(url))
+                        setLoading(false)
+                    })
             })
             .catch(() => {
                 setLoading(false)
@@ -1083,7 +1190,13 @@ const PostPage: React.FC = () => {
                     {thread.openingPost.title} - #{thread.openingPost.sub}
                 </title>
             </Helmet>
-            <PostPageComponent thread={thread} url={url} query={query} />
+            <PostPageComponent
+                thread={thread}
+                url={url}
+                query={query}
+                mods={mods}
+                pinnedPosts={pinnedPosts}
+            />
         </>
     )
 }

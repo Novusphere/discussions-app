@@ -688,8 +688,6 @@ export default class DiscussionsService {
                 transactions = [transactions]
             }
 
-            console.log('got transactions', JSON.stringify(transactions))
-
             const { payload } = await nsdb.search({
                 mods,
                 key,
