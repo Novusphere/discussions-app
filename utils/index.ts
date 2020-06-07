@@ -520,6 +520,7 @@ export const createPostObject = ({
         displayName: posterName,
         sig: '',
         replies: [],
+        modPolicy: [],
     }
 
     if (!isEdit) {
