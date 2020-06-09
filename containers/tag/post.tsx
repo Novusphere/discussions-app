@@ -1,12 +1,5 @@
 import React, { useCallback, useEffect, useLayoutEffect, useMemo, useState } from 'react'
-import {
-    useLocalStore,
-    useComputed,
-    observer,
-    useObservable,
-    useObserver,
-    Observer,
-} from 'mobx-react-lite'
+import { useLocalStore, useComputed, observer, Observer } from 'mobx-react-lite'
 import { discussions, Thread } from '@novuspherejs'
 import {
     Button,
@@ -24,7 +17,7 @@ import {
 import {
     Editor,
     Icons,
-    Replies,
+    NsfwContentBlur,
     ReplyingPostPreview,
     RichTextPreview,
     SharePostPopover,
@@ -39,6 +32,7 @@ import {
     generateVoteObject,
     getThreadUrl,
     mapModsKeysToList,
+    modPolicyToastChange,
     openInNewTab,
     signPost,
     transformTipsToTransfers,
@@ -54,7 +48,6 @@ import { Link, useLocation, useParams } from 'react-router-dom'
 
 import { scroller } from 'react-scroll'
 import PostReplies from './PostReplies'
-import styles from '../../components/HeaderNewPost/HeaderNewPost.module.scss'
 
 interface IPostPageProps {
     thread: Thread
@@ -505,37 +498,11 @@ const PostPageComponentObserverable: React.FunctionComponent<IPostPageProps> = (
                         }
                     }
 
-                    if (existedBefore) {
-                        switch (policy) {
-                            case 'spam':
-                                uiStore.showToast(
-                                    'Success',
-                                    'This post has been unmarked as spam',
-                                    'success'
-                                )
-                                break
-                            case 'pinned':
-                                uiStore.showToast(
-                                    'Success',
-                                    'This post has been unmarked as spam',
-                                    'success'
-                                )
-                                break
-                        }
-                    } else {
-                        switch (policy) {
-                            case 'spam':
-                                uiStore.showToast('Success', 'This post has been pinned', 'success')
-                                break
-                            case 'pinned':
-                                uiStore.showToast(
-                                    'Success',
-                                    'This post has been unpinned',
-                                    'success'
-                                )
-                                break
-                        }
-                    }
+                    modPolicyToastChange({
+                        existedBefore,
+                        policy,
+                        showToast: uiStore.showToast,
+                    })
                 },
             } as any),
         {
@@ -878,34 +845,9 @@ const PostPageComponentObserverable: React.FunctionComponent<IPostPageProps> = (
                                     <div className={'relative w-100'}>
                                         <>
                                             {userStore.nsfwContentSetting && isNSFW && hideNSFW && (
-                                                <div
-                                                    className={
-                                                        'w-100 h-100 absolute z-999 left-0 right-0 flex flex-column justify-center items-center'
-                                                    }
-                                                    style={{
-                                                        'backdrop-filter': 'blur(5px)',
-                                                        'background-color':
-                                                            'rgba(200, 200, 200, 0.5)',
-                                                    }}
-                                                >
-                                                    <span
-                                                        className={'f6 white'}
-                                                        style={{
-                                                            'text-shadow':
-                                                                '1px 1px 4px rgba(150, 150, 150, 1)',
-                                                        }}
-                                                    >
-                                                        This post has been marked NSFW
-                                                    </span>
-                                                    <Button
-                                                        onClick={() => setNSFWVisibility(false)}
-                                                        className={'mt1'}
-                                                        type={'primary'}
-                                                        size={'small'}
-                                                    >
-                                                        Reveal
-                                                    </Button>
-                                                </div>
+                                                <NsfwContentBlur
+                                                    onRevealClick={() => setNSFWVisibility(false)}
+                                                />
                                             )}
                                             <RichTextPreview
                                                 hideFade

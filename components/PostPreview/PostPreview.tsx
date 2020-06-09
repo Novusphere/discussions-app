@@ -4,7 +4,14 @@ import cx from 'classnames'
 import styles from './PostPreview.module.scss'
 import { observer, useLocalStore, useComputed } from 'mobx-react-lite'
 import { Post } from '@novuspherejs'
-import { getThreadUrl, generateVoteObject, voteAsync, Desktop, Mobile } from '@utils'
+import {
+    getThreadUrl,
+    generateVoteObject,
+    voteAsync,
+    Desktop,
+    Mobile,
+    modPolicyToastChange,
+} from '@utils'
 import { ObservableMap } from 'mobx'
 import moment from 'moment'
 import {
@@ -15,6 +22,7 @@ import {
     SharePostPopover,
     Icons,
     PostPreviewLoading,
+    NsfwContentBlur,
 } from '@components'
 import { Link } from 'react-router-dom'
 import _ from 'lodash'
@@ -126,25 +134,11 @@ const PostPreview: FunctionComponent<IPostPreviewProps> = ({
                     }
                 }
 
-                if (existedBefore) {
-                    switch (policy) {
-                        case 'spam':
-                            showToast('Success', 'This post has been unmarked as spam', 'success')
-                            break
-                        case 'pinned':
-                            showToast('Success', 'This post has been unmarked as spam', 'success')
-                            break
-                    }
-                } else {
-                    switch (policy) {
-                        case 'spam':
-                            showToast('Success', 'This post has been pinned', 'success')
-                            break
-                        case 'pinned':
-                            showToast('Success', 'This post has been unpinned', 'success')
-                            break
-                    }
-                }
+                modPolicyToastChange({
+                    existedBefore,
+                    policy,
+                    showToast: showToast,
+                })
             },
 
             async handleVote(e: any, uuid: string, value: number) {
@@ -465,28 +459,7 @@ const PostPreview: FunctionComponent<IPostPreviewProps> = ({
                                         </span>
                                     </div>
                                     <object className={'relative'}>
-                                        {nsfwContentSetting && isNSFW && (
-                                            <div
-                                                className={
-                                                    'w-100 h-100 absolute z-999 left-0 right-0 flex flex-column justify-center items-center'
-                                                }
-                                                style={{
-                                                    height: '90%',
-                                                    'backdrop-filter': 'blur(5px)',
-                                                    'background-color': 'rgba(200, 200, 200, 0.5)',
-                                                }}
-                                            >
-                                                <span
-                                                    className={'f6 white'}
-                                                    style={{
-                                                        'text-shadow':
-                                                            '1px 1px 4px rgba(150, 150, 150, 1)',
-                                                    }}
-                                                >
-                                                    This post has been marked NSFW
-                                                </span>
-                                            </div>
-                                        )}
+                                        {nsfwContentSetting && isNSFW && <NsfwContentBlur />}
                                         <RichTextPreview
                                             className={'h4 gray'}
                                             hideFade={post.content.length < 300}
@@ -495,7 +468,9 @@ const PostPreview: FunctionComponent<IPostPreviewProps> = ({
                                         </RichTextPreview>
                                     </object>
 
-                                    <object className={'z-2 absolute bottom-0 pv3'}>
+                                    <object
+                                        className={'z-3 bg-white w-100 absolute bottom-0 pv3'}
+                                    >
                                         {postTotalReplies()}
                                         {postActions()}
                                     </object>

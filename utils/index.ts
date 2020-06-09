@@ -609,3 +609,41 @@ export const mapModsKeysToList = (mods: string[]) => {
         return pub
     })
 }
+
+export const modPolicyToastChange = ({
+    existedBefore,
+    policy,
+    showToast
+}) => {
+    if (existedBefore) {
+        switch (policy) {
+            case 'spam':
+                showToast(
+                    'Success',
+                    'This post has been unmarked as spam',
+                    'success'
+                )
+                break
+            case 'pinned':
+                showToast(
+                    'Success',
+                    'This post has been unpinned',
+                    'success'
+                )
+                break
+        }
+    } else {
+        switch (policy) {
+            case 'spam':
+                showToast('Success', 'This post has been marked as spam', 'success')
+                break
+            case 'pinned':
+                showToast(
+                    'Success',
+                    'This post has been unpinned',
+                    'success'
+                )
+                break
+        }
+    }
+}

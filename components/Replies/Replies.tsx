@@ -18,7 +18,7 @@ import cx from 'classnames'
 import { RootStore, useStores } from '@stores'
 import {
     createPostObject,
-    generateVoteObject,
+    generateVoteObject, modPolicyToastChange,
     openInNewTab,
     signPost,
     transformTipsToTransfers,
@@ -425,37 +425,11 @@ const Replies: FunctionComponent<IRepliesProps> = props => {
                         }
                     }
 
-                    if (existedBefore) {
-                        switch (policy) {
-                            case 'spam':
-                                uiStore.showToast(
-                                    'Success',
-                                    'This post has been unmarked as spam',
-                                    'success'
-                                )
-                                break
-                            case 'pinned':
-                                uiStore.showToast(
-                                    'Success',
-                                    'This post has been unmarked as spam',
-                                    'success'
-                                )
-                                break
-                        }
-                    } else {
-                        switch (policy) {
-                            case 'spam':
-                                uiStore.showToast('Success', 'This post has been pinned', 'success')
-                                break
-                            case 'pinned':
-                                uiStore.showToast(
-                                    'Success',
-                                    'This post has been unpinned',
-                                    'success'
-                                )
-                                break
-                        }
-                    }
+                    modPolicyToastChange({
+                        existedBefore,
+                        policy,
+                        showToast: uiStore.showToast,
+                    })
                 },
             } as any),
         {
@@ -706,12 +680,15 @@ const Replies: FunctionComponent<IRepliesProps> = props => {
                                                         <>
                                                             <Button
                                                                 title={'Toggle pin reply'}
-                                                                onClick={() =>
-                                                                    userStore.togglePinPost(
-                                                                        replyStore.reply.sub,
-                                                                        replyStore.permaLinkURL
-                                                                    )
+                                                                onClick={e =>
+                                                                    toggleModPolicy(e, 'pinned')
                                                                 }
+                                                                // onClick={() =>
+                                                                //     userStore.DEPRECATED_togglePinPost(
+                                                                //         replyStore.reply.sub,
+                                                                //         replyStore.permaLinkURL
+                                                                //     )
+                                                                // }
                                                             >
                                                                 <Icon
                                                                     type={'pushpin'}

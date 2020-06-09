@@ -366,7 +366,7 @@ export class UserStore {
         this.syncDataFromLocalToServer()
     }
 
-    togglePinPost = (tagName: string, asPathURL: string) => {
+    DEPRECATED_togglePinPost = (tagName: string, asPathURL: string) => {
         if (this.pinnedPosts.has(asPathURL)) {
             this.uiStore.showMessage('This post has been unpinned!', 'success')
             this.pinnedPosts.delete(asPathURL)
