@@ -8,6 +8,7 @@ import { SignInOptions } from '@constants/sign-in-options'
 import cx from 'classnames'
 import { RootStore, StoreContext } from '@stores'
 import { hasErrors } from '@utils'
+import { useMediaQuery } from 'react-responsive'
 
 const { Title, Text } = Typography
 
@@ -33,6 +34,7 @@ const ModalsSignIn: FunctionComponent<IModalsSignInProps> = ({
     handleOk,
     form,
 }) => {
+    const isMobile = useMediaQuery({ maxWidth: 767 })
     const { authStore, uiStore }: RootStore = useContext(StoreContext)
     const [remember, setRemember] = useState(
         authStore.preferredSignInMethod === SIGN_IN_OPTIONS.brainKey
@@ -112,21 +114,19 @@ const ModalsSignIn: FunctionComponent<IModalsSignInProps> = ({
                 ]
             case STEP_OPTIONS.SIGN_IN_WITH_CURRENT_BK:
                 return [
-                    <div key={'prevSubmit'} className={'flex flex-row items-center justify-end'}>
+                    <React.Fragment key={'prevSubmit'}>
                         <Button key="prev" onClick={() => setStep(STEP_OPTIONS.METHOD)}>
                             Go Back
                         </Button>
-                        <Form.Item key="submit" style={{ margin: 0, marginLeft: '1em' }}>
-                            <Button
-                                type="danger"
-                                onClick={handleLoginWithExistingBKSubmit}
-                                disabled={hasErrors(form.getFieldsError())}
-                                htmlType="submit"
-                            >
-                                Login
-                            </Button>
-                        </Form.Item>
-                    </div>,
+                        <Button
+                            type="danger"
+                            onClick={handleLoginWithExistingBKSubmit}
+                            disabled={hasErrors(form.getFieldsError())}
+                            htmlType="submit"
+                        >
+                            Login
+                        </Button>
+                    </React.Fragment>,
                 ]
         }
     }, [step])

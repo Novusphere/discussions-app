@@ -45,6 +45,7 @@ import { MODAL_OPTIONS } from '@globals'
 import cx from 'classnames'
 import Helmet from 'react-helmet'
 import { Link, useLocation, useParams } from 'react-router-dom'
+import { useMediaQuery } from 'react-responsive'
 
 import { scroller } from 'react-scroll'
 import PostReplies from './PostReplies'
@@ -68,6 +69,7 @@ const PostPageComponentObserverable: React.FunctionComponent<IPostPageProps> = (
     pinnedPosts,
     query: { tag: name, id, title },
 }) => {
+    const isMobile = useMediaQuery({ maxWidth: 767 })
     const {
         userStore,
         postsStore,
@@ -772,7 +774,14 @@ const PostPageComponentObserverable: React.FunctionComponent<IPostPageProps> = (
     // )
 
     return (
-        <div id={'thread'}>
+        <div
+            id={'thread'}
+            className={cx([
+                {
+                    mh1: isMobile,
+                },
+            ])}
+        >
             <Link to={`/tag/${thread.openingPost.sub}`}>
                 <Button title={`See all posts in ${name}`} icon={'caret-left'}>
                     <span className={'flex flex-row items-center'}>

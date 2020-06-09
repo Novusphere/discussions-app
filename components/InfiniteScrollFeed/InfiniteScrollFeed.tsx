@@ -12,6 +12,7 @@ import { RootStore, StoreContext } from '@stores'
 import { observer } from 'mobx-react-lite'
 import cx from 'classnames'
 import { useHistory } from 'react-router-dom'
+import { useMediaQuery } from 'react-responsive'
 
 interface IInfiniteScrollFeedProps {
     dataLength: number
@@ -30,6 +31,7 @@ const InfiniteScrollFeed: FunctionComponent<IInfiniteScrollFeedProps> = ({
     posts,
     children,
 }) => {
+    const isMobile = useMediaQuery({ maxWidth: 767 })
     const { uiStore, authStore, userStore, tagStore }: RootStore = useContext(StoreContext)
     const history = useHistory()
     const renderEndMessage = useCallback(() => {
@@ -65,6 +67,11 @@ const InfiniteScrollFeed: FunctionComponent<IInfiniteScrollFeedProps> = ({
             hasMore={hasMore}
             loader={renderLoadingMessage()}
             endMessage={renderEndMessage()}
+            className={cx([
+                {
+                    mh1: isMobile,
+                },
+            ])}
         >
             {!children
                 ? posts

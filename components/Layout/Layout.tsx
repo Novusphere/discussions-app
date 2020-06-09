@@ -1,5 +1,5 @@
-import React, { FunctionComponent, useEffect, memo } from 'react'
-import { Layout as AntdLayout, message, notification } from 'antd'
+import React, { FunctionComponent, useEffect, memo, useState } from 'react'
+import { Layout as AntdLayout, Menu, message, notification } from 'antd'
 import styles from './Layout.module.scss'
 import {
     Modals,
@@ -10,13 +10,15 @@ import {
     SidebarTrendingTags,
     SidebarDiscoverTags,
     TagViewTabs,
+    HeaderSearch,
 } from '@components'
 import { useLocation } from 'react-router-dom'
-import { useObserver } from 'mobx-react-lite'
+import { useObserver, Observer } from 'mobx-react-lite'
 import cx from 'classnames'
 import { RootStore, useStores } from '@stores'
 import { eos } from '@novuspherejs'
 import { refreshOEmbed, Mobile, Desktop } from '@utils'
+import { useMediaQuery } from 'react-responsive'
 
 const { Header: AntdLayoutHeader } = AntdLayout
 
@@ -25,6 +27,8 @@ interface ILayoutProps {}
 const Layout: FunctionComponent<ILayoutProps> = ({ children }) => {
     const { authStore, uiStore, settingStore, walletStore }: RootStore = useStores()
     const location = useLocation()
+    const isMobile = useMediaQuery({ maxWidth: 767 })
+    const [activeMobileItem, setMobileItem] = useState('posts')
 
     message.config({
         top: 75,
@@ -83,7 +87,7 @@ const Layout: FunctionComponent<ILayoutProps> = ({ children }) => {
 
     return (
         <AntdLayout
-            className={'overflow-x-hidden'}
+            className={cx([styles.layout, 'overflow-x-hidden'])}
             style={{
                 minHeight: '100vh',
             }}
@@ -98,48 +102,80 @@ const Layout: FunctionComponent<ILayoutProps> = ({ children }) => {
             {/*    type={'warning'}*/}
             {/*    showIcon*/}
             {/*/>*/}
-            <div className={cx([styles.container, styles.mainContainer, 'center flex pt1 pa0'])}>
-                {useObserver(() => (
+            <Mobile>
+                <div className={cx([styles.searchContainerMobile, 'db card bg-white pa2'])}>
+                    <HeaderSearch />
+                </div>
+            </Mobile>
+            <Desktop>
+                <div
+                    className={cx([styles.container, styles.mainContainer, 'center flex pt1 pa0'])}
+                >
+                    <Observer>
+                        {() => (
+                            <div
+                                className={cx([
+                                    'fl w-20 h-100 overflow-hidden',
+                                    {
+                                        dn: uiStore.hideSidebar,
+                                        'dn db-ns': !uiStore.hideSidebar,
+                                    },
+                                ])}
+                            >
+                                <SidebarLinks />
+                                <SidebarDiscoverTags />
+                            </div>
+                        )}
+                    </Observer>
+
                     <div
                         className={cx([
-                            'fl w-20 h-100 overflow-hidden',
+                            'ml2-ns ml0',
                             {
-                                dn: uiStore.hideSidebar,
-                                'dn db-ns': !uiStore.hideSidebar,
+                                'w-100': uiStore.hideSidebar,
+                                'w-80-ns w-100': !uiStore.hideSidebar,
                             },
                         ])}
                     >
+                        <Observer>
+                            {() => (
+                                <div className={styles.banner}>
+                                    <img
+                                        src={uiStore.activeBanner}
+                                        title={'Active banner'}
+                                        alt={'Active banner image'}
+                                    />
+                                </div>
+                            )}
+                        </Observer>
+                        <SidebarTagView />
+                        <TagViewTabs sidebar={<SidebarTrendingTags />} content={children} />
+                    </div>
+                </div>
+            </Desktop>
+            <Mobile>
+                <Menu
+                    mode={'horizontal'}
+                    selectedKeys={[activeMobileItem]}
+                    onClick={e => setMobileItem(e.key)}
+                >
+                    <Menu.Item key={'posts'}>Posts</Menu.Item>
+                    <Menu.Item key={'my'}>My Tags</Menu.Item>
+                    <Menu.Item key={'trending'}>Trending</Menu.Item>
+                </Menu>
+                {activeMobileItem === 'posts' && (
+                    <>
+                        <SidebarTagView />
+                        {children}
+                    </>
+                )}
+                {activeMobileItem === 'my' && (
+                    <>
                         <SidebarLinks />
                         <SidebarDiscoverTags />
-                    </div>
-                ))}
-
-                <div
-                    className={cx([
-                        'ml2-ns ml0',
-                        {
-                            'w-100': uiStore.hideSidebar,
-                            'w-80-ns w-100': !uiStore.hideSidebar,
-                        },
-                    ])}
-                >
-                    {useObserver(() => (
-                        <div className={styles.banner}>
-                            <img
-                                src={uiStore.activeBanner}
-                                title={'Active banner'}
-                                alt={'Active banner image'}
-                            />
-                        </div>
-                    ))}
-                    <SidebarTagView />
-                    <TagViewTabs
-                        sidebar={<SidebarTrendingTags />}
-                        content={children}
-                    />
-                </div>
-            </div>
-            <Mobile>
+                    </>
+                )}
+                {activeMobileItem === 'trending' && <SidebarTrendingTags />}
                 <footer className={cx([styles.footer, 'bg-white pv3 light-silver'])}>
                     <Footer
                         className={'tc center lh-copy measure-wide'}

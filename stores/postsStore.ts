@@ -1,9 +1,9 @@
 import { observable } from 'mobx'
 import { RootStore } from '@stores/index'
 import { discussions, nsdb, Post, Thread } from '@novuspherejs'
-import { task } from 'mobx-task'
 import { mapModsKeysToList } from '@utils'
 import _ from 'lodash'
+import { task } from 'mobx-task'
 
 interface FetchPostsForTagParams {
     key: string

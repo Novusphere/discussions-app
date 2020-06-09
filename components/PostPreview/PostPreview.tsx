@@ -25,6 +25,7 @@ import {
     NsfwContentBlur,
 } from '@components'
 import { Link } from 'react-router-dom'
+import { useMediaQuery } from 'react-responsive'
 import _ from 'lodash'
 
 interface IPostPreviewProps {
@@ -56,6 +57,7 @@ const PostPreview: FunctionComponent<IPostPreviewProps> = ({
     hasAccount,
 }) => {
     const [url, setUrl] = useState('')
+    const isMobile = useMediaQuery({ maxWidth: 767 })
 
     useEffect(() => {
         async function getUrl() {
@@ -353,7 +355,7 @@ const PostPreview: FunctionComponent<IPostPreviewProps> = ({
                 >
                     <a
                         href={'#'}
-                        className={'f6 mh2 black'}
+                        className={'mh2 black'}
                         onClick={e => {
                             e.preventDefault()
                         }}
@@ -364,10 +366,10 @@ const PostPreview: FunctionComponent<IPostPreviewProps> = ({
                 {hasAccount && (
                     <>
                         <Link to={`${url}#reply`}>
-                            <span className={'f6 mh2 black'}>reply</span>
+                            <span className={'mh2 black'}>reply</span>
                         </Link>
                         <a
-                            className={'f6 mh2 black'}
+                            className={'mh2 black'}
                             onClick={e => {
                                 e.preventDefault()
 
@@ -424,7 +426,7 @@ const PostPreview: FunctionComponent<IPostPreviewProps> = ({
 
     return (
         <Link to={url}>
-            <span
+            <div
                 className={cx([
                     styles.postPreview,
                     'db bg-white mb0 mb2-ns w-100',
@@ -435,14 +437,29 @@ const PostPreview: FunctionComponent<IPostPreviewProps> = ({
                 data-url={url}
                 style={{
                     opacity: shouldBeCollapsed ? 0.5 : 1,
-                    height: post.content.length > 300 ? '325px' : '100%',
+                    height: !isMobile
+                        ? post.content.length > 300
+                            ? '325px'
+                            : '100%'
+                        : post.content.length > 300
+                        ? '225px'
+                        : '100%',
                 }}
             >
                 <div className={'flex flex-row h-100'}>
-                    <div className={'bg-light-gray w2 ph2 pv4 z-2'}>{renderVotingHandles()}</div>
                     <div
                         className={cx([
-                            'flex flex-column bg-white pa2 pa4-ns',
+                            'bg-light-gray w2 ph2 pv4 z-2',
+                            {
+                                dn: isMobile,
+                            },
+                        ])}
+                    >
+                        {renderVotingHandles()}
+                    </div>
+                    <div
+                        className={cx([
+                            'flex flex-column bg-white pa2 pa4-ns w-100',
                             styles.contentContainer,
                         ])}
                     >
@@ -477,7 +494,7 @@ const PostPreview: FunctionComponent<IPostPreviewProps> = ({
                                 </Desktop>
 
                                 <Mobile>
-                                    <div className={'relative overflow-hidden'}>
+                                    <div className={'relative overflow-hidden pt3'}>
                                         <div
                                             className={
                                                 'w-20 fl flex items-center justify-center pt3'
@@ -494,30 +511,32 @@ const PostPreview: FunctionComponent<IPostPreviewProps> = ({
                                                 {post.title}
                                             </span>
 
-                                            {/*<RichTextPreview className={'h3 gray mb3'}>*/}
-                                            {/*    {post.content}*/}
-                                            {/*</RichTextPreview>*/}
+                                            <RichTextPreview className={'h3 gray mt3 mb3'}>
+                                                {post.content}
+                                            </RichTextPreview>
 
                                             <div
                                                 className={
-                                                    'mt2 w-100 left-0 bottom-0 z-2 db f7 flex flex-row items-center mb2'
+                                                    'absolute w-100 left-0 bottom-0 z-2 db f7 flex flex-row items-center mh2 mb2'
                                                 }
+                                                style={{ whiteSpace: 'pre' }}
                                             >
                                                 {renderVotingHandles(true, { className: 'f7' })}
                                                 <div className={'o-30 ml2'}>
                                                     {postTotalReplies()}
                                                 </div>
+                                                <div className={'f7 o-30 ml2'}>{postActions()}</div>
                                                 {postTips()}
                                             </div>
                                         </div>
-                                        <Divider style={{ margin: 0, padding: 0 }} />
                                     </div>
+                                    {/*<Divider style={{ margin: 0, padding: 0 }} />*/}
                                 </Mobile>
                             </>
                         )}
                     </div>
                 </div>
-            </span>
+            </div>
         </Link>
     )
 }
