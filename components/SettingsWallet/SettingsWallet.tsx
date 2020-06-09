@@ -1278,9 +1278,6 @@ const Wallet = () => {
                     <TabPane tab="Deposit" key="1">
                         <Deposit />
                     </TabPane>
-                    <TabPane tab="Transfer" key="2">
-                        <Transfer />
-                    </TabPane>
                     <TabPane tab="Withdrawal" key="3">
                         <Withdrawal />
                     </TabPane>
