@@ -503,7 +503,7 @@ export default class DiscussionsService {
     }> {
         let q: any = { $in: subs.map(sub => sub.toLowerCase()) }
         if (subs.length == 1 && subs[0] == 'all') {
-            q = { $nin: [] } // filtered subs from all sub
+            q = { $nin: ['test'] } // filtered subs from all sub
         }
 
         const query = await nsdb.search({

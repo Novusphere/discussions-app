@@ -69,13 +69,15 @@ export class PostsStore {
             if (!this.postsPosition.cursorId && pinnedPosts.length) {
                 await Promise.all(
                     _.map(pinnedPosts, async ([url, name]) => {
-                        if (tagNames[0] === name) {
-                            if (url.indexOf('#') === -1) {
-                                const post = await discussions.getPostsByAsPathURL(url, key)
-                                post.pinned = true
-                                _pinnedPosts.push(post)
-                            }
+                        if (url && name) {
+                            if (tagNames[0] === name) {
+                                if (url.indexOf('#') === -1) {
+                                    const post = await discussions.getPostsByAsPathURL(url, key)
+                                    post.pinned = true
+                                    _pinnedPosts.push(post)
+                                }
 
+                            }
                         }
                     })
                 )
