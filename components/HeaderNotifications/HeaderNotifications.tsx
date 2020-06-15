@@ -4,7 +4,7 @@ import { Icon, Badge, Button, List, Avatar, Dropdown } from 'antd'
 import styles from './HeaderNotifications.module.scss'
 import { observer } from 'mobx-react-lite'
 import { RootStore, useStores } from '@stores'
-import { getIdenticon, getThreadUrl, useInterval } from '@utils'
+import { getIdenticon, getThreadUrlAsync, useInterval } from '@utils'
 import { RichTextPreview } from '@components'
 import moment from 'moment'
 import cx from 'classnames'
@@ -21,7 +21,7 @@ const NotificationContainer = () => {
     }
 
     const handleNotificationClick = useCallback(({ index, item }) => {
-        getThreadUrl(item, item.title === '' ? item.uuid : null).then(url => {
+        getThreadUrlAsync(item, item.title === '' ? item.uuid : null).then(url => {
             history.push(url)
             userStore.deleteNotification(index)
         })

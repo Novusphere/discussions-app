@@ -30,7 +30,7 @@ import _ from 'lodash'
 import {
     createPostObject,
     generateVoteObject,
-    getThreadUrl,
+    getThreadUrlAsync,
     mapModsKeysToList,
     modPolicyToastChange,
     openInNewTab,
@@ -1115,7 +1115,7 @@ const PostPage: React.FC = () => {
                                 }),
                             },
                         })
-                        getThreadUrl(thread.openingPost).then((url: string) => setUrl(url))
+                        getThreadUrlAsync(thread.openingPost).then((url: string) => setUrl(url))
                         setLoading(false)
                     })
             })

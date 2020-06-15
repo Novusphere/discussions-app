@@ -40,7 +40,16 @@ export class PostsStore {
         return await nsdb.searchForUserByName(name)
     }
 
-    fetchPinnedPostsByModAndTag = async ({ mods, tag, key }) => {
+    @task
+    fetchPinnedPostsByModAndTag = async ({
+        mods,
+        tag,
+        key = '',
+    }: {
+        mods: string[]
+        tag: string
+        key?: string
+    }) => {
         try {
             return await nsdb.getPinnedPostByModAndTag({
                 mods,
@@ -85,7 +94,10 @@ export class PostsStore {
                 key,
             })
 
-            this.posts = _.uniqBy([...pinnedPosts, ...this.posts, ...posts], 'uuid')
+            this.posts = _.uniqBy(
+                [...pinnedPosts.filter(p => p.thread), ...this.posts, ...posts],
+                'uuid'
+            )
 
             this.postsPosition = {
                 items: this.posts.length,

@@ -121,7 +121,7 @@ export const getThreadTitle = (post: Post) => {
     return _.snakeCase(post.title.replace(/[^0-9a-z]/gi, ' '))
 }
 
-export const getThreadUrl = async (post: Post, permalinkUuid?: string) => {
+export const getThreadUrl = (post: Post, permalinkUuid?: string) => {
     const id = encodeId(post)
     let sub = _.trim(post.sub)
     let url = `/tag/${sub}/${id}`
@@ -129,11 +129,6 @@ export const getThreadUrl = async (post: Post, permalinkUuid?: string) => {
     // if a post is a comment not a opening post
     if (post.op) {
         url += `/${getThreadTitle(post.op)}`
-    } else if (!post.op && post.title === '') {
-        const thread = await discussions.getThread(id, '')
-        if (!thread || !thread.openingPost) return ''
-        const newId = encodeId(thread.openingPost as any)
-        url = `/tag/${thread.openingPost.sub}/${newId}/${getThreadTitle(thread as any)}`
     } else {
         url += `/${getThreadTitle(post)}`
     }
@@ -145,8 +140,44 @@ export const getThreadUrl = async (post: Post, permalinkUuid?: string) => {
     return url
 }
 
+export const getThreadUrlAsync = async (post: Post, permalinkUuid?: string) => {
+    // const id = encodeId(post)
+    // let sub = _.trim(post.sub)
+    // let url = `/tag/${sub}/${id}`
+    //
+    // // if a post is a comment not a opening post
+    // if (post.op) {
+    //     url += `/${getThreadTitle(post.op)}`
+    // } else if (!post.op && post.title === '') {
+    //     const thread = await discussions.getThread(id, '')
+    //     if (!thread || !thread.openingPost) return ''
+    //     const newId = encodeId(thread.openingPost as any)
+    //     url = `/tag/${thread.openingPost.sub}/${newId}/${getThreadTitle(thread as any)}`
+    // } else {
+    //     url += `/${getThreadTitle(post)}`
+    // }
+    //
+    // if (permalinkUuid) {
+    //     url += `#${permalinkUuid}`
+    // }
+    //
+    // return url
+
+    let url = getThreadUrl(post, permalinkUuid);
+    const id = encodeId(post);
+
+    if (!post.op && post.title === '') {
+        const thread = await discussions.getThread(id, '')
+        if (!thread || !thread.openingPost) return ''
+        const newId = encodeId(thread.openingPost as any)
+        url = `/tag/${thread.openingPost.sub}/${newId}/${getThreadTitle(thread as any)}`
+    }
+
+    return url
+}
+
 export const pushToThread = async (post: Post, permalinkUuid?: string) => {
-    const url = await getThreadUrl(post, permalinkUuid)
+    const url = await getThreadUrlAsync(post, permalinkUuid)
     return url
 }
 

@@ -6,7 +6,7 @@ import { useParams } from 'react-router-dom'
 import { observer } from 'mobx-react-lite'
 
 const TagPage: React.FC<any> = () => {
-    const { postsStore, authStore }: RootStore = useStores()
+    const { postsStore }: RootStore = useStores()
     const { tag: paramTag } = useParams()
     const tag = useMemo(() => paramTag.toLowerCase(), [paramTag])
     const fetch = ({ sort, postPub }) => {

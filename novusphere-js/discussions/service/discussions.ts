@@ -8,7 +8,7 @@ import * as bip32 from 'bip32'
 import ecc from 'eosjs-ecc'
 import axios from 'axios'
 import { INSDBSearchQuery } from '../../nsdb'
-import { encodeId, getHostName, getSettings, getThreadTitle, getThreadUrl, isDev } from '@utils'
+import { encodeId, getHostName, getSettings, getThreadTitle, getThreadUrlAsync, isDev } from '@utils'
 //import { isDev } from '@utils'
 import moment from 'moment'
 

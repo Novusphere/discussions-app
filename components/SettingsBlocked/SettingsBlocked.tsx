@@ -1,9 +1,11 @@
 import { RootStore, useStores } from '@stores'
-import React, { useCallback } from 'react'
-import { useObserver } from 'mobx-react-lite'
-import { Avatar, Button, Divider, List, Switch, Typography } from 'antd'
-import { getIdenticon } from '@utils'
+import React, { useCallback, useEffect, useState } from 'react'
+import { observer } from 'mobx-react-lite'
+import { Avatar, Button, Divider, List, Spin, Switch, Typography } from 'antd'
+import { getIdenticon, getThreadUrl } from '@utils'
 import { Link } from 'react-router-dom'
+import { Post } from '@novuspherejs'
+import _ from 'lodash'
 
 const { Text } = Typography
 
@@ -30,11 +32,25 @@ const Blocked = () => {
         userStore.setNSFWContent(val)
     }, [])
 
+    const [blockedPosts, setBlockedPosts] = useState([])
+    const [loading, setLoading] = useState(false)
+
     if (!authStore.hasAccount) {
         return <span className={'f6 gray'}>Please sign in to view this option</span>
     }
 
-    return useObserver(() => (
+    const unblockPost = useCallback(
+        (post: Post) => {
+            setBlockedPosts(_.reject(blockedPosts, pinnedPost => pinnedPost.uuid === post.uuid))
+            userStore.setModPolicyAsync({
+                uuid: post.uuid,
+                tags: _.reject(post.tags, tag => tag === 'spam'),
+            })
+        },
+        [blockedPosts]
+    )
+
+    return (
         <>
             <span className={'f6 gray'}>
                 Here you can set how you wish to view blocked content.
@@ -131,45 +147,48 @@ const Blocked = () => {
             </div>
             <div className={'mt4'}>
                 <span className={'f4 b black db mb3'}>Posts</span>
-                <List
-                    locale={{
-                        emptyText: <span>You have no blocked posts</span>,
-                    }}
-                    itemLayout="horizontal"
-                    dataSource={[...userStore.blockedPosts.toJS()]}
-                    renderItem={([path, date]) => {
-                        const [, tagName] = path.split('/')
-                        const tag = tagStore.tagModelFromObservables(tagName)
-                        if (!tag) return null
-                        return (
-                            <List.Item className={'flex flex-row items-center justify-between'}>
-                                <>
-                                    <span className={'flex flex-row items-center'}>
-                                        <span className={'pr3'}>
-                                            <Avatar src={tag.logo} size={'large'} />
+                {loading && <Spin />}
+                {!loading && (
+                    <List
+                        locale={{
+                            emptyText: <span>You have no blocked posts</span>,
+                        }}
+                        itemLayout="horizontal"
+                        dataSource={blockedPosts}
+                        renderItem={(post: Post) => {
+                            const tag = tagStore.tagModelFromObservables(post.tags[0])
+                            if (!tag) return null
+                            const path = getThreadUrl(post, post.title ? '' : post.uuid) as string
+                            return (
+                                <List.Item className={'flex flex-row items-center justify-between'}>
+                                    <>
+                                        <span className={'flex flex-row items-center'}>
+                                            <span className={'pr3'}>
+                                                <Avatar src={tag.logo} size={'large'} />
+                                            </span>
+                                            <Link to={path}>
+                                                <Text ellipsis style={{ maxWidth: '20vw' }}>
+                                                    {path}
+                                                </Text>
+                                            </Link>
                                         </span>
-                                        <Link to={path}>
-                                            <Text ellipsis style={{ maxWidth: '20vw' }}>
-                                                {path}
-                                            </Text>
-                                        </Link>
-                                    </span>
-                                    <Button
-                                        size={'small'}
-                                        type={'danger'}
-                                        key={'unblock'}
-                                        onClick={() => userStore.DEPRECATED_toggleBlockPost(path)}
-                                    >
-                                        unblock
-                                    </Button>
-                                </>
-                            </List.Item>
-                        )
-                    }}
-                />
+                                        <Button
+                                            size={'small'}
+                                            type={'danger'}
+                                            key={'unblock'}
+                                            onClick={() => unblockPost(post)}
+                                        >
+                                            unblock
+                                        </Button>
+                                    </>
+                                </List.Item>
+                            )
+                        }}
+                    />
+                )}
             </div>
         </>
-    ))
+    )
 }
 
-export default Blocked
+export default observer(Blocked)

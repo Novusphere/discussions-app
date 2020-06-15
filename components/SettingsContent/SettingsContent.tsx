@@ -2,9 +2,10 @@ import { RootStore, useStores } from '@stores'
 import React, { useCallback, useEffect, useState } from 'react'
 import { Avatar, Button, Spin, List, Typography } from 'antd'
 import { Link } from 'react-router-dom'
-import { getThreadTitle } from '@utils'
+import { getThreadTitle, getThreadUrl } from '@utils'
 import { useObserver } from 'mobx-react-lite'
-import { discussions } from '@novuspherejs'
+import { discussions, Post } from '@novuspherejs'
+import _ from 'lodash'
 
 const { Text } = Typography
 
@@ -81,47 +82,75 @@ const WatchedThreads = () => {
 }
 
 const PinnedThreads = () => {
-    return null
-    // const { userStore, tagStore }: RootStore = useStores()
-    //
-    // return (
-    //     <List
-    //         locale={{
-    //             emptyText: <span>You have no pinned threads</span>,
-    //         }}
-    //         itemLayout="horizontal"
-    //         dataSource={[...userStore.pinnedPosts.toJS()]}
-    //         renderItem={([path]) => {
-    //             const [, tagName] = path.split('/')
-    //             const tag = tagStore.tagModelFromObservables(tagName)
-    //             if (!tag) return null
-    //             return (
-    //                 <List.Item className={'flex flex-row items-center justify-between'}>
-    //                     <>
-    //                         <span className={'flex flex-row items-center'}>
-    //                             <span className={'pr3'}>
-    //                                 <Avatar src={tag.logo} size={'large'} />
-    //                             </span>
-    //                             <Link to={path}>
-    //                                 <Text ellipsis style={{ maxWidth: '20vw' }}>
-    //                                     {path}
-    //                                 </Text>
-    //                             </Link>
-    //                         </span>
-    //                         <Button
-    //                             size={'small'}
-    //                             type={'danger'}
-    //                             key={'unpin'}
-    //                             onClick={() => userStore.togglePinPost(tagName, path)}
-    //                         >
-    //                             unpin
-    //                         </Button>
-    //                     </>
-    //                 </List.Item>
-    //             )
-    //         }}
-    //     />
-    // )
+    const { userStore, tagStore, postsStore, authStore }: RootStore = useStores()
+    const [pinned, setPinned] = useState([])
+    const [loading, setLoading] = useState(true)
+
+    useEffect(() => {
+        postsStore
+            .fetchPinnedPostsByModAndTag({
+                mods: [authStore.postPub],
+                tag: [...tagStore.subscribed].join(','),
+            })
+            .then(posts => {
+                setPinned(posts)
+                setLoading(false)
+            })
+    }, [])
+
+    const unpinPost = useCallback(
+        (post: Post) => {
+            setPinned(_.reject(pinned, pinnedPost => pinnedPost.uuid === post.uuid))
+            userStore.setModPolicyAsync({
+                uuid: post.uuid,
+                tags: _.reject(post.tags, tag => tag === 'pinned'),
+            })
+        },
+        [pinned]
+    )
+
+    if (loading) {
+        return <Spin />
+    }
+
+    return (
+        <List
+            locale={{
+                emptyText: <span>You have no pinned threads</span>,
+            }}
+            itemLayout="horizontal"
+            dataSource={pinned}
+            renderItem={(post: Post) => {
+                const tag = tagStore.tagModelFromObservables(post.tags[0])
+                if (!tag) return null
+                const path = getThreadUrl(post, post.title ? '' : post.uuid)
+                return (
+                    <List.Item className={'flex flex-row items-center justify-between'}>
+                        <>
+                            <span className={'flex flex-row items-center'}>
+                                <span className={'pr3'}>
+                                    <Avatar src={tag.logo} size={'large'} />
+                                </span>
+                                <Link to={path}>
+                                    <Text ellipsis style={{ maxWidth: '20vw' }}>
+                                        {path}
+                                    </Text>
+                                </Link>
+                            </span>
+                            <Button
+                                size={'small'}
+                                type={'danger'}
+                                key={'unpin'}
+                                onClick={() => unpinPost(post)}
+                            >
+                                unpin
+                            </Button>
+                        </>
+                    </List.Item>
+                )
+            }}
+        />
+    )
 }
 
 const SettingsContent = () => {

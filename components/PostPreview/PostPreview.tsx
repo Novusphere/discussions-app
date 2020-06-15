@@ -5,7 +5,7 @@ import styles from './PostPreview.module.scss'
 import { observer, useLocalStore, useComputed } from 'mobx-react-lite'
 import { Post } from '@novuspherejs'
 import {
-    getThreadUrl,
+    getThreadUrlAsync,
     generateVoteObject,
     voteAsync,
     Desktop,
@@ -67,7 +67,7 @@ const PostPreview: FunctionComponent<IPostPreviewProps> = ({
                 uuid = post.uuid
             }
 
-            return await getThreadUrl(post, uuid)
+            return await getThreadUrlAsync(post, uuid)
         }
 
         let notDone = true
