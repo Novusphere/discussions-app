@@ -39,6 +39,8 @@ import {
     transformTipToMetadata,
     useInterval,
     voteAsync,
+    Desktop,
+    Mobile,
 } from '@utils'
 import { RootStore, useStores } from '@stores'
 import { MODAL_OPTIONS } from '@globals'
@@ -914,17 +916,19 @@ const PostPageComponentObserverable: React.FunctionComponent<IPostPageProps> = (
                     </Observer>
 
                     {!postStore.editing && (
-                        <Observer>
-                            {() => (
-                                <VotingHandles
-                                    uuid={thread.openingPost.uuid}
-                                    myVote={postStore.myVoteValue}
-                                    upVotes={postStore.upvotes}
-                                    downVotes={postStore.downvotes}
-                                    handler={postStore.handleVoting}
-                                />
-                            )}
-                        </Observer>
+                       <Desktop>
+                           <Observer>
+                               {() => (
+                                   <VotingHandles
+                                       uuid={thread.openingPost.uuid}
+                                       myVote={postStore.myVoteValue}
+                                       upVotes={postStore.upvotes}
+                                       downVotes={postStore.downvotes}
+                                       handler={postStore.handleVoting}
+                                   />
+                               )}
+                           </Observer>
+                       </Desktop>
                     )}
                 </div>
 
@@ -933,6 +937,23 @@ const PostPageComponentObserverable: React.FunctionComponent<IPostPageProps> = (
                         {() => (
                             <div className={'mt2 flex flex-row justify-between'}>
                                 <div className={'flex flex-row items-center'}>
+                                    {!postStore.editing && (
+                                        <Mobile>
+                                            <Observer>
+                                                {() => (
+                                                    <VotingHandles
+                                                        className={'mr2'}
+                                                        uuid={thread.openingPost.uuid}
+                                                        myVote={postStore.myVoteValue}
+                                                        upVotes={postStore.upvotes}
+                                                        downVotes={postStore.downvotes}
+                                                        handler={postStore.handleVoting}
+                                                        horizontal
+                                                    />
+                                                )}
+                                            </Observer>
+                                        </Mobile>
+                                    )}
                                     <Button
                                         disabled={postStore.editing}
                                         size={'small'}
