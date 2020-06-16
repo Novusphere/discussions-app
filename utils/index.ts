@@ -459,7 +459,9 @@ export const extractMentionHashesForRegEx = (matchedContentForMentions: any) => 
     if (!matchedContentForMentions) return []
     const regex = new RegExp(/\(?EOS.*\)?\w/, 'gi')
     return matchedContentForMentions.map((items: any) => {
-        return items.match(regex)[0]
+        if (items) {
+            return items.match(regex)[0]
+        }
     })
 }
 
