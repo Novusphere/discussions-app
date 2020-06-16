@@ -1,12 +1,14 @@
 import React, { useCallback, useEffect, useMemo, useState } from 'react'
-import { observer, useObserver, Observer } from 'mobx-react-lite'
+import { observer } from 'mobx-react-lite'
 import { RootStore, useStores } from '@stores'
 import { Avatar, Typography, Button, Dropdown, Menu, Icon, Select, List, Spin } from 'antd'
-import { getIdenticon, sleep } from '@utils'
+import { Desktop, getIdenticon, sleep } from '@utils'
 import { InfiniteScrollFeed, Icons } from '@components'
 import { discussions } from '@novuspherejs'
 import Helmet from 'react-helmet'
 import { useParams } from 'react-router-dom'
+import { useMediaQuery } from 'react-responsive'
+import cx from 'classnames'
 
 const { Paragraph } = Typography
 const { Option } = Select
@@ -29,31 +31,33 @@ const Moderation = ({
         return <Spin className={'db'} />
     }
 
-    return <Select
-        mode={'tags'}
-        size={'default'}
-        showSearch
-        className={'w-100'}
-        placeholder={'Select a tag to assign as moderator'}
-        onChange={onModerationChange}
-        defaultValue={defaultValue}
-    >
-        {options.map((option: any) => {
-            const tag = tagModelFromObservables(option.value)
-            if (!tag) return null
-            return (
-                <Option key={option.value} value={option.value}>
-                    <img
-                        src={tag.logo}
-                        title={`${tag.name} icon`}
-                        className={'mr2 dib'}
-                        width={15}
-                    />
-                    {option.label}
-                </Option>
-            )
-        })}
-    </Select>
+    return (
+        <Select
+            mode={'tags'}
+            size={'default'}
+            showSearch
+            className={'w-100'}
+            placeholder={'Select a tag to assign as moderator'}
+            onChange={onModerationChange}
+            defaultValue={defaultValue}
+        >
+            {options.map((option: any) => {
+                const tag = tagModelFromObservables(option.value)
+                if (!tag) return null
+                return (
+                    <Option key={option.value} value={option.value}>
+                        <img
+                            src={tag.logo}
+                            title={`${tag.name} icon`}
+                            className={'mr2 dib'}
+                            width={15}
+                        />
+                        {option.label}
+                    </Option>
+                )
+            })}
+        </Select>
+    )
 }
 
 const Following = ({ data, handleRemoveUser }: any) => {
@@ -94,6 +98,7 @@ const UserPage: React.FC<any> = () => {
     const [usersPostPub, setPostPub] = useState('')
     const [imageData, setImageData] = useState('')
     const myPostPub = useMemo(() => authStore.postPub, [])
+    const isMobile = useMediaQuery({ maxWidth: 767 })
 
     useEffect(() => {
         uiStore.setSidebarHidden(true)
@@ -178,11 +183,43 @@ const UserPage: React.FC<any> = () => {
             <Helmet>
                 <title>{`/u/${username}`}</title>
             </Helmet>
-            <div className={'flex flex-row'}>
-                <div className={'w-30 vh-75 bg-white card pa3'}>
-                    <div className={'flex flex-row items-center'}>
+            <div
+                className={cx([
+                    'flex',
+                    {
+                        'flex-column': isMobile,
+                        'flex-row': !isMobile,
+                    },
+                ])}
+            >
+                <div
+                    className={cx([
+                        'bg-white card pa3',
+                        {
+                            'w-30 vh-75': !isMobile,
+                            'w-100 mb3': isMobile,
+                        },
+                    ])}
+                >
+                    <div
+                        className={cx([
+                            'flex items-center',
+                            {
+                                'flex-column': isMobile,
+                                'flex-row': !isMobile,
+                            },
+                        ])}
+                    >
                         <Avatar icon={'user'} src={imageData} size={96} />
-                        <div className={'fl ml3'}>
+                        <div
+                            className={cx([
+                                'fl ml3',
+                                {
+                                    'tc pv2': isMobile,
+                                    tl: !isMobile,
+                                },
+                            ])}
+                        >
                             <span className={'db f5 b black'}>{username}</span>
                             <span className={'db f6 light-silver'}>{followers} followers</span>
                             {!isSameUser && authStore.hasAccount && (
@@ -193,7 +230,9 @@ const UserPage: React.FC<any> = () => {
                                         type={'primary'}
                                         onClick={followUser}
                                     >
-                                        {userStore.following.has(usersPostPub) ? 'Unfollow' : 'Follow'}
+                                        {userStore.following.has(usersPostPub)
+                                            ? 'Unfollow'
+                                            : 'Follow'}
                                     </Button>
                                     <DropdownMenu key="more" />
                                 </div>
@@ -201,15 +240,31 @@ const UserPage: React.FC<any> = () => {
                         </div>
                     </div>
 
-                    <div className={'mt4'}>
+                    <div
+                        className={cx([
+                            'mt4',
+                            {
+                                'w-80': !isMobile,
+                                'w-100': isMobile,
+                            },
+                        ])}
+                    >
                         <span className={'moon-gray ttu f6'}>Wallet</span>
-                        <Paragraph ellipsis copyable className={'f6 pt2 w-80'}>
+                        <Paragraph ellipsis copyable className={'f6 pt2'}>
                             {wallet}
                         </Paragraph>
                     </div>
 
                     {isSameUser && (
-                        <div className={'mt4'}>
+                        <div
+                            className={cx([
+                                'mt4',
+                                {
+                                    'w-80': !isMobile,
+                                    'w-100': isMobile,
+                                },
+                            ])}
+                        >
                             <span className={'moon-gray ttu f6'}>
                                 Following Users (Only visible to you)
                             </span>
@@ -251,7 +306,15 @@ const UserPage: React.FC<any> = () => {
                         </div>
                     )}
                 </div>
-                <div className={'fl ml3 w-70'}>
+                <div
+                    className={cx([
+                        'fl ml3',
+                        {
+                            'w-100': isMobile,
+                            'w-70': !isMobile,
+                        },
+                    ])}
+                >
                     <InfiniteScrollFeed
                         dataLength={postsStore.postsPosition.items}
                         hasMore={postsStore.postsPosition.cursorId !== 0}

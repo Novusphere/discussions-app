@@ -4,8 +4,10 @@ import { Avatar, Menu, Icon, Dropdown } from 'antd'
 import styles from './HeaderUserBar.module.scss'
 import { getIdenticon } from '@utils'
 import { UserBalances } from '@components'
-import { useObserver } from 'mobx-react-lite'
+import { Observer } from 'mobx-react-lite'
 import { Link } from 'react-router-dom'
+import cx from 'classnames'
+import { useMediaQuery } from 'react-responsive'
 
 interface IHeaderUserBarProps {
     icon: string
@@ -22,6 +24,7 @@ const HeaderUserBar: FunctionComponent<IHeaderUserBarProps> = ({
     postPub,
     balances,
 }) => {
+    const isMobile = useMediaQuery({ maxWidth: 767 })
     const [visible, onVisibleChange] = useState(false)
 
     const defaults = [
@@ -73,23 +76,32 @@ const HeaderUserBar: FunctionComponent<IHeaderUserBarProps> = ({
 
     return (
         <Dropdown overlay={menu} onVisibleChange={onVisibleChange}>
-            <a className={styles.userLink}>
-                {useObserver(() => (
-                    <>
-                        {displayName}
-                        <Icon
-                            type={'caret-down'}
-                            style={{ marginLeft: 5 }}
-                            rotate={visible ? 180 : 0}
-                        />
-                        <Avatar
-                            src={getIdenticon(icon)}
-                            size={'default'}
-                            icon={'user'}
-                            className={styles.avatar}
-                        />
-                    </>
-                ))}
+            <a
+                className={cx([
+                    styles.userLink,
+                    'w-100 flex flex-row items-center justify-between',
+                ])}
+            >
+                <Observer>
+                    {() => (
+                        <>
+                            {displayName}
+                            <Icon
+                                type={'caret-down'}
+                                style={{ marginLeft: 5 }}
+                                rotate={visible ? 180 : 0}
+                            />
+                            <Avatar
+                                src={getIdenticon(icon)}
+                                size={'default'}
+                                icon={'user'}
+                                style={{
+                                    marginLeft: isMobile ? 0 : '0.5em',
+                                }}
+                            />
+                        </>
+                    )}
+                </Observer>
             </a>
         </Dropdown>
     )

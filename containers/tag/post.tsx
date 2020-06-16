@@ -783,7 +783,13 @@ const PostPageComponentObserverable: React.FunctionComponent<IPostPageProps> = (
             ])}
         >
             <Link to={`/tag/${thread.openingPost.sub}`}>
-                <Button title={`See all posts in ${name}`} icon={'caret-left'}>
+                <Button
+                    title={`See all posts in ${name}`}
+                    icon={'caret-left'}
+                    className={cx({
+                        mt2: isMobile,
+                    })}
+                >
                     <span className={'flex flex-row items-center'}>
                         <img
                             className={'dib'}

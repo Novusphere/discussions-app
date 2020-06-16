@@ -1,4 +1,4 @@
-import React, { FunctionComponent, useEffect, memo, useState } from 'react'
+import React, { FunctionComponent, useEffect, memo, useState, useCallback } from 'react'
 import { Layout as AntdLayout, Menu, message, notification } from 'antd'
 import styles from './Layout.module.scss'
 import {
@@ -85,6 +85,10 @@ const Layout: FunctionComponent<ILayoutProps> = ({ children }) => {
         }
     }, [location])
 
+    const onMyTagClick = useCallback(() => {
+        setMobileItem('posts')
+    }, [])
+
     return (
         <AntdLayout
             className={cx([styles.layout, 'overflow-x-hidden'])}
@@ -122,7 +126,7 @@ const Layout: FunctionComponent<ILayoutProps> = ({ children }) => {
                                     },
                                 ])}
                             >
-                                <SidebarLinks />
+                                <SidebarLinks onMyTagClick={onMyTagClick} />
                                 <SidebarDiscoverTags />
                             </div>
                         )}
@@ -171,7 +175,7 @@ const Layout: FunctionComponent<ILayoutProps> = ({ children }) => {
                 )}
                 {activeMobileItem === 'my' && (
                     <>
-                        <SidebarLinks />
+                        <SidebarLinks onMyTagClick={onMyTagClick} />
                         <SidebarDiscoverTags />
                     </>
                 )}

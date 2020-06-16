@@ -2,7 +2,7 @@ import React, { FunctionComponent, useCallback, useContext } from 'react'
 import InfiniteScroll from 'react-infinite-scroll-component'
 import { PostPreview, PostPreviewLoading } from '@components'
 import { Post } from '@novuspherejs'
-import { Button, Skeleton } from 'antd'
+import { Button } from 'antd'
 
 import Empty from 'antd/lib/empty'
 

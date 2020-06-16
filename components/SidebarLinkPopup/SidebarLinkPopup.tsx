@@ -13,6 +13,8 @@ interface ISidebarLinkPopupProps {
     tag: any
     onSubscribe?: (subscribed: string) => void
     onUnsubscribe?: (subscribed: string) => void
+    onMyTagClick: () => void
+    isMobile: boolean
 }
 
 const SidebarLinkPopup: FunctionComponent<ISidebarLinkPopupProps> = ({
@@ -20,6 +22,8 @@ const SidebarLinkPopup: FunctionComponent<ISidebarLinkPopupProps> = ({
     tag,
     onSubscribe,
     onUnsubscribe,
+    isMobile = false,
+    onMyTagClick,
 }) => {
     return (
         <Popover
@@ -68,7 +72,14 @@ const SidebarLinkPopup: FunctionComponent<ISidebarLinkPopupProps> = ({
             placement={'right'}
             overlayClassName={styles.tagOverlay}
         >
-            <Link to={`/tag/${subscribed}`}>
+            <Link
+                to={`/tag/${subscribed}`}
+                onClick={() => {
+                    if (isMobile) {
+                        onMyTagClick()
+                    }
+                }}
+            >
                 <span className={'flex flex-row items-center'}>
                     <img src={tag.logo} alt={`${subscribed} icon`} width={25} />
                     <span className={'mh2 flex flex-row items-center'}>

@@ -13,24 +13,9 @@ import {
 import { useObserver, Observer } from 'mobx-react-lite'
 import { RootStore, useStores } from '@stores'
 import { Mobile, Desktop } from '@utils'
-import { Menu, Icon, Dropdown } from 'antd'
-
-const { SubMenu } = Menu
+import { Menu } from 'antd'
 
 interface IHeaderDesktopProps {}
-
-const menu = (
-    <Menu>
-        <Menu.Item key="0">
-            <a href="http://www.alipay.com/">1st menu item</a>
-        </Menu.Item>
-        <Menu.Item key="1">
-            <a href="http://www.taobao.com/">2nd menu item</a>
-        </Menu.Item>
-        <Menu.Divider />
-        <Menu.Item key="3">3rd menu item</Menu.Item>
-    </Menu>
-)
 
 const Header: FunctionComponent<IHeaderDesktopProps> = () => {
     const { authStore, walletStore, uiStore }: RootStore = useStores()
