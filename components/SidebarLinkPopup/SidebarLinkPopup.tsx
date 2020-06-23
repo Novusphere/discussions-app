@@ -1,4 +1,4 @@
-import React, { FunctionComponent, memo } from 'react'
+import React, { FunctionComponent, memo, useCallback } from 'react'
 
 import styles from './SidebarLinkPopup.module.scss'
 import { Popover, Button, Icon, Divider, Typography } from 'antd'
@@ -21,6 +21,15 @@ const SidebarLinkPopup: FunctionComponent<ISidebarLinkPopupProps> = ({
     onSubscribe,
     onUnsubscribe,
 }) => {
+    const renderTag = useCallback(
+        () => (
+            <Text ellipsis style={{ maxWidth: '100px' }}>
+                #{subscribed}
+            </Text>
+        ),
+        []
+    )
+
     return (
         <Popover
             content={
@@ -35,9 +44,7 @@ const SidebarLinkPopup: FunctionComponent<ISidebarLinkPopupProps> = ({
                             />
                             <span className={'mh3 dib'}>
                                 <span className={'b db'}>
-                                    <Link to={`/tag/${subscribed}`}>
-                                        <span className={'f5 black db'}>#{subscribed}</span>
-                                    </Link>
+                                    <Link to={`/tag/${subscribed}`}>{renderTag()}</Link>
                                 </span>
                                 {typeof tag.memberCount !== 'undefined' && (
                                     <span className={'f6 db gray'}>{tag.memberCount} members</span>
@@ -71,11 +78,7 @@ const SidebarLinkPopup: FunctionComponent<ISidebarLinkPopupProps> = ({
             <Link to={`/tag/${subscribed}`}>
                 <span className={'flex flex-row items-center'}>
                     <img src={tag.logo} alt={`${subscribed} icon`} width={25} />
-                    <span className={'mh2 flex flex-row items-center'}>
-                        <Text ellipsis style={{ maxWidth: '100px' }}>
-                            #{subscribed}
-                        </Text>
-                    </span>
+                    <span className={'mh2 flex flex-row items-center'}>{renderTag()}</span>
                 </span>
             </Link>
         </Popover>
