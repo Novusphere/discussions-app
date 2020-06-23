@@ -402,6 +402,13 @@ class Editor extends React.Component<IEditorProps, IEditorState> {
         }
     }
 
+    componentWillUnmount(): void {
+        const editor = this.ref.current.getEditor()
+        if (editor.getText()) {
+            window.alert("You have an unfinished post, are you sure you want to exit?")
+        }
+    }
+
     private updateContentByRef = (content: any) => {
         if (this.ref && this.ref.current && typeof this.props.value !== 'undefined') {
             const editor = this.ref.current.getEditor()
