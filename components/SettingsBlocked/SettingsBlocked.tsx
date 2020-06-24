@@ -10,7 +10,7 @@ import _ from 'lodash'
 const { Text } = Typography
 
 const Blocked = () => {
-    const { userStore, tagStore, authStore }: RootStore = useStores()
+    const { userStore, tagStore, authStore, postsStore }: RootStore = useStores()
 
     const handleHiddenOnChange = useCallback(val => {
         if (val) {
@@ -33,7 +33,18 @@ const Blocked = () => {
     }, [])
 
     const [blockedPosts, setBlockedPosts] = useState([])
-    const [loading, setLoading] = useState(false)
+    const [loading, setLoading] = useState(true)
+
+    useEffect(() => {
+        postsStore
+            .fetchSpamPostsByMod({
+                mods: [authStore.postPub],
+            })
+            .then(posts => {
+                setBlockedPosts(posts)
+                setLoading(false)
+            })
+    }, [])
 
     if (!authStore.hasAccount) {
         return <span className={'f6 gray'}>Please sign in to view this option</span>
@@ -41,7 +52,9 @@ const Blocked = () => {
 
     const unblockPost = useCallback(
         (post: Post) => {
-            setBlockedPosts(_.reject(blockedPosts, pinnedPost => pinnedPost.uuid === post.uuid))
+            setBlockedPosts(
+                _.reject(blockedPosts, ({ post: blockedPost }) => blockedPost.uuid === post.uuid)
+            )
             userStore.setModPolicyAsync({
                 uuid: post.uuid,
                 tags: _.reject(post.tags, tag => tag === 'spam'),
@@ -155,7 +168,7 @@ const Blocked = () => {
                         }}
                         itemLayout="horizontal"
                         dataSource={blockedPosts}
-                        renderItem={(post: Post) => {
+                        renderItem={({ post }: { post: Post }) => {
                             const tag = tagStore.tagModelFromObservables(post.tags[0])
                             if (!tag) return null
                             const path = getThreadUrl(post, post.title ? '' : post.uuid) as string

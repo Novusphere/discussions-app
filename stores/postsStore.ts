@@ -61,6 +61,25 @@ export class PostsStore {
         }
     }
 
+
+    @task
+    fetchSpamPostsByMod = async ({
+        mods,
+        key = '',
+    }: {
+        mods: string[]
+        key?: string
+    }) => {
+        try {
+            return await nsdb.getBlockedPostsByMod({
+                mods,
+                key,
+            })
+        } catch (error) {
+            throw error
+        }
+    }
+
     /**
      * For fetching posts inside a tag, home page or all.
      * @param key

@@ -220,4 +220,28 @@ export class NSDB {
             throw error
         }
     }
+
+    async getBlockedPostsByMod({
+        mods,
+        key = '',
+    }: {
+        mods: string[]
+        key?: string
+    }) {
+        try {
+            if (key) {
+                mods.push(key)
+            }
+
+            const { data } = await axios.get(
+                `${this.api}/discussions/moderation/spam?mods=${mods
+                    .filter(Boolean)
+                    .join(',')}&domain=${getOrigin()}`
+            )
+
+            return data
+        } catch (error) {
+            throw error
+        }
+    }
 }
