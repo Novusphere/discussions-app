@@ -11,7 +11,7 @@ const { Option } = Select
 import styles from './Editor.module.scss'
 import { useCallback, useState } from 'react'
 import { useMemo } from 'react'
-import { generateUuid } from '@utils'
+import { generateUuid, warnUserAboutContentRemaining } from '@utils'
 import { useLocation } from 'react-router-dom'
 
 interface IEditorProps {
@@ -332,7 +332,7 @@ class Editor extends React.Component<IEditorProps, IEditorState> {
                     let accounts = this.props.threadUsers
 
                     if (Object.keys(following).length) {
-                        Object.keys(following).map((pub) => {
+                        Object.keys(following).map(pub => {
                             if (!accounts.some(account => account.value === following[pub])) {
                                 accounts.push({
                                     icon: `https://atmosdb.novusphere.io/discussions/keyicon/${pub}`,
@@ -342,7 +342,6 @@ class Editor extends React.Component<IEditorProps, IEditorState> {
                             }
                         })
                     }
-
 
                     if (searchTerm.length === 0) {
                         renderList(accounts, searchTerm)
@@ -404,8 +403,8 @@ class Editor extends React.Component<IEditorProps, IEditorState> {
 
     componentWillUnmount(): void {
         const editor = this.ref.current.getEditor()
-        if (editor.getText()) {
-            window.alert("You have an unfinished post, are you sure you want to exit?")
+        if (!this.state.loading && editor.getText() !== '' && editor.getText() !== '\n') {
+            warnUserAboutContentRemaining()
         }
     }
 
@@ -426,6 +425,10 @@ class Editor extends React.Component<IEditorProps, IEditorState> {
             if (this.ref.current) {
                 this.ref.current.getEditor().enable()
             }
+        }
+
+        if (this.props.disabled !== nextProps.disabled) {
+            this.setLoading(nextProps.disabled)
         }
     }
 

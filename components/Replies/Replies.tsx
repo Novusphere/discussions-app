@@ -20,7 +20,7 @@ import {
     createPostObject,
     generateVoteObject,
     openInNewTab,
-    signPost,
+    signPost, sleep,
     transformTipsToTransfers,
     transformTipToMetadata,
     voteAsync,
@@ -351,9 +351,9 @@ const Replies: FunctionComponent<IRepliesProps> = props => {
 
                     postObject.myVote = [{ value: 1 }]
                     replyStore.reply.replies.push(postObject)
-                    replyStore.submitReplyLoading = false
                     replyStore.setReplyContent('')
                     replyStore.toggleReply()
+                    replyStore.submitReplyLoading = false
 
                     uiStore.showToast('Success', 'Your reply has been submitted', 'success', {
                         btn: (
@@ -672,6 +672,7 @@ const Replies: FunctionComponent<IRepliesProps> = props => {
                                         onChange={replyStore.setEditContent}
                                         value={replyStore.editingContent}
                                         threadUsers={props.threadUsers}
+                                        disabled={replyStore.submitEditLoading}
                                     />
                                     <div className={'flex flex-row justify-end pt2'}>
                                         <Button
@@ -697,6 +698,7 @@ const Replies: FunctionComponent<IRepliesProps> = props => {
                                     <Editor
                                         onChange={replyStore.setReplyContent}
                                         threadUsers={props.threadUsers}
+                                        disabled={replyStore.submitReplyLoading}
                                     />
                                     <div className={'flex flex-row justify-end pt2'}>
                                         <Button

@@ -40,7 +40,7 @@ import {
     getPermaLink,
     getThreadUrl,
     openInNewTab,
-    signPost,
+    signPost, sleep,
     transformTipsToTransfers,
     transformTipToMetadata,
     useInterval,
@@ -331,7 +331,6 @@ const PostPageComponentObserverable: React.FunctionComponent<IPostPageProps> = (
 
                     postObject.myVote = [{ value: 1 }]
                     postStore.replies.push(postObject)
-                    console.log(postStore.replies)
                     postStore.totalReplies += 1
                     postStore.submitReplyLoading = false
                     postStore.setReplyContent('')
@@ -730,6 +729,7 @@ const PostPageComponentObserverable: React.FunctionComponent<IPostPageProps> = (
                                             onChange={postStore.setEditingContent}
                                             value={postStore.editingContent}
                                             threadUsers={postStore.threadUsers}
+                                            disabled={postStore.submitEditLoading}
                                         />
                                         <div className={'flex flex-row justify-end pt2'}>
                                             <Button
@@ -865,7 +865,7 @@ const PostPageComponentObserverable: React.FunctionComponent<IPostPageProps> = (
                     postStore.replying && (
                         <div className={'mt3'} id={'reply'}>
                             <Editor
-                                disabled={postStore.editing}
+                                disabled={postStore.editing || postStore.submitReplyLoading}
                                 onChange={postStore.setReplyContent}
                                 threadUsers={postStore.threadUsers}
                                 value={postStore.replyingContent}

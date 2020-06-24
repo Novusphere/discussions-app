@@ -607,3 +607,7 @@ export const getSignatureAndSubmit = (robj: any, fromAddress: string) => {
         throw error
     }
 }
+
+export const warnUserAboutContentRemaining = () => {
+    window.alert("You have an unfinished post, are you sure you want to exit?")
+}

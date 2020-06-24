@@ -12,6 +12,7 @@ import {
     openInNewTab,
     pushToThread,
     signPost,
+    sleep,
 } from '@utils'
 import { discussions } from '@novuspherejs'
 import Helmet from 'react-helmet'
@@ -91,7 +92,12 @@ const NewPageNoSSRUnwrapped = ({ form, prefilledTag }: any) => {
                                 if (getThread) {
                                     if (int) {
                                         clearInterval(int)
+                                        form.setFieldsValue({
+                                            content: '',
+                                        })
+                                        await sleep(50)
                                         setLoading(false)
+                                        await sleep(50)
                                         const url = await pushToThread(submittedPost)
                                         const newId = encodeId(submittedPost.openingPost as any)
                                         userStore.toggleThreadWatch(newId, {
@@ -216,7 +222,7 @@ const NewPageNoSSRUnwrapped = ({ form, prefilledTag }: any) => {
                                 message: 'Please enter content for your post',
                             },
                         ],
-                    })(<Editor />)}
+                    })(<Editor disabled={loading} />)}
                 </Form.Item>
             </Form>
             <div className={'mt3 flex flex-row justify-end'}>
