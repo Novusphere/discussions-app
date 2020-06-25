@@ -237,6 +237,7 @@ const PostPreview: FunctionComponent<IPostPreviewProps> = ({
             <div
                 className={'flex flex-row f6 lh-copy black items-center flex-wrap justify-between'}
             >
+                {renderVotingHandles()}
                 <span className={'flex flex-row items-center'}>
                     {postIcon()}
                     {postSub()}
@@ -348,7 +349,6 @@ const PostPreview: FunctionComponent<IPostPreviewProps> = ({
                 }}
             >
                 <div className={'flex flex-row h-100'}>
-                    <div className={'bg-light-gray w2 ph2 pv4 z-2'}>{renderVotingHandles()}</div>
                     <div
                         className={cx([
                             'flex flex-column bg-white pa2 pa4-ns',
