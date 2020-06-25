@@ -402,9 +402,11 @@ class Editor extends React.Component<IEditorProps, IEditorState> {
     }
 
     componentWillUnmount(): void {
-        const editor = this.ref.current.getEditor()
-        if (!this.state.loading && editor.getText() !== '' && editor.getText() !== '\n') {
-            warnUserAboutContentRemaining()
+        if (this.ref && this.ref.current) {
+            const editor = this.ref.current.getEditor()
+            if (!this.state.loading && editor.getText() !== '' && editor.getText() !== '\n') {
+                warnUserAboutContentRemaining()
+            }
         }
     }
 
