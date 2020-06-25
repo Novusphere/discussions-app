@@ -312,15 +312,17 @@ const PostPreview: FunctionComponent<IPostPreviewProps> = ({
         return shouldBeCollapsed
             ? null
             : post && (
-                  <VotingHandles
-                      horizontal={horizontal}
-                      upVotes={postStore.upvotes}
-                      downVotes={postStore.downvotes}
-                      myVote={postStore.myVoteValue}
-                      uuid={post.uuid}
-                      handler={postStore.handleVote}
-                      {...props}
-                  />
+                  <object className={'relative z-5'}>
+                      <VotingHandles
+                          horizontal={horizontal}
+                          upVotes={postStore.upvotes}
+                          downVotes={postStore.downvotes}
+                          myVote={postStore.myVoteValue}
+                          uuid={post.uuid}
+                          handler={postStore.handleVote}
+                          {...props}
+                      />
+                  </object>
               )
     }
 
