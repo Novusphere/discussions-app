@@ -237,8 +237,8 @@ const PostPreview: FunctionComponent<IPostPreviewProps> = ({
             <div
                 className={'flex flex-row f6 lh-copy black items-center flex-wrap justify-between'}
             >
-                {renderVotingHandles()}
                 <span className={'flex flex-row items-center'}>
+                    {renderVotingHandles()}
                     {postIcon()}
                     {postSub()}
                     <Divider type={'vertical'} />
