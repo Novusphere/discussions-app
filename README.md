@@ -1,3 +1,7 @@
+# DEPRECATED
+
+Please See https://github.com/Novusphere/discussions-vue instead
+
 # discussions-app
 Implementation of Discussions 2.0 -- https://discussions.app
 
