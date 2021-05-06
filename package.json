@@ -52,7 +52,7 @@
         "react-transition-group": "4.3.0",
         "react-virtualized": "9.21.2",
         "remove-markdown": "0.3.0",
-        "sanitize-html": "1.20.1",
+        "sanitize-html": "2.3.2",
         "showdown": "1.9.1",
         "string.prototype.matchall": "4.0.2",
         "turndown": "5.0.3",
