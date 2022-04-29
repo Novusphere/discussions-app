@@ -5,7 +5,7 @@
         "@babel/runtime": "7.4.5",
         "aes-js": "3.1.2",
         "antd": "3.26.7",
-        "async": "3.1.1",
+        "async": "3.2.2",
         "axios": "0.19.0",
         "babel-plugin-import": "1.13.0",
         "big-integer": "1.6.44",
