@@ -35,7 +35,7 @@
         "mobx-persist": "0.4.1",
         "mobx-react": "6.1.4",
         "mobx-task": "2.0.0",
-        "moment": "2.24.0",
+        "moment": "2.29.4",
         "node-sass": "4.13.1",
         "null-loader": "3.0.0",
         "quill-magic-url": "1.0.3",
