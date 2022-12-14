@@ -21,7 +21,7 @@
         "eos-transit-tokenpocket-provider": "3.1.2",
         "eosjs": "20.0.0",
         "eosjs-ecc": "4.0.7",
-        "express": "4.17.1",
+        "express": "4.17.3",
         "extracted-loader": "1.0.7",
         "he": "1.2.0",
         "identicon.js": "2.3.3",
